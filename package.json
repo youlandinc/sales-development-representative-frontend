@@ -7,27 +7,29 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "clear-all": "rimraf ./.cache ./.next ./node_modules",
+    "prettier": "npx prettier --write .",
     "prepare": "husky"
   },
   "dependencies": {
     "next": "15.1.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "3.2.0",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@types/react": "19.0.3",
+    "@types/react-dom": "19.0.2",
+    "eslint": "9.17.0",
     "eslint-config-next": "15.1.4",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "postcss": "^8",
-    "prettier": "^3.4.2",
-    "typescript": "^5",
-    "typescript-eslint": "^8.18.0",
-    "husky": "^9.1.7"
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-react": "7.37.3",
+    "eslint-plugin-react-hooks": "5.1.0",
+    "husky": "9.1.7",
+    "lint-staged": "^15.3.0",
+    "prettier": "3.4.2",
+    "typescript": "5.7.2",
+    "typescript-eslint": "8.19.1"
   }
 }

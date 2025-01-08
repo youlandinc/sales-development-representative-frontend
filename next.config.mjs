@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-  },
+  env: {},
   reactStrictMode: false,
   trailingSlash: false,
   webpack(config) {
@@ -28,10 +27,10 @@ const nextConfig = {
     },
   },
   // logging: {
-    // fetches: {
-      // fullUrl: true,
-      // hmrRefresh: true,
-    // },
+  // fetches: {
+  // fullUrl: true,
+  // hmrRefresh: true,
+  // },
   // },
   // async redirects() {
   //   return [
