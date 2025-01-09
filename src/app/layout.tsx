@@ -1,8 +1,8 @@
 'use client';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 import NextTopLoader from 'nextjs-toploader';
-import { Container, CssBaseline, ThemeProvider } from '@mui/material';
+import { Container, CssBaseline, Stack, ThemeProvider } from '@mui/material';
 
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 
@@ -17,6 +17,13 @@ import { UserStoreProvider } from '@/provides';
 import { lightTheme } from '@/theme';
 import { useBreakpoints } from '@/hooks';
 import { StyledButton } from '@/components/atoms';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/atoms/StyledOTP/StyledOTP';
+
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 
 const RootLayout = ({
   children,
@@ -25,6 +32,8 @@ const RootLayout = ({
 }>) => {
   const router = useRouter();
   const breakpoints = useBreakpoints();
+
+  const [value, setValue] = useState('');
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -46,11 +55,26 @@ const RootLayout = ({
                     sign in
                   </StyledButton>
                   <StyledButton
-                    variant={'outlined'}
                     onClick={() => router.push('/auth/forget-password')}
+                    variant={'outlined'}
                   >
                     forget password
                   </StyledButton>
+                  <Stack>
+                    <InputOTP
+                      maxLength={4}
+                      onChange={(e) => setValue(e)}
+                      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                      value={value}
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0}></InputOTPSlot>
+                        <InputOTPSlot index={1}></InputOTPSlot>
+                        <InputOTPSlot index={2}></InputOTPSlot>
+                        <InputOTPSlot index={3}></InputOTPSlot>
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </Stack>
                 </Container>
                 {children}
               </UserStoreProvider>

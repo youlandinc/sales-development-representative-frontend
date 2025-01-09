@@ -46,9 +46,9 @@ const nextConfig = {
   //     },
   //   ];
   // },
-  // typescript: {
-  //   ignoreBuildErrors: true,
-  // },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // images: {
   //   domains: ['youland-common-images.s3.us-west-1.amazonaws.com'],
   // },

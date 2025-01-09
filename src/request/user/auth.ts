@@ -1,9 +1,9 @@
 import { post } from '@/request/request';
 import {
+  IUserLoginParams,
+  IUserResetPasswordParams,
   IUserSendCodeParams,
   IUserVerifyCodeParams,
-  IUserResetPasswordParams,
-  IUserLoginParams,
 } from '@/types';
 
 export const _userLogin = (params: IUserLoginParams) => {

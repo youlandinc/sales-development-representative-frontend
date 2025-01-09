@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { SxProps, TextField, StandardTextFieldProps } from '@mui/material';
+import { StandardTextFieldProps, SxProps, TextField } from '@mui/material';
 
 import { useBreakpoints } from '@/hooks';
 
@@ -21,6 +21,7 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
 
   return (
     <TextField
+      onChange={onChange}
       slotProps={{
         input: {
           ...rest.slotProps?.input,
@@ -34,7 +35,6 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
           component: 'div',
         },
       }}
-      onChange={onChange}
       sx={{
         width: '100%',
         borderRadius: 2,
