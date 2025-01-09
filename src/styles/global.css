@@ -1,0 +1,8 @@
+html,
+body {
+  box-sizing: border-box;
+}
+
+strong {
+  font-weight: 600;
+}

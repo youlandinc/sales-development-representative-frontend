@@ -12,6 +12,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { useRouter } from 'nextjs-toploader/app';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
+import { UserStoreProvider } from '@/provides';
+
 import { lightTheme } from '@/theme';
 import { useBreakpoints } from '@/hooks';
 import { StyledButton } from '@/components/atoms';
@@ -38,18 +40,20 @@ const RootLayout = ({
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <ThemeProvider theme={lightTheme}>
               <CssBaseline />
-              <Container sx={{ border: '1px solid' }}>
-                <StyledButton onClick={() => router.push('/auth/sign-in')}>
-                  sign in
-                </StyledButton>
-                <StyledButton
-                  variant={'outlined'}
-                  onClick={() => router.push('/auth/forget-password')}
-                >
-                  forget password
-                </StyledButton>
-              </Container>
-              {children}
+              <UserStoreProvider>
+                <Container sx={{ border: '1px solid' }}>
+                  <StyledButton onClick={() => router.push('/auth/sign-in')}>
+                    sign in
+                  </StyledButton>
+                  <StyledButton
+                    variant={'outlined'}
+                    onClick={() => router.push('/auth/forget-password')}
+                  >
+                    forget password
+                  </StyledButton>
+                </Container>
+                {children}
+              </UserStoreProvider>
             </ThemeProvider>
           </LocalizationProvider>
         </AppRouterCacheProvider>
