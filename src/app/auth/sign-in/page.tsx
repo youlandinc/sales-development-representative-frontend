@@ -43,11 +43,11 @@ const SignIn = () => {
       </Stack>
       <Stack>
         <StyledCheckbox
+          checked={checkbox}
           label={'I am checkbox'}
           onChange={(e, v) => {
             setCheckbox(v);
           }}
-          value={checkbox}
         />
       </Stack>
       <Stack>
@@ -57,7 +57,7 @@ const SignIn = () => {
         />
       </Stack>
       <Stack>
-        <StyledButton>I am Button</StyledButton>
+        <StyledButton>I am button</StyledButton>
       </Stack>
     </Container>
   );
