@@ -2,9 +2,10 @@ import { FC, ReactNode } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 import { toast, ToastT } from 'sonner';
 
+import { EnumHttpVariantType } from '@/types/enum';
+
 import ICON_SUCCESS from './assets/icon_success.svg';
 import ICON_ERROR from './assets/icon_error.svg';
-import { EnumHttpVariantType } from '@/types/enum';
 
 type IStyledToastProps = {
   message: ReactNode;

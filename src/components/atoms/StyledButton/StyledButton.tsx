@@ -36,8 +36,8 @@ export const StyledButton: FC<StyledButtonProps> = ({
           fontWeight: 600,
           lineHeight: 1.5,
           textTransform: 'none',
-          borderRadius: 3,
-          boxShadow: 'none',
+          borderRadius: 2,
+          boxShadow: '0px 1px 1px 0px rgba(73, 51, 173, 0.50)',
         },
         '&.MuiButton-contained': {
           bgcolor:
@@ -92,11 +92,11 @@ export const StyledButton: FC<StyledButtonProps> = ({
         },
         '&.MuiButton-sizeMedium': {
           px: 2.5,
-          height: 56,
+          height: 40,
         },
         '&.MuiButton-sizeSmall': {
           px: 1.5,
-          height: 40,
+          height: 32,
           fontSize: 14,
         },
         ...sx,

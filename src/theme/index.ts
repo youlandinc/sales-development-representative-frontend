@@ -132,7 +132,7 @@ const defaultOptions: ThemeOptions = {
       darker: '#3A5290',
       contrastText: '#FFFFFF',
       contrastHover: '#2B52B6',
-      contrastBackground: '#365EC6',
+      contrastBackground: '#6E4EFB',
     },
     secondary: {
       main: '#FFFFFF',

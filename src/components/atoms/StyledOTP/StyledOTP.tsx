@@ -3,7 +3,7 @@ import {
   ComponentPropsWithoutRef,
   ComponentRef,
   forwardRef,
-  useContext,
+  use,
   useEffect,
   useState,
 } from 'react';
@@ -128,7 +128,7 @@ export const StyledInputOTPSlot = forwardRef<
   ComponentPropsWithoutRef<'div'> & { index: number }
 >(({ index, className, ...props }, ref) => {
   const classes = useStyles();
-  const inputOTPContext = useContext(OTPInputContext);
+  const inputOTPContext = use(OTPInputContext);
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index];
 
   return (
