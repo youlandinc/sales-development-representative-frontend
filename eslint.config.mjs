@@ -1,14 +1,14 @@
 // import { dirname } from 'path';
 // import { FlatCompat } from '@eslint/eslintrc';
-import { fileURLToPath } from 'url'
-import js from '@eslint/js'
-import nextPlugin from '@next/eslint-plugin-next'
-import reactPlugin from 'eslint-plugin-react'
-import hooksPlugin from 'eslint-plugin-react-hooks'
-import tseslint from 'typescript-eslint'
-import eslintConfigPrettier from 'eslint-config-prettier'
+import { fileURLToPath } from 'url';
+import js from '@eslint/js';
+import nextPlugin from '@next/eslint-plugin-next';
+import reactPlugin from 'eslint-plugin-react';
+import hooksPlugin from 'eslint-plugin-react-hooks';
+import tseslint from 'typescript-eslint';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
-const __filename = fileURLToPath(import.meta.url)
+const __filename = fileURLToPath(import.meta.url);
 // const __dirname = dirname(__filename);
 //
 // const compat = new FlatCompat({
@@ -131,9 +131,9 @@ const eslintConfig = [
       '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
-]
+];
 
-export default eslintConfig
+export default eslintConfig;
 
 // **/.git
 // **/.svn
