@@ -6,4 +6,4 @@ export * from './StyledOTP';
 
 export * from './StyledCheckbox';
 
-export * from './ToastContainerProvider';
+export * from './StyledToast';

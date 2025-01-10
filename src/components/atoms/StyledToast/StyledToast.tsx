@@ -2,23 +2,26 @@ import { FC, ReactNode } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 import { toast, ToastT } from 'sonner';
 
-import { EnumHttpVariantType } from '@/types/enum';
+import { HttpVariantEnum } from '@/types';
 
 import ICON_SUCCESS from './assets/icon_success.svg';
 import ICON_ERROR from './assets/icon_error.svg';
+import ICON_CLOSE from './assets/icon_close.svg';
 
 type IStyledToastProps = {
+  id: string | number;
   message: ReactNode;
   description?: (() => ReactNode) | ReactNode;
-  type?: EnumHttpVariantType;
+  type?: HttpVariantEnum;
 };
 
 export const StyledToast: FC<IStyledToastProps> = ({
   message,
   type,
   description,
+  id,
 }) => {
-  const computedData = (type?: EnumHttpVariantType) => {
+  const computedData = (type?: HttpVariantEnum) => {
     switch (type) {
       case 'success':
         return {
@@ -35,18 +38,38 @@ export const StyledToast: FC<IStyledToastProps> = ({
     }
   };
 
-  computedData(EnumHttpVariantType.error);
-
   return (
     <Stack
       bgcolor={'background.white'}
-      border={'1px solid hsl(0, 0%, 93%)'}
+      border={'1px solid #E5E5E5'}
       borderRadius={3}
-      boxShadow={'0 4px 12px #0000001a'}
       gap={'4px'}
       p={2}
+      position={'relative'}
+      sx={{
+        '&:hover': {
+          '.icon_close': {
+            opacity: 1,
+          },
+        },
+      }}
       width={350}
     >
+      <Icon
+        className={'icon_close'}
+        component={ICON_CLOSE}
+        onClick={() => toast.dismiss(id)}
+        sx={{
+          width: 16,
+          height: 16,
+          position: 'absolute',
+          top: '-6px',
+          right: '-6px',
+          cursor: 'pointer',
+          opacity: 0,
+          transition: 'opacity .3s',
+        }}
+      />
       <Stack flexDirection={'row'} gap={'4px'}>
         {computedData(type).icon && (
           <Icon
@@ -85,13 +108,18 @@ type ExternalToast = Omit<
 
 export const customToast = (
   message: ReactNode,
-  type?: EnumHttpVariantType,
+  type?: HttpVariantEnum,
   description?: (() => ReactNode) | ReactNode,
   data?: ExternalToast,
 ) => {
-  toast.custom((_id) => {
+  toast.custom((id) => {
     return (
-      <StyledToast description={description} message={message} type={type} />
+      <StyledToast
+        description={description}
+        id={id}
+        message={message}
+        type={type}
+      />
     );
   }, data);
 };
