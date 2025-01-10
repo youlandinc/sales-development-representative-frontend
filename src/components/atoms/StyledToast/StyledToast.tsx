@@ -15,29 +15,29 @@ type IStyledToastProps = {
   type?: HttpVariantEnum;
 };
 
+const computedData = (type?: HttpVariantEnum) => {
+  switch (type) {
+    case 'success':
+      return {
+        icon: ICON_SUCCESS,
+        color: '#369B7C',
+      };
+    case 'error':
+      return { icon: ICON_ERROR, color: '#E26E6E' };
+    default:
+      return {
+        icon: null,
+        color: '#160F33',
+      };
+  }
+};
+
 export const StyledToast: FC<IStyledToastProps> = ({
   message,
   type,
   description,
   id,
 }) => {
-  const computedData = (type?: HttpVariantEnum) => {
-    switch (type) {
-      case 'success':
-        return {
-          icon: ICON_SUCCESS,
-          color: '#369B7C',
-        };
-      case 'error':
-        return { icon: ICON_ERROR, color: '#E26E6E' };
-      default:
-        return {
-          icon: null,
-          color: '#160F33',
-        };
-    }
-  };
-
   return (
     <Stack
       bgcolor={'background.white'}
