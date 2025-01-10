@@ -1,59 +1,148 @@
 'use client';
-
-import * as React from 'react';
+import {
+  ComponentPropsWithoutRef,
+  ComponentRef,
+  forwardRef,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { OTPInput, OTPInputContext } from 'input-otp';
-import { clsx } from 'clsx';
+import { createUseStyles } from 'react-jss';
 
-const InputOTP = React.forwardRef<
-  React.ElementRef<typeof OTPInput>,
-  React.ComponentPropsWithoutRef<typeof OTPInput>
->(({ className, containerClassName, ...props }, ref) => (
-  <OTPInput
-    className={clsx('disabled:cursor-not-allowed', className)}
-    containerClassName={clsx(
-      'flex items-center gap-2 has-[:disabled]:opacity-50',
-      containerClassName,
-    )}
-    ref={ref}
-    {...props}
-  />
-));
-InputOTP.displayName = 'InputOTP';
+// Default theme variables
+const theme = {
+  '--input': '#e2e8f0', // slate-200
+  '--ring': '#94a3b8', // slate-400
+  '--background': '#ffffff', // white
+  '--foreground': '#0f172a', // slate-900
+};
 
-const InputOTPGroup = React.forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<'div'>
->(({ className, ...props }, ref) => (
-  <div className={clsx('flex items-center', className)} ref={ref} {...props} />
-));
-InputOTPGroup.displayName = 'InputOTPGroup';
+const useStyles = createUseStyles({
+  '@global': {
+    ':root': theme,
+  },
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    '&:has(:disabled)': {
+      opacity: 0.5,
+    },
+  },
+  input: {
+    '&:disabled': {
+      cursor: 'not-allowed',
+    },
+  },
+  group: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  slot: {
+    position: 'relative',
+    display: 'flex',
+    height: '32px',
+    width: '32px',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTop: '1px solid var(--input)',
+    borderBottom: '1px solid var(--input)',
+    borderRight: '1px solid var(--input)',
+    fontSize: '16px',
+    transition: 'all 0.2s',
+    backgroundColor: 'var(--background)',
+    color: 'var(--foreground)',
+    '&:first-child': {
+      borderTopLeftRadius: '4px',
+      borderBottomLeftRadius: '4px',
+      borderLeft: '1px solid var(--input)',
+    },
+    '&:last-child': {
+      borderTopRightRadius: '4px',
+      borderBottomRightRadius: '4px',
+    },
+  },
+  activeSlot: {
+    zIndex: 10,
+    boxShadow: '0 0 0 1px var(--ring), 0 0 0 1px var(--background)',
+  },
+  caret: {
+    pointerEvents: 'none',
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  caretBlink: {
+    height: '1rem',
+    width: '1px',
+    backgroundColor: 'var(--foreground)',
+    animation: '$caretBlink 1s step-end infinite',
+  },
+  '@keyframes caretBlink': {
+    'from, to': {
+      opacity: 1,
+    },
+    '50%': {
+      opacity: 0,
+    },
+  },
+});
 
-const InputOTPSlot = React.forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<'div'> & { index: number }
+export const StyledInputOTP = forwardRef<
+  ComponentRef<typeof OTPInput>,
+  ComponentPropsWithoutRef<typeof OTPInput>
+>(({ className, containerClassName, ...props }, ref) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const classes = useStyles();
+
+  return isClient ? (
+    <OTPInput
+      className={`${classes.input} ${className}`}
+      containerClassName={`${classes.container} ${containerClassName}`}
+      ref={ref}
+      {...props}
+    />
+  ) : null;
+});
+
+export const StyledInputOTPGroup = forwardRef<
+  ComponentRef<'div'>,
+  ComponentPropsWithoutRef<'div'>
+>(({ className, ...props }, ref) => {
+  const classes = useStyles();
+  return (
+    <div className={`${classes.group} ${className}`} ref={ref} {...props} />
+  );
+});
+
+export const StyledInputOTPSlot = forwardRef<
+  ComponentRef<'div'>,
+  ComponentPropsWithoutRef<'div'> & { index: number }
 >(({ index, className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(OTPInputContext);
+  const classes = useStyles();
+  const inputOTPContext = useContext(OTPInputContext);
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index];
 
   return (
     <div
-      className={clsx(
-        'relative flex h-9 w-9 items-center justify-center border-y border-r border-input text-sm shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
-        isActive && 'z-10 ring-1 ring-ring',
-        className,
-      )}
+      className={`${classes.slot} ${isActive ? classes.activeSlot : ''} ${className}`}
       ref={ref}
       {...props}
     >
       {char}
       {hasFakeCaret && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-4 w-px animate-caret-blink bg-foreground duration-1000" />
+        <div className={classes.caret}>
+          <div className={classes.caretBlink} />
         </div>
       )}
     </div>
   );
 });
-InputOTPSlot.displayName = 'InputOTPSlot';
-
-export { InputOTP, InputOTPGroup, InputOTPSlot };

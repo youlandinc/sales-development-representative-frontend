@@ -1,8 +1,8 @@
 'use client';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 
 import NextTopLoader from 'nextjs-toploader';
-import { Container, CssBaseline, Stack, ThemeProvider } from '@mui/material';
+import { Container, CssBaseline, ThemeProvider } from '@mui/material';
 
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 
@@ -14,16 +14,12 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
 import { UserStoreProvider } from '@/provides';
 
+import '@/styles/global.css';
+
 import { lightTheme } from '@/theme';
 import { useBreakpoints } from '@/hooks';
-import { StyledButton } from '@/components/atoms';
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from '@/components/atoms/StyledOTP/StyledOTP';
 
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+import { StyledButton } from '@/components/atoms';
 
 const RootLayout = ({
   children,
@@ -32,8 +28,6 @@ const RootLayout = ({
 }>) => {
   const router = useRouter();
   const breakpoints = useBreakpoints();
-
-  const [value, setValue] = useState('');
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -45,12 +39,14 @@ const RootLayout = ({
           height={2}
           shadow={'none'}
         />
-        <AppRouterCacheProvider options={{ key: 'css', enableCssLayer: true }}>
+        <AppRouterCacheProvider
+          options={{ key: 'css', enableCssLayer: true, prepend: true }}
+        >
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <ThemeProvider theme={lightTheme}>
               <CssBaseline />
               <UserStoreProvider>
-                <Container sx={{ border: '1px solid' }}>
+                <Container>
                   <StyledButton onClick={() => router.push('/auth/sign-in')}>
                     sign in
                   </StyledButton>
@@ -60,21 +56,12 @@ const RootLayout = ({
                   >
                     forget password
                   </StyledButton>
-                  <Stack>
-                    <InputOTP
-                      maxLength={4}
-                      onChange={(e) => setValue(e)}
-                      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                      value={value}
-                    >
-                      <InputOTPGroup>
-                        <InputOTPSlot index={0}></InputOTPSlot>
-                        <InputOTPSlot index={1}></InputOTPSlot>
-                        <InputOTPSlot index={2}></InputOTPSlot>
-                        <InputOTPSlot index={3}></InputOTPSlot>
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </Stack>
+                  <StyledButton
+                    onClick={() => router.push('/')}
+                    variant={'text'}
+                  >
+                    home
+                  </StyledButton>
                 </Container>
                 {children}
               </UserStoreProvider>
