@@ -42,17 +42,18 @@ const useStyles = createUseStyles({
   slot: {
     position: 'relative',
     display: 'flex',
-    height: '32px',
-    width: '32px',
+    height: '48px',
+    width: '48px',
     alignItems: 'center',
     justifyContent: 'center',
     borderTop: '1px solid var(--input)',
     borderBottom: '1px solid var(--input)',
     borderRight: '1px solid var(--input)',
     fontSize: '16px',
+    fontWeight: 600,
     transition: 'all 0.2s',
     backgroundColor: 'var(--background)',
-    color: 'var(--foreground)',
+    color: '#202939',
     '&:first-child': {
       borderTopLeftRadius: '4px',
       borderBottomLeftRadius: '4px',
@@ -70,10 +71,10 @@ const useStyles = createUseStyles({
   caret: {
     pointerEvents: 'none',
     position: 'absolute',
-    inset: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    inset: 0,
   },
   caretBlink: {
     height: '1rem',
@@ -91,7 +92,7 @@ const useStyles = createUseStyles({
   },
 });
 
-export const StyledInputOTP = forwardRef<
+export const StyledOTP = forwardRef<
   ComponentRef<typeof OTPInput>,
   ComponentPropsWithoutRef<typeof OTPInput>
 >(({ className, containerClassName, ...props }, ref) => {
@@ -113,7 +114,7 @@ export const StyledInputOTP = forwardRef<
   ) : null;
 });
 
-export const StyledInputOTPGroup = forwardRef<
+export const StyledOTPGroup = forwardRef<
   ComponentRef<'div'>,
   ComponentPropsWithoutRef<'div'>
 >(({ className, ...props }, ref) => {
@@ -123,7 +124,7 @@ export const StyledInputOTPGroup = forwardRef<
   );
 });
 
-export const StyledInputOTPSlot = forwardRef<
+export const StyledOTPSlot = forwardRef<
   ComponentRef<'div'>,
   ComponentPropsWithoutRef<'div'> & { index: number }
 >(({ index, className, ...props }, ref) => {

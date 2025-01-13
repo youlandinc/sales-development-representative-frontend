@@ -1,9 +1,11 @@
 export * from './StyledButton';
 
-export * from './StyledTextField';
+export * from './StyledCheckbox';
+
+export * from './StyledDialog';
 
 export * from './StyledOTP';
 
-export * from './StyledCheckbox';
+export * from './StyledTextField';
 
 export * from './StyledToast';

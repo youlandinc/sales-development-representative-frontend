@@ -217,7 +217,7 @@ const defaultOptions: ThemeOptions = {
       button_contained_secondary_shadow: '',
       button_outlined_secondary_shadow: '',
       button_contained_info_shadow: '',
-      button_outlined_info_shadow: '',
+      button_outlined_info_shadow: ' 0px 1px 1px 0px rgba(72, 72, 72, 0.50)',
       button_contained_success_shadow: '',
       button_outlined_success_shadow: '',
       button_contained_warning_shadow: '',

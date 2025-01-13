@@ -1,7 +1,15 @@
+import { useState } from 'react';
 import { Stack, Typography } from '@mui/material';
-import { StyledButton, StyledTextField } from '@/components/atoms';
+import {
+  StyledButton,
+  StyledTextField,
+  StyledTextFieldPassword,
+} from '@/components/atoms';
 
 export const SetPassword = () => {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   return (
     <Stack
       alignItems={'center'}
@@ -24,6 +32,16 @@ export const SetPassword = () => {
           Set password
         </Typography>
         <Stack gap={3}>
+          <StyledTextFieldPassword
+            label={'New password'}
+            onChange={(e) => setNewPassword(e.target.value)}
+            value={newPassword}
+          />
+          <StyledTextFieldPassword
+            label={'Confirm password'}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={confirmPassword}
+          />
           <StyledTextField label={'New password'} />
           <StyledTextField label={'Confirm password'} />
 

@@ -1,13 +1,29 @@
 'use client';
+import { useState } from 'react';
 import { Stack, Typography } from '@mui/material';
+import { useRouter } from 'nextjs-toploader/app';
 
 import {
   StyledButton,
   StyledCheckbox,
   StyledTextField,
+  StyledTextFieldPassword,
 } from '@/components/atoms';
 
 export const SignIn = () => {
+  const router = useRouter();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const onClickToForgetPassword = () => {
+    router.push('/auth/forget-password');
+  };
+
+  const onClickToLogin = () => {
+    console.log('login');
+  };
+
   return (
     <Stack
       alignItems={'center'}
@@ -40,8 +56,16 @@ export const SignIn = () => {
         </Stack>
 
         <Stack gap={3}>
-          <StyledTextField label={'Email'} />
-          <StyledTextField label={'Password'} />
+          <StyledTextField
+            label={'Email'}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
+          />
+          <StyledTextFieldPassword
+            label={'Password'}
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+          />
 
           <Stack flexDirection={'row'}>
             <StyledCheckbox
@@ -54,6 +78,7 @@ export const SignIn = () => {
             <Typography
               color={'text.secondary'}
               ml={'auto'}
+              onClick={onClickToForgetPassword}
               sx={{ cursor: 'pointer' }}
               variant={'body2'}
             >
@@ -61,7 +86,7 @@ export const SignIn = () => {
             </Typography>
           </Stack>
 
-          <StyledButton>Log in</StyledButton>
+          <StyledButton onClick={onClickToLogin}>Log in</StyledButton>
         </Stack>
       </Stack>
     </Stack>

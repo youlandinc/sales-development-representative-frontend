@@ -2,10 +2,10 @@
 // import { FlatCompat } from '@eslint/eslintrc';
 // import { fileURLToPath } from 'url';
 import js from '@eslint/js'
-import nextPlugin from '@next/eslint-plugin-next'
 import reactPlugin from 'eslint-plugin-react'
 import hooksPlugin from 'eslint-plugin-react-hooks'
 import tseslint from 'typescript-eslint'
+import nextPlugin from '@next/eslint-plugin-next'
 import eslintConfigPrettier from 'eslint-config-prettier'
 
 // const __filename = fileURLToPath(import.meta.url);
@@ -124,6 +124,7 @@ const eslintConfig = [
       ],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 1,
+      'react/no-unescaped-entities': 'error',
       'no-void': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
