@@ -4,7 +4,7 @@ export const fetchCache = 'force-no-store';
 import { SignIn } from '@/components/molecules';
 
 const SignInPage = () => {
-  return <SignIn></SignIn>;
+  return <SignIn />;
 };
 
 export default SignInPage;

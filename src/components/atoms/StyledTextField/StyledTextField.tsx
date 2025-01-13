@@ -1,8 +1,6 @@
 import { FC } from 'react';
 import { StandardTextFieldProps, SxProps, TextField } from '@mui/material';
 
-import { useBreakpoints } from '@/hooks';
-
 export interface StyledTextFieldProps
   extends Omit<StandardTextFieldProps, 'variant'> {
   sx?: SxProps;
@@ -15,13 +13,13 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
   onChange,
   variant = 'outlined',
   disabledAutoFill = true,
+  size = 'medium',
   ...rest
 }) => {
-  const breakpoints = useBreakpoints();
-
   return (
     <TextField
       onChange={onChange}
+      size={size}
       slotProps={{
         input: {
           ...rest.slotProps?.input,
@@ -44,6 +42,15 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
           '& span': {
             color: 'text.focus',
           },
+        },
+        '& .MuiInputLabel-outlined': {
+          transform: 'translate(14px, 12px) scale(1)',
+        },
+        '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
+          transform: 'translate(14px, -8px) scale(0.75)',
+        },
+        '& .MuiOutlinedInput-input': {
+          padding: '12.5px 14px',
         },
         '& .MuiOutlinedInput-root': {
           borderRadius: 2,

@@ -57,6 +57,12 @@ const RootLayout = ({
                     forget password
                   </StyledButton>
                   <StyledButton
+                    onClick={() => router.push('/auth/set-password')}
+                    variant={'outlined'}
+                  >
+                    set password
+                  </StyledButton>
+                  <StyledButton
                     onClick={() => router.push('/')}
                     variant={'text'}
                   >

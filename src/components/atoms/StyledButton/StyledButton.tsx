@@ -23,6 +23,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
   variant = 'contained',
   children,
   color = 'primary',
+  size = 'large',
   ...rest
 }) => {
   return (
@@ -30,6 +31,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
       color={color}
       disabled={disabled || loading}
       onClick={onClick}
+      size={size}
       sx={{
         '&.MuiButton-root': {
           fontSize: 16,
@@ -37,7 +39,12 @@ export const StyledButton: FC<StyledButtonProps> = ({
           lineHeight: 1.5,
           textTransform: 'none',
           borderRadius: 2,
-          boxShadow: '0px 1px 1px 0px rgba(73, 51, 173, 0.50)',
+          boxShadow: (theme) => {
+            if (variant === 'text' || color === 'inherit') {
+              return 'none';
+            }
+            return theme.palette.boxShadow[`button_${variant}_${color}_shadow`];
+          },
         },
         '&.MuiButton-contained': {
           bgcolor:
@@ -90,14 +97,20 @@ export const StyledButton: FC<StyledButtonProps> = ({
         '&.MuiButton-outlinedInfo, &.MuiButton-textInfo': {
           color: 'text.primary',
         },
-        '&.MuiButton-sizeMedium': {
+        '&.MuiButton-sizeLarge': {
           px: 2.5,
-          height: 40,
+          height: 48,
+          fontSize: 16,
+        },
+        '&.MuiButton-sizeMedium': {
+          px: 2,
+          height: 32,
+          fontSize: 14,
         },
         '&.MuiButton-sizeSmall': {
           px: 1.5,
-          height: 32,
-          fontSize: 14,
+          height: 24,
+          fontSize: 12,
         },
         ...sx,
       }}
