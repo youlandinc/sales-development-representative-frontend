@@ -7,6 +7,7 @@ import { HttpVariantEnum } from '@/types';
 import ICON_SUCCESS from './assets/icon_success.svg';
 import ICON_ERROR from './assets/icon_error.svg';
 import ICON_CLOSE from './assets/icon_close.svg';
+import ICON_WARNING from './assets/icon_warning.svg';
 
 // header => message
 // variant => type
@@ -28,6 +29,11 @@ const computedData = (variant?: HttpVariantEnum) => {
       };
     case HttpVariantEnum.error:
       return { icon: ICON_ERROR, color: '#E26E6E' };
+    case HttpVariantEnum.warning:
+      return {
+        icon: ICON_WARNING,
+        color: '#F9A240',
+      };
     default:
       return {
         icon: null,
