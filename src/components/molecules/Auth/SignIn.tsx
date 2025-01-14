@@ -3,12 +3,19 @@ import { useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
+import { UEncode } from '@/utils';
+import { APP_KEP } from '@/constant';
+
 import {
+  SDRToast,
   StyledButton,
   StyledCheckbox,
   StyledTextField,
   StyledTextFieldPassword,
 } from '@/components/atoms';
+
+import { _userLogin } from '@/request';
+import { HttpError, LoginTypeEnum } from '@/types';
 
 export const SignIn = () => {
   const router = useRouter();
@@ -20,8 +27,23 @@ export const SignIn = () => {
     router.push('/auth/forget-password');
   };
 
-  const onClickToLogin = () => {
-    console.log('login');
+  const onClickToLogin = async () => {
+    const postData = {
+      appkey: APP_KEP,
+      loginType: LoginTypeEnum.ylaccount_login,
+      emailParam: {
+        account: email,
+        password,
+      },
+    };
+
+    try {
+      const { data } = await _userLogin(postData);
+      console.log(data);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
   };
 
   return (

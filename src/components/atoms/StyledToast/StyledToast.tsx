@@ -8,21 +8,25 @@ import ICON_SUCCESS from './assets/icon_success.svg';
 import ICON_ERROR from './assets/icon_error.svg';
 import ICON_CLOSE from './assets/icon_close.svg';
 
+// header => message
+// variant => type
+// message => description
+
 type IStyledToastProps = {
   id: string | number;
-  message: ReactNode;
-  description?: (() => ReactNode) | ReactNode;
-  type?: HttpVariantEnum;
+  header: ReactNode | (() => ReactNode);
+  message?: (() => ReactNode) | ReactNode;
+  variant?: HttpVariantEnum;
 };
 
-const computedData = (type?: HttpVariantEnum) => {
-  switch (type) {
-    case 'success':
+const computedData = (variant?: HttpVariantEnum) => {
+  switch (variant) {
+    case HttpVariantEnum.success:
       return {
         icon: ICON_SUCCESS,
         color: '#369B7C',
       };
-    case 'error':
+    case HttpVariantEnum.error:
       return { icon: ICON_ERROR, color: '#E26E6E' };
     default:
       return {
@@ -33,9 +37,9 @@ const computedData = (type?: HttpVariantEnum) => {
 };
 
 export const StyledToast: FC<IStyledToastProps> = ({
+  header,
+  variant,
   message,
-  type,
-  description,
   id,
 }) => {
   return (
@@ -71,28 +75,28 @@ export const StyledToast: FC<IStyledToastProps> = ({
         }}
       />
       <Stack flexDirection={'row'} gap={'4px'}>
-        {computedData(type).icon && (
+        {computedData(variant).icon && (
           <Icon
-            component={computedData(type).icon}
+            component={computedData(variant).icon}
             sx={{ width: 20, height: 20 }}
           />
         )}
         <Typography
-          color={computedData(type).color}
+          color={computedData(variant).color}
           component={'div'}
           variant={'subtitle2'}
         >
-          {message}
+          {typeof header === 'function' ? header() : header}
         </Typography>
       </Stack>
-      {description && (
+      {message && (
         <Typography
           color={'#7D7D7F'}
           component={'div'}
-          pl={computedData(type).icon ? 3 : 0}
+          pl={computedData(variant).icon ? 3 : 0}
           variant={'body2'}
         >
-          {typeof description === 'function' ? description() : description}
+          {typeof message === 'function' ? message() : message}
         </Typography>
       )}
     </Stack>
@@ -106,20 +110,27 @@ type ExternalToast = Omit<
   id?: number | string;
 };
 
-export const customToast = (
-  message: ReactNode,
-  type?: HttpVariantEnum,
-  description?: (() => ReactNode) | ReactNode,
-  data?: ExternalToast,
-) => {
+type ISDRToastParams = {
+  header: ReactNode;
+  variant: HttpVariantEnum;
+  message: (() => ReactNode) | ReactNode;
+  data?: ExternalToast;
+};
+
+export const SDRToast = ({
+  data: config,
+  header,
+  variant,
+  message,
+}: ISDRToastParams) => {
   toast.custom((id) => {
     return (
       <StyledToast
-        description={description}
+        header={header || message}
         id={id}
-        message={message}
-        type={type}
+        message={header ? message : ''}
+        variant={variant}
       />
     );
-  }, data);
+  }, config);
 };

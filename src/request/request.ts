@@ -28,7 +28,9 @@ service.interceptors.request.use(
     const token =
       accessToken || localStorage?.getItem('USER_LOGIN_INFORMATION');
 
-    config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {

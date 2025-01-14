@@ -20,6 +20,7 @@ import { lightTheme } from '@/theme';
 import { useBreakpoints } from '@/hooks';
 
 import { StyledButton } from '@/components/atoms';
+import { ToastProvider } from '@/provides/ToastProvider';
 
 const RootLayout = ({
   children,
@@ -45,6 +46,7 @@ const RootLayout = ({
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <ThemeProvider theme={lightTheme}>
               <CssBaseline />
+              <ToastProvider />
               <UserStoreProvider>
                 <Container>
                   <StyledButton onClick={() => router.push('/auth/sign-in')}>
