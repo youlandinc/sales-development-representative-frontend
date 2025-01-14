@@ -1,1 +1,1 @@
-export const APP_KEP = 'vTKezhEvcLbJNwVfeqXe';
+export const APP_KEY = 'vTKezhEvcLbJNwVfeqXe';

@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { UEncode } from '@/utils';
-import { APP_KEP } from '@/constant';
+import { UDecode, UEncode } from '@/utils';
+import { APP_KEY } from '@/constant';
 
 import {
   SDRToast,
@@ -16,12 +16,19 @@ import {
 
 import { _userLogin } from '@/request';
 import { HttpError, LoginTypeEnum } from '@/types';
+import { useUserStore } from '@/provides';
 
 export const SignIn = () => {
   const router = useRouter();
+  const { setAccessToken, setAccountId, isHydration } = useUserStore(
+    (state) => state,
+  );
+
+  const [loading, setLoading] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   const onClickToForgetPassword = () => {
     router.push('/auth/forget-password');
@@ -29,22 +36,42 @@ export const SignIn = () => {
 
   const onClickToLogin = async () => {
     const postData = {
-      appkey: APP_KEP,
+      appkey: APP_KEY,
       loginType: LoginTypeEnum.ylaccount_login,
       emailParam: {
         account: email,
-        password,
+        password: UEncode(password),
       },
     };
 
+    if (rememberMe) {
+      localStorage.setItem(UEncode('email'), UEncode(email));
+      localStorage.setItem(UEncode('password'), UEncode(password));
+    }
+
+    setLoading(true);
     try {
-      const { data } = await _userLogin(postData);
-      console.log(data);
+      const {
+        data: {
+          accessToken,
+          userProfile: { accountId },
+        },
+      } = await _userLogin(postData);
+      setAccessToken(accessToken);
+      setAccountId(accountId);
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setEmail(UDecode(localStorage.getItem(UEncode('email')) || ''));
+    setPassword(UDecode(localStorage.getItem(UEncode('password')) || ''));
+    setRememberMe(!!localStorage.getItem(UEncode('email')));
+  }, []);
 
   return (
     <Stack
@@ -58,8 +85,13 @@ export const SignIn = () => {
         bgcolor={'#ffffff'}
         border={'1px solid #E5E5E5'}
         borderRadius={4}
+        component={'form'}
         gap={6}
         maxWidth={600}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await onClickToLogin();
+        }}
         px={5}
         py={7.5}
         width={'100%'}
@@ -79,23 +111,29 @@ export const SignIn = () => {
 
         <Stack gap={3}>
           <StyledTextField
+            disabled={loading}
             label={'Email'}
             onChange={(e) => setEmail(e.target.value)}
+            required
             value={email}
           />
           <StyledTextFieldPassword
+            disabled={loading}
             label={'Password'}
             onChange={(e) => setPassword(e.target.value)}
+            required
             value={password}
           />
 
           <Stack flexDirection={'row'}>
             <StyledCheckbox
+              checked={rememberMe}
               label={
                 <Typography color={'text.secondary'} ml={1} variant={'body2'}>
                   Remember me
                 </Typography>
               }
+              onChange={(e, checked) => setRememberMe(checked)}
             />
             <Typography
               color={'text.secondary'}
@@ -108,7 +146,9 @@ export const SignIn = () => {
             </Typography>
           </Stack>
 
-          <StyledButton onClick={onClickToLogin}>Log in</StyledButton>
+          <StyledButton disabled={loading} loading={loading} type={'submit'}>
+            Log in
+          </StyledButton>
         </Stack>
       </Stack>
     </Stack>

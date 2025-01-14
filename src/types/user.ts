@@ -28,7 +28,7 @@ export interface IUserSendCodeParams {
 
 export interface IUserVerifyCodeParams {
   email: string;
-  appKey: string;
+  appkey: string;
   code: string;
   bizType: BizTypeEnum;
 }

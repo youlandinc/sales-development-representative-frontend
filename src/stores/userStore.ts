@@ -12,6 +12,7 @@ export type UserStoreState = {
 export type UserStoreActions = {
   setIsHydration: (isHydration: boolean) => void;
   setAccessToken: (accessToken: string) => void;
+  setAccountId: (accountId: string) => void;
 };
 
 export type UserStore = UserStoreState & UserStoreActions;
@@ -30,10 +31,11 @@ export const createUserStore = (
   return createStore<UserStore>()(
     devtools(
       persist(
-        (set, get) => ({
+        (set) => ({
           ...initState,
           setIsHydration: (isHydration: boolean) => set({ isHydration }),
           setAccessToken: (accessToken: string) => set({ accessToken }),
+          setAccountId: (accountId: string) => set({ accountId }),
         }),
         {
           name: 'PERSIST_DATA',

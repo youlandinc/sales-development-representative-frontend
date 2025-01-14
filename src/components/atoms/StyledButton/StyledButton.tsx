@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Button, ButtonProps, CircularProgress } from '@mui/material';
+import { StyledLoading } from '@/components/atoms/StyledLoading/StyledLoading';
 
 interface StyledButtonPropsWithDisabled extends ButtonProps {
   loading?: boolean;
@@ -121,14 +122,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
         loadingText ? (
           loadingText
         ) : (
-          <CircularProgress
-            sx={{
-              color: 'action.loading',
-              m: '0 auto',
-              height: '24px !important',
-              width: '24px !important',
-            }}
-          />
+          <StyledLoading size={size} />
         )
       ) : (
         children
