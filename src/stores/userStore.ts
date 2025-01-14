@@ -2,9 +2,7 @@ import { createStore } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
 export type UserStoreState = {
-  isAuth: boolean;
   isHydration: boolean;
-  initialized: boolean;
   accessToken: string;
   accountId: string;
 };
@@ -18,9 +16,7 @@ export type UserStoreActions = {
 export type UserStore = UserStoreState & UserStoreActions;
 
 export const defaultInitState: UserStoreState = {
-  isAuth: false,
   isHydration: false,
-  initialized: false,
   accessToken: '',
   accountId: '',
 };
