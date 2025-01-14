@@ -1,5 +1,5 @@
 'use client';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
@@ -20,9 +20,7 @@ import { useUserStore } from '@/provides';
 
 export const SignIn = () => {
   const router = useRouter();
-  const { setAccessToken, setAccountId, isHydration } = useUserStore(
-    (state) => state,
-  );
+  const { setAccessToken, setAccountId } = useUserStore((state) => state);
 
   const [loading, setLoading] = useState(false);
 

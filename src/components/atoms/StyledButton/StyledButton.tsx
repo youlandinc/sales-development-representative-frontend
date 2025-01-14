@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Button, ButtonProps, CircularProgress } from '@mui/material';
+import { Button, ButtonProps } from '@mui/material';
 import { StyledLoading } from '@/components/atoms/StyledLoading/StyledLoading';
 
 interface StyledButtonPropsWithDisabled extends ButtonProps {
