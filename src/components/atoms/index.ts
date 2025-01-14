@@ -9,3 +9,5 @@ export * from './StyledOTP';
 export * from './StyledTextField';
 
 export * from './StyledToast';
+
+export * from './StyledDatePicker';
