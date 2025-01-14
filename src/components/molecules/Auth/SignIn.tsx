@@ -5,6 +5,7 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { UDecode, UEncode } from '@/utils';
 import { APP_KEY } from '@/constant';
+import { useUserStore } from '@/provides';
 
 import {
   SDRToast,
@@ -16,7 +17,6 @@ import {
 
 import { _userLogin } from '@/request';
 import { HttpError, LoginTypeEnum } from '@/types';
-import { useUserStore } from '@/provides';
 
 export const SignIn = () => {
   const router = useRouter();
