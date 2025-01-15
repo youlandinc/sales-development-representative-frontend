@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { Box, Icon, Stack, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { LAYOUT_SIDE_MENU } from './StyledLayout.data';
 
@@ -9,6 +10,7 @@ import { StyledButton } from '@/components/atoms';
 import ICON_EXPEND from './assets/icon_expend.svg';
 
 export const StyledLayoutSide: FC = () => {
+  const router = useRouter();
   const pathname = usePathname();
 
   const [expend, setExpend] = useState(true);
@@ -85,10 +87,37 @@ export const StyledLayoutSide: FC = () => {
               gap={0.5}
               justifyContent={expend ? 'unset' : 'center'}
               key={`${item.key}-${index}`}
+              onClick={() => router.push(item.url)}
               py={1.5}
-              sx={{ cursor: 'pointer' }}
+              sx={{
+                cursor: 'pointer',
+                transitions: 'all .3s',
+                '& .icon': {
+                  '& path': {
+                    fill: pathname.includes(item.key) ? '' : '#6F6C7D',
+                  },
+                },
+                '& .label': {
+                  color: pathname.includes(item.key)
+                    ? 'primary.main'
+                    : 'text.primary',
+                },
+                '&:hover': {
+                  '& .icon': {
+                    '& path': {
+                      fill: pathname.includes(item.key) ? '' : '#6F6C7D',
+                    },
+                  },
+                  '& .label': {
+                    color: pathname.includes(item.key)
+                      ? 'primary.main'
+                      : '#6F6C7D',
+                  },
+                },
+              }}
             >
               <Icon
+                className={'icon'}
                 component={
                   pathname.includes(item.key)
                     ? item.activeIcon
@@ -97,15 +126,7 @@ export const StyledLayoutSide: FC = () => {
               />
 
               {expend && (
-                <Typography
-                  color={
-                    pathname.includes(item.key)
-                      ? 'primary.main'
-                      : 'text.primary'
-                  }
-                  mb={0.5}
-                  variant={'body2'}
-                >
+                <Typography className={'label'} mb={0.5} variant={'body2'}>
                   {item.label}
                 </Typography>
               )}
