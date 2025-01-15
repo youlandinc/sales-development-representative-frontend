@@ -11,3 +11,5 @@ export * from './StyledTextField';
 export * from './StyledToast';
 
 export * from './StyledDatePicker';
+
+export * from './StyledLayout';

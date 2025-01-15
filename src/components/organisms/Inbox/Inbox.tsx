@@ -4,7 +4,7 @@ import { CKEditor } from 'ckeditor4-react';
 
 import { InboxSide } from '@/components/organisms';
 
-export const InboxPage: FC = () => {
+export const Inbox: FC = () => {
   return (
     <Stack border={'1px solid'} borderColor={'#E5E5E5'} flexDirection={'row'}>
       <InboxSide />

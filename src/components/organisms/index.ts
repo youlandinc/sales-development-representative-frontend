@@ -1,1 +1,1 @@
-export * from './InboxPage';
+export * from './Inbox';

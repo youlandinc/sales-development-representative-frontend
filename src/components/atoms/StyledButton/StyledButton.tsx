@@ -8,7 +8,7 @@ interface StyledButtonPropsWithDisabled extends ButtonProps {
   disabled?: boolean;
 }
 
-type StyledButtonProps<
+export type StyledButtonProps<
   T extends StyledButtonPropsWithDisabled = StyledButtonPropsWithDisabled,
 > = T &
   (T['loading'] extends undefined
@@ -40,12 +40,16 @@ export const StyledButton: FC<StyledButtonProps> = ({
           lineHeight: 1.5,
           textTransform: 'none',
           borderRadius: 2,
+          minWidth: 'auto',
           boxShadow: (theme) => {
             if (variant === 'text' || color === 'inherit') {
               return 'none';
             }
             return theme.palette.boxShadow[`button_${variant}_${color}_shadow`];
           },
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         },
         '&.MuiButton-contained': {
           bgcolor:

@@ -1,15 +1,17 @@
 'use client';
+
 export const fetchCache = 'force-no-store';
 
-import { StyledLayout } from '@/components/atoms';
-import { Inbox } from '@/components/organisms';
+import { useRouter } from 'nextjs-toploader/app';
 
-const InboxPage = () => {
+import { StyledLayout } from '@/components/atoms';
+
+const LibraryPage = () => {
   return (
     <StyledLayout>
-      <Inbox />
+      <h1>LibraryPage</h1>
     </StyledLayout>
   );
 };
 
-export default InboxPage;
+export default LibraryPage;

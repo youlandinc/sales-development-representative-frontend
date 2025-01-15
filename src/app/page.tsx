@@ -10,7 +10,6 @@ import { ToastProvider } from '@/provides/ToastProvider';
 export default function Home() {
   return (
     <Container>
-      <ToastProvider />
       <Stack flexDirection={'row'} gap={3} py={3}>
         {/*<StyledButton*/}
         {/*  onClick={() => {*/}
