@@ -1,19 +1,66 @@
-import { FC, useState } from 'react';
-import { Box, Icon, Stack, Typography } from '@mui/material';
+import { FC, useRef, useState } from 'react';
+import {
+  Avatar,
+  Box,
+  Icon,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 
+import { useUserStore } from '@/provides';
 import { LAYOUT_SIDE_MENU } from './StyledLayout.data';
 
 import { StyledButton } from '@/components/atoms';
 
 import ICON_EXPEND from './assets/icon_expend.svg';
+import ICON_SIDE_LOGOUT from './assets/icon_side_logout.svg';
+import { USystemLogout } from '@/utils';
 
 export const StyledLayoutSide: FC = () => {
+  const { userProfile, isHydration, resetUserStore } = useUserStore(
+    (state) => state,
+  );
+
   const router = useRouter();
   const pathname = usePathname();
 
   const [expend, setExpend] = useState(true);
+
+  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
+
+  const avatarName = () => {
+    if (!isHydration) {
+      return '';
+    }
+    const target =
+      userProfile?.firstName?.[0] + userProfile?.lastName?.[0] || '';
+    const result = target.match(/[a-zA-Z]+/g);
+    return result ? result[0] : '';
+  };
+
+  const avatarUrl = () => {
+    if (!isHydration) {
+      return '/images/placeholder_avatar.png';
+    }
+    if (!userProfile?.avatar) {
+      if (!avatarName) {
+        return '/images/placeholder_avatar.png';
+      }
+      return '';
+    }
+    return userProfile?.avatar;
+  };
+
+  const onClickToLogout = () => {
+    setAnchorEl(null);
+    USystemLogout();
+    resetUserStore();
+  };
 
   const ExpendIcon = () => (
     <Stack
@@ -44,17 +91,25 @@ export const StyledLayoutSide: FC = () => {
     </Stack>
   );
 
+  const onClickToRedirect = (key: string) => {
+    if (pathname.includes(key)) {
+      return;
+    }
+    router.push(key);
+  };
+
   return (
-    <Box
+    <Stack
       sx={{
         width: expend ? 230 : 60,
         height: '100%',
         borderRight: '1px solid #E5E5E5',
-        bgColor: '#FFFFFF',
+        bgcolor: '#FFFFFF',
         position: 'relative',
         px: expend ? 3 : 1.5,
         py: 4,
         transition: 'all .3s',
+        flexShrink: 0,
       }}
     >
       <ExpendIcon />
@@ -87,28 +142,23 @@ export const StyledLayoutSide: FC = () => {
               gap={0.5}
               justifyContent={expend ? 'unset' : 'center'}
               key={`${item.key}-${index}`}
-              onClick={() => router.push(item.url)}
+              onClick={() => onClickToRedirect(item.url)}
               py={1.5}
               sx={{
                 cursor: 'pointer',
                 transitions: 'all .3s',
-                '& .icon': {
-                  '& path': {
-                    fill: pathname.includes(item.key) ? '' : '#6F6C7D',
-                  },
-                },
-                '& .label': {
+                '& .layout_label': {
                   color: pathname.includes(item.key)
                     ? 'primary.main'
                     : 'text.primary',
                 },
                 '&:hover': {
-                  '& .icon': {
+                  '& .layout_icon': {
                     '& path': {
                       fill: pathname.includes(item.key) ? '' : '#6F6C7D',
                     },
                   },
-                  '& .label': {
+                  '& .layout_label': {
                     color: pathname.includes(item.key)
                       ? 'primary.main'
                       : '#6F6C7D',
@@ -117,7 +167,7 @@ export const StyledLayoutSide: FC = () => {
               }}
             >
               <Icon
-                className={'icon'}
+                className={'layout_icon'}
                 component={
                   pathname.includes(item.key)
                     ? item.activeIcon
@@ -126,7 +176,11 @@ export const StyledLayoutSide: FC = () => {
               />
 
               {expend && (
-                <Typography className={'label'} mb={0.5} variant={'body2'}>
+                <Typography
+                  className={'layout_label'}
+                  mb={0.5}
+                  variant={'body2'}
+                >
                   {item.label}
                 </Typography>
               )}
@@ -140,6 +194,85 @@ export const StyledLayoutSide: FC = () => {
           ),
         )}
       </Stack>
-    </Box>
+
+      <Stack
+        alignItems={'center'}
+        flexDirection={'row'}
+        gap={1}
+        mt={'auto'}
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        ref={avatarRef}
+        sx={{ cursor: 'pointer' }}
+      >
+        <Avatar
+          src={avatarUrl()}
+          sx={{
+            bgcolor: userProfile?.backgroundColor,
+            width: 24,
+            height: 24,
+            fontSize: 12,
+            fontWeight: 600,
+          }}
+        >
+          {avatarName()}
+        </Avatar>
+        <Typography variant={'body3'}>{userProfile?.name}</Typography>
+      </Stack>
+
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        MenuListProps={{
+          sx: {
+            width: avatarRef.current?.offsetWidth,
+          },
+        }}
+        onClose={() => setAnchorEl(null)}
+        open={Boolean(anchorEl)}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: -3,
+              boxShadow:
+                '0px 10px 10px 0px rgba(17, 52, 227, 0.10), 0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
+              borderRadius: 2,
+              '& .MuiList-root': {
+                padding: 0,
+              },
+            },
+          },
+        }}
+        sx={{
+          '& .MuiMenu-list': {
+            p: 0,
+            // Menu item default style
+            '& .MuiMenuItem-root': {
+              bgcolor: 'transparent !important',
+            },
+            '& .MuiMenuItem-root:hover': {
+              bgcolor: 'rgba(144, 149, 163, 0.1) !important',
+            },
+            //'& .Mui-selected': {
+            //  bgcolor: 'hsla(,100%,95%,1) !important',
+            //},
+            //'& .Mui-selected:hover': {
+            //  bgcolor: 'hsla(,100%,92%,1) !important',
+            //},
+          },
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <MenuItem onClick={() => onClickToLogout()} sx={{ gap: 1.5 }}>
+          <Icon component={ICON_SIDE_LOGOUT} />
+          <Typography variant={'subtitle3'}>Logout</Typography>
+        </MenuItem>
+      </Menu>
+    </Stack>
   );
 };

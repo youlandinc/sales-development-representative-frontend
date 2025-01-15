@@ -5,12 +5,14 @@ export type UserStoreState = {
   isHydration: boolean;
   accessToken: string;
   accountId: string;
+  userProfile: any;
 };
 
 export type UserStoreActions = {
   setIsHydration: (isHydration: boolean) => void;
   setAccessToken: (accessToken: string) => void;
-  setAccountId: (accountId: string) => void;
+  setUserProfile: (userProfile: any) => void;
+  resetUserStore: () => void;
 };
 
 export type UserStore = UserStoreState & UserStoreActions;
@@ -19,6 +21,7 @@ export const defaultInitState: UserStoreState = {
   isHydration: false,
   accessToken: '',
   accountId: '',
+  userProfile: {},
 };
 
 export const createUserStore = (
@@ -27,11 +30,21 @@ export const createUserStore = (
   return createStore<UserStore>()(
     devtools(
       persist(
-        (set) => ({
+        (set, get) => ({
           ...initState,
           setIsHydration: (isHydration: boolean) => set({ isHydration }),
           setAccessToken: (accessToken: string) => set({ accessToken }),
-          setAccountId: (accountId: string) => set({ accountId }),
+          setUserProfile: (userProfile: any) => {
+            set({ userProfile });
+            set({ accountId: userProfile.accountId });
+          },
+          resetUserStore: () =>
+            set({
+              isHydration: get().isHydration,
+              accessToken: '',
+              accountId: '',
+              userProfile: {},
+            }),
         }),
         {
           name: 'PERSIST_DATA',
@@ -39,6 +52,7 @@ export const createUserStore = (
           partialize: (state) => ({
             accessToken: state.accessToken,
             accountId: state.accountId,
+            userProfile: state.userProfile,
           }),
           onRehydrateStorage: () => {
             return (state) => {

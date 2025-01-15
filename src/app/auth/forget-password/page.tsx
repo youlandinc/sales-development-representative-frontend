@@ -6,6 +6,8 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/provides';
 
+import { DEFAULT_LOGGED_IN_PATH } from '@/constant';
+
 import { SDRToast } from '@/components/atoms';
 import { ForgetPassword } from '@/components/molecules';
 
@@ -26,7 +28,7 @@ const ForgetPasswordPage = () => {
         message: 'You are already logged in!',
         variant: HttpVariantEnum.success,
       });
-      return router.push('/');
+      return router.push(DEFAULT_LOGGED_IN_PATH);
     }
   }, [isHydration, accessToken, router]);
 

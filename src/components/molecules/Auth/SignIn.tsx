@@ -4,7 +4,7 @@ import { Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { UDecode, UEncode } from '@/utils';
-import { APP_KEY } from '@/constant';
+import { APP_KEY, DEFAULT_LOGGED_IN_PATH } from '@/constant';
 import { useUserStore } from '@/provides';
 
 import {
@@ -16,11 +16,14 @@ import {
 } from '@/components/atoms';
 
 import { _userLogin } from '@/request';
-import { HttpError, LoginTypeEnum } from '@/types';
+import { HttpError, HttpVariantEnum, LoginTypeEnum } from '@/types';
 
 export const SignIn = () => {
   const router = useRouter();
-  const { setAccessToken, setAccountId } = useUserStore((state) => state);
+  const { setAccessToken, setUserProfile, isHydration, accessToken } =
+    useUserStore((state) => state);
+
+  const [showToast, setShowToast] = useState(true);
 
   const [loading, setLoading] = useState(false);
 
@@ -50,13 +53,11 @@ export const SignIn = () => {
     setLoading(true);
     try {
       const {
-        data: {
-          accessToken,
-          userProfile: { accountId },
-        },
+        data: { accessToken, userProfile },
       } = await _userLogin(postData);
+      setShowToast(false);
       setAccessToken(accessToken);
-      setAccountId(accountId);
+      setUserProfile(userProfile);
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
@@ -70,6 +71,21 @@ export const SignIn = () => {
     setPassword(UDecode(localStorage.getItem(UEncode('password')) || ''));
     setRememberMe(!!localStorage.getItem(UEncode('email')));
   }, []);
+
+  useEffect(() => {
+    if (!isHydration) {
+      return;
+    }
+    if (accessToken) {
+      showToast &&
+        SDRToast({
+          header: '',
+          message: 'You are already logged in!',
+          variant: HttpVariantEnum.success,
+        });
+      return router.push(DEFAULT_LOGGED_IN_PATH);
+    }
+  }, [isHydration, accessToken, router, showToast]);
 
   return (
     <Stack
