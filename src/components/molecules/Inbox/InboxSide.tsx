@@ -1,18 +1,7 @@
 import { FC, SyntheticEvent, useState } from 'react';
-import {
-  Avatar,
-  Box,
-  CardHeader,
-  IconButton,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from '@mui/material';
+import { Avatar, Box, CardHeader, Stack, Typography } from '@mui/material';
 
 import { StyledTextField } from '@/components/atoms';
-
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export const InboxSide: FC = () => {
   const [value, setValue] = useState(0);
@@ -22,7 +11,7 @@ export const InboxSide: FC = () => {
   };
 
   return (
-    <Stack width={300}>
+    <Stack borderRight={'1px solid #E5E5E5'} width={320}>
       <Stack gap={3}>
         <Stack
           flexDirection={'row'}
@@ -67,13 +56,13 @@ export const InboxSide: FC = () => {
           >
             <Typography
               component={'div'}
+              maxWidth={210}
               sx={{
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
               variant={'subtitle2'}
-              width={'calc(100% - 100px)'}
             >
               You: How To Boost Boost Boost Boost Boost
             </Typography>
@@ -85,6 +74,13 @@ export const InboxSide: FC = () => {
             ></Box>
           </Stack>
         }
+        sx={{
+          px: 2.5,
+          py: 1.5,
+          '&:hover': {
+            bgcolor: '#F8F8FA',
+          },
+        }}
         title={
           <Stack
             alignItems={'center'}
