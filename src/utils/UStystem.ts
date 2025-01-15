@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 
 export const USystemLogout = () => {
-  localStorage.clear();
+  localStorage.removeItem('PERSIST_DATA');
 };
 
 export const UEncode = (password: string): string => {
