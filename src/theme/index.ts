@@ -238,12 +238,12 @@ const defaultOptions: ThemeOptions = {
       fontWeight: 600,
     },
     h3: {
-      fontSize: 36,
+      fontSize: 40,
       lineHeight: 1.5,
       fontWeight: 600,
     },
     h4: {
-      fontSize: 30,
+      fontSize: 32,
       lineHeight: 1.5,
       fontWeight: 600,
     },

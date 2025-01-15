@@ -13,5 +13,3 @@ export * from './StyledToast';
 export * from './StyledDatePicker';
 
 export * from './StyledLayout';
-
-export * from './StyledCampaignStatus';

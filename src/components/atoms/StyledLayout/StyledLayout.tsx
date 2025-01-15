@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect } from 'react';
-import { Box, Container, Stack, SxProps } from '@mui/material';
+import { Box, Stack, SxProps } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/provides';
@@ -40,18 +40,19 @@ export const StyledLayout: FC<StyledLayoutProps> = ({ sx, children }) => {
     >
       <Stack flexDirection={'row'} height={'100%'} width={'100%'}>
         <StyledLayoutSide />
-        <Container
-          maxWidth={false}
+        <Stack
           sx={{
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
             m: 0,
-            p: 0,
+            pt: 7,
+            px: 3,
+            pb: 3,
           }}
         >
           {children}
-        </Container>
+        </Stack>
       </Stack>
     </Box>
   );

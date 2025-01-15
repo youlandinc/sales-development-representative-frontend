@@ -1,34 +1,28 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Typography } from '@mui/material';
+import { CampaignStatusEnum } from '@/types';
 
-enum CampaignStatus {
-  draft = 'DRAFT',
-  active = 'ACTIVE',
-  done = 'DONE',
-  suspended = 'SUSPENDED',
-}
-
-const computedStyles = (status: CampaignStatus) => {
+const computedStyles = (status: CampaignStatusEnum) => {
   switch (status) {
-    case CampaignStatus.draft:
+    case CampaignStatusEnum.draft:
       return {
         color: '#9095A3',
         backgroundColor: '#F0F4FF',
         label: 'Draft',
       };
-    case CampaignStatus.active:
+    case CampaignStatusEnum.active:
       return {
         color: '#43A788',
         backgroundColor: 'rgba(105, 192, 165, 0.10)',
         label: 'Active',
       };
-    case CampaignStatus.done:
+    case CampaignStatusEnum.done:
       return {
         color: '#7849D7',
         backgroundColor: 'rgba(120, 73, 215, 0.20)',
         label: 'Done',
       };
-    case CampaignStatus.suspended:
+    case CampaignStatusEnum.suspended:
       return {
         color: '#7D7D7D',
         backgroundColor: '#F0F0F0',
@@ -44,10 +38,10 @@ const computedStyles = (status: CampaignStatus) => {
 };
 
 type StyledCampaignStatusProps = {
-  status: CampaignStatus;
+  status: CampaignStatusEnum;
 };
 
-export const StyledCampaignStatus: FC<StyledCampaignStatusProps> = ({
+export const CampaignsStatusBadge: FC<StyledCampaignStatusProps> = ({
   status,
 }) => {
   return (

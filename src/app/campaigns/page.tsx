@@ -1,15 +1,13 @@
 'use client';
-
 export const fetchCache = 'force-no-store';
 
-import { useRouter } from 'nextjs-toploader/app';
-
 import { StyledLayout } from '@/components/atoms';
+import { Campaigns } from '@/components/organisms';
 
 const CampaignsPage = () => {
   return (
     <StyledLayout>
-      <h1>Campaigns</h1>
+      <Campaigns />
     </StyledLayout>
   );
 };
