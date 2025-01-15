@@ -199,10 +199,12 @@ export const StyledLayoutSide: FC = () => {
         alignItems={'center'}
         flexDirection={'row'}
         gap={1}
+        justifyContent={expend ? 'unset' : 'center'}
         mt={'auto'}
         onClick={(e) => setAnchorEl(e.currentTarget)}
         ref={avatarRef}
-        sx={{ cursor: 'pointer' }}
+        sx={{ cursor: 'pointer', overflowX: 'hidden' }}
+        width={'100%'}
       >
         <Avatar
           src={avatarUrl()}
@@ -216,7 +218,11 @@ export const StyledLayoutSide: FC = () => {
         >
           {avatarName()}
         </Avatar>
-        <Typography variant={'body3'}>{userProfile?.name}</Typography>
+        {expend && (
+          <Typography variant={'body3'} whiteSpace={'nowrap'}>
+            {userProfile?.name}
+          </Typography>
+        )}
       </Stack>
 
       <Menu
@@ -228,6 +234,7 @@ export const StyledLayoutSide: FC = () => {
         MenuListProps={{
           sx: {
             width: avatarRef.current?.offsetWidth,
+            minWidth: 120,
           },
         }}
         onClose={() => setAnchorEl(null)}
