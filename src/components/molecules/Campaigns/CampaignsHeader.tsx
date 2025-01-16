@@ -1,5 +1,9 @@
 import { FC } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { Icon, InputAdornment, Stack, Typography } from '@mui/material';
+
+import { StyledButton, StyledTextField } from '@/components/atoms';
+
+import ICON_HEADER_SEARCH from './assets/icon_header_search.svg';
 
 import ICON_LEADS_SOURCED from './assets/icon_leads_sourced.svg';
 import ICON_ACTIVE_LEADS from './assets/icon_active_leads.svg';
@@ -33,7 +37,35 @@ const mock = [
 export const CampaignsHeader: FC = () => {
   return (
     <Stack gap={3}>
-      <Typography variant={'h7'}>Campaigns</Typography>
+      <Stack alignItems={'center'} flexDirection={'row'}>
+        <Typography variant={'h7'}>Campaigns</Typography>
+
+        <Stack flexDirection={'row'} gap={3} ml={'auto'}>
+          <StyledTextField
+            size={'small'}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment
+                    position={'start'}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Icon
+                      component={ICON_HEADER_SEARCH}
+                      sx={{ width: 16, height: 16 }}
+                    />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <StyledButton size={'medium'}>+ Create new campaign</StyledButton>
+        </Stack>
+      </Stack>
 
       <Stack flexDirection={'row'} gap={3}>
         {mock.map((item, index) => (

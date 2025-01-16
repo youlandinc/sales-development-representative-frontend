@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Button, ButtonProps } from '@mui/material';
-import { StyledLoading } from '@/components/atoms/StyledLoading/StyledLoading';
+
+import { StyledLoading } from '@/components/atoms';
 
 interface StyledButtonPropsWithDisabled extends ButtonProps {
   loading?: boolean;
@@ -34,23 +35,23 @@ export const StyledButton: FC<StyledButtonProps> = ({
       onClick={onClick}
       size={size}
       sx={{
-        '&.MuiButton-root': {
-          fontSize: 16,
-          fontWeight: 600,
-          lineHeight: 1.5,
-          textTransform: 'none',
-          borderRadius: 2,
-          minWidth: 'auto',
-          boxShadow: (theme) => {
-            if (variant === 'text' || color === 'inherit') {
-              return 'none';
-            }
-            return theme.palette.boxShadow[`button_${variant}_${color}_shadow`];
-          },
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+        flexShrink: 0,
+        fontSize: 16,
+        fontWeight: 600,
+        lineHeight: 1.5,
+        textTransform: 'none',
+        borderRadius: 2,
+        minWidth: 'auto',
+        maxWidth: 'auto',
+        boxShadow: (theme) => {
+          if (variant === 'text' || color === 'inherit') {
+            return 'none';
+          }
+          return theme.palette.boxShadow[`button_${variant}_${color}_shadow`];
         },
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
         '&.MuiButton-contained': {
           bgcolor:
             color !== 'primary'
