@@ -1,12 +1,13 @@
-import { forwardRef, useImperativeHandle, useState } from 'react';
-import { CKEditorEventPayload, useCKEditor } from 'ckeditor4-react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { CKEditor, CKEditorEventPayload } from 'ckeditor4-react';
 import { CKEditorInstance } from 'ckeditor4-react/dist/types';
-import { Box } from '@mui/material';
 
 import './defaultEditorCss.css';
 
 type InboxEditorProps = {
   handleChange?: (e: CKEditorEventPayload<'change'>) => void;
+  initData?: string;
+  config?: Record<string, any>;
 };
 
 export type InboxEditorForwardRefProps = {
@@ -16,10 +17,11 @@ export type InboxEditorForwardRefProps = {
 export const InboxEditor = forwardRef<
   InboxEditorForwardRefProps,
   InboxEditorProps
->(({ handleChange }, ref) => {
-  // const [editor, setEditor] = useState<CKEditorInstance | null>(null);
-  const [element, setElement] = useState(null);
-  const { editor, status } = useCKEditor({
+>(({ handleChange, initData, config }, ref) => {
+  const [, setInitData] = useState<string>('');
+  const [editor, setEditor] = useState<CKEditorInstance | null>(null);
+  // const [element, setElement] = useState(null);
+  /*const { editor, status } = useCKEditor({
     element,
     config: {
       versionCheck: false,
@@ -50,7 +52,7 @@ export const InboxEditor = forwardRef<
       },
     },
     subscribeTo: ['beforeLoad', 'instanceReady', 'change'],
-  });
+  });*/
 
   // if (editor) {
   //   editor.addCommand('mySimpleCommand', {
@@ -70,7 +72,48 @@ export const InboxEditor = forwardRef<
     editInstance: editor as CKEditorInstance,
   }));
 
-  return <Box ref={setElement}></Box>;
+  useEffect(() => {
+    setInitData(JSON.stringify(initData ?? ''));
+    if (editor) {
+      editor.setData(JSON.stringify(initData ?? ''));
+    }
+  }, [initData]);
+  return (
+    <CKEditor
+      config={{
+        versionCheck: false,
+        uiColor: '#FFFFFF',
+        extraPlugins: 'justify,font,colorbutton,editorplaceholder',
+        editorplaceholder: 'Start typing here...',
+        toolbarGroups: [
+          { name: 'document', groups: ['mode', 'document', 'doctools'] },
+          { name: 'clipboard', groups: ['clipboard', 'undo'] },
+          { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
+          { name: 'forms' },
+          // '/',
+          { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+          {
+            name: 'paragraph',
+            groups: ['list', 'indent', 'blocks', 'align', 'bidi'], // 'align' -> 'justify' plugin
+          },
+          { name: 'links' },
+          { name: 'insert' },
+          // '/',
+          { name: 'styles' }, // 'font and fontsize' -> 'font' plugin
+          { name: 'colors' }, // 'colors' -> 'colorbutton' plugin
+          { name: 'tools' },
+        ],
+        contentsCss: ['/css/editorCss.css'],
+        ...config,
+      }}
+      initData={initData}
+      onChange={handleChange}
+      onInstanceReady={(event) => {
+        setEditor(event.editor as unknown as CKEditorInstance);
+      }}
+    />
+  );
+  // return <Box ref={setElement}></Box>;
 });
 /*<CKEditor
       config={{

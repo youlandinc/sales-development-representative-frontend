@@ -1,4 +1,5 @@
 import {
+  Box,
   InputAdornment,
   Stack,
   SxProps,
@@ -6,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { FC, useRef } from 'react';
+import { FC, useEffect, useRef } from 'react';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import {
@@ -54,9 +55,18 @@ const StyledTextFilledField: FC<TextFieldProps> = ({ label, sx, ...rest }) => {
 };
 
 export const InboxForward = () => {
-  const { setInboxContentType } = useInboxStore((state) => state);
+  const { setInboxContentType, forwardContent } = useInboxStore(
+    (state) => state,
+  );
 
   const editorRef = useRef<InboxEditorForwardRefProps | null>(null);
+
+  useEffect(() => {
+    if (editorRef.current?.editInstance) {
+      // editorRef.current.focus();
+      editorRef.current?.editInstance.initData;
+    }
+  }, [forwardContent]);
 
   return (
     <Stack gap={1.5} p={1.5} width={'100%'}>
@@ -81,7 +91,11 @@ export const InboxForward = () => {
         <StyledTextFilledField label={'Cc:'} />
         <StyledTextFilledField label={'Subject:'} />
       </Stack>
-      <InboxEditor ref={editorRef} />
+      <InboxEditor
+        config={{ height: '400px' }}
+        initData={forwardContent}
+        ref={editorRef}
+      />
     </Stack>
   );
 };
