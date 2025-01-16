@@ -41,7 +41,7 @@ export const InboxEditor = forwardRef<
         { name: 'tools' },
       ],
       contentsCss: ['/css/editorCss.css'],
-      dispatchEvent,
+      //dispatchEvent,
     },
     subscribeTo: ['beforeLoad', 'instanceReady', 'change'],
   });
@@ -53,30 +53,30 @@ export const InboxEditor = forwardRef<
   return <Box ref={setElement}></Box>;
 });
 /*<CKEditor
-      config={{
-        versionCheck: false,
-        extraPlugins: 'justify,font,colorbutton',
-        toolbarGroups: [
-          { name: 'document', groups: ['mode', 'document', 'doctools'] },
-          { name: 'clipboard', groups: ['clipboard', 'undo'] },
-          { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
-          { name: 'forms' },
-          '/',
-          { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-          {
-            name: 'paragraph',
-            groups: ['list', 'indent', 'blocks', 'align', 'bidi'], // 'align' -> 'justify' plugin
-          },
-          { name: 'links' },
-          { name: 'insert' },
-          '/',
-          { name: 'styles' }, // 'font and fontsize' -> 'font' plugin
-          { name: 'colors' }, // 'colors' -> 'colorbutton' plugin
-          { name: 'tools' },
-        ],
-      }}
-      onChange={handleChange}
-      onInstanceReady={(event) => {
-        setEditor(event.editor as unknown as CKEditorInstance);
-      }}
-    />*/
+ config={{
+ versionCheck: false,
+ extraPlugins: 'justify,font,colorbutton',
+ toolbarGroups: [
+ { name: 'document', groups: ['mode', 'document', 'doctools'] },
+ { name: 'clipboard', groups: ['clipboard', 'undo'] },
+ { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
+ { name: 'forms' },
+ '/',
+ { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+ {
+ name: 'paragraph',
+ groups: ['list', 'indent', 'blocks', 'align', 'bidi'], // 'align' -> 'justify' plugin
+ },
+ { name: 'links' },
+ { name: 'insert' },
+ '/',
+ { name: 'styles' }, // 'font and fontsize' -> 'font' plugin
+ { name: 'colors' }, // 'colors' -> 'colorbutton' plugin
+ { name: 'tools' },
+ ],
+ }}
+ onChange={handleChange}
+ onInstanceReady={(event) => {
+ setEditor(event.editor as unknown as CKEditorInstance);
+ }}
+ />*/

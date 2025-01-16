@@ -2,8 +2,6 @@
 
 export const fetchCache = 'force-no-store';
 
-import { useRouter } from 'nextjs-toploader/app';
-
 import { StyledLayout } from '@/components/atoms';
 
 const SettingsPage = () => {
