@@ -10,9 +10,8 @@ export const Inbox: FC = () => {
       border={'1px solid'}
       borderColor={'#E5E5E5'}
       borderRadius={4}
+      flex={1}
       flexDirection={'row'}
-      mb={3}
-      mt={6}
     >
       <InboxSide />
       <InboxContent />
