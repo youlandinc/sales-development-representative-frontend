@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Button, ButtonProps } from '@mui/material';
-import { StyledLoading } from '@/components/atoms/StyledLoading/StyledLoading';
+
+import { StyledLoading } from '@/components/atoms';
 
 interface StyledButtonPropsWithDisabled extends ButtonProps {
   loading?: boolean;
