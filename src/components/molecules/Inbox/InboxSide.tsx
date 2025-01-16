@@ -1,49 +1,56 @@
 import { FC, SyntheticEvent, useState } from 'react';
-import { Avatar, Box, CardHeader, Stack, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  CardHeader,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from '@mui/material';
 
 import { StyledTextField } from '@/components/atoms';
 
 export const InboxSide: FC = () => {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState('Engaged');
 
-  const handleChange = (event: SyntheticEvent, newValue: number) => {
+  const handleChange = (event: SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
   return (
     <Stack borderRight={'1px solid #E5E5E5'} width={320}>
-      <Stack gap={3}>
-        <Stack
-          flexDirection={'row'}
-          fontSize={12}
-          fontWeight={600}
-          gap={2}
-          lineHeight={1.5}
-          p={2.5}
-          width={'100%'}
+      <Stack gap={3} p={2.5}>
+        <Tabs
+          aria-label="wrapped label tabs example"
+          onChange={handleChange}
+          sx={{
+            minHeight: 'auto',
+            '& .MuiTab-root': {
+              p: 0,
+              width: '50%',
+              minHeight: 'auto',
+              height: 'fit-content',
+              pb: 1.5,
+              textTransform: 'none',
+              color: '#6F6C7D',
+              fontSize: 12,
+              fontWeight: 600,
+            },
+            '& .Mui-selected': {
+              color: '#2A292E',
+            },
+            '& .MuiTabs-indicator': {
+              bgcolor: '#2A292E',
+            },
+          }}
+          value={value}
         >
-          <Box
-            borderBottom={'2px solid'}
-            borderColor={'text.primary'}
-            flex={1}
-            pb={1.5}
-            textAlign={'center'}
-          >
-            Engaged
-          </Box>
-          <Box
-            borderBottom={'2px solid'}
-            borderColor={'text.primary'}
-            flex={1}
-            pb={1.5}
-            textAlign={'center'}
-          >
-            Sent
-          </Box>
-        </Stack>
+          <Tab label={'Engaged'} value={'Engaged'} />
+          <Tab label={'Sent'} value={'Sent'} />
+        </Tabs>
         <StyledTextField placeholder={'Search contacts...'} />
       </Stack>
-      <Stack flexDirection={'row'} gap={2}></Stack>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: 'red', height: 32, width: 32 }}>R</Avatar>

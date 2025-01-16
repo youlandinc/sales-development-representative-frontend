@@ -3,6 +3,8 @@ import { CKEditorEventPayload, useCKEditor } from 'ckeditor4-react';
 import { CKEditorInstance } from 'ckeditor4-react/dist/types';
 import { Box } from '@mui/material';
 
+import './defaultEditorCss.css';
+
 type InboxEditorProps = {
   handleChange?: (e: CKEditorEventPayload<'change'>) => void;
 };
@@ -21,7 +23,9 @@ export const InboxEditor = forwardRef<
     element,
     config: {
       versionCheck: false,
-      extraPlugins: 'justify,font,colorbutton',
+      uiColor: '#FFFFFF',
+      extraPlugins: 'justify,font,colorbutton,editorplaceholder',
+      editorplaceholder: 'Start typing here...',
       toolbarGroups: [
         { name: 'document', groups: ['mode', 'document', 'doctools'] },
         { name: 'clipboard', groups: ['clipboard', 'undo'] },
@@ -42,9 +46,26 @@ export const InboxEditor = forwardRef<
       ],
       contentsCss: ['/css/editorCss.css'],
       dispatchEvent,
+      style: {
+        border: 'none',
+      },
     },
     subscribeTo: ['beforeLoad', 'instanceReady', 'change'],
   });
+
+  // if (editor) {
+  //   editor.addCommand('mySimpleCommand', {
+  //     exec: function (edt) {
+  //       alert(edt.getData());
+  //     },
+  //   });
+  //   editor.ui.addButton('SuperButton', {
+  //     label: 'Click me',
+  //     command: 'mySimpleCommand',
+  //     toolbar: 'insert',
+  //     icon: 'https://avatars1.githubusercontent.com/u/5500999?v=2&s=16',
+  //   });
+  // }
 
   useImperativeHandle(ref, () => ({
     editInstance: editor as CKEditorInstance,
