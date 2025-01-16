@@ -37,7 +37,7 @@ export const InboxSide: FC = () => {
               fontSize: 12,
               fontWeight: 600,
             },
-            '& .Mui-selected': {
+            '& .MuiTab-root.Mui-selected': {
               color: '#2A292E',
             },
             '& .MuiTabs-indicator': {
