@@ -49,6 +49,8 @@ export const StyledLayout: FC<StyledLayoutProps> = ({ sx, children }) => {
             pt: 7,
             px: 3,
             pb: 3,
+            overflow: 'auto',
+            minWidth: 720,
           }}
         >
           {children}

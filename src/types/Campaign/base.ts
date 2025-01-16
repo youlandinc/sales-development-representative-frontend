@@ -15,6 +15,8 @@ export interface CampaignTableItem {
   sent: number | null;
   uniqueOpens: number | null;
   uniqueOpenRate: number | null;
+  uniqueClicks: number | null;
+  uniqueClickRate: number | null;
   replied: number | null;
   repliedRate: number | null;
 }
