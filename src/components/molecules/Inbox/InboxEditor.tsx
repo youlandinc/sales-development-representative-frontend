@@ -45,7 +45,6 @@ export const InboxEditor = forwardRef<
         { name: 'tools' },
       ],
       contentsCss: ['/css/editorCss.css'],
-      dispatchEvent,
       style: {
         border: 'none',
       },
