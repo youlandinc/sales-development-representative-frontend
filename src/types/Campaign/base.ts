@@ -6,9 +6,9 @@ export enum CampaignStatusEnum {
 }
 
 export interface CampaignTableItem {
-  id: string | number;
-  name: string | null;
-  status: CampaignStatusEnum;
+  campaignId: string | number;
+  campaignName: string | null;
+  campaignStatus: CampaignStatusEnum;
   createdAt: string | null;
   sourced: number | null;
   activeLeads: number | null;

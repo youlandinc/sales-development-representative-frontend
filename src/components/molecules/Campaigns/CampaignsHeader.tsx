@@ -10,6 +10,7 @@ import ICON_ACTIVE_LEADS from './assets/icon_active_leads.svg';
 import ICON_OPEN_RATE from './assets/icon_open_rate.svg';
 import ICON_REPLY_RATE from './assets/icon_reply_rate.svg';
 import ICON_MEETINGS_BOOKED from './assets/icon_meetings_booked.svg';
+import { useDialogStore } from '@/stores/useDialogStore';
 
 const mock = [
   {
@@ -35,6 +36,8 @@ const mock = [
 ];
 
 export const CampaignsHeader: FC = () => {
+  const { open } = useDialogStore();
+
   return (
     <Stack gap={3}>
       <Stack alignItems={'center'} flexDirection={'row'}>
@@ -63,7 +66,9 @@ export const CampaignsHeader: FC = () => {
               },
             }}
           />
-          <StyledButton size={'medium'}>+ Create new campaign</StyledButton>
+          <StyledButton onClick={() => open()} size={'medium'}>
+            + Create new campaign
+          </StyledButton>
         </Stack>
       </Stack>
 

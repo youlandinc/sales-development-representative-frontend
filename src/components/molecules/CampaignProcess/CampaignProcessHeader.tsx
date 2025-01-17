@@ -2,10 +2,11 @@ import { FC } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 import { useDialogStore } from '@/stores/useDialogStore';
 
+import { StyledButton } from '@/components/atoms';
+import { CampaignsStatusBadge } from '@/components/molecules';
+
 import ICON_CLOSE from './assets/icon_close.svg';
 import ICON_BACK from './assets/icon_back.svg';
-import { CampaignsStatusBadge } from '@/components/molecules';
-import { StyledButton } from '@/components/atoms';
 
 export const CampaignProcessHeader: FC = () => {
   const { activeStep } = useDialogStore();
@@ -18,6 +19,8 @@ export const CampaignProcessHeader: FC = () => {
 };
 
 export const CampaignProcessHeaderStepFirst: FC = () => {
+  const { close } = useDialogStore();
+
   return (
     <Stack gap={1.5}>
       <Stack alignItems={'center'} flexDirection={'row'}>
@@ -34,13 +37,14 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
 };
 
 export const CampaignProcessHeaderStepSecondary: FC = () => {
-  const { campaignName, campaignStatus } = useDialogStore();
+  const { campaignName, campaignStatus, close } = useDialogStore();
 
   return (
     <Stack flexDirection={'row'} justifyContent={'space-between'} px={3}>
       <Stack alignItems={'center'} flexDirection={'row'}>
         <Icon
           component={ICON_BACK}
+          onClick={() => close()}
           sx={{
             cursor: 'pointer',
             width: 20,
@@ -54,7 +58,7 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       </Stack>
       <CampaignProcessHeaderButtonGroup />
 
-      <StyledButton disabled>Launch campaign</StyledButton>
+      <StyledButton>Launch campaign</StyledButton>
     </Stack>
   );
 };

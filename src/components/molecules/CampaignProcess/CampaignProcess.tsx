@@ -9,7 +9,7 @@ export const CampaignProcess = () => {
 
   return (
     <StyledDialog
-      content={<></>}
+      content={<CampaignProcessContent />}
       fullScreen={activeStep !== 1}
       header={<CampaignProcessHeader />}
       onClose={(_, reason) => {

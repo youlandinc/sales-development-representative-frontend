@@ -25,9 +25,9 @@ const generateMockData = (length: number): CampaignTableItem[] => {
     const replied = Math.floor(Math.random() * 50);
 
     return {
-      id: -(i + 1),
-      name: `Campaign ${i + 1}: Lock in Low Rates on YouLand Bridge Loans!`,
-      status: randomEnumValue(CampaignStatusEnum),
+      campaignId: -(i + 1),
+      campaignName: `Campaign ${i + 1}: Lock in Low Rates on YouLand Bridge Loans!`,
+      campaignStatus: randomEnumValue(CampaignStatusEnum),
       createdAt: new Date(2025, 0, Math.floor(Math.random() * 30) + 1)
         .toISOString()
         .split('T')[0],
@@ -62,14 +62,13 @@ export const CampaignsTable: FC = () => {
   const columns: GridColDef<CampaignTableItem>[] = [
     {
       headerName: 'Campaign name',
-      field: 'name',
+      field: 'campaignName',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 630,
+      minWidth: 780,
       renderCell: ({ row }) => {
-        const { name, status } = row;
+        const { campaignName, campaignStatus } = row;
         return (
           <Stack
             alignItems={'center'}
@@ -78,9 +77,9 @@ export const CampaignsTable: FC = () => {
             height={'100%'}
           >
             <Typography component={'span'} variant={'body2'}>
-              {name}
+              {campaignName}
             </Typography>
-            <CampaignsStatusBadge status={status} />
+            <CampaignsStatusBadge status={campaignStatus} />
           </Stack>
         );
       },
@@ -89,10 +88,9 @@ export const CampaignsTable: FC = () => {
       headerName: 'Created At',
       field: 'createdAt',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 120,
+      minWidth: 160,
       renderCell: ({ value }) => (
         <Typography component={'span'} variant={'body2'}>
           {UFormatDate(value, 'MMM dd, yyyy')}
@@ -103,10 +101,9 @@ export const CampaignsTable: FC = () => {
       headerName: 'Leads sourced',
       field: 'sourced',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 200,
+      minWidth: 160,
       renderCell: ({ value }) => (
         <Typography component={'span'} variant={'body2'}>
           {UFormatNumber(value)}
@@ -117,10 +114,9 @@ export const CampaignsTable: FC = () => {
       headerName: 'Active Leads',
       field: 'activeLeads',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 120,
+      minWidth: 160,
       renderCell: ({ value }) => (
         <Typography component={'span'} variant={'body2'}>
           {UFormatNumber(value)}
@@ -131,10 +127,9 @@ export const CampaignsTable: FC = () => {
       headerName: 'Emails Sent',
       field: 'sent',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 120,
+      minWidth: 160,
       renderCell: ({ value }) => (
         <Typography component={'span'} variant={'body2'}>
           {UFormatNumber(value)}
@@ -145,10 +140,9 @@ export const CampaignsTable: FC = () => {
       headerName: 'Unique opens',
       field: 'uniqueOpens',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 120,
+      minWidth: 160,
       renderCell: ({ row }) => {
         const { uniqueOpens, uniqueOpenRate } = row;
         return (
@@ -176,11 +170,9 @@ export const CampaignsTable: FC = () => {
       headerName: 'Unique clicks',
       field: 'uniqueClicks',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 120,
-
+      minWidth: 160,
       renderCell: ({ row }) => {
         const { uniqueClicks, uniqueClickRate } = row;
         return (
@@ -208,10 +200,9 @@ export const CampaignsTable: FC = () => {
       headerName: 'Replied',
       field: 'replied',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 120,
+      minWidth: 160,
       renderCell: ({ row }) => {
         const { replied, repliedRate } = row;
         return (
@@ -239,10 +230,9 @@ export const CampaignsTable: FC = () => {
       headerName: '',
       field: '',
       sortable: false,
-      flex: 1,
       align: 'left',
       headerAlign: 'left',
-      minWidth: 120,
+      minWidth: 160,
       renderCell: () => {
         return (
           <Stack
@@ -276,7 +266,7 @@ export const CampaignsTable: FC = () => {
         disableColumnSelector
         disableDensitySelector
         disableRowSelectionOnClick
-        getRowId={(row) => row.id}
+        getRowId={(row) => row.campaignId}
         onPaginationModelChange={setPaginationModel}
         onRowClick={(row) => {
           console.log(row);
@@ -297,12 +287,15 @@ export const CampaignsTable: FC = () => {
             fontSize: 12,
             color: '#7D7D7F',
             fontWeight: 400,
+            '&.MuiDataGrid-withBorderColor': {
+              borderBottom: 'none',
+            },
           },
           '.MuiDataGrid-columnHeader:focus-within': {
             outline: 'none !important',
           },
           '.MuiDataGrid-columnHeaders': {
-            borderBottom: 'none',
+            borderBottom: '1px solid #E5E5E5',
           },
           '& .MuiDataGrid-cell': {
             border: 0,
