@@ -4,7 +4,7 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/provides';
 
-import { LayoutSide } from './LayoutSide';
+import { CampaignProcess, LayoutSide } from '@/components/molecules';
 
 export interface StyledLayoutProps {
   sx?: SxProps;
@@ -56,6 +56,8 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
           {children}
         </Stack>
       </Stack>
+
+      <CampaignProcess />
     </Box>
   );
 };

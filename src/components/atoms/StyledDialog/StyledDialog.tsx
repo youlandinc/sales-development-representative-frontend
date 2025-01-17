@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { CSSProperties, FC, ReactNode } from 'react';
 import {
   Dialog,
   DialogActions,
@@ -14,6 +14,7 @@ export interface StyledDialogProps
   content?: ReactNode;
   footer?: ReactNode;
   headerSx?: SxProps;
+  paperWidth?: CSSProperties['width'];
 }
 
 export const StyledDialog: FC<StyledDialogProps> = ({
@@ -23,6 +24,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
   sx,
   open,
   headerSx,
+  paperWidth = 600,
   ...rest
 }) => {
   const handleSx = (name: string) => {
@@ -87,18 +89,23 @@ export const StyledDialog: FC<StyledDialogProps> = ({
           '& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root':
             {},
           '& .MuiDialog-paper': {
-            width: {
-              lg: 'calc(100% - 64px)',
-              xs: 'calc(100% - 48px)',
-            },
-            mx: 3,
+            width: rest.fullScreen
+              ? '100%'
+              : {
+                  lg: 'calc(100% - 64px)',
+                  xs: 'calc(100% - 48px)',
+                },
+            //mx: 3,
           },
           '& .MuiPaper-root': {
-            borderRadius: 2,
-            maxWidth: {
-              lg: 600,
-              xs: '100%',
-            },
+            transition: 'all .3s',
+            borderRadius: rest.fullScreen ? 0 : 2,
+            maxWidth: rest.fullScreen
+              ? '100%'
+              : {
+                  lg: paperWidth,
+                  xs: '100%',
+                },
             boxShadow:
               '0px 0px 2px rgba(17, 52, 227, 0.1), 0px 10px 10px rgba(17, 52, 227, 0.1)',
           },

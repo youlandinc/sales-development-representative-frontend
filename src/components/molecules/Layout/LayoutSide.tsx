@@ -12,6 +12,8 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/provides';
+import { useDialogStore } from '@/stores/useDialogStore';
+
 import { USystemLogout } from '@/utils';
 
 import { StyledButton } from '@/components/atoms';
@@ -25,6 +27,7 @@ export const LayoutSide: FC = () => {
   const { userProfile, isHydration, resetUserStore } = useUserStore(
     (state) => state,
   );
+  const { open } = useDialogStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -188,7 +191,12 @@ export const LayoutSide: FC = () => {
             </Stack>
           ) : (
             <Stack key={`${item.key}-${index}`} mb={1.5}>
-              <StyledButton color={'info'} size={'medium'} variant={'outlined'}>
+              <StyledButton
+                color={'info'}
+                onClick={() => open()}
+                size={'medium'}
+                variant={'outlined'}
+              >
                 {expend ? 'Create new campaign' : '+'}
               </StyledButton>
             </Stack>
