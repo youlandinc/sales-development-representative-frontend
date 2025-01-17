@@ -9,3 +9,5 @@ export * from './Campaigns';
 export * from './CampaignProcess';
 
 export * from './Inbox';
+
+export * from './Settings';

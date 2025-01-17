@@ -3,11 +3,12 @@
 export const fetchCache = 'force-no-store';
 
 import { Layout } from '@/components/molecules';
+import { Settings } from '@/components/organisms';
 
 const SettingsPage = () => {
   return (
     <Layout>
-      <h1>SettingsPage</h1>
+      <Settings />
     </Layout>
   );
 };
