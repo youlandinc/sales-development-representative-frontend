@@ -2,13 +2,13 @@
 
 export const fetchCache = 'force-no-store';
 
-import { StyledLayout } from '@/components/atoms';
+import { Layout } from '@/components/molecules';
 
 const LibraryPage = () => {
   return (
-    <StyledLayout>
+    <Layout>
       <h1>LibraryPage</h1>
-    </StyledLayout>
+    </Layout>
   );
 };
 

@@ -1,14 +1,14 @@
 'use client';
 export const fetchCache = 'force-no-store';
 
-import { StyledLayout } from '@/components/atoms';
+import { Layout } from '@/components/molecules';
 import { Campaigns } from '@/components/organisms';
 
 const CampaignsPage = () => {
   return (
-    <StyledLayout>
+    <Layout>
       <Campaigns />
-    </StyledLayout>
+    </Layout>
   );
 };
 

@@ -4,14 +4,14 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/provides';
 
-import { StyledLayoutSide } from './StyledLayoutSide';
+import { LayoutSide } from './LayoutSide';
 
 export interface StyledLayoutProps {
   sx?: SxProps;
   children?: ReactNode;
 }
 
-export const StyledLayout: FC<StyledLayoutProps> = ({ sx, children }) => {
+export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
   const router = useRouter();
   const { isHydration, accessToken } = useUserStore((state) => state);
 
@@ -39,7 +39,7 @@ export const StyledLayout: FC<StyledLayoutProps> = ({ sx, children }) => {
       }}
     >
       <Stack flexDirection={'row'} height={'100%'} width={'100%'}>
-        <StyledLayoutSide />
+        <LayoutSide />
         <Stack
           sx={{
             flex: 1,

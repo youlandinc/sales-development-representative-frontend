@@ -12,15 +12,16 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/provides';
-import { LAYOUT_SIDE_MENU } from './StyledLayout.data';
+import { USystemLogout } from '@/utils';
 
 import { StyledButton } from '@/components/atoms';
 
+import { LAYOUT_SIDE_MENU } from './Layout.data';
+
 import ICON_EXPEND from './assets/icon_expend.svg';
 import ICON_SIDE_LOGOUT from './assets/icon_side_logout.svg';
-import { USystemLogout } from '@/utils';
 
-export const StyledLayoutSide: FC = () => {
+export const LayoutSide: FC = () => {
   const { userProfile, isHydration, resetUserStore } = useUserStore(
     (state) => state,
   );
