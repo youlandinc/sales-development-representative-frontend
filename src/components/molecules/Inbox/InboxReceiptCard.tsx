@@ -11,7 +11,11 @@ import {
   InboxEditorForwardRefProps,
 } from '@/components/molecules';
 
-import { InboxContentTypeEnum, useInboxStore } from '@/stores/useInboxStore';
+import {
+  InboxContentTypeEnum,
+  ReceiptTypeEnum,
+  useInboxStore,
+} from '@/stores/useInboxStore';
 
 type InboxReceiptCardProps = {
   avatarName?: string;
@@ -26,7 +30,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   email,
   emailContent,
 }) => {
-  const { setInboxContentType, setForwardContent } = useInboxStore(
+  const { setInboxContentType, setForwardContent, receiptType } = useInboxStore(
     (state) => state,
   );
 
@@ -45,7 +49,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
             component={'span'}
             variant={'subtitle3'}
           >
-            TO:
+            {receiptType === ReceiptTypeEnum.engaged ? 'TO' : 'FROM'}:
           </Typography>
         }
       />

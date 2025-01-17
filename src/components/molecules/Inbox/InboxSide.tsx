@@ -11,11 +11,15 @@ import {
 
 import { StyledTextField } from '@/components/atoms';
 
-export const InboxSide: FC = () => {
-  const [value, setValue] = useState('Engaged');
+import { ReceiptTypeEnum, useInboxStore } from '@/stores/useInboxStore';
 
-  const handleChange = (event: SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+export const InboxSide: FC = () => {
+  const { receiptType, setReceiptType } = useInboxStore((state) => state);
+  // const [value, setValue] = useState('Engaged');
+
+  const handleChange = (_event: SyntheticEvent, newValue: ReceiptTypeEnum) => {
+    // setValue(newValue);
+    setReceiptType(newValue);
   };
 
   return (
@@ -44,10 +48,10 @@ export const InboxSide: FC = () => {
               bgcolor: '#2A292E',
             },
           }}
-          value={value}
+          value={receiptType}
         >
-          <Tab label={'Engaged'} value={'Engaged'} />
-          <Tab label={'Sent'} value={'Sent'} />
+          <Tab label={'Engaged'} value={ReceiptTypeEnum.engaged} />
+          <Tab label={'Sent'} value={ReceiptTypeEnum.sent} />
         </Tabs>
         <StyledTextField placeholder={'Search contacts...'} />
       </Stack>
