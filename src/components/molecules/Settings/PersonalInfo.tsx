@@ -1,13 +1,11 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { StyledButton, StyledTextField } from '@/components/atoms';
+import { SettingsCard } from '@/components/molecules';
 
 export const PersonalInfo = () => {
   return (
-    <Stack border={'1px solid #E5E5E5'} borderRadius={4} gap={3} p={3}>
-      <Typography lineHeight={1.2} variant={'h6'}>
-        Personal Information
-      </Typography>
+    <SettingsCard title={'Personal Information'}>
       <Stack gap={1.5}>
         <Typography>Profile details</Typography>
         <Stack
@@ -59,6 +57,6 @@ export const PersonalInfo = () => {
           <StyledTextField label={'Password'} type={'password'} />
         </Stack>
       </Stack>
-    </Stack>
+    </SettingsCard>
   );
 };

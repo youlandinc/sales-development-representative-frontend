@@ -24,6 +24,7 @@ import ICON_DELETE from './assets/icon_delete.svg';
 import ICON_COPY from './assets/icon_copy.svg';
 import { useSwitch } from '@/hooks';
 import { VerifyEmail } from './VerifyEmail';
+import { SettingsCard } from '@/components/molecules';
 
 const steps = ['Enter email domain', 'Verity ownership', 'Choose username'];
 
@@ -251,10 +252,7 @@ export const EmailConfig = () => {
   };
 
   return (
-    <Stack border={'1px solid #E5E5E5'} borderRadius={4} gap={3} p={3}>
-      <Typography lineHeight={1.2} variant={'h6'}>
-        Email
-      </Typography>
+    <SettingsCard title={'Email'}>
       <Stack gap={2}>
         <Stack
           alignItems={'center'}
@@ -476,6 +474,6 @@ export const EmailConfig = () => {
           },
         }}
       />*/}
-    </Stack>
+    </SettingsCard>
   );
 };
