@@ -22,6 +22,7 @@ import useSWR from 'swr';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { UFormatDate, UFormatNumber, UFormatPercent } from '@/utils';
+import { useSwitch } from '@/hooks';
 
 import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
@@ -32,7 +33,6 @@ import { _deleteCampaignTableItem, _fetchCampaignTableData } from '@/request';
 import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
 import ICON_NO_RESULT from './assets/icon_no_result.svg';
-import { useSwitch } from '@/hooks';
 
 //const generateMockData = (length: number): CampaignTableItem[] => {
 //  const randomEnumValue = (
