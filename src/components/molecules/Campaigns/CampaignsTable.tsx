@@ -400,6 +400,7 @@ export const CampaignsTable: FC = () => {
       await _deleteCampaignTableItem(rowId);
       setRowId(0);
       closeDelete();
+      await mutate();
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
