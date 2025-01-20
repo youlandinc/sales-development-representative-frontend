@@ -151,7 +151,11 @@ function SkeletonLoadingOverlay() {
   );
 }
 
-export const CampaignsTable: FC = () => {
+interface CampaignsTableProps {
+  store: { searchWord: string };
+}
+
+export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
   const columns: GridColDef<CampaignTableItem>[] = [
     {
       headerName: 'Campaign name',
@@ -370,12 +374,17 @@ export const CampaignsTable: FC = () => {
   const [totalElements, setTotalElements] = useState(0);
 
   const { data, isLoading, mutate } = useSWR(
-    { page: paginationModel.page, size: paginationModel.pageSize },
-    async ({ page, size }) => {
+    {
+      page: paginationModel.page,
+      size: paginationModel.pageSize,
+      searchWord: store.searchWord,
+    },
+    async ({ page, size, searchWord }) => {
       try {
         const { data } = await _fetchCampaignTableData({
           size,
           page,
+          searchWord,
         });
         const { page: resPage } = data;
         setTotalElements(resPage.totalElements);

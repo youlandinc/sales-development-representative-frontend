@@ -1,6 +1,7 @@
 'use client';
-import { FC, useState } from 'react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import {
+  debounce,
   Icon,
   InputAdornment,
   Skeleton,
@@ -59,7 +60,15 @@ const mock = [
   },
 ];
 
-export const CampaignsHeader: FC = () => {
+interface CampaignsHeaderProps {
+  dispatch: any;
+  store: { searchWord: string };
+}
+
+export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
+  store,
+  dispatch,
+}) => {
   const { open } = useDialogStore();
 
   const [cardData, setCardData] = useState(mock);
@@ -86,6 +95,21 @@ export const CampaignsHeader: FC = () => {
     },
   );
 
+  const [value, setValue] = useState(store.searchWord);
+
+  const debounceSearchWord = useMemo(
+    () =>
+      debounce((value) => {
+        dispatch({ type: 'change', payload: { field: 'searchWord', value } });
+      }, 500),
+    [dispatch],
+  );
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    debounceSearchWord(e.target.value);
+  };
+
   return (
     <Stack gap={3}>
       <Stack alignItems={'center'} flexDirection={'row'}>
@@ -93,6 +117,7 @@ export const CampaignsHeader: FC = () => {
 
         <Stack flexDirection={'row'} gap={3} ml={'auto'}>
           <StyledTextField
+            onChange={onChange}
             size={'small'}
             slotProps={{
               input: {
@@ -113,6 +138,7 @@ export const CampaignsHeader: FC = () => {
                 ),
               },
             }}
+            value={value}
           />
           <StyledButton onClick={() => open()} size={'medium'}>
             + Create new campaign
