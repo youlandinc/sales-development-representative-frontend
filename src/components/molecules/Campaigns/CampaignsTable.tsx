@@ -33,6 +33,7 @@ import { _deleteCampaignTableItem, _fetchCampaignTableData } from '@/request';
 import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
 import ICON_NO_RESULT from './assets/icon_no_result.svg';
+import { useRouter } from 'nextjs-toploader/app';
 
 //const generateMockData = (length: number): CampaignTableItem[] => {
 //  const randomEnumValue = (
@@ -156,6 +157,8 @@ interface CampaignsTableProps {
 }
 
 export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
+  const router = useRouter();
+
   const columns: GridColDef<CampaignTableItem>[] = [
     {
       headerName: 'Campaign name',
@@ -431,8 +434,8 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         getRowId={(row) => row.campaignId}
         loading={isLoading}
         onPaginationModelChange={setPaginationModel}
-        onRowClick={(row) => {
-          console.log(row);
+        onRowClick={({ row }) => {
+          router.push(row.campaignId);
         }}
         paginationMode={'server'}
         paginationModel={paginationModel}
