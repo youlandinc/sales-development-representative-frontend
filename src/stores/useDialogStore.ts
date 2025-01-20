@@ -13,17 +13,23 @@ export type DialogStoreActions = {
   open: () => void;
   close: () => void;
   setActiveStep: (activeStep: number) => void;
+  resetDialogState: () => void;
 };
 
-export type DialogStoreProps = DialogStoreState & DialogStoreActions;
-
-export const useDialogStore = create<DialogStoreProps>()((set) => ({
+const InitialState: DialogStoreState = {
   visible: false,
   activeStep: 1,
   campaignId: '2',
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
-  setActiveStep: (activeStep) => set({ activeStep }),
+};
+
+export type DialogStoreProps = DialogStoreState & DialogStoreActions;
+
+export const useDialogStore = create<DialogStoreProps>()((set, get) => ({
+  ...InitialState,
   open: () => set({ visible: true }),
   close: () => set({ visible: false }),
+  setActiveStep: (activeStep) => set({ activeStep }),
+  resetDialogState: () => set(InitialState),
 }));

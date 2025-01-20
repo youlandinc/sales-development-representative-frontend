@@ -1,10 +1,34 @@
 import { useState } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
+import { useDialogStore } from '@/stores/useDialogStore';
+
 import { StyledTextField } from '@/components/atoms';
 
+import { CampaignLeadsCard } from './index';
+
 import ICON_SEND from './assets/icon_send.svg';
-import { useDialogStore } from '@/stores/useDialogStore';
+
+const mockLeads = [
+  {
+    id: '1',
+    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
+    role: 'CEO',
+    company: 'Google',
+    backgroundColor: '#dedede',
+  },
+  {
+    id: '2',
+    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
+    role: 'CEO',
+    company: 'Tesla',
+    backgroundColor: '#dedede',
+  },
+];
 
 export const CampaignProcessContent = () => {
   const { activeStep } = useDialogStore();
@@ -30,7 +54,6 @@ export const CampaignProcessContent = () => {
     >
       <Stack
         alignItems={'center'}
-        border={'1px solid'}
         flex={1}
         flexShrink={0}
         gap={4}
@@ -113,16 +136,37 @@ export const CampaignProcessContent = () => {
       </Stack>
 
       {activeStep === 1 ? (
+        // step 1
         <Stack
-          border={'1px solid'}
+          border={'1px solid #DFDEE6'}
+          borderRadius={4}
           height={'100%'}
+          p={3}
           sx={{
             transition: 'all .3s',
             visibility: showLeads ? 'visible' : 'hidden',
           }}
           width={showLeads ? 360 : 0}
-        ></Stack>
+        >
+          <Stack
+            borderBottom={'1px solid #E5E5E5'}
+            flexDirection={'row'}
+            pb={1.5}
+          >
+            <Typography variant={'subtitle1'}>Preview leads</Typography>
+            <Typography color={'text.secondary'} ml={'auto'} variant={'body2'}>
+              Estimated <b>{271}</b> leads
+            </Typography>
+          </Stack>
+          {mockLeads.map((lead, index) => (
+            <CampaignLeadsCard
+              key={`${lead.firstName}-${lead.lastName}-${index}`}
+              {...lead}
+            />
+          ))}
+        </Stack>
       ) : (
+        // step 2 or step 3
         <Stack
           border={'1px solid'}
           flex={1}

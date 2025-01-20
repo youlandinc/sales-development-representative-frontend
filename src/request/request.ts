@@ -5,6 +5,8 @@ import { HttpError, HttpErrorEnum, HttpVariantEnum } from '@/types';
 import { USystemLogout } from '@/utils';
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
+//'Access-Control-Allow-Origin': '*',
+axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
 
 const service = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,

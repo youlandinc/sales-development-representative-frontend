@@ -1,13 +1,34 @@
-import { FC, useState } from 'react';
-import { Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { UFormatDate, UFormatNumber, UFormatPercent } from '@/utils/UFormater';
+import { FC, ReactNode, useMemo, useState } from 'react';
+import {
+  Box,
+  Icon,
+  LinearProgress,
+  Menu,
+  MenuItem,
+  Skeleton,
+  Stack,
+  styled,
+  Typography,
+} from '@mui/material';
+import {
+  DataGrid,
+  GridColDef,
+  gridColumnPositionsSelector,
+  gridColumnsTotalWidthSelector,
+  useGridApiContext,
+} from '@mui/x-data-grid';
+
+import { UFormatDate, UFormatNumber, UFormatPercent } from '@/utils';
+
+import { CampaignStatusEnum, CampaignTableItem, HttpError } from '@/types';
 
 import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
-import { CampaignStatusEnum, CampaignTableItem } from '@/types';
 
 import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
+import useSWR from 'swr';
+import { _fetchCampaignTableData } from '@/request';
+import { SDRToast } from '@/components/atoms';
 
 const generateMockData = (length: number): CampaignTableItem[] => {
   const randomEnumValue = (
@@ -47,18 +68,86 @@ const generateMockData = (length: number): CampaignTableItem[] => {
 
 const mockData = generateMockData(10000);
 
-export const CampaignsTable: FC = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 50,
-  });
-
-  const onClickToDelete = () => {
-    console.log('delete');
+function mulberry32(a: number): () => number {
+  return () => {
+    let t = (a += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
 
+function randomBetween(seed: number, min: number, max: number): () => number {
+  const random = mulberry32(seed);
+  return () => min + (max - min) * random();
+}
+
+const SkeletonCell = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  borderBottom: '1px solid #D2D6E1',
+}));
+
+function SkeletonLoadingOverlay() {
+  const apiRef = useGridApiContext();
+
+  const dimensions = apiRef.current?.getRootDimensions();
+  const viewportHeight = dimensions?.viewportInnerSize.height ?? 0;
+
+  const rowHeight = 40;
+  const skeletonRowsCount = Math.ceil(viewportHeight / rowHeight);
+
+  const totalWidth = gridColumnsTotalWidthSelector(apiRef);
+  const positions = gridColumnPositionsSelector(apiRef);
+  const inViewportCount = useMemo(
+    () => positions.filter((value) => value <= totalWidth).length,
+    [totalWidth, positions],
+  );
+  const columns = apiRef.current.getVisibleColumns().slice(0, inViewportCount);
+
+  const children = useMemo(() => {
+    // reseed random number generator to create stable lines betwen renders
+    const random = randomBetween(12345, 25, 75);
+    const array: ReactNode[] = [];
+
+    for (let i = 0; i < skeletonRowsCount; i += 1) {
+      for (const column of columns) {
+        const width = Math.round(random());
+        array.push(
+          <SkeletonCell
+            key={`col-${column.field}-${i}`}
+            sx={{ justifyContent: column.align }}
+          >
+            <Skeleton sx={{ mx: 1 }} width={`${width}%`} />
+          </SkeletonCell>,
+        );
+      }
+      array.push(<SkeletonCell key={`fill-${i}`} />);
+    }
+    return array;
+  }, [skeletonRowsCount, columns]);
+
+  const rowsCount = apiRef.current.getRowsCount();
+
+  return rowsCount > 0 ? (
+    <LinearProgress />
+  ) : (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `${columns
+          .map(({ computedWidth }) => `${computedWidth}px`)
+          .join(' ')} 1fr`,
+        gridAutoRows: `${rowHeight}px`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export const CampaignsTable: FC = () => {
   const columns: GridColDef<CampaignTableItem>[] = [
     {
       headerName: 'Campaign name',
@@ -256,6 +345,41 @@ export const CampaignsTable: FC = () => {
     },
   ];
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 20,
+  });
+
+  const [totalElements, setTotalElements] = useState(0);
+
+  const { data, isLoading, mutate } = useSWR(
+    { page: paginationModel.page, size: paginationModel.pageSize },
+    async ({ page, size }) => {
+      try {
+        const { data } = await _fetchCampaignTableData({
+          size,
+          page,
+        });
+        const { page: resPage } = data;
+        setTotalElements(resPage.totalElements);
+        return data;
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+        return 'error';
+      }
+    },
+    {
+      revalidateOnFocus: false,
+    },
+  );
+
+  const onClickToDelete = () => {
+    console.log('delete');
+  };
+
   return (
     <Stack flex={1} flexDirection={'column'} overflow={'auto'}>
       <DataGrid
@@ -267,15 +391,30 @@ export const CampaignsTable: FC = () => {
         disableDensitySelector
         disableRowSelectionOnClick
         getRowId={(row) => row.campaignId}
+        loading={isLoading}
         onPaginationModelChange={setPaginationModel}
         onRowClick={(row) => {
           console.log(row);
         }}
+        paginationMode={'server'}
         paginationModel={paginationModel}
+        rowCount={totalElements}
         rowHeight={40}
-        rows={mockData}
+        rows={data?.content || []}
         slots={{
           pagination: CommonPagination,
+          loadingOverlay: SkeletonLoadingOverlay,
+          noRowsOverlay: () => (
+            <Stack height={'100%'} pl={8} pt={4} width={'100%'}>
+              <Typography
+                color={'text.secondary'}
+                mt={1.5}
+                variant={'subtitle2'}
+              >
+                No outstanding payables
+              </Typography>
+            </Stack>
+          ),
         }}
         sx={{
           m: '0 auto',

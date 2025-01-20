@@ -1,7 +1,22 @@
-import { FC } from 'react';
-import { Icon, InputAdornment, Stack, Typography } from '@mui/material';
+'use client';
+import { FC, useState } from 'react';
+import {
+  Icon,
+  InputAdornment,
+  Skeleton,
+  Stack,
+  Typography,
+} from '@mui/material';
+import useSWR from 'swr';
 
-import { StyledButton, StyledTextField } from '@/components/atoms';
+import { useDialogStore } from '@/stores/useDialogStore';
+
+import { UFormatNumber, UFormatPercent } from '@/utils';
+
+import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
+
+import { HttpError } from '@/types';
+import { _fetchCampaignStatistics } from '@/request';
 
 import ICON_HEADER_SEARCH from './assets/icon_header_search.svg';
 
@@ -10,33 +25,66 @@ import ICON_ACTIVE_LEADS from './assets/icon_active_leads.svg';
 import ICON_OPEN_RATE from './assets/icon_open_rate.svg';
 import ICON_REPLY_RATE from './assets/icon_reply_rate.svg';
 import ICON_MEETINGS_BOOKED from './assets/icon_meetings_booked.svg';
-import { useDialogStore } from '@/stores/useDialogStore';
 
 const mock = [
   {
     label: 'Leads sourced',
     icon: ICON_LEADS_SOURCED,
+    value: 0,
+    key: 'leadsSourced',
   },
   {
     label: 'Active leads',
     icon: ICON_ACTIVE_LEADS,
+    value: 0,
+    key: 'activeLeads',
   },
   {
     label: 'Open rate',
     icon: ICON_OPEN_RATE,
+    value: 0,
+    key: 'openRate',
   },
   {
     label: 'Reply rate',
     icon: ICON_REPLY_RATE,
+    value: 0,
+    key: 'replyRate',
   },
   {
     label: 'Meetings booked',
     icon: ICON_MEETINGS_BOOKED,
+    value: 0,
+    key: 'meetingsBooked',
   },
 ];
 
 export const CampaignsHeader: FC = () => {
   const { open } = useDialogStore();
+
+  const [cardData, setCardData] = useState(mock);
+
+  const { isLoading } = useSWR(
+    'campaigns',
+    async () => {
+      try {
+        const { data } = await _fetchCampaignStatistics();
+
+        setCardData((prev) =>
+          prev.map((item) => ({
+            ...item,
+            value: data[item.key],
+          })),
+        );
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+    {
+      revalidateOnFocus: false,
+    },
+  );
 
   return (
     <Stack gap={3}>
@@ -73,7 +121,7 @@ export const CampaignsHeader: FC = () => {
       </Stack>
 
       <Stack flexDirection={'row'} gap={3}>
-        {mock.map((item, index) => (
+        {cardData.map((item, index) => (
           <Stack
             border={'1px solid #E5E5E5'}
             borderRadius={2}
@@ -89,7 +137,15 @@ export const CampaignsHeader: FC = () => {
               </Typography>
             </Stack>
 
-            <Typography variant={'h4'}>25,898</Typography>
+            {isLoading ? (
+              <Skeleton height={48} width={56} />
+            ) : (
+              <Typography variant={'h4'}>
+                {item.value < 1
+                  ? UFormatPercent(item.value)
+                  : UFormatNumber(item.value)}
+              </Typography>
+            )}
           </Stack>
         ))}
       </Stack>
