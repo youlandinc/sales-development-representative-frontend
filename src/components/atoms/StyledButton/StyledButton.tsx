@@ -43,12 +43,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
         borderRadius: 2,
         minWidth: 'auto',
         maxWidth: 'auto',
-        boxShadow: (theme) => {
-          if (variant === 'text' || color === 'inherit') {
-            return 'none';
-          }
-          return theme.palette.boxShadow[`button_${variant}_${color}_shadow`];
-        },
+        boxShadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',

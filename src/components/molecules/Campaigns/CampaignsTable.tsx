@@ -17,56 +17,60 @@ import {
   gridColumnsTotalWidthSelector,
   useGridApiContext,
 } from '@mui/x-data-grid';
+import useSWR from 'swr';
+
+import { useDialogStore } from '@/stores/useDialogStore';
 
 import { UFormatDate, UFormatNumber, UFormatPercent } from '@/utils';
 
-import { CampaignStatusEnum, CampaignTableItem, HttpError } from '@/types';
-
+import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
+
+import { CampaignTableItem, HttpError } from '@/types';
+import { _deleteCampaignTableItem, _fetchCampaignTableData } from '@/request';
 
 import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
-import useSWR from 'swr';
-import { _fetchCampaignTableData } from '@/request';
-import { SDRToast } from '@/components/atoms';
+import ICON_NO_RESULT from './assets/icon_no_result.svg';
+import { useSwitch } from '@/hooks';
 
-const generateMockData = (length: number): CampaignTableItem[] => {
-  const randomEnumValue = (
-    enumObj: typeof CampaignStatusEnum,
-  ): CampaignStatusEnum => {
-    const values = Object.values(enumObj) as CampaignStatusEnum[];
-    return values[Math.floor(Math.random() * values.length)];
-  };
-
-  return Array.from({ length }, (_, i) => {
-    const sourced = Math.floor(Math.random() * 5000);
-    const sent = Math.random() > 0.5 ? Math.floor(Math.random() * 3000) : null;
-    const uniqueOpens = Math.floor(Math.random() * 100);
-    const uniqueClicks = Math.floor(Math.random() * 100);
-    const replied = Math.floor(Math.random() * 50);
-
-    return {
-      campaignId: -(i + 1),
-      campaignName: `Campaign ${i + 1}: Lock in Low Rates on YouLand Bridge Loans!`,
-      campaignStatus: randomEnumValue(CampaignStatusEnum),
-      createdAt: new Date(2025, 0, Math.floor(Math.random() * 30) + 1)
-        .toISOString()
-        .split('T')[0],
-      sourced: sourced,
-      activeLeads:
-        Math.random() > 0.5 ? Math.floor(Math.random() * 5000) : null,
-      sent: sent,
-      uniqueOpens: uniqueOpens,
-      uniqueOpenRate: sent ? parseFloat((uniqueOpens / sent).toFixed(2)) : 0,
-      uniqueClicks: uniqueClicks,
-      uniqueClickRate: sent ? parseFloat((uniqueClicks / sent).toFixed(2)) : 0,
-      replied: replied,
-      repliedRate: sent ? parseFloat((replied / sent).toFixed(2)) : 0,
-    };
-  });
-};
-
-const mockData = generateMockData(10000);
+//const generateMockData = (length: number): CampaignTableItem[] => {
+//  const randomEnumValue = (
+//    enumObj: typeof CampaignStatusEnum,
+//  ): CampaignStatusEnum => {
+//    const values = Object.values(enumObj) as CampaignStatusEnum[];
+//    return values[Math.floor(Math.random() * values.length)];
+//  };
+//
+//  return Array.from({ length }, (_, i) => {
+//    const sourced = Math.floor(Math.random() * 5000);
+//    const sent = Math.random() > 0.5 ? Math.floor(Math.random() * 3000) : null;
+//    const uniqueOpens = Math.floor(Math.random() * 100);
+//    const uniqueClicks = Math.floor(Math.random() * 100);
+//    const replied = Math.floor(Math.random() * 50);
+//
+//    return {
+//      campaignId: -(i + 1),
+//      campaignName: `Campaign ${i + 1}: Lock in Low Rates on YouLand Bridge Loans!`,
+//      campaignStatus: randomEnumValue(CampaignStatusEnum),
+//      createdAt: new Date(2025, 0, Math.floor(Math.random() * 30) + 1)
+//        .toISOString()
+//        .split('T')[0],
+//      sourced: sourced,
+//      activeLeads:
+//        Math.random() > 0.5 ? Math.floor(Math.random() * 5000) : null,
+//      sent: sent,
+//      uniqueOpens: uniqueOpens,
+//      uniqueOpenRate: sent ? parseFloat((uniqueOpens / sent).toFixed(2)) : 0,
+//      uniqueClicks: uniqueClicks,
+//      uniqueClickRate: sent ? parseFloat((uniqueClicks / sent).toFixed(2)) : 0,
+//      replied: replied,
+//      repliedRate: sent ? parseFloat((replied / sent).toFixed(2)) : 0,
+//    };
+//  });
+//};
+//
+//const mockData = generateMockData(10000);
 
 function mulberry32(a: number): () => number {
   return () => {
@@ -322,7 +326,7 @@ export const CampaignsTable: FC = () => {
       align: 'left',
       headerAlign: 'left',
       minWidth: 160,
-      renderCell: () => {
+      renderCell: ({ row }) => {
         return (
           <Stack
             height={'100%'}
@@ -336,6 +340,7 @@ export const CampaignsTable: FC = () => {
               component={ICON_TABLE_ACTION}
               onClick={(e: any) => {
                 setAnchorEl(e.currentTarget);
+                setRowId(row.campaignId);
               }}
               sx={{ cursor: 'pointer' }}
             />
@@ -345,12 +350,22 @@ export const CampaignsTable: FC = () => {
     },
   ];
 
+  const { open } = useDialogStore();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
   });
+
+  const {
+    open: openDelete,
+    close: closeDelete,
+    visible: visibleDelete,
+  } = useSwitch(false);
+  const [deleting, setDeleting] = useState(false);
+  const [rowId, setRowId] = useState<string | number>(0);
 
   const [totalElements, setTotalElements] = useState(0);
 
@@ -376,11 +391,24 @@ export const CampaignsTable: FC = () => {
     },
   );
 
-  const onClickToDelete = () => {
-    console.log('delete');
+  const onClickToDelete = async () => {
+    if (!rowId) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await _deleteCampaignTableItem(rowId);
+      setRowId(0);
+      closeDelete();
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setDeleting(false);
+    }
   };
 
-  return (
+  return data === 'error' ? null : (
     <Stack flex={1} flexDirection={'column'} overflow={'auto'}>
       <DataGrid
         columnHeaderHeight={40}
@@ -405,13 +433,30 @@ export const CampaignsTable: FC = () => {
           pagination: CommonPagination,
           loadingOverlay: SkeletonLoadingOverlay,
           noRowsOverlay: () => (
-            <Stack height={'100%'} pl={8} pt={4} width={'100%'}>
+            <Stack
+              alignItems={'center'}
+              height={'100%'}
+              justifyContent={'center'}
+              minHeight={480}
+              width={'100%'}
+            >
+              <Icon
+                component={ICON_NO_RESULT}
+                sx={{
+                  width: 256,
+                  height: 238,
+                }}
+              />
+              <Typography color={'text.secondary'} mt={1.5} variant={'body2'}>
+                You don&#39;t have any Campaigns yet.
+              </Typography>
               <Typography
-                color={'text.secondary'}
-                mt={1.5}
-                variant={'subtitle2'}
+                color={'#6E4EFB'}
+                onClick={() => open()}
+                sx={{ cursor: 'pointer' }}
+                variant={'body2'}
               >
-                No outstanding payables
+                Create new campaign
               </Typography>
             </Stack>
           ),
@@ -502,13 +547,65 @@ export const CampaignsTable: FC = () => {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={onClickToDelete} sx={{ alignItems: 'center' }}>
+        <MenuItem
+          onClick={() => {
+            openDelete();
+            setAnchorEl(null);
+          }}
+          sx={{ alignItems: 'center' }}
+        >
           <Icon component={ICON_TABLE_DELETE} />
           <Typography pb={0.5} variant={'subtitle3'}>
             Delete campaign
           </Typography>
         </MenuItem>
       </Menu>
+
+      <StyledDialog
+        content={
+          <Typography
+            color={'text.secondary'}
+            pb={3}
+            pt={1.5}
+            variant={'body2'}
+          >
+            This action cannot be undone, and all data will be permanently
+            deleted.
+          </Typography>
+        }
+        footer={
+          <Stack flexDirection={'row'} gap={3} justifyContent={'flex-end'}>
+            <StyledButton
+              color={'info'}
+              onClick={() => {
+                closeDelete();
+                setRowId(0);
+              }}
+              size={'medium'}
+              sx={{ width: 90 }}
+              variant={'outlined'}
+            >
+              Cancel
+            </StyledButton>
+            <StyledButton
+              color={'error'}
+              disabled={deleting}
+              loading={deleting}
+              onClick={onClickToDelete}
+              size={'medium'}
+              sx={{ width: 90 }}
+            >
+              Delete
+            </StyledButton>
+          </Stack>
+        }
+        header={'Do you want to delete this campaign?'}
+        onClose={() => {
+          closeDelete();
+          setRowId(0);
+        }}
+        open={visibleDelete}
+      />
     </Stack>
   );
 };

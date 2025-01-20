@@ -82,18 +82,7 @@ declare module '@mui/material/styles' {
   interface TypeBoxShadow {
     card_shadow: string;
     dropdown_shadow: string;
-    button_contained_primary_shadow: string;
-    button_outlined_primary_shadow: string;
-    button_contained_secondary_shadow: string;
-    button_outlined_secondary_shadow: string;
-    button_contained_info_shadow: string;
-    button_outlined_info_shadow: string;
-    button_contained_success_shadow: string;
-    button_outlined_success_shadow: string;
-    button_contained_warning_shadow: string;
-    button_outlined_warning_shadow: string;
-    button_contained_error_shadow: string;
-    button_outlined_error_shadow: string;
+    button_shadow: string;
   }
 
   interface TypographyVariants {
@@ -211,19 +200,7 @@ const defaultOptions: ThemeOptions = {
       card_shadow: '0px 0px 10px 0px rgba(17, 52, 227, 0.20)',
       dropdown_shadow:
         '0px 10px 10px 0px rgba(17, 52, 227, 0.10), 0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
-      button_contained_primary_shadow:
-        '0px 1px 1px 0px rgba(73, 51, 173, 0.50)',
-      button_outlined_primary_shadow: '0px 1px 1px 0px rgba(72, 72, 72, 0.50)',
-      button_contained_secondary_shadow: '',
-      button_outlined_secondary_shadow: '',
-      button_contained_info_shadow: '',
-      button_outlined_info_shadow: ' 0px 1px 1px 0px rgba(72, 72, 72, 0.50)',
-      button_contained_success_shadow: '',
-      button_outlined_success_shadow: '',
-      button_contained_warning_shadow: '',
-      button_outlined_warning_shadow: '',
-      button_contained_error_shadow: '',
-      button_outlined_error_shadow: '',
+      button_shadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
     },
   },
   typography: {

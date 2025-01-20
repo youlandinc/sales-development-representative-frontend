@@ -15,7 +15,7 @@ import { UFormatNumber, UFormatPercent } from '@/utils';
 
 import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 
-import { HttpError } from '@/types';
+import { HttpError, ResponseCampaignStatistics } from '@/types';
 import { _fetchCampaignStatistics } from '@/request';
 
 import ICON_HEADER_SEARCH from './assets/icon_header_search.svg';
@@ -73,7 +73,7 @@ export const CampaignsHeader: FC = () => {
         setCardData((prev) =>
           prev.map((item) => ({
             ...item,
-            value: data[item.key],
+            value: data[item.key as keyof ResponseCampaignStatistics],
           })),
         );
       } catch (err) {

@@ -1,12 +1,17 @@
-import { get, post } from '@/request/request';
+import { del, get, post } from '@/request/request';
+import { ResponseCampaignStatistics, ResponseCampaignTable } from '@/types';
 
 export const _fetchCampaignStatistics = () => {
-  return get('/sdr/campaign/statistics');
+  return get<ResponseCampaignStatistics>('/sdr/campaign/statistics');
 };
 
 export const _fetchCampaignTableData = (params: {
   size: number;
   page: number;
 }) => {
-  return post('/sdr/campaign/infos', params);
+  return post<ResponseCampaignTable>('/sdr/campaign/infos', params);
+};
+
+export const _deleteCampaignTableItem = (campaignId: string | number) => {
+  return del(`/sdr/campaign/info/${campaignId}`);
 };

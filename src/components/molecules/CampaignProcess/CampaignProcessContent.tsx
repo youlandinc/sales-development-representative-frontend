@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { StyledTextField } from '@/components/atoms';
+import { SDRToast, StyledTextField } from '@/components/atoms';
 
 import { CampaignLeadsCard } from './index';
 
 import ICON_SEND from './assets/icon_send.svg';
+import { _sendChatMessage } from '@/request/campaign/createCampagin';
+import { HttpError } from '@/types';
 
 const mockLeads = [
   {
@@ -35,12 +37,54 @@ export const CampaignProcessContent = () => {
 
   const [showLeads, setShowLeads] = useState(false);
 
-  const [content, setContent] = useState('');
+  const [sending, setSending] = useState(false);
+  const [inputValue, setInputValue] = useState('');
   const [showContent, setShowContent] = useState(false);
 
   const onClickToSendMessage = () => {
     setShowContent(!showContent);
     setShowLeads(!showLeads);
+  };
+
+  const handleKeyDown = async (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter') {
+      if (event.shiftKey) {
+        // Shift + Enter: Add newline
+        event.preventDefault(); // 防止默认的换行行为
+        setInputValue((prev) => prev + '\n');
+        event.preventDefault(); // Prevent default Enter behavior
+      } else {
+        // Enter: Send message
+        if (inputValue.trim()) {
+          setInputValue(''); // Clear the input box
+        } else {
+          await sendMessage();
+        }
+        event.preventDefault(); // Prevent default Enter behavior
+      }
+    }
+  };
+
+  const sendMessage = async () => {
+    const message = inputValue.trim();
+    if (!message) {
+      return;
+    }
+    // Send message
+    const postData = {
+      message,
+    };
+    setSending(true);
+    try {
+      const { data } = await _sendChatMessage(postData);
+      console.log(data);
+      setInputValue('');
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -89,6 +133,7 @@ export const CampaignProcessContent = () => {
         <Stack
           bgcolor={'#F8F8FA'}
           borderRadius={4}
+          component={'form'}
           maxWidth={showContent ? '100%' : 768}
           minHeight={100}
           pb={1.5}
@@ -97,8 +142,10 @@ export const CampaignProcessContent = () => {
           width={'100%'}
         >
           <StyledTextField
+            disabled={sending}
             multiline
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={'Message...'}
             rows={4}
             sx={{
@@ -116,18 +163,18 @@ export const CampaignProcessContent = () => {
                 },
               },
             }}
-            value={content}
+            value={inputValue}
           />
 
           <Stack
             alignItems={'center'}
-            bgcolor={'#BABCBE'}
+            bgcolor={sending ? '#DEDEDE' : '#BABCBE'}
             borderRadius={'50%'}
             height={32}
             justifyContent={'center'}
             ml={'auto'}
-            onClick={onClickToSendMessage}
-            sx={{ cursor: 'pointer' }}
+            onClick={sendMessage}
+            sx={{ cursor: sending ? 'default' : 'pointer' }}
             width={32}
           >
             <Icon component={ICON_SEND} sx={{ width: 24, height: 24 }} />
