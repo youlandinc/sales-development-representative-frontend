@@ -50,7 +50,7 @@ export const CommonReceiptCardHeader: FC<CommonReceiptCardHeaderProps> = ({
         </Typography>
       </Stack>
       {time && (
-        <Typography color={'#637381'} variant={'body3'}>
+        <Typography color={'#637381'} component={'div'} variant={'body3'}>
           {time}
         </Typography>
       )}

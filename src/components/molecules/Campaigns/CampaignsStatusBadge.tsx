@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Typography } from '@mui/material';
+import { SxProps, Typography } from '@mui/material';
 import { CampaignStatusEnum } from '@/types';
 
 const computedStyles = (status: CampaignStatusEnum) => {
@@ -39,10 +39,12 @@ const computedStyles = (status: CampaignStatusEnum) => {
 
 type StyledCampaignStatusProps = {
   status: CampaignStatusEnum;
+  sx?: SxProps;
 };
 
 export const CampaignsStatusBadge: FC<StyledCampaignStatusProps> = ({
   status,
+  sx,
 }) => {
   return (
     <Typography
@@ -51,6 +53,7 @@ export const CampaignsStatusBadge: FC<StyledCampaignStatusProps> = ({
       color={computedStyles(status).color}
       px={1.25}
       py={'2px'}
+      sx={sx}
       variant={'subtitle3'}
       width={'fit-content'}
     >

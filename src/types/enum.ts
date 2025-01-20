@@ -4,3 +4,8 @@ export enum EmailDomainStateEnum {
   FAILED = 'FAILED',
   ACTIVE = 'ACTIVE',
 }
+
+export enum MarketingReportProcessStatusEnum {
+  scheduled = 'SCHEDULED',
+  completed = 'COMPLETED',
+}

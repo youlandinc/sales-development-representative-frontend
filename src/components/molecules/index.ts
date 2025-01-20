@@ -11,3 +11,5 @@ export * from './CampaignProcess';
 export * from './Inbox';
 
 export * from './Settings';
+
+export * from './CampaignsPending';
