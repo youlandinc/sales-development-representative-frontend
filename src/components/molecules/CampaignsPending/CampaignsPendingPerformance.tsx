@@ -20,7 +20,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
   // option = [],
 }) => {
   const [expandedTarget, setExpandedTarget] = useState('');
-  const [selectedValue, setSelectedValue] = useState('-1L');
+  const [selectedValue] = useState('-1L');
 
   const onClickToExpand = useCallback(
     (target: string) => {
@@ -34,10 +34,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
   );
 
   const performance = useMemo(() => {
-    const result = performances.find(
-      (item) => item.subjectId === selectedValue,
-    );
-    return result;
+    return performances.find((item) => item.subjectId === selectedValue);
   }, [performances, selectedValue]);
 
   return (
