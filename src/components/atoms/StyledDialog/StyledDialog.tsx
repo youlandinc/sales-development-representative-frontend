@@ -82,6 +82,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
 
   return (
     <Dialog
+      closeAfterTransition={false}
       fullWidth={true}
       open={open}
       sx={{

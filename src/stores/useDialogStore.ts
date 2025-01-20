@@ -4,6 +4,7 @@ import { CampaignStatusEnum } from '@/types';
 export type DialogStoreState = {
   visible: boolean;
   activeStep: number;
+  chatId: string | number;
   campaignId: number | string | null;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
@@ -19,7 +20,8 @@ export type DialogStoreActions = {
 const InitialState: DialogStoreState = {
   visible: false,
   activeStep: 1,
-  campaignId: '2',
+  chatId: '',
+  campaignId: '',
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
 };

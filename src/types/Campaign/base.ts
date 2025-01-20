@@ -29,3 +29,21 @@ export interface CampaignLeadItem {
   company: string | null;
   backgroundColor: string | null;
 }
+
+export interface ResponseCampaignTable {
+  content: CampaignTableItem[];
+  page: {
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    number: number;
+  };
+}
+
+export interface ResponseCampaignStatistics {
+  leadsSourced: number;
+  activeLeads: number;
+  openRate: number;
+  replyRate: number;
+  meetingsBooked: number;
+}
