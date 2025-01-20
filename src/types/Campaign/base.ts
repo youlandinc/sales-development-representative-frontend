@@ -20,3 +20,12 @@ export interface CampaignTableItem {
   replied: number | null;
   repliedRate: number | null;
 }
+
+export interface CampaignLeadItem {
+  name: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  role: string | null;
+  company: string | null;
+  backgroundColor: string | null;
+}
