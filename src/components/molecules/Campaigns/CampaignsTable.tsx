@@ -22,6 +22,7 @@ import useSWR from 'swr';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { UFormatDate, UFormatNumber, UFormatPercent } from '@/utils';
+import { useSwitch } from '@/hooks';
 
 import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
@@ -32,7 +33,6 @@ import { _deleteCampaignTableItem, _fetchCampaignTableData } from '@/request';
 import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
 import ICON_NO_RESULT from './assets/icon_no_result.svg';
-import { useSwitch } from '@/hooks';
 
 //const generateMockData = (length: number): CampaignTableItem[] => {
 //  const randomEnumValue = (
@@ -151,7 +151,11 @@ function SkeletonLoadingOverlay() {
   );
 }
 
-export const CampaignsTable: FC = () => {
+interface CampaignsTableProps {
+  store: { searchWord: string };
+}
+
+export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
   const columns: GridColDef<CampaignTableItem>[] = [
     {
       headerName: 'Campaign name',
@@ -370,12 +374,17 @@ export const CampaignsTable: FC = () => {
   const [totalElements, setTotalElements] = useState(0);
 
   const { data, isLoading, mutate } = useSWR(
-    { page: paginationModel.page, size: paginationModel.pageSize },
-    async ({ page, size }) => {
+    {
+      page: paginationModel.page,
+      size: paginationModel.pageSize,
+      searchWord: store.searchWord,
+    },
+    async ({ page, size, searchWord }) => {
       try {
         const { data } = await _fetchCampaignTableData({
           size,
           page,
+          searchWord,
         });
         const { page: resPage } = data;
         setTotalElements(resPage.totalElements);

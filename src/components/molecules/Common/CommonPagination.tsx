@@ -41,7 +41,7 @@ export const CommonPagination: FC = () => {
         </StyledButton>
         <StyledButton
           color={'info'}
-          disabled={page === pageCount - 1}
+          disabled={page === pageCount - 1 || pageCount === 0}
           onClick={() => {
             setPaginationModel({ page: page + 1, pageSize: pageSize });
           }}

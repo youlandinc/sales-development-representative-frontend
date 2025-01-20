@@ -8,6 +8,7 @@ export const _fetchCampaignStatistics = () => {
 export const _fetchCampaignTableData = (params: {
   size: number;
   page: number;
+  searchWord?: string;
 }) => {
   return post<ResponseCampaignTable>('/sdr/campaign/infos', params);
 };
