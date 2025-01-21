@@ -81,16 +81,3 @@ export const UFormatDate = (
   }
   return format(new Date(date), timeFormat, options);
 };
-
-export const POSThousandSeparator = (
-  amount: number | undefined | string | null,
-): string => {
-  if (!amount) {
-    return '0';
-  }
-  let target = amount;
-  if (UTypeOf(target) === 'String') {
-    target = parseFloat(target as string);
-  }
-  return target.toLocaleString('en-US', {});
-};

@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { format, parseISO } from 'date-fns';
 
-import { POSThousandSeparator } from '@/utils/UFormater';
+import { UFormatNumber } from '@/utils/UFormater';
 
 import { IMarketingReportTimeline } from '@/types';
 import { MarketingReportProcessStatusEnum } from '@/types/enum';
@@ -115,7 +115,7 @@ export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
                       component={'span'}
                       variant={'subtitle3'}
                     >
-                      {POSThousandSeparator(item.quantity)}
+                      {UFormatNumber(item.quantity)}
                     </Typography>{' '}
                     emails per day over the course of{' '}
                     <Typography
@@ -123,7 +123,7 @@ export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
                       component={'span'}
                       variant={'subtitle3'}
                     >
-                      {POSThousandSeparator(item.dayDone)}
+                      {UFormatNumber(item.dayDone)}
                     </Typography>{' '}
                     days.
                   </Typography>
@@ -143,7 +143,7 @@ export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
                       component={'span'}
                       variant={'subtitle3'}
                     >
-                      {POSThousandSeparator(item.total)}
+                      {UFormatNumber(item.total)}
                     </Typography>{' '}
                     emails. To date,{' '}
                     <Typography
@@ -151,7 +151,7 @@ export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
                       component={'span'}
                       variant={'subtitle3'}
                     >
-                      {POSThousandSeparator(item.sent)}
+                      {UFormatNumber(item.sent)}
                     </Typography>{' '}
                     emails have been successfully sent, with{' '}
                     <Typography
@@ -159,7 +159,7 @@ export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
                       component={'span'}
                       variant={'subtitle3'}
                     >
-                      {POSThousandSeparator(item.unSent)}
+                      {UFormatNumber(item.unSent)}
                     </Typography>{' '}
                     emails failing to deliver.
                   </Typography>

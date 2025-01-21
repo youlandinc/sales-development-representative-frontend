@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { Box, Collapse, Icon, Stack, Tooltip, Typography } from '@mui/material';
 import { format, isValid } from 'date-fns';
 
-import { POSThousandSeparator } from '@/utils/UFormater';
+import { UFormatNumber } from '@/utils/UFormater';
 
 import { MarketingReportPerformance } from '@/types';
 
@@ -93,9 +93,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Delivered to
               <Typography variant={'h6'}>
-                {POSThousandSeparator(
-                  performance?.deliveryStatistics?.deliveredTo,
-                )}
+                {UFormatNumber(performance?.deliveryStatistics?.deliveredTo)}
               </Typography>
             </Stack>
             <Stack
@@ -131,7 +129,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Sent to
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(performance?.deliveryStatistics?.sentTo)}
+                {UFormatNumber(performance?.deliveryStatistics?.sentTo)}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -139,9 +137,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Delivered to
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
-                  performance?.deliveryStatistics?.deliveredTo,
-                )}
+                {UFormatNumber(performance?.deliveryStatistics?.deliveredTo)}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -170,9 +166,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
-                  performance?.deliveryStatistics?.softBounces,
-                )}
+                {UFormatNumber(performance?.deliveryStatistics?.softBounces)}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -193,9 +187,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
-                  performance?.deliveryStatistics?.hardBounces,
-                )}
+                {UFormatNumber(performance?.deliveryStatistics?.hardBounces)}
               </Typography>
             </Stack>
           </Stack>
@@ -240,9 +232,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Total opens
               <Typography variant={'h6'}>
-                {POSThousandSeparator(
-                  performance?.openStatistics?.estimatedOpens,
-                )}
+                {UFormatNumber(performance?.openStatistics?.estimatedOpens)}
               </Typography>
             </Stack>
             <Stack
@@ -258,11 +248,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
               <Typography variant={'h6'}>
                 {performance?.openStatistics?.uniqueOpenRate + '%'}
                 <Typography component={'span'} variant={'body2'}>
-                  (
-                  {POSThousandSeparator(
-                    performance?.openStatistics?.uniqueOpens,
-                  )}
-                  )
+                  ({UFormatNumber(performance?.openStatistics?.uniqueOpens)})
                 </Typography>
               </Typography>
             </Stack>
@@ -320,7 +306,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(performance?.openStatistics?.uniqueOpens)}
+                {UFormatNumber(performance?.openStatistics?.uniqueOpens)}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -341,7 +327,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(performance?.openStatistics?.totalOpens)}
+                {UFormatNumber(performance?.openStatistics?.totalOpens)}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -349,9 +335,8 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Average time to open
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
-                  performance?.openStatistics?.averageTimeToOpen,
-                ) + 'min'}
+                {UFormatNumber(performance?.openStatistics?.averageTimeToOpen) +
+                  'min'}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -372,7 +357,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
+                {UFormatNumber(
                   performance?.openStatistics?.unTrackableContacts,
                 )}
               </Typography>
@@ -419,9 +404,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Unique clicks
               <Typography variant={'h6'}>
-                {POSThousandSeparator(
-                  performance?.clickStatistics?.uniqueClicks,
-                )}
+                {UFormatNumber(performance?.clickStatistics?.uniqueClicks)}
               </Typography>
             </Stack>
             <Stack
@@ -437,11 +420,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
               <Typography variant={'h6'}>
                 {performance?.clickStatistics?.clickThoughRate + '%'}
                 <Typography component={'span'} variant={'body2'}>
-                  (
-                  {POSThousandSeparator(
-                    performance?.clickStatistics?.uniqueClicks,
-                  )}
-                  )
+                  ({UFormatNumber(performance?.clickStatistics?.uniqueClicks)})
                 </Typography>
               </Typography>
             </Stack>
@@ -485,9 +464,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
-                  performance?.clickStatistics?.totalClicks,
-                )}
+                {UFormatNumber(performance?.clickStatistics?.totalClicks)}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -508,9 +485,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
-                  performance?.clickStatistics?.uniqueClicks,
-                )}
+                {UFormatNumber(performance?.clickStatistics?.uniqueClicks)}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -552,7 +527,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
+                {UFormatNumber(
                   performance?.clickStatistics?.averageTimeToClick,
                 ) + 'min'}
               </Typography>
@@ -627,7 +602,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Unsubscribes
               <Typography variant={'h6'}>
-                {POSThousandSeparator(
+                {UFormatNumber(
                   performance?.unsubscribesStatistics?.unsubscribes,
                 )}
               </Typography>
@@ -646,7 +621,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 {performance?.unsubscribesStatistics?.unsubscribeRate + '%'}
                 <Typography component={'span'} variant={'body2'}>
                   (
-                  {POSThousandSeparator(
+                  {UFormatNumber(
                     performance?.unsubscribesStatistics?.unsubscribes,
                   )}
                   )
@@ -672,7 +647,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Unsubscribes
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
+                {UFormatNumber(
                   performance?.unsubscribesStatistics?.unsubscribes,
                 )}
               </Typography>
@@ -703,7 +678,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {POSThousandSeparator(
+                {UFormatNumber(
                   performance?.unsubscribesStatistics?.spamComplaints,
                 )}
               </Typography>
