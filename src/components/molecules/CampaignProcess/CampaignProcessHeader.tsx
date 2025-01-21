@@ -20,7 +20,8 @@ export const CampaignProcessHeader: FC = () => {
 };
 
 export const CampaignProcessHeaderStepFirst: FC = () => {
-  const { close, resetDialogState } = useDialogStore();
+  const { close, resetDialogState, leadsVisible, createCampaign, creating } =
+    useDialogStore();
 
   return (
     <Stack gap={1.5}>
@@ -35,7 +36,21 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
           sx={{ ml: 'auto', cursor: 'pointer' }}
         />
       </Stack>
-      <CampaignProcessHeaderButtonGroup />
+
+      <Stack flexDirection={'row'}>
+        <CampaignProcessHeaderButtonGroup />
+        {leadsVisible && (
+          <StyledButton
+            disabled={creating}
+            loading={creating}
+            onClick={async () => await createCampaign()}
+            size={'medium'}
+            sx={{ ml: 'auto', width: 180 }}
+          >
+            Continue to Messaging
+          </StyledButton>
+        )}
+      </Stack>
     </Stack>
   );
 };

@@ -3,7 +3,7 @@ import { Icon, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { SDRToast, StyledTextField } from '@/components/atoms';
+import { SDRToast, StyledLoading, StyledTextField } from '@/components/atoms';
 
 import { CampaignLeadsCard, CampaignProcessChatServer } from './index';
 
@@ -100,17 +100,22 @@ export const CampaignProcessContent = () => {
     }
   }, [deps]);
 
+  const [leadsFetching, setLeadsFetching] = useState(false);
+
   const fetchLeads = async () => {
+    !leadsVisible && setLeadsVisible(true);
+    setLeadsFetching(true);
     try {
       const {
         data: { leads, counts },
       } = await _fetchChatLeads(chatId);
       setLeadsList(leads);
       setLeadsCount(counts);
-      !leadsVisible && setLeadsVisible(true);
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
+    } finally {
+      setLeadsFetching(false);
     }
   };
 
@@ -259,10 +264,12 @@ export const CampaignProcessContent = () => {
       {activeStep === 1 ? (
         // step 1
         <Stack
+          alignItems={leadsFetching ? 'center' : 'unset'}
           border={'1px solid #DFDEE6'}
           borderRadius={4}
           flexShrink={0}
           height={'100%'}
+          justifyContent={leadsFetching ? 'center' : 'unset'}
           overflow={'auto'}
           px={leadsVisible ? 3 : 0}
           sx={{
@@ -271,32 +278,42 @@ export const CampaignProcessContent = () => {
           }}
           width={leadsVisible ? 360 : 0}
         >
-          <Stack
-            bgcolor={'#ffffff'}
-            borderBottom={'1px solid #E5E5E5'}
-            flexDirection={'row'}
-            pb={1.5}
-            position={'sticky'}
-            pt={3}
-            sx={{
-              zIndex: 999,
-            }}
-            top={0}
-          >
-            <Typography variant={'subtitle1'}>Preview leads</Typography>
-            <Typography color={'text.secondary'} ml={'auto'} variant={'body2'}>
-              Estimated <b>{leadsCount}</b> leads
-            </Typography>
-          </Stack>
+          {leadsFetching ? (
+            <StyledLoading size={48} />
+          ) : (
+            <>
+              <Stack
+                bgcolor={'#ffffff'}
+                borderBottom={'1px solid #E5E5E5'}
+                flexDirection={'row'}
+                pb={1.5}
+                position={'sticky'}
+                pt={3}
+                sx={{
+                  zIndex: 999,
+                }}
+                top={0}
+              >
+                <Typography variant={'subtitle1'}>Preview leads</Typography>
+                <Typography
+                  color={'text.secondary'}
+                  ml={'auto'}
+                  variant={'body2'}
+                >
+                  Estimated <b>{leadsCount}</b> leads
+                </Typography>
+              </Stack>
 
-          <Stack pb={3}>
-            {leadsList.map((lead, index) => (
-              <CampaignLeadsCard
-                key={`${lead.firstName}-${lead.lastName}-${index}`}
-                {...lead}
-              />
-            ))}
-          </Stack>
+              <Stack pb={3}>
+                {leadsList.map((lead, index) => (
+                  <CampaignLeadsCard
+                    key={`${lead.firstName}-${lead.lastName}-${index}`}
+                    {...lead}
+                  />
+                ))}
+              </Stack>
+            </>
+          )}
         </Stack>
       ) : (
         // step 2 or step 3
