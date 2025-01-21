@@ -1,12 +1,13 @@
 import { get, post } from '@/request/request';
+import { ResponseCampaignLeadsInfo } from '@/types';
 
 export const _sendChatMessage = (params: {
   chatId?: number;
   message: string;
 }) => {
-  return post('/sdr/ai/chat', params);
+  return post<{ chatId: number | string }>('/sdr/ai/chat', params);
 };
 
 export const _fetchChatLeads = (chatId: string | number) => {
-  return get(`/sdr/ai/chat/${chatId}`);
+  return get<ResponseCampaignLeadsInfo>(`/sdr/ai/leads/${chatId}`);
 };

@@ -105,6 +105,8 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
     [dispatch],
   );
 
+  //const debounceSearchWord = debounce((value)=>dispatch({ type: 'change', payload: { field: 'searchWord', value } }), 500);
+
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     debounceSearchWord(e.target.value);

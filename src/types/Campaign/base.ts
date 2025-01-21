@@ -23,15 +23,6 @@ export interface CampaignTableItem {
   repliedRate: number | null;
 }
 
-export interface CampaignLeadItem {
-  name: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  role: string | null;
-  company: string | null;
-  backgroundColor: string | null;
-}
-
 export type IMarketingReportTimeline = {
   status: MarketingReportProcessStatusEnum;
   startTime: string | null;

@@ -20,7 +20,7 @@ export const CampaignProcessHeader: FC = () => {
 };
 
 export const CampaignProcessHeaderStepFirst: FC = () => {
-  const { close } = useDialogStore();
+  const { close, resetDialogState } = useDialogStore();
 
   return (
     <Stack gap={1.5}>
@@ -28,7 +28,10 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
         <Typography variant={'h6'}>Start new campaign</Typography>
         <Icon
           component={ICON_CLOSE}
-          onClick={() => close()}
+          onClick={() => {
+            close();
+            resetDialogState();
+          }}
           sx={{ ml: 'auto', cursor: 'pointer' }}
         />
       </Stack>
@@ -45,7 +48,9 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       <Stack alignItems={'center'} flexDirection={'row'}>
         <Icon
           component={ICON_BACK}
-          onClick={() => close()}
+          onClick={() => {
+            close();
+          }}
           sx={{
             cursor: 'pointer',
             width: 20,
