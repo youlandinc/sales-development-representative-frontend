@@ -358,7 +358,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         loading={isLoading}
         onPaginationModelChange={setPaginationModel}
         onRowClick={({ row }) => {
-          router.push(row.campaignId);
+          router.push(`/campaigns/pending/${row.campaignId}`);
         }}
         paginationMode={'server'}
         paginationModel={paginationModel}

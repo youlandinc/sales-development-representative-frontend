@@ -13,3 +13,5 @@ export * from './Inbox';
 export * from './Settings';
 
 export * from './CampaignsPending';
+
+export * from './Library';

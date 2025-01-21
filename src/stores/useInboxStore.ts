@@ -16,13 +16,13 @@ export type InboxStoreState = {
   forwardContent: string;
 };
 
-export type TableImportStoreActions = {
+export type InboxStoreStateActions = {
   setInboxContentType: (inboxContentType: InboxContentTypeEnum) => void;
   setForwardContent: (forwardContent: string) => void;
   setReceiptType: (receiptType: ReceiptTypeEnum) => void;
 };
 
-export type InboxStoreProps = InboxStoreState & TableImportStoreActions;
+export type InboxStoreProps = InboxStoreState & InboxStoreStateActions;
 
 export const useInboxStore = create<InboxStoreProps>()((set) => ({
   receiptType: ReceiptTypeEnum.engaged,
