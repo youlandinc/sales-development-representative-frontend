@@ -11,3 +11,7 @@ export const _sendChatMessage = (params: {
 export const _fetchChatLeads = (chatId: string | number) => {
   return get<ResponseCampaignLeadsInfo>(`/sdr/ai/leads/${chatId}`);
 };
+
+export const _createCampaign = (params: { chatId: number | string }) => {
+  return post('/sdr/campaign/info', params);
+};

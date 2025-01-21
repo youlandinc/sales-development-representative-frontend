@@ -12,9 +12,11 @@ export const CampaignProcess = () => {
       content={<CampaignProcessContent />}
       fullScreen={activeStep !== 1}
       header={<CampaignProcessHeader />}
-      onClose={() => {
-        close();
-        resetDialogState();
+      onClose={(_, reason) => {
+        if (reason === 'escapeKeyDown') {
+          close();
+          resetDialogState();
+        }
       }}
       open={visible}
       paperWidth={1200}

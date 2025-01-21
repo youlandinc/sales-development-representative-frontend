@@ -1,15 +1,16 @@
 import { create } from 'zustand';
-import { CampaignLeadItem, CampaignStatusEnum } from '@/types';
+import { CampaignLeadItem, CampaignStatusEnum, HttpError } from '@/types';
 import {
   ProcessCreateChatEnum,
   ResponseCampaignProcessChatServer,
 } from '@/types/Campaign/processCreate';
+import { _createCampaign } from '@/request';
+import { SDRToast } from '@/components/atoms';
 
 export type DialogStoreState = {
   visible: boolean;
   activeStep: number;
   chatId: string | number;
-  campaignId: number | string | null;
   returning: boolean;
   chatSSE: EventSource | undefined;
   isFirst: boolean;
@@ -23,8 +24,11 @@ export type DialogStoreState = {
   leadsList: CampaignLeadItem[];
   leadsCount: number;
   leadsVisible: boolean;
+  creating: boolean;
+  campaignId: number | string | null;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
+  reloadTable: boolean;
 };
 
 export type DialogStoreActions = {
@@ -44,7 +48,9 @@ export type DialogStoreActions = {
     data?: ResponseCampaignProcessChatServer[];
     isFake?: boolean;
   }) => void;
+  createCampaign: () => Promise<void>;
   resetDialogState: () => void;
+  setReloadTable: (reloadTable: boolean) => void;
 };
 
 const InitialState: DialogStoreState = {
@@ -58,9 +64,11 @@ const InitialState: DialogStoreState = {
   leadsList: [],
   leadsCount: 0,
   leadsVisible: false,
+  creating: false,
   campaignId: '',
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
+  reloadTable: false,
 };
 
 export type DialogStoreProps = DialogStoreState & DialogStoreActions;
@@ -75,6 +83,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   setLeadsList: (leadsList) => set({ leadsList }),
   setLeadsCount: (leadsCount) => set({ leadsCount }),
   setLeadsVisible: (leadsVisible) => set({ leadsVisible }),
+  setReloadTable: (reloadTable) => set({ reloadTable }),
   addMessageItem: (message) => {
     const { messageList } = get();
     messageList.push(message);
@@ -177,6 +186,22 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       set({ chatSSE: void 0 });
       throw new Error('SSE connection error');
     };
+  },
+  createCampaign: async () => {
+    const { chatId } = get();
+    if (!chatId) {
+      return;
+    }
+    set({ creating: true });
+    try {
+      const { data } = await _createCampaign({ chatId });
+      console.log(data);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      //set({ creating: false, activeStep: 2 });
+    }
   },
   resetDialogState: () => {
     get().chatSSE?.close();
