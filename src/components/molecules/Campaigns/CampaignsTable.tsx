@@ -478,7 +478,8 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           m: '0 auto',
           height: 'auto',
           width: '100%',
-          border: 'none',
+          border: 'none !important',
+          outline: 'none !important',
           '.MuiDataGrid-columnHeader': {
             bgcolor: 'transparent',
             fontSize: 12,
