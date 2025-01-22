@@ -4,7 +4,11 @@ import { useRouter } from 'nextjs-toploader/app';
 import Image from 'next/image';
 
 import { StyledButton } from '@/components/atoms';
-import { LibraryCard, LibraryCardProps } from '@/components/molecules';
+import {
+  LibraryCard,
+  LibraryCardProps,
+  ScrollTabs,
+} from '@/components/molecules';
 
 import ICON_BUILDINGS from './assets/icon_buildings.svg';
 
@@ -178,6 +182,7 @@ export const LibraryCompanyMain = () => {
           </ContentBox>
         </LibraryCompanyCard>
       </Stack>
+      <ScrollTabs />
     </Stack>
   );
 };
