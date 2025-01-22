@@ -17,7 +17,7 @@ export const CommonRenameTextField: FC<StyledTextFieldProps> = ({
         fontWeight={600}
         lineHeight={1.5}
         minHeight={36}
-        minWidth={120}
+        minWidth={'2em'}
         p={'2px 6px'}
         sx={{ opacity: 0 }}
       >
