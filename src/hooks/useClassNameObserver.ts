@@ -20,12 +20,10 @@ export const useClassNameObserver = (
       }
     });
 
-    // 开始监听
     observer.observe(element, {
-      attributes: true, // 监听属性变化
+      attributes: true,
     });
 
-    // 清理监听器
     return () => observer.disconnect();
   }, [element, callback]);
 };

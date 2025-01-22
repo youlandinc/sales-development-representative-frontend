@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Stack, Tabs, tabsClasses } from '@mui/material';
-import { CommonReceiptCardHeader } from '@/components/molecules';
-import { StyledButton } from '@/components/atoms';
+
 import { useClassNameObserver } from '@/hooks/useClassNameObserver';
+
+import { StyledButton } from '@/components/atoms';
+import { CommonReceiptCardHeader } from '@/components/molecules';
 
 export const ScrollTabs = () => {
   const [btns, setBtns] = useState<HTMLElement[] | null>(null);

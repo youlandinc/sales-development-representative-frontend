@@ -11,7 +11,7 @@ import {
 } from './index';
 
 export const CampaignProcessContent = () => {
-  const { activeStep } = useDialogStore();
+  const { activeStep, leadsVisible } = useDialogStore();
 
   const renderContent = useMemo(() => {
     switch (activeStep) {
@@ -29,11 +29,10 @@ export const CampaignProcessContent = () => {
   return (
     <Stack
       flexDirection={'row'}
-      gap={3}
+      gap={leadsVisible ? 3 : 0}
       height={activeStep === 1 ? '60vh' : '100%'}
       justifyContent={'center'}
       minHeight={480}
-      pt={3}
       width={'100%'}
     >
       <CampaignProcessContentChat />

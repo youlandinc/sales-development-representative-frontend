@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { _fetchChatLeads } from '@/request';
-import { HttpError } from '@/types';
-import { SDRToast, StyledLoading } from '@/components/atoms';
 import { Stack, Typography } from '@mui/material';
-import { CampaignLeadsCard } from '@/components/molecules';
+
 import { useDialogStore } from '@/stores/useDialogStore';
+import { UFormatNumber } from '@/utils';
+
+import { SDRToast, StyledLoading } from '@/components/atoms';
+import { CampaignLeadsCard } from '@/components/molecules';
+
+import { HttpError } from '@/types';
+import { _fetchChatLeads } from '@/request';
 
 export const CampaignProcessContentAudience = () => {
   const {
@@ -84,7 +88,7 @@ export const CampaignProcessContentAudience = () => {
           >
             <Typography variant={'subtitle1'}>Preview leads</Typography>
             <Typography color={'text.secondary'} ml={'auto'} variant={'body2'}>
-              Estimated <b>{leadsCount}</b> leads
+              Estimated <b>{UFormatNumber(leadsCount)}</b> leads
             </Typography>
           </Stack>
 

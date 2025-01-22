@@ -35,7 +35,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
   } = useDialogStore();
 
   return (
-    <Stack gap={1.5}>
+    <Stack gap={1.5} pt={3} px={3}>
       <Stack alignItems={'center'} flexDirection={'row'}>
         <Typography variant={'h6'}>Start new campaign</Typography>
         <Icon
@@ -67,10 +67,15 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
 };
 
 export const CampaignProcessHeaderStepSecondary: FC = () => {
-  const { campaignName, campaignStatus, closeProcess, renameCampaign } =
-    useDialogStore();
-
-  console.log(campaignName);
+  const {
+    campaignName,
+    campaignStatus,
+    closeProcess,
+    renameCampaign,
+    activeStep,
+    setActiveStep,
+    setSetupPhase,
+  } = useDialogStore();
 
   const [value, setValue] = useState(campaignName);
 
@@ -87,8 +92,22 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
     await debounceSearchWord(e.target.value);
   };
 
+  const onClickToNext = async () => {
+    if (activeStep === 2) {
+      setActiveStep(3);
+      await setSetupPhase(SetupPhaseEnum.launch);
+      return;
+    }
+    console.log('finally');
+  };
+
   return (
-    <Stack flexDirection={'row'} justifyContent={'space-between'} px={3}>
+    <Stack
+      borderBottom={'1px solid #DFDEE6'}
+      flexDirection={'row'}
+      justifyContent={'space-between'}
+      p={3}
+    >
       <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
         <Icon
           component={ICON_BACK}
@@ -121,7 +140,13 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       </Stack>
       <CampaignProcessHeaderButtonGroup />
 
-      <StyledButton>Launch campaign</StyledButton>
+      <StyledButton
+        onClick={() => onClickToNext()}
+        size={'medium'}
+        sx={{ width: 180, alignSelf: 'flex-end' }}
+      >
+        {activeStep === 2 ? 'Next' : 'Launch campaign'}
+      </StyledButton>
     </Stack>
   );
 };
@@ -173,12 +198,9 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
             if (!campaignId || returning) {
               return;
             }
-            const setupPhase =
-              BUTTON_GROUP.find((pre) => pre.id === item.id + 1)?.setupPhase ||
-              BUTTON_GROUP[2].setupPhase;
 
             setActiveStep(item.id);
-            await setSetupPhase(setupPhase);
+            await setSetupPhase(item.setupPhase);
           }}
           px={1.5}
           py={1}
@@ -195,9 +217,8 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
                   ? 'primary.main'
                   : '#D0CEDA',
               bgcolor: activeStep === item.id ? '#D5CBFB' : 'transparent',
-              border: disabled()
-                ? '1px solid #D0CEDA'
-                : activeStep === item.id
+              border:
+                activeStep === item.id || disabled()
                   ? '1px solid transparent'
                   : '1px solid #D0CEDA',
             },

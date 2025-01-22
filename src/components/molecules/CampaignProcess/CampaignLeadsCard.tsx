@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Avatar, Icon, Stack, Typography } from '@mui/material';
+import { Avatar, Icon, Stack, SxProps, Typography } from '@mui/material';
 
 import { CampaignLeadItem } from '@/types';
 
@@ -7,13 +7,20 @@ import { StyledTooltip } from '@/components/atoms';
 
 import ICON_LINKEDIN from './assets/icon_linkedin.svg';
 
-export const CampaignLeadsCard: FC<CampaignLeadItem> = ({
+interface CampaignLeadItemProps extends CampaignLeadItem {
+  sx?: SxProps;
+  onClick?: () => void;
+}
+
+export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
   name,
   firstName,
   lastName,
   role,
   company,
   backgroundColor,
+  sx,
+  onClick = () => {},
 }) => {
   const avatarName = () => {
     const target = (firstName?.[0] ?? '') + (lastName?.[0] ?? '') || '';
@@ -26,7 +33,9 @@ export const CampaignLeadsCard: FC<CampaignLeadItem> = ({
       borderBottom={'1px solid #E5E5E5'}
       flexDirection={'row'}
       gap={1}
+      onClick={onClick}
       py={1.5}
+      sx={sx}
     >
       <Avatar
         sx={{

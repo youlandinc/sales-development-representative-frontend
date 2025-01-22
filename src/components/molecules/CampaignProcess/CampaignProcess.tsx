@@ -13,6 +13,7 @@ export const CampaignProcess = () => {
       content={<CampaignProcessContent />}
       fullScreen={activeStep !== 1}
       header={<CampaignProcessHeader />}
+      headerSx={{ p: '0' }}
       onClose={(_, reason) => {
         if (reason === 'escapeKeyDown') {
           closeProcess();
