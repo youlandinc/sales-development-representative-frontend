@@ -4,3 +4,5 @@ export * from './CommonEmailContent';
 export * from './CommonBackButton';
 
 export * from './CommonRenameTextField';
+
+export * from './ScrollTabs';
