@@ -271,6 +271,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setSetupPhase,
     setMessageList,
     setCampaignId,
+    createChatSSE,
   } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -363,14 +364,12 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           setLeadsVisible(true);
           setCampaignName(campaignName || 'Untitled Campaign');
           setCampaignStatus(campaignStatus);
-          setSetupPhase(setupPhase);
           setLeadsList(leads);
           setLeadsCount(counts);
-          await setActiveStep(
-            { id: ACTIVE_STEP_HASH[setupPhase], setupPhase, label: '' },
-            false,
-          );
+          setActiveStep(ACTIVE_STEP_HASH[setupPhase]);
+          await setSetupPhase(setupPhase, false);
           setMessageList(chatRecord);
+          await createChatSSE(chatId);
           openProcess();
         } catch (err) {
           const { message, variant, header } = err as HttpError;

@@ -1,10 +1,13 @@
-import { FC } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
+import { debounce, Icon, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { StyledButton } from '@/components/atoms';
-import { CampaignsStatusBadge } from '@/components/molecules';
+import {
+  CampaignsStatusBadge,
+  CommonRenameTextField,
+} from '@/components/molecules';
 
 import { SetupPhaseEnum } from '@/types';
 
@@ -28,6 +31,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
     leadsVisible,
     createCampaign,
     creating,
+    campaignId,
   } = useDialogStore();
 
   return (
@@ -46,7 +50,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
 
       <Stack flexDirection={'row'}>
         <CampaignProcessHeaderButtonGroup />
-        {leadsVisible && (
+        {leadsVisible && !campaignId && (
           <StyledButton
             disabled={creating}
             loading={creating}
@@ -63,11 +67,27 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
 };
 
 export const CampaignProcessHeaderStepSecondary: FC = () => {
-  const { campaignName, campaignStatus, closeProcess } = useDialogStore();
+  const { campaignName, campaignStatus, closeProcess, renameCampaign } =
+    useDialogStore();
+
+  const [value, setValue] = useState(campaignName);
+
+  const debounceSearchWord = useMemo(
+    () =>
+      debounce(async (value) => {
+        await renameCampaign(value);
+      }, 500),
+    [renameCampaign],
+  );
+
+  const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    await debounceSearchWord(e.target.value);
+  };
 
   return (
     <Stack flexDirection={'row'} justifyContent={'space-between'} px={3}>
-      <Stack alignItems={'center'} flexDirection={'row'}>
+      <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
         <Icon
           component={ICON_BACK}
           onClick={() => {
@@ -79,9 +99,22 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
             height: 20,
           }}
         />
-        <Typography ml={3} mr={1.5} variant={'h6'}>
-          {campaignName || 'Untitled campaign'}
-        </Typography>
+        <Stack height={36}>
+          <CommonRenameTextField
+            onChange={onChange}
+            slotProps={{
+              input: {
+                onBlur: (e) => {
+                  if (e.target.value === '') {
+                    setValue('Untitled campaign');
+                  }
+                },
+              },
+            }}
+            value={value}
+          />
+        </Stack>
+
         <CampaignsStatusBadge status={campaignStatus} />
       </Stack>
       <CampaignProcessHeaderButtonGroup />
@@ -110,7 +143,8 @@ const BUTTON_GROUP = [
 ];
 
 const CampaignProcessHeaderButtonGroup: FC = () => {
-  const { activeStep, setActiveStep, campaignId } = useDialogStore();
+  const { activeStep, setActiveStep, campaignId, setSetupPhase } =
+    useDialogStore();
 
   const disabled = () => {
     if (activeStep === 1) {
@@ -133,11 +167,16 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
           flexDirection={'row'}
           gap={1.5}
           key={`${item.id}-${index}`}
-          onClick={() => {
+          onClick={async () => {
             if (!campaignId) {
               return;
             }
-            setActiveStep(item);
+            const setupPhase =
+              BUTTON_GROUP.find((pre) => pre.id === item.id + 1)?.setupPhase ||
+              BUTTON_GROUP[2].setupPhase;
+
+            setActiveStep(item.id);
+            await setSetupPhase(setupPhase);
           }}
           px={1.5}
           py={1}

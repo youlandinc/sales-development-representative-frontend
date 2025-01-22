@@ -21,5 +21,5 @@ export const _renameCampaign = (params: {
   campaignName: string;
   campaignId: string | number;
 }) => {
-  return put('/sdr/campaign/name', { params });
+  return put('/sdr/campaign/name', params);
 };

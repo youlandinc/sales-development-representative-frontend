@@ -11,7 +11,11 @@ import {
 import { SDRToast } from '@/components/atoms';
 
 import { ProcessCreateChatEnum } from '@/types';
-import { _createCampaign, _updateCampaignProcessSnapshot } from '@/request';
+import {
+  _createCampaign,
+  _renameCampaign,
+  _updateCampaignProcessSnapshot,
+} from '@/request';
 
 export type DialogStoreState = {
   visibleProcess: boolean;
@@ -35,14 +39,7 @@ export type DialogStoreState = {
 export type DialogStoreActions = {
   openProcess: () => void;
   closeProcess: () => void;
-  setActiveStep: (
-    item: {
-      id: number;
-      label: string;
-      setupPhase: SetupPhaseEnum;
-    },
-    redirect?: boolean,
-  ) => Promise<void>;
+  setActiveStep: (activeStep: number) => void;
   setChatId: (chatId: number | string) => void;
   createChatSSE: (chatId: number | string) => Promise<void>;
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
@@ -54,10 +51,12 @@ export type DialogStoreActions = {
 
   setMessageList: (messageList: ResponseCampaignChatRecord[]) => void;
 
+  renameCampaign: (name: string) => Promise<void>;
+
   setCampaignId: (campaignId: number | string) => void;
   setCampaignName: (name: string) => void;
   setCampaignStatus: (status: CampaignStatusEnum) => void;
-  setSetupPhase: (phase: SetupPhaseEnum) => void;
+  setSetupPhase: (phase: SetupPhaseEnum, redirect?: boolean) => Promise<void>;
   resetDialogState: () => void;
   setReloadTable: (reloadTable: boolean) => void;
 };
@@ -89,42 +88,51 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   closeProcess: () => set({ visibleProcess: false }),
   setCampaignName: (name) => set({ campaignName: name }),
   setCampaignStatus: (status) => set({ campaignStatus: status }),
-  setSetupPhase: (phase) => set({ setupPhase: phase }),
-  setMessageList: (messageList) => set({ messageList }),
-  setCampaignId: (campaignId) => set({ campaignId }),
-  setActiveStep: async (
-    item: {
-      id: number;
-      label: string;
-      setupPhase: SetupPhaseEnum;
-    },
-    redirect = true,
-  ) => {
-    const { campaignId } = get();
-    if (!redirect) {
-      set({ activeStep: item.id, setupPhase: item.setupPhase });
+  renameCampaign: async (campaignName) => {
+    const { campaignName: current, campaignId } = get();
+    if (!campaignId) {
       return;
     }
-    set({ activeStep: item.id });
+    set({ campaignName });
+    try {
+      await _renameCampaign({ campaignId: get().campaignId!, campaignName });
+    } catch (err) {
+      set({ campaignName: current });
+      const { message, header, variant } = err as HttpError;
+      SDRToast({
+        message,
+        header,
+        variant,
+      });
+    }
+  },
+  setSetupPhase: async (setupPhase, redirect = true) => {
+    const { campaignId } = get();
+    if (!redirect) {
+      set({ setupPhase });
+      return;
+    }
     if (campaignId) {
       try {
         await _updateCampaignProcessSnapshot({
           campaignId: campaignId,
-          setupPhase: item.setupPhase,
+          setupPhase,
         });
-        set({ setupPhase: item.setupPhase });
+        set({ setupPhase });
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
         set({
-          activeStep: item.id - 1 || 1,
-          setupPhase:
-            item.id - 1 === 2
-              ? SetupPhaseEnum.messaging
-              : SetupPhaseEnum.audience,
+          activeStep: 1,
+          setupPhase: SetupPhaseEnum.audience,
         });
       }
     }
+  },
+  setMessageList: (messageList) => set({ messageList }),
+  setCampaignId: (campaignId) => set({ campaignId }),
+  setActiveStep: (activeStep) => {
+    set({ activeStep });
   },
   setChatId: (chatId) => set({ chatId }),
   setReturning: (returning) => set({ returning }),
@@ -246,12 +254,13 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       const { data } = await _createCampaign({ chatId });
       await _updateCampaignProcessSnapshot({
         campaignId: data.campaignId,
-        setupPhase: SetupPhaseEnum.audience,
+        setupPhase: SetupPhaseEnum.messaging,
       });
       set({
         campaignId: data.campaignId,
         campaignName: data.campaignName,
         campaignStatus: data.campaignStatus,
+        setupPhase: SetupPhaseEnum.messaging,
       });
     } catch (err) {
       const { message, header, variant } = err as HttpError;
