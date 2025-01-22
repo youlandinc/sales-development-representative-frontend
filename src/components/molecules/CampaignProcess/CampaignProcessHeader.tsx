@@ -6,6 +6,8 @@ import { useDialogStore } from '@/stores/useDialogStore';
 import { StyledButton } from '@/components/atoms';
 import { CampaignsStatusBadge } from '@/components/molecules';
 
+import { SetupPhaseEnum } from '@/types';
+
 import ICON_CLOSE from './assets/icon_close.svg';
 import ICON_BACK from './assets/icon_back.svg';
 
@@ -20,8 +22,13 @@ export const CampaignProcessHeader: FC = () => {
 };
 
 export const CampaignProcessHeaderStepFirst: FC = () => {
-  const { close, resetDialogState, leadsVisible, createCampaign, creating } =
-    useDialogStore();
+  const {
+    closeProcess,
+    resetDialogState,
+    leadsVisible,
+    createCampaign,
+    creating,
+  } = useDialogStore();
 
   return (
     <Stack gap={1.5}>
@@ -30,7 +37,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
         <Icon
           component={ICON_CLOSE}
           onClick={() => {
-            close();
+            closeProcess();
             resetDialogState();
           }}
           sx={{ ml: 'auto', cursor: 'pointer' }}
@@ -56,7 +63,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
 };
 
 export const CampaignProcessHeaderStepSecondary: FC = () => {
-  const { campaignName, campaignStatus, close } = useDialogStore();
+  const { campaignName, campaignStatus, closeProcess } = useDialogStore();
 
   return (
     <Stack flexDirection={'row'} justifyContent={'space-between'} px={3}>
@@ -64,7 +71,7 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
         <Icon
           component={ICON_BACK}
           onClick={() => {
-            close();
+            closeProcess();
           }}
           sx={{
             cursor: 'pointer',
@@ -88,17 +95,17 @@ const BUTTON_GROUP = [
   {
     id: 1,
     label: 'Audience',
-    url: '',
+    setupPhase: SetupPhaseEnum.audience,
   },
   {
     id: 2,
     label: 'Messaging',
-    url: '',
+    setupPhase: SetupPhaseEnum.messaging,
   },
   {
     id: 3,
     label: 'Launch',
-    url: '',
+    setupPhase: SetupPhaseEnum.launch,
   },
 ];
 
@@ -130,7 +137,7 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
             if (!campaignId) {
               return;
             }
-            setActiveStep(item.id);
+            setActiveStep(item);
           }}
           px={1.5}
           py={1}

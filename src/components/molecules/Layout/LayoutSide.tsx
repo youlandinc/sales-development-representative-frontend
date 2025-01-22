@@ -27,7 +27,7 @@ export const LayoutSide: FC = () => {
   const { userProfile, isHydration, resetUserStore } = useUserStore(
     (state) => state,
   );
-  const { open } = useDialogStore();
+  const { openProcess } = useDialogStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -193,7 +193,7 @@ export const LayoutSide: FC = () => {
             <Stack key={`${item.key}-${index}`} mb={1.5}>
               <StyledButton
                 color={'info'}
-                onClick={() => open()}
+                onClick={() => openProcess()}
                 size={'medium'}
                 variant={'outlined'}
               >

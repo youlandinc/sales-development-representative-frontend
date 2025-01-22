@@ -4,7 +4,7 @@ import { Fade, Icon, Stack, Typography } from '@mui/material';
 import {
   ProcessCreateChatEnum,
   ResponseCampaignProcessChatServer,
-} from '@/types/Campaign/processCreate';
+} from '@/types';
 
 import ICON_LOADING from './assets/icon_loading.svg';
 
@@ -12,6 +12,7 @@ import ICON_EARTH from './assets/icon_earth.svg';
 import ICON_LINKEDIN from './assets/icon_linkedin.svg';
 
 import ICON_CHAT_LOGO from './assets/icon_chat_logo.svg';
+
 import ICON_CHAT_THINKING from './assets/icon_chat_thinking.svg';
 import ICON_CHAT_PLAN from './assets/icon_chat_plan.svg';
 import ICON_CHAT_AFTER_PLAN from './assets/icon_chat_after_plan.svg';
@@ -25,49 +26,27 @@ export interface CampaignProcessChatServerProps {
   isFake?: boolean;
 }
 
-const STEP_HASH: {
-  [key in ProcessCreateChatEnum]: { icon: any; sort: number };
-} = {
-  [ProcessCreateChatEnum.thinking]: {
-    icon: ICON_CHAT_THINKING,
-    sort: 1,
-  },
-  [ProcessCreateChatEnum.create_plan]: {
-    icon: ICON_CHAT_PLAN,
-    sort: 2,
-  },
-  [ProcessCreateChatEnum.job_role]: {
-    icon: ICON_CHAT_AFTER_PLAN,
-    sort: 3,
-  },
-  [ProcessCreateChatEnum.job_title]: {
-    icon: ICON_CHAT_AFTER_PLAN,
-    sort: 4,
-  },
-  [ProcessCreateChatEnum.company_industry]: {
-    icon: ICON_CHAT_AFTER_PLAN,
-    sort: 5,
-  },
-  [ProcessCreateChatEnum.search]: {
-    icon: ICON_CHAT_SEARCH,
-    sort: 6,
-  },
-  [ProcessCreateChatEnum.completed]: {
-    icon: ICON_CHAT_COMPLETED,
-    sort: 7,
-  },
+const STEP_HASH = (step: ProcessCreateChatEnum) => {
+  switch (step) {
+    case ProcessCreateChatEnum.thinking:
+      return ICON_CHAT_THINKING;
+    case ProcessCreateChatEnum.create_plan:
+      return ICON_CHAT_PLAN;
+    case ProcessCreateChatEnum.search:
+      return ICON_CHAT_SEARCH;
+    case ProcessCreateChatEnum.completed:
+      return ICON_CHAT_COMPLETED;
+    default: {
+      return ICON_CHAT_AFTER_PLAN;
+    }
+  }
 };
 
 export const CampaignProcessChatServer: FC<CampaignProcessChatServerProps> = ({
   data,
   isFake,
 }) => {
-  const sortedData = data
-    .map((item) => ({
-      ...item,
-      sort: STEP_HASH[item.step].sort,
-    }))
-    .sort((a, b) => a.sort - b.sort);
+  const sortedData = data.sort((a, b) => a.sort - b.sort);
 
   return (
     <Stack flexDirection={'row'} gap={1} height={'auto'} width={'100%'}>
@@ -100,17 +79,18 @@ export const CampaignProcessChatServer: FC<CampaignProcessChatServerProps> = ({
                 <Stack flexDirection={'row'} flexShrink={0}>
                   <Stack gap={0.5}>
                     <Icon
-                      component={STEP_HASH[item.step].icon}
+                      component={STEP_HASH(item.step)}
                       sx={{ width: 20, height: 20, flexShrink: 0 }}
                     />
-                    {item.step !== ProcessCreateChatEnum.completed && (
-                      <Stack
-                        alignSelf={'center'}
-                        bgcolor={'#D0CEDA'}
-                        flex={1}
-                        width={'1px'}
-                      />
-                    )}
+                    {item.step !== ProcessCreateChatEnum.completed &&
+                      index !== sortedData.length - 1 && (
+                        <Stack
+                          alignSelf={'center'}
+                          bgcolor={'#D0CEDA'}
+                          flex={1}
+                          width={'1px'}
+                        />
+                      )}
                   </Stack>
                 </Stack>
 
@@ -118,6 +98,7 @@ export const CampaignProcessChatServer: FC<CampaignProcessChatServerProps> = ({
                   <Typography
                     color={'#6F6C7D'}
                     lineHeight={1}
+                    mt={0.25}
                     variant={'body2'}
                   >
                     {item.title || 'I am title'}

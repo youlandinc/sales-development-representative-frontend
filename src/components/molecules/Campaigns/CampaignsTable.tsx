@@ -28,7 +28,12 @@ import { useSwitch } from '@/hooks';
 import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
 
-import { CampaignStatusEnum, CampaignTableItem, HttpError } from '@/types';
+import {
+  CampaignStatusEnum,
+  CampaignTableItem,
+  HttpError,
+  SetupPhaseEnum,
+} from '@/types';
 import {
   _deleteCampaignTableItem,
   _fetchCampaignInfo,
@@ -39,47 +44,17 @@ import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
 import ICON_NO_RESULT from './assets/icon_no_result.svg';
 
-//const generateMockData = (length: number): CampaignTableItem[] => {
-//  const randomEnumValue = (
-//    enumObj: typeof CampaignStatusEnum,
-//  ): CampaignStatusEnum => {
-//    const values = Object.values(enumObj) as CampaignStatusEnum[];
-//    return values[Math.floor(Math.random() * values.length)];
-//  };
-//
-//  return Array.from({ length }, (_, i) => {
-//    const sourced = Math.floor(Math.random() * 5000);
-//    const sent = Math.random() > 0.5 ? Math.floor(Math.random() * 3000) : null;
-//    const uniqueOpens = Math.floor(Math.random() * 100);
-//    const uniqueClicks = Math.floor(Math.random() * 100);
-//    const replied = Math.floor(Math.random() * 50);
-//
-//    return {
-//      campaignId: -(i + 1),
-//      campaignName: `Campaign ${i + 1}: Lock in Low Rates on YouLand Bridge Loans!`,
-//      campaignStatus: randomEnumValue(CampaignStatusEnum),
-//      createdAt: new Date(2025, 0, Math.floor(Math.random() * 30) + 1)
-//        .toISOString()
-//        .split('T')[0],
-//      sourced: sourced,
-//      activeLeads:
-//        Math.random() > 0.5 ? Math.floor(Math.random() * 5000) : null,
-//      sent: sent,
-//      uniqueOpens: uniqueOpens,
-//      uniqueOpenRate: sent ? parseFloat((uniqueOpens / sent).toFixed(2)) : 0,
-//      uniqueClicks: uniqueClicks,
-//      uniqueClickRate: sent ? parseFloat((uniqueClicks / sent).toFixed(2)) : 0,
-//      replied: replied,
-//      repliedRate: sent ? parseFloat((replied / sent).toFixed(2)) : 0,
-//    };
-//  });
-//};
-//
-//const mockData = generateMockData(10000);
-
 interface CampaignsTableProps {
   store: { searchWord: string };
 }
+
+const ACTIVE_STEP_HASH: {
+  [key in SetupPhaseEnum]: number;
+} = {
+  [SetupPhaseEnum.audience]: 1,
+  [SetupPhaseEnum.messaging]: 2,
+  [SetupPhaseEnum.launch]: 3,
+};
 
 export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
   const router = useRouter();
@@ -282,7 +257,21 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     },
   ];
 
-  const { open, reloadTable, setReloadTable } = useDialogStore();
+  const {
+    openProcess,
+    reloadTable,
+    setReloadTable,
+    setLeadsVisible,
+    setLeadsCount,
+    setChatId,
+    setActiveStep,
+    setLeadsList,
+    setCampaignName,
+    setCampaignStatus,
+    setSetupPhase,
+    setMessageList,
+    setCampaignId,
+  } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -356,8 +345,33 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     switch (campaignStatus) {
       case CampaignStatusEnum.draft: {
         try {
-          const { data } = await _fetchCampaignInfo(campaignId);
-          console.log(data);
+          const {
+            data: {
+              campaignName,
+              chatId,
+              setupPhase,
+              campaignStatus,
+              data: {
+                leadInfo: { counts, leads },
+                chatRecord,
+              },
+            },
+          } = await _fetchCampaignInfo(campaignId);
+
+          setCampaignId(campaignId);
+          setChatId(chatId);
+          setLeadsVisible(true);
+          setCampaignName(campaignName || 'Untitled Campaign');
+          setCampaignStatus(campaignStatus);
+          setSetupPhase(setupPhase);
+          setLeadsList(leads);
+          setLeadsCount(counts);
+          await setActiveStep(
+            { id: ACTIVE_STEP_HASH[setupPhase], setupPhase, label: '' },
+            false,
+          );
+          setMessageList(chatRecord);
+          openProcess();
         } catch (err) {
           const { message, variant, header } = err as HttpError;
           SDRToast({ message, variant, header });

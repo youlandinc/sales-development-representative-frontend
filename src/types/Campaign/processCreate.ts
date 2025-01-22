@@ -1,3 +1,5 @@
+import { CampaignStatusEnum } from '@/types';
+
 export enum ProcessCreateChatEnum {
   thinking = 'THINKING',
   create_plan = 'CREATE_PLAN',
@@ -13,15 +15,6 @@ export enum SourceEnum {
   server = 'SERVER',
 }
 
-export interface ResponseCampaignProcessChatServer {
-  id: string;
-  title: string;
-  step: ProcessCreateChatEnum;
-  sort?: number;
-  content?: string;
-  labels?: string[];
-}
-
 export interface CampaignLeadItem {
   name: string | null;
   firstName: string | null;
@@ -34,4 +27,39 @@ export interface CampaignLeadItem {
 export interface ResponseCampaignLeadsInfo {
   counts: number;
   leads: CampaignLeadItem[];
+}
+
+export enum SetupPhaseEnum {
+  messaging = 'MESSAGING',
+  audience = 'AUDIENCE',
+  launch = 'LAUNCH',
+}
+
+export interface ResponseCampaignProcessChatServer {
+  id: string;
+  title: string;
+  step: ProcessCreateChatEnum;
+  sort: number;
+  content?: string | null;
+  labels?: string[] | null;
+}
+
+export interface ResponseCampaignChatRecord {
+  id: string | null;
+  data: ResponseCampaignProcessChatServer[];
+  message: string | null;
+  source: SourceEnum;
+  isFake?: boolean;
+}
+
+export interface ResponseCampaignInfo {
+  campaignId: string | number;
+  campaignName: string | null;
+  campaignStatus: CampaignStatusEnum;
+  chatId: number | string;
+  setupPhase: SetupPhaseEnum;
+  data: {
+    leadInfo: ResponseCampaignLeadsInfo;
+    chatRecord: ResponseCampaignChatRecord[];
+  };
 }

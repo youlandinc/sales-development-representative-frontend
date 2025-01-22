@@ -69,7 +69,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
   store,
   dispatch,
 }) => {
-  const { open } = useDialogStore();
+  const { openProcess } = useDialogStore();
 
   const [cardData, setCardData] = useState(mock);
 
@@ -142,7 +142,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
             }}
             value={value}
           />
-          <StyledButton onClick={() => open()} size={'medium'}>
+          <StyledButton onClick={() => openProcess()} size={'medium'}>
             + Create new campaign
           </StyledButton>
         </Stack>

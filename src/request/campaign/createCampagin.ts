@@ -1,5 +1,9 @@
-import { get, post } from '@/request/request';
-import { ResponseCampaignLeadsInfo } from '@/types';
+import { get, post, put } from '@/request/request';
+import {
+  ResponseCampaignInfo,
+  ResponseCampaignLeadsInfo,
+  SetupPhaseEnum,
+} from '@/types';
 
 export const _sendChatMessage = (params: {
   chatId?: number;
@@ -17,5 +21,12 @@ export const _createCampaign = (params: { chatId: number | string }) => {
 };
 
 export const _fetchCampaignInfo = (campaignId: string | number) => {
-  return get(`/sdr/campaign/info/${campaignId}`);
+  return get<ResponseCampaignInfo>(`/sdr/campaign/info/${campaignId}`);
+};
+
+export const _updateCampaignProcessSnapshot = (params: {
+  campaignId: string | number;
+  setupPhase: SetupPhaseEnum;
+}) => {
+  return put('/sdr/campaign/redirect', params);
 };

@@ -7,8 +7,8 @@ import { SDRToast, StyledLoading, StyledTextField } from '@/components/atoms';
 
 import { CampaignLeadsCard, CampaignProcessChatServer } from './index';
 
-import { HttpError } from '@/types';
-import { _fetchChatLeads, _sendChatMessage } from '@/request/campaign';
+import { HttpError, SourceEnum } from '@/types';
+import { _fetchChatLeads, _sendChatMessage } from '@/request';
 
 import ICON_SEND from './assets/icon_send.svg';
 
@@ -68,11 +68,17 @@ export const CampaignProcessContent = () => {
     }
     setSending(true);
     try {
-      addMessageItem({ message, source: 'user' });
+      addMessageItem({ message, source: SourceEnum.user, id: '', data: [] });
       const {
         data: { chatId: resChatId },
       } = await _sendChatMessage(postData);
-      addMessageItem({ isFake: true, source: 'server', data: [], id: '-1' });
+      addMessageItem({
+        isFake: true,
+        source: SourceEnum.server,
+        data: [],
+        id: '-1',
+        message: '',
+      });
       if (!chatId) {
         await createChatSSE(resChatId);
       }
@@ -139,15 +145,21 @@ export const CampaignProcessContent = () => {
       height={activeStep === 1 ? '60vh' : '100%'}
       justifyContent={'center'}
       minHeight={480}
-      mt={3}
+      pt={3}
       width={'100%'}
     >
       <Stack
         alignItems={'center'}
+        border={'1px solid'}
+        borderColor={activeStep === 1 ? 'transparent' : '#DFDEE6'}
+        borderRadius={4}
         gap={4}
         justifyContent={messageList.length > 0 ? 'unset' : 'center'}
         maxWidth={activeStep === 1 ? '100%' : 460}
         minWidth={460}
+        pb={activeStep === 1 ? 0 : 6}
+        pt={activeStep === 1 ? 0 : 3}
+        px={activeStep === 1 ? 0 : 3}
         sx={{ transition: 'all .3s', overflow: 'hidden' }}
         width={activeStep === 1 ? '100%' : 460}
       >
@@ -159,10 +171,10 @@ export const CampaignProcessContent = () => {
         >
           {messageList.length <= 0 ? (
             <>
-              <Typography variant={'h5'}>
+              <Typography textAlign={'center'} variant={'h5'}>
                 Define your target audience
               </Typography>
-              <Typography>
+              <Typography textAlign={'center'}>
                 Describe your ideal customer (industry, demographics, interests)
               </Typography>
               {/*<Typography>or upload a CSV with your contact list.</Typography>*/}
@@ -179,10 +191,10 @@ export const CampaignProcessContent = () => {
                 <Stack
                   key={`${index}`}
                   maxWidth={'60%'}
-                  ml={item.source === 'user' ? 'auto' : 'unset'}
+                  ml={item.source === SourceEnum.user ? 'auto' : 'unset'}
                   width={'fit-content'}
                 >
-                  {item.source === 'user' ? (
+                  {item.source === SourceEnum.user ? (
                     <Typography
                       bgcolor={'#EAE9EF'}
                       borderRadius={2}
@@ -322,8 +334,6 @@ export const CampaignProcessContent = () => {
           flex={1}
           sx={{
             transition: 'all .3s',
-            visibility: leadsVisible ? 'visible' : 'hidden',
-            display: 'none',
           }}
         ></Stack>
       )}

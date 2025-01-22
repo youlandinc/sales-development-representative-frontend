@@ -5,7 +5,8 @@ import { StyledDialog } from '@/components/atoms';
 import { CampaignProcessContent, CampaignProcessHeader } from './index';
 
 export const CampaignProcess = () => {
-  const { visible, close, activeStep, resetDialogState } = useDialogStore();
+  const { visibleProcess, closeProcess, activeStep, resetDialogState } =
+    useDialogStore();
 
   return (
     <StyledDialog
@@ -14,11 +15,11 @@ export const CampaignProcess = () => {
       header={<CampaignProcessHeader />}
       onClose={(_, reason) => {
         if (reason === 'escapeKeyDown') {
-          close();
+          closeProcess();
           resetDialogState();
         }
       }}
-      open={visible}
+      open={visibleProcess}
       paperWidth={1200}
     />
   );
