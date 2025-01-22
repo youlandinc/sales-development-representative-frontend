@@ -70,6 +70,8 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
   const { campaignName, campaignStatus, closeProcess, renameCampaign } =
     useDialogStore();
 
+  console.log(campaignName);
+
   const [value, setValue] = useState(campaignName);
 
   const debounceSearchWord = useMemo(

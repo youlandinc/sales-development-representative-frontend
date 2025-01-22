@@ -93,9 +93,13 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     if (!campaignId) {
       return;
     }
-    set({ campaignName });
+    set({ campaignName: campaignName || 'Untitled Campaign' });
     try {
-      await _renameCampaign({ campaignId: get().campaignId!, campaignName });
+      await _renameCampaign({
+        campaignId: get().campaignId!,
+        campaignName: campaignName || 'Untitled Campaign',
+      });
+      set({ reloadTable: true });
     } catch (err) {
       set({ campaignName: current });
       const { message, header, variant } = err as HttpError;
