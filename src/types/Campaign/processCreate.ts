@@ -8,6 +8,11 @@ export enum ProcessCreateChatEnum {
   completed = 'COMPLETED',
 }
 
+export enum SourceEnum {
+  user = 'USER',
+  server = 'SERVER',
+}
+
 export interface ResponseCampaignProcessChatServer {
   id: string;
   title: string;

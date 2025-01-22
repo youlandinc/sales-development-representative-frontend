@@ -28,8 +28,12 @@ import { useSwitch } from '@/hooks';
 import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
 
-import { CampaignTableItem, HttpError } from '@/types';
-import { _deleteCampaignTableItem, _fetchCampaignTableData } from '@/request';
+import { CampaignStatusEnum, CampaignTableItem, HttpError } from '@/types';
+import {
+  _deleteCampaignTableItem,
+  _fetchCampaignInfo,
+  _fetchCampaignTableData,
+} from '@/request';
 
 import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
@@ -344,6 +348,28 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     }
   };
 
+  const onRawClick = async (row: CampaignTableItem) => {
+    const { campaignId, campaignStatus } = row;
+    if (!campaignId) {
+      return;
+    }
+    switch (campaignStatus) {
+      case CampaignStatusEnum.draft: {
+        try {
+          const { data } = await _fetchCampaignInfo(campaignId);
+          console.log(data);
+        } catch (err) {
+          const { message, variant, header } = err as HttpError;
+          SDRToast({ message, variant, header });
+        }
+        break;
+      }
+      default: {
+        console.log('pending approve');
+      }
+    }
+  };
+
   return data === 'error' ? null : (
     <Stack flex={1} flexDirection={'column'} overflow={'auto'}>
       <DataGrid
@@ -351,14 +377,18 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         columns={columns}
         disableColumnFilter
         disableColumnMenu
+        disableColumnResize
         disableColumnSelector
+        disableColumnSorting
         disableDensitySelector
+        disableEval
+        disableMultipleRowSelection
         disableRowSelectionOnClick
         getRowId={(row) => row.campaignId}
         loading={isLoading}
         onPaginationModelChange={setPaginationModel}
-        onRowClick={({ row }) => {
-          router.push(`/campaigns/pending/${row.campaignId}`);
+        onRowClick={async ({ row }) => {
+          await onRawClick(row);
         }}
         paginationMode={'server'}
         paginationModel={paginationModel}
@@ -403,6 +433,9 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           width: '100%',
           border: 'none !important',
           outline: 'none !important',
+          '.MuiDataGrid-main': {
+            outline: 'none',
+          },
           '.MuiDataGrid-columnHeader': {
             bgcolor: 'transparent',
             fontSize: 12,

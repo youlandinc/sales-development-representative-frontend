@@ -15,3 +15,7 @@ export const _fetchChatLeads = (chatId: string | number) => {
 export const _createCampaign = (params: { chatId: number | string }) => {
   return post('/sdr/campaign/info', params);
 };
+
+export const _fetchCampaignInfo = (campaignId: string | number) => {
+  return get(`/sdr/campaign/info/${campaignId}`);
+};
