@@ -19,7 +19,7 @@ import ICON_CHAT_AFTER_PLAN from './assets/icon_chat_after_plan.svg';
 import ICON_CHAT_SEARCH from './assets/icon_chat_search.svg';
 import ICON_CHAT_COMPLETED from './assets/icon_chat_completed.svg';
 
-export interface CampaignProcessChatServerProps {
+export interface CampaignProcessContentChatServerCardProps {
   source: string;
   id: string | number;
   data: ResponseCampaignProcessChatServer[];
@@ -42,10 +42,9 @@ const STEP_HASH = (step: ProcessCreateChatEnum) => {
   }
 };
 
-export const CampaignProcessChatServer: FC<CampaignProcessChatServerProps> = ({
-  data,
-  isFake,
-}) => {
+export const CampaignProcessContentChatServerCard: FC<
+  CampaignProcessContentChatServerCardProps
+> = ({ data, isFake }) => {
   const sortedData = data.sort((a, b) => a.sort - b.sort);
 
   return (

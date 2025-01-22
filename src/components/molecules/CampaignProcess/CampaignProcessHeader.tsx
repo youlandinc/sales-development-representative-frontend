@@ -145,7 +145,7 @@ const BUTTON_GROUP = [
 ];
 
 const CampaignProcessHeaderButtonGroup: FC = () => {
-  const { activeStep, setActiveStep, campaignId, setSetupPhase } =
+  const { activeStep, setActiveStep, campaignId, setSetupPhase, returning } =
     useDialogStore();
 
   const disabled = () => {
@@ -170,7 +170,7 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
           gap={1.5}
           key={`${item.id}-${index}`}
           onClick={async () => {
-            if (!campaignId) {
+            if (!campaignId || returning) {
               return;
             }
             const setupPhase =
@@ -190,9 +190,8 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
               width: 28,
               borderRadius: 2,
               transition: 'all .2s',
-              color: disabled()
-                ? '#D0CEDA'
-                : activeStep === item.id
+              color:
+                activeStep === item.id || disabled()
                   ? 'primary.main'
                   : '#D0CEDA',
               bgcolor: activeStep === item.id ? '#D5CBFB' : 'transparent',
@@ -203,7 +202,7 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
                   : '1px solid #D0CEDA',
             },
             '&:hover': {
-              border: !campaignId ? '' : '2px solid #6E4EFB',
+              border: !campaignId || returning ? '' : '2px solid #6E4EFB',
             },
           }}
         >
@@ -218,7 +217,7 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
             color={
               activeStep === item.id
                 ? 'text.primary'
-                : !campaignId
+                : returning || !campaignId
                   ? '#D0CEDA'
                   : 'text.primary'
             }
