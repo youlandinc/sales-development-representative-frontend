@@ -232,7 +232,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           if (target) {
             target.data!.push(data);
           }
-          set({ messageList, returning: false, isFirst: false });
+          set({ messageList, returning: false });
           break;
         }
       }
@@ -263,6 +263,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         campaignName: data.campaignName,
         campaignStatus: data.campaignStatus,
         setupPhase: SetupPhaseEnum.messaging,
+        messagingSteps: data.data.steps,
       });
     } catch (err) {
       const { message, header, variant } = err as HttpError;

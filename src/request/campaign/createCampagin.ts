@@ -36,7 +36,7 @@ export const _closeSSE = (chatId: string | number) => {
 
 // first step
 export const _createCampaign = (params: { chatId: number | string }) => {
-  return post('/sdr/campaign/info', params);
+  return post<ResponseCampaignInfo>('/sdr/campaign/info', params);
 };
 
 // second step
