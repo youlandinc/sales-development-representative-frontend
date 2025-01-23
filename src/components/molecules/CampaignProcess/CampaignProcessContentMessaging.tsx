@@ -1,5 +1,7 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
+  Collapse,
   Icon,
   Skeleton,
   Stack,
@@ -9,19 +11,27 @@ import {
 } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
+
 import { UFormatNumber } from '@/utils';
+import { useClassNameObserver } from '@/hooks';
+
+import { SDRToast, StyledButton } from '@/components/atoms';
+import { CampaignLeadsCard } from '@/components/molecules';
+
+import { CampaignLeadItem, HttpError, ResponseCampaignEmail } from '@/types';
+import { _fetchChatLeads, _fetchEmailByLead } from '@/request';
 
 import ICON_NEXT from './assets/icon_next.svg';
 import ICON_PREV from './assets/icon_prev.svg';
-import { CampaignLeadsCard } from '@/components/molecules';
-import { useEffect, useState } from 'react';
-import { useClassNameObserver } from '@/hooks/useClassNameObserver';
-import { _fetchChatLeads } from '@/request';
-import { HttpError } from '@/types';
-import { SDRToast } from '@/components/atoms';
+
+import ICON_MESSAGING_COMPANY from './assets/icon_messaging_company.svg';
+import ICON_MESSAGING_PERSON from './assets/icon_messaging_person.svg';
+
+import ICON_MESSAGING_EMAIL from './assets/icon_messaging_email.svg';
 
 export const CampaignProcessContentMessaging = () => {
   const {
+    campaignId,
     leadsCount,
     leadsList,
     leadsVisible,
@@ -30,14 +40,61 @@ export const CampaignProcessContentMessaging = () => {
     chatId,
     returning,
     setLeadsVisible,
+    messagingSteps,
   } = useDialogStore();
 
   const [leadsFetching, setLeadsFetching] = useState(false);
 
-  const [buttons, setButtons] = useState<HTMLElement[] | null>(null);
-
+  const [activeInfo, setActiveInfo] = useState<'company' | 'person'>('company');
   const [activeValue, setActiveValue] = useState(0);
+  const [expend, setExpend] = useState(true);
 
+  const [emailTemplate, setEmailTemplate] = useState<ResponseCampaignEmail[]>();
+
+  const fetchLeads = async () => {
+    !leadsVisible && setLeadsVisible(true);
+    setLeadsFetching(true);
+    setExpend(false);
+    setActiveInfo('company');
+    try {
+      const {
+        data: { leads, counts },
+      } = await _fetchChatLeads(chatId);
+      setLeadsList(leads);
+      setLeadsCount(counts);
+      setExpend(true);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setLeadsFetching(false);
+    }
+  };
+
+  const [fetchTemplateLoading, setFetchTemplateLoading] = useState(false);
+
+  const onClickToChangeLead = async (item: CampaignLeadItem, index: number) => {
+    setActiveValue(index);
+    if (!campaignId || !item.previewLeadId) {
+      return;
+    }
+    const postData = {
+      campaignId,
+      previewLeadId: item.previewLeadId,
+    };
+    setFetchTemplateLoading(true);
+    try {
+      const { data } = await _fetchEmailByLead(postData);
+      setEmailTemplate(data);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setFetchTemplateLoading(false);
+    }
+  };
+
+  const [buttons, setButtons] = useState<HTMLElement[] | null>(null);
   const [preDisabled, setPreDisabled] = useState(true);
   const [nextDisabled, setNextDisabled] = useState(false);
 
@@ -46,7 +103,7 @@ export const CampaignProcessContentMessaging = () => {
       'custom-scroll-btn',
     ) as unknown as HTMLElement[];
     setButtons(elements);
-  }, [leadsFetching]);
+  }, []);
 
   useClassNameObserver(buttons?.[0], (className) => {
     setPreDisabled(className.includes('Mui-disabled'));
@@ -54,23 +111,6 @@ export const CampaignProcessContentMessaging = () => {
   useClassNameObserver(buttons?.[1], (className) => {
     setNextDisabled(className.includes('Mui-disabled'));
   });
-
-  const fetchLeads = async () => {
-    !leadsVisible && setLeadsVisible(true);
-    setLeadsFetching(true);
-    try {
-      const {
-        data: { leads, counts },
-      } = await _fetchChatLeads(chatId);
-      setLeadsList(leads);
-      setLeadsCount(counts);
-    } catch (err) {
-      const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      setLeadsFetching(false);
-    }
-  };
 
   useEffect(
     () => {
@@ -82,18 +122,59 @@ export const CampaignProcessContentMessaging = () => {
     [returning],
   );
 
+  useEffect(() => {
+    if (leadsList.length === 0) {
+      return;
+    }
+    if (!emailTemplate) {
+      onClickToChangeLead(leadsList[0], 0);
+    }
+  }, [emailTemplate, leadsList]);
+
+  const computedEmail = useMemo(() => {
+    if (fetchTemplateLoading) {
+      return messagingSteps.map((step, index) => {
+        return {
+          ...step,
+          content: '',
+          subject: '',
+          loading: true,
+        };
+      });
+    }
+    return messagingSteps.map((step, index) => {
+      const template = emailTemplate?.find(
+        (template) => template.stepId === step.stepId,
+      );
+      return template
+        ? {
+            ...step,
+            ...template,
+            loading: false,
+          }
+        : {
+            ...step,
+            content: '',
+            subject: '',
+            loading: false,
+          };
+    });
+  }, [emailTemplate, messagingSteps, fetchTemplateLoading]);
+
   return (
     <Stack
       borderLeft={'1px solid #DFDEE6'}
       flex={1}
       gap={3}
-      p={3}
+      pt={3}
+      px={3}
       sx={{
         transition: 'all .3s',
+        overflowY: 'hidden',
       }}
       width={'calc(100% - 510px)'}
     >
-      <Stack gap={2} width={'100%'}>
+      <Stack gap={3} width={'100%'}>
         <Stack alignItems={'center'} flexDirection={'row'}>
           <Typography variant={'subtitle2'}>
             Estimated <b>{UFormatNumber(leadsCount)}</b> leads
@@ -148,6 +229,7 @@ export const CampaignProcessContentMessaging = () => {
                 sx: { display: 'none' },
               },
             }}
+            sx={{ p: 0 }}
             TabIndicatorProps={{
               sx: {
                 display: 'none',
@@ -185,17 +267,18 @@ export const CampaignProcessContentMessaging = () => {
                         </Stack>
                       </Stack>
                     }
-                    sx={{ textTransform: 'none' }}
+                    sx={{ textTransform: 'none', p: 0 }}
                   />
                 ))
               : leadsList.map((lead, index) => (
                   <Tab
+                    disabled={leadsFetching || fetchTemplateLoading}
                     key={index}
                     label={
                       <CampaignLeadsCard
                         key={index}
                         {...lead}
-                        onClick={() => setActiveValue(index)}
+                        onClick={() => onClickToChangeLead(lead, index)}
                         sx={{
                           border:
                             activeValue === index
@@ -212,14 +295,227 @@ export const CampaignProcessContentMessaging = () => {
                         }}
                       />
                     }
-                    sx={{ textTransform: 'none' }}
+                    sx={{ textTransform: 'none', p: 0 }}
                   />
                 ))}
           </Tabs>
         </Box>
+
+        <Stack
+          bgcolor={'#ffffff'}
+          border={'1px solid #DFDEE6'}
+          borderRadius={4}
+          p={2}
+        >
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            gap={2}
+            onClick={(e) => {
+              if (leadsFetching) {
+                return;
+              }
+              e.preventDefault();
+              e.stopPropagation();
+              setExpend(!expend);
+            }}
+            sx={{
+              cursor: leadsFetching ? 'default' : 'pointer',
+            }}
+          >
+            <Icon
+              component={ICON_NEXT}
+              sx={{
+                width: 18,
+                height: 18,
+                transform: expend ? 'rotate(90deg)' : 'rotate(0deg)',
+                transition: 'transform .3s',
+                '& path': {
+                  fill: leadsFetching ? '#6F6C7D' : '#2A292E',
+                },
+              }}
+            />
+
+            <StyledButton
+              color={'info'}
+              disabled={leadsFetching || !leadsList[activeValue]}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setActiveInfo('company');
+              }}
+              size={'small'}
+              sx={{
+                color:
+                  leadsFetching || activeInfo !== 'company'
+                    ? '#6F6C7D !important'
+                    : '#2A292E !important',
+              }}
+              variant={activeInfo === 'company' ? 'outlined' : 'text'}
+            >
+              <Icon
+                component={ICON_MESSAGING_COMPANY}
+                sx={{
+                  width: 18,
+                  height: 18,
+                  mr: 0.4,
+                  '& path': {
+                    fill: activeInfo === 'company' ? '#2A292E' : '#6F6C7D',
+                  },
+                }}
+              />
+              Company research
+            </StyledButton>
+            <StyledButton
+              color={'info'}
+              disabled={leadsFetching || !leadsList[activeValue]}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setActiveInfo('person');
+              }}
+              size={'small'}
+              sx={{
+                color:
+                  leadsFetching || activeInfo !== 'person'
+                    ? '#6F6C7D !important'
+                    : '#2A292E !important',
+              }}
+              variant={activeInfo === 'person' ? 'outlined' : 'text'}
+            >
+              <Icon
+                component={ICON_MESSAGING_PERSON}
+                sx={{
+                  width: 18,
+                  height: 18,
+                  mr: 0.5,
+                  '& path': {
+                    fill: activeInfo === 'person' ? '#2A292E' : '#6F6C7D',
+                  },
+                }}
+              />
+              Personal research
+            </StyledButton>
+          </Stack>
+
+          <Collapse in={expend}>
+            <Stack gap={1} mt={2}>
+              <Typography color={'text.secondary'} variant={'subtitle3'}>
+                Overview
+              </Typography>
+              <Typography variant={'body3'}>
+                {activeInfo === 'company'
+                  ? leadsList[activeValue]?.companyResearch
+                  : leadsList[activeValue]?.personalResearch}
+              </Typography>
+            </Stack>
+          </Collapse>
+        </Stack>
       </Stack>
 
-      <Stack>content</Stack>
+      <Stack
+        bgcolor={'#F8F8FA'}
+        border={'1px solid #D2D6E1'}
+        borderRadius={4}
+        flex={1}
+        gap={3}
+        overflow={'auto'}
+        p={3}
+      >
+        {computedEmail.map((step, index) => (
+          <Stack
+            alignSelf={'center'}
+            bgcolor={'#FFF'}
+            borderRadius={2}
+            gap={1.5}
+            key={`step-${step.stepId}-${index}`}
+            minWidth={600}
+            p={3}
+            width={'65%'}
+          >
+            {/*header*/}
+            <Stack borderBottom={'1px solid #E5E5E5'} gap={1} pb={1.5}>
+              <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
+                <Typography variant={'h6'}>Step {index + 1}</Typography>
+                <Icon
+                  component={ICON_MESSAGING_EMAIL}
+                  sx={{ width: 24, height: 24 }}
+                />
+              </Stack>
+
+              <Stack alignItems={'center'} flexDirection={'row'}>
+                <Stack flexDirection={'row'} gap={'.5em'}>
+                  Subject :
+                  {step.loading ? (
+                    <Skeleton animation={'wave'} height={'100%'} width={320} />
+                  ) : (
+                    <b>{step.subject}</b>
+                  )}
+                </Stack>
+
+                <StyledButton
+                  color={'info'}
+                  disabled={step.loading}
+                  size={'small'}
+                  sx={{ ml: 'auto' }}
+                  variant={'outlined'}
+                >
+                  Edit subject prompt
+                </StyledButton>
+              </Stack>
+            </Stack>
+
+            {/*content*/}
+            <Stack>
+              {step.loading ? (
+                <Stack>
+                  <Skeleton width={120} />
+                  <Skeleton sx={{ mt: 1.5 }} width={'80%'} />
+                  <Skeleton width={'50%'} />
+                  <Skeleton sx={{ mt: 1.5 }} width={'60%'} />
+                  <Skeleton width={'90%'} />
+                  <Skeleton sx={{ mt: 3 }} width={'30%'} />
+                </Stack>
+              ) : (
+                <ShadowContent html={step.content} />
+              )}
+            </Stack>
+
+            <StyledButton
+              color={'info'}
+              disabled={step.loading}
+              size={'small'}
+              sx={{ ml: 'auto' }}
+              variant={'outlined'}
+            >
+              Edit body prompt
+            </StyledButton>
+          </Stack>
+        ))}
+      </Stack>
     </Stack>
   );
+};
+
+const ShadowContent = ({ html }: { html: string }) => {
+  const shadowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!shadowRef.current) {
+      return;
+    }
+
+    const shadowRoot =
+      shadowRef.current.shadowRoot ||
+      shadowRef.current.attachShadow({ mode: 'open' });
+
+    shadowRoot.innerHTML = '';
+
+    const contentContainer = document.createElement('div');
+    contentContainer.innerHTML = html;
+
+    shadowRoot.appendChild(contentContainer);
+  }, [html]);
+
+  return <div ref={shadowRef} />;
 };

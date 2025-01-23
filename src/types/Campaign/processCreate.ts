@@ -22,6 +22,10 @@ export interface CampaignLeadItem {
   role: string | null;
   company: string | null;
   backgroundColor: string | null;
+  leadId?: string | number;
+  previewLeadId?: string | number;
+  companyResearch: string | null;
+  personalResearch: string | null;
 }
 
 export interface ResponseCampaignLeadsInfo {
@@ -52,6 +56,34 @@ export interface ResponseCampaignChatRecord {
   isFake?: boolean;
 }
 
+export interface ResponseCampaignMessagingStep {
+  stepId: number | string;
+  numericalOrder: number;
+  afterDays: number | null;
+  bodyWordCount: number | null;
+  subjectInstructions: string | null;
+  subjectExamples: string[];
+  bodyInstructions: string | null;
+  bodyCallToAction: string | null;
+  bodyExamples: string[];
+}
+
+export interface ResponseCampaignLaunchInfo {
+  dailyLimit: number | null;
+  autopilot: boolean;
+  sendNow: boolean;
+  scheduleTime: string | null;
+  sender: string | null;
+  replyTo: string | null;
+  senderName: string | null;
+}
+
+export interface ResponseCampaignEmail {
+  stepId: string | number;
+  content: string;
+  subject: string;
+}
+
 export interface ResponseCampaignInfo {
   campaignId: string | number;
   campaignName: string | null;
@@ -61,5 +93,7 @@ export interface ResponseCampaignInfo {
   data: {
     leadInfo: ResponseCampaignLeadsInfo;
     chatRecord: ResponseCampaignChatRecord[];
+    steps: ResponseCampaignMessagingStep[];
+    launchInfo: ResponseCampaignLaunchInfo;
   };
 }

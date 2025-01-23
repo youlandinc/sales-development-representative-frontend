@@ -82,6 +82,8 @@ export const StyledButton: FC<StyledButtonProps> = ({
         },
         '&.MuiButton-text': {
           bgcolor: 'transparent',
+          boxShadow: 'none',
+          border: '1px solid transparent',
           color:
             color !== 'primary'
               ? `${color}.main`

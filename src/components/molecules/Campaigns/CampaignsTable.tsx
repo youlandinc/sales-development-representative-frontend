@@ -272,6 +272,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setMessageList,
     setCampaignId,
     createChatSSE,
+    setMessagingSteps,
   } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -355,6 +356,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               data: {
                 leadInfo: { counts, leads },
                 chatRecord,
+                steps,
               },
             },
           } = await _fetchCampaignInfo(campaignId);
@@ -370,6 +372,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           await setSetupPhase(setupPhase, false);
           setMessageList(chatRecord);
           await createChatSSE(chatId);
+          setMessagingSteps(steps);
           openProcess();
         } catch (err) {
           const { message, variant, header } = err as HttpError;

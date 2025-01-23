@@ -103,7 +103,6 @@ export const CampaignProcessContentChat: FC = () => {
       alignItems={'center'}
       border={'1px solid'}
       borderColor={activeStep === 1 ? 'transparent' : '#DFDEE6'}
-      borderRadius={activeStep === 1 ? 0 : 4}
       gap={4}
       justifyContent={messageList.length > 0 ? 'unset' : 'center'}
       maxWidth={activeStep === 1 ? '100%' : 460}
@@ -111,7 +110,14 @@ export const CampaignProcessContentChat: FC = () => {
       mt={3}
       pb={activeStep === 1 ? 0 : 6}
       pt={activeStep === 1 ? 0 : 3}
-      sx={{ transition: 'all .3s', overflow: 'hidden' }}
+      sx={{
+        transition: 'all .3s',
+        overflow: 'hidden',
+        borderTopLeftRadius: activeStep === 1 ? '8px' : '16px',
+        borderTopRightRadius: activeStep === 1 ? '8px' : '16px',
+        borderBottomLeftRadius: '16px',
+        borderBottomRightRadius: '16px',
+      }}
       width={activeStep === 1 ? '100%' : 460}
     >
       <Stack

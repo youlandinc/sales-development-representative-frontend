@@ -32,6 +32,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
     createCampaign,
     creating,
     campaignId,
+    leadsList,
   } = useDialogStore();
 
   return (
@@ -40,9 +41,9 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
         <Typography variant={'h6'}>Start new campaign</Typography>
         <Icon
           component={ICON_CLOSE}
-          onClick={() => {
+          onClick={async () => {
             closeProcess();
-            resetDialogState();
+            await resetDialogState();
           }}
           sx={{ ml: 'auto', cursor: 'pointer' }}
         />
@@ -52,7 +53,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
         <CampaignProcessHeaderButtonGroup />
         {leadsVisible && !campaignId && (
           <StyledButton
-            disabled={creating}
+            disabled={creating || leadsList.length === 0}
             loading={creating}
             onClick={async () => await createCampaign()}
             size={'medium'}
@@ -75,6 +76,7 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
     activeStep,
     setActiveStep,
     setSetupPhase,
+    resetDialogState,
   } = useDialogStore();
 
   const [value, setValue] = useState(campaignName);
@@ -111,8 +113,9 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
         <Icon
           component={ICON_BACK}
-          onClick={() => {
+          onClick={async () => {
             closeProcess();
+            await resetDialogState();
           }}
           sx={{
             cursor: 'pointer',

@@ -48,9 +48,22 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
       >
         {avatarName()}
       </Avatar>
-      <Stack width={'60%'}>
+      <Stack maxWidth={'60%'} width={'60%'}>
         <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
-          <Typography variant={'subtitle2'}>{name}</Typography>
+          <StyledTooltip mode={'hover'} title={name}>
+            <Typography
+              sx={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                width: 'fit-content',
+                maxWidth: '100%',
+              }}
+              variant={'subtitle2'}
+            >
+              {name}
+            </Typography>
+          </StyledTooltip>
           <Icon component={ICON_LINKEDIN} sx={{ width: 18, height: 18 }} />
         </Stack>
 

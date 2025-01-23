@@ -4,6 +4,7 @@ import {
   CampaignStatusEnum,
   HttpError,
   ResponseCampaignChatRecord,
+  ResponseCampaignMessagingStep,
   SetupPhaseEnum,
   SourceEnum,
 } from '@/types';
@@ -12,28 +13,31 @@ import { SDRToast } from '@/components/atoms';
 
 import { ProcessCreateChatEnum } from '@/types';
 import {
+  _closeSSE,
   _createCampaign,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
 } from '@/request';
 
 export type DialogStoreState = {
+  reloadTable: boolean;
   visibleProcess: boolean;
   activeStep: number;
   chatId: string | number;
-  returning: boolean;
   chatSSE: EventSource | undefined;
   isFirst: boolean;
+  creating: boolean;
+  returning: boolean;
   messageList: ResponseCampaignChatRecord[];
   leadsList: CampaignLeadItem[];
   leadsCount: number;
   leadsVisible: boolean;
-  creating: boolean;
   campaignId: number | string | null;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
-  reloadTable: boolean;
   setupPhase: SetupPhaseEnum;
+
+  messagingSteps: ResponseCampaignMessagingStep[];
 };
 
 export type DialogStoreActions = {
@@ -57,8 +61,10 @@ export type DialogStoreActions = {
   setCampaignName: (name: string) => void;
   setCampaignStatus: (status: CampaignStatusEnum) => void;
   setSetupPhase: (phase: SetupPhaseEnum, redirect?: boolean) => Promise<void>;
-  resetDialogState: () => void;
   setReloadTable: (reloadTable: boolean) => void;
+  setMessagingSteps: (messagingSteps: ResponseCampaignMessagingStep[]) => void;
+
+  resetDialogState: () => Promise<void>;
 };
 
 const InitialState: DialogStoreState = {
@@ -77,6 +83,8 @@ const InitialState: DialogStoreState = {
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
   setupPhase: SetupPhaseEnum.audience,
+
+  messagingSteps: [],
   reloadTable: false,
 };
 
@@ -152,13 +160,23 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   createChatSSE: async (chatId: number | string) => {
     const params = chatId || get().chatId;
 
-    const eventSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/chat/subscriber/${params}`,
-    );
+    const initialSSE = () => {
+      return new EventSource(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/chat/subscriber/${params}`,
+      );
+    };
+
+    const eventSource = initialSSE();
+
+    if (!eventSource) {
+      return;
+    }
 
     set({ chatSSE: eventSource });
 
-    eventSource.onmessage = (e) => {
+    const { chatSSE } = get();
+
+    chatSSE!.onmessage = (e) => {
       if (e.data === 'heart-beating:alive' || e.data === 'heartbeat') {
         return;
       }
@@ -174,7 +192,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           const temp = {
             source: SourceEnum.server,
             id: data.id,
-            data: [{ ...data, sort: 1 }],
+            data: [data],
             message: '',
           };
           get().addMessageItem(temp);
@@ -185,34 +203,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           const { messageList } = get();
           const target = messageList.find((item) => item.id === data.id);
           if (target) {
-            target.data!.push({ ...data, sort: 2 });
-          }
-          set({ messageList });
-          break;
-        }
-        case ProcessCreateChatEnum.job_title: {
-          const { messageList } = get();
-          const target = messageList.find((item) => item.id === data.id);
-          if (target) {
-            target.data!.push({ ...data, sort: 3 });
-          }
-          set({ messageList });
-          break;
-        }
-        case ProcessCreateChatEnum.job_role: {
-          const { messageList } = get();
-          const target = messageList.find((item) => item.id === data.id);
-          if (target) {
-            target.data!.push({ ...data, sort: 4 });
-          }
-          set({ messageList });
-          break;
-        }
-        case ProcessCreateChatEnum.company_industry: {
-          const { messageList } = get();
-          const target = messageList.find((item) => item.id === data.id);
-          if (target) {
-            target.data!.push({ ...data, sort: 5 });
+            target.data!.push(data);
           }
           set({ messageList });
           break;
@@ -221,7 +212,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           const { messageList } = get();
           const target = messageList.find((item) => item.id === data.id);
           if (target) {
-            target.data!.push({ ...data, sort: 6 });
+            target.data!.push(data);
           }
           set({ messageList });
           break;
@@ -230,22 +221,29 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           const { messageList } = get();
           const target = messageList.find((item) => item.id === data.id);
           if (target) {
-            target.data!.push({ ...data, sort: 7 });
+            target.data!.push(data);
           }
           set({ messageList, returning: false, isFirst: false });
           break;
         }
-        default:
-          return data;
+        default: {
+          const { messageList } = get();
+          const target = messageList.find((item) => item.id === data.id);
+          if (target) {
+            target.data!.push(data);
+          }
+          set({ messageList, returning: false, isFirst: false });
+          break;
+        }
       }
     };
 
-    eventSource.onerror = (e) => {
-      //eslint-disable-next-line no-console
-      console.log(e);
-      eventSource.close();
-      set({ chatSSE: void 0 });
-      throw new Error('SSE connection error');
+    chatSSE!.onerror = async () => {
+      if (chatSSE?.readyState === EventSource.CLOSED) {
+        const retriedSSE = initialSSE();
+        eventSource.close();
+        set({ chatSSE: retriedSSE });
+      }
     };
   },
   createCampaign: async () => {
@@ -273,8 +271,13 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       set({ creating: false, activeStep: 2, reloadTable: true });
     }
   },
-  resetDialogState: () => {
-    get().chatSSE?.close();
+  setMessagingSteps: (messagingSteps) => set({ messagingSteps }),
+  resetDialogState: async () => {
+    const { chatSSE, chatId } = get();
+    if (chatSSE?.readyState === 1) {
+      chatSSE?.close();
+      await _closeSSE(chatId);
+    }
     set({ ...store.getInitialState(), messageList: [] }, true);
   },
 }));
