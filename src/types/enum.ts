@@ -5,7 +5,7 @@ export enum EmailDomainStateEnum {
   ACTIVE = 'ACTIVE',
 }
 
-export enum MarketingReportProcessStatusEnum {
+export enum CampaignsPendingTimeLineEnum {
   scheduled = 'SCHEDULED',
   completed = 'COMPLETED',
 }

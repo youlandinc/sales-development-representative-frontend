@@ -1,8 +1,12 @@
-import { FC, PropsWithChildren, ReactNode } from 'react';
+import { FC, PropsWithChildren, ReactNode, useState } from 'react';
 import { Icon, Stack, Tooltip, Typography } from '@mui/material';
+import { useRouter } from 'nextjs-toploader/app';
 
-import { StyledButton, StyledTextField } from '@/components/atoms';
+import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 import { CommonBackButton } from '@/components/molecules';
+import { useSwitch } from '@/hooks';
+
+import { HttpError, HttpVariantEnum } from '@/types';
 
 import ICON_WARNING from './assets/icon_warning.svg';
 
@@ -32,6 +36,73 @@ export const StyledTextFieldLabel: FC<
 };
 
 export const LibraryCompanyEdit = () => {
+  const router = useRouter();
+  const [sellingInfo, setSellingInfo] = useState('');
+  const { visible, open, close } = useSwitch();
+
+  const handleExtract = async () => {
+    let str = '';
+    open();
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        module: 'PRODUCT_INTRODUCTION',
+        params: {
+          companyName: 'Youland',
+          companyPage: 'https://youland.com/',
+        },
+      }),
+    })
+      .then((response) => {
+        if (response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+
+          const readStream = () => {
+            reader.read().then(({ done, value }) => {
+              if (done) {
+                close();
+                return;
+              }
+              // decode
+              const data = decoder
+                .decode(value)
+                .replace(/data:/g, '')
+                .replace(/\n/g, '');
+
+              str = str + data;
+              setSellingInfo(str);
+
+              // continue read stream
+              readStream();
+            });
+          };
+
+          readStream();
+        }
+      })
+      .catch((error) => {
+        const { message, header, variant } = error as HttpError;
+        SDRToast({ message, header, variant });
+      });
+    /*await _generateSellingInfo().then((res) => {
+      const dataStream = res.data;
+       // 处理数据流
+      const lines: string[] = dataStream.split('\n');
+      let str = '';
+      lines.forEach((line) => {
+        if (line.startsWith('data:')) {
+          const data = line.replace('data:', '');
+          str = str + data;
+          setSellingInfo(str);
+        }
+      });
+    });*/
+  };
+
   return (
     <Stack gap={3} maxWidth={1200}>
       <CommonBackButton backPath={'/library'} title={'Company overview'} />
@@ -43,7 +114,7 @@ export const LibraryCompanyEdit = () => {
             'Enter the full name of your company as it should appear in emails sent to target users.'
           }
         >
-          <StyledTextField required />
+          <StyledTextField defaultValue={'Youland'} required />
         </StyledTextFieldLabel>
         <StyledTextFieldLabel
           label={'Company page'}
@@ -54,6 +125,7 @@ export const LibraryCompanyEdit = () => {
         >
           <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
             <StyledTextField
+              defaultValue={'youland.com'}
               required
               slotProps={{
                 input: {
@@ -61,7 +133,12 @@ export const LibraryCompanyEdit = () => {
                 },
               }}
             />
-            <StyledButton color={'info'} variant={'outlined'}>
+            <StyledButton
+              color={'info'}
+              loading={visible}
+              onClick={handleExtract}
+              variant={'outlined'}
+            >
               Smart extract
             </StyledButton>
           </Stack>
@@ -75,6 +152,9 @@ export const LibraryCompanyEdit = () => {
         >
           <StyledTextField
             multiline
+            onChange={(e) => {
+              setSellingInfo(e.target.value);
+            }}
             required
             rows={10}
             sx={{
@@ -83,10 +163,21 @@ export const LibraryCompanyEdit = () => {
                 height: 'auto !important',
               },
             }}
+            value={sellingInfo}
           />
         </StyledTextFieldLabel>
       </Stack>
-      <StyledButton sx={{ alignSelf: 'flex-start' }}>
+      <StyledButton
+        onClick={() => {
+          SDRToast({
+            header: '',
+            message: 'Save successfully!',
+            variant: HttpVariantEnum.success,
+          });
+          router.push('/library');
+        }}
+        sx={{ alignSelf: 'flex-start' }}
+      >
         Save and continue
       </StyledButton>
     </Stack>

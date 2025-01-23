@@ -4,14 +4,14 @@ import { format, isValid } from 'date-fns';
 
 import { UFormatNumber } from '@/utils/UFormater';
 
-import { MarketingReportPerformance } from '@/types';
+import { ICampaignsPendingPerformance } from '@/types';
 
 import ICON_PERFORMANCE from './assets/icon_performance.svg';
 import ICON_ARROW from './assets/icon_collapse.svg';
 import ICON_INFO from './assets/icon_info.svg';
 
 export interface CampaignMarketingPerformance {
-  performances?: MarketingReportPerformance[];
+  performances?: ICampaignsPendingPerformance[];
   // option?: TOption[];
 }
 

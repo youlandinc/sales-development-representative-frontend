@@ -1,7 +1,14 @@
-import { MarketingReportProcessStatusEnum } from '@/types/enum';
+import { CampaignsPendingTimeLineEnum } from '@/types/enum';
+import { CampaignStatusEnum } from '@/types';
 
-export type IMarketingReportTimeline = {
-  status: MarketingReportProcessStatusEnum;
+export interface ICampaignsPendingBaseInfo {
+  sentOn: string;
+  replyTo: string;
+  from: string;
+}
+
+export type ICampaignsPendingTimeline = {
+  status: CampaignsPendingTimeLineEnum;
   startTime: string | null;
   endTime: string;
   total: number | null;
@@ -11,7 +18,7 @@ export type IMarketingReportTimeline = {
   unSent: number | null;
 };
 
-export interface MarketingReportDeliveryStatistics {
+export interface CampaignsPendingDeliveryStatistics {
   sentTo: number;
   deliveredTo: number;
   deliveryRate: number;
@@ -19,7 +26,7 @@ export interface MarketingReportDeliveryStatistics {
   hardBounces: number;
 }
 
-export interface MarketingReportOpenStatistics {
+export interface CampaignsPendingOpenStatistics {
   estimatedOpens: number;
   trackableOpens: number;
   uniqueOpens: number;
@@ -29,7 +36,7 @@ export interface MarketingReportOpenStatistics {
   unTrackableContacts: number;
 }
 
-export interface MarketingReportClickStatistics {
+export interface CampaignsPendingClickStatistics {
   lastClick: string;
   totalClicks: number;
   uniqueClicks: number;
@@ -38,19 +45,33 @@ export interface MarketingReportClickStatistics {
   averageTimeToClick: number;
 }
 
-export interface MarketingReportUnsubscribeStatistics {
+export interface CampaignsPendingUnsubscribeStatistics {
   unsubscribes: number;
   unsubscribeRate: number;
   spamComplaints: number;
   spamComplaintRate: number;
 }
 
-export interface MarketingReportPerformance {
+export interface ICampaignsPendingPerformance {
   campaignId: string | number;
   subjectId: string;
   subjectName: string;
-  deliveryStatistics: MarketingReportDeliveryStatistics;
-  openStatistics: MarketingReportOpenStatistics;
-  clickStatistics: MarketingReportClickStatistics;
-  unsubscribesStatistics: MarketingReportUnsubscribeStatistics;
+  deliveryStatistics: CampaignsPendingDeliveryStatistics;
+  openStatistics: CampaignsPendingOpenStatistics;
+  clickStatistics: CampaignsPendingClickStatistics;
+  unsubscribesStatistics: CampaignsPendingUnsubscribeStatistics;
+}
+
+type StringOrNull<T> = {
+  [K in keyof T]: string | null;
+};
+
+export interface CampaignsPendingResponseData {
+  campaignName: string;
+  campaignId: number;
+  campaignStatus: CampaignStatusEnum;
+  data: {
+    timeline: ICampaignsPendingTimeline[];
+    performances: ICampaignsPendingPerformance[];
+  } & StringOrNull<ICampaignsPendingBaseInfo>;
 }

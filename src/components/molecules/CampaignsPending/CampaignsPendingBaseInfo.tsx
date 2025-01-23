@@ -1,20 +1,12 @@
 import { FC } from 'react';
 import { Stack, Typography } from '@mui/material';
-
-// import { MarketingReportBaseInfo } from '@/types';
 import { format, parseISO } from 'date-fns';
 
-export type IMarketingReportBaseInfo = {
-  sentOn: string;
-  subject: string;
-  from: string;
-};
+import { ICampaignsPendingBaseInfo } from '@/types';
 
-type CampaignMarketingBaseInfoProps = IMarketingReportBaseInfo;
-
-export const CampaignsPendingBaseInfo: FC<CampaignMarketingBaseInfoProps> = ({
+export const CampaignsPendingBaseInfo: FC<ICampaignsPendingBaseInfo> = ({
   sentOn,
-  subject,
+  replyTo,
   from,
 }) => {
   return (
@@ -38,16 +30,16 @@ export const CampaignsPendingBaseInfo: FC<CampaignMarketingBaseInfoProps> = ({
 
       <Stack>
         <Typography color={'text.secondary'} variant={'body3'}>
-          Subject
+          From
         </Typography>
-        <Typography variant={'subtitle2'}>{subject}</Typography>
+        <Typography variant={'subtitle2'}>{from}</Typography>
       </Stack>
 
       <Stack>
         <Typography color={'text.secondary'} variant={'body3'}>
-          From
+          Reply to
         </Typography>
-        <Typography variant={'subtitle2'}>{from}</Typography>
+        <Typography variant={'subtitle2'}>{replyTo}</Typography>
       </Stack>
     </Stack>
   );

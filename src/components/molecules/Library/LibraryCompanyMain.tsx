@@ -4,11 +4,7 @@ import { useRouter } from 'nextjs-toploader/app';
 import Image from 'next/image';
 
 import { StyledButton } from '@/components/atoms';
-import {
-  LibraryCard,
-  LibraryCardProps,
-  ScrollTabs,
-} from '@/components/molecules';
+import { LibraryCard, LibraryCardProps } from '@/components/molecules';
 
 import ICON_BUILDINGS from './assets/icon_buildings.svg';
 
@@ -35,7 +31,7 @@ const LibraryCompanyCard: FC<PropsWithChildren<LibraryCardProps>> = ({
 export const ContentBox: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Box border={'1px solid #DFDEE6'} borderRadius={2} p={1.5}>
-      <Typography sx={commonStyle} variant={'body2'}>
+      <Typography minHeight={'4.5em'} sx={commonStyle} variant={'body2'}>
         {children}
       </Typography>
     </Box>
@@ -182,7 +178,6 @@ export const LibraryCompanyMain = () => {
           </ContentBox>
         </LibraryCompanyCard>
       </Stack>
-      <ScrollTabs />
     </Stack>
   );
 };

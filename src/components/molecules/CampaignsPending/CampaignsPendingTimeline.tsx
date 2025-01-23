@@ -12,19 +12,19 @@ import { format, parseISO } from 'date-fns';
 
 import { UFormatNumber } from '@/utils/UFormater';
 
-import { IMarketingReportTimeline } from '@/types';
-import { MarketingReportProcessStatusEnum } from '@/types/enum';
+import { ICampaignsPendingTimeline } from '@/types';
+import { CampaignsPendingTimeLineEnum } from '@/types/enum';
 
 import ICON_TIMELINE from './assets/icon_timeline.svg';
 
 export interface CampaignMarketingTimelineProps {
-  timeline: IMarketingReportTimeline[];
+  timeline: ICampaignsPendingTimeline[];
   campaignName: string;
 }
 
 const TIMELINE_HASH = {
-  [MarketingReportProcessStatusEnum.completed]: 'Sending completed',
-  [MarketingReportProcessStatusEnum.scheduled]: 'Scheduled',
+  [CampaignsPendingTimeLineEnum.completed]: 'Sending completed',
+  [CampaignsPendingTimeLineEnum.scheduled]: 'Scheduled',
 };
 
 export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
@@ -88,7 +88,7 @@ export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
               }}
             >
               <Stack gap={1} mb={1}>
-                {item.status === MarketingReportProcessStatusEnum.scheduled ? (
+                {item.status === CampaignsPendingTimeLineEnum.scheduled ? (
                   <Typography color={'text.secondary'} variant={'body3'}>
                     The{' '}
                     <Typography

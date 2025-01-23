@@ -377,6 +377,9 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         }
         break;
       }
+      case CampaignStatusEnum.active:
+        router.push(`/campaigns/pending/${campaignId}`);
+        break;
       default: {
         console.log('pending approve');
       }

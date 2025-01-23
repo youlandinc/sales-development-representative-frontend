@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Icon, Stack } from '@mui/material';
+import { useRouter } from 'nextjs-toploader/app';
 
 import {
   CampaignsStatusBadge,
@@ -10,11 +11,22 @@ import { StyledButton } from '@/components/atoms';
 import { CampaignStatusEnum } from '@/types';
 
 import ICON_ARROW from './assets/icon_arrow.svg';
-import { useRouter } from 'nextjs-toploader/app';
 
-export const CampaignsPendingHeader = () => {
+type CampaignsPendingHeaderProps = {
+  campaignName: string;
+  campaignStatus: CampaignStatusEnum;
+};
+
+export const CampaignsPendingHeader: FC<CampaignsPendingHeaderProps> = ({
+  campaignName,
+  campaignStatus,
+}) => {
   const router = useRouter();
-  const [title, setTitle] = useState('Untitled campaign');
+  const [title, setTitle] = useState('');
+
+  useEffect(() => {
+    setTitle(campaignName);
+  }, [campaignName]);
 
   return (
     <Stack
@@ -38,6 +50,7 @@ export const CampaignsPendingHeader = () => {
         </Stack>
         <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
           <CommonRenameTextField
+            // defaultValue={campaignName}
             onChange={(e) => setTitle(e.target.value)}
             slotProps={{
               input: {
@@ -50,10 +63,7 @@ export const CampaignsPendingHeader = () => {
             }}
             value={title}
           />
-          <CampaignsStatusBadge
-            status={CampaignStatusEnum.draft}
-            sx={{ py: 0.5 }}
-          />
+          <CampaignsStatusBadge status={campaignStatus} sx={{ py: 0.5 }} />
         </Stack>
       </Stack>
       <Stack flexDirection={'row'} gap={3}>
