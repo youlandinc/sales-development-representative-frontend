@@ -169,7 +169,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
               <Skeleton height={48} width={56} />
             ) : (
               <Typography variant={'h4'}>
-                {item.value < 1
+                {item.key === 'openRate' || item.key === 'replyRate'
                   ? UFormatPercent(item.value)
                   : UFormatNumber(item.value)}
               </Typography>

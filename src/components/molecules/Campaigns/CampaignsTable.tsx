@@ -437,7 +437,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               </Typography>
               <Typography
                 color={'#6E4EFB'}
-                onClick={() => open()}
+                onClick={() => openProcess()}
                 sx={{ cursor: 'pointer' }}
                 variant={'body2'}
               >
