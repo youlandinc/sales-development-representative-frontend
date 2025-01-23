@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Collapse,
@@ -73,26 +73,29 @@ export const CampaignProcessContentMessaging = () => {
 
   const [fetchTemplateLoading, setFetchTemplateLoading] = useState(false);
 
-  const onClickToChangeLead = async (item: CampaignLeadItem, index: number) => {
-    setActiveValue(index);
-    if (!campaignId || !item.previewLeadId || fetchTemplateLoading) {
-      return;
-    }
-    const postData = {
-      campaignId,
-      previewLeadId: item.previewLeadId,
-    };
-    setFetchTemplateLoading(true);
-    try {
-      const { data } = await _fetchEmailByLead(postData);
-      setEmailTemplate(data);
-    } catch (err) {
-      const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      setFetchTemplateLoading(false);
-    }
-  };
+  const onClickToChangeLead = useCallback(
+    async (item: CampaignLeadItem, index: number) => {
+      setActiveValue(index);
+      if (!campaignId || !item.previewLeadId || fetchTemplateLoading) {
+        return;
+      }
+      const postData = {
+        campaignId,
+        previewLeadId: item.previewLeadId,
+      };
+      setFetchTemplateLoading(true);
+      try {
+        const { data } = await _fetchEmailByLead(postData);
+        setEmailTemplate(data);
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      } finally {
+        setFetchTemplateLoading(false);
+      }
+    },
+    [campaignId, fetchTemplateLoading],
+  );
 
   const [buttons, setButtons] = useState<HTMLElement[] | null>(null);
   const [preDisabled, setPreDisabled] = useState(true);
@@ -129,11 +132,11 @@ export const CampaignProcessContentMessaging = () => {
     if (!emailTemplate) {
       onClickToChangeLead(leadsList[0], 0);
     }
-  }, [emailTemplate, leadsList]);
+  }, [emailTemplate, fetchTemplateLoading, leadsList, onClickToChangeLead]);
 
   const computedEmail = useMemo(() => {
     if (fetchTemplateLoading) {
-      return messagingSteps.map((step, index) => {
+      return messagingSteps.map((step) => {
         return {
           ...step,
           content: '',
@@ -142,7 +145,7 @@ export const CampaignProcessContentMessaging = () => {
         };
       });
     }
-    return messagingSteps.map((step, index) => {
+    return messagingSteps.map((step) => {
       const template = emailTemplate?.find(
         (template) => template.stepId === step.stepId,
       );
