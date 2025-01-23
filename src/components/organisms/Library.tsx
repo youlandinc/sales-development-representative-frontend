@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Box, Fade, Stack, Typography } from '@mui/material';
 
 import { StyledButton } from '@/components/atoms';

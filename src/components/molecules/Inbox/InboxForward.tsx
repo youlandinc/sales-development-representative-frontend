@@ -1,5 +1,4 @@
 import {
-  Box,
   InputAdornment,
   Stack,
   SxProps,

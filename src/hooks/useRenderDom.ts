@@ -11,6 +11,7 @@ export const useRenderDom = (
       }
       element.current.shadowRoot!.innerHTML = `<style>${style ?? ''} </style>${string || ''}`;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [element],
   );
 
