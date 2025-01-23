@@ -100,7 +100,7 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       await setSetupPhase(SetupPhaseEnum.launch);
       return;
     }
-    console.log('finally');
+    //console.log('finally');
   };
 
   return (

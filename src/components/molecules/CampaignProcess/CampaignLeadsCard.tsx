@@ -20,6 +20,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
   company,
   backgroundColor,
   sx,
+  avatar,
   onClick = () => {},
 }) => {
   const avatarName = () => {
@@ -38,6 +39,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
       sx={sx}
     >
       <Avatar
+        src={avatar || ''}
         sx={{
           bgcolor: backgroundColor || '#dedede',
           width: 32,
