@@ -107,7 +107,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Delivery rate
               <Typography variant={'h6'}>
-                {performance?.deliveryStatistics?.deliveryRate + '%'}
+                {performance?.deliveryStatistics?.deliveryRate || 0 + '%'}
               </Typography>
             </Stack>
           </Stack>
@@ -145,7 +145,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Delivery rate
               </Typography>
               <Typography variant={'subtitle1'}>
-                {performance?.deliveryStatistics?.deliveryRate + '%'}
+                {performance?.deliveryStatistics?.deliveryRate || 0 + '%'}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -246,9 +246,11 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Unique open rate
               <Typography variant={'h6'}>
-                {performance?.openStatistics?.uniqueOpenRate + '%'}
+                {performance?.openStatistics?.uniqueOpenRate || 0 + '%'}
                 <Typography component={'span'} variant={'body2'}>
-                  ({UFormatNumber(performance?.openStatistics?.uniqueOpens)})
+                  (
+                  {UFormatNumber(performance?.openStatistics?.uniqueOpens || 0)}
+                  )
                 </Typography>
               </Typography>
             </Stack>
@@ -285,7 +287,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 </Tooltip>
               </Typography>
               <Typography variant={'subtitle1'}>
-                {performance?.openStatistics?.uniqueOpenRate + '%'}
+                {performance?.openStatistics?.uniqueOpenRate || 0 + '%'}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -418,9 +420,13 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Click-through rate
               <Typography variant={'h6'}>
-                {performance?.clickStatistics?.clickThoughRate + '%'}
+                {performance?.clickStatistics?.clickThoughRate || 0 + '%'}
                 <Typography component={'span'} variant={'body2'}>
-                  ({UFormatNumber(performance?.clickStatistics?.uniqueClicks)})
+                  (
+                  {UFormatNumber(
+                    performance?.clickStatistics?.uniqueClicks || 0,
+                  )}
+                  )
                 </Typography>
               </Typography>
             </Stack>
@@ -443,7 +449,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Click-through rate
               </Typography>
               <Typography variant={'subtitle1'}>
-                {performance?.clickStatistics?.clickThoughRate + '%'}
+                {performance?.clickStatistics?.clickThoughRate || 0 + '%'}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -618,11 +624,12 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
             >
               Unsubscribe rate
               <Typography variant={'h6'}>
-                {performance?.unsubscribesStatistics?.unsubscribeRate + '%'}
+                {performance?.unsubscribesStatistics?.unsubscribeRate ||
+                  0 + '%'}
                 <Typography component={'span'} variant={'body2'}>
                   (
                   {UFormatNumber(
-                    performance?.unsubscribesStatistics?.unsubscribes,
+                    performance?.unsubscribesStatistics?.unsubscribes || 0,
                   )}
                   )
                 </Typography>
@@ -657,7 +664,8 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Unsubscribe rate
               </Typography>
               <Typography variant={'subtitle1'}>
-                {performance?.unsubscribesStatistics?.unsubscribeRate + '%'}
+                {performance?.unsubscribesStatistics?.unsubscribeRate ||
+                  0 + '%'}
               </Typography>
             </Stack>
             <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -688,7 +696,8 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                 Spam complaint rate
               </Typography>
               <Typography variant={'subtitle1'}>
-                {performance?.unsubscribesStatistics?.spamComplaintRate + '%'}
+                {performance?.unsubscribesStatistics?.spamComplaintRate ||
+                  0 + '%'}
               </Typography>
             </Stack>
           </Stack>

@@ -19,15 +19,15 @@ type CampaignsPendingEmailsCardProps = {
   avatarBgcolor?: string;
   email: ReactNode;
   emailContent: string;
+  time: string;
 };
 
 export const CampaignsPendingEmailsCard: FC<
   CampaignsPendingEmailsCardProps
-> = ({ avatarBgcolor, avatarName, email, emailContent }) => {
+> = ({ avatarBgcolor, avatarName, email, emailContent, time }) => {
   // const { setInboxContentType, setForwardContent, receiptType } = useInboxStore(
   //   (state) => state,
   // );
-
   const { visible, open, close } = useSwitch();
   const editorRef = useRef<InboxEditorForwardRefProps | null>(null);
 
@@ -47,22 +47,24 @@ export const CampaignsPendingEmailsCard: FC<
           </Typography>
         }
         time={
-          <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
-            <Icon component={ICON_CALENDAR} sx={{ width: 16, height: 16 }} />
-            <Typography color={'#637381'} component={'div'} variant={'body3'}>
-              {format(new Date(), 'MM/dd/yyyy')}
-            </Typography>
-          </Stack>
+          time && (
+            <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+              <Icon component={ICON_CALENDAR} sx={{ width: 16, height: 16 }} />
+              <Typography color={'#637381'} component={'div'} variant={'body3'}>
+                {format(time, 'MM/dd/yyyy')}
+              </Typography>
+            </Stack>
+          )
         }
       />
       <Stack gap={1.5} p={1.5}>
-        {visible ? (
-          <Fade in={visible}>
-            <Box>
-              <InboxEditor ref={editorRef} />
-            </Box>
-          </Fade>
-        ) : (
+        <Fade in={visible}>
+          <Box height={visible ? 'auto' : 0} mb={visible ? 0 : '-12px'}>
+            <InboxEditor initData={emailContent} ref={editorRef} />
+          </Box>
+        </Fade>
+
+        {!visible && (
           <CommonEmailContent
             content={emailContent}
             style={'p {font-size:12px;margin:0;line-height:1.8;}'}
@@ -71,7 +73,6 @@ export const CampaignsPendingEmailsCard: FC<
 
         <Stack flexDirection={'row'} gap={1.5} justifyContent={'flex-end'}>
           <StyledButton
-            onClick={open}
             size={'medium'}
             sx={{ px: '12px !important' }}
             variant={'outlined'}
@@ -88,11 +89,7 @@ export const CampaignsPendingEmailsCard: FC<
               >
                 Edit
               </StyledButton>
-              <StyledButton
-                onClick={open}
-                size={'medium'}
-                sx={{ px: '12px !important' }}
-              >
+              <StyledButton size={'medium'} sx={{ px: '12px !important' }}>
                 Approve
               </StyledButton>
             </>

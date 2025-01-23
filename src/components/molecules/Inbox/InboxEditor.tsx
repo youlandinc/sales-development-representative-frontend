@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { FC, RefObject, useEffect, useImperativeHandle, useState } from 'react';
 import { CKEditor, CKEditorEventPayload } from 'ckeditor4-react';
 import { CKEditorInstance } from 'ckeditor4-react/dist/types';
 
@@ -8,18 +8,22 @@ type InboxEditorProps = {
   handleChange?: (e: CKEditorEventPayload<'change'>) => void;
   initData?: string;
   config?: Record<string, any>;
+  ref?: RefObject<InboxEditorForwardRefProps | null>;
 };
 
 export type InboxEditorForwardRefProps = {
   editInstance: CKEditorInstance;
 };
 
-export const InboxEditor = forwardRef<
-  InboxEditorForwardRefProps,
-  InboxEditorProps
->(({ handleChange, initData, config }, ref) => {
-  const [, setInitData] = useState<string>('');
+export const InboxEditor: FC<InboxEditorProps> = ({
+  handleChange,
+  initData,
+  config,
+  ref,
+}) => {
+  // const [initValue, setInitValue] = useState<string>('');
   const [editor, setEditor] = useState<CKEditorInstance | null>(null);
+  // const { visible, close, open } = useSwitch();
   // const [element, setElement] = useState(null);
   /*const { editor, status } = useCKEditor({
     element,
@@ -67,17 +71,16 @@ export const InboxEditor = forwardRef<
   //     icon: 'https://avatars1.githubusercontent.com/u/5500999?v=2&s=16',
   //   });
   // }
-
   useImperativeHandle(ref, () => ({
     editInstance: editor as CKEditorInstance,
   }));
 
   useEffect(() => {
-    setInitData(JSON.stringify(initData ?? ''));
-    if (editor) {
-      editor.setData(JSON.stringify(initData ?? ''));
+    if (editor && typeof initData === 'string') {
+      editor.setData(initData);
     }
-  }, [initData]);
+  }, [initData, editor]);
+
   return (
     <CKEditor
       config={{
@@ -106,15 +109,19 @@ export const InboxEditor = forwardRef<
         contentsCss: ['/css/editorCss.css'],
         ...config,
       }}
-      initData={initData}
+      // initData={initData}
+      onBeforeLoad={() => {
+        // open();
+      }}
       onChange={handleChange}
       onInstanceReady={(event) => {
+        // close();
         setEditor(event.editor as unknown as CKEditorInstance);
       }}
     />
   );
   // return <Box ref={setElement}></Box>;
-});
+};
 /*<CKEditor
       config={{
         versionCheck: false,

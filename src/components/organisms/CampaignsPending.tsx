@@ -26,7 +26,7 @@ export const CampaignsPending = () => {
   const [baseInfo, setBaseInfo] = useState<ICampaignsPendingBaseInfo>({
     sentOn: new Date().toISOString(),
     replyTo: '',
-    from: '',
+    sender: '',
   });
   const [campaignName, setCampaignName] = useState('');
   const [campaignStatus, setCampaignStatus] = useState(
@@ -40,7 +40,7 @@ export const CampaignsPending = () => {
       );
       setBaseInfo({
         sentOn: data.data.sentOn || new Date().toISOString(),
-        from: data.data.from || '',
+        sender: data.data.sender || '',
         replyTo: data.data.replyTo || '',
       });
       setCampaignName(data.campaignName);
@@ -66,7 +66,7 @@ export const CampaignsPending = () => {
         campaignStatus={campaignStatus}
       />
       <Stack flexDirection={'row'} gap={3} pb={6} pt={3} px={6}>
-        <Stack gap={3} width={400}>
+        <Stack gap={3} height={'fit-content'} width={400}>
           <CampaignsPendingBaseInfo {...baseInfo} />
           <CampaignsPendingTimeline
             campaignName={'yeah'}

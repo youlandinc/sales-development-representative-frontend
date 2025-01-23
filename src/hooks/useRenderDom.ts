@@ -8,8 +8,8 @@ export const useRenderDom = (
     (string: string) => {
       if (!element.current?.shadowRoot) {
         element.current.attachShadow({ mode: 'open' });
-        element.current.shadowRoot!.innerHTML = `<style>${style ?? ''} </style>${string || ''}`;
       }
+      element.current.shadowRoot!.innerHTML = `<style>${style ?? ''} </style>${string || ''}`;
     },
     [element],
   );

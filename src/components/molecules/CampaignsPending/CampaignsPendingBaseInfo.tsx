@@ -7,7 +7,7 @@ import { ICampaignsPendingBaseInfo } from '@/types';
 export const CampaignsPendingBaseInfo: FC<ICampaignsPendingBaseInfo> = ({
   sentOn,
   replyTo,
-  from,
+  sender,
 }) => {
   return (
     <Stack
@@ -32,7 +32,7 @@ export const CampaignsPendingBaseInfo: FC<ICampaignsPendingBaseInfo> = ({
         <Typography color={'text.secondary'} variant={'body3'}>
           From
         </Typography>
-        <Typography variant={'subtitle2'}>{from}</Typography>
+        <Typography variant={'subtitle2'}>{sender}</Typography>
       </Stack>
 
       <Stack>

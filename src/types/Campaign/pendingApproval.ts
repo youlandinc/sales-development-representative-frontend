@@ -4,7 +4,7 @@ import { CampaignStatusEnum } from '@/types';
 export interface ICampaignsPendingBaseInfo {
   sentOn: string;
   replyTo: string;
-  from: string;
+  sender: string;
 }
 
 export type ICampaignsPendingTimeline = {
@@ -73,5 +73,26 @@ export interface CampaignsPendingResponseData {
   data: {
     timeline: ICampaignsPendingTimeline[];
     performances: ICampaignsPendingPerformance[];
+    autopilot: boolean;
+    hasManySteps: boolean;
   } & StringOrNull<ICampaignsPendingBaseInfo>;
 }
+
+export type ICampaignsPendingEmailsItem = {
+  emailId: number;
+  sentOn: string;
+  email: string;
+  avatar: string;
+  subject: string;
+  content: string;
+};
+
+export type CampaignsPendingEmailsResponseData = {
+  content: ICampaignsPendingEmailsItem[];
+  page: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
+};
