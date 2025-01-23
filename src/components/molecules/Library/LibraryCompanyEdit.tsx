@@ -137,6 +137,7 @@ export const LibraryCompanyEdit = () => {
               color={'info'}
               loading={visible}
               onClick={handleExtract}
+              sx={{ width: 128 }}
               variant={'outlined'}
             >
               Smart extract

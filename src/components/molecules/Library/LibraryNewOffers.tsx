@@ -61,6 +61,7 @@ export const LibraryNewOffers = () => {
               color={'info'}
               loading={visible}
               onClick={handleClick}
+              sx={{ width: 128 }}
               variant={'outlined'}
             >
               Smart extract
