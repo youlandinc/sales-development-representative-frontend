@@ -1,13 +1,5 @@
 import { FC, useRef, useState } from 'react';
-import {
-  Avatar,
-  Box,
-  Icon,
-  Menu,
-  MenuItem,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Avatar, Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 
@@ -22,6 +14,8 @@ import { LAYOUT_SIDE_MENU } from './Layout.data';
 
 import ICON_EXPEND from './assets/icon_expend.svg';
 import ICON_SIDE_LOGOUT from './assets/icon_side_logout.svg';
+
+import ICON_LOGO_EXPEND from './assets/icon_logo_expend.svg';
 
 export const LayoutSide: FC = () => {
   const { userProfile, isHydration, resetUserStore } = useUserStore(
@@ -118,17 +112,16 @@ export const LayoutSide: FC = () => {
     >
       <ExpendIcon />
 
-      <Stack gap={0.5}>
-        <Box
-          bgcolor={'black'}
-          borderRadius={5}
-          height={expend ? 32 : 24}
+      <Stack gap={0.5} overflow={'hidden'}>
+        <Icon
+          component={ICON_LOGO_EXPEND}
           sx={{
-            transition: 'all .3s',
+            ml: 0.25,
+            height: expend ? 48 : 32,
+            width: expend ? 146 : 98,
+            transition: 'width .3s',
           }}
-          width={expend ? 48 : 32}
         />
-        {expend && <Typography variant={'subtitle2'}>LOGO</Typography>}
       </Stack>
 
       <Stack

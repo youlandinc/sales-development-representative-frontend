@@ -75,7 +75,7 @@ export const CampaignProcessContentMessaging = () => {
 
   const onClickToChangeLead = async (item: CampaignLeadItem, index: number) => {
     setActiveValue(index);
-    if (!campaignId || !item.previewLeadId) {
+    if (!campaignId || !item.previewLeadId || fetchTemplateLoading) {
       return;
     }
     const postData = {
@@ -123,7 +123,7 @@ export const CampaignProcessContentMessaging = () => {
   );
 
   useEffect(() => {
-    if (leadsList.length === 0) {
+    if (leadsList.length === 0 || fetchTemplateLoading) {
       return;
     }
     if (!emailTemplate) {
