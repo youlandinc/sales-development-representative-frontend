@@ -427,12 +427,12 @@ export const CampaignProcessContentMessaging = () => {
       >
         {computedEmail.map((step, index) => (
           <Stack
-            alignSelf={'center'}
             bgcolor={'#FFF'}
             borderRadius={2}
             gap={1.5}
             key={`step-${step.stepId}-${index}`}
             minWidth={600}
+            mx={'auto'}
             p={3}
             width={'65%'}
           >
@@ -446,13 +446,15 @@ export const CampaignProcessContentMessaging = () => {
                 />
               </Stack>
 
-              <Stack alignItems={'center'} flexDirection={'row'}>
+              <Stack flexDirection={'row'}>
                 <Stack flexDirection={'row'} gap={'.5em'}>
-                  Subject :
+                  <Typography flexShrink={0}>Subject :</Typography>
                   {step.loading ? (
                     <Skeleton animation={'wave'} height={'100%'} width={320} />
                   ) : (
-                    <b>{step.subject}</b>
+                    <Typography variant={'subtitle1'}>
+                      {step.subject}
+                    </Typography>
                   )}
                 </Stack>
 
