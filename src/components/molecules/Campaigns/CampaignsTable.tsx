@@ -381,7 +381,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         break;
       }
       default: {
-        router.push(`/campaigns/pending/${campaignId}`);
+        router.push(`/campaigns/report/${campaignId}`);
         break;
       }
     }
