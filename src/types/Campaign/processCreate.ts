@@ -57,16 +57,25 @@ export interface ResponseCampaignChatRecord {
   isFake?: boolean;
 }
 
-export interface ResponseCampaignMessagingStep {
+export interface ResponseCampaignMessagingStepFormBody {
   stepId: number | string;
-  numericalOrder: number;
-  afterDays: number | null;
   bodyWordCount: number | null;
-  subjectInstructions: string | null;
-  subjectExamples: string[];
   bodyInstructions: string | null;
   bodyCallToAction: string | null;
   bodyExamples: string[];
+}
+
+export interface ResponseCampaignMessagingStepFormSubject {
+  stepId: number | string;
+  subjectInstructions: string | null;
+  subjectExamples: string[];
+}
+
+export interface ResponseCampaignMessagingStep
+  extends ResponseCampaignMessagingStepFormBody,
+    ResponseCampaignMessagingStepFormSubject {
+  numericalOrder: number;
+  afterDays: number | null;
 }
 
 export interface ResponseCampaignLaunchInfo {

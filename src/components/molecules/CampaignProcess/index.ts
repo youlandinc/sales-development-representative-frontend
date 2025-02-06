@@ -5,6 +5,9 @@ export * from './CampaignProcessContentAudience';
 export * from './CampaignProcessContentMessaging';
 export * from './CampaignProcessContentLunch';
 
+export * from './CampaignProcessDrawerSubject';
+export * from './CampaignProcessDrawerBody';
+
 export * from './CampaignProcessContentChat';
 export * from './CampaignProcessContentChatServerCard';
 

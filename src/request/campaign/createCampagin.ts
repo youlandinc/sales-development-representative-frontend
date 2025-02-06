@@ -6,6 +6,7 @@ import {
   ResponseCampaignMessagingStep,
   SetupPhaseEnum,
 } from '@/types';
+import { ModuleEnum } from '@/types/enum';
 
 // common
 export const _sendChatMessage = (params: {
@@ -69,4 +70,51 @@ export const _fetchStepEmail = (params: {
 
 export const _deleteStepEmail = (stepId: string | number) => {
   return del(`/sdr/campaign/step/${stepId}`);
+};
+
+// secondary step drawer
+
+export const _updateStepEmailSubjectInstructions = (params: {
+  subjectExamples: string[];
+}) => {
+  return post('/sdr/ai/normal/generate', {
+    tenantId: '1000052022092800000102',
+    module: ModuleEnum.email_subject,
+    params: {
+      ...params,
+    },
+  });
+};
+
+export const _updateStepEmailSubject = (params: {
+  stepId: string | number;
+  instructions: string;
+  examples: string[];
+  previewLeadId: string | number;
+}) => {
+  return put('/sdr/campaign/step/subject', params);
+};
+
+export const _updateStepEmailBodyInstructions = (params: {
+  contentExamples: string[];
+  suggestedWordCount: number;
+}) => {
+  return post('/sdr/ai/normal/generate', {
+    tenantId: '1000052022092800000102',
+    module: ModuleEnum.email_body,
+    params: {
+      ...params,
+    },
+  });
+};
+
+export const _updateStepEmailBody = (params: {
+  stepId: string | number;
+  instructions: string;
+  examples: string[];
+  previewLeadId: string | number;
+  wordCount: number;
+  callToAction: string;
+}) => {
+  return put('/sdr/campaign/step/body', params);
 };

@@ -61,6 +61,7 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
         '& .MuiOutlinedInput-root': {
           borderRadius: 2,
           boxShadow: 'none',
+          py: 0,
           input: {
             '&::placeholder': {
               color: 'text.placeholder',

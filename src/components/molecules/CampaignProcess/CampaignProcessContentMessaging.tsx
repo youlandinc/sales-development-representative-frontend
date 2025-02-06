@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import {
   Box,
   Collapse,
@@ -13,13 +20,24 @@ import {
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { UFormatNumber } from '@/utils';
-import { useClassNameObserver } from '@/hooks';
+import { useClassNameObserver, useSwitch } from '@/hooks';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import { CampaignLeadsCard } from '@/components/molecules';
 
-import { CampaignLeadItem, HttpError, ResponseCampaignEmail } from '@/types';
+import {
+  CampaignLeadItem,
+  HttpError,
+  ResponseCampaignEmail,
+  ResponseCampaignMessagingStepFormBody,
+  ResponseCampaignMessagingStepFormSubject,
+} from '@/types';
 import { _fetchChatLeads, _fetchEmailByLead } from '@/request';
+
+import {
+  CampaignProcessDrawerBody,
+  CampaignProcessDrawerSubject,
+} from './index';
 
 import ICON_NEXT from './assets/icon_next.svg';
 import ICON_PREV from './assets/icon_prev.svg';
@@ -42,6 +60,65 @@ export const CampaignProcessContentMessaging = () => {
     setLeadsVisible,
     messagingSteps,
   } = useDialogStore();
+
+  const {
+    open: openSubject,
+    visible: visibleSubject,
+    close: closeSubject,
+  } = useSwitch(false);
+  const {
+    open: openBody,
+    visible: visibleBody,
+    close: closeBody,
+  } = useSwitch(false);
+
+  const [formSubject, dispatchFormSubject] = useReducer(
+    FORM_SUBJECT_REDUCER,
+    FORM_SUBJECT,
+  );
+  const [formBody, dispatchFormBody] = useReducer(FORM_BODY_REDUCER, FORM_BODY);
+
+  const [targetIndex, setTargetIndex] = useState<number>(-1);
+
+  const onClickToOpenSubject = (index: number) => {
+    openSubject();
+    setTargetIndex(index);
+    dispatchFormSubject({
+      type: 'init',
+      value: {
+        subjectInstructions: messagingSteps[index].subjectInstructions || '',
+        subjectExamples: messagingSteps[index].subjectExamples.length
+          ? messagingSteps[index].subjectExamples
+          : [''],
+        stepId: messagingSteps[index].stepId,
+      },
+    });
+  };
+
+  const onClickToOpenBody = (index: number) => {
+    openBody();
+    setTargetIndex(index);
+    dispatchFormBody({
+      type: 'init',
+      value: {
+        bodyInstructions: messagingSteps[index].bodyInstructions || '',
+        bodyCallToAction: messagingSteps[index].bodyCallToAction || '',
+        bodyWordCount: messagingSteps[index].bodyWordCount || 0,
+        bodyExamples: messagingSteps[index].bodyExamples.length
+          ? messagingSteps[index].bodyExamples
+          : [''],
+        stepId: messagingSteps[index].stepId,
+      },
+    });
+  };
+
+  const messagingBoxRef = useRef<HTMLDivElement>(null);
+
+  const onCloseDrawer = () => {
+    closeSubject();
+    closeBody();
+    setTargetIndex(-1);
+  };
 
   const [leadsFetching, setLeadsFetching] = useState(false);
 
@@ -171,6 +248,7 @@ export const CampaignProcessContentMessaging = () => {
       gap={3}
       pt={3}
       px={3}
+      ref={messagingBoxRef}
       sx={{
         transition: 'all .3s',
         overflowY: 'hidden',
@@ -461,6 +539,7 @@ export const CampaignProcessContentMessaging = () => {
                 <StyledButton
                   color={'info'}
                   disabled={step.loading}
+                  onClick={() => onClickToOpenSubject(index)}
                   size={'small'}
                   sx={{ ml: 'auto' }}
                   variant={'outlined'}
@@ -489,6 +568,7 @@ export const CampaignProcessContentMessaging = () => {
             <StyledButton
               color={'info'}
               disabled={step.loading}
+              onClick={() => onClickToOpenBody(index)}
               size={'small'}
               sx={{ ml: 'auto' }}
               variant={'outlined'}
@@ -498,6 +578,24 @@ export const CampaignProcessContentMessaging = () => {
           </Stack>
         ))}
       </Stack>
+
+      <CampaignProcessDrawerSubject
+        container={messagingBoxRef.current}
+        dispatchForm={dispatchFormSubject}
+        formData={formSubject}
+        onClose={onCloseDrawer}
+        previewLeadId={leadsList[activeValue]?.previewLeadId}
+        visible={visibleSubject}
+      />
+
+      <CampaignProcessDrawerBody
+        container={messagingBoxRef.current}
+        dispatchForm={dispatchFormBody}
+        formData={formBody}
+        onClose={onCloseDrawer}
+        previewLeadId={leadsList[activeValue]?.previewLeadId}
+        visible={visibleBody}
+      />
     </Stack>
   );
 };
@@ -523,4 +621,114 @@ const ShadowContent = ({ html }: { html: string }) => {
   }, [html]);
 
   return <div ref={shadowRef} />;
+};
+
+type FormReducerMethods =
+  | 'update'
+  | 'reset'
+  | 'init'
+  | 'removeItem'
+  | 'addItem'
+  | 'updateItem';
+
+const FORM_SUBJECT: ResponseCampaignMessagingStepFormSubject = {
+  stepId: -1,
+  subjectInstructions: '',
+  subjectExamples: [],
+};
+
+const FORM_SUBJECT_REDUCER = (
+  state: ResponseCampaignMessagingStepFormSubject,
+  action: {
+    type: FormReducerMethods;
+    key?: string;
+    value?: any;
+    index?: number;
+  },
+) => {
+  switch (action.type) {
+    case 'update':
+      return {
+        ...state,
+        [action.key!]: action.value,
+      };
+    case 'reset':
+      return { ...FORM_SUBJECT };
+    case 'init':
+      return { ...state, ...action.value };
+    case 'removeItem':
+      return {
+        ...state,
+        subjectExamples: state.subjectExamples.filter(
+          (_, index) => index !== action.index,
+        ),
+      };
+    case 'addItem':
+      return {
+        ...state,
+        subjectExamples: [...state.subjectExamples, ''],
+      };
+    case 'updateItem': {
+      const { index } = action;
+      const { value } = action;
+      state.subjectExamples[index!] = value;
+      return {
+        ...state,
+      };
+    }
+    default:
+      return state;
+  }
+};
+
+const FORM_BODY: ResponseCampaignMessagingStepFormBody = {
+  stepId: -1,
+  bodyInstructions: '',
+  bodyCallToAction: '',
+  bodyWordCount: 0,
+  bodyExamples: [],
+};
+
+const FORM_BODY_REDUCER = (
+  state: ResponseCampaignMessagingStepFormBody,
+  action: {
+    type: FormReducerMethods;
+    key?: string;
+    value: any;
+    index?: number;
+  },
+) => {
+  switch (action.type) {
+    case 'update':
+      return {
+        ...state,
+        [action.key!]: action.value,
+      };
+    case 'reset':
+      return { ...FORM_BODY };
+    case 'init':
+      return { ...state, ...action.value };
+    case 'removeItem':
+      return {
+        ...state,
+        bodyExamples: state.bodyExamples.filter(
+          (_, index) => index !== action.index,
+        ),
+      };
+    case 'addItem':
+      return {
+        ...state,
+        bodyExamples: [...state.bodyExamples, ''],
+      };
+    case 'updateItem': {
+      const { index } = action;
+      const { value } = action;
+      state.bodyExamples[index!] = value;
+      return {
+        ...state,
+      };
+    }
+    default:
+      return state;
+  }
 };
