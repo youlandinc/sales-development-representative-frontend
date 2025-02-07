@@ -15,3 +15,5 @@ export * from './StyledDatePicker';
 export * from './StyledLoading';
 
 export * from './StyledTooltip';
+
+export * from './StyledTextFilledField';

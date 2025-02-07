@@ -6,23 +6,50 @@ import {
   CampaignsStatusBadge,
   CommonRenameTextField,
 } from '@/components/molecules';
-import { StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton } from '@/components/atoms';
 
-import { CampaignStatusEnum } from '@/types';
+import { CampaignStatusEnum, HttpError } from '@/types';
+
+import useAsyncFn from '@/hooks/useAsyncFn';
+
+import {
+  _approveAllCampaignPendingEmail,
+  _suspendCampaignPendingEmail,
+} from '@/request';
 
 import ICON_ARROW from './assets/icon_arrow.svg';
 
 type CampaignsPendingHeaderProps = {
   campaignName: string;
   campaignStatus: CampaignStatusEnum;
+  campaignId: number;
 };
 
 export const CampaignsPendingHeader: FC<CampaignsPendingHeaderProps> = ({
   campaignName,
   campaignStatus,
+  campaignId,
 }) => {
   const router = useRouter();
   const [title, setTitle] = useState('');
+
+  const [approveState, approve] = useAsyncFn(async () => {
+    try {
+      return await _approveAllCampaignPendingEmail(campaignId);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  }, [campaignId]);
+
+  const [suspendState, suspend] = useAsyncFn(async () => {
+    try {
+      return await _suspendCampaignPendingEmail(campaignId, false);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  }, [campaignId]);
 
   useEffect(() => {
     setTitle(campaignName);
@@ -67,10 +94,22 @@ export const CampaignsPendingHeader: FC<CampaignsPendingHeaderProps> = ({
         </Stack>
       </Stack>
       <Stack flexDirection={'row'} gap={3}>
-        <StyledButton color={'error'} variant={'outlined'}>
+        <StyledButton
+          color={'error'}
+          loading={suspendState.loading}
+          onClick={suspend}
+          sx={{ width: 108 }}
+          variant={'outlined'}
+        >
           Suspend
         </StyledButton>
-        <StyledButton>Approve all</StyledButton>
+        <StyledButton
+          loading={approveState.loading}
+          onClick={approve}
+          sx={{ width: 125 }}
+        >
+          Approve all
+        </StyledButton>
       </Stack>
     </Stack>
   );

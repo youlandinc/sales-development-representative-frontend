@@ -70,7 +70,7 @@ export const CampaignsPendingTimeline: FC<CampaignMarketingTimelineProps> = ({
               }
             >
               <Stack alignItems={'center'} flexDirection={'row'}>
-                <Typography variant={'subtitle1'}>
+                <Typography fontWeight={600} variant={'body3'}>
                   {TIMELINE_HASH[item.status]}
                 </Typography>
                 <Typography

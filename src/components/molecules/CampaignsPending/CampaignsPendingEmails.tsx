@@ -1,41 +1,49 @@
-import { useEffect, useState } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { useEffect } from 'react';
+import { Box, Fade, Skeleton, Stack, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
 
 import { SDRToast } from '@/components/atoms';
 import { CampaignsPendingEmailsCard } from '@/components/molecules';
 
 import { _fetCampaignPendingEmails } from '@/request';
-import { HttpError, ICampaignsPendingEmailsItem } from '@/types';
+import { HttpError } from '@/types';
+import { usePendingApprovalStore } from '@/stores/usePendingApprovalStore';
+import useAsyncFn from '@/hooks/useAsyncFn';
 
 export const CampaignsPendingEmails = () => {
   const { campaignId } = useParams<{ campaignId?: string }>();
-  const [pendingEmailInfo, setPendingEmailInfo] = useState<
-    ICampaignsPendingEmailsItem[]
-  >([
-    {
-      emailId: 0,
-      sentOn: '',
-      email: '',
-      avatar: '',
-      subject: '',
-      content: '',
-    },
-  ]);
 
-  const fetchData = async () => {
+  const { pendingEmails, setPendingEmails } = usePendingApprovalStore(
+    (state) => state,
+  );
+
+  const [state, fetchData] = useAsyncFn(async () => {
     try {
       const { data } = await _fetCampaignPendingEmails(
         parseInt(campaignId as string),
         100,
         0,
       );
-      setPendingEmailInfo(data.content);
+      setPendingEmails(data.content);
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     }
-  };
+  }, [campaignId]);
+
+  /*  const fetchData = async () => {
+    try {
+      const { data } = await _fetCampaignPendingEmails(
+        parseInt(campaignId as string),
+        100,
+        0,
+      );
+      setPendingEmails(data.content);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  };*/
 
   useEffect(() => {
     if (campaignId?.trim() !== '') {
@@ -46,25 +54,39 @@ export const CampaignsPendingEmails = () => {
   }, [campaignId]);
 
   return (
-    <Stack gap={3}>
-      <Typography variant={'subtitle2'}>
-        Pending Emails ({pendingEmailInfo.length})
-      </Typography>
+    <Fade in={true}>
       <Stack gap={3}>
-        {pendingEmailInfo.map((item, index) => (
-          <CampaignsPendingEmailsCard
-            avatarName={'R'}
-            email={item.email}
-            emailContent={
-              '<p><span style="font-size:12px"><strong>Elementum varius nisi vel tempus. Donec eleifend egestas viverra.</strong></span></p>' +
-              '<p>&nbsp;</p>' +
-              `<p><span style="font-size:12px">${item.content}</span></p>`
-            }
-            key={index}
-            time={item.sentOn}
-          />
-        ))}
+        <Typography variant={'subtitle2'}>
+          Pending Emails ({pendingEmails.length})
+        </Typography>
+        <Stack gap={3}>
+          {state.loading ? (
+            <Box
+              sx={{
+                '& .MuiSkeleton-root': { height: 18 },
+                bgcolor: 'background.white',
+              }}
+            >
+              <Skeleton width={'50%'} />
+              <Skeleton />
+              <Skeleton />
+            </Box>
+          ) : (
+            pendingEmails.map((item, index) => (
+              <CampaignsPendingEmailsCard
+                avatarName={'R'}
+                avatarUrl={item.avatar || undefined}
+                email={item.email}
+                emailContent={item.content || ''}
+                emailId={item.emailId}
+                key={index}
+                subject={item.subject || ''}
+                time={item.sentOn}
+              />
+            ))
+          )}
+        </Stack>
       </Stack>
-    </Stack>
+    </Fade>
   );
 };

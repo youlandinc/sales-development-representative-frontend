@@ -11,6 +11,7 @@ type CommonReceiptCardHeaderProps = {
   emailSx?: SxProps;
   time?: ReactNode;
   sx?: SxProps;
+  handleAvatarClick?: () => void;
 };
 
 export const CommonReceiptCardHeader: FC<CommonReceiptCardHeaderProps> = ({
@@ -23,6 +24,7 @@ export const CommonReceiptCardHeader: FC<CommonReceiptCardHeaderProps> = ({
   avatarSx,
   avatarSrc,
   sx,
+  handleAvatarClick,
 }) => {
   return (
     <Stack
@@ -34,12 +36,14 @@ export const CommonReceiptCardHeader: FC<CommonReceiptCardHeaderProps> = ({
       <Stack alignItems={'center'} flexDirection={'row'} gap={1} sx={emailSx}>
         {prefix && prefix}
         <Avatar
+          onClick={handleAvatarClick}
           src={avatarSrc}
           sx={{
             bgcolor: avatarBgcolor,
             height: 24,
             width: 24,
             fontSize: 12,
+            fontWeight: 600,
             ...avatarSx,
           }}
         >

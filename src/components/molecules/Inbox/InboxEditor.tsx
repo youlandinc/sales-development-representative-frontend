@@ -85,6 +85,23 @@ export const InboxEditor: FC<InboxEditorProps> = ({
     <CKEditor
       config={{
         versionCheck: false,
+        fontSize_defaultLabel: '12px',
+        stylesSet: [
+          {
+            name: 'Line Height 1.5',
+            element: 'p',
+            styles: {
+              'line-height': '1.5',
+            },
+          },
+          {
+            name: 'Line Height 2.0',
+            element: 'p',
+            styles: {
+              'line-height': '2.0',
+            },
+          },
+        ],
         uiColor: '#FFFFFF',
         extraPlugins: 'justify,font,colorbutton,editorplaceholder',
         editorplaceholder: 'Start typing here...',

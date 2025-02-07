@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Fade, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
@@ -11,11 +11,12 @@ import {
   CampaignsPendingTimeline,
 } from '@/components/molecules';
 
-import { CampaignsPendingTimeLineEnum } from '@/types/enum';
 import {
   CampaignStatusEnum,
   HttpError,
   ICampaignsPendingBaseInfo,
+  ICampaignsPendingPerformance,
+  ICampaignsPendingTimeline,
 } from '@/types';
 import { _fetchCampaignPendingInfo } from '@/request';
 
@@ -32,6 +33,9 @@ export const CampaignsPending = () => {
   const [campaignStatus, setCampaignStatus] = useState(
     CampaignStatusEnum.active,
   );
+  const [timeline, setTimeline] = useState<ICampaignsPendingTimeline[]>([]);
+  const [performances, setPerformances] =
+    useState<ICampaignsPendingPerformance>();
 
   const fetData = async () => {
     try {
@@ -45,6 +49,8 @@ export const CampaignsPending = () => {
       });
       setCampaignName(data.campaignName);
       setCampaignStatus(data.campaignStatus);
+      setTimeline(data.data.timeLine);
+      setPerformances(data.data.performance);
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
@@ -60,8 +66,9 @@ export const CampaignsPending = () => {
   }, [campaignId]);
 
   return (
-    <Stack height={'100%'}>
+    <Stack height={'100vh'}>
       <CampaignsPendingHeader
+        campaignId={parseInt(campaignId as string)}
         campaignName={campaignName}
         campaignStatus={campaignStatus}
       />
@@ -69,29 +76,8 @@ export const CampaignsPending = () => {
         <Stack gap={3} height={'fit-content'} width={400}>
           <CampaignsPendingBaseInfo {...baseInfo} />
           <CampaignsPendingTimeline
-            campaignName={'yeah'}
-            timeline={[
-              {
-                total: 9,
-                sent: 9,
-                unSent: 0,
-                status: CampaignsPendingTimeLineEnum.completed,
-                startTime: '2024-12-20T00:40:36.281516Z',
-                endTime: '2024-12-20T00:40:59.714739Z',
-                dayDone: null,
-                quantity: null,
-              },
-              {
-                total: null,
-                sent: null,
-                unSent: null,
-                status: CampaignsPendingTimeLineEnum.scheduled,
-                startTime: '2024-12-20T00:40:36.192890Z',
-                endTime: '2024-12-20T00:40:36.192890Z',
-                dayDone: 1,
-                quantity: 9,
-              },
-            ]}
+            campaignName={campaignName}
+            timeline={timeline}
           />
         </Stack>
         <Stack flex={1} gap={3}>
@@ -127,19 +113,10 @@ export const CampaignsPending = () => {
               Performance
             </StyledButton>
           </Stack>
-          {activeBtn === 'email' && (
-            <Fade in>
-              <Box>
-                <CampaignsPendingEmails />
-              </Box>
-            </Fade>
-          )}
+
+          {activeBtn === 'email' && <CampaignsPendingEmails />}
           {activeBtn === 'performance' && (
-            <Fade in={activeBtn === 'performance'}>
-              <Box>
-                <CampaignsPendingPerformance />
-              </Box>
-            </Fade>
+            <CampaignsPendingPerformance performances={performances} />
           )}
         </Stack>
       </Stack>

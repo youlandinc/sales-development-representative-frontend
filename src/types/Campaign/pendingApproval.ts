@@ -71,8 +71,8 @@ export interface CampaignsPendingResponseData {
   campaignId: number;
   campaignStatus: CampaignStatusEnum;
   data: {
-    timeline: ICampaignsPendingTimeline[];
-    performances: ICampaignsPendingPerformance[];
+    timeLine: ICampaignsPendingTimeline[];
+    performance: ICampaignsPendingPerformance;
     autopilot: boolean;
     hasManySteps: boolean;
   } & StringOrNull<ICampaignsPendingBaseInfo>;
@@ -82,7 +82,7 @@ export type ICampaignsPendingEmailsItem = {
   emailId: number;
   sentOn: string;
   email: string;
-  avatar: string;
+  avatar: string | null;
   subject: string;
   content: string;
 };
