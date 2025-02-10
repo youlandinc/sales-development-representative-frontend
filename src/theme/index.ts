@@ -176,7 +176,7 @@ const defaultOptions: ThemeOptions = {
     },
     text: {
       primary: '#202939',
-      secondary: '#9095A3',
+      secondary: '#6F6C7D',
       hover: '#636A7C',
       disabled: '#BABCBE',
       white: '#FFFFFF',

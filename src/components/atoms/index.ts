@@ -17,3 +17,7 @@ export * from './StyledLoading';
 export * from './StyledTooltip';
 
 export * from './StyledTextFilledField';
+
+export * from './StyledSwitch';
+
+export * from './StyledSelect';

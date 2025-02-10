@@ -273,6 +273,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setCampaignId,
     createChatSSE,
     setMessagingSteps,
+    setLunchInfo,
   } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -357,6 +358,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
                 leadInfo: { counts, leads },
                 chatRecord,
                 steps,
+                launchInfo,
               },
             },
           } = await _fetchCampaignInfo(campaignId);
@@ -369,6 +371,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           setLeadsList(leads);
           setLeadsCount(counts);
           setActiveStep(ACTIVE_STEP_HASH[setupPhase]);
+          setLunchInfo(launchInfo);
           await setSetupPhase(setupPhase, false);
           setMessageList(chatRecord);
           await createChatSSE(chatId);

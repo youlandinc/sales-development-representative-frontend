@@ -3,11 +3,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { DatePicker, DatePickerProps } from '@mui/x-date-pickers/DatePicker';
 
-type StyledDatePickerProps = DatePickerProps<Date> & { onClear?: () => void };
+type StyledDatePickerProps = DatePickerProps<Date> & {
+  onClear?: () => void;
+  error?: boolean;
+};
 
 export const StyledDatePicker: FC<StyledDatePickerProps> = ({
   onClear,
   slotProps,
+  error,
   ...rest
 }) => {
   return (
@@ -15,6 +19,7 @@ export const StyledDatePicker: FC<StyledDatePickerProps> = ({
       <DatePicker
         slotProps={{
           textField: {
+            error,
             sx: {
               '& .MuiInputBase-input': {
                 px: 2,
@@ -38,11 +43,9 @@ export const StyledDatePicker: FC<StyledDatePickerProps> = ({
               '& .Mui-focused.MuiInputLabel-root': {
                 transform: 'translate(16px, -7px) scale(0.75)',
               },
-
               '& .Mui-focused': {
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'border.focus',
-                  borderWidth: '1px',
+                  border: '1px solid #6E4EFB !important',
                 },
               },
             },

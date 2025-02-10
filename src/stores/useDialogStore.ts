@@ -4,6 +4,7 @@ import {
   CampaignStatusEnum,
   HttpError,
   ResponseCampaignChatRecord,
+  ResponseCampaignLaunchInfo,
   ResponseCampaignMessagingStep,
   SetupPhaseEnum,
   SourceEnum,
@@ -38,6 +39,9 @@ export type DialogStoreState = {
   setupPhase: SetupPhaseEnum;
 
   messagingSteps: ResponseCampaignMessagingStep[];
+
+  lunchInfo: ResponseCampaignLaunchInfo;
+  isValidate: boolean | undefined;
 };
 
 export type DialogStoreActions = {
@@ -64,6 +68,9 @@ export type DialogStoreActions = {
   setReloadTable: (reloadTable: boolean) => void;
   setMessagingSteps: (messagingSteps: ResponseCampaignMessagingStep[]) => void;
 
+  setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => void;
+  setIsValidate: (isValidate: boolean | undefined) => void;
+
   resetDialogState: () => Promise<void>;
 };
 
@@ -83,15 +90,29 @@ const InitialState: DialogStoreState = {
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
   setupPhase: SetupPhaseEnum.audience,
-
   messagingSteps: [],
+
+  lunchInfo: {
+    dailyLimit: 100,
+    autopilot: false,
+    sendNow: false,
+    scheduleTime: null,
+    sender: null,
+    replyTo: null,
+    senderName: null,
+  },
   reloadTable: false,
+  isValidate: undefined,
 };
 
 export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setIsValidate: (isValidate: undefined | boolean) => {
+    set({ isValidate });
+  },
+  setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => set({ lunchInfo }),
   openProcess: () => set({ visibleProcess: true }),
   closeProcess: () => set({ visibleProcess: false }),
   setCampaignName: (name) => set({ campaignName: name }),
@@ -279,6 +300,21 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       chatSSE?.close();
       await _closeSSE(chatId);
     }
-    set({ ...store.getInitialState(), messageList: [] }, true);
+    set(
+      {
+        ...store.getInitialState(),
+        messageList: [],
+        lunchInfo: {
+          dailyLimit: 100,
+          autopilot: false,
+          sendNow: false,
+          scheduleTime: null,
+          sender: null,
+          replyTo: null,
+          senderName: null,
+        },
+      },
+      true,
+    );
   },
 }));

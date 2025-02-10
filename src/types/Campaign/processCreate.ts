@@ -79,7 +79,7 @@ export interface ResponseCampaignMessagingStep
 }
 
 export interface ResponseCampaignLaunchInfo {
-  dailyLimit: number | null;
+  dailyLimit: number;
   autopilot: boolean;
   sendNow: boolean;
   scheduleTime: string | null;

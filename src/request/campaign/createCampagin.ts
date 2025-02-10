@@ -125,3 +125,17 @@ export const _updateStepEmailBody = (params: {
 }) => {
   return put('/sdr/campaign/step/body', params);
 };
+
+// third step
+export const _saveAndLunchCampaign = (params: {
+  campaignId: string | number;
+  dailyLimit: number;
+  autopilot: boolean;
+  sendNow: boolean;
+  scheduleTime: string | null;
+  sender: string;
+  replyTo: string;
+  senderName: string;
+}) => {
+  return put('/sdr/campaign/info', params);
+};

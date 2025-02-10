@@ -186,9 +186,6 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
                 height: 4,
                 borderRadius: '50%',
                 transform: 'translateY(-50%)',
-                '&[data-index="11"]': {
-                  display: 'none',
-                },
               },
             }}
             value={formData.bodyWordCount || 100}

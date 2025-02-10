@@ -1,15 +1,17 @@
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import { debounce, Icon, Stack, Typography } from '@mui/material';
+import { addDays, differenceInDays } from 'date-fns';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton } from '@/components/atoms';
 import {
   CampaignsStatusBadge,
   CommonRenameTextField,
 } from '@/components/molecules';
 
-import { SetupPhaseEnum } from '@/types';
+import { HttpError, HttpVariantEnum, SetupPhaseEnum } from '@/types';
+import { _saveAndLunchCampaign } from '@/request';
 
 import ICON_CLOSE from './assets/icon_close.svg';
 import ICON_BACK from './assets/icon_back.svg';
@@ -76,10 +78,15 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
     activeStep,
     setActiveStep,
     setSetupPhase,
+    lunchInfo,
     resetDialogState,
+    setIsValidate,
+    campaignId,
+    setReloadTable,
   } = useDialogStore();
 
   const [value, setValue] = useState(campaignName);
+  const [loading, setLoading] = useState(false);
 
   const debounceSearchWord = useMemo(
     () =>
@@ -100,7 +107,47 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       await setSetupPhase(SetupPhaseEnum.launch);
       return;
     }
-    //console.log('finally');
+
+    if (!campaignId) {
+      return;
+    }
+
+    if (!lunchInfo.sendNow) {
+      if (
+        !lunchInfo.scheduleTime ||
+        differenceInDays(lunchInfo.scheduleTime, addDays(new Date(), 1)) <= 0
+      ) {
+        setIsValidate(false);
+        return;
+      }
+    }
+
+    const postData = {
+      campaignId: campaignId!,
+      dailyLimit: lunchInfo.dailyLimit,
+      autopilot: lunchInfo.autopilot,
+      sendNow: lunchInfo.sendNow,
+      scheduleTime: lunchInfo.scheduleTime || null,
+      sender: lunchInfo.sender!,
+      replyTo: lunchInfo.replyTo!,
+      senderName: lunchInfo.senderName!,
+    };
+    setLoading(true);
+    try {
+      await _saveAndLunchCampaign(postData);
+      SDRToast({
+        message: 'Campaign launched successfully!',
+        variant: HttpVariantEnum.success,
+        header: '',
+      });
+      await resetDialogState();
+      setReloadTable(true);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -144,6 +191,8 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       <CampaignProcessHeaderButtonGroup />
 
       <StyledButton
+        disabled={loading}
+        loading={loading}
         onClick={() => onClickToNext()}
         size={'medium'}
         sx={{ width: 180, alignSelf: 'flex-end' }}
