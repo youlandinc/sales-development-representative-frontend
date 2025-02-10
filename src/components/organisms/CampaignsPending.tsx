@@ -18,10 +18,17 @@ import {
   ICampaignsPendingPerformance,
   ICampaignsPendingTimeline,
 } from '@/types';
-import { _fetchCampaignPendingInfo } from '@/request';
+import {
+  _fetCampaignPendingEmails,
+  _fetchCampaignPendingInfo,
+} from '@/request';
+import useAsyncFn from '@/hooks/useAsyncFn';
+
+import { usePendingApprovalStore } from '@/stores/usePendingApprovalStore';
 
 export const CampaignsPending = () => {
   const { campaignId } = useParams();
+  const { setPendingEmails } = usePendingApprovalStore((state) => state);
 
   const [activeBtn, setActiveBtn] = useState<'email' | 'performance'>('email');
   const [baseInfo, setBaseInfo] = useState<ICampaignsPendingBaseInfo>({
@@ -37,7 +44,7 @@ export const CampaignsPending = () => {
   const [performances, setPerformances] =
     useState<ICampaignsPendingPerformance>();
 
-  const fetData = async () => {
+  const [baseDataState, fetchBaseData] = useAsyncFn(async () => {
     try {
       const { data } = await _fetchCampaignPendingInfo(
         parseInt(campaignId as string),
@@ -55,15 +62,36 @@ export const CampaignsPending = () => {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     }
-  };
+  });
+  const [state, fetchPendingEmailsData] = useAsyncFn(async () => {
+    try {
+      const { data } = await _fetCampaignPendingEmails(
+        parseInt(campaignId as string),
+        100,
+        0,
+      );
+      setPendingEmails(data.content);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  }, [campaignId]);
 
   useEffect(() => {
     if (campaignId) {
       // noinspection JSIgnoredPromiseFromCall
-      fetData();
+      fetchBaseData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campaignId]);
+
+  useEffect(() => {
+    if (campaignId) {
+      // noinspection JSIgnoredPromiseFromCall
+      activeBtn === 'email' && fetchPendingEmailsData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [campaignId, activeBtn]);
 
   return (
     <Stack height={'100vh'}>
@@ -71,8 +99,10 @@ export const CampaignsPending = () => {
         campaignId={parseInt(campaignId as string)}
         campaignName={campaignName}
         campaignStatus={campaignStatus}
+        cb={fetchBaseData}
+        loading={baseDataState.loading}
       />
-      <Stack flexDirection={'row'} gap={3} pb={6} pt={3} px={6}>
+      <Stack flex={1} flexDirection={'row'} gap={3} pb={6} pt={3} px={6}>
         <Stack gap={3} height={'fit-content'} width={400}>
           <CampaignsPendingBaseInfo {...baseInfo} />
           <CampaignsPendingTimeline
@@ -114,7 +144,9 @@ export const CampaignsPending = () => {
             </StyledButton>
           </Stack>
 
-          {activeBtn === 'email' && <CampaignsPendingEmails />}
+          {activeBtn === 'email' && (
+            <CampaignsPendingEmails loading={state.loading} />
+          )}
           {activeBtn === 'performance' && (
             <CampaignsPendingPerformance performances={performances} />
           )}

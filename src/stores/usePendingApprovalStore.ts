@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { ICampaignsPendingEmailsItem } from '@/types';
 
 export type PendingApprovalState = {
+  isNoData: boolean;
   pendingEmails: ICampaignsPendingEmailsItem[];
 };
 
@@ -14,6 +15,7 @@ export type PendingApprovalStateStoreActions = {
     content: string,
   ) => void;
   deletePendingEmailById: (emailId: number) => void;
+  setIsNoData: (noData: boolean) => void;
 };
 
 export type PendingApprovalStoreProps = PendingApprovalState &
@@ -21,8 +23,10 @@ export type PendingApprovalStoreProps = PendingApprovalState &
 
 export const usePendingApprovalStore = create<PendingApprovalStoreProps>()(
   (set) => ({
+    isNoData: false,
     pendingEmails: [],
-    setPendingEmails: (emails) => set({ pendingEmails: emails }),
+    setPendingEmails: (emails) =>
+      set({ pendingEmails: emails, isNoData: emails.length === 0 }),
     updatePendingEmailById: (emailId, subject, content) =>
       set((state) => ({
         pendingEmails: state.pendingEmails.map((item) =>
@@ -37,5 +41,6 @@ export const usePendingApprovalStore = create<PendingApprovalStoreProps>()(
           (item) => item.emailId !== emailId,
         ),
       })),
+    setIsNoData: (isNoData) => set({ isNoData }),
   }),
 );

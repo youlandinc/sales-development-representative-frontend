@@ -47,5 +47,5 @@ export const _suspendCampaignPendingEmail = (
   campaignId: number,
   active: boolean,
 ) => {
-  return put(`/sdr/campaign/info/status/${campaignId}`, { active });
+  return put(`/sdr/campaign/info/status/${campaignId}?active=${active}`);
 };
