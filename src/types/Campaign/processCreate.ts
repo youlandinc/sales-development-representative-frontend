@@ -92,6 +92,8 @@ export interface ResponseCampaignEmail {
   stepId: string | number;
   content: string;
   subject: string;
+  bodyInstructions: string;
+  subjectInstructions: string;
 }
 
 export interface ResponseCampaignInfo {

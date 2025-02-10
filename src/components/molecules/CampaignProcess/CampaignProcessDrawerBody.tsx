@@ -108,6 +108,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
         ...formData,
       };
       setMessagingSteps(temp);
+      onClose();
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
@@ -126,7 +127,6 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
         '& .MuiDrawer-paper': {
           width: '100%',
           maxWidth: '1200px !important',
-          minWidth: '800px !important',
           px: 3,
           py: 6,
         },
@@ -151,8 +151,8 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
           <Typography variant={'subtitle2'}>Suggested word count</Typography>
           <Slider
             marks={WORD_COUNT_OPTIONS}
-            max={300}
-            min={0}
+            max={400}
+            min={100}
             onChange={(_, v) => {
               dispatchForm({
                 type: 'update',
@@ -191,7 +191,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
                 },
               },
             }}
-            value={formData.bodyWordCount || 0}
+            value={formData.bodyWordCount || 100}
             valueLabelDisplay={'auto'}
           />
         </Stack>

@@ -59,17 +59,24 @@ export const _addStepEmail = (params: {
   );
 };
 
+export const _updateStepEmailSendDays = (params: {
+  stepId: string | number;
+  sendAfterDays: number;
+}) => {
+  return put('/sdr/campaign/step', params);
+};
+
+export const _deleteStepEmail = (stepId: string | number) => {
+  return del(`/sdr/campaign/step/${stepId}`);
+};
+
 export const _fetchStepEmail = (params: {
   stepId: string | number;
   previewLeadId: number | string;
 }) => {
   return get<ResponseCampaignEmail>(
-    `/srd/campaign/email/${params.previewLeadId}/${params.stepId}`,
+    `/sdr/campaign/step/email/${params.previewLeadId}/${params.stepId}`,
   );
-};
-
-export const _deleteStepEmail = (stepId: string | number) => {
-  return del(`/sdr/campaign/step/${stepId}`);
 };
 
 // secondary step drawer

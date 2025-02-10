@@ -104,6 +104,8 @@ export const CampaignProcessDrawerSubject: FC<
       };
 
       setMessagingSteps(temp);
+
+      onClose();
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
@@ -122,7 +124,6 @@ export const CampaignProcessDrawerSubject: FC<
         '& .MuiDrawer-paper': {
           width: '100%',
           maxWidth: '1200px !important',
-          minWidth: '800px !important',
           px: 3,
           py: 6,
         },

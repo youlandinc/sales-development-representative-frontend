@@ -26,6 +26,10 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link href="/favicon.svg" rel="icon" sizes={'any'} />
+        <title>Attune</title>
+      </head>
       <body>
         <InitColorSchemeScript attribute="class" />
         <NextTopLoader

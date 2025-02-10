@@ -22,7 +22,11 @@ import { useDialogStore } from '@/stores/useDialogStore';
 import { UFormatNumber } from '@/utils';
 import { useClassNameObserver, useSwitch } from '@/hooks';
 
-import { SDRToast, StyledButton } from '@/components/atoms';
+import {
+  SDRToast,
+  StyledButton,
+  StyledTextFieldNumber,
+} from '@/components/atoms';
 import { CampaignLeadsCard } from '@/components/molecules';
 
 import {
@@ -32,7 +36,14 @@ import {
   ResponseCampaignMessagingStepFormBody,
   ResponseCampaignMessagingStepFormSubject,
 } from '@/types';
-import { _fetchChatLeads, _fetchEmailByLead } from '@/request';
+import {
+  _addStepEmail,
+  _deleteStepEmail,
+  _fetchChatLeads,
+  _fetchEmailByLead,
+  _fetchStepEmail,
+  _updateStepEmailSendDays,
+} from '@/request';
 
 import {
   CampaignProcessDrawerBody,
@@ -47,6 +58,10 @@ import ICON_MESSAGING_PERSON from './assets/icon_messaging_person.svg';
 
 import ICON_MESSAGING_EMAIL from './assets/icon_messaging_email.svg';
 
+import ICON_ADD from './assets/icon_add.svg';
+import ICON_DASHED from './assets/icon_dashed.svg';
+import ICON_TRASH from './assets/icon_trash.svg';
+
 export const CampaignProcessContentMessaging = () => {
   const {
     campaignId,
@@ -59,6 +74,7 @@ export const CampaignProcessContentMessaging = () => {
     returning,
     setLeadsVisible,
     messagingSteps,
+    setMessagingSteps,
   } = useDialogStore();
 
   const {
@@ -78,11 +94,8 @@ export const CampaignProcessContentMessaging = () => {
   );
   const [formBody, dispatchFormBody] = useReducer(FORM_BODY_REDUCER, FORM_BODY);
 
-  const [targetIndex, setTargetIndex] = useState<number>(-1);
-
   const onClickToOpenSubject = (index: number) => {
     openSubject();
-    setTargetIndex(index);
     dispatchFormSubject({
       type: 'init',
       value: {
@@ -97,7 +110,6 @@ export const CampaignProcessContentMessaging = () => {
 
   const onClickToOpenBody = (index: number) => {
     openBody();
-    setTargetIndex(index);
     dispatchFormBody({
       type: 'init',
       value: {
@@ -117,7 +129,6 @@ export const CampaignProcessContentMessaging = () => {
   const onCloseDrawer = () => {
     closeSubject();
     closeBody();
-    setTargetIndex(-1);
   };
 
   const [leadsFetching, setLeadsFetching] = useState(false);
@@ -149,6 +160,113 @@ export const CampaignProcessContentMessaging = () => {
   };
 
   const [fetchTemplateLoading, setFetchTemplateLoading] = useState(false);
+
+  const [addStepEmailLoading, setAddStepEmailLoading] = useState(false);
+  const [removeStepEmailLoading, setRemoveStepEmailLoading] = useState(false);
+  const [updateStepEmailDaysLoading, setUpdateStepEmailDaysLoading] =
+    useState(false);
+
+  const [daysHash, setDaysHash] = useState<{
+    [key: string]: number | undefined;
+  }>();
+
+  const onBlurToChangeSendDays = useCallback(
+    async (id: string | number, days: number) => {
+      if (updateStepEmailDaysLoading || !id) {
+        return;
+      }
+      setUpdateStepEmailDaysLoading(true);
+      const postData = {
+        stepId: id,
+        sendAfterDays: days,
+      };
+      try {
+        await _updateStepEmailSendDays(postData);
+        const temp = JSON.parse(JSON.stringify(messagingSteps));
+        const index = temp.findIndex((step: any) => step.stepId === id);
+        temp[index].afterDays = days;
+        setMessagingSteps(temp);
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      } finally {
+        setUpdateStepEmailDaysLoading(false);
+      }
+    },
+    [messagingSteps, setMessagingSteps, updateStepEmailDaysLoading],
+  );
+
+  const onClickToRemoveStepEmail = useCallback(
+    async (id: string | number) => {
+      if (removeStepEmailLoading || !id) {
+        return;
+      }
+      setRemoveStepEmailLoading(true);
+      try {
+        await _deleteStepEmail(id);
+        const temp = JSON.parse(JSON.stringify(messagingSteps));
+        const index = temp.findIndex((step: any) => step.stepId === id);
+        temp.splice(index, 1);
+        setMessagingSteps(temp);
+        setEmailTemplate((prev) => {
+          if (prev) {
+            prev.splice(index, 1);
+          }
+          return prev;
+        });
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      } finally {
+        setRemoveStepEmailLoading(false);
+      }
+    },
+    [messagingSteps, removeStepEmailLoading, setMessagingSteps],
+  );
+
+  const onClickToAddStepEmail = useCallback(async () => {
+    if (
+      !campaignId ||
+      addStepEmailLoading ||
+      !leadsList[activeValue]?.previewLeadId
+    ) {
+      return;
+    }
+    setAddStepEmailLoading(true);
+    const postData = {
+      campaignId,
+      previewLeadId: leadsList[activeValue].previewLeadId,
+    };
+    try {
+      const { data } = await _addStepEmail(postData);
+      const temp = JSON.parse(JSON.stringify(messagingSteps));
+      temp.push(data);
+      setMessagingSteps(temp);
+      const insidePostData = {
+        stepId: data.stepId,
+        previewLeadId: leadsList[activeValue].previewLeadId,
+      };
+      const { data: newStep } = await _fetchStepEmail(insidePostData);
+      setEmailTemplate((prev) => {
+        if (prev) {
+          prev.push(newStep);
+        }
+        return prev;
+      });
+      setAddStepEmailLoading(false);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+      setAddStepEmailLoading(false);
+    }
+  }, [
+    activeValue,
+    addStepEmailLoading,
+    campaignId,
+    leadsList,
+    messagingSteps,
+    setMessagingSteps,
+  ]);
 
   const onClickToChangeLead = useCallback(
     async (item: CampaignLeadItem, index: number) => {
@@ -212,6 +330,13 @@ export const CampaignProcessContentMessaging = () => {
   }, [emailTemplate, fetchTemplateLoading, leadsList, onClickToChangeLead]);
 
   const computedEmail = useMemo(() => {
+    setDaysHash(() => {
+      const newHash = {} as any;
+      messagingSteps.forEach((step) => {
+        newHash[step.stepId] = step.afterDays;
+      });
+      return newHash;
+    });
     if (fetchTemplateLoading) {
       return messagingSteps.map((step) => {
         return {
@@ -222,10 +347,31 @@ export const CampaignProcessContentMessaging = () => {
         };
       });
     }
+    if (addStepEmailLoading) {
+      return messagingSteps.map((step) => {
+        const template = emailTemplate?.find(
+          (template) => template.stepId === step.stepId,
+        );
+        return template
+          ? {
+              ...step,
+              ...template,
+              loading: false,
+            }
+          : {
+              ...step,
+              content: '',
+              subject: '',
+              loading: true,
+            };
+      });
+    }
+
     return messagingSteps.map((step) => {
       const template = emailTemplate?.find(
         (template) => template.stepId === step.stepId,
       );
+
       return template
         ? {
             ...step,
@@ -239,7 +385,12 @@ export const CampaignProcessContentMessaging = () => {
             loading: false,
           };
     });
-  }, [emailTemplate, messagingSteps, fetchTemplateLoading]);
+  }, [
+    fetchTemplateLoading,
+    addStepEmailLoading,
+    messagingSteps,
+    emailTemplate,
+  ]);
 
   return (
     <Stack
@@ -505,76 +656,180 @@ export const CampaignProcessContentMessaging = () => {
       >
         {computedEmail.map((step, index) => (
           <Stack
-            bgcolor={'#FFF'}
-            borderRadius={2}
             gap={1.5}
             key={`step-${step.stepId}-${index}`}
             minWidth={600}
             mx={'auto'}
-            p={3}
             width={'65%'}
           >
-            {/*header*/}
-            <Stack borderBottom={'1px solid #E5E5E5'} gap={1} pb={1.5}>
-              <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
-                <Typography variant={'h6'}>Step {index + 1}</Typography>
-                <Icon
-                  component={ICON_MESSAGING_EMAIL}
-                  sx={{ width: 24, height: 24 }}
-                />
-              </Stack>
-
-              <Stack flexDirection={'row'}>
-                <Stack flexDirection={'row'} gap={'.5em'}>
-                  <Typography flexShrink={0}>Subject :</Typography>
-                  {step.loading ? (
-                    <Skeleton animation={'wave'} height={'100%'} width={320} />
-                  ) : (
-                    <Typography variant={'subtitle1'}>
-                      {step.subject}
-                    </Typography>
+            <Stack bgcolor={'#FFF'} borderRadius={2} gap={1.5} p={3}>
+              {/*header*/}
+              <Stack borderBottom={'1px solid #E5E5E5'} gap={1} pb={1.5}>
+                <Stack alignItems={'center'} flexDirection={'row'}>
+                  <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
+                    <Typography variant={'h6'}>Step {index + 1}</Typography>
+                    <Icon
+                      component={ICON_MESSAGING_EMAIL}
+                      sx={{ width: 24, height: 24 }}
+                    />
+                  </Stack>
+                  {index > 0 && (
+                    <Icon
+                      component={ICON_TRASH}
+                      onClick={async () => {
+                        if (step.loading || removeStepEmailLoading) {
+                          return;
+                        }
+                        await onClickToRemoveStepEmail(step.stepId);
+                      }}
+                      sx={{
+                        width: 24,
+                        height: 24,
+                        ml: 'auto',
+                        cursor:
+                          step.loading || removeStepEmailLoading
+                            ? 'default'
+                            : 'pointer',
+                        '& path': {
+                          fill:
+                            step.loading || removeStepEmailLoading
+                              ? '#D0CEDA'
+                              : '#343330',
+                        },
+                      }}
+                    />
                   )}
                 </Stack>
 
-                <StyledButton
-                  color={'info'}
-                  disabled={step.loading}
-                  onClick={() => onClickToOpenSubject(index)}
-                  size={'small'}
-                  sx={{ ml: 'auto' }}
-                  variant={'outlined'}
-                >
-                  Edit subject prompt
-                </StyledButton>
-              </Stack>
-            </Stack>
+                <Stack flexDirection={'row'}>
+                  <Stack flexDirection={'row'} gap={'.5em'}>
+                    <Typography flexShrink={0}>Subject :</Typography>
+                    {step.loading ? (
+                      <Skeleton
+                        animation={'wave'}
+                        height={'100%'}
+                        width={320}
+                      />
+                    ) : (
+                      <Typography variant={'subtitle1'}>
+                        {step.subject}
+                      </Typography>
+                    )}
+                  </Stack>
 
-            {/*content*/}
-            <Stack>
-              {step.loading ? (
-                <Stack>
-                  <Skeleton width={120} />
-                  <Skeleton sx={{ mt: 1.5 }} width={'80%'} />
-                  <Skeleton width={'50%'} />
-                  <Skeleton sx={{ mt: 1.5 }} width={'60%'} />
-                  <Skeleton width={'90%'} />
-                  <Skeleton sx={{ mt: 3 }} width={'30%'} />
+                  <StyledButton
+                    color={'info'}
+                    disabled={step.loading}
+                    onClick={() => onClickToOpenSubject(index)}
+                    size={'small'}
+                    sx={{ ml: 'auto' }}
+                    variant={'outlined'}
+                  >
+                    Edit subject prompt
+                  </StyledButton>
                 </Stack>
-              ) : (
-                <ShadowContent html={step.content} />
-              )}
+              </Stack>
+
+              {/*content*/}
+              <Stack>
+                {step.loading ? (
+                  <Stack>
+                    <Skeleton width={120} />
+                    <Skeleton sx={{ mt: 1.5 }} width={'80%'} />
+                    <Skeleton width={'50%'} />
+                    <Skeleton sx={{ mt: 1.5 }} width={'60%'} />
+                    <Skeleton width={'90%'} />
+                    <Skeleton sx={{ mt: 3 }} width={'30%'} />
+                  </Stack>
+                ) : (
+                  <ShadowContent html={step.content} />
+                )}
+              </Stack>
+
+              <StyledButton
+                color={'info'}
+                disabled={step.loading}
+                onClick={() => onClickToOpenBody(index)}
+                size={'small'}
+                sx={{ ml: 'auto' }}
+                variant={'outlined'}
+              >
+                Edit body prompt
+              </StyledButton>
             </Stack>
 
-            <StyledButton
-              color={'info'}
-              disabled={step.loading}
-              onClick={() => onClickToOpenBody(index)}
-              size={'small'}
-              sx={{ ml: 'auto' }}
-              variant={'outlined'}
-            >
-              Edit body prompt
-            </StyledButton>
+            {index === computedEmail.length - 1 ? (
+              <Icon
+                component={ICON_ADD}
+                onClick={async () => {
+                  if (addStepEmailLoading || step.loading) {
+                    return;
+                  }
+                  await onClickToAddStepEmail();
+                }}
+                sx={{
+                  height: 48,
+                  width: 48,
+                  cursor:
+                    step.loading || addStepEmailLoading ? 'default' : 'pointer',
+                  alignSelf: 'center',
+                  '& path': {
+                    fill:
+                      step.loading || addStepEmailLoading
+                        ? '#D0CEDA'
+                        : '#343330',
+                  },
+                }}
+              />
+            ) : (
+              <Stack alignItems={'center'} alignSelf={'center'} width={160}>
+                <Icon component={ICON_DASHED} sx={{ height: 24, width: 1 }} />
+                <Stack
+                  alignItems={'center'}
+                  color={step.loading ? 'text.secondary' : 'text.primary'}
+                  flexDirection={'row'}
+                  fontSize={12}
+                  gap={0.5}
+                >
+                  Send after{' '}
+                  <StyledTextFieldNumber
+                    disabled={step.loading}
+                    onBlur={async () => {
+                      if (!daysHash?.[step.stepId]) {
+                        setDaysHash((prev) => {
+                          return {
+                            ...prev,
+                            [step.stepId]: 2,
+                          };
+                        });
+                      }
+                      await onBlurToChangeSendDays(
+                        step.stepId,
+                        daysHash?.[step.stepId] || 2,
+                      );
+                    }}
+                    onValueChange={({ floatValue }) => {
+                      setDaysHash((prev) => {
+                        return {
+                          ...prev,
+                          [step.stepId]: floatValue,
+                        };
+                      });
+                    }}
+                    sx={{
+                      p: 1,
+                      fontSize: 12,
+                      borderRadius: 1,
+                      flex: 1,
+                      '& .MuiInputBase-input': { py: 0 },
+                    }}
+                    value={daysHash?.[step.stepId]}
+                  />{' '}
+                  days
+                </Stack>
+                <Icon component={ICON_DASHED} sx={{ height: 24, width: 1 }} />
+              </Stack>
+            )}
           </Stack>
         ))}
       </Stack>
@@ -685,7 +940,7 @@ const FORM_BODY: ResponseCampaignMessagingStepFormBody = {
   stepId: -1,
   bodyInstructions: '',
   bodyCallToAction: '',
-  bodyWordCount: 0,
+  bodyWordCount: 100,
   bodyExamples: [],
 };
 
