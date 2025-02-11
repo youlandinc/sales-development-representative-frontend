@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
-import { DatePicker, DatePickerProps } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers';
 
-type StyledDatePickerProps = DatePickerProps<Date> & {
+type StyledDatePickerProps = DateTimePickerProps<Date> & {
   onClear?: () => void;
   error?: boolean;
 };
@@ -16,7 +16,7 @@ export const StyledDatePicker: FC<StyledDatePickerProps> = ({
 }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <DatePicker
+      <DateTimePicker
         slotProps={{
           textField: {
             error,
