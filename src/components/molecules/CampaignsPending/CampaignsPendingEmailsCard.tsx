@@ -36,6 +36,8 @@ type CampaignsPendingEmailsCardProps = {
   time: string;
   emailId: number;
   subject: string;
+  showStepNumber?: boolean;
+  stepNumber: number;
 };
 
 export const CampaignsPendingEmailsCard: FC<
@@ -49,6 +51,8 @@ export const CampaignsPendingEmailsCard: FC<
   emailId,
   subject,
   avatarUrl,
+  showStepNumber,
+  stepNumber,
 }) => {
   const { updatePendingEmailById, deletePendingEmailById } =
     usePendingApprovalStore((state) => state);
@@ -142,6 +146,9 @@ export const CampaignsPendingEmailsCard: FC<
           <Stack gap={1.5}>
             {!visible ? (
               <Typography fontWeight={600} lineHeight={1.4} variant={'body3'}>
+                <Box color={'text.secondary'} component={'span'}>
+                  {showStepNumber ? `Step ${stepNumber}: ` : ' '}
+                </Box>
                 {rewriteState.loading ? <Skeleton /> : subject}
               </Typography>
             ) : (
@@ -178,11 +185,13 @@ export const CampaignsPendingEmailsCard: FC<
               </Box>
             )}
           </Stack>
-          <Fade in={visible}>
-            <Box height={visible ? 'auto' : 0} mb={visible ? 0 : '-12px'}>
-              <InboxEditor initData={`${emailContent}`} ref={editorRef} />
-            </Box>
-          </Fade>
+          {visible && (
+            <Fade in={true}>
+              <Box height={visible ? 'auto' : 0} mb={visible ? 0 : '-12px'}>
+                <InboxEditor initData={`${emailContent}`} ref={editorRef} />
+              </Box>
+            </Fade>
+          )}
 
           <Stack
             flexDirection={'row'}

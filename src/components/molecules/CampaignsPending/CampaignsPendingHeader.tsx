@@ -26,7 +26,7 @@ type CampaignsPendingHeaderProps = {
   campaignName: string;
   campaignStatus: CampaignStatusEnum;
   campaignId: number;
-  cb?: () => Promise<void>;
+  cb?: () => Promise<any>;
   loading?: boolean;
 };
 

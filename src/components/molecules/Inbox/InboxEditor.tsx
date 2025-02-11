@@ -2,7 +2,7 @@ import { FC, RefObject, useEffect, useImperativeHandle, useState } from 'react';
 import { CKEditor, CKEditorEventPayload } from 'ckeditor4-react';
 import { CKEditorInstance } from 'ckeditor4-react/dist/types';
 
-import './defaultEditorCss.css';
+// import './defaultEditorCss.css';
 
 type InboxEditorProps = {
   handleChange?: (e: CKEditorEventPayload<'change'>) => void;
@@ -86,12 +86,14 @@ export const InboxEditor: FC<InboxEditorProps> = ({
       config={{
         versionCheck: false,
         fontSize_defaultLabel: '12px',
+        addCss: 'p {font-size:12px;margin:0;line-height:1.8;}',
         stylesSet: [
           {
             name: 'Line Height 1.5',
             element: 'p',
             styles: {
               'line-height': '1.5',
+              margin: '0',
             },
           },
           {
@@ -99,6 +101,7 @@ export const InboxEditor: FC<InboxEditorProps> = ({
             element: 'p',
             styles: {
               'line-height': '2.0',
+              margin: '0',
             },
           },
         ],
@@ -134,6 +137,10 @@ export const InboxEditor: FC<InboxEditorProps> = ({
       onInstanceReady={(event) => {
         // close();
         setEditor(event.editor as unknown as CKEditorInstance);
+        // const iframe = document?.querySelector('.cke_reset iframe');
+        // if (iframe) {
+        //   console.log(iframe);
+        // }
       }}
     />
   );

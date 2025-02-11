@@ -18,17 +18,11 @@ import {
   ICampaignsPendingPerformance,
   ICampaignsPendingTimeline,
 } from '@/types';
-import {
-  _fetCampaignPendingEmails,
-  _fetchCampaignPendingInfo,
-} from '@/request';
+import { _fetchCampaignPendingInfo } from '@/request';
 import useAsyncFn from '@/hooks/useAsyncFn';
-
-import { usePendingApprovalStore } from '@/stores/usePendingApprovalStore';
 
 export const CampaignsPending = () => {
   const { campaignId } = useParams();
-  const { setPendingEmails } = usePendingApprovalStore((state) => state);
 
   const [activeBtn, setActiveBtn] = useState<'email' | 'performance'>('email');
   const [baseInfo, setBaseInfo] = useState<ICampaignsPendingBaseInfo>({
@@ -58,24 +52,13 @@ export const CampaignsPending = () => {
       setCampaignStatus(data.campaignStatus);
       setTimeline(data.data.timeLine);
       setPerformances(data.data.performance);
+      !!data.data.autopilot && setActiveBtn('performance');
+      return data;
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     }
   });
-  const [state, fetchPendingEmailsData] = useAsyncFn(async () => {
-    try {
-      const { data } = await _fetCampaignPendingEmails(
-        parseInt(campaignId as string),
-        100,
-        0,
-      );
-      setPendingEmails(data.content);
-    } catch (err) {
-      const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    }
-  }, [campaignId]);
 
   useEffect(() => {
     if (campaignId) {
@@ -85,13 +68,14 @@ export const CampaignsPending = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campaignId]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     if (campaignId) {
       // noinspection JSIgnoredPromiseFromCall
-      activeBtn === 'email' && fetchPendingEmailsData();
+      activeBtn === 'email' &&
+        fetchPendingEmailsData(parseInt(campaignId as string));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [campaignId, activeBtn]);
+  }, [campaignId, activeBtn]);*/
 
   return (
     <Stack height={'100vh'}>
@@ -122,16 +106,18 @@ export const CampaignsPending = () => {
               },
             }}
           >
-            <StyledButton
-              className={activeBtn === 'email' ? 'active' : ''}
-              color={'info'}
-              onClick={() => setActiveBtn('email')}
-              size={'medium'}
-              sx={{ px: '12px !important', py: '8px !important' }}
-              variant={'outlined'}
-            >
-              Pending emails
-            </StyledButton>
+            {!baseDataState.value?.data?.autopilot && (
+              <StyledButton
+                className={activeBtn === 'email' ? 'active' : ''}
+                color={'info'}
+                onClick={() => setActiveBtn('email')}
+                size={'medium'}
+                sx={{ px: '12px !important', py: '8px !important' }}
+                variant={'outlined'}
+              >
+                Pending emails
+              </StyledButton>
+            )}
             <StyledButton
               className={activeBtn === 'performance' ? 'active' : ''}
               color={'info'}
@@ -143,12 +129,17 @@ export const CampaignsPending = () => {
               Performance
             </StyledButton>
           </Stack>
-
-          {activeBtn === 'email' && (
-            <CampaignsPendingEmails loading={state.loading} />
-          )}
-          {activeBtn === 'performance' && (
-            <CampaignsPendingPerformance performances={performances} />
+          {!baseDataState.loading && (
+            <>
+              {activeBtn === 'email' && (
+                <CampaignsPendingEmails
+                  showStepNumber={baseDataState.value?.data?.hasManySteps}
+                />
+              )}
+              {activeBtn === 'performance' && (
+                <CampaignsPendingPerformance performances={performances} />
+              )}
+            </>
           )}
         </Stack>
       </Stack>

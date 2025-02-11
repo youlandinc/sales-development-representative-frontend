@@ -85,6 +85,8 @@ export type ICampaignsPendingEmailsItem = {
   avatar: string | null;
   subject: string;
   content: string;
+  stepSequence: number;
+  name: string;
 };
 
 export type CampaignsPendingEmailsResponseData = {

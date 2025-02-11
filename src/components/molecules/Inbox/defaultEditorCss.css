@@ -2,3 +2,20 @@
   border-radius: 4px;
   overflow: hidden;
 }
+.custom-cke {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.5 !important;
+  /*p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    word-wrap: break-word;
+  }*/
+}
+.custom-cke p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
