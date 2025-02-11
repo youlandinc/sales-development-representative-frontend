@@ -42,7 +42,7 @@ export const CampaignsPendingEmails: FC<CampaignsPendingEmailsProps> = ({
       ) : (
         <Stack gap={3}>
           <Typography variant={'subtitle2'}>
-            Pending Emails ({loading ? 0 : totalEmails})
+            Pending Emails ({loading ? 0 : pendingEmails.length})
           </Typography>
           <Stack gap={3}>
             {loading ? (
