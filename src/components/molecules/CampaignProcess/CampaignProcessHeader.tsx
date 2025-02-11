@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import { debounce, Icon, Stack, Typography } from '@mui/material';
-import { addDays, differenceInDays } from 'date-fns';
+import { addDays, differenceInCalendarDays } from 'date-fns';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
@@ -115,7 +115,10 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
     if (!lunchInfo.sendNow) {
       if (
         !lunchInfo.scheduleTime ||
-        differenceInDays(lunchInfo.scheduleTime, addDays(new Date(), 1)) <= 0
+        differenceInCalendarDays(
+          lunchInfo.scheduleTime,
+          addDays(new Date(), 1),
+        ) < 0
       ) {
         setIsValidate(false);
         return;

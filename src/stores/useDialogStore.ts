@@ -285,6 +285,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         campaignStatus: data.campaignStatus,
         setupPhase: SetupPhaseEnum.messaging,
         messagingSteps: data.data.steps,
+        lunchInfo: data.data.launchInfo,
       });
     } catch (err) {
       const { message, header, variant } = err as HttpError;
