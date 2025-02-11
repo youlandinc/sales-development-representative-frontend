@@ -16,11 +16,13 @@ import { UNotUndefined } from '@/utils';
 
 const tomorrow = addDays(new Date(), 1);
 
-const INITIAL_STATE: ResponseCampaignLaunchInfo = {
+const INITIAL_STATE: Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
+  scheduleTime: Date | null;
+} = {
   dailyLimit: 100,
   autopilot: false,
   sendNow: false,
-  scheduleTime: '',
+  scheduleTime: null,
   sender: 'example@site.com',
   replyTo: 'example@site.com',
   senderName: 'example',
@@ -43,8 +45,11 @@ export const CampaignProcessContentLunch = () => {
   const { lunchInfo, setLunchInfo, setIsValidate, isValidate } =
     useDialogStore();
 
-  const [formData, setFormData] =
-    useState<ResponseCampaignLaunchInfo>(INITIAL_STATE);
+  const [formData, setFormData] = useState<
+    Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
+      scheduleTime: Date | null;
+    }
+  >(INITIAL_STATE);
 
   const [optionValue, setOptionValue] = useState('schedule');
 
@@ -59,7 +64,13 @@ export const CampaignProcessContentLunch = () => {
   const updateLunchInfo = useMemo(
     () =>
       debounce(() => {
-        setLunchInfo(formData);
+        setLunchInfo({
+          ...formData,
+          scheduleTime:
+            isValid(formData.scheduleTime) && isDate(formData.scheduleTime)
+              ? formData.scheduleTime.toISOString()
+              : null,
+        });
       }, 500),
     [formData, setLunchInfo],
   );
@@ -206,11 +217,9 @@ export const CampaignProcessContentLunch = () => {
                 error={UNotUndefined(isValidate) ? !isValidate : false}
                 minDate={tomorrow}
                 onChange={(date) => {
-                  const value =
-                    isValid(date) && isDate(date) ? date.toISOString() : null;
                   setFormData({
                     ...formData,
-                    scheduleTime: value,
+                    scheduleTime: date,
                   });
                 }}
                 onError={(error) => {
