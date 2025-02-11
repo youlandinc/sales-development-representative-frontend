@@ -55,7 +55,17 @@ export const CampaignProcessContentLunch = () => {
 
   useEffect(
     () => {
-      setFormData({ ...lunchInfo, ...INITIAL_STATE });
+      setFormData({
+        dailyLimit: lunchInfo.dailyLimit || INITIAL_STATE.dailyLimit,
+        autopilot: lunchInfo.autopilot || INITIAL_STATE.autopilot,
+        sendNow: lunchInfo.sendNow || INITIAL_STATE.sendNow,
+        scheduleTime: lunchInfo.scheduleTime
+          ? new Date(lunchInfo.scheduleTime)
+          : INITIAL_STATE.scheduleTime,
+        sender: lunchInfo.sender || INITIAL_STATE.sender,
+        replyTo: lunchInfo.replyTo || INITIAL_STATE.replyTo,
+        senderName: lunchInfo.senderName || INITIAL_STATE.senderName,
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
