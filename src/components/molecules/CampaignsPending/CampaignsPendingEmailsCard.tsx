@@ -54,8 +54,12 @@ export const CampaignsPendingEmailsCard: FC<
   showStepNumber,
   stepNumber,
 }) => {
-  const { updatePendingEmailById, deletePendingEmailById } =
-    usePendingApprovalStore((state) => state);
+  const {
+    updatePendingEmailById,
+    deletePendingEmailById,
+    setTotalEmails,
+    totalEmails,
+  } = usePendingApprovalStore((state) => state);
 
   const { visible, open, close } = useSwitch();
   const [clickType, setClickType] = useState<'approve' | 'delete'>('approve');
@@ -87,6 +91,7 @@ export const CampaignsPendingEmailsCard: FC<
       try {
         await _approveCampaignPendingEmail(emailId, isApprove);
         deletePendingEmailById(emailId);
+        setTotalEmails(totalEmails - 1);
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });

@@ -1,11 +1,11 @@
-import { FC, useEffect } from 'react';
+import { FC, SyntheticEvent, useEffect, useState } from 'react';
 import { Box, Fade, Icon, Skeleton, Stack, Typography } from '@mui/material';
+import { useParams } from 'next/navigation';
 
 import { CampaignsPendingEmailsCard } from '@/components/molecules';
 import { usePendingApprovalStore } from '@/stores/usePendingApprovalStore';
 
 import ICON_NO_DATA from './assets/icon_no_emails.svg';
-import { useParams } from 'next/navigation';
 
 type CampaignsPendingEmailsProps = {
   loading?: boolean;
@@ -15,21 +15,43 @@ export const CampaignsPendingEmails: FC<CampaignsPendingEmailsProps> = ({
   showStepNumber,
 }) => {
   const { campaignId } = useParams();
+
+  const [isScrolling, setIsScrolling] = useState(false);
+
   const {
     pendingEmails,
     isNoData,
     totalEmails,
     loading,
     fetchPendingEmailsData,
+    setPendingEmails,
+    pageSize,
+    pageNumber,
   } = usePendingApprovalStore((state) => state);
+
+  const handleScroll = async (e: SyntheticEvent<HTMLDivElement>) => {
+    setIsScrolling(true);
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    // console.log(scrollHeight, scrollTop, clientHeight);
+    if (
+      scrollHeight - scrollTop < clientHeight + 300 &&
+      !loading &&
+      pendingEmails.length < totalEmails
+    ) {
+      const res = await fetchPendingEmailsData(
+        parseInt(campaignId as string),
+        pageSize,
+        pageNumber + 1,
+      );
+      setPendingEmails(pendingEmails.concat(res?.content || []));
+    }
+  };
 
   useEffect(() => {
     if (campaignId) {
       // noinspection JSIgnoredPromiseFromCall
-
-      fetchPendingEmailsData(parseInt(campaignId as string));
+      fetchPendingEmailsData(parseInt(campaignId as string), pageSize, 0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campaignId]);
 
   return (
@@ -40,12 +62,18 @@ export const CampaignsPendingEmails: FC<CampaignsPendingEmailsProps> = ({
           <Typography variant={'body2'}>No emails need approval.</Typography>
         </Stack>
       ) : (
-        <Stack gap={3}>
+        <Stack flex={1} gap={3} overflow={'auto'}>
           <Typography variant={'subtitle2'}>
-            Pending Emails ({loading ? 0 : pendingEmails.length})
+            Pending Emails ({totalEmails})
           </Typography>
-          <Stack gap={3}>
-            {loading ? (
+          <Stack
+            flex={1}
+            gap={3}
+            onScroll={handleScroll}
+            overflow={'auto'}
+            pr={3}
+          >
+            {loading && !isScrolling ? (
               <Box
                 sx={{
                   '& .MuiSkeleton-root': { height: 18 },

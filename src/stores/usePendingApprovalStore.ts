@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 
-import { HttpError, ICampaignsPendingEmailsItem } from '@/types';
+import {
+  CampaignsPendingEmailsResponseData,
+  HttpError,
+  ICampaignsPendingEmailsItem,
+} from '@/types';
 import { _fetCampaignPendingEmails } from '@/request';
 import { SDRToast } from '@/components/atoms';
 
@@ -9,10 +13,13 @@ export type PendingApprovalState = {
   pendingEmails: ICampaignsPendingEmailsItem[];
   loading: boolean;
   totalEmails: number;
+  pageSize: number;
+  pageNumber: number;
 };
 
 export type PendingApprovalStateStoreActions = {
   setPendingEmails: (emails: ICampaignsPendingEmailsItem[]) => void;
+  setTotalEmails: (totalEmails: number) => void;
   updatePendingEmailById: (
     emailId: number,
     subject: string,
@@ -20,7 +27,12 @@ export type PendingApprovalStateStoreActions = {
   ) => void;
   deletePendingEmailById: (emailId: number) => void;
   setIsNoData: (noData: boolean) => void;
-  fetchPendingEmailsData: (campaignId: number) => Promise<void>;
+  fetchPendingEmailsData: (
+    campaignId: number,
+    pageSize: number,
+    pageNumber: number,
+  ) => Promise<CampaignsPendingEmailsResponseData | undefined>;
+  setLoading: (loading: boolean) => void;
 };
 
 export type PendingApprovalStoreProps = PendingApprovalState &
@@ -29,10 +41,12 @@ export type PendingApprovalStoreProps = PendingApprovalState &
 export const usePendingApprovalStore = create<PendingApprovalStoreProps>()(
   (set) => ({
     isNoData: false,
+    pageSize: 10,
+    pageNumber: 0,
     totalEmails: 0,
     loading: false,
     pendingEmails: [],
-    setPendingEmails: (emails) => set({ pendingEmails: emails }),
+    setPendingEmails: (emails) => set(() => ({ pendingEmails: emails })),
     updatePendingEmailById: (emailId, subject, content) =>
       set((state) => ({
         pendingEmails: state.pendingEmails.map((item) =>
@@ -48,16 +62,24 @@ export const usePendingApprovalStore = create<PendingApprovalStoreProps>()(
         ),
       })),
     setIsNoData: (isNoData) => set({ isNoData }),
-    fetchPendingEmailsData: async (campaignId) => {
+    setLoading: (loading) => set({ loading }),
+    setTotalEmails: (totalEmails) => set({ totalEmails }),
+    fetchPendingEmailsData: async (campaignId, pageSize, pageNumber) => {
       try {
         set({ loading: true });
-        const { data } = await _fetCampaignPendingEmails(campaignId, 1000, 0);
-        set({
+        const { data } = await _fetCampaignPendingEmails(
+          campaignId,
+          pageSize,
+          pageNumber,
+        );
+        set(() => ({
           isNoData: data.page.totalElements === 0,
           pendingEmails: data.content,
           loading: false,
           totalEmails: data.page.totalElements,
-        });
+          pageNumber: data.page.number,
+        }));
+        return data;
       } catch (err) {
         set({ loading: false });
         const { message, header, variant } = err as HttpError;

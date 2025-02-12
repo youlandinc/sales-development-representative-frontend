@@ -20,9 +20,13 @@ import {
 } from '@/types';
 import { _fetchCampaignPendingInfo } from '@/request';
 import useAsyncFn from '@/hooks/useAsyncFn';
+import { usePendingApprovalStore } from '@/stores/usePendingApprovalStore';
 
 export const CampaignsPending = () => {
   const { campaignId } = useParams();
+  const { setLoading, setIsNoData, setTotalEmails } = usePendingApprovalStore(
+    (state) => state,
+  );
 
   const [activeBtn, setActiveBtn] = useState<'email' | 'performance'>('email');
   const [baseInfo, setBaseInfo] = useState<ICampaignsPendingBaseInfo>({
@@ -62,6 +66,9 @@ export const CampaignsPending = () => {
 
   useEffect(() => {
     if (campaignId) {
+      setLoading(true);
+      setIsNoData(false);
+      setTotalEmails(0);
       // noinspection JSIgnoredPromiseFromCall
       fetchBaseData();
     }
@@ -86,7 +93,15 @@ export const CampaignsPending = () => {
         cb={fetchBaseData}
         loading={baseDataState.loading}
       />
-      <Stack flex={1} flexDirection={'row'} gap={3} pb={6} pt={3} px={6}>
+      <Stack
+        flex={1}
+        flexDirection={'row'}
+        gap={3}
+        overflow={'auto'}
+        pb={6}
+        pl={6}
+        pt={3}
+      >
         <Stack gap={3} height={'fit-content'} width={400}>
           <CampaignsPendingBaseInfo {...baseInfo} />
           <CampaignsPendingTimeline
@@ -94,7 +109,7 @@ export const CampaignsPending = () => {
             timeline={timeline}
           />
         </Stack>
-        <Stack flex={1} gap={3}>
+        <Stack flex={1} gap={3} overflow={'auto'}>
           <Stack
             flexDirection={'row'}
             gap={1}
@@ -129,7 +144,7 @@ export const CampaignsPending = () => {
               Performance
             </StyledButton>
           </Stack>
-          {!baseDataState.loading && (
+          {!baseDataState.loading && baseDataState.value && (
             <>
               {activeBtn === 'email' && (
                 <CampaignsPendingEmails
