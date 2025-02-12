@@ -27,6 +27,7 @@ interface CampaignProcessDrawerBodyProps {
   formData: ResponseCampaignMessagingStepFormBody;
   dispatchForm: ActionDispatch<any>;
   previewLeadId?: string | number;
+  onChangeTemplate: (value: any) => void;
 }
 
 export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
@@ -36,6 +37,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
   formData,
   dispatchForm,
   previewLeadId,
+  onChangeTemplate,
 }) => {
   const { messagingSteps, setMessagingSteps } = useDialogStore();
 
@@ -107,6 +109,9 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
         ...data,
         ...formData,
       };
+
+      onChangeTemplate(data);
+
       setMessagingSteps(temp);
       onClose();
     } catch (err) {

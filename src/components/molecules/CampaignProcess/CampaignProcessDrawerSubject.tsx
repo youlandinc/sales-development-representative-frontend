@@ -25,6 +25,7 @@ interface CampaignProcessDrawerSubjectProps {
   formData: ResponseCampaignMessagingStepFormSubject;
   dispatchForm: ActionDispatch<any>;
   previewLeadId?: string | number;
+  onChangeTemplate: (value: any) => void;
 }
 
 export const CampaignProcessDrawerSubject: FC<
@@ -36,6 +37,7 @@ export const CampaignProcessDrawerSubject: FC<
   formData,
   dispatchForm,
   previewLeadId,
+  onChangeTemplate,
 }) => {
   const { messagingSteps, setMessagingSteps } = useDialogStore();
 
@@ -92,16 +94,18 @@ export const CampaignProcessDrawerSubject: FC<
       const { data } = await _updateStepEmailSubject(postData);
 
       const temp = JSON.parse(JSON.stringify(messagingSteps));
-      const target = temp.findIndex(
+      const index = temp.findIndex(
         (item: ResponseCampaignMessagingStep) =>
           item.stepId === formData.stepId,
       );
 
-      temp[target] = {
-        ...temp[target],
+      temp[index] = {
+        ...messagingSteps[index],
         ...data,
         ...formData,
       };
+
+      onChangeTemplate(data);
 
       setMessagingSteps(temp);
 

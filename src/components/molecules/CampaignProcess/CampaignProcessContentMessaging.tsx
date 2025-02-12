@@ -838,6 +838,23 @@ export const CampaignProcessContentMessaging = () => {
         container={messagingBoxRef.current}
         dispatchForm={dispatchFormSubject}
         formData={formSubject}
+        onChangeTemplate={(template) => {
+          const target = JSON.parse(
+            JSON.stringify(
+              emailTemplate?.find((item) => item.stepId === template.stepId),
+            ),
+          );
+          target.subject = template.subject;
+          setEmailTemplate((prev) => {
+            const index = prev?.findIndex(
+              (item) => item.stepId === template.stepId,
+            );
+            if (index !== -1) {
+              prev![index!] = target;
+            }
+            return prev;
+          });
+        }}
         onClose={onCloseDrawer}
         previewLeadId={leadsList[activeValue]?.previewLeadId}
         visible={visibleSubject}
@@ -847,6 +864,23 @@ export const CampaignProcessContentMessaging = () => {
         container={messagingBoxRef.current}
         dispatchForm={dispatchFormBody}
         formData={formBody}
+        onChangeTemplate={(template) => {
+          const target = JSON.parse(
+            JSON.stringify(
+              emailTemplate?.find((item) => item.stepId === template.stepId),
+            ),
+          );
+          target.content = template.content;
+          setEmailTemplate((prev) => {
+            const index = prev?.findIndex(
+              (item) => item.stepId === template.stepId,
+            );
+            if (index !== -1) {
+              prev![index!] = target;
+            }
+            return prev;
+          });
+        }}
         onClose={onCloseDrawer}
         previewLeadId={leadsList[activeValue]?.previewLeadId}
         visible={visibleBody}
