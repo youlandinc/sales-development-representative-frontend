@@ -13,4 +13,5 @@ export enum CampaignsPendingTimeLineEnum {
 export enum ModuleEnum {
   email_subject = 'SUBJECT_INSTRUCTION',
   email_body = 'CONTENT_INSTRUCTION',
+  personal_research = 'PERSONAL_RESEARCH',
 }

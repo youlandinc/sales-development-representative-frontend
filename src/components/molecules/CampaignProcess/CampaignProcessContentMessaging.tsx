@@ -61,6 +61,7 @@ import ICON_MESSAGING_EMAIL from './assets/icon_messaging_email.svg';
 import ICON_ADD from './assets/icon_add.svg';
 import ICON_DASHED from './assets/icon_dashed.svg';
 import ICON_TRASH from './assets/icon_trash.svg';
+import { ModuleEnum } from '@/types/enum';
 
 export const CampaignProcessContentMessaging = () => {
   const {
@@ -76,6 +77,57 @@ export const CampaignProcessContentMessaging = () => {
     messagingSteps,
     setMessagingSteps,
   } = useDialogStore();
+
+  const [personalResearchLoading, setPersonalResearchLoading] = useState(false);
+
+  const onClickToFetchPersonalResearch = async (id: string | number) => {
+    setPersonalResearchLoading(true);
+    let str = '';
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        module: ModuleEnum.personal_research,
+        params: {
+          leadId: id,
+        },
+      }),
+    })
+      .then((response) => {
+        if (response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+
+          const readStream = () => {
+            reader.read().then(({ done, value }) => {
+              if (done) {
+                setPersonalResearchLoading(false);
+                return;
+              }
+              // decode
+              const data = decoder.decode(value).replace(/data:/g, '');
+              //.replace(/\n/g, '');
+
+              str = str + data;
+              setResearchInfo(str);
+
+              // continue read stream
+              readStream();
+            });
+          };
+
+          readStream();
+        }
+      })
+      .catch((error) => {
+        const { message, header, variant } = error as HttpError;
+        SDRToast({ message, header, variant });
+      });
+  };
+
+  const [researchInfo, setResearchInfo] = useState('');
 
   const {
     open: openSubject,
@@ -270,6 +322,12 @@ export const CampaignProcessContentMessaging = () => {
 
   const onClickToChangeLead = useCallback(
     async (item: CampaignLeadItem, index: number) => {
+      if (activeValue === index) {
+        return;
+      }
+      setPersonalResearchLoading(false);
+      setResearchInfo('');
+      setActiveInfo('company');
       setActiveValue(index);
       if (!campaignId || !item.previewLeadId || fetchTemplateLoading) {
         return;
@@ -289,7 +347,7 @@ export const CampaignProcessContentMessaging = () => {
         setFetchTemplateLoading(false);
       }
     },
-    [campaignId, fetchTemplateLoading],
+    [activeValue, campaignId, fetchTemplateLoading],
   );
 
   const [buttons, setButtons] = useState<HTMLElement[] | null>(null);
@@ -601,10 +659,19 @@ export const CampaignProcessContentMessaging = () => {
             <StyledButton
               color={'info'}
               disabled={leadsFetching || !leadsList[activeValue]}
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setActiveInfo('person');
+                if (
+                  !personalResearchLoading &&
+                  leadsList[activeValue] &&
+                  !researchInfo
+                ) {
+                  await onClickToFetchPersonalResearch(
+                    leadsList[activeValue].previewLeadId!,
+                  );
+                }
               }}
               size={'small'}
               sx={{
@@ -638,7 +705,7 @@ export const CampaignProcessContentMessaging = () => {
               <Typography variant={'body3'}>
                 {activeInfo === 'company'
                   ? leadsList[activeValue]?.companyResearch
-                  : leadsList[activeValue]?.personalResearch}
+                  : researchInfo}
               </Typography>
             </Stack>
           </Collapse>
