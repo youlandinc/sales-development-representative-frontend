@@ -322,9 +322,6 @@ export const CampaignProcessContentMessaging = () => {
 
   const onClickToChangeLead = useCallback(
     async (item: CampaignLeadItem, index: number) => {
-      if (activeValue === index) {
-        return;
-      }
       setPersonalResearchLoading(false);
       setResearchInfo('');
       setActiveInfo('company');
