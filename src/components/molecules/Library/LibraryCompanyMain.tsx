@@ -1,21 +1,23 @@
-import { FC, PropsWithChildren } from 'react';
-import { Box, Icon, Stack, Typography } from '@mui/material';
+import { FC, PropsWithChildren, useEffect, useState } from 'react';
+import { Box, Icon, Skeleton, Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
-import Image from 'next/image';
 
-import { StyledButton } from '@/components/atoms';
-import { LibraryCard, LibraryCardProps } from '@/components/molecules';
+import { SDRToast, StyledButton } from '@/components/atoms';
+import {
+  LibraryCard,
+  LibraryCardProps,
+  LibraryChip,
+} from '@/components/molecules';
+
+import { useAsyncFn } from '@/hooks';
+
+import { _editTag, _fetchCompanyInfo } from '@/request/library/offers';
+import { HttpError } from '@/types';
 
 import ICON_BUILDINGS from './assets/icon_buildings.svg';
 
-const commonStyle = {
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  WebkitBoxOrient: 'vertical',
-  WebkitLineClamp: '3',
-  display: '-webkit-box',
-  width: '100%',
-};
+import { ITag, useLibraryStore } from '@/stores/useLibraryStore';
+import { PREVIEW_IMAGE_URL } from '@/constant';
 
 const LibraryCompanyCard: FC<PropsWithChildren<LibraryCardProps>> = ({
   children,
@@ -28,18 +30,44 @@ const LibraryCompanyCard: FC<PropsWithChildren<LibraryCardProps>> = ({
   );
 };
 
-export const ContentBox: FC<PropsWithChildren> = ({ children }) => {
-  return (
-    <Box border={'1px solid #DFDEE6'} borderRadius={2} p={1.5}>
-      <Typography minHeight={'4.5em'} sx={commonStyle} variant={'body2'}>
-        {children}
-      </Typography>
-    </Box>
-  );
-};
-
 export const LibraryCompanyMain = () => {
+  const { updateCompanyInfo, companyPage, sellIntroduction } = useLibraryStore(
+    (state) => state,
+  );
+
   const router = useRouter();
+  const [imgLoading, setImgLoading] = useState(true);
+
+  const [state, fetchCompanyInfo] = useAsyncFn(async () => {
+    try {
+      const res = await _fetchCompanyInfo();
+      updateCompanyInfo('companyName', res.data.companyName);
+      updateCompanyInfo('companyPage', res.data.companyPage);
+      updateCompanyInfo('sellIntroduction', res.data.sellIntroduction);
+      return res;
+    } catch (error) {
+      close();
+      const { message, header, variant } = error as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  });
+
+  const [editState, editTag] = useAsyncFn(async (param: ITag) => {
+    try {
+      await _editTag(param);
+      await fetchCompanyInfo();
+    } catch (error) {
+      close();
+      const { message, header, variant } = error as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  });
+
+  useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
+    fetchCompanyInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Stack gap={3}>
@@ -85,28 +113,29 @@ export const LibraryCompanyMain = () => {
             }}
             variant={'body2'}
           >
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States. Their services
-            include bridge loans, DSCR rental loans, and all-cash home purchase
-            loans, aiming to simplify real estate loan transactions through data
-            and algorithm-driven end-to-end solutions. Their technology-driven
-            platform automates the initiation, approval, and servicing processes
-            of loans, enhancing efficiency and reducing costs. As a direct
-            lender, YouLand eliminates intermediaries, providing clients with
-            more competitive loan products and a seamless borrowing experience.
-            Headquartered in San Francisco, California, YouLand is committed to
-            offering fast and flexible financing solutions to real estate
-            investors nationwide.
+            {sellIntroduction}
           </Typography>
-          <Box flex={1.5}>
-            <Image
-              alt={'picture'}
-              height={377}
-              layout={'responsive'}
-              src={'/images/demo_image_company.png'}
-              width={969}
-            />
+          <Box
+            flex={1.5}
+            maxHeight={'18rem'}
+            maxWidth={'50%'}
+            minHeight={300}
+            overflow={'hidden'}
+          >
+            {imgLoading && <Skeleton height={'100%'} variant={'rectangular'} />}
+            {companyPage !== '' && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt={'picture'}
+                height={'auto'}
+                onLoad={() => {
+                  setImgLoading(false);
+                }}
+                src={`${PREVIEW_IMAGE_URL}${companyPage}`}
+                style={{ objectFit: 'cover' }}
+                width={'100%'}
+              />
+            )}
           </Box>
         </Stack>
       </LibraryCard>
@@ -117,21 +146,25 @@ export const LibraryCompanyMain = () => {
           }
           title={'Pain points'}
         >
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
+          {state.loading ? (
+            <>
+              <Skeleton height={20} />
+              <Skeleton height={20} width={'50%'} />
+            </>
+          ) : (
+            <Stack flexDirection={'row'} flexWrap={'wrap'} gap={1.5}>
+              {state.value?.data?.painPoints.map((item, index) => (
+                <LibraryChip
+                  description={item.description}
+                  handleSave={editTag}
+                  id={item.id}
+                  key={index}
+                  loading={editState.loading}
+                  name={item.name}
+                />
+              ))}
+            </Stack>
+          )}
         </LibraryCompanyCard>
         <LibraryCompanyCard
           icon={
@@ -139,21 +172,25 @@ export const LibraryCompanyMain = () => {
           }
           title={'Solutions'}
         >
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
+          {state.loading ? (
+            <>
+              <Skeleton height={20} />
+              <Skeleton height={20} width={'50%'} />
+            </>
+          ) : (
+            <Stack flexDirection={'row'} flexWrap={'wrap'} gap={1.5}>
+              {state.value?.data?.solutions.map((item, index) => (
+                <LibraryChip
+                  description={item.description}
+                  handleSave={editTag}
+                  id={item.id}
+                  key={index}
+                  loading={editState.loading}
+                  name={item.name}
+                />
+              ))}
+            </Stack>
+          )}
         </LibraryCompanyCard>
         <LibraryCompanyCard
           icon={
@@ -161,21 +198,25 @@ export const LibraryCompanyMain = () => {
           }
           title={'Proof points'}
         >
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
-          <ContentBox>
-            YouLand is a technology-driven digital real estate lending platform
-            that offers a variety of financing solutions for real estate
-            investors across all 50 states in the United States.
-          </ContentBox>
+          {state.loading ? (
+            <>
+              <Skeleton height={20} />
+              <Skeleton height={20} width={'50%'} />
+            </>
+          ) : (
+            <Stack flexDirection={'row'} flexWrap={'wrap'} gap={1.5}>
+              {state.value?.data?.proofPoints.map((item, index) => (
+                <LibraryChip
+                  description={item.description}
+                  handleSave={editTag}
+                  id={item.id}
+                  key={index}
+                  loading={editState.loading}
+                  name={item.name}
+                />
+              ))}
+            </Stack>
+          )}
         </LibraryCompanyCard>
       </Stack>
     </Stack>

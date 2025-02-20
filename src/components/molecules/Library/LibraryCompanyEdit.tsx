@@ -1,44 +1,46 @@
-import { FC, PropsWithChildren, ReactNode, useState } from 'react';
-import { Icon, Stack, Tooltip, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
-import { CommonBackButton } from '@/components/molecules';
-import { useSwitch } from '@/hooks';
+import {
+  CommonBackButton,
+  StyledTextFieldLabel,
+  StyledVerticalTextField,
+} from '@/components/molecules';
+import { useAsyncFn, useSwitch } from '@/hooks';
 
 import { HttpError, HttpVariantEnum } from '@/types';
+import { _saveCompanyInfo } from '@/request/library/offers';
 
-import ICON_WARNING from './assets/icon_warning.svg';
-
-type StyledTextFieldLabelProps = {
-  label?: ReactNode;
-  required?: boolean;
-  toolTipTittle?: ReactNode;
-};
-
-export const StyledTextFieldLabel: FC<
-  PropsWithChildren<StyledTextFieldLabelProps>
-> = ({ children, label, required, toolTipTittle }) => {
-  return (
-    <Stack gap={1}>
-      <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
-        <Stack alignItems={'center'} flexDirection={'row'} gap={'2px'}>
-          <Typography fontWeight={600}>{label}</Typography>
-          {required && <Typography color={'#E26E6E'}>*</Typography>}
-        </Stack>
-        <Tooltip title={toolTipTittle}>
-          <Icon component={ICON_WARNING} sx={{ width: 18, height: 18 }} />
-        </Tooltip>
-      </Stack>
-      {children}
-    </Stack>
-  );
-};
+import { useLibraryStore } from '@/stores/useLibraryStore';
 
 export const LibraryCompanyEdit = () => {
+  const { companyName, companyPage, sellIntroduction, updateCompanyInfo } =
+    useLibraryStore((state) => state);
+
   const router = useRouter();
-  const [sellingInfo, setSellingInfo] = useState('');
   const { visible, open, close } = useSwitch();
+
+  const [saveState, save] = useAsyncFn(
+    async (param: {
+      companyName: string;
+      companyPage: string;
+      sellIntroduction: string;
+    }) => {
+      try {
+        await _saveCompanyInfo(param);
+        SDRToast({
+          header: '',
+          message: 'Save successfully!',
+          variant: HttpVariantEnum.success,
+        });
+        router.push('/library');
+      } catch (e) {
+        const { message, header, variant } = e as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+  );
 
   const handleExtract = async () => {
     let str = '';
@@ -51,8 +53,8 @@ export const LibraryCompanyEdit = () => {
       body: JSON.stringify({
         module: 'PRODUCT_INTRODUCTION',
         params: {
-          companyName: 'Youland',
-          companyPage: 'https://youland.com/',
+          companyName: companyName,
+          companyPage: `https://${companyPage}`,
         },
       }),
     })
@@ -74,7 +76,7 @@ export const LibraryCompanyEdit = () => {
                 .replace(/\n/g, '');
 
               str = str + data;
-              setSellingInfo(str);
+              updateCompanyInfo('sellIntroduction', str);
 
               // continue read stream
               readStream();
@@ -88,34 +90,21 @@ export const LibraryCompanyEdit = () => {
         const { message, header, variant } = error as HttpError;
         SDRToast({ message, header, variant });
       });
-    /*await _generateSellingInfo().then((res) => {
-      const dataStream = res.data;
-       // 处理数据流
-      const lines: string[] = dataStream.split('\n');
-      let str = '';
-      lines.forEach((line) => {
-        if (line.startsWith('data:')) {
-          const data = line.replace('data:', '');
-          str = str + data;
-          setSellingInfo(str);
-        }
-      });
-    });*/
   };
 
   return (
     <Stack gap={3} maxWidth={1200}>
       <CommonBackButton backPath={'/library'} title={'Company overview'} />
       <Stack autoComplete={'off'} component={'form'} gap={1.5}>
-        <StyledTextFieldLabel
+        <StyledVerticalTextField
           label={'Company name'}
+          onChange={(e) => updateCompanyInfo('companyName', e.target.value)}
           required
           toolTipTittle={
             'Enter the full name of your company as it should appear in emails sent to target users.'
           }
-        >
-          <StyledTextField defaultValue={'Youland'} required />
-        </StyledTextFieldLabel>
+          value={companyName}
+        />
         <StyledTextFieldLabel
           label={'Company page'}
           required
@@ -125,16 +114,18 @@ export const LibraryCompanyEdit = () => {
         >
           <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
             <StyledTextField
-              defaultValue={'youland.com'}
+              onChange={(e) => updateCompanyInfo('companyPage', e.target.value)}
               required
               slotProps={{
                 input: {
                   startAdornment: 'https://',
                 },
               }}
+              value={companyPage}
             />
             <StyledButton
               color={'info'}
+              disabled={companyPage.trim() === ''}
               loading={visible}
               onClick={handleExtract}
               sx={{ width: 128 }}
@@ -154,7 +145,7 @@ export const LibraryCompanyEdit = () => {
           <StyledTextField
             multiline
             onChange={(e) => {
-              setSellingInfo(e.target.value);
+              updateCompanyInfo('sellIntroduction', e.target.value);
             }}
             required
             rows={10}
@@ -164,20 +155,25 @@ export const LibraryCompanyEdit = () => {
                 height: 'auto !important',
               },
             }}
-            value={sellingInfo}
+            value={sellIntroduction}
           />
         </StyledTextFieldLabel>
       </Stack>
       <StyledButton
-        onClick={() => {
-          SDRToast({
-            header: '',
-            message: 'Save successfully!',
-            variant: HttpVariantEnum.success,
+        disabled={
+          companyPage.trim() === '' &&
+          companyName.trim() === '' &&
+          sellIntroduction.trim() === ''
+        }
+        loading={saveState.loading}
+        onClick={async () => {
+          await save({
+            companyName,
+            companyPage,
+            sellIntroduction,
           });
-          router.push('/library');
         }}
-        sx={{ alignSelf: 'flex-start' }}
+        sx={{ alignSelf: 'flex-start', width: 181 }}
       >
         Save and continue
       </StyledButton>

@@ -10,8 +10,6 @@ import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 
 import { CampaignStatusEnum, HttpError } from '@/types';
 
-import useAsyncFn from '@/hooks/useAsyncFn';
-
 import {
   _approveAllCampaignPendingEmail,
   _renameCampaign,
@@ -19,7 +17,7 @@ import {
 } from '@/request';
 
 import ICON_ARROW from './assets/icon_arrow.svg';
-import { useSwitch } from '@/hooks';
+import { useAsyncFn, useSwitch } from '@/hooks';
 import { usePendingApprovalStore } from '@/stores/usePendingApprovalStore';
 
 type CampaignsPendingHeaderProps = {

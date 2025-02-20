@@ -19,7 +19,7 @@ import {
   ICampaignsPendingTimeline,
 } from '@/types';
 import { _fetchCampaignPendingInfo } from '@/request';
-import useAsyncFn from '@/hooks/useAsyncFn';
+import { useAsyncFn } from '@/hooks';
 import { usePendingApprovalStore } from '@/stores/usePendingApprovalStore';
 
 export const CampaignsPending = () => {

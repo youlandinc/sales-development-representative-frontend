@@ -1,158 +1,142 @@
-import { FC, PropsWithChildren, ReactNode } from 'react';
-import { Box, Icon, Stack, Typography } from '@mui/material';
-import { useRouter } from 'nextjs-toploader/app';
-import Image from 'next/image';
+import { Fragment, useEffect } from 'react';
+import { Stack, Typography } from '@mui/material';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
-import { ContentBox, LibraryCard } from '@/components/molecules';
+import {
+  LibraryOffersEditCard,
+  LibraryOffersInfoCard,
+} from '@/components/molecules';
+import { useAsyncFn } from '@/hooks';
 
-import { HttpVariantEnum } from '@/types';
-
-import ICON_DELETE from './assets/icon_delete.svg';
-
-type LibraryOffersCardProps = {
-  title?: ReactNode;
-  handleDelete?: () => void;
-};
-
-const LibraryOffersCard: FC<PropsWithChildren<LibraryOffersCardProps>> = ({
-  title,
-  handleDelete,
-  children,
-}) => {
-  return (
-    <LibraryCard
-      sx={{ width: '30%' }}
-      title={
-        <Stack
-          alignItems={'center'}
-          flex={1}
-          flexDirection={'row'}
-          justifyContent={'space-between'}
-        >
-          <Typography component={'div'} fontWeight={600} lineHeight={1.2}>
-            {title}
-          </Typography>
-          <Icon
-            component={ICON_DELETE}
-            onClick={handleDelete}
-            sx={{ width: 20, height: 20, cursor: 'pointer' }}
-          />
-        </Stack>
-      }
-    >
-      <Stack gap={1.5}>{children}</Stack>
-    </LibraryCard>
-  );
-};
+import { HttpError } from '@/types';
+import { _createOffer, _deleteOffer } from '@/request/library/offers';
+import { useLibraryStore } from '@/stores/useLibraryStore';
 
 export const LibraryOffersMain = () => {
-  const router = useRouter();
+  const {
+    offerList,
+    addOffer,
+    isAdd,
+    editId,
+    setEditId,
+    setIsAdd,
+    fetchOffersInfo,
+    deleteOffer,
+  } = useLibraryStore((state) => state);
+
+  // const [index, setIndex] = useState(Infinity);
+
+  const [, fetchData] = useAsyncFn(async () => {
+    try {
+      await fetchOffersInfo();
+    } catch (error) {
+      close();
+      const { message, header, variant } = error as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  });
+
+  const [createState, createOffer] = useAsyncFn(async () => {
+    try {
+      const { data } = await _createOffer();
+      addOffer(data);
+    } catch (error) {
+      close();
+      const { message, header, variant } = error as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  });
+
+  const [, del] = useAsyncFn(async (id: number) => {
+    try {
+      deleteOffer(id);
+      await _deleteOffer(id);
+    } catch (error) {
+      close();
+      const { message, header, variant } = error as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  });
+
+  useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <Stack flexDirection={'row'} flexWrap={'wrap'} gap={3}>
-      <LibraryOffersCard
-        handleDelete={() => {
-          SDRToast({
-            header: 'Delete successfully!',
-            variant: HttpVariantEnum.success,
-            message: undefined,
-          });
-        }}
-        title={'Stabilized Bridge Loan'}
+    <Stack gap={3}>
+      <Stack
+        alignItems={'center'}
+        flexDirection={'row'}
+        justifyContent={'space-between'}
       >
-        <Box flex={1.5}>
-          <Image
-            alt={'picture'}
-            height={377}
-            layout={'responsive'}
-            src={'/images/demo_image_offers.png'}
-            width={969}
-          />
-        </Box>
-        <ContentBox>
-          Short- term financing for purchase and refinance of investment
-          properties with high leverage, up to 75% LTV.
-        </ContentBox>
-
-        <ContentBox>
-          YouLand is a technology-driven digital real estate lending platform
-          that offers a variety of financing solutions for real estate investors
-          across all 50 states in the United States. Their services include
-          bridge loans, DSCR rental loans, and all-cash home purchase loans,
-          aiming to simplify real estate loan transactions through data and
-          algorithm-driven end-to-end solutions. Their technology-driven
-          platform automates the initiation, approval, and servicing processes
-          of loans, enhancing efficiency and reducing costs. As a direct lender,
-          YouLand eliminates intermediaries, providing clients with more
-          competitive loan products and a seamless borrowing experience.
-          Headquartered in San Francisco, California, YouLand is committed to
-          offering fast and flexible financing solutions to real estate
-          investors nationwide.
-        </ContentBox>
-      </LibraryOffersCard>
-      <LibraryOffersCard
-        handleDelete={() => {
-          SDRToast({
-            header: 'Delete successfully!',
-            variant: HttpVariantEnum.success,
-            message: undefined,
-          });
-        }}
-        title={'Fix and Flip Loan'}
-      >
-        <Box>
-          <Image
-            alt={'picture'}
-            height={243}
-            layout={'responsive'}
-            src={'/images/demo_image_offers.png'}
-            width={483}
-          />
-        </Box>
-        <ContentBox>
-          YouLand is a technology-driven digital real estate lending platform
-          that offers a variety of financing solutions for real estate investors
-          across all 50 states in the United States. Their services include
-          bridge loans, DSCR rental loans, and all-cash home purchase loans,
-          aiming to simplify real estate loan transactions through data and
-          algorithm-driven end-to-end solutions. Their technology-driven
-          platform automates the initiation, approval, and servicing processes
-          of loans, enhancing efficiency and reducing costs. As a direct lender,
-          YouLand eliminates intermediaries, providing clients with more
-          competitive loan products and a seamless borrowing experience.
-          Headquartered in San Francisco, California, YouLand is committed to
-          offering fast and flexible financing solutions to real estate
-          investors nationwide.
-        </ContentBox>
-
-        <ContentBox>
-          YouLand is a technology-driven digital real estate lending platform
-          that offers a variety of financing solutions for real estate investors
-          across all 50 states in the United States. Their services include
-          bridge loans, DSCR rental loans, and all-cash home purchase loans,
-          aiming to simplify real estate loan transactions through data and
-          algorithm-driven end-to-end solutions. Their technology-driven
-          platform automates the initiation, approval, and servicing processes
-          of loans, enhancing efficiency and reducing costs. As a direct lender,
-          YouLand eliminates intermediaries, providing clients with more
-          competitive loan products and a seamless borrowing experience.
-          Headquartered in San Francisco, California, YouLand is committed to
-          offering fast and flexible financing solutions to real estate
-          investors nationwide.
-        </ContentBox>
-      </LibraryOffersCard>
-      <StyledButton
-        color={'info'}
-        onClick={() => {
-          router.push('/library/offers');
-        }}
-        size={'medium'}
-        sx={{ px: '12px !important', py: '6px !important' }}
-        variant={'outlined'}
-      >
-        Add new offer
-      </StyledButton>
+        <Typography variant={'body2'}>
+          This is an overview of all offers stored about your business
+        </Typography>
+        <StyledButton
+          disabled={isAdd}
+          loading={createState.loading}
+          onClick={createOffer}
+          size={'medium'}
+          sx={{ px: '12px !important', py: '6px !important', width: 136 }}
+        >
+          Create new offer
+        </StyledButton>
+      </Stack>
+      <Stack flexDirection={'row'} flexWrap={'wrap'} gap={3}>
+        {offerList.map((offer) => (
+          <Fragment key={offer.id}>
+            {editId === offer.id ? (
+              isAdd ? (
+                <LibraryOffersEditCard
+                  handleCancel={async () => {
+                    setEditId(Infinity);
+                    setIsAdd(false);
+                    await del(offer.id);
+                  }}
+                  id={offer.id}
+                  painPoints={[]}
+                  productDescription={''}
+                  productName={''}
+                  productUrl={''}
+                  proofPoints={[]}
+                  solutions={[]}
+                />
+              ) : (
+                <LibraryOffersEditCard
+                  handleCancel={async () => {
+                    setEditId(Infinity);
+                  }}
+                  handleDelete={async () => {
+                    await del(offer.id);
+                  }}
+                  id={offer.id}
+                  painPoints={offer.painPoints}
+                  productDescription={offer.productDescription}
+                  productName={offer.productName}
+                  productUrl={offer.productUrl}
+                  proofPoints={offer.proofPoints}
+                  solutions={offer.solutions}
+                />
+              )
+            ) : (
+              <LibraryOffersInfoCard
+                handleEdit={() => {
+                  setEditId(offer.id);
+                }}
+                id={offer.id}
+                painPoints={offer.painPoints}
+                productDescription={offer.productDescription}
+                productName={offer.productName}
+                productUrl={offer.productUrl}
+                proofPoints={offer.proofPoints}
+                solutions={offer.solutions}
+              />
+            )}
+          </Fragment>
+        ))}
+      </Stack>
     </Stack>
   );
 };

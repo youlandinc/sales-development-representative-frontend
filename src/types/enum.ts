@@ -15,3 +15,9 @@ export enum ModuleEnum {
   email_body = 'CONTENT_INSTRUCTION',
   personal_research = 'PERSONAL_RESEARCH',
 }
+
+export enum LibraryTypeOfferTagTypeEnum {
+  pain_points = 'PAIN_POINTS',
+  solutions = 'SOLUTIONS',
+  proof_points = 'PROOF_POINTS',
+}

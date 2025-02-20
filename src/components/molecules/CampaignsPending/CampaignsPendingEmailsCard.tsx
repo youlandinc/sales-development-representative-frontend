@@ -2,7 +2,7 @@ import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, Fade, Skeleton, Stack, Typography } from '@mui/material';
 import { format } from 'date-fns';
 
-import { useSwitch } from '@/hooks';
+import { useAsyncFn, useSwitch } from '@/hooks';
 
 import {
   SDRToast,
@@ -17,7 +17,6 @@ import {
   InboxEditorForwardRefProps,
 } from '@/components/molecules';
 
-import useAsyncFn from '@/hooks/useAsyncFn';
 import {
   _approveCampaignPendingEmail,
   _editCampaignPendingEmail,
