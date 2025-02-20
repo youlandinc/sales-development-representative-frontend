@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { Box, Icon, Stack, Typography } from '@mui/material';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import {
@@ -239,7 +239,7 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
 
   return (
     <LibraryCard sx={{ width: '30%' }}>
-      <Stack gap={1.5}>
+      <Stack gap={1.5} height={'100%'}>
         <StyledVerticalTextField
           label={'Product name'}
           onChange={(e) => setLibName(e.target.value)}
@@ -274,23 +274,25 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
           }
           value={url}
         />
-        <StyledVerticalTextField
-          label={'Description'}
-          multiline
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          rows={10}
-          sx={{
-            '& .MuiOutlinedInput-input': {
-              p: 0,
-              height: 'auto !important',
-            },
-          }}
-          toolTipTittle={
-            "Provide your company's website URL. This link will be included in emails to direct users to learn more about your business."
-          }
-          value={desc}
-        />
+        <Box flex={1}>
+          <StyledVerticalTextField
+            label={'Description'}
+            multiline
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            rows={10}
+            sx={{
+              '& .MuiOutlinedInput-input': {
+                p: 0,
+                height: 'auto !important',
+              },
+            }}
+            toolTipTittle={
+              "Provide your company's website URL. This link will be included in emails to direct users to learn more about your business."
+            }
+            value={desc}
+          />
+        </Box>
         <ChipEditCard
           chips={painPoints}
           offerId={id}

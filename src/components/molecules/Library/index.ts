@@ -8,3 +8,4 @@ export * from './LibraryChip';
 export * from './LibraryChipEditDialog';
 export * from './LibraryOffersInfoCard';
 export * from './LibraryOffersEditCard';
+export * from './LibraryOfferCard';

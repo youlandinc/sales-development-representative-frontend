@@ -52,7 +52,6 @@ export const StyledVerticalTextField: FC<StyledVerticalTextField> = ({
       toolTipTittle={toolTipTittle}
     >
       <StyledTextField
-        multiline
         onChange={onChange}
         required={required}
         value={value}
