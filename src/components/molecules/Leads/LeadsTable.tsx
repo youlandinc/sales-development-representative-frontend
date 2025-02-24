@@ -262,7 +262,7 @@ export const LeadsTable: FC = () => {
   >();
 
   const [fetchLoading, setFetchLoading] = useState(false);
-  const [expendInfo, setExpendInfo] = useState<boolean>(false);
+  const [expendInfo, setExpendInfo] = useState<boolean>(true);
   const [activeInfo, setActiveInfo] = useState<'company' | 'person'>('company');
   const [expendCampaigns, setExpendCampaigns] = useState<boolean>(false);
   const [campaignsData, setCampaignsData] = useState<LeadsInfoCampaignsData[]>(
