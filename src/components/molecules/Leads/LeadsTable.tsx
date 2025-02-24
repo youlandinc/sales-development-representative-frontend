@@ -653,13 +653,8 @@ export const LeadsTable: FC = () => {
                     key={`${campaign.sentOn}-${index}`}
                     p={1.5}
                   >
-                    <Stack
-                      flexDirection={'row'}
-                      fontSize={12}
-                      fontWeight={600}
-                      gap={1}
-                    >
-                      {itemDetails?.name}
+                    <Stack flexDirection={'row'} fontSize={12} gap={1}>
+                      Step {index + 1}
                       <Typography color={'text.secondary'} fontSize={'inherit'}>
                         {UFormatDate(campaign.sentOn, 'MMM dd, yyyy')}
                       </Typography>
