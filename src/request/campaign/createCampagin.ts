@@ -126,6 +126,17 @@ export const _updateStepEmailBody = (params: {
   return put('/sdr/campaign/step/body', params);
 };
 
+export const _fetchLibraryOfferOptions = () => {
+  return get('/sdr/library/offer/options');
+};
+
+export const _updateSelectedLibraryOffer = (params: {
+  campaignId: string | number;
+  offerIds: Array<number | string>;
+}) => {
+  return put('/sdr/campaign/offers/select', params);
+};
+
 // third step
 export const _saveAndLunchCampaign = (params: {
   campaignId: string | number;

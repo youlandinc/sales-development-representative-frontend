@@ -6,6 +6,7 @@ import {
   ResponseCampaignChatRecord,
   ResponseCampaignLaunchInfo,
   ResponseCampaignMessagingStep,
+  ResponseOfferOption,
   SetupPhaseEnum,
   SourceEnum,
 } from '@/types';
@@ -37,6 +38,8 @@ export type DialogStoreState = {
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
   setupPhase: SetupPhaseEnum;
+
+  offerOptions: ResponseOfferOption[];
 
   messagingSteps: ResponseCampaignMessagingStep[];
 
@@ -71,6 +74,8 @@ export type DialogStoreActions = {
   setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => void;
   setIsValidate: (isValidate: boolean | undefined) => void;
 
+  setOfferOptions: (offerOptions: ResponseOfferOption[]) => void;
+
   resetDialogState: () => Promise<void>;
 };
 
@@ -92,6 +97,8 @@ const InitialState: DialogStoreState = {
   setupPhase: SetupPhaseEnum.audience,
   messagingSteps: [],
 
+  offerOptions: [],
+
   lunchInfo: {
     dailyLimit: 100,
     autopilot: false,
@@ -111,6 +118,9 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
   setIsValidate: (isValidate: undefined | boolean) => {
     set({ isValidate });
+  },
+  setOfferOptions(offerOptions) {
+    set({ offerOptions });
   },
   setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => set({ lunchInfo }),
   openProcess: () => set({ visibleProcess: true }),
@@ -286,6 +296,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         setupPhase: SetupPhaseEnum.messaging,
         messagingSteps: data.data.steps,
         lunchInfo: data.data.launchInfo,
+        offerOptions: data.data.offerOptions,
       });
     } catch (err) {
       const { message, header, variant } = err as HttpError;

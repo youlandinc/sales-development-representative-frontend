@@ -96,6 +96,12 @@ export interface ResponseCampaignEmail {
   subjectInstructions: string;
 }
 
+export interface ResponseOfferOption {
+  id: string | number;
+  name: string;
+  selected: boolean;
+}
+
 export interface ResponseCampaignInfo {
   campaignId: string | number;
   campaignName: string | null;
@@ -107,5 +113,6 @@ export interface ResponseCampaignInfo {
     chatRecord: ResponseCampaignChatRecord[];
     steps: ResponseCampaignMessagingStep[];
     launchInfo: ResponseCampaignLaunchInfo;
+    offerOptions: ResponseOfferOption[];
   };
 }

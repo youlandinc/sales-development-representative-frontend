@@ -26,6 +26,7 @@ import {
   SDRToast,
   StyledButton,
   StyledShadowContent,
+  StyledSwitch,
   StyledTextFieldNumber,
 } from '@/components/atoms';
 import { CampaignLeadsCard } from '@/components/molecules';
@@ -37,6 +38,7 @@ import {
   ResponseCampaignEmail,
   ResponseCampaignMessagingStepFormBody,
   ResponseCampaignMessagingStepFormSubject,
+  ResponseOfferOption,
 } from '@/types';
 import {
   _addStepEmail,
@@ -44,6 +46,7 @@ import {
   _fetchChatLeads,
   _fetchEmailByLead,
   _fetchStepEmail,
+  _updateSelectedLibraryOffer,
   _updateStepEmailSendDays,
 } from '@/request';
 
@@ -77,6 +80,8 @@ export const CampaignProcessContentMessaging = () => {
     setLeadsVisible,
     messagingSteps,
     setMessagingSteps,
+    offerOptions,
+    setOfferOptions,
   } = useDialogStore();
 
   const [personalResearchLoading, setPersonalResearchLoading] = useState(false);
@@ -348,6 +353,46 @@ export const CampaignProcessContentMessaging = () => {
     [campaignId, fetchTemplateLoading],
   );
 
+  const onClickToChangeOffer = useCallback(
+    async (checked: boolean, index: number) => {
+      if (!campaignId || !leadsList[activeValue]?.previewLeadId) {
+        return;
+      }
+      const temp = JSON.parse(JSON.stringify(offerOptions));
+      temp[index].selected = checked;
+      setOfferOptions(temp);
+
+      const postData = {
+        campaignId,
+        offerIds: temp.reduce(
+          (cur: Array<number | string>, pre: ResponseOfferOption) => {
+            if (pre.selected) {
+              cur.push(pre.id);
+            }
+            return cur;
+          },
+          [],
+        ),
+      };
+      const previewData = {
+        campaignId,
+        previewLeadId: leadsList[activeValue].previewLeadId,
+      };
+      setFetchTemplateLoading(true);
+      try {
+        await _updateSelectedLibraryOffer(postData);
+        const { data } = await _fetchEmailByLead(previewData);
+        setEmailTemplate(data);
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      } finally {
+        setFetchTemplateLoading(false);
+      }
+    },
+    [activeValue, campaignId, leadsList, offerOptions, setOfferOptions],
+  );
+
   const [buttons, setButtons] = useState<HTMLElement[] | null>(null);
   const [preDisabled, setPreDisabled] = useState(true);
   const [nextDisabled, setNextDisabled] = useState(false);
@@ -463,6 +508,28 @@ export const CampaignProcessContentMessaging = () => {
       width={'calc(100% - 510px)'}
     >
       <Stack gap={3} width={'100%'}>
+        <Stack flexDirection={'row'} gap={1.5}>
+          {offerOptions.map((item, index) => (
+            <Stack
+              border={'1px solid'}
+              borderColor={item.selected ? '#6E4EFB' : '#E5E5E5'}
+              borderRadius={2}
+              flexDirection={'row'}
+              gap={1.5}
+              key={`${item.name}-${index}`}
+              p={1.5}
+            >
+              <StyledSwitch
+                checked={item.selected}
+                onChange={async (_, checked) =>
+                  await onClickToChangeOffer(checked, index)
+                }
+              />
+              <Typography variant={'subtitle2'}>{item.name}</Typography>
+            </Stack>
+          ))}
+        </Stack>
+
         <Stack alignItems={'center'} flexDirection={'row'}>
           <Typography variant={'subtitle2'}>
             Estimated <b>{UFormatNumber(leadsCount)}</b> leads
