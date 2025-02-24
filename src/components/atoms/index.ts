@@ -21,3 +21,5 @@ export * from './StyledTextFilledField';
 export * from './StyledSwitch';
 
 export * from './StyledSelect';
+
+export * from './StyledShadowContent';

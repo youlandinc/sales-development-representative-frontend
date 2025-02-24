@@ -1,7 +1,9 @@
-export * from './Inbox';
-
 export * from './Campaigns';
 
-export * from './Settings';
+export * from './Leads';
 
 export * from './Library';
+
+export * from './Inbox';
+
+export * from './Settings';

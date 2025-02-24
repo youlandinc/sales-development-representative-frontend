@@ -25,6 +25,7 @@ import { useClassNameObserver, useSwitch } from '@/hooks';
 import {
   SDRToast,
   StyledButton,
+  StyledShadowContent,
   StyledTextFieldNumber,
 } from '@/components/atoms';
 import { CampaignLeadsCard } from '@/components/molecules';
@@ -32,6 +33,7 @@ import { CampaignLeadsCard } from '@/components/molecules';
 import {
   CampaignLeadItem,
   HttpError,
+  ModuleEnum,
   ResponseCampaignEmail,
   ResponseCampaignMessagingStepFormBody,
   ResponseCampaignMessagingStepFormSubject,
@@ -61,7 +63,6 @@ import ICON_MESSAGING_EMAIL from './assets/icon_messaging_email.svg';
 import ICON_ADD from './assets/icon_add.svg';
 import ICON_DASHED from './assets/icon_dashed.svg';
 import ICON_TRASH from './assets/icon_trash.svg';
-import { ModuleEnum } from '@/types/enum';
 
 export const CampaignProcessContentMessaging = () => {
   const {
@@ -344,7 +345,7 @@ export const CampaignProcessContentMessaging = () => {
         setFetchTemplateLoading(false);
       }
     },
-    [activeValue, campaignId, fetchTemplateLoading],
+    [campaignId, fetchTemplateLoading],
   );
 
   const [buttons, setButtons] = useState<HTMLElement[] | null>(null);
@@ -806,7 +807,7 @@ export const CampaignProcessContentMessaging = () => {
                     <Skeleton sx={{ mt: 3 }} width={'30%'} />
                   </Stack>
                 ) : (
-                  <ShadowContent html={step.content} />
+                  <StyledShadowContent html={step.content} />
                 )}
               </Stack>
 
@@ -951,29 +952,6 @@ export const CampaignProcessContentMessaging = () => {
       />
     </Stack>
   );
-};
-
-const ShadowContent = ({ html }: { html: string }) => {
-  const shadowRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!shadowRef.current) {
-      return;
-    }
-
-    const shadowRoot =
-      shadowRef.current.shadowRoot ||
-      shadowRef.current.attachShadow({ mode: 'open' });
-
-    shadowRoot.innerHTML = '';
-
-    const contentContainer = document.createElement('div');
-    contentContainer.innerHTML = html;
-
-    shadowRoot.appendChild(contentContainer);
-  }, [html]);
-
-  return <div ref={shadowRef} />;
 };
 
 type FormReducerMethods =

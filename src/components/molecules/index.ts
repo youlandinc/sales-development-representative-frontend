@@ -6,6 +6,8 @@ export * from './Auth';
 
 export * from './Campaigns';
 
+export * from './Leads';
+
 export * from './CampaignProcess';
 
 export * from './Inbox';
