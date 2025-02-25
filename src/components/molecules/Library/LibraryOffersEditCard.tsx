@@ -158,7 +158,9 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
   id,
   handleDelete,
 }) => {
-  const { setEditId, fetchOffersInfo } = useLibraryStore((state) => state);
+  const { setEditId, fetchOffersInfo, setIsAdd } = useLibraryStore(
+    (state) => state,
+  );
 
   const [libName, setLibName] = useState('');
   const [desc, setDescription] = useState('');
@@ -175,6 +177,7 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
         await _editOffer(param);
         await fetchOffersInfo();
         setEditId(Infinity);
+        setIsAdd(false);
       } catch (error) {
         close();
         const { message, header, variant } = error as HttpError;
