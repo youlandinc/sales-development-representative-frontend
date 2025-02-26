@@ -236,9 +236,9 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
   }, [libName, url]);
 
   useEffect(() => {
-    setDescription(productDescription);
-    setLibName(productName);
-    setUrl(productUrl);
+    productDescription && setDescription(productDescription);
+    productName && setLibName(productName);
+    productUrl && setUrl(productUrl);
   }, [productName, productDescription, productUrl]);
 
   return (
