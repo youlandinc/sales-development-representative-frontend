@@ -7,7 +7,7 @@ export const Inbox: FC = () => {
   return (
     <Stack
       border={'1px solid'}
-      borderColor={'#E5E5E5'}
+      borderColor={'#DFDEE6'}
       borderRadius={4}
       flex={1}
       flexDirection={'row'}

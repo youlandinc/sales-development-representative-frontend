@@ -51,7 +51,7 @@ export const CampaignProcessContentChatServerCard: FC<
     <Stack flexDirection={'row'} gap={1} height={'auto'} width={'100%'}>
       <Icon
         component={ICON_CHAT_LOGO}
-        sx={{ width: 32, height: 32, flexShrink: 0 }}
+        sx={{ width: 16, height: 16, flexShrink: 0 }}
       />
       <Stack gap={1}>
         {isFake ? (

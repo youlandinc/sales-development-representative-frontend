@@ -218,13 +218,23 @@ export const CampaignProcessContentChat: FC = () => {
 
         <Stack
           alignItems={'center'}
-          bgcolor={sending || returning ? '#DEDEDE' : '#BABCBE'}
+          bgcolor={
+            sending || returning || !inputValue.trim()
+              ? 'background.disabled'
+              : 'primary.main'
+          }
           borderRadius={'50%'}
           height={32}
           justifyContent={'center'}
           ml={'auto'}
           onClick={sendMessage}
-          sx={{ cursor: sending || returning ? 'default' : 'pointer' }}
+          sx={{
+            cursor:
+              sending || returning || !inputValue.trim()
+                ? 'default'
+                : 'pointer',
+            transition: 'all .3s',
+          }}
           width={32}
         >
           <Icon component={ICON_SEND} sx={{ width: 24, height: 24 }} />

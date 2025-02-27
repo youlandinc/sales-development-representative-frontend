@@ -66,7 +66,7 @@ export const StyledCheckbox: FC<StyledCheckboxProps> = ({
           },
           '& .Mui-checked': {
             '& svg > path': {
-              fill: 'hsla(222,42%,55%,1) !important',
+              fill: '#6E4EFB !important',
             },
           },
           '& .MuiCheckbox-root': {

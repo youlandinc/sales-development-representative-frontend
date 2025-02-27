@@ -92,7 +92,7 @@ const StyledCard: FC<StyledCardProps> = ({
 }) => {
   return (
     <Stack
-      border={'1px solid #E5E5E5'}
+      border={'1px solid #DFDEE6'}
       borderRadius={2}
       gap={1}
       maxWidth={435}
@@ -137,13 +137,13 @@ export const EmailConfig = () => {
         return (
           <StyledButton
             /*   loading={state.loading}
-                onClick={async () => {
-                  if (domain.trim() === '') {
-                    setErrors(['Email not be empty']);
-                    return;
-                  }
-                  await setCustomEmail();
-                }}*/
+                 onClick={async () => {
+                 if (domain.trim() === '') {
+                 setErrors(['Email not be empty']);
+                 return;
+                 }
+                 await setCustomEmail();
+                 }}*/
             size={'small'}
             sx={{
               py: '6px !important',
@@ -164,8 +164,8 @@ export const EmailConfig = () => {
             }}
             variant={'contained'}
             /*  onClick={async () => {
-                    await verifyDomain();
-                  }}*/
+                 await verifyDomain();
+                 }}*/
           >
             Verify now
           </StyledButton>
@@ -174,13 +174,13 @@ export const EmailConfig = () => {
         return (
           <StyledButton
             /*       loading={updateState.loading}
-                onClick={async () => {
-                  if (userName.trim() === '') {
-                    setErrors(['Username not be empty']);
-                    return;
-                  }
-                  await updateEmailDomain(id, userName);
-                }}*/
+                 onClick={async () => {
+                 if (userName.trim() === '') {
+                 setErrors(['Username not be empty']);
+                 return;
+                 }
+                 await updateEmailDomain(id, userName);
+                 }}*/
             size={'small'}
             sx={{
               py: '6px !important',
@@ -419,61 +419,61 @@ export const EmailConfig = () => {
         }}
       />
       {/*<StyledDialog
-        content={
-          <Typography my={3} variant={'subtitle1'}>
-            Are you sure you want to delete {deleteContent}?
-          </Typography>
-        }
-        disableEscapeKeyDown
-        footer={
-          <Stack flexDirection={'row'} gap={1.5}>
-            <StyledButton
-              color={'info'}
-              onClick={deleteClose}
-              size={'small'}
-              sx={{
-                borderRadius: 3,
-                height: 36,
-              }}
-              variant={'outlined'}
-            >
-              Cancel
-            </StyledButton>
-            <StyledButton
-              color={'error'}
-              loading={deleteState.loading}
-              onClick={async () => {
-                await deleteEmailDomain(id);
-              }}
-              size={'small'}
-              sx={{
-                borderRadius: 3,
-                height: 36,
-              }}
-              variant={'contained'}
-            >
-              Delete
-            </StyledButton>
-          </Stack>
-        }
-        header={
-          <Stack alignItems={'center'} flexDirection={'row'}>
-            <DeleteForeverOutlined sx={{ mr: 1.5, fontSize: 24 }} />
-            <Typography color={'text.primary'} variant={'h6'}>
-              Delete domain?
-            </Typography>
-          </Stack>
-        }
-        onClose={deleteClose}
-        open={deleteVisible}
-        sx={{
-          '&.MuiDialog-root': {
-            '& .MuiPaper-root': {
-              maxWidth: 600,
-            },
-          },
-        }}
-      />*/}
+         content={
+         <Typography my={3} variant={'subtitle1'}>
+         Are you sure you want to delete {deleteContent}?
+         </Typography>
+         }
+         disableEscapeKeyDown
+         footer={
+         <Stack flexDirection={'row'} gap={1.5}>
+         <StyledButton
+         color={'info'}
+         onClick={deleteClose}
+         size={'small'}
+         sx={{
+         borderRadius: 3,
+         height: 36,
+         }}
+         variant={'outlined'}
+         >
+         Cancel
+         </StyledButton>
+         <StyledButton
+         color={'error'}
+         loading={deleteState.loading}
+         onClick={async () => {
+         await deleteEmailDomain(id);
+         }}
+         size={'small'}
+         sx={{
+         borderRadius: 3,
+         height: 36,
+         }}
+         variant={'contained'}
+         >
+         Delete
+         </StyledButton>
+         </Stack>
+         }
+         header={
+         <Stack alignItems={'center'} flexDirection={'row'}>
+         <DeleteForeverOutlined sx={{ mr: 1.5, fontSize: 24 }} />
+         <Typography color={'text.primary'} variant={'h6'}>
+         Delete domain?
+         </Typography>
+         </Stack>
+         }
+         onClose={deleteClose}
+         open={deleteVisible}
+         sx={{
+         '&.MuiDialog-root': {
+         '& .MuiPaper-root': {
+         maxWidth: 600,
+         },
+         },
+         }}
+         />*/}
     </SettingsCard>
   );
 };

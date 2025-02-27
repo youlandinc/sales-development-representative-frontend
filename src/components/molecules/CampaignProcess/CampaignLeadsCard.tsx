@@ -10,6 +10,7 @@ import ICON_LINKEDIN from './assets/icon_linkedin.svg';
 interface CampaignLeadItemProps extends CampaignLeadItem {
   sx?: SxProps;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
@@ -21,6 +22,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
   backgroundColor,
   sx,
   avatar,
+  disabled,
   onClick = () => {},
 }) => {
   const avatarName = () => {
@@ -31,7 +33,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
 
   return (
     <Stack
-      borderBottom={'1px solid #E5E5E5'}
+      borderBottom={'1px solid #DFDEE6'}
       flexDirection={'row'}
       gap={1}
       onClick={onClick}
@@ -54,6 +56,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
         <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
           <StyledTooltip mode={'hover'} title={name}>
             <Typography
+              color={disabled ? 'text.disabled' : 'text.primary'}
               sx={{
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -71,7 +74,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
 
         <StyledTooltip mode={'hover'} title={role}>
           <Typography
-            color={'text.secondary'}
+            color={disabled ? 'text.disabled' : 'text.secondary'}
             sx={{
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -89,6 +92,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
       <StyledTooltip mode={'hover'} title={company}>
         <Typography
           alignSelf={'center'}
+          color={disabled ? 'text.disabled' : 'text.primary'}
           maxWidth={'20%'}
           ml={'auto'}
           sx={{

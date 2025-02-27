@@ -507,13 +507,13 @@ export const CampaignProcessContentMessaging = () => {
       }}
       width={'calc(100% - 510px)'}
     >
-      <Stack gap={3} width={'100%'}>
+      <Stack gap={1.5} width={'100%'}>
         <Typography variant={'subtitle2'}>Offers</Typography>
         <Stack flexDirection={'row'} gap={1.5}>
           {offerOptions.map((item, index) => (
             <Stack
               border={'1px solid'}
-              borderColor={item.selected ? '#6E4EFB' : '#E5E5E5'}
+              borderColor={item.selected ? '#6E4EFB' : '#DFDEE6'}
               borderRadius={2}
               flexDirection={'row'}
               gap={1.5}
@@ -531,7 +531,7 @@ export const CampaignProcessContentMessaging = () => {
           ))}
         </Stack>
 
-        <Stack alignItems={'center'} flexDirection={'row'}>
+        <Stack alignItems={'center'} flexDirection={'row'} mt={1.5}>
           <Typography variant={'subtitle2'}>
             Estimated <b>{UFormatNumber(leadsCount)}</b> leads
           </Typography>
@@ -606,7 +606,7 @@ export const CampaignProcessContentMessaging = () => {
                     key={i}
                     label={
                       <Stack
-                        border={'1px solid #E5E5E5'}
+                        border={'1px solid #DFDEE6'}
                         borderRadius={2}
                         flexDirection={'row'}
                         flexShrink={0}
@@ -628,18 +628,26 @@ export const CampaignProcessContentMessaging = () => {
                 ))
               : leadsList.map((lead, index) => (
                   <Tab
-                    disabled={leadsFetching || fetchTemplateLoading}
                     key={index}
                     label={
                       <CampaignLeadsCard
+                        disabled={
+                          activeValue !== index
+                            ? leadsFetching || fetchTemplateLoading
+                            : false
+                        }
                         key={index}
-                        {...lead}
-                        onClick={() => onClickToChangeLead(lead, index)}
+                        onClick={async () => {
+                          if (leadsFetching || fetchTemplateLoading) {
+                            return;
+                          }
+                          await onClickToChangeLead(lead, index);
+                        }}
                         sx={{
                           border:
                             activeValue === index
-                              ? '1px solid #D5CBFB'
-                              : '1px solid #E5E5E5',
+                              ? '1px solid #6E4EFB'
+                              : '1px solid #DFDEE6',
                           bgcolor:
                             activeValue === index ? '#F7F4FD' : '#ffffff',
                           borderRadius: 2,
@@ -649,6 +657,7 @@ export const CampaignProcessContentMessaging = () => {
                           p: 1.5,
                           cursor: 'pointer',
                         }}
+                        {...lead}
                       />
                     }
                     sx={{ textTransform: 'none', p: 0 }}
@@ -658,9 +667,10 @@ export const CampaignProcessContentMessaging = () => {
         </Box>
 
         <Stack
-          bgcolor={'#ffffff'}
+          bgcolor={'background.default'}
           border={'1px solid #DFDEE6'}
           borderRadius={4}
+          mt={1.5}
           p={2}
         >
           <Stack
@@ -765,10 +775,10 @@ export const CampaignProcessContentMessaging = () => {
 
           <Collapse in={expend}>
             <Stack gap={1} mt={2}>
-              <Typography color={'text.secondary'} variant={'subtitle3'}>
+              <Typography color={'text.primary'} variant={'h7'}>
                 Overview
               </Typography>
-              <Typography variant={'body3'}>
+              <Typography variant={'body2'}>
                 {activeInfo === 'company'
                   ? leadsList[activeValue]?.companyResearch
                   : researchInfo}
@@ -797,7 +807,7 @@ export const CampaignProcessContentMessaging = () => {
           >
             <Stack bgcolor={'#FFF'} borderRadius={2} gap={1.5} p={3}>
               {/*header*/}
-              <Stack borderBottom={'1px solid #E5E5E5'} gap={1} pb={1.5}>
+              <Stack borderBottom={'1px solid #DFDEE6'} gap={1} pb={1.5}>
                 <Stack alignItems={'center'} flexDirection={'row'}>
                   <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
                     <Typography variant={'h6'}>Step {index + 1}</Typography>
@@ -826,7 +836,7 @@ export const CampaignProcessContentMessaging = () => {
                         '& path': {
                           fill:
                             step.loading || removeStepEmailLoading
-                              ? '#D0CEDA'
+                              ? '#D5CBFB'
                               : '#343330',
                         },
                       }}
@@ -854,7 +864,7 @@ export const CampaignProcessContentMessaging = () => {
                     color={'info'}
                     disabled={step.loading}
                     onClick={() => onClickToOpenSubject(index)}
-                    size={'small'}
+                    size={'medium'}
                     sx={{ ml: 'auto' }}
                     variant={'outlined'}
                   >
@@ -883,7 +893,7 @@ export const CampaignProcessContentMessaging = () => {
                 color={'info'}
                 disabled={step.loading}
                 onClick={() => onClickToOpenBody(index)}
-                size={'small'}
+                size={'medium'}
                 sx={{ ml: 'auto' }}
                 variant={'outlined'}
               >
@@ -909,7 +919,7 @@ export const CampaignProcessContentMessaging = () => {
                   '& path': {
                     fill:
                       step.loading || addStepEmailLoading
-                        ? '#D0CEDA'
+                        ? '#D5CBFB'
                         : '#343330',
                   },
                 }}

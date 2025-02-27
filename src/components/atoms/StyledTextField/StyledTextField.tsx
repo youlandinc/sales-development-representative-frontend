@@ -22,6 +22,11 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
       size={size}
       slotProps={{
         input: {
+          sx: {
+            '.MuiInputBase-inputMultiline': {
+              py: 1.5,
+            },
+          },
           ...rest.slotProps?.input,
           autoComplete: disabledAutoFill ? 'off' : '',
         },
@@ -67,32 +72,32 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
           py: 0,
           input: {
             '&::placeholder': {
-              color: 'text.placeholder',
+              color: 'text.secondary',
             },
             color: 'text.primary',
             lineHeight: 1,
           },
           '& fieldset': {
-            borderColor: 'background.border_default',
+            borderColor: 'border.default',
           },
           '&:hover fieldset': {
-            borderColor: 'background.border_hover',
-            color: 'background.border_hover',
+            borderColor: 'border.hover',
+            color: 'text.hover',
           },
           '&.Mui-focused fieldset': {
             border: '1px solid',
-            borderColor: 'background.border_focus',
+            borderColor: 'border.hover',
           },
         },
         '& .Mui-disabled.MuiOutlinedInput-root': {
           '&:hover fieldset': {
-            borderColor: 'background.border_disabled',
+            borderColor: 'border.hover',
           },
         },
         '& .Mui-disabled': {
           cursor: 'not-allowed',
           '&:hover fieldset': {
-            borderColor: 'background.border_default',
+            borderColor: 'border.hover',
           },
         },
         '& .MuiFormHelperText-root': {

@@ -67,7 +67,7 @@ export const LayoutSide: FC = () => {
       onClick={() => setExpend(!expend)}
       sx={{
         cursor: 'pointer',
-        border: '1px solid #E5E5E5',
+        border: '1px solid #DFDEE6',
         borderRadius: '50%',
         height: 20,
         width: 20,
@@ -101,7 +101,7 @@ export const LayoutSide: FC = () => {
       sx={{
         width: expend ? 230 : 60,
         height: '100%',
-        borderRight: '1px solid #E5E5E5',
+        borderRight: '1px solid #DFDEE6',
         bgcolor: '#FFFFFF',
         position: 'relative',
         px: expend ? 3 : 1.5,
@@ -158,7 +158,7 @@ export const LayoutSide: FC = () => {
                   '& .layout_label': {
                     color: pathname.includes(item.key)
                       ? 'primary.main'
-                      : '#6F6C7D',
+                      : 'text.secondary',
                   },
                 },
               }}
@@ -264,12 +264,6 @@ export const LayoutSide: FC = () => {
             '& .MuiMenuItem-root:hover': {
               bgcolor: 'rgba(144, 149, 163, 0.1) !important',
             },
-            //'& .Mui-selected': {
-            //  bgcolor: 'hsla(,100%,95%,1) !important',
-            //},
-            //'& .Mui-selected:hover': {
-            //  bgcolor: 'hsla(,100%,92%,1) !important',
-            //},
           },
         }}
         transformOrigin={{

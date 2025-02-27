@@ -48,13 +48,13 @@ export const StyledButton: FC<StyledButtonProps> = ({
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
         '&.MuiButton-contained': {
-          bgcolor:
-            color !== 'primary'
-              ? `${color}.main`
-              : `${color}.contrastBackground`,
+          bgcolor: `${color}.main`,
+          //color !== 'primary'
+          //  ? `${color}.main`
+          //  : `${color}.contrastBackground`,
           '&:hover': {
-            bgcolor:
-              color !== 'primary' ? `${color}.hover` : `${color}.contrastHover`,
+            bgcolor: `${color}.hover`,
+            //color !== 'primary' ? `${color}.hover` : `${color}.contrastHover`,
           },
           '&.Mui-disabled': {
             bgcolor: 'action.disabled_background',
@@ -72,8 +72,8 @@ export const StyledButton: FC<StyledButtonProps> = ({
               : `${color}.contrastBackground`,
           '&:hover': {
             bgcolor: `${color}.background`,
-            borderColor:
-              color !== 'primary' ? `${color}.main` : `${color}.contrastHover`,
+            borderColor: `${color}.main`,
+            //color !== 'primary' ? `${color}.main` : `${color}.contrastHover`,
           },
           '&.Mui-disabled': {
             borderColor: 'action.disabled',
@@ -84,14 +84,14 @@ export const StyledButton: FC<StyledButtonProps> = ({
           bgcolor: 'transparent',
           boxShadow: 'none',
           border: '1px solid transparent',
-          color:
-            color !== 'primary'
-              ? `${color}.main`
-              : `${color}.contrastBackground`,
+          color: `${color}.main`,
+          //color !== 'primary'
+          //  ? `${color}.main`
+          //  : `${color}.contrastBackground`,
           '&:hover': {
             bgcolor: 'transparent',
-            color:
-              color !== 'primary' ? `${color}.hover` : `${color}.contrastHover`,
+            color: `${color}.hover`,
+            //color !== 'primary' ? `${color}.hover` : `${color}.contrastHover`,
           },
           '&.Mui-disabled': {
             color: 'action.disabled',

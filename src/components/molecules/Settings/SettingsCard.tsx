@@ -10,7 +10,7 @@ export const SettingsCard: FC<PropsWithChildren<SettingsCardProps>> = ({
   children,
 }) => {
   return (
-    <Stack border={'1px solid #E5E5E5'} borderRadius={4} gap={3} p={3}>
+    <Stack border={'1px solid #DFDEE6'} borderRadius={4} gap={3} p={3}>
       <Typography component={'div'} lineHeight={1.2} variant={'h6'}>
         {title}
       </Typography>

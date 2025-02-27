@@ -23,7 +23,7 @@ export const InboxSide: FC = () => {
   };
 
   return (
-    <Stack borderRight={'1px solid #E5E5E5'} width={320}>
+    <Stack borderRight={'1px solid #DFDEE6'} width={320}>
       <Stack gap={3} p={2.5}>
         <Tabs
           aria-label="wrapped label tabs example"

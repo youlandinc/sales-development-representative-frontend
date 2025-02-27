@@ -26,7 +26,7 @@ export const LibraryCard: FC<PropsWithChildren<LibraryCardProps>> = ({
   return (
     <Stack
       border={'1px solid'}
-      borderColor={'#E5E5E5'}
+      borderColor={'#DFDEE6'}
       borderRadius={2}
       gap={1.5}
       p={3}

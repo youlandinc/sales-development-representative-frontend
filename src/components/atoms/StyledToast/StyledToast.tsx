@@ -50,8 +50,8 @@ export const StyledToast: FC<IStyledToastProps> = ({
 }) => {
   return (
     <Stack
-      bgcolor={'background.white'}
-      border={'1px solid #E5E5E5'}
+      bgcolor={'background.default'}
+      border={'1px solid #DFDEE6'}
       borderRadius={3}
       gap={'4px'}
       p={2}

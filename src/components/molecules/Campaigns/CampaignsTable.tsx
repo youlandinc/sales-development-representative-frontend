@@ -460,7 +460,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
             outline: 'none !important',
           },
           '.MuiDataGrid-columnHeaders': {
-            borderBottom: '1px solid #E5E5E5',
+            borderBottom: '1px solid #DFDEE6',
           },
           '& .MuiDataGrid-cell': {
             border: 0,
@@ -469,7 +469,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
             visibility: 'hidden',
           },
           '.MuiDataGrid-row': {
-            borderBottom: '1px solid #E5E5E5',
+            borderBottom: '1px solid #DFDEE6',
           },
           '.MuiDataGrid-cell': {
             overflow: 'unset !important',

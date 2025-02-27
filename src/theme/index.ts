@@ -50,6 +50,7 @@ declare module '@mui/material/styles' {
     disabled: string;
     hover: string;
     focus: string;
+    active: string;
     primary: string;
     secondary: string;
   }
@@ -59,6 +60,7 @@ declare module '@mui/material/styles' {
     disabled: string;
     hover: string;
     focus: string;
+    active: string;
     primary: string;
     secondary: string;
   }
@@ -68,6 +70,7 @@ declare module '@mui/material/styles' {
     disabled: string;
     hover: string;
     focus: string;
+    active: string;
     primary: string;
     secondary: string;
   }
@@ -117,16 +120,13 @@ const defaultOptions: ThemeOptions = {
   ...customBreakpoints,
   palette: {
     primary: {
-      main: '#5B76BC',
-      hover: '#4B6BB6',
-      background: '#EFF1F8',
-      light: '#EDF1FF',
-      lighter: '#F4F6FA',
-      dark: '#7D9DE8',
-      darker: '#3A5290',
+      main: '#6E4EFB',
+      hover: '#5133D7',
+      light: '#AC99FB',
+      lighter: '#D5CBFB',
+      dark: '#3D25A8',
+      darker: '#2F226A',
       contrastText: '#FFFFFF',
-      contrastHover: '#2B52B6',
-      contrastBackground: '#6E4EFB',
     },
     secondary: {
       main: '#FFFFFF',
@@ -160,44 +160,31 @@ const defaultOptions: ThemeOptions = {
     },
 
     text: {
-      default: '#333333',
+      default: '#2A292E',
       disabled: '#BABCBE',
-      hover: '#5B76BC',
-      focus: '#5B76BC',
-      primary: '#333333',
-      secondary: '#5B76BC',
-
-      //primary: '#202939',
-      //secondary: '#6F6C7D',
-      //hover: '#636A7C',
-      //disabled: '#BABCBE',
-      //white: '#FFFFFF',
-      //focus: '#202939',
+      hover: '#4C4957',
+      focus: '#363440',
+      active: '#6E4EFB',
+      primary: '#2A292E',
+      secondary: '#6F6C7D',
     },
     background: {
       default: '#FFFFFF',
       disabled: '#BABCBE',
-      hover: '#5B76BC',
+      hover: '#4C4957',
       focus: '#5B76BC',
-      primary: '#333333',
-      secondary: '#5B76BC',
-
-      //white: '#FFFFFF',
-      //homepage: '#F4F6FA',
-      //footer: '#121214',
-      //main: '#5B76BC',
-      //babyBlue: '#303D6C',
-      //skyBlue: '#3C538F',
-      //faq: '#F8F9FC',
+      active: '#F7F4FD',
+      primary: '#2A292E',
+      secondary: '#6F6C7D',
     },
     border: {
-      default: '#333333',
+      default: '#DFDEE6',
       disabled: '#BABCBE',
-      hover: '#5B76BC',
-      focus: '#5B76BC',
-      primary: '#333333',
-      secondary: '#5B76BC',
-
+      hover: '#4C4957',
+      focus: '#363440',
+      active: '#6E4EFB',
+      primary: '#2A292E',
+      secondary: '#6F6C7D',
       //normal: '#D2D6E1',
       //hover: '#9095A3',
       //focus: '#202939',
@@ -213,36 +200,36 @@ const defaultOptions: ThemeOptions = {
   typography: {
     fontFamily: 'var(--font-poppins)',
     h1: {
-      fontSize: 56,
+      fontSize: 40,
       fontWeight: 600,
     },
     h2: {
-      fontSize: 48,
-      lineHeight: 1.5,
-      fontWeight: 600,
-    },
-    h3: {
-      fontSize: 40,
-      lineHeight: 1.5,
-      fontWeight: 600,
-    },
-    h4: {
       fontSize: 32,
       lineHeight: 1.5,
       fontWeight: 600,
     },
-    h5: {
+    h3: {
+      fontSize: 28,
+      lineHeight: 1.5,
+      fontWeight: 600,
+    },
+    h4: {
       fontSize: 24,
       lineHeight: 1.5,
       fontWeight: 600,
     },
-    h6: {
+    h5: {
       fontSize: 20,
       lineHeight: 1.5,
       fontWeight: 600,
     },
+    h6: {
+      fontSize: 16,
+      lineHeight: 1.5,
+      fontWeight: 600,
+    },
     h7: {
-      fontSize: 18,
+      fontSize: 14,
       lineHeight: 1.5,
       fontWeight: 600,
     },

@@ -76,7 +76,7 @@ export const CampaignProcessContentAudience = () => {
         <>
           <Stack
             bgcolor={'#ffffff'}
-            borderBottom={'1px solid #E5E5E5'}
+            borderBottom={'1px solid #DFDEE6'}
             flexDirection={'row'}
             pb={1.5}
             position={'sticky'}

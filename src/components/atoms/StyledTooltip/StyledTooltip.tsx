@@ -12,9 +12,9 @@ import { useSwitch } from '@/hooks';
 const SxStyle = {
   fontSize: 12,
   fontWeight: 400,
-  bgcolor: 'background.white',
+  bgcolor: 'background.default',
   color: 'text.primary',
-  border: '1px solid #E6E8ED',
+  border: '1px solid #DFDEE6',
   p: 1.5,
   borderRadius: 2,
   '&.darker': {

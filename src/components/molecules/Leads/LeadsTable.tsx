@@ -253,8 +253,9 @@ export const LeadsTable: FC = () => {
   const onClickToClose = () => {
     setItemDetails(undefined);
     setFetchLoading(false);
-    setExpendInfo(false);
+    setExpendInfo(true);
     setExpendCampaigns(false);
+    setActiveInfo('company');
     setCampaignsData([]);
     closeDetails();
   };
@@ -378,7 +379,7 @@ export const LeadsTable: FC = () => {
               outline: 'none !important',
             },
             '.MuiDataGrid-columnHeaders': {
-              borderBottom: '1px solid #E5E5E5',
+              borderBottom: '1px solid #DFDEE6',
             },
             '& .MuiDataGrid-cell': {
               border: 0,
@@ -387,7 +388,7 @@ export const LeadsTable: FC = () => {
               visibility: 'hidden',
             },
             '.MuiDataGrid-row': {
-              borderBottom: '1px solid #E5E5E5',
+              borderBottom: '1px solid #DFDEE6',
             },
             '.MuiDataGrid-cell': {
               overflow: 'unset !important',
@@ -591,10 +592,8 @@ export const LeadsTable: FC = () => {
 
             <Collapse in={expendInfo}>
               <Stack gap={1} mt={2}>
-                <Typography color={'text.secondary'} variant={'subtitle3'}>
-                  Overview
-                </Typography>
-                <Typography variant={'body3'}>
+                <Typography variant={'h7'}>Overview</Typography>
+                <Typography variant={'body2'}>
                   {activeInfo === 'company'
                     ? itemDetails?.companyResearch
                     : itemDetails?.personalResearch}
@@ -648,20 +647,29 @@ export const LeadsTable: FC = () => {
                   <Stack
                     borderBottom={
                       index !== campaignsData.length - 1
-                        ? '1px solid #E5E5E5'
+                        ? '1px solid #DFDEE6'
                         : 'unset'
                     }
                     gap={1.5}
                     key={`${campaign.sentOn}-${index}`}
                     p={1.5}
                   >
-                    <Stack flexDirection={'row'} fontSize={12} gap={1}>
+                    <Stack
+                      flexDirection={'row'}
+                      fontSize={16}
+                      fontWeight={600}
+                      gap={0.5}
+                    >
                       Step {index + 1}
-                      <Typography color={'text.secondary'} fontSize={'inherit'}>
+                      <Typography
+                        color={'text.secondary'}
+                        ml={'auto'}
+                        variant={'body2'}
+                      >
                         {UFormatDate(campaign.sentOn, 'MMM dd, yyyy')}
                       </Typography>
                     </Stack>
-                    <Typography variant={'subtitle3'}>
+                    <Typography variant={'subtitle1'}>
                       {campaign.subject}
                     </Typography>
                     <StyledShadowContent html={campaign.content} />

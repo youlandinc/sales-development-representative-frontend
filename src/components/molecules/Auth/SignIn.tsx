@@ -97,7 +97,7 @@ export const SignIn = () => {
     >
       <Stack
         bgcolor={'#ffffff'}
-        border={'1px solid #E5E5E5'}
+        border={'1px solid #DFDEE6'}
         borderRadius={4}
         component={'form'}
         gap={6}

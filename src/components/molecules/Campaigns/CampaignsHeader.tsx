@@ -151,7 +151,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
       <Stack flexDirection={'row'} gap={3}>
         {cardData.map((item, index) => (
           <Stack
-            border={'1px solid #E5E5E5'}
+            border={'1px solid #DFDEE6'}
             borderRadius={2}
             flex={1}
             gap={1.5}

@@ -270,12 +270,13 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
               color:
                 activeStep === item.id || disabled()
                   ? 'primary.main'
-                  : '#D0CEDA',
-              bgcolor: activeStep === item.id ? '#D5CBFB' : 'transparent',
+                  : 'text.disabled',
+              bgcolor:
+                activeStep === item.id ? 'primary.lighter' : 'transparent',
               border:
                 activeStep === item.id || disabled()
                   ? '1px solid transparent'
-                  : '1px solid #D0CEDA',
+                  : '1px solid #D5CBFB',
             },
             '&:hover': {
               border: !campaignId || returning ? '' : '2px solid #6E4EFB',
@@ -294,7 +295,7 @@ const CampaignProcessHeaderButtonGroup: FC = () => {
               activeStep === item.id
                 ? 'text.primary'
                 : returning || !campaignId
-                  ? '#D0CEDA'
+                  ? 'text.disabled'
                   : 'text.primary'
             }
           >
