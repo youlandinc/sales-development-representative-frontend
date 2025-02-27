@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect, useState } from 'react';
+import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, Icon, Stack, Typography } from '@mui/material';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
@@ -158,11 +158,14 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
   id,
   handleDelete,
 }) => {
-  const { setEditId, fetchOffersInfo } = useLibraryStore((state) => state);
+  const { setEditId, fetchOffersInfo, setIsAdd } = useLibraryStore(
+    (state) => state,
+  );
 
   const [libName, setLibName] = useState('');
   const [desc, setDescription] = useState('');
   const [url, setUrl] = useState('');
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const [editState, editOffer] = useAsyncFn(
     async (
@@ -175,6 +178,7 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
         await _editOffer(param);
         await fetchOffersInfo();
         setEditId(Infinity);
+        setIsAdd(false);
       } catch (error) {
         close();
         const { message, header, variant } = error as HttpError;
@@ -232,67 +236,63 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
   }, [libName, url]);
 
   useEffect(() => {
-    setDescription(productDescription);
-    setLibName(productName);
-    setUrl(productUrl);
+    productDescription && setDescription(productDescription);
+    productName && setLibName(productName);
+    productUrl && setUrl(productUrl);
   }, [productName, productDescription, productUrl]);
 
   return (
     <LibraryCard sx={{ width: '30%' }}>
       <Stack gap={1.5} height={'100%'}>
-        <StyledVerticalTextField
-          label={'Product name'}
-          onChange={(e) => setLibName(e.target.value)}
-          required
-          toolTipTittle={
-            "Provide your company's website URL. This link will be included in emails to direct users to learn more about your business."
-          }
-          value={libName}
-        />
-        <StyledVerticalTextField
-          label={'Product page'}
-          onChange={(e) => setUrl(e.target.value)}
-          required
-          slotProps={{
-            input: {
-              startAdornment: 'https://',
-              endAdornment: (
-                <StyledButton
-                  loading={extractState.loading}
-                  onClick={extract}
-                  size={'small'}
-                  sx={{ px: '4px !important', width: 88 }}
-                  variant={'text'}
-                >
-                  Smart extract
-                </StyledButton>
-              ),
-            },
-          }}
-          toolTipTittle={
-            "Provide your company's website URL. This link will be included in emails to direct users to learn more about your business."
-          }
-          value={url}
-        />
-        <Box flex={1}>
+        <Stack component={'form'} flex={1} gap={1.5} ref={formRef}>
           <StyledVerticalTextField
-            label={'Description'}
-            multiline
-            onChange={(e) => setDescription(e.target.value)}
+            label={'Product name'}
+            onChange={(e) => setLibName(e.target.value)}
             required
-            rows={10}
-            sx={{
-              '& .MuiOutlinedInput-input': {
-                p: 0,
-                height: 'auto !important',
+            toolTipTittle={'The name of the product your company offers.'}
+            value={libName}
+          />
+          <StyledVerticalTextField
+            label={'Product page'}
+            onChange={(e) => setUrl(e.target.value)}
+            required
+            slotProps={{
+              input: {
+                startAdornment: 'https://',
+                endAdornment: (
+                  <StyledButton
+                    loading={extractState.loading}
+                    onClick={extract}
+                    size={'small'}
+                    sx={{ px: '4px !important', width: 88 }}
+                    variant={'text'}
+                  >
+                    Smart extract
+                  </StyledButton>
+                ),
               },
             }}
-            toolTipTittle={
-              "Provide your company's website URL. This link will be included in emails to direct users to learn more about your business."
-            }
-            value={desc}
+            toolTipTittle={''}
+            value={url}
           />
-        </Box>
+          <Box flex={1}>
+            <StyledVerticalTextField
+              label={'Description'}
+              multiline
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              rows={10}
+              sx={{
+                '& .MuiOutlinedInput-input': {
+                  p: 0,
+                  height: 'auto !important',
+                },
+              }}
+              toolTipTittle={''}
+              value={desc}
+            />
+          </Box>
+        </Stack>
         <ChipEditCard
           chips={painPoints}
           offerId={id}
@@ -346,6 +346,11 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
                 Cancel
               </StyledButton>
               <StyledButton
+                disabled={
+                  libName?.trim() === '' ||
+                  url?.trim() === '' ||
+                  desc?.trim() === ''
+                }
                 loading={editState.loading}
                 onClick={async () => {
                   await editOffer({

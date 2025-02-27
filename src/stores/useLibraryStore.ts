@@ -68,7 +68,6 @@ export const useLibraryStore = create<InboxStoreProps>()((set) => ({
   addOffer: (offerId) =>
     set((state) => ({
       offerList: [
-        ...state.offerList,
         {
           id: offerId,
           productName: '',
@@ -78,6 +77,7 @@ export const useLibraryStore = create<InboxStoreProps>()((set) => ({
           solutions: [],
           proofPoints: [],
         },
+        ...state.offerList,
       ],
       isAdd: true,
       editId: offerId,

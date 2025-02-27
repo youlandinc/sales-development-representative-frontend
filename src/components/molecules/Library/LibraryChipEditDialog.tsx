@@ -51,9 +51,7 @@ export const LibraryChipEditDialog: FC<LibraryChipEditDialogProps> = ({
             label={'Name'}
             onChange={(e) => setLibName(e.target.value)}
             required
-            toolTipTittle={
-              "Provide your company's website URL. This link will be included in emails to direct users to learn more about your business."
-            }
+            toolTipTittle={''}
             value={libName || ''}
           />
           <StyledVerticalTextField
@@ -68,9 +66,7 @@ export const LibraryChipEditDialog: FC<LibraryChipEditDialogProps> = ({
                 height: 'auto !important',
               },
             }}
-            toolTipTittle={
-              "Provide your company's website URL. This link will be included in emails to direct users to learn more about your business."
-            }
+            toolTipTittle={''}
             value={desc || ''}
           />
         </Stack>
