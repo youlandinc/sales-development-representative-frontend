@@ -37,10 +37,13 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
         width: '100%',
         borderRadius: 2,
         padding: 0,
-        '& label.Mui-focused': {
-          color: 'text.focus',
-          '& span': {
+        '& label': {
+          color: 'text.primary',
+          '&.Mui-focused': {
             color: 'text.focus',
+            '& span': {
+              color: 'text.focus',
+            },
           },
         },
         '& .MuiInputLabel-outlined': {

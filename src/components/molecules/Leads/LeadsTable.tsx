@@ -239,6 +239,8 @@ export const LeadsTable: FC = () => {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
       onClickToClose();
+    } finally {
+      setFetchLoading(false);
     }
   };
 

@@ -46,43 +46,36 @@ declare module '@mui/material/styles' {
   }
 
   interface TypeText {
+    default: string;
+    disabled: string;
+    hover: string;
+    focus: string;
     primary: string;
     secondary: string;
-    hover: string;
-    disabled: string;
-    white: string;
   }
 
   interface TypeBorder {
-    normal: string;
+    default: string;
+    disabled: string;
     hover: string;
     focus: string;
-    disabled: string;
-  }
-
-  interface TypeAction {
-    loading: string;
-    active: string;
-    hover: string;
-    selected: string;
-    disabled: string;
-    disabled_background: string;
+    primary: string;
+    secondary: string;
   }
 
   interface TypeBackground {
-    white: string;
-    homepage: string;
-    footer: string;
-    main: string;
-    babyBlue: string;
-    skyBlue: string;
-    faq: string;
+    default: string;
+    disabled: string;
+    hover: string;
+    focus: string;
+    primary: string;
+    secondary: string;
   }
 
   interface TypeBoxShadow {
-    card_shadow: string;
-    dropdown_shadow: string;
-    button_shadow: string;
+    card: string;
+    dropdown: string;
+    button: string;
   }
 
   interface TypographyVariants {
@@ -166,41 +159,55 @@ const defaultOptions: ThemeOptions = {
       contrastText: '#FFFFFF',
     },
 
-    action: {
-      active: '#636A7C',
-      hover: '#F4F6FA',
-      selected: '#EDF1FF',
-      disabled: '#BABCBE',
-      disabled_background: '#EDEDED',
-      loading: '#E3E3EE',
-    },
     text: {
-      primary: '#202939',
-      secondary: '#6F6C7D',
-      hover: '#636A7C',
+      default: '#333333',
       disabled: '#BABCBE',
-      white: '#FFFFFF',
+      hover: '#5B76BC',
+      focus: '#5B76BC',
+      primary: '#333333',
+      secondary: '#5B76BC',
+
+      //primary: '#202939',
+      //secondary: '#6F6C7D',
+      //hover: '#636A7C',
+      //disabled: '#BABCBE',
+      //white: '#FFFFFF',
+      //focus: '#202939',
     },
     background: {
-      white: '#FFFFFF',
-      homepage: '#F4F6FA',
-      footer: '#121214',
-      main: '#5B76BC',
-      babyBlue: '#303D6C',
-      skyBlue: '#3C538F',
-      faq: '#F8F9FC',
+      default: '#FFFFFF',
+      disabled: '#BABCBE',
+      hover: '#5B76BC',
+      focus: '#5B76BC',
+      primary: '#333333',
+      secondary: '#5B76BC',
+
+      //white: '#FFFFFF',
+      //homepage: '#F4F6FA',
+      //footer: '#121214',
+      //main: '#5B76BC',
+      //babyBlue: '#303D6C',
+      //skyBlue: '#3C538F',
+      //faq: '#F8F9FC',
     },
     border: {
-      normal: '#D2D6E1',
-      hover: '#9095A3',
-      focus: '#202939',
+      default: '#333333',
       disabled: '#BABCBE',
+      hover: '#5B76BC',
+      focus: '#5B76BC',
+      primary: '#333333',
+      secondary: '#5B76BC',
+
+      //normal: '#D2D6E1',
+      //hover: '#9095A3',
+      //focus: '#202939',
+      //disabled: '#BABCBE',
     },
     boxShadow: {
-      card_shadow: '0px 0px 10px 0px rgba(17, 52, 227, 0.20)',
-      dropdown_shadow:
+      card: '0px 0px 10px 0px rgba(17, 52, 227, 0.20)',
+      dropdown:
         '0px 10px 10px 0px rgba(17, 52, 227, 0.10), 0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
-      button_shadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
+      button: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
     },
   },
   typography: {
@@ -335,7 +342,6 @@ const darkTheme = createTheme({
     },
     background: {
       ...defaultOptions.palette?.background,
-      homepage: 'rgba(60, 83, 143, 1)',
     },
   },
 });

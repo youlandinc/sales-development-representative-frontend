@@ -508,6 +508,7 @@ export const CampaignProcessContentMessaging = () => {
       width={'calc(100% - 510px)'}
     >
       <Stack gap={3} width={'100%'}>
+        <Typography variant={'subtitle2'}>Offers</Typography>
         <Stack flexDirection={'row'} gap={1.5}>
           {offerOptions.map((item, index) => (
             <Stack
