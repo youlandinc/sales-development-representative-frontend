@@ -37,6 +37,7 @@ type CampaignsPendingEmailsCardProps = {
   subject: string;
   showStepNumber?: boolean;
   stepNumber: number;
+  leadId: number;
 };
 
 export const CampaignsPendingEmailsCard: FC<
@@ -52,6 +53,7 @@ export const CampaignsPendingEmailsCard: FC<
   avatarUrl,
   showStepNumber,
   stepNumber,
+  leadId,
 }) => {
   const {
     updatePendingEmailById,
@@ -282,7 +284,11 @@ export const CampaignsPendingEmailsCard: FC<
           </Stack>
         </Stack>
       </Stack>
-      <CommonCampaignUserInfo onClose={drawerClose} open={drawerShow} />
+      <CommonCampaignUserInfo
+        leadId={leadId}
+        onClose={drawerClose}
+        open={drawerShow}
+      />
     </>
   );
 };

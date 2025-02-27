@@ -37,4 +37,9 @@ export interface ResponseLeadsInfo {
   companyResearch: string | null;
   leadId: string | number;
   previewLeadId: string | number;
+  avatar: string;
+  company: string;
+  email: string;
+  jobTitle: string;
+  name: string;
 }

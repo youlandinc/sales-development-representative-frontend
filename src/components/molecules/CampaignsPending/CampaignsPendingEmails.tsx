@@ -98,6 +98,7 @@ export const CampaignsPendingEmails: FC<CampaignsPendingEmailsProps> = ({
                   emailContent={item.content || ''}
                   emailId={item.emailId}
                   key={index}
+                  leadId={item.leadId}
                   showStepNumber={showStepNumber}
                   stepNumber={item.stepSequence}
                   subject={item.subject || ''}

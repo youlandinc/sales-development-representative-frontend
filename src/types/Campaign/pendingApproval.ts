@@ -87,6 +87,7 @@ export type ICampaignsPendingEmailsItem = {
   content: string;
   stepSequence: number;
   name: string;
+  leadId: number;
 };
 
 export type CampaignsPendingEmailsResponseData = {
