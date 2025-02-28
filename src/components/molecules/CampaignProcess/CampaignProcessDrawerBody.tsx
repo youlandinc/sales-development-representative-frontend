@@ -139,7 +139,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
     >
       <Stack gap={3}>
         <Stack flexDirection={'row'}>
-          <Typography variant={'subtitle1'}>Email body prompt</Typography>
+          <Typography variant={'h5'}>Email body prompt</Typography>
           <Icon
             component={ICON_CLOSE}
             onClick={onClose}
@@ -153,7 +153,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
         </Stack>
 
         <Stack gap={1.5}>
-          <Typography variant={'subtitle2'}>Suggested word count</Typography>
+          <Typography variant={'subtitle1'}>Suggested word count</Typography>
           <Slider
             marks={WORD_COUNT_OPTIONS}
             max={400}

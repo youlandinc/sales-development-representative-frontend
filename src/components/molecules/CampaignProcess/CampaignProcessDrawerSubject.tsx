@@ -135,7 +135,7 @@ export const CampaignProcessDrawerSubject: FC<
     >
       <Stack gap={3}>
         <Stack flexDirection={'row'}>
-          <Typography variant={'subtitle1'}>Subject line prompt</Typography>
+          <Typography variant={'h5'}>Subject line prompt</Typography>
           <Icon
             component={ICON_CLOSE}
             onClick={onClose}
@@ -149,7 +149,7 @@ export const CampaignProcessDrawerSubject: FC<
         </Stack>
         <Stack gap={1.5}>
           <Stack alignItems={'flex-end'} flexDirection={'row'}>
-            <Typography variant={'subtitle2'}>Instructions</Typography>
+            <Typography variant={'subtitle1'}>Instructions</Typography>
             <StyledButton
               color={'info'}
               disabled={
