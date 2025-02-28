@@ -19,6 +19,9 @@ import {
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
+import Markdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+
 import { UFormatNumber } from '@/utils';
 import { useClassNameObserver, useSwitch } from '@/hooks';
 
@@ -34,7 +37,7 @@ import { CampaignLeadsCard } from '@/components/molecules';
 import {
   CampaignLeadItem,
   HttpError,
-  ModuleEnum,
+  //ModuleEnum,
   ResponseCampaignEmail,
   ResponseCampaignMessagingStepFormBody,
   ResponseCampaignMessagingStepFormSubject,
@@ -45,6 +48,7 @@ import {
   _deleteStepEmail,
   _fetchChatLeads,
   _fetchEmailByLead,
+  _fetchLeadPersonalResearch,
   _fetchStepEmail,
   _updateSelectedLibraryOffer,
   _updateStepEmailSendDays,
@@ -85,55 +89,70 @@ export const CampaignProcessContentMessaging = () => {
   } = useDialogStore();
 
   const [personalResearchLoading, setPersonalResearchLoading] = useState(false);
+  const [researchInfo, setResearchInfo] = useState('');
 
   const onClickToFetchPersonalResearch = async (id: string | number) => {
+    if (!id) {
+      return;
+    }
     setPersonalResearchLoading(true);
-    let str = '';
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        module: ModuleEnum.personal_research,
-        params: {
-          leadId: id,
-        },
-      }),
-    })
-      .then((response) => {
-        if (response.body) {
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder('utf-8');
-
-          const readStream = () => {
-            reader.read().then(({ done, value }) => {
-              if (done) {
-                setPersonalResearchLoading(false);
-                return;
-              }
-              // decode
-              const data = decoder.decode(value).replace(/data:/g, '');
-              //.replace(/\n/g, '');
-
-              str = str + data;
-              setResearchInfo(str);
-
-              // continue read stream
-              readStream();
-            });
-          };
-
-          readStream();
-        }
-      })
-      .catch((error) => {
-        const { message, header, variant } = error as HttpError;
-        SDRToast({ message, header, variant });
-      });
+    try {
+      const { data } = await _fetchLeadPersonalResearch(id);
+      setResearchInfo(data);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setPersonalResearchLoading(false);
+    }
   };
 
-  const [researchInfo, setResearchInfo] = useState('');
+  //const onClickToFetchPersonalResearch = async (id: string | number) => {
+  //  setPersonalResearchLoading(true);
+  //  let str = '';
+  //  fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/generate`, {
+  //    method: 'POST',
+  //    headers: {
+  //      'Content-Type': 'application/json',
+  //    },
+  //    body: JSON.stringify({
+  //      module: ModuleEnum.personal_research,
+  //      params: {
+  //        leadId: id,
+  //      },
+  //    }),
+  //  })
+  //    .then((response) => {
+  //      if (response.body) {
+  //        const reader = response.body.getReader();
+  //        const decoder = new TextDecoder('utf-8');
+  //
+  //        const readStream = () => {
+  //          reader.read().then(({ done, value }) => {
+  //            if (done) {
+  //              setPersonalResearchLoading(false);
+  //              return;
+  //            }
+  //            // decode
+  //            const data = decoder.decode(value).replace(/data:/g, '');
+  //            //.replace(/\n/g, '');
+  //
+  //            str = str + data;
+  //            setResearchInfo(str);
+  //
+  //            // continue read stream
+  //            readStream();
+  //          });
+  //        };
+  //
+  //        readStream();
+  //      }
+  //    })
+  //    .catch((error) => {
+  //      const { message, header, variant } = error as HttpError;
+  //      SDRToast({ message, header, variant });
+  //    });
+  //};
 
   const {
     open: openSubject,
@@ -774,15 +793,39 @@ export const CampaignProcessContentMessaging = () => {
           </Stack>
 
           <Collapse in={expend}>
-            <Stack gap={1} mt={2}>
+            <Stack gap={1} maxHeight={160} mt={2} overflow={'auto'}>
               <Typography color={'text.primary'} variant={'h7'}>
                 Overview
               </Typography>
-              <Typography variant={'body2'}>
-                {activeInfo === 'company'
-                  ? leadsList[activeValue]?.companyResearch
-                  : researchInfo}
-              </Typography>
+
+              {activeInfo === 'company' ? (
+                <Typography variant={'body2'}>
+                  {leadsList[activeValue]?.companyResearch || 'No data'}
+                </Typography>
+              ) : personalResearchLoading ? (
+                <>
+                  <Skeleton animation={'wave'} width={'85%'} />
+                  <Skeleton animation={'wave'} width={'100%'} />
+                  <Skeleton animation={'wave'} width={'70%'} />
+                </>
+              ) : (
+                <Box
+                  sx={{
+                    fontSize: '14px',
+                    padding: '0',
+                    '& p': { margin: '0.5em 0' },
+                    '& h1, & h2, & h3, & h4, & h5, & h6': {
+                      marginTop: '1em',
+                      marginBottom: '0.5em',
+                    },
+                    '& a': { color: '#6E4EFB' },
+                  }}
+                >
+                  <Markdown rehypePlugins={[rehypeRaw]}>
+                    {researchInfo}
+                  </Markdown>
+                </Box>
+              )}
             </Stack>
           </Collapse>
         </Stack>

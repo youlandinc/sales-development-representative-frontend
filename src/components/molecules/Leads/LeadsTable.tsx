@@ -1,11 +1,13 @@
 import { ChangeEvent, FC, useMemo, useState } from 'react';
 import {
   Avatar,
+  Box,
   Collapse,
   debounce,
   Drawer,
   Icon,
   InputAdornment,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
@@ -42,6 +44,8 @@ import ICON_LINKEDIN from './assets/icon_linkedin.svg';
 import ICON_NEXT from './assets/icon_next.svg';
 import ICON_COMPANY from './assets/icon_company.svg';
 import ICON_PERSON from './assets/icon_person.svg';
+import Markdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 export const LeadsTable: FC = () => {
   const [value, setValue] = useState('');
@@ -593,11 +597,29 @@ export const LeadsTable: FC = () => {
             <Collapse in={expendInfo}>
               <Stack gap={1} mt={2}>
                 <Typography variant={'h7'}>Overview</Typography>
-                <Typography variant={'body2'}>
-                  {activeInfo === 'company'
-                    ? itemDetails?.companyResearch
-                    : itemDetails?.personalResearch}
-                </Typography>
+
+                {activeInfo === 'company' ? (
+                  <Typography variant={'body2'}>
+                    {itemDetails?.companyResearch || 'No data'}
+                  </Typography>
+                ) : (
+                  <Box
+                    sx={{
+                      fontSize: '14px',
+                      padding: '0',
+                      '& p': { margin: '0.5em 0' },
+                      '& h1, & h2, & h3, & h4, & h5, & h6': {
+                        marginTop: '1em',
+                        marginBottom: '0.5em',
+                      },
+                      '& a': { color: '#6E4EFB' },
+                    }}
+                  >
+                    <Markdown rehypePlugins={[rehypeRaw]}>
+                      {itemDetails?.personalResearch}
+                    </Markdown>
+                  </Box>
+                )}
               </Stack>
             </Collapse>
           </Stack>

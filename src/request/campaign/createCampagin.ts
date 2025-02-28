@@ -79,6 +79,15 @@ export const _fetchStepEmail = (params: {
   );
 };
 
+export const _fetchLeadPersonalResearch = (leadId: string | number) => {
+  return post('/sdr/ai/normal/generate', {
+    module: ModuleEnum.personal_research,
+    params: {
+      leadId,
+    },
+  });
+};
+
 // secondary step drawer
 
 export const _updateStepEmailSubjectInstructions = (params: {
