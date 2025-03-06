@@ -83,7 +83,7 @@ export const LibraryCompanyMain = () => {
             <StyledButton
               color={'info'}
               onClick={() => {
-                router.push('/library/company/123');
+                router.push('/library/company');
               }}
               size={'medium'}
               sx={{
