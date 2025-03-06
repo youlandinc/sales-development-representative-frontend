@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 
-import { EmailConfig, PersonalInfo } from '@/components/molecules';
+import { SettingsEmails, SettingsPersonalInfo } from '@/components/molecules';
 
 export const Settings = () => {
   return (
@@ -8,8 +8,8 @@ export const Settings = () => {
       <Typography lineHeight={1.2} variant={'h6'}>
         Settings
       </Typography>
-      <EmailConfig />
-      <PersonalInfo />
+      <SettingsEmails />
+      <SettingsPersonalInfo />
     </Stack>
   );
 };

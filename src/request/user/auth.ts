@@ -1,4 +1,4 @@
-import { post } from '@/request/request';
+import { post, put } from '@/request/request';
 import {
   IUserLoginParams,
   IUserResetPasswordParams,
@@ -20,4 +20,10 @@ export const _userVerifyCode = (params: IUserVerifyCodeParams) => {
 
 export const _userRestPassword = (params: IUserResetPasswordParams) => {
   return post('/usercenter/api/lender/resetPassword/admin/complete', params);
+};
+
+export const _commonUpload = (files: FormData) => {
+  return put('/usercenter/api/common/file/upload', files, {
+    headers: { 'content-type': 'multipart/form-data' },
+  });
 };

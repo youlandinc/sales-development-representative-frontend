@@ -158,7 +158,6 @@ const defaultOptions: ThemeOptions = {
       background: '#FFEEEA',
       contrastText: '#FFFFFF',
     },
-
     text: {
       default: '#2A292E',
       disabled: '#BABCBE',

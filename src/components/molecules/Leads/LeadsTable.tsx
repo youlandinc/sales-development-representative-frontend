@@ -7,7 +7,6 @@ import {
   Drawer,
   Icon,
   InputAdornment,
-  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';

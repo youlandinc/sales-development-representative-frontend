@@ -1,8 +1,8 @@
 export enum EmailDomainStateEnum {
-  PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS',
-  FAILED = 'FAILED',
-  ACTIVE = 'ACTIVE',
+  pending = 'PENDING',
+  success = 'SUCCESS',
+  failed = 'FAILED',
+  active = 'ACTIVE',
 }
 
 export enum CampaignsPendingTimeLineEnum {

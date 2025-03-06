@@ -14,7 +14,7 @@ type VerifyEmailProps = {
   }[];
 };
 
-export const VerifyEmail: FC<VerifyEmailProps> = ({ domains }) => {
+export const SettingsEmailVerify: FC<VerifyEmailProps> = ({ domains }) => {
   return (
     <Stack spacing={1.5}>
       <Typography
