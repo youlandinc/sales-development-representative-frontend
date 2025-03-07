@@ -37,9 +37,9 @@ export const _fetchOffersInfo = () => {
 
 export const _fetchCompanyInfo = () => {
   return get<{
-    companyName: string;
-    companyPage: string;
-    sellIntroduction: string;
+    companyName: string | null;
+    companyPage: string | null;
+    sellIntroduction: string | null;
     painPoints: ITag[];
     solutions: ITag[];
     proofPoints: ITag[];

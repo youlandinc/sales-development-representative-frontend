@@ -41,9 +41,9 @@ export const LibraryCompanyMain = () => {
   const [state, fetchCompanyInfo] = useAsyncFn(async () => {
     try {
       const res = await _fetchCompanyInfo();
-      updateCompanyInfo('companyName', res.data.companyName);
-      updateCompanyInfo('companyPage', res.data.companyPage);
-      updateCompanyInfo('sellIntroduction', res.data.sellIntroduction);
+      updateCompanyInfo('companyName', res.data.companyName || '');
+      updateCompanyInfo('companyPage', res.data.companyPage || '');
+      updateCompanyInfo('sellIntroduction', res.data.sellIntroduction || '');
       return res;
     } catch (error) {
       close();
