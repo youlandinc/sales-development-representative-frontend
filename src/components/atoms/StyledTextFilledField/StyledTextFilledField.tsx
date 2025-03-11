@@ -14,6 +14,8 @@ export const StyledTextFilledField: FC<TextFieldProps> = ({
   sx,
   ...rest
 }) => {
+  const { slotProps, ...otherProps } = rest || {};
+  const { input, htmlInput, ...otherSlotProps } = slotProps || {};
   return (
     <Stack alignItems={'flex-start'} flexDirection={'row'} gap={1.25}>
       <StyledTextField
@@ -30,7 +32,10 @@ export const StyledTextFilledField: FC<TextFieldProps> = ({
                 </Typography>
               </InputAdornment>
             ),
+            ...input,
           },
+          htmlInput: htmlInput,
+          ...otherSlotProps,
         }}
         sx={{
           '& .MuiInputBase-input': {
@@ -44,7 +49,7 @@ export const StyledTextFilledField: FC<TextFieldProps> = ({
           ...(sx as SxProps),
         }}
         variant={'standard'}
-        {...rest}
+        {...otherProps}
       />
     </Stack>
   );
