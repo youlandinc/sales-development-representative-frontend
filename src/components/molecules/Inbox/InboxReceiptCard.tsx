@@ -17,7 +17,7 @@ import {
   useInboxStore,
 } from '@/stores/useInboxStore';
 import { format } from 'date-fns';
-import { _forwardEmails, _replyEmails, ForwardEmailsParam } from '@/request';
+import { _replyEmails, ForwardEmailsParam } from '@/request';
 import { HttpError } from '@/types';
 
 type InboxReceiptCardProps = {
@@ -129,7 +129,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
                   await replyEmail({
                     parentEmailId: selectedEmail!.emailId,
                     recipient: email,
-                    cc: [''],
+                    cc: [],
                     subject: '',
                     content: editorRef.current?.editInstance.getData() || '',
                   });

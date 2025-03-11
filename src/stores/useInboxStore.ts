@@ -1,7 +1,4 @@
 import { create } from 'zustand';
-import { CampaignsPendingEmailsResponseData, HttpError } from '@/types';
-import { _fetchEmails, _fetchEmailsDetails } from '@/request';
-import { SDRToast } from '@/components/atoms';
 
 export enum InboxContentTypeEnum {
   receipt = 'receipt',

@@ -9,7 +9,7 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, format, isSameDay } from 'date-fns';
 
 import { SDRToast, StyledTextField } from '@/components/atoms';
 
@@ -225,7 +225,9 @@ export const InboxSide: FC = () => {
             >
               <Typography variant={'subtitle2'}>{item.name}</Typography>
               <Typography variant={'subtitle3'}>
-                {differenceInDays(new Date(), new Date(item.sentOn))} days
+                {isSameDay(new Date(), new Date(item.sentOn))
+                  ? format(new Date(item.sentOn), 'HH:mm')
+                  : format(new Date(item.sentOn), 'yyyy/MM/dd')}
               </Typography>
             </Stack>
           }

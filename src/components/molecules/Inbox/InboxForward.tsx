@@ -1,17 +1,9 @@
-import {
-  Autocomplete,
-  Box,
-  Chip,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Autocomplete, Box, Chip, Stack, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 
 import {
   SDRToast,
   StyledButton,
-  StyledTextField,
   StyledTextFilledField,
 } from '@/components/atoms';
 import {
