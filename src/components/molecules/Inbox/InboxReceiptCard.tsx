@@ -25,6 +25,12 @@ type InboxReceiptCardProps = {
   avatarBgcolor?: string;
   email: string;
   emailContent: string;
+  emailType: ReceiptTypeEnum;
+};
+
+const SOURCE_LABEL = {
+  [ReceiptTypeEnum.engaged]: 'FROM: ',
+  [ReceiptTypeEnum.sent]: 'TO: ',
 };
 
 export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
@@ -32,11 +38,11 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   avatarName,
   email,
   emailContent,
+  emailType,
 }) => {
   const {
     setInboxContentType,
     setForwardContent,
-    receiptType,
     selectedEmail,
     setForwardReceipt,
   } = useInboxStore((state) => state);
@@ -66,7 +72,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
             component={'span'}
             variant={'subtitle3'}
           >
-            {receiptType === ReceiptTypeEnum.engaged ? 'TO' : 'FROM'}:
+            {SOURCE_LABEL[emailType] || ''}
           </Typography>
         }
       />

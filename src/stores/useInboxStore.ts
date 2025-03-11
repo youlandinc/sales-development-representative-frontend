@@ -27,6 +27,7 @@ export type InboxContentItem = {
   subject: string | null;
   content: string | null;
   sentOn: string;
+  emailType: ReceiptTypeEnum;
 };
 
 export type InboxStoreState = {
