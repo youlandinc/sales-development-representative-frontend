@@ -31,9 +31,9 @@ export const InboxReceipt = () => {
                 {selectedEmail?.name}
               </Typography>
               <Typography color={'#637381'} variant={'subtitle3'}>
-                {'<'}
-                {selectedEmail?.email}
-                {'>'}
+                {typeof selectedEmail?.email === 'string'
+                  ? `<${selectedEmail?.email}>`
+                  : ''}
               </Typography>
             </Stack>
           }
