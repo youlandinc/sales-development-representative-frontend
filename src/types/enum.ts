@@ -21,3 +21,8 @@ export enum LibraryTypeOfferTagTypeEnum {
   solutions = 'SOLUTIONS',
   proof_points = 'PROOF_POINTS',
 }
+
+export enum SSE_EVENT_TYPE {
+  'new_email' = 'NEW_EMAIL',
+  'new_reply' = 'NEW_REPLY',
+}

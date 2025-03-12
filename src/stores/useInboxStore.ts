@@ -61,6 +61,8 @@ export type InboxStoreStateActions = {
   setFetchSentLoading: (fetchSentLoading: boolean) => void;
   setFetchEmailLoading: (fetchEmailLoading: boolean) => void;
   setTotalEmails: (totalEmails: number) => void;
+  unshiftInboxSideList: (newData: InboxSideItem) => void;
+  updateEmailIsRead: (emailId: number) => void;
   // fetchEmailsData: (
   //   params: PaginationParam & {
   //     searchContact?: string;
@@ -97,7 +99,21 @@ export const useInboxStore = create<InboxStoreProps>()((set) => ({
   setFetchSentLoading: (fetchSentLoading) => set({ fetchSentLoading }),
   setFetchEmailLoading: (fetchEmailLoading) => set({ fetchEmailLoading }),
   setTotalEmails: (totalEmails) => set({ totalEmails }),
-  setForwardEmailId: (forwardEmailId: number) => set({ forwardEmailId }),
+  setForwardEmailId: (forwardEmailId) => set({ forwardEmailId }),
+  unshiftInboxSideList: (newData) =>
+    set((state) => {
+      return { inboxSideList: [newData, ...state.inboxSideList] };
+    }),
+  updateEmailIsRead: (emailId) =>
+    set((state) => {
+      const updatedList = state.inboxSideList.map((item) => {
+        if (item.emailId === emailId) {
+          return { ...item, read: false };
+        }
+        return item;
+      });
+      return { inboxSideList: updatedList };
+    }),
   // fetchEmailDetails: async (emailId) => {
   //   try {
   //     const res = await _fetchEmailsDetails(emailId);

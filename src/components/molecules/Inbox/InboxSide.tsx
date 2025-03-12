@@ -23,7 +23,8 @@ import { SDRToast, StyledTextField } from '@/components/atoms';
 import { ReceiptTypeEnum, useInboxStore } from '@/stores/useInboxStore';
 import { useAsyncFn, useContainerHeight } from '@/hooks';
 import { _fetchEmails, _fetchEmailsDetails } from '@/request';
-import { HttpError } from '@/types';
+import { HttpError, SSE_EVENT_TYPE } from '@/types';
+import { useUserStore } from '@/provides';
 
 export const InboxSide: FC = () => {
   const {
@@ -39,7 +40,11 @@ export const InboxSide: FC = () => {
     setFetchEmailLoading,
     totalEmails,
     setTotalEmails,
+    updateEmailIsRead,
+    unshiftInboxSideList,
   } = useInboxStore((state) => state);
+  const { userProfile } = useUserStore((state) => state);
+
   const [contacts, setContacts] = useState('');
   const [scrollLoading, setScrollLoading] = useState(false);
   const [engagedPage, setEngagedPage] = useState(0);
@@ -181,6 +186,43 @@ export const InboxSide: FC = () => {
       fetchEmails(ReceiptTypeEnum.engaged, '', 0, defaultPageSize);
       // }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    console.log('register');
+    const PERSIST_DATA = JSON.parse(
+      localStorage.getItem('PERSIST_DATA') || '{}',
+    );
+
+    const eventSource = new EventSource(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/sdr/inbox/email/notify/subscriber/${PERSIST_DATA?.state?.accountId || ''}`,
+    );
+    // recieve message
+    eventSource.onmessage = function (event) {
+      // onMessage?.(event);
+      const { data } = event;
+      if (data !== 'heartbeat') {
+        const notification = JSON.parse(data);
+        const { event } = notification;
+        if (notification.tenantId === userProfile?.tenantId) {
+          if (event === SSE_EVENT_TYPE.new_email) {
+            const data = notification.data;
+            unshiftInboxSideList(data.data);
+          }
+          if (event === SSE_EVENT_TYPE.new_reply) {
+            const emailId = notification.emailId;
+            updateEmailIsRead(emailId);
+          }
+        }
+      }
+    };
+
+    // clear
+    return () => {
+      console.log('clear');
+      eventSource?.close();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
