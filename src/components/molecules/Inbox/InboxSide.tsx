@@ -42,6 +42,7 @@ export const InboxSide: FC = () => {
     setTotalEmails,
     updateEmailIsRead,
     unshiftInboxSideList,
+    setFetchEmailDetailsLoading,
   } = useInboxStore((state) => state);
   const { userProfile } = useUserStore((state) => state);
 
@@ -145,6 +146,7 @@ export const InboxSide: FC = () => {
 
   const [, fetchEmailDetails] = useAsyncFn(async (emailId: number) => {
     try {
+      setFetchEmailDetailsLoading(true);
       const res = await _fetchEmailsDetails(emailId);
       if (
         Array.isArray(res.data.emailInfos) &&
@@ -152,7 +154,9 @@ export const InboxSide: FC = () => {
       ) {
         setInboxContentList(res.data.emailInfos);
       }
+      setFetchEmailDetailsLoading(false);
     } catch (e) {
+      setFetchEmailDetailsLoading(false);
       const { message, header, variant } = e as HttpError;
       SDRToast({ message, header, variant });
     }

@@ -64,7 +64,13 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   });
 
   return (
-    <Stack gap={1}>
+    <Stack
+      border={'1px solid'}
+      borderColor={'border.default'}
+      borderRadius={4}
+      gap={1}
+      p={1.5}
+    >
       <CommonReceiptCardHeader
         avatarBgcolor={avatarBgcolor}
         avatarName={avatarName}

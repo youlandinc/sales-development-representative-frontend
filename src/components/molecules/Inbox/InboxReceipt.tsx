@@ -8,14 +8,17 @@ import {
 import { useInboxStore } from '@/stores/useInboxStore';
 
 export const InboxReceipt = () => {
-  const { inboxContentList, selectedEmail, fetchEmailLoading } = useInboxStore(
-    (state) => state,
-  );
+  const {
+    inboxContentList,
+    selectedEmail,
+    fetchEmailLoading,
+    fetchEmailDetailsLoading,
+  } = useInboxStore((state) => state);
 
   return (
     <Stack flex={1} height={'100%'}>
-      {fetchEmailLoading ? (
-        <Box height={81}>
+      {fetchEmailLoading || fetchEmailDetailsLoading ? (
+        <Box height={81} px={2} py={2.5}>
           <Skeleton width={'50%'} />
           <Skeleton />
           <Skeleton />
@@ -52,7 +55,7 @@ export const InboxReceipt = () => {
         />
       )}
       <Stack flex={1} gap={2} overflow={'auto'} p={4}>
-        {fetchEmailLoading ? (
+        {fetchEmailLoading || fetchEmailDetailsLoading ? (
           <Box height={81}>
             <Skeleton width={'50%'} />
             <Skeleton />
