@@ -13,7 +13,7 @@ export const InboxReceipt = () => {
   );
 
   return (
-    <Stack flex={1}>
+    <Stack flex={1} height={'100%'}>
       {fetchEmailLoading ? (
         <Box height={81}>
           <Skeleton width={'50%'} />
@@ -51,20 +51,29 @@ export const InboxReceipt = () => {
           }
         />
       )}
-      <Stack gap={2} p={4}>
-        {inboxContentList.map((inboxContent, index) => (
-          <InboxReceiptCard
-            avatarName={inboxContent?.name?.[0]?.toUpperCase()}
-            email={inboxContent.email || ''}
-            emailContent={
-              `<p><span style="font-size:12px"><strong>${inboxContent.subject}</strong></span></p>` +
-              '<p>&nbsp;</p>' +
-              `<p><span style="font-size:12px">${inboxContent.content}</span></p>`
-            }
-            emailType={inboxContent.emailType}
-            key={index}
-          />
-        ))}
+      <Stack flex={1} gap={2} overflow={'auto'} p={4}>
+        {fetchEmailLoading ? (
+          <Box height={81}>
+            <Skeleton width={'50%'} />
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
+          </Box>
+        ) : (
+          inboxContentList.map((inboxContent, index) => (
+            <InboxReceiptCard
+              avatarName={inboxContent?.name?.[0]?.toUpperCase()}
+              email={inboxContent.email || ''}
+              emailContent={
+                `<p><span style="font-size:12px"><strong>${inboxContent.subject}</strong></span></p>` +
+                '<p>&nbsp;</p>' +
+                `<p><span style="font-size:12px">${inboxContent.content}</span></p>`
+              }
+              emailType={inboxContent.emailType}
+              key={index}
+            />
+          ))
+        )}
       </Stack>
     </Stack>
   );

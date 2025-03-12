@@ -42,6 +42,7 @@ export type InboxStoreState = {
   inboxSideSentList: InboxSideItem[];
   inboxContentList: InboxContentItem[];
   selectedEmail?: InboxSideItem;
+  totalEmails: number;
 };
 
 export type InboxStoreStateActions = {
@@ -56,6 +57,7 @@ export type InboxStoreStateActions = {
   setFetchEngageLoading: (fetchEngageLoading: boolean) => void;
   setFetchSentLoading: (fetchSentLoading: boolean) => void;
   setFetchEmailLoading: (fetchEmailLoading: boolean) => void;
+  setTotalEmails: (totalEmails: number) => void;
   // fetchEmailsData: (
   //   params: PaginationParam & {
   //     searchContact?: string;
@@ -74,6 +76,7 @@ export const useInboxStore = create<InboxStoreProps>()((set) => ({
   fetchEmailLoading: false,
   forwardReceipt: '',
   inboxSideList: [],
+  totalEmails: 0,
   inboxSideSentList: [],
   inboxContentList: [],
   receiptType: ReceiptTypeEnum.engaged,
@@ -90,6 +93,7 @@ export const useInboxStore = create<InboxStoreProps>()((set) => ({
   setFetchEngageLoading: (fetchEngageLoading) => set({ fetchEngageLoading }),
   setFetchSentLoading: (fetchSentLoading) => set({ fetchSentLoading }),
   setFetchEmailLoading: (fetchEmailLoading) => set({ fetchEmailLoading }),
+  setTotalEmails: (totalEmails) => set({ totalEmails }),
   // fetchEmailDetails: async (emailId) => {
   //   try {
   //     const res = await _fetchEmailsDetails(emailId);

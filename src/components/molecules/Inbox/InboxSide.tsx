@@ -1,4 +1,11 @@
-import { FC, SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import {
+  FC,
+  SyntheticEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Avatar,
   Box,
@@ -9,12 +16,12 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import { differenceInDays, format, isSameDay } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 
 import { SDRToast, StyledTextField } from '@/components/atoms';
 
 import { ReceiptTypeEnum, useInboxStore } from '@/stores/useInboxStore';
-import { useAsyncFn } from '@/hooks';
+import { useAsyncFn, useContainerHeight } from '@/hooks';
 import { _fetchEmails, _fetchEmailsDetails } from '@/request';
 import { HttpError } from '@/types';
 
@@ -30,16 +37,29 @@ export const InboxSide: FC = () => {
     setInboxSideSentList,
     inboxSideSentList,
     setFetchEmailLoading,
+    totalEmails,
+    setTotalEmails,
   } = useInboxStore((state) => state);
   const [contacts, setContacts] = useState('');
+  const [scrollLoading, setScrollLoading] = useState(false);
+  const [engagedPage, setEngagedPage] = useState(0);
+  const [sentPage, setSentPage] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const containerHeight = useContainerHeight(scrollRef);
+  const defaultPageSize = Math.floor(containerHeight / 65) + 5;
 
   const [, fetchEmails] = useAsyncFn(
-    async (emailType: ReceiptTypeEnum, contacts?: string) => {
+    async (
+      emailType: ReceiptTypeEnum,
+      contacts?: string,
+      page = 0,
+      size = 20,
+    ) => {
       setFetchEmailLoading(true);
       try {
         const res = await _fetchEmails({
-          page: 0,
-          size: 10,
+          page,
+          size,
           emailType,
           searchContact: contacts,
         });
@@ -48,17 +68,20 @@ export const InboxSide: FC = () => {
             setInboxSideList(res.data.content);
             res.data.content.length > 0 &&
               setSelectedEmail(res.data.content[0]);
+            setTotalEmails(res.data.page.totalElements);
           }
           if (emailType === ReceiptTypeEnum.sent) {
             res.data.content.length > 0 &&
               setSelectedEmail(res.data.content[0]);
             setInboxSideSentList(res.data.content);
+            setTotalEmails(res.data.page.totalElements);
           }
           setFetchEmailLoading(false);
           res.data.content.length > 0
             ? await fetchEmailDetails(res.data.content[0].emailId)
             : setInboxContentList([]);
         }
+        return res;
       } catch (e) {
         setFetchEmailLoading(false);
         const { message, header, variant } = e as HttpError;
@@ -67,13 +90,43 @@ export const InboxSide: FC = () => {
     },
   );
 
+  const [, scrollFetchEmails] = useAsyncFn(
+    async (emailType: ReceiptTypeEnum, contacts?: string, page = 0) => {
+      try {
+        setScrollLoading(true);
+        const res = await _fetchEmails({
+          page,
+          size: 10,
+          emailType,
+          searchContact: contacts,
+        });
+        if (Array.isArray(res.data.content)) {
+          if (emailType === ReceiptTypeEnum.engaged) {
+            setInboxSideList(inboxSideList.concat(res.data.content));
+          }
+          if (emailType === ReceiptTypeEnum.sent) {
+            setInboxSideSentList(inboxSideSentList.concat(res.data.content));
+          }
+        }
+        setScrollLoading(false);
+        return res;
+      } catch (e) {
+        setScrollLoading(false);
+        const { message, header, variant } = e as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+    [inboxSideList, inboxSideSentList],
+  );
+
   const debounceSearch = useMemo(
     () =>
       debounce(async (value: string) => {
-        await fetchEmails(receiptType, value);
+        await fetchEmails(receiptType, value, 0, defaultPageSize);
       }, 500),
 
-    [receiptType],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receiptType, defaultPageSize],
   );
 
   const handleChange = async (
@@ -82,7 +135,7 @@ export const InboxSide: FC = () => {
   ) => {
     // setValue(newValue);
     setReceiptType(newValue);
-    await fetchEmails(newValue);
+    await fetchEmails(newValue, contacts, 0, defaultPageSize);
   };
 
   const [, fetchEmailDetails] = useAsyncFn(async (emailId: number) => {
@@ -100,8 +153,35 @@ export const InboxSide: FC = () => {
     }
   });
 
+  const currentNumber =
+    receiptType === ReceiptTypeEnum.engaged
+      ? inboxSideList.length
+      : inboxSideSentList.length;
+
+  const handleScroll = async (e: SyntheticEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (
+      scrollHeight - scrollTop < clientHeight + 300 &&
+      !scrollLoading &&
+      currentNumber < totalEmails
+    ) {
+      await scrollFetchEmails(receiptType, contacts, engagedPage + 1);
+      if (receiptType === ReceiptTypeEnum.engaged) {
+        setEngagedPage(engagedPage + 1);
+      } else {
+        setSentPage(sentPage + 1);
+      }
+    }
+  };
+
   useEffect(() => {
-    fetchEmails(ReceiptTypeEnum.engaged);
+    if (scrollRef.current) {
+      // if (inboxSideSentList.length === 0 || inboxSideSentList.length === 0) {
+      // noinspection JSIgnoredPromiseFromCall
+      fetchEmails(ReceiptTypeEnum.engaged, '', 0, defaultPageSize);
+      // }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -144,95 +224,96 @@ export const InboxSide: FC = () => {
           value={contacts}
         />
       </Stack>
-
-      {(receiptType === ReceiptTypeEnum.engaged
-        ? inboxSideList
-        : inboxSideSentList
-      ).map((item, index) => (
-        <CardHeader
-          avatar={
-            <Avatar
-              src={item.avatar || undefined}
-              sx={{
-                bgcolor: 'background.avatar_defaultBg',
-                height: 32,
-                width: 32,
-              }}
-            >
-              {item.name?.[0]?.toUpperCase()}
-            </Avatar>
-          }
-          key={index}
-          onClick={async () => {
-            if (receiptType === ReceiptTypeEnum.engaged) {
-              setInboxSideList(
-                inboxSideList.map((inbox) => {
-                  if (inbox.emailId === item.emailId) {
-                    return { ...inbox, read: true };
-                  }
-                  return inbox;
-                }),
-              );
-            }
-            setSelectedEmail(item);
-            await fetchEmailDetails(item.emailId);
-          }}
-          subheader={
-            <Stack
-              alignItems={'center'}
-              flexDirection={'row'}
-              justifyContent={'space-between'}
-            >
-              <Typography
-                component={'div'}
-                maxWidth={210}
+      <Stack flex={1} onScroll={handleScroll} overflow={'auto'} ref={scrollRef}>
+        {(receiptType === ReceiptTypeEnum.engaged
+          ? inboxSideList
+          : inboxSideSentList
+        ).map((item, index) => (
+          <CardHeader
+            avatar={
+              <Avatar
+                src={item.avatar || undefined}
                 sx={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  bgcolor: 'background.avatar_defaultBg',
+                  height: 32,
+                  width: 32,
                 }}
-                variant={'subtitle2'}
               >
-                You: {item.subject}
-              </Typography>
-              {receiptType === ReceiptTypeEnum.engaged && (
-                <Box
-                  bgcolor={item.read ? 'transparent' : '#6E4EFB'}
-                  borderRadius={'10px'}
-                  height={10}
-                  width={10}
-                ></Box>
-              )}
-            </Stack>
-          }
-          sx={{
-            px: 2.5,
-            py: 1.5,
-            '&:hover': {
-              bgcolor: '#F8F8FA',
-            },
-            cursor: 'pointer',
-            bgcolor:
-              selectedEmail?.emailId === item.emailId
-                ? '#F8F8FA'
-                : 'transparent',
-          }}
-          title={
-            <Stack
-              alignItems={'center'}
-              flexDirection={'row'}
-              justifyContent={'space-between'}
-            >
-              <Typography variant={'subtitle2'}>{item.name}</Typography>
-              <Typography variant={'subtitle3'}>
-                {isSameDay(new Date(), new Date(item.sentOn))
-                  ? format(new Date(item.sentOn), 'HH:mm')
-                  : format(new Date(item.sentOn), 'yyyy/MM/dd')}
-              </Typography>
-            </Stack>
-          }
-        />
-      ))}
+                {item.name?.[0]?.toUpperCase()}
+              </Avatar>
+            }
+            key={index}
+            onClick={async () => {
+              if (receiptType === ReceiptTypeEnum.engaged) {
+                setInboxSideList(
+                  inboxSideList.map((inbox) => {
+                    if (inbox.emailId === item.emailId) {
+                      return { ...inbox, read: true };
+                    }
+                    return inbox;
+                  }),
+                );
+              }
+              setSelectedEmail(item);
+              await fetchEmailDetails(item.emailId);
+            }}
+            subheader={
+              <Stack
+                alignItems={'center'}
+                flexDirection={'row'}
+                justifyContent={'space-between'}
+              >
+                <Typography
+                  component={'div'}
+                  maxWidth={210}
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                  variant={'subtitle2'}
+                >
+                  You: {item.subject}
+                </Typography>
+                {receiptType === ReceiptTypeEnum.engaged && (
+                  <Box
+                    bgcolor={item.read ? 'transparent' : '#6E4EFB'}
+                    borderRadius={'10px'}
+                    height={10}
+                    width={10}
+                  ></Box>
+                )}
+              </Stack>
+            }
+            sx={{
+              px: 2.5,
+              py: 1.5,
+              '&:hover': {
+                bgcolor: '#F8F8FA',
+              },
+              cursor: 'pointer',
+              bgcolor:
+                selectedEmail?.emailId === item.emailId
+                  ? '#F8F8FA'
+                  : 'transparent',
+            }}
+            title={
+              <Stack
+                alignItems={'center'}
+                flexDirection={'row'}
+                justifyContent={'space-between'}
+              >
+                <Typography variant={'subtitle2'}>{item.name}</Typography>
+                <Typography variant={'subtitle3'}>
+                  {isSameDay(new Date(), new Date(item.sentOn))
+                    ? format(new Date(item.sentOn), 'HH:mm')
+                    : format(new Date(item.sentOn), 'yyyy/MM/dd')}
+                </Typography>
+              </Stack>
+            }
+          />
+        ))}
+      </Stack>
     </Stack>
   );
 };
