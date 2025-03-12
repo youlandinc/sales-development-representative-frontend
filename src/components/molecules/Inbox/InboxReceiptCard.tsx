@@ -26,6 +26,7 @@ type InboxReceiptCardProps = {
   email: string;
   emailContent: string;
   emailType: ReceiptTypeEnum;
+  emailId: number;
 };
 
 const SOURCE_LABEL = {
@@ -39,12 +40,14 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   email,
   emailContent,
   emailType,
+  emailId,
 }) => {
   const {
     setInboxContentType,
     setForwardContent,
     selectedEmail,
     setForwardReceipt,
+    setForwardEmailId,
   } = useInboxStore((state) => state);
 
   const { visible, open, close } = useSwitch();
@@ -107,6 +110,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
                     emailContent,
                 );
                 setForwardReceipt(email || '');
+                setForwardEmailId(emailId);
               }}
               size={'medium'}
               sx={{ px: '12px !important' }}
@@ -133,7 +137,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
                 loading={state.loading}
                 onClick={async () => {
                   await replyEmail({
-                    parentEmailId: selectedEmail!.emailId,
+                    emailId: emailId,
                     recipient: email,
                     cc: [],
                     subject: '',

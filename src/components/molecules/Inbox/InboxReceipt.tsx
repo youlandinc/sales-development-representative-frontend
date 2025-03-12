@@ -69,6 +69,7 @@ export const InboxReceipt = () => {
                 '<p>&nbsp;</p>' +
                 `<p><span style="font-size:12px">${inboxContent.content}</span></p>`
               }
+              emailId={inboxContent.emailId}
               emailType={inboxContent.emailType}
               key={index}
             />

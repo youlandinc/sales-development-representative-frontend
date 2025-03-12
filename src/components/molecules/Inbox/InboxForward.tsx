@@ -22,8 +22,13 @@ const validateEmail = (email: string) => {
 };
 
 export const InboxForward = () => {
-  const { setInboxContentType, forwardContent, forwardReceipt, selectedEmail } =
-    useInboxStore((state) => state);
+  const {
+    setInboxContentType,
+    forwardContent,
+    forwardReceipt,
+    selectedEmail,
+    forwardEmailId,
+  } = useInboxStore((state) => state);
 
   const [receipt, setReceipt] = useState('');
   const [cc, setCc] = useState('');
@@ -71,9 +76,9 @@ export const InboxForward = () => {
           disabled={receipt.trim() === ''}
           loading={state.loading}
           onClick={async () => {
-            if (typeof selectedEmail?.emailId === 'number') {
+            if (typeof forwardEmailId === 'number') {
               await sendEmail({
-                parentEmailId: selectedEmail.emailId,
+                emailId: forwardEmailId,
                 recipient: receipt,
                 cc: emailChip,
                 subject: subject,
