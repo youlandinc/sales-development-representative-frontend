@@ -27,6 +27,7 @@ type InboxReceiptCardProps = {
   emailContent: string;
   emailType: ReceiptTypeEnum;
   emailId: number;
+  avatarSrc: string;
 };
 
 const SOURCE_LABEL = {
@@ -41,6 +42,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   emailContent,
   emailType,
   emailId,
+  avatarSrc,
 }) => {
   const {
     setInboxContentType,
@@ -74,6 +76,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
       <CommonReceiptCardHeader
         avatarBgcolor={avatarBgcolor}
         avatarName={avatarName}
+        avatarSrc={avatarSrc?.length > 0 ? avatarSrc : undefined}
         email={email}
         prefix={
           <Typography

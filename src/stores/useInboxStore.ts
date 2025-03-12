@@ -23,7 +23,7 @@ export type InboxSideItem = {
 export type InboxContentItem = {
   email: string | null;
   name: string | null;
-  avatar: string | null;
+  avatar: string;
   subject: string | null;
   content: string | null;
   sentOn: string;

@@ -27,6 +27,7 @@ export const InboxReceipt = () => {
         <CommonReceiptCardHeader
           avatarBgcolor={'background.avatar_defaultBg'}
           avatarName={selectedEmail?.name?.[0]?.toUpperCase()}
+          avatarSrc={selectedEmail?.avatar || undefined}
           avatarSx={{ height: 40, width: 40, fontSize: 20 }}
           email={
             <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
@@ -66,6 +67,7 @@ export const InboxReceipt = () => {
           inboxContentList.map((inboxContent, index) => (
             <InboxReceiptCard
               avatarName={inboxContent?.name?.[0]?.toUpperCase()}
+              avatarSrc={inboxContent.avatar}
               email={inboxContent.email || ''}
               emailContent={
                 `<p><span style="font-size:12px"><strong>${inboxContent.subject}</strong></span></p>` +
