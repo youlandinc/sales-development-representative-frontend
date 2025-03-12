@@ -182,7 +182,6 @@ export const InboxSide: FC = () => {
       }
     }
   };
-  console.log(inboxSideList);
 
   useEffect(() => {
     if (scrollRef.current) {
