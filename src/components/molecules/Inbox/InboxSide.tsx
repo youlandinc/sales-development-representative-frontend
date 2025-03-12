@@ -182,6 +182,7 @@ export const InboxSide: FC = () => {
       }
     }
   };
+  console.log(inboxSideList);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -212,7 +213,7 @@ export const InboxSide: FC = () => {
         if (notification.tenantId === userProfile?.tenantId) {
           if (event === SSE_EVENT_TYPE.new_email) {
             const data = notification.data;
-            unshiftInboxSideList(data.data);
+            unshiftInboxSideList(data);
           }
           if (event === SSE_EVENT_TYPE.new_reply) {
             const emailId = notification.emailId;
