@@ -11,6 +11,7 @@ export const Inbox: FC = () => {
       borderRadius={4}
       flex={1}
       flexDirection={'row'}
+      overflow={'hidden'}
     >
       <InboxSide />
       <InboxContent />

@@ -1,8 +1,8 @@
 export enum EmailDomainStateEnum {
-  PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS',
-  FAILED = 'FAILED',
-  ACTIVE = 'ACTIVE',
+  pending = 'PENDING',
+  success = 'SUCCESS',
+  failed = 'FAILED',
+  active = 'ACTIVE',
 }
 
 export enum CampaignsPendingTimeLineEnum {
@@ -20,4 +20,9 @@ export enum LibraryTypeOfferTagTypeEnum {
   pain_points = 'PAIN_POINTS',
   solutions = 'SOLUTIONS',
   proof_points = 'PROOF_POINTS',
+}
+
+export enum SSE_EVENT_TYPE {
+  'new_email' = 'NEW_EMAIL',
+  'new_reply' = 'NEW_REPLY',
 }

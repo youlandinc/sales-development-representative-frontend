@@ -1,9 +1,9 @@
-import { FC, ReactNode, useRef } from 'react';
+import { FC, useRef } from 'react';
 import { Fade, Stack, Typography } from '@mui/material';
 
-import { useSwitch } from '@/hooks';
+import { useAsyncFn, useSwitch } from '@/hooks';
 
-import { StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton } from '@/components/atoms';
 import {
   CommonEmailContent,
   CommonReceiptCardHeader,
@@ -16,12 +16,23 @@ import {
   ReceiptTypeEnum,
   useInboxStore,
 } from '@/stores/useInboxStore';
+import { format } from 'date-fns';
+import { _replyEmails, ForwardEmailsParam } from '@/request';
+import { HttpError } from '@/types';
 
 type InboxReceiptCardProps = {
   avatarName?: string;
   avatarBgcolor?: string;
-  email: ReactNode;
+  email: string;
   emailContent: string;
+  emailType: ReceiptTypeEnum;
+  emailId: number;
+  avatarSrc: string;
+};
+
+const SOURCE_LABEL = {
+  [ReceiptTypeEnum.engaged]: 'FROM: ',
+  [ReceiptTypeEnum.sent]: 'TO: ',
 };
 
 export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
@@ -29,19 +40,43 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   avatarName,
   email,
   emailContent,
+  emailType,
+  emailId,
+  avatarSrc,
 }) => {
-  const { setInboxContentType, setForwardContent, receiptType } = useInboxStore(
-    (state) => state,
-  );
+  const {
+    setInboxContentType,
+    setForwardContent,
+    selectedEmail,
+    setForwardReceipt,
+    setForwardEmailId,
+  } = useInboxStore((state) => state);
 
   const { visible, open, close } = useSwitch();
   const editorRef = useRef<InboxEditorForwardRefProps | null>(null);
 
+  const [state, replyEmail] = useAsyncFn(async (param: ForwardEmailsParam) => {
+    try {
+      await _replyEmails(param);
+      close();
+    } catch (e) {
+      const { message, header, variant } = e as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  });
+
   return (
-    <Stack gap={1}>
+    <Stack
+      border={'1px solid'}
+      borderColor={'border.default'}
+      borderRadius={4}
+      gap={1}
+      p={1.5}
+    >
       <CommonReceiptCardHeader
         avatarBgcolor={avatarBgcolor}
         avatarName={avatarName}
+        avatarSrc={avatarSrc?.length > 0 ? avatarSrc : undefined}
         email={email}
         prefix={
           <Typography
@@ -49,7 +84,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
             component={'span'}
             variant={'subtitle3'}
           >
-            {receiptType === ReceiptTypeEnum.engaged ? 'TO' : 'FROM'}:
+            {SOURCE_LABEL[emailType] || ''}
           </Typography>
         }
       />
@@ -76,19 +111,15 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
                 setInboxContentType(InboxContentTypeEnum.forward);
                 setForwardContent(
                   '<p><span style="font-size:12px"><span style="color:#866bfb">Here is the forwarded email:</span></span></p>' +
-                    '<p><span style="font-size:12px"><span style="color:#866bfb">Sender: Richard Jia richard@Youland.com </span></span></p>' +
-                    '<p><span style="font-size:12px"><span style="color:#866bfb">Subject: FW: 11x Demo </span></span></p>' +
-                    '<p><span style="font-size:12px"><span style="color:#866bfb">Date: January 16, 2025, 02:31:27 GMT+8 </span></span></p>' +
-                    '<p><span style="font-size:12px"><span style="color:#866bfb">Recipient: Stanley stanley@Youland.com </span></span></p>' +
-                    '<p><span style="font-size:12px"><span style="color:#866bfb">Cc: Warren Jia warren@Youland.com, Rico Shen rico@Youland.com, Pran fan@Youland.com</span></span></p>' +
+                    `<p><span style="font-size:12px"><span style="color:#866bfb">Sender: ${selectedEmail?.email}</span></span></p>` +
+                    `<p><span style="font-size:12px"><span style="color:#866bfb">Subject: ${selectedEmail?.subject}</span></span></p>` +
+                    `<p><span style="font-size:12px"><span style="color:#866bfb">Date: ${typeof selectedEmail?.sentOn === 'string' ? format(new Date(selectedEmail.sentOn), 'MMMM dd, yyyy, HH:mm:ss') : ''}</span></span></p>` +
+                    `<p><span style="font-size:12px"><span style="color:#866bfb">Recipient: ${email || ''}</span></span></p>` +
                     '<p>&nbsp;</p>' +
-                    '<p><span style="font-size:12px"><strong>Elementum varius nisi vel tempus. Donec eleifend egestas viverra.</strong></span></p>' +
-                    '<p>&nbsp;</p>' +
-                    '<p><span style="font-size:12px">Hello </span></p>' +
-                    '<p><span style="font-size:12px">Dear Sir Good Morning, </span></p>' +
-                    '<p><span style="font-size:12px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non diam facilisis, commodo libero et, commodo sapien. Pellentesque sollicitudin massa sagittis dolor facilisis, sit amet vulputate nunc molestie. Pellentesque maximus nibh id luctus porta. Ut consectetur dui nec nulla mattis luctus. Donec nisi diam, congue vitae felis at, ullamcorper bibendum tortor. Vestibulum pellentesque felis felis. Etiam ac tortor felis. Ut elit arcu, rhoncus in laoreet vel, gravida sed tortor.</span></p>' +
-                    '<p><span style="font-size:12px">In elementum varius nisi vel tempus. Donec eleifend egestas viverra. Donec dapibus sollicitudin blandit. Donec scelerisque purus sit amet feugiat efficitur. Quisque feugiat semper sapien vel hendrerit. Mauris lacus felis, consequat nec pellentesque viverra, venenatis a lorem. Sed urna lectus.Quisque feugiat semper sapien vel hendrerit</span></p>',
+                    emailContent,
                 );
+                setForwardReceipt(email || '');
+                setForwardEmailId(emailId);
               }}
               size={'medium'}
               sx={{ px: '12px !important' }}
@@ -112,9 +143,18 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
                 Cancel
               </StyledButton>
               <StyledButton
-                onClick={open}
+                loading={state.loading}
+                onClick={async () => {
+                  await replyEmail({
+                    emailId: emailId,
+                    recipient: email,
+                    cc: [],
+                    subject: '',
+                    content: editorRef.current?.editInstance.getData() || '',
+                  });
+                }}
                 size={'medium'}
-                sx={{ px: '12px !important' }}
+                sx={{ px: '12px !important', width: 56 }}
               >
                 Send
               </StyledButton>

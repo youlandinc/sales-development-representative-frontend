@@ -8,7 +8,7 @@ export const InboxContent = () => {
   const { inboxContentType } = useInboxStore((state) => state);
 
   return (
-    <Stack flex={1}>
+    <Stack flex={1} height={'100%'}>
       {inboxContentType === InboxContentTypeEnum.receipt ? (
         <InboxReceipt />
       ) : (

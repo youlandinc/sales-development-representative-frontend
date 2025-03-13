@@ -1,11 +1,14 @@
-import React from 'react';
+import { FC } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { StyledButton, StyledTextField } from '@/components/atoms';
-import { SettingsCard } from '@/components/molecules';
 
-export const PersonalInfo = () => {
+import { StyledButton, StyledTextField } from '@/components/atoms';
+
+export const SettingsPersonalInfo: FC = () => {
   return (
-    <SettingsCard title={'Personal Information'}>
+    <Stack border={'1px solid #DFDEE6'} borderRadius={4} gap={3} p={3}>
+      <Typography component={'div'} lineHeight={1.2} variant={'h6'}>
+        Personal Information
+      </Typography>
       <Stack gap={1.5}>
         <Typography>Profile details</Typography>
         <Stack
@@ -57,6 +60,6 @@ export const PersonalInfo = () => {
           <StyledTextField label={'Password'} type={'password'} />
         </Stack>
       </Stack>
-    </SettingsCard>
+    </Stack>
   );
 };

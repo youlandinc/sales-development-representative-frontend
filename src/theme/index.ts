@@ -73,6 +73,7 @@ declare module '@mui/material/styles' {
     active: string;
     primary: string;
     secondary: string;
+    avatar_defaultBg: string;
   }
 
   interface TypeBoxShadow {
@@ -91,6 +92,10 @@ declare module '@mui/material/styles' {
     body3?: CSSProperties;
     subtitle3?: CSSProperties;
     h7?: CSSProperties;
+  }
+
+  interface TypeAction {
+    disabled_background: string;
   }
 }
 
@@ -158,7 +163,6 @@ const defaultOptions: ThemeOptions = {
       background: '#FFEEEA',
       contrastText: '#FFFFFF',
     },
-
     text: {
       default: '#2A292E',
       disabled: '#BABCBE',
@@ -176,6 +180,11 @@ const defaultOptions: ThemeOptions = {
       active: '#F7F4FD',
       primary: '#2A292E',
       secondary: '#6F6C7D',
+      avatar_defaultBg: '#DFE2E7',
+    },
+    action: {
+      disabled: '#BABCBE', //textfield:border color 、 icon color 、label color 、placeholder color
+      disabled_background: '#EDEDED', //contained:background  outlined:borderColor
     },
     border: {
       default: '#DFDEE6',

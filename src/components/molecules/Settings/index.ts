@@ -1,4 +1,8 @@
-export * from './EmailConfig';
-export * from './PersonalInfo';
-export * from './VerifyEmail';
-export * from './SettingsCard';
+export * from './SettingsEmails';
+export * from './SettingsPersonalInfo';
+
+export * from './SettingsCardEmail';
+
+export * from './SettingsEmailProfile';
+
+export * from './SettingsEmailVerify';
