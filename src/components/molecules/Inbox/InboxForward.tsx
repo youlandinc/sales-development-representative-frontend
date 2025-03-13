@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Chip, Stack, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 
 import {
   SDRToast,
@@ -16,9 +16,110 @@ import { useAsyncFn } from '@/hooks';
 import { HttpError } from '@/types';
 import { _forwardEmails, ForwardEmailsParam } from '@/request';
 
-const validateEmail = (email: string) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
+type StyledChipFieldProps = {
+  value: string[];
+  onChange: (value: string[]) => void;
+  label: string;
+};
+
+const StyledChipField: FC<StyledChipFieldProps> = ({
+  label,
+  value,
+  onChange,
+}) => {
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const [inputValue, setInputValue] = useState('');
+
+  return (
+    <Stack
+      alignItems={'center'}
+      flexDirection={'row'}
+      gap={1}
+      position={'relative'}
+    >
+      <Typography
+        color={'#6F6C7D'}
+        lineHeight={1.4}
+        // position={'relative'}
+        top={4}
+        variant={'subtitle3'}
+      >
+        {label}
+      </Typography>
+      <Autocomplete
+        freeSolo
+        fullWidth
+        inputValue={inputValue}
+        multiple
+        onChange={(_e, newValue) => {
+          onChange(newValue);
+        }}
+        onInputChange={(_e, newValue) => {
+          setInputValue(newValue);
+        }}
+        options={[]}
+        renderInput={(params) => (
+          <StyledTextFilledField
+            onKeyDown={(event) => {
+              if (
+                event.key === 'Enter' ||
+                event.key === ',' ||
+                event.key === ' '
+              ) {
+                (event as any).defaultMuiPrevented = true;
+                const inputValue = (event.target as any).value.trim();
+                if (inputValue && validateEmail(inputValue)) {
+                  if (!value.includes(inputValue)) {
+                    onChange([...value, inputValue]);
+                    setInputValue('');
+                  }
+                }
+                event.preventDefault(); // prevent default behavior
+              }
+            }}
+            placeholder={'adam@gmail.com, joe@outlook.com'}
+            slotProps={{
+              input: params.InputProps,
+              htmlInput: params.inputProps,
+            }}
+            type={'email'}
+          />
+        )}
+        renderTags={(value, getTagProps) =>
+          value.map((option, index) => {
+            return (
+              <Chip
+                label={option}
+                variant="outlined"
+                {...getTagProps({ index })}
+                key={index}
+                onDelete={() => {
+                  onChange(value.filter((item) => item !== option));
+                }}
+                sx={{
+                  fontSize: '12px',
+                  m: '0px 0px 8px 4px !important',
+                  lineHeight: '1.5',
+                  height: 'auto !important',
+                  '& .MuiChip-deleteIcon': { fontSize: '15px' },
+                }}
+              />
+            );
+          })
+        }
+        sx={{
+          '& .MuiInput-root .MuiInput-input': {
+            padding: '0 0 8px 4px',
+          },
+        }}
+        value={value}
+      />
+    </Stack>
+  );
 };
 
 export const InboxForward = () => {
@@ -30,8 +131,7 @@ export const InboxForward = () => {
     forwardEmailId,
   } = useInboxStore((state) => state);
 
-  const [receipt, setReceipt] = useState('');
-  const [cc, setCc] = useState('');
+  const [receipt, setReceipt] = useState<string[]>([]);
   const [subject, setSubject] = useState('');
   const [emailChip, setEmailChip] = useState<string[]>([]);
 
@@ -55,7 +155,7 @@ export const InboxForward = () => {
   }, [forwardContent]);
 
   useEffect(() => {
-    setReceipt(forwardReceipt);
+    setReceipt([forwardReceipt]);
   }, [forwardReceipt]);
 
   return (
@@ -73,7 +173,7 @@ export const InboxForward = () => {
           Cancel
         </StyledButton>
         <StyledButton
-          disabled={receipt.trim() === ''}
+          disabled={receipt.length === 0}
           loading={state.loading}
           onClick={async () => {
             if (typeof forwardEmailId === 'number') {
@@ -93,95 +193,25 @@ export const InboxForward = () => {
         </StyledButton>
       </Stack>
       <Stack gap={1.5}>
-        <StyledTextFilledField
+        {/* <StyledTextFilledField
           label={'Receipt:'}
           onChange={(e) => setReceipt(e.target.value)}
           value={receipt}
+        />*/}
+        <StyledChipField
+          label={'Receipt:'}
+          onChange={(value) => {
+            setReceipt(value);
+          }}
+          value={receipt}
         />
-        {/*<StyledTextFilledField*/}
-        {/*  label={'Cc:'}*/}
-        {/*  onChange={(e) => setCc(e.target.value)}*/}
-        {/*  value={cc}*/}
-        {/*/>*/}
-        <Box position={'relative'}>
-          <Typography
-            color={'#6F6C7D'}
-            lineHeight={1.4}
-            position={'absolute'}
-            top={4}
-            variant={'subtitle3'}
-          >
-            Cc:
-          </Typography>
-          <Autocomplete
-            freeSolo
-            inputValue={cc}
-            multiple
-            onChange={(_e, newValue) => {
-              setEmailChip(newValue);
-            }}
-            onInputChange={(_e, newValue) => {
-              setCc(newValue);
-            }}
-            options={[]}
-            renderInput={(params) => (
-              <StyledTextFilledField
-                onKeyDown={(event) => {
-                  if (
-                    event.key === 'Enter' ||
-                    event.key === ',' ||
-                    event.key === ' '
-                  ) {
-                    (event as any).defaultMuiPrevented = true;
-                    const inputValue = (event.target as any).value.trim();
-                    if (inputValue && validateEmail(inputValue)) {
-                      if (!emailChip.includes(inputValue)) {
-                        setEmailChip([...emailChip, inputValue]);
-                        setCc('');
-                      }
-                    }
-                    event.preventDefault(); // prevent default behavior
-                  }
-                }}
-                placeholder={'adam@gmail.com, joe@outlook.com'}
-                slotProps={{
-                  input: params.InputProps,
-                  htmlInput: params.inputProps,
-                }}
-                type={'email'}
-              />
-            )}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => {
-                return (
-                  <Chip
-                    label={option}
-                    variant="outlined"
-                    {...getTagProps({ index })}
-                    key={index}
-                    onDelete={() => {
-                      setEmailChip(emailChip.filter((item) => item !== option));
-                    }}
-                    sx={{
-                      fontSize: '12px',
-                      m: '0px 0px 8px 4px !important',
-                      lineHeight: '1.5',
-                      height: 'auto !important',
-                      '& .MuiChip-deleteIcon': { fontSize: '15px' },
-                      '&:first-child': { ml: '30px !important' },
-                    }}
-                  />
-                );
-              })
-            }
-            sx={{
-              '& .MuiInput-root .MuiInput-input': {
-                padding: emailChip.length ? '0 0 8px 4px' : '0 0 8px 30px',
-              },
-            }}
-            value={emailChip}
-          />
-        </Box>
+        <StyledChipField
+          label={'Cc:'}
+          onChange={(value) => {
+            setEmailChip(value);
+          }}
+          value={emailChip}
+        />
         <StyledTextFilledField
           label={'Subject:'}
           onChange={(e) => setSubject(e.target.value)}

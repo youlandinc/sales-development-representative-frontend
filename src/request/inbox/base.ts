@@ -16,7 +16,7 @@ export const _fetchEmails = (
 
 export type ForwardEmailsParam = {
   emailId: number;
-  recipient: string;
+  recipient: string[] | string;
   cc: string[];
   subject: string;
   content: string;
