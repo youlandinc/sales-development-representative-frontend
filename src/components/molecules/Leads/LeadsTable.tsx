@@ -8,6 +8,7 @@ import {
   Icon,
   InputAdornment,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
@@ -129,9 +130,11 @@ export const LeadsTable: FC = () => {
       headerAlign: 'left',
       minWidth: 240,
       renderCell: ({ value }) => (
-        <Typography component={'span'} variant={'body2'}>
-          {value}
-        </Typography>
+        <Tooltip title={value}>
+          <Typography component={'span'} variant={'body2'}>
+            {value}
+          </Typography>
+        </Tooltip>
       ),
     },
     {
@@ -394,7 +397,7 @@ export const LeadsTable: FC = () => {
               borderBottom: '1px solid #DFDEE6',
             },
             '.MuiDataGrid-cell': {
-              overflow: 'unset !important',
+              overflow: 'hidden !important',
               position: 'relative',
               '&:focus': {
                 outline: 0,
