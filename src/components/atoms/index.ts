@@ -23,3 +23,7 @@ export * from './StyledSwitch';
 export * from './StyledSelect';
 
 export * from './StyledShadowContent';
+
+export * from './StyledGrid';
+
+export * from './StyledTextFieldSearch';

@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from 'react';
+import { FC, Fragment, ReactElement, ReactNode, useRef, useState } from 'react';
 import { Avatar, Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
@@ -16,6 +16,63 @@ import ICON_EXPEND from './assets/icon_expend.svg';
 import ICON_SIDE_LOGOUT from './assets/icon_side_logout.svg';
 
 import ICON_LOGO_EXPEND from './assets/icon_logo_expend.svg';
+
+type StyledMenuItemProps = {
+  expend?: boolean;
+  active?: boolean;
+  label?: string;
+  activeIcon?: any;
+  defaultIcon?: any;
+  onClick?: () => void;
+};
+
+const StyledMenuItem: FC<StyledMenuItemProps> = ({
+  expend,
+  label,
+  active,
+  activeIcon,
+  defaultIcon,
+  onClick,
+}) => {
+  return (
+    <Stack
+      alignItems={'center'}
+      flexDirection={'row'}
+      gap={0.5}
+      justifyContent={expend ? 'unset' : 'center'}
+      onClick={() => onClick?.()}
+      py={1.5}
+      sx={{
+        cursor: 'pointer',
+        transitions: 'all .3s',
+        '& .layout_label': {
+          color: active ? 'primary.main' : 'text.primary',
+        },
+        '&:hover': {
+          '& .layout_icon': {
+            '& path': {
+              fill: active ? '' : '#6F6C7D',
+            },
+          },
+          '& .layout_label': {
+            color: active ? 'primary.main' : 'text.secondary',
+          },
+        },
+      }}
+    >
+      <Icon
+        className={'layout_icon'}
+        component={active ? activeIcon : defaultIcon}
+      />
+
+      {expend && (
+        <Typography className={'layout_label'} mb={0.5} variant={'body2'}>
+          {label}
+        </Typography>
+      )}
+    </Stack>
+  );
+};
 
 export const LayoutSide: FC = () => {
   const { userProfile, isHydration, resetUserStore } = useUserStore(
@@ -89,8 +146,10 @@ export const LayoutSide: FC = () => {
     </Stack>
   );
 
+  const isSelected = (key: string) => pathname === key;
+
   const onClickToRedirect = (key: string) => {
-    if (pathname.includes(key)) {
+    if (isSelected(key)) {
       return;
     }
     router.push(key);
@@ -133,55 +192,32 @@ export const LayoutSide: FC = () => {
       >
         {LAYOUT_SIDE_MENU.map((item, index) =>
           item.type === 'link' ? (
-            <Stack
-              alignItems={'center'}
-              flexDirection={'row'}
-              gap={0.5}
-              justifyContent={expend ? 'unset' : 'center'}
-              key={`${item.key}-${index}`}
-              onClick={() => onClickToRedirect(item.url)}
-              py={1.5}
-              sx={{
-                cursor: 'pointer',
-                transitions: 'all .3s',
-                '& .layout_label': {
-                  color: pathname.includes(item.key)
-                    ? 'primary.main'
-                    : 'text.primary',
-                },
-                '&:hover': {
-                  '& .layout_icon': {
-                    '& path': {
-                      fill: pathname.includes(item.key) ? '' : '#6F6C7D',
-                    },
-                  },
-                  '& .layout_label': {
-                    color: pathname.includes(item.key)
-                      ? 'primary.main'
-                      : 'text.secondary',
-                  },
-                },
-              }}
-            >
-              <Icon
-                className={'layout_icon'}
-                component={
-                  pathname.includes(item.key)
-                    ? item.activeIcon
-                    : item.defaultIcon
-                }
+            <Fragment key={index}>
+              <StyledMenuItem
+                active={isSelected(item.url)}
+                activeIcon={item.activeIcon}
+                defaultIcon={item.defaultIcon}
+                expend
+                key={`${item.key}-${index}`}
+                label={item.label}
+                onClick={() => onClickToRedirect(item.url)}
               />
-
-              {expend && (
-                <Typography
-                  className={'layout_label'}
-                  mb={0.5}
-                  variant={'body2'}
-                >
-                  {item.label}
-                </Typography>
+              {item.subMenus && (
+                <Stack pl={'28px'}>
+                  {item.subMenus.map((item, i) => (
+                    <StyledMenuItem
+                      active={isSelected(item.url)}
+                      activeIcon={item.activeIcon}
+                      defaultIcon={item.defaultIcon}
+                      expend
+                      key={`${item.key}-${i}`}
+                      label={item.label}
+                      onClick={() => onClickToRedirect(item.url)}
+                    />
+                  ))}
+                </Stack>
               )}
-            </Stack>
+            </Fragment>
           ) : (
             <Stack key={`${item.key}-${index}`} mb={1.5}>
               <StyledButton

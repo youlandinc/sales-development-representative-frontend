@@ -17,3 +17,9 @@ export * from './Settings';
 export * from './CampaignsPending';
 
 export * from './Library';
+
+export * from './Contacts';
+
+export * from './GridPagination';
+
+export * from './Segments';
