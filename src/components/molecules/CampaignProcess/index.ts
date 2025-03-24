@@ -14,6 +14,10 @@ export * from './CampaignProcessContentChatServerCard';
 
 export * from './CampaignProcessContentFilter';
 
+export * from './CampaignProcessContentCSV';
+
+export * from './CampaignProcessContentCRM';
+
 export * from './CampaignLeadsCard';
 
 export * from './CampaignProcess';

@@ -7,6 +7,8 @@ import {
   CampaignProcessContentAudience,
   CampaignProcessContentChat,
   CampaignProcessContentChoose,
+  CampaignProcessContentCRM,
+  CampaignProcessContentCSV,
   CampaignProcessContentFilter,
   CampaignProcessContentLunch,
   CampaignProcessContentMessaging,
@@ -37,15 +39,15 @@ export const CampaignProcessContent = () => {
       case ProcessCreateTypeEnum.filter:
         return activeStep === 1 && <CampaignProcessContentFilter />;
       case ProcessCreateTypeEnum.crm:
+        return activeStep === 1 && <CampaignProcessContentCRM />;
       case ProcessCreateTypeEnum.csv:
+        return activeStep === 1 && <CampaignProcessContentCSV />;
       case ProcessCreateTypeEnum.agent:
         return <CampaignProcessContentChat />;
       default:
         return <></>;
     }
   }, [activeStep, campaignType]);
-
-  console.log(leadsVisible);
 
   return (
     <Stack
@@ -56,6 +58,7 @@ export const CampaignProcessContent = () => {
       minHeight={activeStep === 1 ? 480 : 'auto'}
       minWidth={900}
       overflow={'hidden'}
+      pt={3}
       width={'100%'}
     >
       {renderNode}

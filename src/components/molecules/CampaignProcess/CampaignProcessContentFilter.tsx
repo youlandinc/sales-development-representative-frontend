@@ -2,7 +2,6 @@ import { FC, useState } from 'react';
 import { Box, Collapse, Icon, Stack, Typography } from '@mui/material';
 import useSWR from 'swr';
 
-import { useDebounce } from '@/hooks';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { COMPANY_HEADCOUNT_OPTIONS, COMPANY_REVENUE_OPTIONS } from './data';
@@ -10,7 +9,7 @@ import { SDRToast } from '@/components/atoms';
 import { StyledSearchSelect, StyledSelectWithCustom } from './index';
 
 import { HttpError } from '@/types';
-import { _fetchFilterLeads, _fetchFilterOptions } from '@/request';
+import { _fetchFilterOptions } from '@/request';
 
 import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
 
@@ -25,13 +24,13 @@ export enum SelectWithFlagTypeEnum {
   input = 'INPUT',
 }
 
-interface SearchWithFlagData {
+export interface SearchWithFlagData {
   value: string;
   isIncludes?: boolean;
   type: SelectWithFlagTypeEnum;
 }
 
-interface SelectWithCustomProps {
+export interface SelectWithCustomProps {
   inputValue: string;
   selectValue: string;
 }
@@ -48,20 +47,7 @@ interface TreeNode {
 }
 
 export const CampaignProcessContentFilter: FC = () => {
-  const {
-    isFirst,
-    setIsFirst,
-    setLeadsList,
-    setLeadsCount,
-    leadsVisible,
-    setLeadsVisible,
-    setLeadsFetchLoading,
-  } = useDialogStore();
-
-  const [formData, setFormData] =
-    useState<Record<string, SearchWithFlagData[] | SelectWithCustomProps>>(
-      INITIAL_FORM,
-    );
+  const { filterFormData, setFilterFormData } = useDialogStore();
 
   const [renderData, setRenderData] = useState<TreeNode[]>(RENDER_DATA);
 
@@ -93,38 +79,8 @@ export const CampaignProcessContentFilter: FC = () => {
     },
   );
 
-  const debouncedFormData = useDebounce(formData, 500);
-
-  useSWR(
-    debouncedFormData,
-    async () => {
-      if (isFirst) {
-        return setIsFirst(false);
-      }
-      if (!leadsVisible) {
-        setLeadsVisible(true);
-      }
-      setLeadsFetchLoading(true);
-      try {
-        const {
-          data: { counts, leads },
-        } = await _fetchFilterLeads(debouncedFormData);
-        setLeadsList(leads);
-        setLeadsCount(counts);
-      } catch (err) {
-        const { message, header, variant } = err as HttpError;
-        SDRToast({ message, header, variant });
-      } finally {
-        setLeadsFetchLoading(false);
-      }
-    },
-    {
-      revalidateOnFocus: false,
-    },
-  );
-
   return (
-    <Stack gap={3} height={'100%'} overflow={'auto'} pt={3} width={'100%'}>
+    <Stack gap={3} height={'100%'} overflow={'auto'} width={'100%'}>
       {renderData.map((item, index) => (
         <Box
           border={'1px solid #DFDEE6'}
@@ -173,21 +129,21 @@ export const CampaignProcessContentFilter: FC = () => {
                   {child.type === TreeNodeRenderTypeEnum.select_with_custom ? (
                     <StyledSelectWithCustom
                       inputValue={
-                        (formData?.[child.value] as SelectWithCustomProps)
+                        (filterFormData?.[child.value] as SelectWithCustomProps)
                           .inputValue
                       }
                       onSelectChange={(e) => {
-                        setFormData({
-                          ...formData,
+                        setFilterFormData({
+                          ...filterFormData,
                           [child.value]: {
-                            ...formData?.[child.value],
+                            ...filterFormData?.[child.value],
                             selectValue: e.target.value,
                           },
                         });
                       }}
                       options={child.options}
                       selectValue={
-                        (formData?.[child.value] as SelectWithCustomProps)
+                        (filterFormData?.[child.value] as SelectWithCustomProps)
                           .selectValue
                       }
                     />
@@ -196,35 +152,39 @@ export const CampaignProcessContentFilter: FC = () => {
                       disabled={isLoading}
                       id={`${item.label}-${child.label}-${index}-${childIndex}`}
                       onDelete={(value) => {
-                        setFormData({
-                          ...formData,
+                        setFilterFormData({
+                          ...filterFormData,
                           [child.value]: (
-                            formData?.[child.value] as SearchWithFlagData[]
+                            filterFormData?.[
+                              child.value
+                            ] as SearchWithFlagData[]
                           )?.filter((item: any) => item.value !== value),
                         });
                       }}
                       onInputKeyDown={(data) => {
-                        setFormData({
-                          ...formData,
+                        setFilterFormData({
+                          ...filterFormData,
                           [child.value]: data,
                         });
                       }}
                       onReset={() => {
-                        setFormData({
-                          ...formData,
+                        setFilterFormData({
+                          ...filterFormData,
                           [child.value]: [],
                         });
                       }}
                       onSelect={(data) => {
-                        setFormData({
-                          ...formData,
+                        setFilterFormData({
+                          ...filterFormData,
                           [child.value]: data,
                         });
                       }}
                       options={child.options}
                       type={child.type}
                       value={
-                        (formData?.[child.value] as SearchWithFlagData[]) || []
+                        (filterFormData?.[
+                          child.value
+                        ] as SearchWithFlagData[]) || []
                       }
                     />
                   )}
@@ -236,24 +196,6 @@ export const CampaignProcessContentFilter: FC = () => {
       ))}
     </Stack>
   );
-};
-
-const INITIAL_FORM = {
-  jobTitle: [],
-  universityName: [],
-  companyHeadcount: {
-    selectValue: '',
-    inputValue: '',
-  },
-  industry: [],
-  currentCompany: [],
-  personLocation: [],
-  companyRevenue: {
-    selectValue: '',
-    inputValue: '',
-  },
-  skills: [],
-  excludeSkill: [],
 };
 
 const RENDER_DATA: TreeNode[] = [

@@ -21,6 +21,10 @@ import {
   _renameCampaign,
   _updateCampaignProcessSnapshot,
 } from '@/request';
+import {
+  SearchWithFlagData,
+  SelectWithCustomProps,
+} from '@/components/molecules';
 
 export type DialogStoreState = {
   campaignType: ProcessCreateTypeEnum | undefined;
@@ -33,6 +37,9 @@ export type DialogStoreState = {
   creating: boolean;
   returning: boolean;
   messageList: ResponseCampaignChatRecord[];
+
+  filterFormData: Record<string, SearchWithFlagData[] | SelectWithCustomProps>;
+
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
   leadsCount: number;
@@ -63,6 +70,10 @@ export type DialogStoreActions = {
   createCampaign: () => Promise<void>;
 
   setIsFirst: (isFirst: boolean) => void;
+
+  setFilterFormData: (
+    formData: Record<string, SearchWithFlagData[] | SelectWithCustomProps>,
+  ) => void;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -107,6 +118,24 @@ const InitialState: DialogStoreState = {
 
   creating: false,
 
+  filterFormData: {
+    jobTitle: [],
+    universityName: [],
+    companyHeadcount: {
+      selectValue: '',
+      inputValue: '',
+    },
+    industry: [],
+    currentCompany: [],
+    personLocation: [],
+    companyRevenue: {
+      selectValue: '',
+      inputValue: '',
+    },
+    skills: [],
+    excludeSkill: [],
+  },
+
   leadsFetchLoading: false,
   leadsList: [],
   leadsCount: 0,
@@ -134,6 +163,7 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setFilterFormData: (formData) => set({ filterFormData: formData }),
   setIsFirst: (isFirst) => set({ isFirst }),
   setLeadsFetchLoading: (leadsFetchLoading) => set({ leadsFetchLoading }),
   setCampaignType: (campaignType: ProcessCreateTypeEnum) =>

@@ -16,10 +16,8 @@ export const CampaignProcess = () => {
       headerSx={{ p: 0 }}
       onClose={async (_, reason) => {
         if (reason === 'escapeKeyDown') {
+          await resetDialogState();
           closeProcess();
-          setTimeout(() => {
-            resetDialogState();
-          }, 300);
         }
       }}
       open={visibleProcess}
