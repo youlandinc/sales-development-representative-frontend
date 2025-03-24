@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Autocomplete, Checkbox, Chip, TextField } from '@mui/material';
+import { Autocomplete, Box, Checkbox, Chip, TextField } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import { styled } from '@mui/material/styles';
 
@@ -28,7 +28,7 @@ export interface StyledSearchSelectProps {
   onSelect: (data: any[]) => void;
   onDelete: (value: string) => void;
   onReset: () => void;
-  type: TreeNodeRenderTypeEnum;
+  type?: TreeNodeRenderTypeEnum;
   id: string;
 }
 
@@ -39,7 +39,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
   onSelect,
   onDelete,
   onReset,
-  type,
+  //type,
   id,
 }) => {
   return (
@@ -48,6 +48,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
       getOptionLabel={(option) => option.label}
       id={id}
       multiple
+      open={true}
       options={options}
       renderInput={(params) => (
         <TextField
@@ -78,8 +79,9 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
       )}
       renderOption={(props, option) => {
         return (
-          <li
+          <Box
             {...props}
+            component={'li'}
             key={`${option.key}-checkbox-key`}
             onClick={(e) => {
               e.stopPropagation();
@@ -98,6 +100,11 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
                 ]);
               }
             }}
+            sx={{
+              bgcolor: value.some((item) => item.value === option.value)
+                ? '#EFE9FB'
+                : 'transparent',
+            }}
           >
             <Checkbox
               checked={value.some((item) => item.value === option.value)}
@@ -106,7 +113,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
               style={{ marginRight: 8 }}
             />
             {option.label}
-          </li>
+          </Box>
         );
       }}
       renderTags={(value, getTagProps) => {
@@ -130,7 +137,15 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
         chip: {
           color: 'primary',
         },
+        paper: {
+          sx: {
+            '& .MuiAutocomplete-listbox': {
+              p: 0,
+            },
+          },
+        },
       }}
+      sx={{ '& fieldset': { borderRadius: 2 } }}
       value={value}
     />
   );
@@ -218,3 +233,4 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
 //    </Stack>
 //  </li>
 //) : ()
+

@@ -50,6 +50,7 @@ export const CampaignProcessContentChoose: FC = () => {
       height={'100%'}
       justifyContent={'space-between'}
       my={3}
+      px={1}
       width={'100%'}
     >
       {DEFAULT_PRODUCT.map((item, index) => (

@@ -63,10 +63,8 @@ export const CampaignProcessHeaderStepChoose: FC = () => {
         <Icon
           component={ICON_CLOSE}
           onClick={async () => {
+            await resetDialogState();
             closeProcess();
-            setTimeout(() => {
-              resetDialogState();
-            }, 300);
           }}
           sx={{ ml: 'auto', cursor: 'pointer' }}
         />
@@ -99,10 +97,8 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
         <Icon
           component={ICON_CLOSE}
           onClick={async () => {
+            await resetDialogState();
             closeProcess();
-            setTimeout(() => {
-              resetDialogState();
-            }, 300);
           }}
           sx={{ ml: 'auto', cursor: 'pointer' }}
         />
@@ -221,10 +217,8 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
         <Icon
           component={ICON_BACK}
           onClick={async () => {
+            await resetDialogState();
             closeProcess();
-            setTimeout(() => {
-              resetDialogState();
-            }, 300);
           }}
           sx={{
             cursor: 'pointer',

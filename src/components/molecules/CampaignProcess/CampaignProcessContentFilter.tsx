@@ -53,6 +53,7 @@ export const CampaignProcessContentFilter: FC = () => {
     setIsFirst,
     setLeadsList,
     setLeadsCount,
+    leadsVisible,
     setLeadsVisible,
     setLeadsFetchLoading,
   } = useDialogStore();
@@ -100,12 +101,14 @@ export const CampaignProcessContentFilter: FC = () => {
       if (isFirst) {
         return setIsFirst(false);
       }
+      if (!leadsVisible) {
+        setLeadsVisible(true);
+      }
       setLeadsFetchLoading(true);
       try {
         const {
           data: { counts, leads },
         } = await _fetchFilterLeads(debouncedFormData);
-        setLeadsVisible(true);
         setLeadsList(leads);
         setLeadsCount(counts);
       } catch (err) {
@@ -121,11 +124,15 @@ export const CampaignProcessContentFilter: FC = () => {
   );
 
   return (
-    <Stack height={'100%'} overflow={'auto'} pt={3} width={'100%'}>
+    <Stack gap={3} height={'100%'} overflow={'auto'} pt={3} width={'100%'}>
       {isLoading
         ? null
         : renderData.map((item, index) => (
-            <Box key={`filter-${index}`}>
+            <Box
+              border={'1px solid #DFDEE6'}
+              borderRadius={2}
+              key={`filter-${index}`}
+            >
               <Stack
                 alignItems={'center'}
                 flexDirection={'row'}
@@ -159,8 +166,9 @@ export const CampaignProcessContentFilter: FC = () => {
                   <Stack
                     gap={3}
                     key={`${item.label}-${child.label}-${index}-${childIndex}`}
+                    pb={childIndex === item.children.length - 1 ? 3 : 0}
+                    pt={childIndex === 0 ? 0 : 1.5}
                     px={3}
-                    py={1.5}
                   >
                     <Stack gap={1}>
                       <Typography variant={'subtitle2'}>

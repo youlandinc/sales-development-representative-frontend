@@ -151,13 +151,25 @@ export const CampaignProcessContentAudience = () => {
               </Typography>
             </Stack>
 
-            <Stack pb={3}>
-              {leadsList.map((lead, index) => (
-                <CampaignLeadsCard
-                  key={`${lead.firstName}-${lead.lastName}-${index}`}
-                  {...lead}
-                />
-              ))}
+            <Stack
+              alignItems={'center'}
+              flex={1}
+              justifyContent={'center'}
+              pb={3}
+              width={'100%'}
+            >
+              {leadsList.length > 0 ? (
+                leadsList.map((lead, index) => (
+                  <CampaignLeadsCard
+                    key={`${lead.firstName}-${lead.lastName}-${index}`}
+                    {...lead}
+                  />
+                ))
+              ) : (
+                <Typography color={'text.secondary'} variant={'body2'}>
+                  No matching leads found.
+                </Typography>
+              )}
             </Stack>
           </>
         )}

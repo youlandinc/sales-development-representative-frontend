@@ -39,6 +39,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
       onClick={onClick}
       py={1.5}
       sx={sx}
+      width={'100%'}
     >
       <Avatar
         src={avatar || ''}
