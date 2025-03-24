@@ -1,5 +1,12 @@
 import { CampaignStatusEnum } from '@/types';
 
+export enum ProcessCreateTypeEnum {
+  filter = 'FILTER',
+  csv = 'CSV',
+  crm = 'CRM',
+  agent = 'AGENT',
+}
+
 export enum ProcessCreateChatEnum {
   thinking = 'THINKING',
   create_plan = 'CREATE_PLAN',

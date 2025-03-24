@@ -159,3 +159,12 @@ export const _saveAndLunchCampaign = (params: {
 }) => {
   return put('/sdr/campaign/info', params);
 };
+
+// filter
+export const _fetchFilterOptions = () => {
+  return get('/sdr/dict/audience/filter');
+};
+
+export const _fetchFilterLeads = (params: any) => {
+  return post('/sdr/leads/filter/preview', params);
+};

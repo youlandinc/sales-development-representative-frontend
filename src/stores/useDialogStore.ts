@@ -3,6 +3,7 @@ import {
   CampaignLeadItem,
   CampaignStatusEnum,
   HttpError,
+  ProcessCreateTypeEnum,
   ResponseCampaignChatRecord,
   ResponseCampaignLaunchInfo,
   ResponseCampaignMessagingStep,
@@ -22,6 +23,7 @@ import {
 } from '@/request';
 
 export type DialogStoreState = {
+  campaignType: ProcessCreateTypeEnum | undefined;
   reloadTable: boolean;
   visibleProcess: boolean;
   activeStep: number;
@@ -31,9 +33,11 @@ export type DialogStoreState = {
   creating: boolean;
   returning: boolean;
   messageList: ResponseCampaignChatRecord[];
+  leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
   leadsCount: number;
   leadsVisible: boolean;
+
   campaignId: number | string | null;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
@@ -48,17 +52,22 @@ export type DialogStoreState = {
 };
 
 export type DialogStoreActions = {
+  setCampaignType: (campaignType: ProcessCreateTypeEnum) => void;
   openProcess: () => void;
   closeProcess: () => void;
   setActiveStep: (activeStep: number) => void;
   setChatId: (chatId: number | string) => void;
-  createChatSSE: (chatId: number | string) => Promise<void>;
-  setLeadsList: (leadsList: CampaignLeadItem[]) => void;
-  setLeadsCount: (leadsCount: number) => void;
   setReturning: (returning: boolean) => void;
-  setLeadsVisible: (leadsVisible: boolean) => void;
+  createChatSSE: (chatId: number | string) => Promise<void>;
   addMessageItem: (message: ResponseCampaignChatRecord) => void;
   createCampaign: () => Promise<void>;
+
+  setIsFirst: (isFirst: boolean) => void;
+
+  setLeadsList: (leadsList: CampaignLeadItem[]) => void;
+  setLeadsCount: (leadsCount: number) => void;
+  setLeadsVisible: (leadsVisible: boolean) => void;
+  setLeadsFetchLoading: (leadsFetchLoading: boolean) => void;
 
   setMessageList: (messageList: ResponseCampaignChatRecord[]) => void;
 
@@ -80,21 +89,29 @@ export type DialogStoreActions = {
 };
 
 const InitialState: DialogStoreState = {
-  visibleProcess: false,
-  activeStep: 1,
-  chatId: '',
-  chatSSE: void 0,
-  isFirst: true,
-  returning: false,
-  messageList: [],
-  leadsList: [],
-  leadsCount: 0,
-  leadsVisible: false,
-  creating: false,
+  campaignType: void 0,
   campaignId: '',
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
   setupPhase: SetupPhaseEnum.audience,
+  activeStep: 0,
+
+  visibleProcess: false,
+
+  chatId: '',
+  chatSSE: void 0,
+  messageList: [],
+
+  isFirst: true,
+  returning: false,
+
+  creating: false,
+
+  leadsFetchLoading: false,
+  leadsList: [],
+  leadsCount: 0,
+  leadsVisible: false,
+
   messagingSteps: [],
 
   offerOptions: [],
@@ -108,6 +125,7 @@ const InitialState: DialogStoreState = {
     replyTo: null,
     senderName: null,
   },
+
   reloadTable: false,
   isValidate: undefined,
 };
@@ -116,6 +134,10 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setIsFirst: (isFirst) => set({ isFirst }),
+  setLeadsFetchLoading: (leadsFetchLoading) => set({ leadsFetchLoading }),
+  setCampaignType: (campaignType: ProcessCreateTypeEnum) =>
+    set({ campaignType, activeStep: 1 }),
   setIsValidate: (isValidate: undefined | boolean) => {
     set({ isValidate });
   },
