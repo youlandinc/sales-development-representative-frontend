@@ -17,7 +17,9 @@ const StyledChip = styled(Chip)({
     borderRadius: '16px',
   },
   '.MuiChip-deleteIcon': {
-    color: '#0363C4',
+    color: 'text.primary',
+    width: 16,
+    height: 16,
   },
 });
 

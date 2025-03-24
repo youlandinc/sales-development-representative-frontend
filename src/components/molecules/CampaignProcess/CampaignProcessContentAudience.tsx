@@ -85,10 +85,8 @@ export const CampaignProcessContentAudience = () => {
             pb={1.5}
             position={'sticky'}
             pt={3}
-            sx={{
-              zIndex: 999,
-            }}
             top={0}
+            zIndex={999}
           >
             <Typography variant={'subtitle1'}>Preview leads</Typography>
             <Typography color={'text.secondary'} ml={'auto'} variant={'body2'}>
@@ -136,10 +134,8 @@ export const CampaignProcessContentAudience = () => {
             pb={1.5}
             position={'sticky'}
             pt={3}
-            sx={{
-              zIndex: 999,
-            }}
             top={0}
+            zIndex={999}
           >
             <Typography variant={'subtitle1'}>Preview leads</Typography>
             <Typography color={'text.secondary'} ml={'auto'} variant={'body2'}>
