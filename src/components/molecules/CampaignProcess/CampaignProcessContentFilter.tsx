@@ -93,7 +93,7 @@ export const CampaignProcessContentFilter: FC = () => {
     },
   );
 
-  const debouncedFormData = useDebounce(formData, 1000);
+  const debouncedFormData = useDebounce(formData, 500);
 
   useSWR(
     debouncedFormData,
@@ -125,120 +125,115 @@ export const CampaignProcessContentFilter: FC = () => {
 
   return (
     <Stack gap={3} height={'100%'} overflow={'auto'} pt={3} width={'100%'}>
-      {isLoading
-        ? null
-        : renderData.map((item, index) => (
-            <Box
-              border={'1px solid #DFDEE6'}
-              borderRadius={2}
-              key={`filter-${index}`}
-            >
-              <Stack
-                alignItems={'center'}
-                flexDirection={'row'}
-                justifyContent={'space-between'}
-                onClick={() => {
-                  const target = JSON.parse(JSON.stringify(item));
-                  target.collapse = !target.collapse;
-                  setRenderData(
-                    renderData.map((section, sectionIndex) =>
-                      sectionIndex === index ? target : section,
-                    ),
-                  );
-                }}
-                p={1.5}
-                width={'100%'}
-              >
-                <Typography variant={'subtitle1'}>{item.label}</Typography>
-                <Icon
-                  component={ICON_ARROW_DOWN}
-                  sx={{
-                    transform: `rotate(${item.collapse ? '180deg' : '0deg'})`,
-                    transition: 'all .3s',
-                    height: 16,
-                    width: 16,
-                  }}
-                />
-              </Stack>
+      {renderData.map((item, index) => (
+        <Box
+          border={'1px solid #DFDEE6'}
+          borderRadius={2}
+          key={`filter-${index}`}
+        >
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+            onClick={() => {
+              const target = JSON.parse(JSON.stringify(item));
+              target.collapse = !target.collapse;
+              setRenderData(
+                renderData.map((section, sectionIndex) =>
+                  sectionIndex === index ? target : section,
+                ),
+              );
+            }}
+            p={1.5}
+            width={'100%'}
+          >
+            <Typography variant={'subtitle1'}>{item.label}</Typography>
+            <Icon
+              component={ICON_ARROW_DOWN}
+              sx={{
+                transform: `rotate(${item.collapse ? '180deg' : '0deg'})`,
+                transition: 'all .3s',
+                height: 16,
+                width: 16,
+              }}
+            />
+          </Stack>
 
-              <Collapse in={item.collapse}>
-                {item.children.map((child, childIndex) => (
-                  <Stack
-                    gap={3}
-                    key={`${item.label}-${child.label}-${index}-${childIndex}`}
-                    pb={childIndex === item.children.length - 1 ? 3 : 0}
-                    pt={childIndex === 0 ? 0 : 1.5}
-                    px={3}
-                  >
-                    <Stack gap={1}>
-                      <Typography variant={'subtitle2'}>
-                        {child.label}
-                      </Typography>
-                      {child.type ===
-                      TreeNodeRenderTypeEnum.select_with_custom ? (
-                        <StyledSelectWithCustom
-                          inputValue={
-                            (formData?.[child.value] as SelectWithCustomProps)
-                              .inputValue
-                          }
-                          onSelectChange={(e) => {
-                            setFormData({
-                              ...formData,
-                              [child.value]: {
-                                ...formData?.[child.value],
-                                selectValue: e.target.value,
-                              },
-                            });
-                          }}
-                          options={child.options}
-                          selectValue={
-                            (formData?.[child.value] as SelectWithCustomProps)
-                              .selectValue
-                          }
-                        />
-                      ) : (
-                        <StyledSearchSelect
-                          id={`${item.label}-${child.label}-${index}-${childIndex}`}
-                          onDelete={(value) => {
-                            setFormData({
-                              ...formData,
-                              [child.value]: (
-                                formData?.[child.value] as SearchWithFlagData[]
-                              )?.filter((item: any) => item.value !== value),
-                            });
-                          }}
-                          onInputKeyDown={(data) => {
-                            setFormData({
-                              ...formData,
-                              [child.value]: data,
-                            });
-                          }}
-                          onReset={() => {
-                            setFormData({
-                              ...formData,
-                              [child.value]: [],
-                            });
-                          }}
-                          onSelect={(data) => {
-                            setFormData({
-                              ...formData,
-                              [child.value]: data,
-                            });
-                          }}
-                          options={child.options}
-                          type={child.type}
-                          value={
-                            (formData?.[child.value] as SearchWithFlagData[]) ||
-                            []
-                          }
-                        />
-                      )}
-                    </Stack>
-                  </Stack>
-                ))}
-              </Collapse>
-            </Box>
-          ))}
+          <Collapse in={item.collapse}>
+            {item.children.map((child, childIndex) => (
+              <Stack
+                gap={3}
+                key={`${item.label}-${child.label}-${index}-${childIndex}`}
+                pb={childIndex === item.children.length - 1 ? 3 : 0}
+                pt={childIndex === 0 ? 0 : 1.5}
+                px={3}
+              >
+                <Stack gap={1}>
+                  <Typography variant={'subtitle2'}>{child.label}</Typography>
+                  {child.type === TreeNodeRenderTypeEnum.select_with_custom ? (
+                    <StyledSelectWithCustom
+                      inputValue={
+                        (formData?.[child.value] as SelectWithCustomProps)
+                          .inputValue
+                      }
+                      onSelectChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          [child.value]: {
+                            ...formData?.[child.value],
+                            selectValue: e.target.value,
+                          },
+                        });
+                      }}
+                      options={child.options}
+                      selectValue={
+                        (formData?.[child.value] as SelectWithCustomProps)
+                          .selectValue
+                      }
+                    />
+                  ) : (
+                    <StyledSearchSelect
+                      disabled={isLoading}
+                      id={`${item.label}-${child.label}-${index}-${childIndex}`}
+                      onDelete={(value) => {
+                        setFormData({
+                          ...formData,
+                          [child.value]: (
+                            formData?.[child.value] as SearchWithFlagData[]
+                          )?.filter((item: any) => item.value !== value),
+                        });
+                      }}
+                      onInputKeyDown={(data) => {
+                        setFormData({
+                          ...formData,
+                          [child.value]: data,
+                        });
+                      }}
+                      onReset={() => {
+                        setFormData({
+                          ...formData,
+                          [child.value]: [],
+                        });
+                      }}
+                      onSelect={(data) => {
+                        setFormData({
+                          ...formData,
+                          [child.value]: data,
+                        });
+                      }}
+                      options={child.options}
+                      type={child.type}
+                      value={
+                        (formData?.[child.value] as SearchWithFlagData[]) || []
+                      }
+                    />
+                  )}
+                </Stack>
+              </Stack>
+            ))}
+          </Collapse>
+        </Box>
+      ))}
     </Stack>
   );
 };

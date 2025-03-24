@@ -108,72 +108,67 @@ export const CampaignProcessContentAudience = () => {
       )}
     </Stack>
   ) : (
-    !isFirst && (
-      <Stack
-        alignItems={leadsFetchLoading ? 'center' : 'unset'}
-        border={'1px solid #DFDEE6'}
-        borderRadius={4}
-        flexShrink={0}
-        height={'100%'}
-        justifyContent={leadsFetchLoading ? 'center' : 'unset'}
-        overflow={'auto'}
-        position={'sticky'}
-        px={3}
-        sx={{
-          transition: 'all .3s',
-          visibility: leadsVisible ? 'visible' : 'hidden',
-        }}
-        width={leadsVisible ? 360 : 0}
-      >
-        {leadsFetchLoading ? (
-          <StyledLoading size={48} />
-        ) : (
-          <>
-            <Stack
-              bgcolor={'#ffffff'}
-              borderBottom={'1px solid #DFDEE6'}
-              flexDirection={'row'}
-              pb={1.5}
-              position={'sticky'}
-              pt={3}
-              sx={{
-                zIndex: 999,
-              }}
-              top={0}
-            >
-              <Typography variant={'subtitle1'}>Preview leads</Typography>
-              <Typography
-                color={'text.secondary'}
-                ml={'auto'}
-                variant={'body2'}
-              >
-                Estimated <b>{UFormatNumber(leadsCount)}</b> leads
-              </Typography>
-            </Stack>
+    <Stack
+      alignItems={leadsFetchLoading ? 'center' : 'unset'}
+      border={'1px solid #DFDEE6'}
+      borderRadius={4}
+      flexShrink={0}
+      height={'calc(100% - 24px)'}
+      justifyContent={leadsFetchLoading ? 'center' : 'unset'}
+      mt={3}
+      overflow={'auto'}
+      position={'sticky'}
+      px={leadsVisible ? 3 : 0}
+      sx={{
+        transition: 'all .3s',
+        visibility: leadsVisible ? 'visible' : 'hidden',
+      }}
+      width={leadsVisible ? 360 : 0}
+    >
+      {leadsFetchLoading ? (
+        <StyledLoading size={48} />
+      ) : (
+        <>
+          <Stack
+            bgcolor={'#ffffff'}
+            borderBottom={'1px solid #DFDEE6'}
+            flexDirection={'row'}
+            pb={1.5}
+            position={'sticky'}
+            pt={3}
+            sx={{
+              zIndex: 999,
+            }}
+            top={0}
+          >
+            <Typography variant={'subtitle1'}>Preview leads</Typography>
+            <Typography color={'text.secondary'} ml={'auto'} variant={'body2'}>
+              Estimated <b>{UFormatNumber(leadsCount)}</b> leads
+            </Typography>
+          </Stack>
 
-            <Stack
-              alignItems={'center'}
-              flex={1}
-              justifyContent={'center'}
-              pb={3}
-              width={'100%'}
-            >
-              {leadsList.length > 0 ? (
-                leadsList.map((lead, index) => (
-                  <CampaignLeadsCard
-                    key={`${lead.firstName}-${lead.lastName}-${index}`}
-                    {...lead}
-                  />
-                ))
-              ) : (
-                <Typography color={'text.secondary'} variant={'body2'}>
-                  No matching leads found.
-                </Typography>
-              )}
-            </Stack>
-          </>
-        )}
-      </Stack>
-    )
+          <Stack
+            alignItems={leadsList.length > 0 ? 'unset' : 'center'}
+            flex={1}
+            justifyContent={leadsList.length > 0 ? 'unset' : 'center'}
+            pb={3}
+            width={'100%'}
+          >
+            {leadsList.length > 0 ? (
+              leadsList.map((lead, index) => (
+                <CampaignLeadsCard
+                  key={`${lead.firstName}-${lead.lastName}-${index}`}
+                  {...lead}
+                />
+              ))
+            ) : (
+              <Typography color={'text.secondary'} variant={'body2'}>
+                No matching leads found.
+              </Typography>
+            )}
+          </Stack>
+        </>
+      )}
+    </Stack>
   );
 };

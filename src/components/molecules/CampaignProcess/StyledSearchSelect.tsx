@@ -30,6 +30,7 @@ export interface StyledSearchSelectProps {
   onReset: () => void;
   type?: TreeNodeRenderTypeEnum;
   id: string;
+  disabled?: boolean;
 }
 
 export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
@@ -39,16 +40,17 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
   onSelect,
   onDelete,
   onReset,
+  disabled,
   //type,
   id,
 }) => {
   return (
     <Autocomplete
       disableCloseOnSelect
+      disabled={disabled}
       getOptionLabel={(option) => option.label}
       id={id}
       multiple
-      open={true}
       options={options}
       renderInput={(params) => (
         <TextField

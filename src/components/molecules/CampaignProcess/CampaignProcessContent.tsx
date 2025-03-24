@@ -45,6 +45,8 @@ export const CampaignProcessContent = () => {
     }
   }, [activeStep, campaignType]);
 
+  console.log(leadsVisible);
+
   return (
     <Stack
       flexDirection={'row'}
