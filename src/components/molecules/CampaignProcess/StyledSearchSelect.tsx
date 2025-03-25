@@ -4,10 +4,8 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { styled } from '@mui/material/styles';
 
 import { CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
-import {
-  SelectWithFlagTypeEnum,
-  TreeNodeRenderTypeEnum,
-} from '@/components/molecules';
+import { TreeNodeRenderTypeEnum } from '@/components/molecules';
+import { SelectWithFlagTypeEnum } from '@/types';
 
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;

@@ -3,8 +3,10 @@ import {
   CampaignLeadItem,
   CampaignStatusEnum,
   HttpError,
+  ProcessCreateChatEnum,
   ProcessCreateTypeEnum,
   ResponseCampaignChatRecord,
+  ResponseCampaignFilterFormData,
   ResponseCampaignLaunchInfo,
   ResponseCampaignMessagingStep,
   ResponseOfferOption,
@@ -13,18 +15,12 @@ import {
 } from '@/types';
 
 import { SDRToast } from '@/components/atoms';
-
-import { ProcessCreateChatEnum } from '@/types';
 import {
   _closeSSE,
   _createCampaign,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
 } from '@/request';
-import {
-  SearchWithFlagData,
-  SelectWithCustomProps,
-} from '@/components/molecules';
 
 export type DialogStoreState = {
   campaignType: ProcessCreateTypeEnum | undefined;
@@ -38,7 +34,7 @@ export type DialogStoreState = {
   returning: boolean;
   messageList: ResponseCampaignChatRecord[];
 
-  filterFormData: Record<string, SearchWithFlagData[] | SelectWithCustomProps>;
+  filterFormData: ResponseCampaignFilterFormData;
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
@@ -71,9 +67,7 @@ export type DialogStoreActions = {
 
   setIsFirst: (isFirst: boolean) => void;
 
-  setFilterFormData: (
-    formData: Record<string, SearchWithFlagData[] | SelectWithCustomProps>,
-  ) => void;
+  setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -330,13 +324,39 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     };
   },
   createCampaign: async () => {
-    const { chatId } = get();
-    if (!chatId) {
+    const { campaignType } = get();
+    let postData;
+    switch (campaignType) {
+      case ProcessCreateTypeEnum.agent: {
+        const { chatId } = get();
+        if (!chatId) {
+          return;
+        }
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.agent,
+          data: {
+            chatId,
+          },
+        };
+        break;
+      }
+      case ProcessCreateTypeEnum.filter: {
+        const { filterFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.filter,
+          data: {
+            conditions: filterFormData,
+          },
+        };
+        break;
+      }
+    }
+    if (!postData) {
       return;
     }
     set({ creating: true });
     try {
-      const { data } = await _createCampaign({ chatId });
+      const { data } = await _createCampaign(postData);
       await _updateCampaignProcessSnapshot({
         campaignId: data.campaignId,
         setupPhase: SetupPhaseEnum.messaging,
@@ -349,7 +369,16 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         messagingSteps: data.data.steps,
         lunchInfo: data.data.launchInfo,
         offerOptions: data.data.offerOptions,
+        chatId: data.chatId,
       });
+      switch (campaignType) {
+        case ProcessCreateTypeEnum.filter: {
+          set({
+            filterFormData: data.data.conditions,
+          });
+          break;
+        }
+      }
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });

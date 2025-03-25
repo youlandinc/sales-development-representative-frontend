@@ -1,5 +1,6 @@
 import { del, get, post, put } from '@/request/request';
 import {
+  ProcessCreateTypeEnum,
   ResponseCampaignEmail,
   ResponseCampaignInfo,
   ResponseCampaignLeadsInfo,
@@ -36,7 +37,10 @@ export const _closeSSE = (chatId: string | number) => {
 };
 
 // first step
-export const _createCampaign = (params: { chatId: number | string }) => {
+export const _createCampaign = (params: {
+  startingPoint: ProcessCreateTypeEnum;
+  data: any;
+}) => {
   return post<ResponseCampaignInfo>('/sdr/campaign/info', params);
 };
 

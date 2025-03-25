@@ -1,5 +1,21 @@
 import { CampaignStatusEnum } from '@/types';
 
+export enum SelectWithFlagTypeEnum {
+  select = 'SELECT',
+  input = 'INPUT',
+}
+
+export interface SearchWithFlagData {
+  value: string;
+  isIncludes?: boolean;
+  type: SelectWithFlagTypeEnum;
+}
+
+export interface SelectWithCustomProps {
+  inputValue: string;
+  selectValue: string;
+}
+
 export enum ProcessCreateTypeEnum {
   filter = 'FILTER',
   csv = 'CSV',
@@ -109,17 +125,28 @@ export interface ResponseOfferOption {
   selected: boolean;
 }
 
+export interface ResponseCampaignFilterFormData {
+  [key: string]: SearchWithFlagData[] | SelectWithCustomProps;
+}
+
 export interface ResponseCampaignInfo {
   campaignId: string | number;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
   chatId: number | string;
   setupPhase: SetupPhaseEnum;
+  startingPoint: ProcessCreateTypeEnum;
   data: {
+    // common
     leadInfo: ResponseCampaignLeadsInfo;
-    chatRecord: ResponseCampaignChatRecord[];
     steps: ResponseCampaignMessagingStep[];
     launchInfo: ResponseCampaignLaunchInfo;
     offerOptions: ResponseOfferOption[];
+    // chat
+    chatRecord?: ResponseCampaignChatRecord[];
+    // filter
+    conditions?: ResponseCampaignFilterFormData;
+    // csv
+    // crm
   };
 }

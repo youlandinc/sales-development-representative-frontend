@@ -8,7 +8,7 @@ import { COMPANY_HEADCOUNT_OPTIONS, COMPANY_REVENUE_OPTIONS } from './data';
 import { SDRToast } from '@/components/atoms';
 import { StyledSearchSelect, StyledSelectWithCustom } from './index';
 
-import { HttpError } from '@/types';
+import { HttpError, SearchWithFlagData, SelectWithCustomProps } from '@/types';
 import { _fetchFilterOptions } from '@/request';
 
 import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
@@ -17,22 +17,6 @@ export enum TreeNodeRenderTypeEnum {
   search_with_flag = 'SEARCH_WITH_FLAG',
   search_select = 'SEARCH_SELECT',
   select_with_custom = 'SELECT_WITH_CUSTOM',
-}
-
-export enum SelectWithFlagTypeEnum {
-  select = 'SELECT',
-  input = 'INPUT',
-}
-
-export interface SearchWithFlagData {
-  value: string;
-  isIncludes?: boolean;
-  type: SelectWithFlagTypeEnum;
-}
-
-export interface SelectWithCustomProps {
-  inputValue: string;
-  selectValue: string;
 }
 
 interface TreeNode {

@@ -20,6 +20,7 @@ import {
   CampaignStatusEnum,
   CampaignTableItem,
   HttpError,
+  ProcessCreateTypeEnum,
   SetupPhaseEnum,
 } from '@/types';
 import {
@@ -249,20 +250,27 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     openProcess,
     reloadTable,
     setReloadTable,
+    setActiveStep,
+    setCampaignType,
+    setIsFirst,
     setLeadsVisible,
     setLeadsCount,
-    setChatId,
-    setActiveStep,
     setLeadsList,
     setCampaignName,
     setCampaignStatus,
-    setSetupPhase,
-    setMessageList,
     setCampaignId,
-    createChatSSE,
+    setSetupPhase,
+    setChatId,
+    // common
     setMessagingSteps,
     setLunchInfo,
     setOfferOptions,
+
+    // chat
+    createChatSSE,
+    setMessageList,
+    // filter
+    setFilterFormData,
   } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -343,9 +351,11 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               chatId,
               setupPhase,
               campaignStatus,
+              startingPoint,
               data: {
                 leadInfo: { counts, leads },
                 chatRecord,
+                conditions,
                 steps,
                 launchInfo,
                 offerOptions,
@@ -353,6 +363,8 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
             },
           } = await _fetchCampaignInfo(campaignId);
 
+          setIsFirst(false);
+          setCampaignType(startingPoint);
           setCampaignId(campaignId);
           setChatId(chatId);
           setLeadsVisible(true);
@@ -364,8 +376,17 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           setLunchInfo(launchInfo);
           setOfferOptions(offerOptions);
           await setSetupPhase(setupPhase, false);
-          setMessageList(chatRecord);
-          await createChatSSE(chatId);
+
+          switch (startingPoint) {
+            case ProcessCreateTypeEnum.agent:
+              setMessageList(chatRecord!);
+              await createChatSSE(chatId);
+              break;
+            case ProcessCreateTypeEnum.filter:
+              setFilterFormData(conditions!);
+              break;
+          }
+
           setMessagingSteps(steps);
           openProcess();
         } catch (err) {
