@@ -316,7 +316,8 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
-    MuiTextField: {
+    //create by alfred ---------------------start
+    /*MuiTextField: {
       styleOverrides: {
         root: {
           background: 'transparent',
@@ -413,7 +414,8 @@ const defaultOptions: ThemeOptions = {
             '0px 10px 10px 0px rgba(17, 52, 227, 0.10),0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
         },
       },
-    },
+    },*/
+    //create by alfred ---------------------close
   },
 };
 
