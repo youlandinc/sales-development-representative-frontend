@@ -67,14 +67,14 @@ export const LAYOUT_SIDE_MENU = [
       },
     ],
   },
-  {
-    label: 'Leads',
-    url: '/leads',
-    key: 'leads',
-    defaultIcon: ICON_SIDE_LEADS_DEFAULT,
-    activeIcon: ICON_SIDE_LEADS_ACTIVE,
-    type: 'link',
-  },
+  // {
+  //   label: 'Leads',
+  //   url: '/leads',
+  //   key: 'leads',
+  //   defaultIcon: ICON_SIDE_LEADS_DEFAULT,
+  //   activeIcon: ICON_SIDE_LEADS_ACTIVE,
+  //   type: 'link',
+  // },
   {
     label: 'Inbox',
     url: '/inbox',
