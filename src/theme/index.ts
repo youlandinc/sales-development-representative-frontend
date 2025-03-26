@@ -317,7 +317,7 @@ const defaultOptions: ThemeOptions = {
       },
     },
     //create by alfred ---------------------start
-    /*MuiTextField: {
+    MuiTextField: {
       styleOverrides: {
         root: {
           background: 'transparent',
@@ -327,7 +327,7 @@ const defaultOptions: ThemeOptions = {
     MuiInputBase: {
       styleOverrides: {
         root: {
-          padding: '0 16px 0 16px',
+          // padding: '0 16px 0 16px',
         },
       },
     },
@@ -335,6 +335,15 @@ const defaultOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           color: 'var(--mui-palette-text-primary)',
+          fontSize: 14,
+          lineHeight: 1.43,
+          // transform: 'translate(14px, 6px) scale(1)',
+        },
+        shrink: {
+          // transform: 'translate(14px, -7px) scale(0.75)',
+        },
+        sizeSmall: {
+          // transform: 'translate(12px, 5px) scale(1)',
         },
       },
     },
@@ -342,14 +351,16 @@ const defaultOptions: ThemeOptions = {
       styleOverrides: {
         //input element
         input: {
-          padding: '12px 0 12px 0',
-          height: 'auto',
-          minHeight: 'auto',
-          lineHeight: 1.5,
+          paddingTop: '10px',
+          paddingBottom: '10px',
           zIndex: 1,
+          fontSize: 14,
+          lineHeight: 1.43,
+          height: 'auto',
         },
         inputSizeSmall: {
-          padding: '6px 0 6px 0',
+          paddingTop: '6px',
+          paddingBottom: '6px',
           fontSize: 14,
         },
         // border style
@@ -379,7 +390,7 @@ const defaultOptions: ThemeOptions = {
     MuiAutocomplete: {
       styleOverrides: {
         input: {
-          padding: '0 4px 0 8px',
+          // padding: '0 4px 0 8px',
         },
         endAdornment: {
           zIndex: 1,
@@ -414,7 +425,7 @@ const defaultOptions: ThemeOptions = {
             '0px 10px 10px 0px rgba(17, 52, 227, 0.10),0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
         },
       },
-    },*/
+    },
     //create by alfred ---------------------close
   },
 };

@@ -5,7 +5,9 @@ import {
   DrawerProps,
   Fade,
   Icon,
+  Select,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
@@ -296,7 +298,7 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                           index,
                           filterIndex,
                           'columnName',
-                          value!.value as unknown as string | number,
+                          (value?.value as unknown as string | number) || '',
                         );
                       }}
                       options={columnOptions}
@@ -353,7 +355,8 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                       }}
                       value={filter.operation}
                     />
-                    <StyledTextField
+                    <TextField
+                      // label={'Text'}
                       onChange={(e) =>
                         onChangeSegmentsFilters(
                           index,
@@ -368,9 +371,6 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                         ...defaultSelectStyle,
                         '& .MuiInputBase-input': { zIndex: 1 },
                         width: '100%',
-                        '& .MuiOutlinedInput-input': {
-                          py: '6px',
-                        },
                       }}
                       value={filter.operationText}
                     />
