@@ -230,19 +230,19 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
     return null;
   }
 
-  if (!totalRecords) {
-    return (
-      <>
-        {!isLoading && !loading && (
-          <Fade in={!isLoading && !loading}>
-            <Box height={'100%'}>
-              <GridNoData />
-            </Box>
-          </Fade>
-        )}
-      </>
-    );
-  }
+  // if (!totalRecords) {
+  //   return (
+  //     <>
+  //       {!isLoading && !loading && (
+  //         <Fade in={!isLoading && !loading}>
+  //           <Box height={'100%'}>
+  //             <GridNoData />
+  //           </Box>
+  //         </Fade>
+  //       )}
+  //     </>
+  //   );
+  // }
 
   return (
     <Fade in={true}>
