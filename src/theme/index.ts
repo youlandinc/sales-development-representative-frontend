@@ -1,6 +1,7 @@
 'use client';
 import { CSSProperties } from 'react';
 import { createTheme, ThemeOptions } from '@mui/material/styles';
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
@@ -273,6 +274,7 @@ const defaultOptions: ThemeOptions = {
       fontWeight: 400,
     },
   },
+
   components: {
     MuiButton: {
       defaultProps: {
@@ -314,6 +316,106 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
+    //create by alfred ---------------------start
+    /*MuiTextField: {
+      styleOverrides: {
+        root: {
+          background: 'transparent',
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          padding: '0 16px 0 16px',
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: 'var(--mui-palette-text-primary)',
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        //input element
+        input: {
+          padding: '12px 0 12px 0',
+          height: 'auto',
+          minHeight: 'auto',
+          lineHeight: 1.5,
+          zIndex: 1,
+        },
+        inputSizeSmall: {
+          padding: '6px 0 6px 0',
+          fontSize: 14,
+        },
+        // border style
+        notchedOutline: {
+          borderColor: 'var(--mui-palette-border-default)',
+          borderWidth: '1px',
+          background: 'transparent',
+          borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+        },
+        //border style when hover
+        root: {
+          [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: 'var(--mui-palette-border-hover)',
+            borderWidth: '1px',
+            background: 'transparent',
+            borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+          },
+          [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: 'var(--mui-palette-border-hover)',
+            borderWidth: '1px',
+            background: 'transparent',
+            borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+          },
+        },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        input: {
+          padding: '0 4px 0 8px',
+        },
+        endAdornment: {
+          zIndex: 1,
+        },
+        paper: {
+          fontSize: 14,
+          boxShadow:
+            '0px 10px 10px 0px rgba(17, 52, 227, 0.10),0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
+        },
+        listbox: {
+          padding: '0px 0px 0px 0px',
+        },
+        option: {
+          padding: '12px 12px 12px 12px !important',
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          zIndex: 1,
+        },
+        root: {
+          background: 'transparent',
+        },
+      },
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          boxShadow:
+            '0px 10px 10px 0px rgba(17, 52, 227, 0.10),0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
+        },
+      },
+    },*/
+    //create by alfred ---------------------close
   },
 };
 

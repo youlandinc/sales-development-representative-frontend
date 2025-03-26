@@ -56,6 +56,9 @@ importers:
       lodash:
         specifier: 4.17.21
         version: 4.17.21
+      material-react-table:
+        specifier: ^3.2.1
+        version: 3.2.1(35adgn3dphqlex35n6b7ahl6fu)
       next:
         specifier: 15.1.4
         version: 15.1.4(@babel/core@7.26.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1340,6 +1343,30 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
+  '@tanstack/match-sorter-utils@8.19.4':
+    resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
+    engines: {node: '>=12'}
+
+  '@tanstack/react-table@8.20.6':
+    resolution: {integrity: sha512-w0jluT718MrOKthRcr2xsjqzx+oEM7B7s/XXyfs19ll++hlId3fjTm+B2zrR3ijpANpkzBAr15j1XGVOMxpggQ==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+
+  '@tanstack/react-virtual@3.11.2':
+    resolution: {integrity: sha512-OuFzMXPF4+xZgx8UzJha0AieuMihhhaWG0tCqpp6tDzlFwOmNBPYMuLOtMJ1Tr4pXLHmgjcWhG6RlknY2oNTdQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  '@tanstack/table-core@8.20.5':
+    resolution: {integrity: sha512-P9dF7XbibHph2PFRz8gfBKEXEY/HJPOhym8CHmjF8y3q5mWpKx9xtZapXQUWCgkqvsK0R46Azuz+VaxD4Xl+Tg==}
+    engines: {node: '>=12'}
+
+  '@tanstack/virtual-core@3.11.2':
+    resolution: {integrity: sha512-vTtpNt7mKCiZ1pwU9hfKPhpdVO2sVzFQsxoVBGtOSHxlrRRzYr8iQ2TlwbAcRYCcEiZ9ECAM8kBzH0v2+VzfKw==}
+
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
@@ -2249,6 +2276,10 @@ packages:
   hastscript@9.0.1:
     resolution: {integrity: sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w==}
 
+  highlight-words@2.0.0:
+    resolution: {integrity: sha512-If5n+IhSBRXTScE7wl16VPmd+44Vy7kof24EdqhjsZsDuHikpv1OCagVcJFpB4fS4UPUniedlWqrjIO8vWOsIQ==}
+    engines: {node: '>= 20', npm: '>= 9'}
+
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
@@ -2588,6 +2619,18 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  material-react-table@3.2.1:
+    resolution: {integrity: sha512-sQtTf7bETpkPN2Hm5BVtz89wrfXCVQguz6XlwMChSnfKFO5QCKAJJC5aSIKnUc3S0AvTz/k/ILi00FnnY1Gixw==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@emotion/react': '>=11.13'
+      '@emotion/styled': '>=11.13'
+      '@mui/icons-material': '>=6'
+      '@mui/material': '>=6'
+      '@mui/x-date-pickers': '>=7.15'
+      react: '>=18.0'
+      react-dom: '>=18.0'
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -3015,6 +3058,9 @@ packages:
 
   remark-rehype@11.1.1:
     resolution: {integrity: sha512-g/osARvjkBXb6Wo0XvAeXQohVta8i84ACbenPpoSsxTOQH/Ae0/RGP4WZgnMH5pMLpsj4FG7OHmcIcXxpza8eQ==}
+
+  remove-accents@0.5.0:
+    resolution: {integrity: sha512-8g3/Otx1eJaVD12e31UbJj1YzdtVvzH85HV7t+9MJYk/u3XmkOUJ5Ys9wQrf9PCPK8+xn4ymzqYCiZl6QWKn+A==}
 
   reselect@5.1.1:
     resolution: {integrity: sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==}
@@ -4775,6 +4821,26 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@tanstack/match-sorter-utils@8.19.4':
+    dependencies:
+      remove-accents: 0.5.0
+
+  '@tanstack/react-table@8.20.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@tanstack/table-core': 8.20.5
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+
+  '@tanstack/react-virtual@3.11.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@tanstack/virtual-core': 3.11.2
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+
+  '@tanstack/table-core@8.20.5': {}
+
+  '@tanstack/virtual-core@3.11.2': {}
+
   '@trysound/sax@0.2.0': {}
 
   '@types/crypto-js@4.2.2': {}
@@ -5540,7 +5606,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@9.17.0(jiti@1.21.7)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0)(eslint@9.17.0(jiti@1.21.7)))(eslint@9.17.0(jiti@1.21.7)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -5562,7 +5628,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.17.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@9.17.0(jiti@1.21.7))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0)(eslint@9.17.0(jiti@1.21.7)))(eslint@9.17.0(jiti@1.21.7))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -5937,6 +6003,8 @@ snapshots:
       hast-util-parse-selector: 4.0.0
       property-information: 7.0.0
       space-separated-tokens: 2.0.2
+
+  highlight-words@2.0.0: {}
 
   hoist-non-react-statics@3.3.2:
     dependencies:
@@ -6323,6 +6391,20 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  material-react-table@3.2.1(35adgn3dphqlex35n6b7ahl6fu):
+    dependencies:
+      '@emotion/react': 11.14.0(@types/react@19.0.3)(react@19.0.0)
+      '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react@19.0.0)
+      '@mui/icons-material': 6.3.1(@mui/material@6.3.1(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.3)(react@19.0.0)
+      '@mui/material': 6.3.1(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@mui/x-date-pickers': 7.23.3(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react@19.0.0))(@mui/material@6.3.1(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@6.3.1(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(react@19.0.0))(@types/react@19.0.3)(date-fns@4.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@tanstack/match-sorter-utils': 8.19.4
+      '@tanstack/react-table': 8.20.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@tanstack/react-virtual': 3.11.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      highlight-words: 2.0.0
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   math-intrinsics@1.1.0: {}
 
@@ -6930,6 +7012,8 @@ snapshots:
       mdast-util-to-hast: 13.2.0
       unified: 11.0.5
       vfile: 6.0.3
+
+  remove-accents@0.5.0: {}
 
   reselect@5.1.1: {}
 

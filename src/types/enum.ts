@@ -26,3 +26,14 @@ export enum SSE_EVENT_TYPE {
   'new_email' = 'NEW_EMAIL',
   'new_reply' = 'NEW_REPLY',
 }
+
+export enum FilterOperationEnum {
+  equals = 'EQUALS',
+  not = 'NOT',
+  contains = 'CONTAINS',
+  not_contains = 'NOT_CONTAINS',
+  starts_with = 'STARTS_WITH',
+  not_starts_with = 'NOT_STARTS_WITH',
+  ends_with = 'ENDS_WITH',
+  not_ends_with = 'NOT_ENDS_WITH',
+}

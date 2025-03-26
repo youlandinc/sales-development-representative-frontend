@@ -1,11 +1,5 @@
 import { FC } from 'react';
-import {
-  InputAdornment,
-  Stack,
-  SxProps,
-  TextFieldProps,
-  Typography,
-} from '@mui/material';
+import { Stack, SxProps, TextFieldProps, Typography } from '@mui/material';
 
 import { StyledTextField } from '@/components/atoms';
 
