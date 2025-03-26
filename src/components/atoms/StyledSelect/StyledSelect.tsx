@@ -173,11 +173,73 @@ export const StyledSelect: FC<StyledSelectProps> = ({
     <FormControl
       error={!!(validate?.length && validate[0])}
       required={required}
+      sx={{
+        [disabled ? '& label' : '']: {
+          color: 'text.disabled',
+        },
+        width: '100%',
+        '& .Mui-disabled': {
+          color: 'text.disabled',
+          cursor: 'not-allowed',
+        },
+        '& .MuiInputBase-formControl': {
+          borderRadius: 2,
+        },
+        '& .MuiInputLabel-formControl.Mui-focused': {
+          color: 'text.primary',
+        },
+        '& .Mui-focused': {
+          '& .MuiOutlinedInput-notchedOutline': {
+            border: '1px solid #202939 !important',
+          },
+          '& .MuiOutlinedInput-input': {
+            background: 'transparent',
+          },
+        },
+        '& .MuiInputLabel-sizeMedium': {
+          // transform: 'translate(14px, 8px) scale(1)',
+        },
+        '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
+          // transform:
+          //   size === 'medium'
+          //     ? 'translate(14px, -8px) scale(0.75)'
+          //     : 'translate(12px, -8px) scale(0.75)',
+        },
+        ...sx,
+      }}
       variant={'outlined'}
     >
       <InputLabel>{label}</InputLabel>
       <Select
         disabled={disabled}
+        inputProps={{
+          MenuProps: {
+            MenuListProps: {
+              sx: {
+                p: 0,
+                m: 0,
+                '& .MuiMenuItem-root:hover': {
+                  bgcolor: 'rgba(144, 149, 163, 0.1) !important',
+                },
+                '& .Mui-selected': {
+                  bgcolor: '#EFE9FB !important',
+                },
+                '& .Mui-selected:hover': {
+                  bgcolor: '#EFE9FB !important',
+                },
+                '& .MuiMenuItem-root': {
+                  fontSize: 14,
+                  color: 'text.primary',
+                  p: 1.5,
+                },
+                ...sxList,
+              },
+            },
+            PaperProps: {
+              style: { marginTop: 12, borderRadius: 8 },
+            },
+          },
+        }}
         label={label}
         MenuProps={{
           disableScrollLock: true,
