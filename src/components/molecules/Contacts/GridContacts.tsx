@@ -83,7 +83,6 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [segmentsFilters],
   );
-
   const { loading } = useAsync(async () => {
     await fetchAllColumns(gridType);
   }, []);
@@ -104,8 +103,6 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
           segmentId: selectedSegmentId,
         },
       },
-      metadataColumns,
-      { ...newGridData },
     ],
     async ([tableId, queryCondition]) => {
       return await _getGridListById(tableId, queryCondition)
