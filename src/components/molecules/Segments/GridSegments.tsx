@@ -1,17 +1,13 @@
 import { useCallback, useState } from 'react';
 import { Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
-import { useRouter } from 'nextjs-toploader/app';
 import { MRT_ColumnDef } from 'material-react-table';
 import { format } from 'date-fns';
 import useSWR from 'swr';
 
 import { useSwitch } from '@/hooks';
 
-import {
-  useContactsStore,
-  useContactsToolbarStore,
-} from '@/stores/ContactsStores';
+import { useContactsToolbarStore } from '@/stores/ContactsStores';
 
 import {
   SDRToast,
@@ -31,9 +27,9 @@ import {
 import { UFormatNumber } from '@/utils';
 
 export const GridSegments = () => {
-  const router = useRouter();
+  // const router = useRouter();
 
-  const { updateSelectedSegment } = useContactsStore((state) => state);
+  // const { updateSelectedSegment } = useContactsStore((state) => state);
   const { resetToolbarData } = useContactsToolbarStore((state) => state);
 
   const [pagination, setPagination] = useState({
@@ -48,13 +44,13 @@ export const GridSegments = () => {
   const pageCount = data?.data?.page?.totalPages || 0;
   const total = data?.data?.page?.totalElements || 0;
 
-  const onClickToRedirectToDirectory = useCallback(
-    async (id: string | number) => {
-      await updateSelectedSegment(id);
-      router.push('/contacts/directory');
-    },
-    [router, updateSelectedSegment],
-  );
+  // const onClickToRedirectToDirectory = useCallback(
+  //   async (id: string | number) => {
+  //     await updateSelectedSegment(id);
+  //     router.push('/contacts/directory');
+  //   },
+  //   [router, updateSelectedSegment],
+  // );
 
   return (
     <Stack bgcolor={'#fff'} border={'1px solid #ccc'} borderRadius={2}>
@@ -76,10 +72,10 @@ export const GridSegments = () => {
               height: 20,
             },
         }}
-        onRowClick={async ({ row }) => {
-          const { id } = row;
-          await onClickToRedirectToDirectory(id);
-        }}
+        // onRowClick={async ({ row }) => {
+        //   const { id } = row;
+        //   await onClickToRedirectToDirectory(id);
+        // }}
         style={{
           borderBottom: '1px solid #ccc',
           borderTopLeftRadius: '8px',

@@ -324,26 +324,22 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
-    MuiInputBase: {
-      styleOverrides: {
-        root: {
-          // padding: '0 16px 0 16px',
-        },
-      },
-    },
     MuiInputLabel: {
       styleOverrides: {
         root: {
           color: 'var(--mui-palette-text-primary)',
           fontSize: 14,
           lineHeight: 1.43,
-          // transform: 'translate(14px, 6px) scale(1)',
+          transform: 'translate(14px, 10px) scale(1)',
+          '&.Mui-focused': {
+            color: 'var(--mui-palette-text-primary)',
+          },
         },
         shrink: {
-          // transform: 'translate(14px, -7px) scale(0.75)',
+          transform: 'translate(14px, -8px) scale(0.75)',
         },
         sizeSmall: {
-          // transform: 'translate(12px, 5px) scale(1)',
+          transform: 'translate(12px, 5px) scale(1)',
         },
       },
     },
@@ -351,16 +347,16 @@ const defaultOptions: ThemeOptions = {
       styleOverrides: {
         //input element
         input: {
-          paddingTop: '10px',
-          paddingBottom: '10px',
+          paddingTop: '10px !important',
+          paddingBottom: '10px !important',
           zIndex: 1,
           fontSize: 14,
           lineHeight: 1.43,
           height: 'auto',
         },
         inputSizeSmall: {
-          paddingTop: '6px',
-          paddingBottom: '6px',
+          paddingTop: '6px !important',
+          paddingBottom: '6px !important',
           fontSize: 14,
         },
         // border style
@@ -370,6 +366,7 @@ const defaultOptions: ThemeOptions = {
           background: 'transparent',
           borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
         },
+
         //border style when hover
         root: {
           [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
@@ -389,8 +386,12 @@ const defaultOptions: ThemeOptions = {
     },
     MuiAutocomplete: {
       styleOverrides: {
+        inputRoot: {
+          padding: '0',
+        },
         input: {
-          // padding: '0 4px 0 8px',
+          paddingTop: '10px',
+          paddingBottom: '10px',
         },
         endAdornment: {
           zIndex: 1,
