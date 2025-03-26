@@ -301,7 +301,6 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                           (value?.value as unknown as string | number) || '',
                         );
                       }}
-                      open={true}
                       options={columnOptions}
                       renderInput={(params) => (
                         <StyledTextField
