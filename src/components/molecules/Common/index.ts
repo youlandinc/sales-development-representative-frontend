@@ -7,3 +7,5 @@ export * from './CommonCampaignUserInfo';
 
 export * from './CommonPagination';
 export * from './CommonTableLoadingOverlay';
+
+export * from './CommonSegmentsDrawer';

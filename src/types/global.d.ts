@@ -6,6 +6,13 @@ interface TOption {
   label: string;
 }
 
+interface Option {
+  key: string | number;
+  value: string | number;
+  label: string | React.ReactNode;
+  subComponent?: React.ReactNode;
+}
+
 interface PaginationParam {
   page: number;
   size: number;
@@ -19,6 +26,12 @@ interface PaginationResponse<T> {
     totalElements: number;
     totalPages: number;
   };
+}
+
+interface HttpError {
+  message: string;
+  header: string;
+  variant: HttpVariant;
 }
 
 //interface Window {

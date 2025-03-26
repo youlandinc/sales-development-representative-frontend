@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Chip, Stack, Typography } from '@mui/material';
+import { Autocomplete, Chip, Stack, Typography } from '@mui/material';
 import { FC, useEffect, useRef, useState } from 'react';
 
 import {
@@ -127,7 +127,6 @@ export const InboxForward = () => {
     setInboxContentType,
     forwardContent,
     forwardReceipt,
-    selectedEmail,
     forwardEmailId,
   } = useInboxStore((state) => state);
 
