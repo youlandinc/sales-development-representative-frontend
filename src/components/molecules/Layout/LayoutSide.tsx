@@ -169,7 +169,7 @@ export const LayoutSide: FC = () => {
   return (
     <Stack
       sx={{
-        width: expend ? 230 : 60,
+        width: expend ? 230 : 70,
         height: '100%',
         borderRight: '1px solid #DFDEE6',
         bgcolor: '#FFFFFF',
@@ -217,7 +217,7 @@ export const LayoutSide: FC = () => {
               active={isSelected(item.url)}
               activeIcon={item.activeIcon}
               defaultIcon={item.defaultIcon}
-              expend
+              expend={expend}
               key={`${item.key}-${index}`}
               label={item.label}
               onClick={() => (item.url ? onClickToRedirect(item.url) : false)}
@@ -232,7 +232,7 @@ export const LayoutSide: FC = () => {
                     active={isSelected(item.url)}
                     activeIcon={item.activeIcon}
                     defaultIcon={item.defaultIcon}
-                    expend
+                    expend={expend}
                     key={`${item.key}-${i}`}
                     label={item.label}
                     onClick={() => onClickToRedirect(item.url)}
