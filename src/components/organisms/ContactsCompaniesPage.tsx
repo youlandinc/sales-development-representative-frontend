@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react';
 import { Stack, Typography } from '@mui/material';
 
-import { ContactsHeader, GridContacts } from '@/components/molecules';
+import { GridContacts, HeaderFilter } from '@/components/molecules';
 
 import { ContactsPageMode, ContactsTableTypeEnum } from '@/types';
 import { useContactsStore } from '@/stores/ContactsStores/useContactsStore';
@@ -21,7 +21,7 @@ export const ContactsCompaniesPage: FC = () => {
     <Stack gap={3} height={'100%'} overflow={'auto'} px={8} py={6}>
       <Stack gap={1.5}>
         <Typography variant={'h6'}>Companies</Typography>
-        <ContactsHeader headerType={ContactsTableTypeEnum.companies} />
+        <HeaderFilter headerType={ContactsTableTypeEnum.companies} />
       </Stack>
       <GridContacts gridType={ContactsTableTypeEnum.companies} />
     </Stack>

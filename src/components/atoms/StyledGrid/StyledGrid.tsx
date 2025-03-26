@@ -65,7 +65,7 @@ export const StyledGrid: FC<StyledGridProps> = ({
     getRowId: getRowId || ((row) => row.id), //default
     rowVirtualizerOptions: { overscan: 5 }, //optionally customize the row virtualizer
     columnVirtualizerOptions: { overscan: 5 }, //optionally customize the column virtualizer
-    muiSelectCheckboxProps: (props) => {
+    muiSelectCheckboxProps: () => {
       return {
         icon: (
           <Icon
@@ -88,7 +88,7 @@ export const StyledGrid: FC<StyledGridProps> = ({
         title: '',
       };
     },
-    muiSelectAllCheckboxProps: (props) => {
+    muiSelectAllCheckboxProps: () => {
       return {
         icon: (
           <Icon
@@ -224,7 +224,7 @@ export const StyledGrid: FC<StyledGridProps> = ({
       }),
       ...rest.defaultColumn,
     },
-    muiTableHeadProps: (props) => {
+    muiTableHeadProps: () => {
       return {
         sx: {
           opacity: 1,

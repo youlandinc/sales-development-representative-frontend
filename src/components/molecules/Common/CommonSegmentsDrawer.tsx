@@ -1,26 +1,26 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
-  ButtonGroup,
   Drawer,
   DrawerProps,
   Fade,
   Icon,
-  Menu,
-  MenuItem,
   Stack,
   Typography,
 } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import {
+  SDRToast,
   StyledButton,
   StyledSelect,
   StyledTextField,
 } from '@/components/atoms';
+
 import {
+  ToolBarTypeEnum,
   useContactsStore,
-  useDirectoryToolbarStore,
+  useContactsToolbarStore,
   useGridStore,
 } from '@/stores/ContactsStores';
 import { FILTER_OPERATIONS } from '@/constant';
@@ -29,25 +29,15 @@ import {
   FilterOperationEnum,
   FilterProps,
 } from '@/types';
-import ICON_CLOSE from './assets/icon_close.svg';
+import { _updateExistSegment } from '@/request';
 
-export enum SegmentsDrawerEnum {
-  people = 'people',
-  companies = 'companies',
-}
+import ICON_CLOSE from './assets/icon_close.svg';
+import ICON_ADD from './assets/icon_add.svg';
+import { useSwitch } from '@/hooks';
+import { SaveSegmentDialog } from '@/components/molecules';
 
 type CommonSegmentsDrawerProps = DrawerProps & {
   type?: ContactsTableTypeEnum;
-};
-
-const TAG_LABEL = {
-  [SegmentsDrawerEnum.people]: 'People',
-  [SegmentsDrawerEnum.companies]: 'Companies',
-};
-
-const TAG_LABEL_BGCOLOR = {
-  [SegmentsDrawerEnum.people]: '#5BCBA9',
-  [SegmentsDrawerEnum.companies]: '#F8A84C',
 };
 
 const defaultBtnStyle = {
@@ -57,80 +47,25 @@ const defaultBtnStyle = {
   fontSize: '14px !important',
 };
 
-const SegmentsCondition = () => {
-  const { columnOptions } = useGridStore((state) => state);
-  const [condition, setCondition] = useState('');
-  const [text, setText] = useState('');
-  const [column, setColumn] = useState<TOption | null>(null);
-
-  return (
-    <Stack gap={1.5}>
-      <Stack
-        alignItems={'center'}
-        bgcolor={'background.active'}
-        flexDirection={'row'}
-        gap={1.5}
-        p={1.5}
-      >
-        <Autocomplete
-          fullWidth
-          getOptionLabel={(option) => option.label}
-          onChange={(e, value) => {
-            setColumn(value as TOption);
-          }}
-          options={columnOptions}
-          renderInput={(params) => (
-            <StyledTextField
-              {...params}
-              placeholder={'Select or search a filter'}
-              slotProps={{
-                input: params.InputProps,
-                htmlInput: params.inputProps,
-              }}
-            />
-          )}
-          value={column}
-        />
-        <StyledSelect
-          label={'Condition'}
-          onChange={(e) => setCondition(e.target.value as string)}
-          options={FILTER_OPERATIONS}
-          size={'small'}
-          value={condition}
-        />
-        <StyledTextField
-          label={'Text'}
-          onChange={(e) => setText(e.target.value)}
-          size={'small'}
-          value={text}
-        />
-        <Icon
-          component={ICON_CLOSE}
-          // onClick={async () => {
-          //   const result = deleteSegmentsFilters(index, filterIndex);
-          //   if (Object.keys(result).length === 0) {
-          //     clearSegmentsFiltersGroup();
-          //     await updateSelectedSegment(-1);
-          //   }
-          // }}
-          sx={{
-            width: 24,
-            height: 24,
-            flexShrink: 0,
-            cursor: 'pointer',
-          }}
-        />
-      </Stack>
-      <ButtonGroup>
-        <StyledButton color={'info'} size={'small'} variant={'outlined'}>
-          And
-        </StyledButton>
-        <StyledButton color={'info'} size={'small'} variant={'outlined'}>
-          Or
-        </StyledButton>
-      </ButtonGroup>
-    </Stack>
-  );
+const defaultSelectStyle = {
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'transparent !important',
+    bgcolor: 'background.active',
+    borderRadius: '8px !important',
+  },
+  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+    bgcolor: 'background.active',
+    borderColor: '#6E4EFB !important',
+  },
+  '& .Mui-focused': {
+    '& .MuiOutlinedInput-notchedOutline': {
+      bgcolor: 'background.active',
+      borderColor: '#6E4EFB !important',
+      borderWidth: '1px !important',
+      borderRadius: '8px  !important',
+    },
+  },
+  '& .MuiSelect-outlined': { zIndex: 1 },
 };
 
 export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
@@ -146,9 +81,14 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
     deleteSegmentsFilters,
     onChangeSegmentsFilters,
     clearSegmentsFiltersGroup,
-  } = useDirectoryToolbarStore((state) => state);
-  const { updateSelectedSegment, clearSegmentSelectState, selectedSegmentId } =
-    useContactsStore((state) => state);
+    setOriginalSegmentsFilters,
+    computedCanSaved,
+    toolBarType,
+  } = useContactsToolbarStore((state) => state);
+  const { updateSelectedSegment, selectedSegmentId } = useContactsStore(
+    (state) => state,
+  );
+
   const filterGroup = useMemo(() => {
     const result: FilterProps[][] = [];
     if (segmentsFilters) {
@@ -165,61 +105,135 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
   const [tag, setTag] = useState<ContactsTableTypeEnum>(
     ContactsTableTypeEnum.people,
   );
-  const [showFooter, setShowFooter] = useState(false);
 
+  const [, setUpdateLoading] = useState(false);
+  const {
+    visible: dialogShow,
+    close: dialogClose,
+    open: dialogOpen,
+  } = useSwitch();
+
+  const showFooter = computedCanSaved();
   const handleReviewLists = () => {
     rest?.onClose?.({}, 'backdropClick');
-    if (type === ContactsTableTypeEnum.companies) {
-      router.push('/contacts/companies');
-      return;
+    if (!type) {
+      if (type === ContactsTableTypeEnum.companies) {
+        router.push('/contacts/companies');
+        return;
+      }
+      router.push('/contacts/people');
+    } else {
+      if (tag === ContactsTableTypeEnum.companies) {
+        router.push('/contacts/companies');
+        return;
+      }
+      router.push('/contacts/people');
     }
-    router.push('/contacts/people');
   };
 
   const handleClose = async () => {
     rest?.onClose?.({}, 'backdropClick');
-    clearSegmentsFiltersGroup();
-    await updateSelectedSegment(-1);
-    clearSegmentSelectState();
+    // clearSegmentsFiltersGroup();
+    // await updateSelectedSegment(-1);
+    // clearSegmentSelectState();
   };
 
-  useEffect(() => {
-    return useDirectoryToolbarStore.subscribe((state, prevState) => {
-      if (state.segmentsFilters === prevState.segmentsFilters) {
-        return;
-      }
-
-      const shouldShowFooter = () => {
-        if (Object.keys(state.segmentsFilters).length === 0) {
-          return false;
-        }
-
-        const hasValidSegments = Object.values(state.segmentsFilters).every(
-          (segment) =>
-            segment.length > 0 &&
-            segment.every(
-              (item) => item.columnName && item.operation && item.operationText,
-            ),
-        );
-
-        if (!hasValidSegments) {
-          return false;
-        }
-
-        return state.originalSegmentsFilters !== state.segmentsFilters;
+  const onClickToSaveChanges = async () => {
+    if (!selectedSegmentId && selectedSegmentId != -1) {
+      return;
+    }
+    if (selectedSegmentId) {
+      const postData = {
+        segmentId: selectedSegmentId,
+        segmentFilters: segmentsFilters,
       };
+      setUpdateLoading(true);
+      try {
+        await _updateExistSegment(postData);
+        setOriginalSegmentsFilters(segmentsFilters);
+        rest?.onClose?.({}, 'backdropClick');
+      } catch (err) {
+        const { header, message, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      } finally {
+        setUpdateLoading(false);
+      }
+    }
+  };
 
-      setShowFooter(shouldShowFooter());
-    });
-  }, []);
+  const computedFooter = (type: ToolBarTypeEnum) => {
+    switch (type) {
+      case ToolBarTypeEnum.new_segment:
+        return (
+          <>
+            <StyledButton
+              color={'info'}
+              onClick={handleClose}
+              sx={defaultBtnStyle}
+              variant={'text'}
+            >
+              Cancel
+            </StyledButton>
+            <StyledButton
+              disabled={!showFooter}
+              onClick={handleReviewLists}
+              sx={defaultBtnStyle}
+            >
+              Review lists
+            </StyledButton>
+          </>
+        );
+      case ToolBarTypeEnum.edit_segment:
+        return (
+          <>
+            <StyledButton
+              color={'info'}
+              onClick={handleClose}
+              sx={defaultBtnStyle}
+              variant={'text'}
+            >
+              Cancel
+            </StyledButton>
+            <StyledButton
+              disabled={!showFooter}
+              onClick={onClickToSaveChanges}
+              sx={defaultBtnStyle}
+            >
+              Save changes
+            </StyledButton>
+          </>
+        );
+      case ToolBarTypeEnum.new_filter:
+        return (
+          <>
+            <StyledButton
+              disabled={!showFooter}
+              onClick={dialogOpen}
+              sx={defaultBtnStyle}
+              variant={'outlined'}
+            >
+              Save as list
+            </StyledButton>
+            <StyledButton
+              disabled={!showFooter}
+              onClick={() => rest?.onClose?.({}, 'backdropClick')}
+              sx={defaultBtnStyle}
+            >
+              View filter results
+            </StyledButton>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     if (rest?.open) {
       fetchAllColumns(type || ContactsTableTypeEnum.people);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, rest?.open]);
-
-  console.log(filterGroup);
 
   return (
     <Drawer anchor={'right'} {...rest}>
@@ -274,22 +288,43 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                     gap={1.5}
                     key={`group-${index}-${filterIndex}`}
                   >
-                    <StyledSelect
-                      label={'Column'}
-                      onChange={(e) => {
+                    <Autocomplete
+                      fullWidth
+                      getOptionLabel={(option) => option.label}
+                      onChange={(_, value) => {
                         onChangeSegmentsFilters(
                           index,
                           filterIndex,
                           'columnName',
-                          e.target.value as unknown as string | number,
+                          value!.value as unknown as string | number,
                         );
                       }}
                       options={columnOptions}
+                      renderInput={(params) => (
+                        <StyledTextField
+                          {...params}
+                          placeholder={'Select or search a filter'}
+                          slotProps={{
+                            input: params.InputProps,
+                            htmlInput: params.inputProps,
+                          }}
+                        />
+                      )}
                       size={'small'}
-                      value={filter.columnName}
+                      sx={{
+                        ...defaultSelectStyle,
+                        '& .MuiAutocomplete-input': {
+                          padding: '0 4px 0 8px !important',
+                        },
+                      }}
+                      value={
+                        columnOptions.find(
+                          (option) => option.value === filter.columnName,
+                        ) || { key: '', label: '', value: '' }
+                      }
                     />
                     <StyledSelect
-                      label={'Condition'}
+                      displayEmpty
                       onChange={(e) => {
                         onChangeSegmentsFilters(
                           index,
@@ -299,11 +334,26 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                         );
                       }}
                       options={FILTER_OPERATIONS}
+                      renderValue={(value) => {
+                        return value
+                          ? FILTER_OPERATIONS.find(
+                              (item) => item.value === (value as string),
+                            )?.label
+                          : 'Condition';
+                      }}
                       size={'small'}
+                      sx={{
+                        ...defaultSelectStyle,
+                        '& .MuiSelect-select': {
+                          color:
+                            filter.operation !== ''
+                              ? 'text.default'
+                              : '#bdbdbd',
+                        },
+                      }}
                       value={filter.operation}
                     />
                     <StyledTextField
-                      label={'Text'}
                       onChange={(e) =>
                         onChangeSegmentsFilters(
                           index,
@@ -312,30 +362,37 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                           e.target.value,
                         )
                       }
+                      placeholder={'Text'}
                       size={'small'}
+                      sx={{
+                        ...defaultSelectStyle,
+                        '& .MuiInputBase-input': { zIndex: 1 },
+                        width: '100%',
+                        '& .MuiOutlinedInput-input': {
+                          py: '6px',
+                        },
+                      }}
                       value={filter.operationText}
                     />
-                    {index !== 0 && (
-                      <Icon
-                        component={ICON_CLOSE}
-                        onClick={async () => {
-                          const result = deleteSegmentsFilters(
-                            index,
-                            filterIndex,
-                          );
-                          if (Object.keys(result).length === 0) {
-                            clearSegmentsFiltersGroup();
-                            await updateSelectedSegment(-1);
-                          }
-                        }}
-                        sx={{
-                          width: 24,
-                          height: 24,
-                          flexShrink: 0,
-                          cursor: 'pointer',
-                        }}
-                      />
-                    )}
+                    <Icon
+                      component={ICON_CLOSE}
+                      onClick={async () => {
+                        const result = deleteSegmentsFilters(
+                          index,
+                          filterIndex,
+                        );
+                        if (Object.keys(result).length === 0) {
+                          clearSegmentsFiltersGroup();
+                          await updateSelectedSegment(-1);
+                        }
+                      }}
+                      sx={{
+                        width: 16,
+                        height: 16,
+                        flexShrink: 0,
+                        cursor: 'pointer',
+                      }}
+                    />
                   </Stack>
                 ))}
 
@@ -351,13 +408,22 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                   }}
                   size={'small'}
                   sx={{
-                    width: 'fit-content',
+                    mr: 'auto',
                     borderWidth: '1px !important',
                     fontWeight: '400 !important',
+                    color: '#6E4EFB !important',
+                    alignItems: 'center',
+                    gap: '4px',
+                    py: '6px',
+                    height: 'auto !important',
                   }}
                   variant={'outlined'}
                 >
-                  + AND
+                  <Icon
+                    component={ICON_ADD}
+                    sx={{ width: 20, height: 20, color: 'currentColor' }}
+                  />
+                  And
                 </StyledButton>
               </Stack>
             </Stack>
@@ -369,47 +435,40 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
               onClick={addSegmentsFiltersGroup}
               size={'small'}
               sx={{
-                width: 'fit-content',
+                mr: 'auto',
                 borderWidth: '1px !important',
                 fontWeight: '400 !important',
+                color: '#6E4EFB !important',
+                alignItems: 'center',
+                gap: '4px',
+                py: '6px',
+                height: 'auto !important',
               }}
               variant={'outlined'}
             >
-              + OR
+              <Icon
+                component={ICON_ADD}
+                sx={{ width: 20, height: 20, color: 'currentColor' }}
+              />{' '}
+              Or
             </StyledButton>
           )}
 
           <Fade in={true}>
             <Stack flexDirection={'row'} gap={6} mt={'auto'}>
-              <StyledButton
-                color={'info'}
-                onClick={handleClose}
-                sx={defaultBtnStyle}
-                variant={'text'}
-              >
-                Cancel
-              </StyledButton>
-              {selectedSegmentId !== '' && selectedSegmentId !== '-1' ? (
-                <StyledButton
-                  disabled={!showFooter}
-                  onClick={handleReviewLists}
-                  sx={defaultBtnStyle}
-                >
-                  Save
-                </StyledButton>
-              ) : (
-                <StyledButton
-                  disabled={!showFooter}
-                  onClick={handleReviewLists}
-                  sx={defaultBtnStyle}
-                >
-                  Review lists
-                </StyledButton>
-              )}
+              {computedFooter(toolBarType)}
             </Stack>
           </Fade>
         </Stack>
       </Stack>
+      <SaveSegmentDialog
+        onClose={() => {
+          dialogClose();
+          rest?.onClose?.({}, 'backdropClick');
+        }}
+        open={dialogShow}
+        segmentType={type || tag}
+      />
     </Drawer>
   );
 };

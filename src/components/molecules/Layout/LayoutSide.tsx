@@ -1,5 +1,13 @@
-import { FC, Fragment, ReactElement, ReactNode, useRef, useState } from 'react';
-import { Avatar, Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { FC, Fragment, useRef, useState } from 'react';
+import {
+  Avatar,
+  Icon,
+  Menu,
+  MenuItem,
+  Stack,
+  SxProps,
+  Typography,
+} from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 
@@ -24,6 +32,7 @@ type StyledMenuItemProps = {
   activeIcon?: any;
   defaultIcon?: any;
   onClick?: () => void;
+  sx?: SxProps;
 };
 
 const StyledMenuItem: FC<StyledMenuItemProps> = ({
@@ -33,6 +42,7 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
   activeIcon,
   defaultIcon,
   onClick,
+  sx,
 }) => {
   return (
     <Stack
@@ -58,6 +68,7 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
             color: active ? 'primary.main' : 'text.secondary',
           },
         },
+        ...sx,
       }}
     >
       <Icon
@@ -146,7 +157,7 @@ export const LayoutSide: FC = () => {
     </Stack>
   );
 
-  const isSelected = (key: string) => pathname === key;
+  const isSelected = (key?: string) => pathname === key;
 
   const onClickToRedirect = (key: string) => {
     if (isSelected(key)) {
@@ -190,47 +201,47 @@ export const LayoutSide: FC = () => {
           overflowX: 'hidden',
         }}
       >
-        {LAYOUT_SIDE_MENU.map((item, index) =>
-          item.type === 'link' ? (
-            <Fragment key={index}>
-              <StyledMenuItem
-                active={isSelected(item.url)}
-                activeIcon={item.activeIcon}
-                defaultIcon={item.defaultIcon}
-                expend
-                key={`${item.key}-${index}`}
-                label={item.label}
-                onClick={() => onClickToRedirect(item.url)}
-              />
-              {item.subMenus && (
-                <Stack pl={'28px'}>
-                  {item.subMenus.map((item, i) => (
-                    <StyledMenuItem
-                      active={isSelected(item.url)}
-                      activeIcon={item.activeIcon}
-                      defaultIcon={item.defaultIcon}
-                      expend
-                      key={`${item.key}-${i}`}
-                      label={item.label}
-                      onClick={() => onClickToRedirect(item.url)}
-                    />
-                  ))}
-                </Stack>
-              )}
-            </Fragment>
-          ) : (
-            <Stack key={`${item.key}-${index}`} mb={1.5}>
-              <StyledButton
-                color={'info'}
-                onClick={() => openProcess()}
-                size={'medium'}
-                variant={'outlined'}
-              >
-                {expend ? 'Create new campaign' : '+'}
-              </StyledButton>
-            </Stack>
-          ),
-        )}
+        <Stack mb={1.5}>
+          <StyledButton
+            color={'info'}
+            onClick={() => openProcess()}
+            size={'medium'}
+            variant={'outlined'}
+          >
+            {expend ? 'Create new campaign' : '+'}
+          </StyledButton>
+        </Stack>
+        {LAYOUT_SIDE_MENU.map((item, index) => (
+          <Fragment key={index}>
+            <StyledMenuItem
+              active={isSelected(item.url)}
+              activeIcon={item.activeIcon}
+              defaultIcon={item.defaultIcon}
+              expend
+              key={`${item.key}-${index}`}
+              label={item.label}
+              onClick={() => (item.url ? onClickToRedirect(item.url) : false)}
+              sx={{
+                cursor: item.url ? 'pointer' : 'default',
+              }}
+            />
+            {item.subMenus && (
+              <Stack pl={'28px'}>
+                {item.subMenus.map((item, i) => (
+                  <StyledMenuItem
+                    active={isSelected(item.url)}
+                    activeIcon={item.activeIcon}
+                    defaultIcon={item.defaultIcon}
+                    expend
+                    key={`${item.key}-${i}`}
+                    label={item.label}
+                    onClick={() => onClickToRedirect(item.url)}
+                  />
+                ))}
+              </Stack>
+            )}
+          </Fragment>
+        ))}
       </Stack>
 
       <Stack

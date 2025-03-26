@@ -19,10 +19,10 @@ export const _getGridListById = (
   tableId: number,
   queryCondition: Partial<DirectoryGridQueryCondition>,
 ) => {
-  return post<DirectoryGridResponse>(
-    `${tempUrl}/customer/es/records/${tableId}`,
-    queryCondition,
-  );
+  return post<DirectoryGridResponse>('/sdr/leads/list', {
+    tableId,
+    ...queryCondition,
+  });
 };
 
 // export const _addNewColumn = (data: {

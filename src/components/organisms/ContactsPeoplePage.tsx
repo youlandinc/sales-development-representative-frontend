@@ -1,11 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { Stack, Typography } from '@mui/material';
 
-import {
-  ContactsHeader,
-  GridContacts,
-  HeaderFilter,
-} from '@/components/molecules';
+import { GridContacts, HeaderFilter } from '@/components/molecules';
 
 import { ContactsPageMode, ContactsTableTypeEnum } from '@/types';
 import { useContactsStore } from '@/stores/ContactsStores/useContactsStore';

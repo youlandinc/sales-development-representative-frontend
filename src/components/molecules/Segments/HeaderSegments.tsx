@@ -4,8 +4,9 @@ import { StyledButton } from '@/components/atoms';
 import { useRouter } from 'nextjs-toploader/app';
 
 import {
+  ToolBarTypeEnum,
   useContactsStore,
-  useDirectoryToolbarStore,
+  useContactsToolbarStore,
 } from '@/stores/ContactsStores';
 
 import ICON_CREATE_SEGMENT from './assets/icon_create_segment.svg';
@@ -21,7 +22,8 @@ export const HeaderSegments = () => {
     createSegmentsFiltersGroup,
     clearSegmentsFiltersGroup,
     setFromOther,
-  } = useDirectoryToolbarStore((state) => state);
+    setToolBarType,
+  } = useContactsToolbarStore((state) => state);
 
   const { visible, open, close } = useSwitch();
   const onClickToCreateSegment = useCallback(async () => {
@@ -31,8 +33,10 @@ export const HeaderSegments = () => {
     createSegmentsFiltersGroup();
     setFromOther(true);
     open();
+    setToolBarType(ToolBarTypeEnum.new_segment);
     // router.push('/contacts');
     router.refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     clearSegmentSelectState,
     clearSegmentsFiltersGroup,

@@ -10,7 +10,7 @@ import { useSwitch } from '@/hooks';
 
 import {
   useContactsStore,
-  useDirectoryToolbarStore,
+  useContactsToolbarStore,
 } from '@/stores/ContactsStores';
 
 import {
@@ -26,7 +26,7 @@ import { HttpError } from '@/types';
 import {
   _deleteExistSegment,
   _fetchSegmentsList,
-  _renameExistSegment,
+  _updateExistSegment,
 } from '@/request';
 import { UFormatNumber } from '@/utils';
 
@@ -34,7 +34,7 @@ export const GridSegments = () => {
   const router = useRouter();
 
   const { updateSelectedSegment } = useContactsStore((state) => state);
-  const { resetToolbarData } = useDirectoryToolbarStore((state) => state);
+  const { resetToolbarData } = useContactsToolbarStore((state) => state);
 
   const [pagination, setPagination] = useState({
     page: 0,
@@ -206,12 +206,12 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
 
         const onClickToRename = useCallback(async () => {
           const postData = {
-            segmentsId: segmentId,
+            segmentId: segmentId,
             segmentName,
           };
           setRenameLoading(true);
           try {
-            await _renameExistSegment(postData);
+            await _updateExistSegment(postData);
             await mutate();
           } catch (err) {
             const { header, message, variant } = err as HttpError;
@@ -327,7 +327,7 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
                     onClick={() => {
                       deleteClose();
                     }}
-                    size={'small'}
+                    size={'medium'}
                     variant={'outlined'}
                   >
                     Cancel
@@ -337,7 +337,7 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
                     disabled={deleteLoading}
                     loading={deleteLoading}
                     onClick={onClickToDelete}
-                    size={'small'}
+                    size={'medium'}
                     sx={{
                       width: 72,
                     }}
@@ -353,7 +353,7 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
               content={
                 <Stack my={1.5}>
                   <StyledTextField
-                    label={'Segment name'}
+                    label={'List name'}
                     onChange={(e) => setSegmentName(e.target.value)}
                     value={segmentName}
                   />
@@ -370,7 +370,7 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
                     onClick={() => {
                       renameClose();
                     }}
-                    size={'small'}
+                    size={'medium'}
                     variant={'outlined'}
                   >
                     Cancel
@@ -379,14 +379,15 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
                     disabled={renameLoading}
                     loading={renameLoading}
                     onClick={onClickToRename}
-                    size={'small'}
+                    size={'medium'}
                     sx={{ width: 60 }}
                   >
                     Save
                   </StyledButton>
                 </Stack>
               }
-              header={'Rename segment'}
+              header={'Rename list'}
+              onClose={renameClose}
               open={renameVisible}
             />
           </Stack>

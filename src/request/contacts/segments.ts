@@ -12,7 +12,7 @@ export const _createNewSegment = (params: any) => {
 };
 
 export const _updateExistSegment = (params: any) => {
-  return put(`${tempUrl}/customer/segments/update`, params);
+  return put('/sdr/segment/info', params);
 };
 
 export const _fetchSegmentOptions = (tableId: ContactsTableTypeEnum) => {

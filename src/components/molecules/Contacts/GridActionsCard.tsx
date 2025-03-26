@@ -5,6 +5,7 @@ import { StyledButton } from '@/components/atoms';
 
 import ICON_DELETE from './assets/icon_grid_delete.svg';
 import ICON_EXPORT from './assets/icon_grid_export.svg';
+import ICON_CLOSE from './assets/icon_close.svg';
 
 type ExportLoanTypeProps = {
   onClose?: () => void;
@@ -22,6 +23,7 @@ export const GridActionsCard: FC<ExportLoanTypeProps> = ({
   handleDelete,
   exportLoading,
   deleteLoading,
+  onClose,
 }) => {
   const btns = [
     {
@@ -42,46 +44,65 @@ export const GridActionsCard: FC<ExportLoanTypeProps> = ({
     <Fade in={open}>
       <Stack
         alignItems={'center'}
-        bgcolor={'background.skyBlue'}
+        bgcolor={'primary.main'}
         borderRadius={25}
         bottom={0}
         flexDirection={'row'}
-        gap={3}
         left={0}
         m={'0 auto'}
+        pl={2.5}
         position={'absolute'}
-        px={4}
+        pr={4}
         py={2}
         right={0}
         width={'fit-content'}
         zIndex={20}
       >
-        {btns.map((item, index) => (
-          <Fragment key={index}>
-            <StyledButton
-              loading={item.loading}
-              onClick={item.onClick}
-              sx={{
-                color: 'text.white',
-                p: '0 !important',
-                height: 'fit-content !important',
-                minWidth: 'fit-content !important',
-                width: 51,
-              }}
-              variant={'text'}
-            >
-              <Stack alignItems={'center'} gap={'6px'}>
-                <Icon component={item.icon} sx={{ width: 24, height: 24 }} />
-                <Typography color={'text.white'} variant={'body2'}>
-                  {item.label}
-                </Typography>
-              </Stack>
-            </StyledButton>
-            {index !== btns.length - 1 && (
-              <Box bgcolor={'background.white'} height={25} width={'1px'}></Box>
-            )}
-          </Fragment>
-        ))}
+        <Icon
+          component={ICON_CLOSE}
+          onClick={onClose}
+          sx={{
+            width: 20,
+            height: 20,
+            cursor: 'pointer',
+            '& path': {
+              fill: '#fff',
+            },
+          }}
+        />
+        <Stack alignItems={'center'} flexDirection={'row'} gap={3} pl={3}>
+          {btns.map((item, index) => (
+            <Fragment key={index}>
+              <StyledButton
+                loading={item.loading}
+                onClick={item.onClick}
+                sx={{
+                  color: 'text.white',
+                  p: '0 !important',
+                  height: 'fit-content !important',
+                  minWidth: 'fit-content !important',
+                  width: 'auto',
+                  border: 'unset',
+                }}
+                variant={'text'}
+              >
+                <Stack alignItems={'center'} gap={'6px'}>
+                  <Icon component={item.icon} sx={{ width: 24, height: 24 }} />
+                  <Typography color={'background.default'} variant={'body2'}>
+                    {item.label}
+                  </Typography>
+                </Stack>
+              </StyledButton>
+              {index !== btns.length - 1 && (
+                <Box
+                  bgcolor={'background.default'}
+                  height={25}
+                  width={'1px'}
+                ></Box>
+              )}
+            </Fragment>
+          ))}
+        </Stack>
       </Stack>
     </Fade>
   );

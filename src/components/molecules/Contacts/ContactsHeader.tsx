@@ -1,30 +1,13 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Stack } from '@mui/material';
-
-import { useSwitch } from '@/hooks';
-
-import {
-  useContactsStore,
-  useDirectoryToolbarStore,
-  useGridStore,
-} from '@/stores/ContactsStores';
-import {
-  SDRToast,
-  StyledButton,
-  StyledDialog,
-  StyledTextField,
-} from '@/components/atoms';
-import { HeaderFilter } from './index';
-
-import { _createNewSegment, _updateExistSegment } from '@/request';
-import { ContactsTableTypeEnum, FilterProps, HttpError } from '@/types';
+import { FC } from 'react';
+import { ContactsTableTypeEnum } from '@/types';
 
 type ContactsHeaderProps = {
   headerType: ContactsTableTypeEnum;
 };
 
-export const ContactsHeader: FC<ContactsHeaderProps> = ({ headerType }) => {
-  const { visible, open, close } = useSwitch(false);
+export const ContactsHeader: FC<ContactsHeaderProps> = () => {
+  return null;
+  /*const { visible, open, close } = useSwitch(false);
 
   const {
     setPageMode,
@@ -217,5 +200,5 @@ export const ContactsHeader: FC<ContactsHeaderProps> = ({ headerType }) => {
         open={visible}
       />
     </>
-  );
+  );*/
 };

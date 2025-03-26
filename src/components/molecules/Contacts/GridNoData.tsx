@@ -1,12 +1,10 @@
 import { FC } from 'react';
-import { Box, Icon, Stack, Typography } from '@mui/material';
-
-import { useSwitch } from '@/hooks';
+import { Icon, Stack } from '@mui/material';
 
 import ICON_NO_DATA from './assets/icon_no_data.svg';
 
 export const GridNoData: FC = () => {
-  const { visible, open, close } = useSwitch();
+  // const { visible, open, close } = useSwitch();
   return (
     <>
       <Stack
@@ -18,7 +16,7 @@ export const GridNoData: FC = () => {
       >
         <Stack gap={1.25}>
           <Icon component={ICON_NO_DATA} sx={{ width: 256, height: 236 }} />
-          <Box>
+          {/*<Box>
             <Typography variant={'body2'}>
               You don’t have any contacts yet.
             </Typography>
@@ -30,7 +28,7 @@ export const GridNoData: FC = () => {
             >
               Create a contact
             </Typography>
-          </Box>
+          </Box>*/}
         </Stack>
       </Stack>
     </>

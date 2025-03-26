@@ -27,14 +27,6 @@ import ICON_SIDE_CONTACTS_LISTS_ACTIVE from './assets/icon_side_contacts_lists_a
 
 export const LAYOUT_SIDE_MENU = [
   {
-    label: '',
-    url: '',
-    key: '',
-    defaultIcon: '',
-    activeIcon: '',
-    type: 'button',
-  },
-  {
     label: 'Campaigns',
     url: '/campaigns',
     key: 'campaigns',
@@ -44,7 +36,6 @@ export const LAYOUT_SIDE_MENU = [
   },
   {
     label: 'Contacts',
-    url: '/contacts',
     key: 'contacts',
     defaultIcon: ICON_SIDE_CONTACTS_DEFAULT,
     activeIcon: ICON_SIDE_CONTACTS_ACTIVE,

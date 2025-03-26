@@ -1,6 +1,5 @@
 import { Box, Fade, Stack, Typography } from '@mui/material';
 import { MRT_ColumnDef } from 'material-react-table';
-import { useRouter } from 'nextjs-toploader/app';
 import { FC, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -23,9 +22,11 @@ import {
   _setPageSize,
 } from '@/request';
 
-import { useContactsStore } from '@/stores/ContactsStores/useContactsStore';
-import { useDirectoryToolbarStore } from '@/stores/ContactsStores/useDirectoryToolbarStore';
-import { useGridStore } from '@/stores/ContactsStores/useGridStore';
+import {
+  useContactsStore,
+  useContactsToolbarStore,
+  useGridStore,
+} from '@/stores/ContactsStores';
 
 type GridContactsProps = {
   gridType: ContactsTableTypeEnum;
@@ -33,7 +34,7 @@ type GridContactsProps = {
 
 export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
   const { selectedSegmentId } = useContactsStore((state) => state);
-  const { newGridData, segmentsFilters } = useDirectoryToolbarStore(
+  const { newGridData, segmentsFilters } = useContactsToolbarStore(
     (state) => state,
   );
   const {
@@ -47,9 +48,11 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
     size,
     setSize,
     setPage,
+    setTotalRecordsWithFilter,
+    setColumn,
   } = useGridStore((state) => state);
 
-  const router = useRouter();
+  // const router = useRouter();
 
   const [rowSelection, setRowSelection] = useState({});
 
@@ -90,27 +93,32 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
     isLoading,
     mutate,
   } = useSWR(
-    typeof tableId === 'number'
-      ? [
-          tableId,
-          {
-            page: page + 1,
-            size: size,
-            searchFilter: {
-              keyword,
-              segmentsFilters: querySegmentsFilters,
-              segmentId: selectedSegmentId,
-            },
-          },
-          metadataColumns,
-          { ...newGridData },
-        ]
-      : null,
+    [
+      gridType,
+      {
+        page: page,
+        size: size,
+        searchFilter: {
+          keyword,
+          segmentsFilters: querySegmentsFilters,
+          segmentId: selectedSegmentId,
+        },
+      },
+      metadataColumns,
+      { ...newGridData },
+    ],
     async ([tableId, queryCondition]) => {
-      return await _getGridListById(tableId, queryCondition).then((res) => {
-        setTotalRecords(res.data.totalRecords);
-        return res;
-      });
+      return await _getGridListById(tableId, queryCondition)
+        .then((res) => {
+          setTotalRecords(res.data.dataTotal);
+          setTotalRecordsWithFilter(res.data.data.page.totalElements);
+          return res;
+        })
+        .catch((err) => {
+          setTotalRecordsWithFilter(0);
+          const { header, message, variant } = err as HttpError;
+          SDRToast({ message, header, variant });
+        });
     },
     {
       revalidateOnFocus: false,
@@ -199,8 +207,7 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
       : [];
   }, [metadataColumns]);
 
-  const data =
-    list?.data?.metadataValues?.records?.map((item) => {
+  const data = list?.data?.data?.content || []; /*?.map((item) => {
       return item.reduce(
         (pre, cur) => {
           pre[cur.columnName] = cur.columnValue;
@@ -208,12 +215,23 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
         },
         {} as Record<string, any>,
       );
-    }) || [];
-  const totalContacts = list?.data?.metadataValues?.total || 0;
-  const pageCount = list?.data?.metadataValues?.pages;
+    }) || []*/
+  const totalContacts = list?.data?.data?.page?.totalElements || 0;
+  const pageCount = list?.data?.data?.page?.totalPages || 0;
 
   const actionsCardShow = Object.keys(rowSelection).length > 0;
   const rowSelectionIds = Object.entries(rowSelection).map((item) => item[0]);
+
+  useEffect(() => {
+    return () => {
+      setColumn([]);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (loading) {
+    return null;
+  }
 
   if (!totalRecords) {
     return (
@@ -230,61 +248,66 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
   }
 
   return (
-    <Box height={'100%'} position={'relative'}>
-      <Stack gap={1.5}>
-        <GridToolBar totalContacts={totalContacts} />
-        <Stack bgcolor={'#fff'} border={'1px solid #ccc'} borderRadius={2}>
-          <StyledGrid
-            columns={columns}
-            data={data || []}
-            enableBatchRowSelection={true}
-            enableColumnResizing={true}
-            enableMultiRowSelection={true}
-            enableRowSelection={true}
-            enableSelectAll={true}
-            getRowId={(row) => row.id}
-            loading={isLoading || loading}
-            onRowClick={({ row }) => {
-              router.push(`/contacts/directory/detail/${tableId}/${row.id}`);
-            }}
-            onRowSelectionChange={setRowSelection}
-            rowCount={0}
-            rowSelection={rowSelection}
-            style={{
-              maxHeight: 'calc(100vh - 390px)',
-              borderBottom: '1px solid #ccc',
-              borderTopLeftRadius: '8px',
-              borderTopRightRadius: '8px',
-            }}
-          />
-          <GridPagination
-            currentPage={page}
-            onPageChange={(page) => {
-              setPage(page);
-            }}
-            onRowsPerPageChange={async (e) => {
-              setSize(parseInt(e.target.value));
-              await setPageSize({
-                pageSize: parseInt(e.target.value),
-              });
-            }}
-            pageCount={pageCount}
-            rowCount={totalContacts}
-            rowsPerPage={size}
-          />
+    <Fade in={true}>
+      <Box height={'100%'} position={'relative'}>
+        <Stack gap={1.5}>
+          <GridToolBar totalContacts={totalContacts} />
+          <Stack bgcolor={'#fff'} border={'1px solid #ccc'} borderRadius={2}>
+            <StyledGrid
+              columns={columns}
+              data={data || []}
+              enableBatchRowSelection={true}
+              enableColumnResizing={true}
+              enableMultiRowSelection={true}
+              enableRowSelection={true}
+              enableSelectAll={true}
+              getRowId={(row) => row.id}
+              loading={isLoading || loading}
+              // onRowClick={({ row }) => {
+              //   router.push(`/contacts/directory/detail/${tableId}/${row.id}`);
+              // }}
+              onRowSelectionChange={setRowSelection}
+              rowCount={0}
+              rowSelection={rowSelection}
+              style={{
+                maxHeight: 'calc(100vh - 390px)',
+                borderBottom: '1px solid #ccc',
+                borderTopLeftRadius: '8px',
+                borderTopRightRadius: '8px',
+              }}
+            />
+            <GridPagination
+              currentPage={page}
+              onPageChange={(page) => {
+                setPage(page);
+              }}
+              onRowsPerPageChange={async (e) => {
+                setSize(parseInt(e.target.value));
+                await setPageSize({
+                  pageSize: parseInt(e.target.value),
+                });
+              }}
+              pageCount={pageCount}
+              rowCount={totalContacts}
+              rowsPerPage={size}
+            />
+          </Stack>
         </Stack>
-      </Stack>
-      <GridActionsCard
-        deleteLoading={deleteState.loading}
-        exportLoading={exportState.loading}
-        handleDelete={async () => {
-          await deleteGridRecords(rowSelectionIds);
-        }}
-        handleExport={async () => {
-          await exportGridRecords(rowSelectionIds, tableId as number);
-        }}
-        open={actionsCardShow}
-      />
-    </Box>
+        <GridActionsCard
+          deleteLoading={deleteState.loading}
+          exportLoading={exportState.loading}
+          handleDelete={async () => {
+            await deleteGridRecords(rowSelectionIds);
+          }}
+          handleExport={async () => {
+            await exportGridRecords(rowSelectionIds, tableId as number);
+          }}
+          onClose={() => {
+            setRowSelection({});
+          }}
+          open={actionsCardShow}
+        />
+      </Box>
+    </Fade>
   );
 };

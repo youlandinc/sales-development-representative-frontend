@@ -11,7 +11,7 @@ import { PREVIEW_IMAGE_URL } from '@/constant';
 
 export enum modeEnum {
   add = 'add',
-  edit = 'edit',
+  // edit = 'edit',
 }
 
 export type ChipsCardProps = {
@@ -64,6 +64,7 @@ export const LibraryOffersInfoCard: FC<LibraryOffersCardProps> = ({
       <Stack alignItems={'space-between'} gap={1.5} height={'100%'}>
         <Box height={'14rem'} maxWidth={'100%'} overflow={'hidden'}>
           {visible && <Skeleton height={'100%'} variant={'rectangular'} />}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             alt={'picture'}
             height={'auto'}

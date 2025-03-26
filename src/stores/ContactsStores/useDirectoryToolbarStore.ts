@@ -1,7 +1,13 @@
 import { create } from 'zustand';
 import { FilterOperationEnum, FilterProps } from '@/types';
 
-export type useDirectoryToolbarStoreStates = {
+export enum ToolBarTypeEnum {
+  new_filter = 'new_filter',
+  edit_segment = 'edit_segment',
+  new_segment = 'new_segment',
+}
+
+export type useContactsToolbarStoreStates = {
   newGridData: Record<string, any>;
   segmentsFilters: {
     [key: string | number]: FilterProps[];
@@ -10,8 +16,10 @@ export type useDirectoryToolbarStoreStates = {
     [key: string | number]: FilterProps[];
   };
   fromOther: boolean;
+  toolBarType: ToolBarTypeEnum;
 };
-export type useDirectoryToolbarStoreActions = {
+
+export type useContactsToolbarStoreActions = {
   setFromOther: (value: boolean) => void;
   setNewGridData: (newGridData: Record<string, any>) => void;
   addSegmentsFiltersGroup: () => void;
@@ -37,10 +45,12 @@ export type useDirectoryToolbarStoreActions = {
     [key: string]: Array<FilterProps & any>;
   }) => void;
   resetToolbarData: () => void;
+  computedCanSaved: () => boolean;
+  setToolBarType: (type: ToolBarTypeEnum) => void;
 };
 
-export const useDirectoryToolbarStore = create<
-  useDirectoryToolbarStoreStates & useDirectoryToolbarStoreActions
+export const useContactsToolbarStore = create<
+  useContactsToolbarStoreStates & useContactsToolbarStoreActions
 >((set, get) => ({
   fromOther: false,
   setFromOther: (value) => set({ fromOther: value }),
@@ -50,6 +60,8 @@ export const useDirectoryToolbarStore = create<
 
   segmentsFilters: {},
   originalSegmentsFilters: {},
+  toolBarType: ToolBarTypeEnum.new_filter,
+
   setSegmentsFilters: (value) => {
     set({ segmentsFilters: value });
   },
@@ -140,5 +152,27 @@ export const useDirectoryToolbarStore = create<
       segmentsFilters: {},
       originalSegmentsFilters: {},
     });
+  },
+  computedCanSaved: () => {
+    if (Object.keys(get().segmentsFilters).length === 0) {
+      return false;
+    }
+
+    const hasValidSegments = Object.values(get().segmentsFilters).every(
+      (segment) =>
+        segment.length > 0 &&
+        segment.every(
+          (item) => item.columnName && item.operation && item.operationText,
+        ),
+    );
+
+    if (!hasValidSegments) {
+      return false;
+    }
+
+    return get().originalSegmentsFilters !== get().segmentsFilters;
+  },
+  setToolBarType: (type) => {
+    set({ toolBarType: type });
   },
 }));

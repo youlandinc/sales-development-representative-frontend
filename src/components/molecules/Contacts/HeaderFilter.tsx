@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   CircularProgress,
   Icon,
@@ -8,23 +8,22 @@ import {
   Typography,
 } from '@mui/material';
 
-import { useAsync, useAsyncFn, useSwitch } from '@/hooks';
+import { useAsync, useSwitch } from '@/hooks';
 
 import {
+  ToolBarTypeEnum,
   useContactsStore,
-  useDirectoryToolbarStore,
+  useContactsToolbarStore,
+  useGridStore,
 } from '@/stores/ContactsStores';
 
+import { SDRToast, StyledButton } from '@/components/atoms';
 import {
-  SDRToast,
-  StyledButton,
-  StyledDialog,
-  StyledTextField,
-} from '@/components/atoms';
-import { CommonSegmentsDrawer } from '@/components/molecules';
+  CommonSegmentsDrawer,
+  SaveSegmentDialog,
+} from '@/components/molecules';
 
 import { ContactsTableTypeEnum, HttpError } from '@/types';
-import { _createNewSegment } from '@/request';
 
 import ICON_FILTER_ADD from './assets/icon_filter_add.svg';
 import ICON_LIST from './assets/icon_list.svg';
@@ -57,11 +56,15 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
     setOriginalSegmentsFilters,
     fromOther,
     setFromOther,
-  } = useDirectoryToolbarStore((state) => state);
+    computedCanSaved,
+    setToolBarType,
+  } = useContactsToolbarStore((state) => state);
+
+  const { totalRecordsWithFilter } = useGridStore((state) => state);
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [selectLoading, setSelectLoading] = useState(false);
-  const [segmentName, setSegmentName] = useState('');
+  // const [segmentName, setSegmentName] = useState('');
   const { visible, close, open } = useSwitch();
   const {
     visible: dialogShow,
@@ -69,14 +72,16 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
     open: dialogOpen,
   } = useSwitch();
 
-  useAsync(async () => {
+  const showFilter = computedCanSaved();
+
+  const { loading } = useAsync(async () => {
     if (fromOther) {
       return setFromOther(false);
     }
-    if (selectedSegmentId && selectedSegmentId == -1) {
-      await onClickToSelect(selectedSegmentId);
-      return;
-    }
+    // if (selectedSegmentId && selectedSegmentId == -1) {
+    //   await onClickToSelect(selectedSegmentId);
+    //   return;
+    // }
     const options = await fetchSegmentsOptions(headerType);
     const target = options.filter((item) => item.isSelect);
     if (target.length > 0) {
@@ -106,27 +111,12 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
     clearSegmentSelectState();
   };
 
-  const [state, createSegment] = useAsyncFn(async () => {
-    const postData = {
-      tableId: headerType,
-      tableName: '',
-      segmentName,
-      segmentsFilters: segmentsFilters!,
+  useEffect(() => {
+    return () => {
+      onClickToClearFilter();
     };
-    try {
-      const { data } = await _createNewSegment(postData);
-      await fetchSegmentsOptions(headerType);
-      setSelectedSegmentId(data);
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      dialogClose();
-      setSegmentName('');
-    }
-  }, [headerType, segmentsFilters, segmentName]);
-
-  console.log(selectedSegmentId, selectedSegmentId !== '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Stack gap={1.5} width={'100%'}>
@@ -136,6 +126,7 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
           onClick={() => {
             createSegmentsFiltersGroup();
             open();
+            setToolBarType(ToolBarTypeEnum.new_filter);
           }}
           size={'medium'}
           sx={{ px: '12px !important', py: '8px !important' }}
@@ -145,16 +136,17 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
             component={ICON_FILTER_ADD}
             sx={{ width: 20, height: 20, mr: 0.75, fill: 'currentColor' }}
           />
-          <Typography variant={'body2'}>Add filter</Typography>
+          <Typography variant={'body2'}>Set filter</Typography>
         </StyledButton>
         <StyledButton
-          disabled={Object.keys(segmentsFilters).length > 0 || selectLoading}
-          loading={selectLoading}
+          disabled={loading}
+          loading={loading}
           onClick={(e) => {
             if (segmentOptions.length === 0) {
               return;
             }
             setAnchorEl(e.currentTarget);
+            setToolBarType(ToolBarTypeEnum.edit_segment);
           }}
           size={'medium'}
           sx={{ px: '12px !important', py: '8px !important', width: 106 }}
@@ -235,7 +227,7 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
         />
       </Stack>
       {(!!selectedSegmentId && selectedSegmentId != -1) ||
-      Object.keys(segmentsFilters).length ? (
+      (Object.keys(segmentsFilters).length && showFilter) ? (
         <Stack
           alignItems={'center'}
           bgcolor={'background.active'}
@@ -255,7 +247,7 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
             </Typography>
           ) : (
             <Typography color={'text.primary'} variant={'subtitle2'}>
-              Preview of lists (12,332 contacts)
+              Preview of lists ({totalRecordsWithFilter} contacts)
             </Typography>
           )}
           <Stack
@@ -295,43 +287,10 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
           </Stack>
         </Stack>
       ) : null}
-      <StyledDialog
-        content={
-          <Stack py={3}>
-            <StyledTextField
-              label={'Segment name'}
-              onChange={(e) => setSegmentName(e.target.value)}
-              size={'small'}
-              value={segmentName}
-            />
-          </Stack>
-        }
-        footer={
-          <Stack flexDirection={'row'} gap={1.5}>
-            <StyledButton
-              color={'info'}
-              onClick={close}
-              size={'small'}
-              variant={'outlined'}
-            >
-              Cancel
-            </StyledButton>
-            <StyledButton
-              disabled={state.loading || !segmentName}
-              loading={state.loading}
-              onClick={createSegment}
-              size={'small'}
-              sx={{
-                width: '60px',
-              }}
-            >
-              Save
-            </StyledButton>
-          </Stack>
-        }
-        header={'Save as segment'}
+      <SaveSegmentDialog
         onClose={dialogClose}
         open={dialogShow}
+        segmentType={headerType}
       />
     </Stack>
   );

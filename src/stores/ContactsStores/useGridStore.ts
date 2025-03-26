@@ -9,6 +9,7 @@ type DirectoryStoresStates = {
   page: number;
   size: number;
   totalRecords: number;
+  totalRecordsWithFilter: number;
   tableId?: number;
   loading?: boolean;
   tableLabel: string;
@@ -30,6 +31,7 @@ type DirectoryStoresActions = {
   setKeyword: (keyword: string) => void;
   setPage: (page: number) => void;
   setSize: (size: number) => void;
+  setTotalRecordsWithFilter: (totalRecordsWithFilter: number) => void;
 };
 
 export const useGridStore = create<
@@ -42,6 +44,7 @@ export const useGridStore = create<
   keyword: '',
   page: 0,
   size: 100,
+  totalRecordsWithFilter: 0,
 
   loading: false,
   metadataColumns: [],
@@ -107,4 +110,6 @@ export const useGridStore = create<
   setKeyword: (keyword) => set({ keyword, page: 0 }),
   setPage: (page) => set({ page }),
   setSize: (size) => set({ size }),
+  setTotalRecordsWithFilter: (totalRecordsWithFilter) =>
+    set({ totalRecordsWithFilter }),
 }));

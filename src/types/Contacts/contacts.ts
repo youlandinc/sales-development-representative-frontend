@@ -80,6 +80,9 @@ export type RecordsItem = {
 };
 
 export type DirectoryGridResponse = {
+  data: PaginationResponse<Record<string, any>[]>;
+  dataTotal: number;
+}; /* {
   tableId: number;
   tableLabel: string;
   tableName: string;
@@ -92,7 +95,7 @@ export type DirectoryGridResponse = {
     records: RecordsItem[][];
   };
   totalRecords: number;
-};
+};*/
 
 export type GridColumnItem = {
   id: ColumnItem['columnId'];
