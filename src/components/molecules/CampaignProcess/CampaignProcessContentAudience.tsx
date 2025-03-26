@@ -23,6 +23,7 @@ export const CampaignProcessContentAudience: FC = () => {
     // filter
     filterFormData,
 
+    leadsFetchLoading,
     leadsList,
     leadsCount,
     leadsVisible,
@@ -99,12 +100,12 @@ export const CampaignProcessContentAudience: FC = () => {
 
   return !isFirst ? (
     <Stack
-      alignItems={isLoading ? 'center' : 'unset'}
+      alignItems={isLoading || leadsFetchLoading ? 'center' : 'unset'}
       border={'1px solid #DFDEE6'}
       borderRadius={4}
       flexShrink={0}
       height={'100%'}
-      justifyContent={isLoading ? 'center' : 'unset'}
+      justifyContent={isLoading || leadsFetchLoading ? 'center' : 'unset'}
       overflow={'auto'}
       px={leadsVisible ? 3 : 0}
       sx={{
@@ -113,7 +114,7 @@ export const CampaignProcessContentAudience: FC = () => {
       }}
       width={leadsVisible ? 360 : 0}
     >
-      {isLoading ? (
+      {isLoading || leadsFetchLoading ? (
         <StyledLoading size={48} />
       ) : (
         <>

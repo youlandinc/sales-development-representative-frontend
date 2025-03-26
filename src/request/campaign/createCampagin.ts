@@ -1,6 +1,7 @@
 import { del, get, post, put } from '@/request/request';
 import {
   ProcessCreateTypeEnum,
+  ResponseCampaignCSVLeads,
   ResponseCampaignEmail,
   ResponseCampaignInfo,
   ResponseCampaignLeadsInfo,
@@ -171,4 +172,11 @@ export const _fetchFilterOptions = () => {
 
 export const _fetchFilterLeads = (params: any) => {
   return post('/sdr/leads/filter/preview', params);
+};
+
+// csv
+export const _fetchCsvLeads = (files: FormData) => {
+  return post<ResponseCampaignCSVLeads>('/sdr/leads/csv', files, {
+    headers: { 'content-type': 'multipart/form-data' },
+  });
 };

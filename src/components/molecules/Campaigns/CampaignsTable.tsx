@@ -271,6 +271,8 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setMessageList,
     // filter
     setFilterFormData,
+    // csv
+    setCSVFormData,
   } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -359,6 +361,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
                 steps,
                 launchInfo,
                 offerOptions,
+                fileInfo,
               },
             },
           } = await _fetchCampaignInfo(campaignId);
@@ -384,6 +387,9 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               break;
             case ProcessCreateTypeEnum.filter:
               setFilterFormData(conditions!);
+              break;
+            case ProcessCreateTypeEnum.csv:
+              setCSVFormData(fileInfo!);
               break;
           }
 

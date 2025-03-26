@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   CampaignLeadItem,
   CampaignStatusEnum,
+  FileInfo,
   HttpError,
   ProcessCreateChatEnum,
   ProcessCreateTypeEnum,
@@ -35,6 +36,7 @@ export type DialogStoreState = {
   messageList: ResponseCampaignChatRecord[];
 
   filterFormData: ResponseCampaignFilterFormData;
+  csvFormData: FileInfo;
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
@@ -68,6 +70,7 @@ export type DialogStoreActions = {
   setIsFirst: (isFirst: boolean) => void;
 
   setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
+  setCSVFormData: (formData: FileInfo) => void;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -130,6 +133,12 @@ const InitialState: DialogStoreState = {
     excludeSkill: [],
   },
 
+  csvFormData: {
+    url: '',
+    originalFileName: '',
+    fileName: '',
+  },
+
   leadsFetchLoading: false,
   leadsList: [],
   leadsCount: 0,
@@ -157,6 +166,7 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setCSVFormData: (formData: FileInfo) => set({ csvFormData: formData }),
   setFilterFormData: (formData) => set({ filterFormData: formData }),
   setIsFirst: (isFirst) => set({ isFirst }),
   setLeadsFetchLoading: (leadsFetchLoading) => set({ leadsFetchLoading }),
@@ -350,6 +360,15 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         };
         break;
       }
+      case ProcessCreateTypeEnum.csv: {
+        const { csvFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.csv,
+          data: {
+            fileInfo: csvFormData,
+          },
+        };
+      }
     }
     if (!postData) {
       return;
@@ -375,6 +394,12 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         case ProcessCreateTypeEnum.filter: {
           set({
             filterFormData: data.data.conditions,
+          });
+          break;
+        }
+        case ProcessCreateTypeEnum.csv: {
+          set({
+            csvFormData: data.data.fileInfo,
           });
           break;
         }

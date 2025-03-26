@@ -147,6 +147,21 @@ export interface ResponseCampaignInfo {
     // filter
     conditions?: ResponseCampaignFilterFormData;
     // csv
+    fileInfo?: FileInfo;
     // crm
   };
+}
+
+export interface FileInfo {
+  url: string;
+  fileName: string;
+  originalFileName: string;
+  [key: string]: any;
+}
+
+export interface ResponseCampaignCSVLeads {
+  counts: number;
+  leads: CampaignLeadItem[];
+  data: { [key: string]: string };
+  fileInfo: FileInfo;
 }
