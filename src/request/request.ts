@@ -64,6 +64,7 @@ service.interceptors.response.use(
         header,
         variant,
       };
+      console.log(code === HttpErrorEnum.token_expired);
       if (code === HttpErrorEnum.token_expired) {
         USystemLogout();
       }

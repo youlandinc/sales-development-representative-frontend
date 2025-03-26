@@ -241,8 +241,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   setReloadTable: (reloadTable) => set({ reloadTable }),
   addMessageItem: (message) => {
     const { messageList } = get();
-    messageList.push(message);
-    set({ messageList });
+    set({ messageList: [...messageList, message] });
   },
   createChatSSE: async (chatId: number | string) => {
     const params = chatId || get().chatId;
@@ -272,10 +271,10 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       switch (data.step) {
         case ProcessCreateChatEnum.thinking: {
           const { messageList } = get();
-          messageList.splice(
-            messageList.findIndex((item) => item.isFake),
-            1,
-          );
+          const fakeIndex = messageList.findIndex((item) => item.isFake);
+          if (fakeIndex !== -1) {
+            messageList.splice(fakeIndex, 1);
+          }
           const temp = {
             source: SourceEnum.server,
             id: data.id,
@@ -328,7 +327,6 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     chatSSE!.onerror = async () => {
       if (chatSSE?.readyState === EventSource.CLOSED) {
         const retriedSSE = initialSSE();
-        eventSource.close();
         set({ chatSSE: retriedSSE });
       }
     };
