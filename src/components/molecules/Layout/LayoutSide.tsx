@@ -169,7 +169,7 @@ export const LayoutSide: FC = () => {
   return (
     <Stack
       sx={{
-        width: expend ? 230 : 70,
+        width: expend ? 230 : 65,
         height: '100%',
         borderRight: '1px solid #DFDEE6',
         bgcolor: '#FFFFFF',
