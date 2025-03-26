@@ -1,4 +1,4 @@
-import { FC, Fragment, useRef, useState } from 'react';
+import { FC, Fragment, useEffect, useRef, useState } from 'react';
 import {
   Avatar,
   Icon,
@@ -96,13 +96,7 @@ export const LayoutSide: FC = () => {
 
   // 0 false, 1 true
 
-  const [expend, setExpend] = useState(() => {
-    if (localStorage.getItem('expend') === null) {
-      localStorage.setItem('expend', '1');
-      return true;
-    }
-    return localStorage.getItem('expend') === '1';
-  });
+  const [expend, setExpend] = useState(true);
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -176,6 +170,15 @@ export const LayoutSide: FC = () => {
     }
     router.push(key);
   };
+
+  useEffect(() => {
+    if (localStorage.getItem('expend') === null) {
+      localStorage.setItem('expend', '1');
+    }
+    if (localStorage.getItem('expend') === '1') {
+      setExpend(true);
+    }
+  }, []);
 
   return (
     <Stack
