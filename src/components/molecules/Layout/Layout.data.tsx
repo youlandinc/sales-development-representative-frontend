@@ -36,7 +36,7 @@ export const LAYOUT_SIDE_MENU = [
   },
   {
     label: 'Contacts',
-    key: 'contacts',
+    key: 'Contacts',
     defaultIcon: ICON_SIDE_CONTACTS_DEFAULT,
     activeIcon: ICON_SIDE_CONTACTS_ACTIVE,
     type: 'link',

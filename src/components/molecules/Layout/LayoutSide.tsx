@@ -157,7 +157,7 @@ export const LayoutSide: FC = () => {
     </Stack>
   );
 
-  const isSelected = (key?: string) => pathname === key;
+  const isSelected = (key?: string) => pathname.includes(key || '');
 
   const onClickToRedirect = (key: string) => {
     if (isSelected(key)) {
@@ -169,7 +169,7 @@ export const LayoutSide: FC = () => {
   return (
     <Stack
       sx={{
-        width: expend ? 230 : 65,
+        width: expend ? 230 : 60,
         height: '100%',
         borderRight: '1px solid #DFDEE6',
         bgcolor: '#FFFFFF',
@@ -213,29 +213,31 @@ export const LayoutSide: FC = () => {
         </Stack>
         {LAYOUT_SIDE_MENU.map((item, index) => (
           <Fragment key={index}>
-            <StyledMenuItem
-              active={isSelected(item.url)}
-              activeIcon={item.activeIcon}
-              defaultIcon={item.defaultIcon}
-              expend={expend}
-              key={`${item.key}-${index}`}
-              label={item.label}
-              onClick={() => (item.url ? onClickToRedirect(item.url) : false)}
-              sx={{
-                cursor: item.url ? 'pointer' : 'default',
-              }}
-            />
+            {item.subMenus && !expend ? null : (
+              <StyledMenuItem
+                active={isSelected(item.key)}
+                activeIcon={item.activeIcon}
+                defaultIcon={item.defaultIcon}
+                expend={expend}
+                key={`${item.key}-${index}`}
+                label={item.label}
+                onClick={() => (item.url ? onClickToRedirect(item.url) : false)}
+                sx={{
+                  cursor: item.url ? 'pointer' : 'default',
+                }}
+              />
+            )}
             {item.subMenus && (
-              <Stack pl={'28px'}>
-                {item.subMenus.map((item, i) => (
+              <Stack pl={expend ? '28px' : 0}>
+                {item.subMenus.map((subItem, i) => (
                   <StyledMenuItem
-                    active={isSelected(item.url)}
-                    activeIcon={item.activeIcon}
-                    defaultIcon={item.defaultIcon}
+                    active={isSelected(subItem.key)}
+                    activeIcon={subItem.activeIcon}
+                    defaultIcon={subItem.defaultIcon}
                     expend={expend}
-                    key={`${item.key}-${i}`}
-                    label={item.label}
-                    onClick={() => onClickToRedirect(item.url)}
+                    key={`${subItem.key}-${i}`}
+                    label={subItem.label}
+                    onClick={() => onClickToRedirect(subItem.url)}
                   />
                 ))}
               </Stack>
