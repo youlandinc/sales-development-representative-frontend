@@ -387,7 +387,8 @@ const defaultOptions: ThemeOptions = {
     MuiAutocomplete: {
       styleOverrides: {
         inputRoot: {
-          padding: '0',
+          paddingTop: '0px',
+          paddingBottom: '0px',
         },
         input: {
           paddingTop: '10px',
@@ -404,9 +405,9 @@ const defaultOptions: ThemeOptions = {
         listbox: {
           padding: '0px 0px 0px 0px',
         },
-        option: {
-          padding: '12px 12px 12px 12px !important',
-        },
+        // option: {
+        //   padding: '12px 12px 12px 12px !important',
+        // },
       },
     },
     MuiSelect: {
