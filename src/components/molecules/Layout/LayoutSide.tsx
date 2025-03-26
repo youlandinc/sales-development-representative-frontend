@@ -94,7 +94,22 @@ export const LayoutSide: FC = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [expend, setExpend] = useState(true);
+  // 0 false, 1 true
+
+  const [expend, setExpend] = useState(() => {
+    if (localStorage.getItem('expend') === null) {
+      console.log(123);
+      localStorage.setItem('expend', '1');
+      return true;
+    }
+    return localStorage.getItem('expend') === '1';
+  });
+
+  console.log(
+    localStorage.getItem('expend') === '1',
+    localStorage.getItem('expend'),
+    expend,
+  );
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -132,7 +147,10 @@ export const LayoutSide: FC = () => {
     <Stack
       alignItems={'center'}
       justifyContent={'center'}
-      onClick={() => setExpend(!expend)}
+      onClick={() => {
+        setExpend(!expend);
+        localStorage?.setItem('expend', !expend ? '1' : '0');
+      }}
       sx={{
         cursor: 'pointer',
         border: '1px solid #DFDEE6',
