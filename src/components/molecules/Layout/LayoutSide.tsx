@@ -98,18 +98,11 @@ export const LayoutSide: FC = () => {
 
   const [expend, setExpend] = useState(() => {
     if (localStorage.getItem('expend') === null) {
-      console.log(123);
       localStorage.setItem('expend', '1');
       return true;
     }
     return localStorage.getItem('expend') === '1';
   });
-
-  console.log(
-    localStorage.getItem('expend') === '1',
-    localStorage.getItem('expend'),
-    expend,
-  );
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
