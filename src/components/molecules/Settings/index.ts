@@ -1,4 +1,5 @@
 export * from './SettingsEmails';
+export * from './SettingsIntegrations';
 export * from './SettingsPersonalInfo';
 
 export * from './SettingsCardEmail';
