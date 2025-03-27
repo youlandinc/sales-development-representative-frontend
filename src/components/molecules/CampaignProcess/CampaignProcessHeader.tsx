@@ -32,6 +32,7 @@ const titleTail = (
     case ProcessCreateTypeEnum.crm:
       return 'Use CRM list';
     case ProcessCreateTypeEnum.agent:
+      return 'Agent';
     default:
       return '';
   }
