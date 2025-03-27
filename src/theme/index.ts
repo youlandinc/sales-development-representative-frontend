@@ -2,6 +2,11 @@
 import { CSSProperties } from 'react';
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+import {
+  filledInputClasses,
+  inputBaseClasses,
+  inputLabelClasses,
+} from '@mui/material';
 
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
@@ -105,6 +110,24 @@ declare module '@mui/material/Typography' {
     body3: true;
     subtitle3: true;
     h7: true;
+  }
+}
+
+declare module '@mui/material/TextField' {
+  interface TextFieldPropsSizeOverrides {
+    large: true;
+  }
+}
+
+declare module '@mui/material/InputBase' {
+  interface InputBasePropsSizeOverrides {
+    large: true;
+  }
+}
+
+declare module '@mui/material/InputLabel' {
+  interface InputLabelPropsSizeOverrides {
+    large: true;
   }
 }
 
@@ -317,13 +340,6 @@ const defaultOptions: ThemeOptions = {
       },
     },
     //create by alfred ---------------------start
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          background: 'transparent',
-        },
-      },
-    },
     MuiInputLabel: {
       styleOverrides: {
         root: {
@@ -334,9 +350,17 @@ const defaultOptions: ThemeOptions = {
           '&.Mui-focused': {
             color: 'var(--mui-palette-text-primary)',
           },
+          '&.MuiInputLabel-sizeLarge': {
+            fontSize: 16,
+            lineHeight: 1.5,
+            transform: 'translate(14px, 12px) scale(1)',
+          },
         },
         shrink: {
           transform: 'translate(14px, -8px) scale(0.75)',
+          '&.MuiInputLabel-sizeLarge.MuiInputLabel-shrink': {
+            transform: 'translate(14px, -10px) scale(0.75)',
+          },
         },
         sizeSmall: {
           transform: 'translate(12px, 5px) scale(1)',
@@ -384,6 +408,87 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
+    MuiTextField: {
+      defaultProps: {
+        slotProps: {
+          htmlInput: {
+            sx: (theme) => ({
+              //medium
+              [`&.${outlinedInputClasses.input}`]: {
+                paddingTop: '10px',
+                paddingBottom: '10px',
+                zIndex: 1,
+              },
+              //small
+              [`&.${outlinedInputClasses.inputSizeSmall}`]: {
+                paddingTop: '6px',
+                paddingBottom: '6px',
+              },
+              //large
+              ['&.MuiInputBase-sizeLarge']: {
+                paddingTop: '12px',
+                paddingBottom: '12px',
+                fontSize: 16,
+              },
+              color: theme.palette.text.primary,
+              lineHeight: 1.5,
+              fontSize: 14,
+            }),
+          },
+          inputLabel: {
+            sx: {
+              color: 'var(--mui-palette-text-primary)',
+              fontSize: 14,
+              lineHeight: 1.43,
+              //medium
+              transform: 'translate(14px, 10px) scale(1)',
+              '&.Mui-focused': {
+                color: 'var(--mui-palette-text-primary)',
+              },
+              [`&.${inputLabelClasses.shrink}`]: {
+                transform: 'translate(14px, -8px) scale(0.75)',
+              },
+              //large
+              '&.MuiInputLabel-sizeLarge': {
+                fontSize: 16,
+                lineHeight: 1.5,
+                transform: 'translate(14px, 12px) scale(1)',
+              },
+              [`&.${inputLabelClasses.shrink}.MuiInputLabel-sizeLarge`]: {
+                fontSize: 16,
+                lineHeight: 1.5,
+                transform: 'translate(14px, -10px) scale(0.75)',
+              },
+              //small
+
+              [`&.${inputLabelClasses.sizeSmall}`]: {
+                fontSize: 14,
+                lineHeight: 1.5,
+                transform: 'translate(12px, 5px) scale(1)',
+              },
+              [`&.${inputLabelClasses.shrink}.${inputLabelClasses.sizeSmall}`]:
+                {
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                  transform: 'translate(12px, -9px) scale(0.75)',
+                },
+            },
+          },
+        },
+      },
+      styleOverrides: {
+        root: {
+          background: 'transparent',
+          '& .MuiInputBase-sizeLarge': {
+            '& .MuiOutlinedInput-input': {
+              fontSize: 16,
+              paddingTop: 12,
+              paddingBottom: 12,
+            },
+          },
+        },
+      },
+    },
     MuiAutocomplete: {
       styleOverrides: {
         inputRoot: {
@@ -416,16 +521,24 @@ const defaultOptions: ThemeOptions = {
         // },
       },
     },
-    MuiSelect: {
-      styleOverrides: {
-        icon: {
-          zIndex: 1,
-        },
-        root: {
-          background: 'transparent',
-        },
-      },
-    },
+    // MuiSelect: {
+    //   styleOverrides: {
+    //     icon: {
+    //       zIndex: 1,
+    //     },
+    //     root: {
+    //       background: 'transparent',
+    //       '&.MuiInputBase-sizeLarge': {
+    //         '& .MuiOutlinedInput-input': {
+    //           fontSize: 16,
+    //           lineHeight: 1.5,
+    //           paddingTop: 12,
+    //           paddingBottom: 12,
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
     MuiPopover: {
       styleOverrides: {
         paper: {
