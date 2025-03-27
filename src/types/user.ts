@@ -39,3 +39,16 @@ export interface IUserResetPasswordParams {
   verifyCode?: string;
   email: string;
 }
+
+export enum UserIntegrationEnum {
+  hubspot = 'HUBSPOT',
+}
+
+export interface UserIntegrationItem {
+  tenantId: string;
+  account: string | null;
+  thirdParty: UserIntegrationEnum;
+  oauthUrl: string;
+  connected: boolean;
+  websiteUrl: string;
+}

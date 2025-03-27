@@ -1,6 +1,10 @@
 import { Stack, Typography } from '@mui/material';
 
-import { SettingsEmails, SettingsPersonalInfo } from '@/components/molecules';
+import {
+  SettingsEmails,
+  SettingsIntegrations,
+  SettingsPersonalInfo,
+} from '@/components/molecules';
 
 export const Settings = () => {
   return (
@@ -9,6 +13,7 @@ export const Settings = () => {
         Settings
       </Typography>
       <SettingsEmails />
+      <SettingsIntegrations />
       <SettingsPersonalInfo />
     </Stack>
   );
