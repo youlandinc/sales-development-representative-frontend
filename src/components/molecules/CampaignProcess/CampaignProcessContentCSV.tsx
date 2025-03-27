@@ -83,6 +83,7 @@ export const CampaignProcessContentCSV: FC = () => {
     setIsFirst,
     setCSVFormData,
     csvFormData,
+    leadsCount,
     setLeadsFetchLoading,
   } = useDialogStore();
 
@@ -213,7 +214,8 @@ export const CampaignProcessContentCSV: FC = () => {
           <Stack flexDirection={'row'} gap={1}>
             <Icon component={ICON_CHAT_COMPLETED} />
             <Typography>
-              Based on the CSV you provided, a total of 100 records were found.
+              Based on the CSV you provided, a total of {leadsCount} records
+              were found.
             </Typography>
           </Stack>,
         ]);
@@ -235,7 +237,7 @@ export const CampaignProcessContentCSV: FC = () => {
       }, 1000);
       return () => clearInterval(timerRef.current);
     }
-  }, [animateIndex, mode, uploading]);
+  }, [animateIndex, leadsCount, mode, uploading]);
 
   const onClickToReUpload = () => {
     if (uploading) {

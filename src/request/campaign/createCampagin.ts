@@ -19,7 +19,7 @@ export const _sendChatMessage = (params: {
 };
 
 export const _fetchChatLeads = (chatId: string | number) => {
-  return get<ResponseCampaignLeadsInfo>(`/sdr/ai/leads/${chatId}`);
+  return get<ResponseCampaignLeadsInfo>(`/sdr/leads/chat/preview/${chatId}`);
 };
 
 export const _fetchCampaignInfo = (campaignId: string | number) => {
