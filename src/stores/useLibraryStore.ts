@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { _fetCampaignPendingEmails } from '@/request';
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import { _fetchOffersInfo } from '@/request/library/offers';

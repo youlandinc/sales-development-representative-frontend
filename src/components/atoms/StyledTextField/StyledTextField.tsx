@@ -52,19 +52,19 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
           },
         },
         '& .MuiInputLabel-outlined': {
-          transform:
-            size === 'medium'
-              ? 'translate(14px, 12px) scale(1)'
-              : 'translate(12px, 5px) scale(1)',
+          // transform:
+          //   size === 'medium'
+          //     ? 'translate(14px, 10px) scale(1)'
+          //     : 'translate(12px, 5px) scale(1)',
         },
         '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
-          transform:
-            size === 'medium'
-              ? 'translate(14px, -8px) scale(0.75)'
-              : 'translate(12px, -8px) scale(0.75)',
+          // transform:
+          //   size === 'medium'
+          //     ? 'translate(14px, -8px) scale(0.75)'
+          //     : 'translate(12px, -8px) scale(0.75)',
         },
         '& .MuiOutlinedInput-input': {
-          py: size === 'medium' ? '12.5px' : '5px',
+          // py: size === 'medium' ? '12px' : '5px',
         },
         '& .MuiOutlinedInput-root': {
           borderRadius: 2,
@@ -78,7 +78,7 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
             lineHeight: 1,
           },
           '& fieldset': {
-            borderColor: 'border.default',
+            // borderColor: 'border.default',
           },
           '&:hover fieldset': {
             borderColor: 'border.hover',

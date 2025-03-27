@@ -1,5 +1,28 @@
 import { CampaignStatusEnum } from '@/types';
 
+export enum SelectWithFlagTypeEnum {
+  select = 'SELECT',
+  input = 'INPUT',
+}
+
+export interface SearchWithFlagData {
+  value: string;
+  isIncludes?: boolean;
+  type: SelectWithFlagTypeEnum;
+}
+
+export interface SelectWithCustomProps {
+  inputValue: string;
+  selectValue: string;
+}
+
+export enum ProcessCreateTypeEnum {
+  filter = 'FILTER',
+  csv = 'CSV',
+  crm = 'CRM',
+  agent = 'AGENT',
+}
+
 export enum ProcessCreateChatEnum {
   thinking = 'THINKING',
   create_plan = 'CREATE_PLAN',
@@ -102,17 +125,43 @@ export interface ResponseOfferOption {
   selected: boolean;
 }
 
+export interface ResponseCampaignFilterFormData {
+  [key: string]: SearchWithFlagData[] | SelectWithCustomProps;
+}
+
 export interface ResponseCampaignInfo {
   campaignId: string | number;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
   chatId: number | string;
   setupPhase: SetupPhaseEnum;
+  startingPoint: ProcessCreateTypeEnum;
   data: {
+    // common
     leadInfo: ResponseCampaignLeadsInfo;
-    chatRecord: ResponseCampaignChatRecord[];
     steps: ResponseCampaignMessagingStep[];
     launchInfo: ResponseCampaignLaunchInfo;
     offerOptions: ResponseOfferOption[];
+    // chat
+    chatRecord?: ResponseCampaignChatRecord[];
+    // filter
+    conditions?: ResponseCampaignFilterFormData;
+    // csv
+    fileInfo?: FileInfo;
+    // crm
   };
+}
+
+export interface FileInfo {
+  url: string;
+  fileName: string;
+  originalFileName: string;
+  [key: string]: any;
+}
+
+export interface ResponseCampaignCSVLeads {
+  counts: number;
+  leads: CampaignLeadItem[];
+  data: { [key: string]: string };
+  fileInfo: FileInfo;
 }

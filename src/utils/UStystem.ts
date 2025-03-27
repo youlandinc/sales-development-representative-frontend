@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 
 export const USystemLogout = () => {
   localStorage.removeItem('PERSIST_DATA');
+  location.href = '/auth/sign-in';
 };
 
 export const UEncode = (password: string): string => {

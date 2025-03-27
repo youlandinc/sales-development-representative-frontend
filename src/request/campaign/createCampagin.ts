@@ -1,5 +1,7 @@
 import { del, get, post, put } from '@/request/request';
 import {
+  ProcessCreateTypeEnum,
+  ResponseCampaignCSVLeads,
   ResponseCampaignEmail,
   ResponseCampaignInfo,
   ResponseCampaignLeadsInfo,
@@ -17,7 +19,7 @@ export const _sendChatMessage = (params: {
 };
 
 export const _fetchChatLeads = (chatId: string | number) => {
-  return get<ResponseCampaignLeadsInfo>(`/sdr/ai/leads/${chatId}`);
+  return get<ResponseCampaignLeadsInfo>(`/sdr/leads/chat/preview/${chatId}`);
 };
 
 export const _fetchCampaignInfo = (campaignId: string | number) => {
@@ -36,7 +38,10 @@ export const _closeSSE = (chatId: string | number) => {
 };
 
 // first step
-export const _createCampaign = (params: { chatId: number | string }) => {
+export const _createCampaign = (params: {
+  startingPoint: ProcessCreateTypeEnum;
+  data: any;
+}) => {
   return post<ResponseCampaignInfo>('/sdr/campaign/info', params);
 };
 
@@ -158,4 +163,20 @@ export const _saveAndLunchCampaign = (params: {
   senderName: string;
 }) => {
   return put('/sdr/campaign/info', params);
+};
+
+// filter
+export const _fetchFilterOptions = () => {
+  return get('/sdr/dict/audience/filter');
+};
+
+export const _fetchFilterLeads = (params: any) => {
+  return post('/sdr/leads/filter/preview', params);
+};
+
+// csv
+export const _fetchCsvLeads = (files: FormData) => {
+  return post<ResponseCampaignCSVLeads>('/sdr/leads/csv', files, {
+    headers: { 'content-type': 'multipart/form-data' },
+  });
 };

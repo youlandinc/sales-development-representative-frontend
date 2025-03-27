@@ -28,9 +28,10 @@ export const CommonRenameTextField: FC<StyledTextFieldProps> = ({
           '& .MuiOutlinedInput-input': {
             fontSize: 20,
             fontWeight: 600,
-            p: '2px 6px',
+            py: '2px',
+            px: '6px ',
             height: 'auto',
-            lineHeight: '1.5 !important',
+            lineHeight: '1.5 ',
           },
           '& .MuiOutlinedInput-notchedOutline': {
             borderColor: 'transparent',

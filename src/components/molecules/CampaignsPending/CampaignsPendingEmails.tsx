@@ -52,6 +52,7 @@ export const CampaignsPendingEmails: FC<CampaignsPendingEmailsProps> = ({
       // noinspection JSIgnoredPromiseFromCall
       fetchPendingEmailsData(parseInt(campaignId as string), pageSize, 0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campaignId]);
 
   return (

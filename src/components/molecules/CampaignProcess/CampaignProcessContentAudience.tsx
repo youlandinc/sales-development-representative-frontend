@@ -1,67 +1,111 @@
-import { useEffect, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
+import { FC } from 'react';
+import useSWR from 'swr';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 import { UFormatNumber } from '@/utils';
 
+import { useDebounce } from '@/hooks';
+
 import { SDRToast, StyledLoading } from '@/components/atoms';
 import { CampaignLeadsCard } from '@/components/molecules';
 
-import { HttpError } from '@/types';
-import { _fetchChatLeads } from '@/request';
+import { HttpError, ProcessCreateTypeEnum } from '@/types';
+import { _fetchChatLeads, _fetchFilterLeads } from '@/request';
 
-export const CampaignProcessContentAudience = () => {
+export const CampaignProcessContentAudience: FC = () => {
   const {
-    chatId,
+    campaignType,
     isFirst,
-    leadsVisible,
+    // agent
+    chatId,
     returning,
-    leadsCount,
+    // filter
+    filterFormData,
+
+    leadsFetchLoading,
     leadsList,
+    leadsCount,
+    leadsVisible,
+
+    setIsFirst,
     setLeadsList,
     setLeadsCount,
     setLeadsVisible,
+    setLeadsFetchLoading,
   } = useDialogStore();
 
-  const [leadsFetching, setLeadsFetching] = useState(false);
+  const debouncedFormData = useDebounce(filterFormData, 500);
 
-  const fetchLeads = async () => {
-    !leadsVisible && setLeadsVisible(true);
-    setLeadsFetching(true);
-    try {
-      const {
-        data: { leads, counts },
-      } = await _fetchChatLeads(chatId);
-      setLeadsList(leads);
-      setLeadsCount(counts);
-    } catch (err) {
-      const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      setLeadsFetching(false);
-    }
-  };
-
-  useEffect(
-    () => {
-      if (isFirst) {
-        return;
-      }
-      if (!returning) {
-        fetchLeads();
+  const { isLoading } = useSWR(
+    campaignType === ProcessCreateTypeEnum.agent
+      ? {
+          returning,
+          isFirst,
+        }
+      : campaignType === ProcessCreateTypeEnum.filter
+        ? debouncedFormData
+        : null,
+    async (data: any) => {
+      switch (campaignType) {
+        case ProcessCreateTypeEnum.agent:
+          if (isFirst || data.returning) {
+            return;
+          }
+          setLeadsFetchLoading(true);
+          setLeadsVisible(true);
+          try {
+            const {
+              data: { leads, counts },
+            } = await _fetchChatLeads(chatId);
+            setLeadsList(leads);
+            setLeadsCount(counts);
+          } catch (err) {
+            const { message, header, variant } = err as HttpError;
+            SDRToast({ message, header, variant });
+          } finally {
+            setLeadsFetchLoading(false);
+          }
+          break;
+        case ProcessCreateTypeEnum.filter:
+          if (isFirst) {
+            return setIsFirst(false);
+          }
+          if (!leadsVisible) {
+            setLeadsVisible(true);
+          }
+          setLeadsFetchLoading(true);
+          try {
+            const {
+              data: { counts, leads },
+            } = await _fetchFilterLeads(debouncedFormData);
+            setLeadsList(leads);
+            setLeadsCount(counts);
+          } catch (err) {
+            const { message, header, variant } = err as HttpError;
+            SDRToast({ message, header, variant });
+          } finally {
+            setLeadsFetchLoading(false);
+          }
+          break;
+        case ProcessCreateTypeEnum.crm:
+        case ProcessCreateTypeEnum.csv:
+          return null;
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isFirst, returning],
+    {
+      revalidateOnFocus: false,
+    },
   );
-  return (
+
+  return !isFirst ? (
     <Stack
-      alignItems={leadsFetching ? 'center' : 'unset'}
+      alignItems={isLoading || leadsFetchLoading ? 'center' : 'unset'}
       border={'1px solid #DFDEE6'}
       borderRadius={4}
       flexShrink={0}
       height={'100%'}
-      justifyContent={leadsFetching ? 'center' : 'unset'}
+      justifyContent={isLoading || leadsFetchLoading ? 'center' : 'unset'}
       overflow={'auto'}
       px={leadsVisible ? 3 : 0}
       sx={{
@@ -70,7 +114,7 @@ export const CampaignProcessContentAudience = () => {
       }}
       width={leadsVisible ? 360 : 0}
     >
-      {leadsFetching ? (
+      {isLoading || leadsFetchLoading ? (
         <StyledLoading size={48} />
       ) : (
         <>
@@ -81,10 +125,8 @@ export const CampaignProcessContentAudience = () => {
             pb={1.5}
             position={'sticky'}
             pt={3}
-            sx={{
-              zIndex: 999,
-            }}
             top={0}
+            zIndex={999}
           >
             <Typography variant={'subtitle1'}>Preview leads</Typography>
             <Typography color={'text.secondary'} ml={'auto'} variant={'body2'}>
@@ -92,16 +134,28 @@ export const CampaignProcessContentAudience = () => {
             </Typography>
           </Stack>
 
-          <Stack pb={3}>
-            {leadsList.map((lead, index) => (
-              <CampaignLeadsCard
-                key={`${lead.firstName}-${lead.lastName}-${index}`}
-                {...lead}
-              />
-            ))}
+          <Stack
+            alignItems={leadsList.length > 0 ? 'unset' : 'center'}
+            flex={1}
+            justifyContent={leadsList.length > 0 ? 'unset' : 'center'}
+            pb={3}
+            width={'100%'}
+          >
+            {leadsList.length > 0 ? (
+              leadsList.map((lead, index) => (
+                <CampaignLeadsCard
+                  key={`${lead.firstName}-${lead.lastName}-${index}`}
+                  {...lead}
+                />
+              ))
+            ) : (
+              <Typography color={'text.secondary'} variant={'body2'}>
+                No matching leads found.
+              </Typography>
+            )}
           </Stack>
         </>
       )}
     </Stack>
-  );
+  ) : null;
 };

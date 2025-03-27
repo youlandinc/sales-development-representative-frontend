@@ -2,8 +2,12 @@ import { create } from 'zustand';
 import {
   CampaignLeadItem,
   CampaignStatusEnum,
+  FileInfo,
   HttpError,
+  ProcessCreateChatEnum,
+  ProcessCreateTypeEnum,
   ResponseCampaignChatRecord,
+  ResponseCampaignFilterFormData,
   ResponseCampaignLaunchInfo,
   ResponseCampaignMessagingStep,
   ResponseOfferOption,
@@ -12,8 +16,6 @@ import {
 } from '@/types';
 
 import { SDRToast } from '@/components/atoms';
-
-import { ProcessCreateChatEnum } from '@/types';
 import {
   _closeSSE,
   _createCampaign,
@@ -22,6 +24,7 @@ import {
 } from '@/request';
 
 export type DialogStoreState = {
+  campaignType: ProcessCreateTypeEnum | undefined;
   reloadTable: boolean;
   visibleProcess: boolean;
   activeStep: number;
@@ -31,9 +34,15 @@ export type DialogStoreState = {
   creating: boolean;
   returning: boolean;
   messageList: ResponseCampaignChatRecord[];
+
+  filterFormData: ResponseCampaignFilterFormData;
+  csvFormData: FileInfo;
+
+  leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
   leadsCount: number;
   leadsVisible: boolean;
+
   campaignId: number | string | null;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
@@ -48,17 +57,25 @@ export type DialogStoreState = {
 };
 
 export type DialogStoreActions = {
+  setCampaignType: (campaignType: ProcessCreateTypeEnum) => void;
   openProcess: () => void;
   closeProcess: () => void;
   setActiveStep: (activeStep: number) => void;
   setChatId: (chatId: number | string) => void;
-  createChatSSE: (chatId: number | string) => Promise<void>;
-  setLeadsList: (leadsList: CampaignLeadItem[]) => void;
-  setLeadsCount: (leadsCount: number) => void;
   setReturning: (returning: boolean) => void;
-  setLeadsVisible: (leadsVisible: boolean) => void;
+  createChatSSE: (chatId: number | string) => Promise<void>;
   addMessageItem: (message: ResponseCampaignChatRecord) => void;
   createCampaign: () => Promise<void>;
+
+  setIsFirst: (isFirst: boolean) => void;
+
+  setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
+  setCSVFormData: (formData: FileInfo) => void;
+
+  setLeadsList: (leadsList: CampaignLeadItem[]) => void;
+  setLeadsCount: (leadsCount: number) => void;
+  setLeadsVisible: (leadsVisible: boolean) => void;
+  setLeadsFetchLoading: (leadsFetchLoading: boolean) => void;
 
   setMessageList: (messageList: ResponseCampaignChatRecord[]) => void;
 
@@ -80,21 +97,53 @@ export type DialogStoreActions = {
 };
 
 const InitialState: DialogStoreState = {
-  visibleProcess: false,
-  activeStep: 1,
-  chatId: '',
-  chatSSE: void 0,
-  isFirst: true,
-  returning: false,
-  messageList: [],
-  leadsList: [],
-  leadsCount: 0,
-  leadsVisible: false,
-  creating: false,
+  campaignType: void 0,
   campaignId: '',
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
   setupPhase: SetupPhaseEnum.audience,
+  activeStep: 0,
+
+  visibleProcess: false,
+
+  chatId: '',
+  chatSSE: void 0,
+  messageList: [],
+
+  isFirst: true,
+  returning: false,
+
+  creating: false,
+
+  filterFormData: {
+    jobTitle: [],
+    universityName: [],
+    companyHeadcount: {
+      selectValue: '',
+      inputValue: '',
+    },
+    industry: [],
+    currentCompany: [],
+    personLocation: [],
+    companyRevenue: {
+      selectValue: '',
+      inputValue: '',
+    },
+    skills: [],
+    excludeSkill: [],
+  },
+
+  csvFormData: {
+    url: '',
+    originalFileName: '',
+    fileName: '',
+  },
+
+  leadsFetchLoading: false,
+  leadsList: [],
+  leadsCount: 0,
+  leadsVisible: false,
+
   messagingSteps: [],
 
   offerOptions: [],
@@ -108,6 +157,7 @@ const InitialState: DialogStoreState = {
     replyTo: null,
     senderName: null,
   },
+
   reloadTable: false,
   isValidate: undefined,
 };
@@ -116,6 +166,12 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setCSVFormData: (formData: FileInfo) => set({ csvFormData: formData }),
+  setFilterFormData: (formData) => set({ filterFormData: formData }),
+  setIsFirst: (isFirst) => set({ isFirst }),
+  setLeadsFetchLoading: (leadsFetchLoading) => set({ leadsFetchLoading }),
+  setCampaignType: (campaignType: ProcessCreateTypeEnum) =>
+    set({ campaignType, activeStep: 1 }),
   setIsValidate: (isValidate: undefined | boolean) => {
     set({ isValidate });
   },
@@ -216,10 +272,10 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       switch (data.step) {
         case ProcessCreateChatEnum.thinking: {
           const { messageList } = get();
-          messageList.splice(
-            messageList.findIndex((item) => item.isFake),
-            1,
-          );
+          const fakeIndex = messageList.findIndex((item) => item.isFake);
+          if (fakeIndex !== -1) {
+            messageList.splice(fakeIndex, 1);
+          }
           const temp = {
             source: SourceEnum.server,
             id: data.id,
@@ -272,19 +328,53 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     chatSSE!.onerror = async () => {
       if (chatSSE?.readyState === EventSource.CLOSED) {
         const retriedSSE = initialSSE();
-        eventSource.close();
         set({ chatSSE: retriedSSE });
       }
     };
   },
   createCampaign: async () => {
-    const { chatId } = get();
-    if (!chatId) {
+    const { campaignType } = get();
+    let postData;
+    switch (campaignType) {
+      case ProcessCreateTypeEnum.agent: {
+        const { chatId } = get();
+        if (!chatId) {
+          return;
+        }
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.agent,
+          data: {
+            chatId,
+          },
+        };
+        break;
+      }
+      case ProcessCreateTypeEnum.filter: {
+        const { filterFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.filter,
+          data: {
+            conditions: filterFormData,
+          },
+        };
+        break;
+      }
+      case ProcessCreateTypeEnum.csv: {
+        const { csvFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.csv,
+          data: {
+            fileInfo: csvFormData,
+          },
+        };
+      }
+    }
+    if (!postData) {
       return;
     }
     set({ creating: true });
     try {
-      const { data } = await _createCampaign({ chatId });
+      const { data } = await _createCampaign(postData);
       await _updateCampaignProcessSnapshot({
         campaignId: data.campaignId,
         setupPhase: SetupPhaseEnum.messaging,
@@ -297,7 +387,22 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         messagingSteps: data.data.steps,
         lunchInfo: data.data.launchInfo,
         offerOptions: data.data.offerOptions,
+        chatId: data.chatId,
       });
+      switch (campaignType) {
+        case ProcessCreateTypeEnum.filter: {
+          set({
+            filterFormData: data.data.conditions,
+          });
+          break;
+        }
+        case ProcessCreateTypeEnum.csv: {
+          set({
+            csvFormData: data.data.fileInfo,
+          });
+          break;
+        }
+      }
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });

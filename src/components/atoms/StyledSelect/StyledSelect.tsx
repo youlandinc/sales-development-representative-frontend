@@ -33,6 +33,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   disabled,
   sxList,
   sx,
+  size,
   required,
   tooltipTitle = '',
   tooltipSx = { width: '100%' },
@@ -78,6 +79,9 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             '& .MuiOutlinedInput-input': {
               background: 'transparent',
             },
+          },
+          '& .MuiInputLabel-sizeMedium': {
+            // transform: 'translate(14px, 8px) scale(1)',
           },
           ...sx,
         }}
@@ -192,6 +196,15 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             background: 'transparent',
           },
         },
+        '& .MuiInputLabel-sizeMedium': {
+          // transform: 'translate(14px, 8px) scale(1)',
+        },
+        '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
+          // transform:
+          //   size === 'medium'
+          //     ? 'translate(14px, -8px) scale(0.75)'
+          //     : 'translate(12px, -8px) scale(0.75)',
+        },
         ...sx,
       }}
       variant={'outlined'}
@@ -232,6 +245,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           disableScrollLock: true,
         }}
         onChange={onChange}
+        size={size}
         value={value}
         {...rest}
         // size={['xs', 'sm', 'md'].includes(breakpoints) ? 'small' : 'medium'}

@@ -11,13 +11,13 @@ export const CampaignProcess = () => {
   return (
     <StyledDialog
       content={<CampaignProcessContent />}
-      fullScreen={activeStep !== 1}
+      fullScreen={![0, 1].includes(activeStep)}
       header={<CampaignProcessHeader />}
       headerSx={{ p: 0 }}
       onClose={async (_, reason) => {
         if (reason === 'escapeKeyDown') {
-          closeProcess();
           await resetDialogState();
+          closeProcess();
         }
       }}
       open={visibleProcess}

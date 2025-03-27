@@ -28,6 +28,7 @@
     "date-fns": "4.1.0",
     "input-otp": "^1.4.2",
     "lodash": "4.17.21",
+    "material-react-table": "^3.2.1",
     "next": "15.1.4",
     "nextjs-toploader": "^3.7.15",
     "react": "19.0.0",

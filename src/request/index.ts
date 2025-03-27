@@ -9,3 +9,5 @@ export * from './leads';
 export * from './settings';
 
 export * from './inbox';
+
+export * from './contacts';

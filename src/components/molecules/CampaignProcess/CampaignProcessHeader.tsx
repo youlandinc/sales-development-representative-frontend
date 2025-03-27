@@ -10,19 +10,67 @@ import {
   CommonRenameTextField,
 } from '@/components/molecules';
 
-import { HttpError, HttpVariantEnum, SetupPhaseEnum } from '@/types';
+import {
+  HttpError,
+  HttpVariantEnum,
+  ProcessCreateTypeEnum,
+  SetupPhaseEnum,
+} from '@/types';
 import { _saveAndLunchCampaign } from '@/request';
 
 import ICON_CLOSE from './assets/icon_close.svg';
 import ICON_BACK from './assets/icon_back.svg';
 
+const titleTail = (
+  campaignType: ProcessCreateTypeEnum | undefined | null | string,
+) => {
+  switch (campaignType) {
+    case ProcessCreateTypeEnum.filter:
+      return 'Filter and select audience';
+    case ProcessCreateTypeEnum.csv:
+      return 'Upload CSV';
+    case ProcessCreateTypeEnum.crm:
+      return 'Use CRM list';
+    case ProcessCreateTypeEnum.agent:
+      return 'Agent';
+    default:
+      return '';
+  }
+};
+
 export const CampaignProcessHeader: FC = () => {
   const { activeStep } = useDialogStore();
 
-  return activeStep === 1 ? (
-    <CampaignProcessHeaderStepFirst />
-  ) : (
-    <CampaignProcessHeaderStepSecondary />
+  return useMemo(() => {
+    switch (activeStep) {
+      case 1:
+        return <CampaignProcessHeaderStepFirst />;
+      case 2:
+      case 3:
+        return <CampaignProcessHeaderStepSecondary />;
+      default:
+        return <CampaignProcessHeaderStepChoose />;
+    }
+  }, [activeStep]);
+};
+
+export const CampaignProcessHeaderStepChoose: FC = () => {
+  const { closeProcess, resetDialogState } = useDialogStore();
+
+  return (
+    <Stack>
+      <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>
+        <Typography variant={'h5'}>Start new campaign</Typography>
+        <Icon
+          component={ICON_CLOSE}
+          onClick={async () => {
+            await resetDialogState();
+            closeProcess();
+          }}
+          sx={{ ml: 'auto', cursor: 'pointer' }}
+        />
+      </Stack>
+    </Stack>
   );
 };
 
@@ -35,17 +83,23 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
     creating,
     campaignId,
     leadsList,
+    campaignType,
   } = useDialogStore();
 
   return (
     <Stack gap={1.5} pt={3} px={3}>
       <Stack alignItems={'center'} flexDirection={'row'}>
-        <Typography variant={'h6'}>Start new campaign</Typography>
+        <Typography variant={'h5'}>
+          Start new campaign -{' '}
+          <Typography color={'#6F6C7D'} component={'span'} variant={'h5'}>
+            {titleTail(campaignType)}
+          </Typography>
+        </Typography>
         <Icon
           component={ICON_CLOSE}
           onClick={async () => {
-            closeProcess();
             await resetDialogState();
+            closeProcess();
           }}
           sx={{ ml: 'auto', cursor: 'pointer' }}
         />
@@ -164,8 +218,8 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
         <Icon
           component={ICON_BACK}
           onClick={async () => {
-            closeProcess();
             await resetDialogState();
+            closeProcess();
           }}
           sx={{
             cursor: 'pointer',
