@@ -7,4 +7,5 @@ export const createFile = (data: Blob, fileName: string) => {
   a.download = fileName;
   a.click();
   document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 };

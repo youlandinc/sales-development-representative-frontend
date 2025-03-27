@@ -43,15 +43,15 @@ export const _sortColumn = (param: SortColumnParam) => {
 
 export const _deleteGridRecords = (param: {
   tableId: number;
-  recordIds: string[];
+  ids: string[];
 }) => {
-  return del(`${tempUrl}/customer/es/record`, { data: param });
+  return del('/sdr/leads/info', { data: param });
 };
 
-export const _exportGridRecords = (records: string[], tableId: number) => {
+export const _exportGridRecords = (ids: string[], tableId: number) => {
   return post(
-    `${tempUrl}/customer/es/export`,
-    { records, tableId },
+    '/sdr/leads/export',
+    { ids, tableId },
     {
       responseType: 'blob',
     },
