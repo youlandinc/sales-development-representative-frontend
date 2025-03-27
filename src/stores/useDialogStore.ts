@@ -241,7 +241,8 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   setReloadTable: (reloadTable) => set({ reloadTable }),
   addMessageItem: (message) => {
     const { messageList } = get();
-    set({ messageList: [...messageList, message] });
+    messageList.push(message);
+    set({ messageList });
   },
   createChatSSE: async (chatId: number | string) => {
     const params = chatId || get().chatId;
