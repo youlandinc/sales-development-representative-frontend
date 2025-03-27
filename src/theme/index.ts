@@ -347,16 +347,16 @@ const defaultOptions: ThemeOptions = {
       styleOverrides: {
         //input element
         input: {
-          paddingTop: '10px !important',
-          paddingBottom: '10px !important',
+          paddingTop: '10px',
+          paddingBottom: '10px',
           zIndex: 1,
           fontSize: 14,
           lineHeight: 1.43,
           height: 'auto',
         },
         inputSizeSmall: {
-          paddingTop: '6px !important',
-          paddingBottom: '6px !important',
+          paddingTop: '6px',
+          paddingBottom: '6px',
           fontSize: 14,
         },
         // border style
@@ -387,8 +387,8 @@ const defaultOptions: ThemeOptions = {
     MuiAutocomplete: {
       styleOverrides: {
         inputRoot: {
-          paddingTop: '0px',
-          paddingBottom: '0px',
+          paddingTop: '2.5px',
+          paddingBottom: '2.5px',
         },
         input: {
           paddingTop: '10px',
@@ -404,6 +404,12 @@ const defaultOptions: ThemeOptions = {
         },
         listbox: {
           padding: '0px 0px 0px 0px',
+        },
+        tagSizeMedium: {
+          maxHeight: 28,
+        },
+        tagSizeSmall: {
+          maxHeight: 20,
         },
         // option: {
         //   padding: '12px 12px 12px 12px !important',

@@ -301,7 +301,7 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
                 }}
                 sx={{ p: '14px 24px', fontSize: 14 }}
               >
-                Delete segment
+                Delete list
               </MenuItem>
             </Menu>
 

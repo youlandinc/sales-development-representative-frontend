@@ -78,7 +78,7 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
             lineHeight: 1,
           },
           '& fieldset': {
-            borderColor: 'border.default',
+            // borderColor: 'border.default',
           },
           '&:hover fieldset': {
             borderColor: 'border.hover',
