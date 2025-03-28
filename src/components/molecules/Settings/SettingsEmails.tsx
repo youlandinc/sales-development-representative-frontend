@@ -35,8 +35,9 @@ export const SettingsEmails: FC = () => {
       {/*</StyledTextField>*/}
       <StyledTextField label={'Small size'} size={'small'} />
       <StyledTextField label={'Medium size'} size={'medium'} />
-      <StyledTextField label={'Medium size'} size={'medium'} />
       <StyledSelect label={'large label'} options={[]} size={'large'} />
+      <StyledSelect label={'medium label'} options={[]} size={'medium'} />
+      <StyledSelect label={'small label'} options={[]} size={'small'} />
       {/*<Stack gap={2}>*/}
       {/*  <Stack*/}
       {/*    alignItems={'center'}*/}

@@ -7,7 +7,9 @@ import {
   StandardTextFieldProps,
   SxProps,
   TextField,
+  TextFieldSlotsAndSlotProps,
 } from '@mui/material';
+import { TextFieldSlots } from '@mui/material/TextField/TextField';
 
 export interface StyledTextFieldProps
   extends Omit<StandardTextFieldProps, 'variant'> {
@@ -23,8 +25,9 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
   size = 'medium',
   ...rest
 }) => {
-  const { slotProps = {} } = rest;
-  const { htmlInput = {}, inputLabel = {} } = slotProps;
+  const { slotProps = {}, ...otherProps } =
+    rest as TextFieldSlotsAndSlotProps<TextFieldSlots>;
+  const { htmlInput = {}, inputLabel = {}, ...restSlotProps } = slotProps;
   const { sx: htmlInputSx = {}, ...htmlInputRest } =
     htmlInput as InputBaseComponentProps;
   const { sx: inputLabelSx = {}, ...inputLabelRest } =
@@ -43,6 +46,9 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
             //medium
             transform: 'translate(14px, 10px) scale(1)',
             '&.Mui-focused': {
+              color: 'text.primary',
+            },
+            [`&.${inputLabelClasses.focused}`]: {
               color: 'text.primary',
             },
             [`&.${inputLabelClasses.shrink}`]: {
@@ -108,9 +114,10 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
         formHelperText: {
           component: 'div',
         },
+        ...restSlotProps,
       }}
       variant={variant}
-      {...rest}
+      {...otherProps}
     />
   );
 };

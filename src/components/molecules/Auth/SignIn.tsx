@@ -11,6 +11,7 @@ import {
   SDRToast,
   StyledButton,
   StyledCheckbox,
+  StyledSelect,
   StyledTextField,
   StyledTextFieldPassword,
 } from '@/components/atoms';
@@ -129,6 +130,8 @@ export const SignIn = () => {
             label={'Email'}
             onChange={(e) => setEmail(e.target.value)}
             required
+            size={'large'}
+            type={'email'}
             value={email}
           />
           <StyledTextFieldPassword
@@ -136,8 +139,12 @@ export const SignIn = () => {
             label={'Password'}
             onChange={(e) => setPassword(e.target.value)}
             required
+            size={'large'}
             value={password}
           />
+          <StyledSelect label={'large'} options={[]} size={'large'} />
+          <StyledSelect label={'medium'} options={[]} />
+          <StyledSelect label={'small'} options={[]} size={'small'} />
 
           <Stack flexDirection={'row'}>
             <StyledCheckbox
