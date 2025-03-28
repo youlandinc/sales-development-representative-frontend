@@ -51,7 +51,7 @@ export const HeaderSegments = () => {
       flexDirection={'row'}
       justifyContent={'space-between'}
     >
-      <Typography variant={'h6'}>Lists</Typography>
+      <Typography variant={'h5'}>Lists</Typography>
       <StyledButton
         color={'info'}
         onClick={onClickToCreateSegment}

@@ -271,7 +271,7 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
         )}
         <Stack flex={1} gap={3}>
           {filterGroup.map((group, index) => (
-            <Stack gap={1.5} key={`group-${index}`}>
+            <Stack gap={3} key={`group-${index}`}>
               {index !== 0 && (
                 <Typography color={'#D2D6E1'} variant={'subtitle2'}>
                   OR
@@ -312,7 +312,6 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                           }}
                         />
                       )}
-                      size={'small'}
                       slotProps={{
                         listbox: {
                           sx: {
@@ -326,6 +325,10 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                           padding: '0 4px 0 8px !important',
                         },
                         '& .MuiAutocomplete-option': { p: 1.5 },
+                        '& .MuiAutocomplete-inputRoot': {
+                          py: '8.5px',
+                        },
+                        '& .MuiOutlinedInput-input': { zIndex: 1 },
                       }}
                       value={
                         columnOptions.find(
@@ -382,27 +385,26 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                       }}
                       value={filter.operationText}
                     />
-                    {filterIndex !== 0 && (
-                      <Icon
-                        component={ICON_CLOSE}
-                        onClick={async () => {
-                          const result = deleteSegmentsFilters(
-                            index,
-                            filterIndex,
-                          );
-                          if (Object.keys(result).length === 0) {
-                            clearSegmentsFiltersGroup();
-                            await updateSelectedSegment(-1);
-                          }
-                        }}
-                        sx={{
-                          width: 16,
-                          height: 16,
-                          flexShrink: 0,
-                          cursor: 'pointer',
-                        }}
-                      />
-                    )}
+
+                    <Icon
+                      component={ICON_CLOSE}
+                      onClick={async () => {
+                        const result = deleteSegmentsFilters(
+                          index,
+                          filterIndex,
+                        );
+                        if (Object.keys(result).length === 0) {
+                          clearSegmentsFiltersGroup();
+                          await updateSelectedSegment(-1);
+                        }
+                      }}
+                      sx={{
+                        width: 16,
+                        height: 16,
+                        flexShrink: 0,
+                        cursor: 'pointer',
+                      }}
+                    />
                   </Stack>
                 ))}
 

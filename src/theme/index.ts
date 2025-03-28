@@ -335,14 +335,59 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
+    //create by alfred ---------------------start
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: 'var(--mui-palette-text-primary)',
+          fontSize: 14,
+          lineHeight: 1.43,
+          transform: 'translate(14px, 10px) scale(1)',
+          '&.Mui-focused': {
+            color: 'var(--mui-palette-text-primary)',
+          },
+          '&.MuiInputLabel-sizeLarge': {
+            fontSize: 16,
+            lineHeight: 1.5,
+            transform: 'translate(14px, 12px) scale(1)',
+          },
+        },
+        shrink: {
+          transform: 'translate(14px, -8px) scale(0.75)',
+          '&.MuiInputLabel-sizeLarge.MuiInputLabel-shrink': {
+            transform: 'translate(14px, -10px) scale(0.75)',
+          },
+        },
+        sizeSmall: {
+          transform: 'translate(12px, 5px) scale(1)',
+        },
+      },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
+        //input element
+        input: {
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          zIndex: 1,
+          fontSize: 14,
+          lineHeight: 1.43,
+          height: 'auto',
+        },
+        inputSizeSmall: {
+          paddingTop: '6px',
+          paddingBottom: '6px',
+          fontSize: 14,
+        },
+        // border style
         notchedOutline: {
           borderColor: 'var(--mui-palette-border-default)',
           borderWidth: '1px',
           background: 'transparent',
           borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
         },
+
+        //border style when hover
         root: {
           [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
             borderColor: 'var(--mui-palette-border-hover)',
@@ -355,6 +400,87 @@ const defaultOptions: ThemeOptions = {
             borderWidth: '1px',
             background: 'transparent',
             borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        slotProps: {
+          htmlInput: {
+            sx: (theme) => ({
+              //medium
+              [`&.${outlinedInputClasses.input}`]: {
+                paddingTop: '10px',
+                paddingBottom: '10px',
+                zIndex: 1,
+              },
+              //small
+              [`&.${outlinedInputClasses.inputSizeSmall}`]: {
+                paddingTop: '6px',
+                paddingBottom: '6px',
+              },
+              //large
+              ['&.MuiInputBase-sizeLarge']: {
+                paddingTop: '12px',
+                paddingBottom: '12px',
+                fontSize: 16,
+              },
+              color: theme.palette.text.primary,
+              lineHeight: 1.5,
+              fontSize: 14,
+            }),
+          },
+          inputLabel: {
+            sx: {
+              color: 'var(--mui-palette-text-primary)',
+              fontSize: 14,
+              lineHeight: 1.43,
+              //medium
+              transform: 'translate(14px, 10px) scale(1)',
+              '&.Mui-focused': {
+                color: 'var(--mui-palette-text-primary)',
+              },
+              [`&.${inputLabelClasses.shrink}`]: {
+                transform: 'translate(14px, -8px) scale(0.75)',
+              },
+              //large
+              '&.MuiInputLabel-sizeLarge': {
+                fontSize: 16,
+                lineHeight: 1.5,
+                transform: 'translate(14px, 12px) scale(1)',
+              },
+              [`&.${inputLabelClasses.shrink}.MuiInputLabel-sizeLarge`]: {
+                fontSize: 16,
+                lineHeight: 1.5,
+                transform: 'translate(14px, -10px) scale(0.75)',
+              },
+              //small
+
+              [`&.${inputLabelClasses.sizeSmall}`]: {
+                fontSize: 14,
+                lineHeight: 1.5,
+                transform: 'translate(12px, 5px) scale(1)',
+              },
+              [`&.${inputLabelClasses.shrink}.${inputLabelClasses.sizeSmall}`]:
+                {
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                  transform: 'translate(12px, -9px) scale(0.75)',
+                },
+            },
+          },
+        },
+      },
+      styleOverrides: {
+        root: {
+          background: 'transparent',
+          '& .MuiInputBase-sizeLarge': {
+            '& .MuiOutlinedInput-input': {
+              fontSize: 16,
+              paddingTop: 12,
+              paddingBottom: 12,
+            },
           },
         },
       },
@@ -386,8 +512,29 @@ const defaultOptions: ThemeOptions = {
         tagSizeSmall: {
           maxHeight: 20,
         },
+        // option: {
+        //   padding: '12px 12px 12px 12px !important',
+        // },
       },
     },
+    // MuiSelect: {
+    //   styleOverrides: {
+    //     icon: {
+    //       zIndex: 1,
+    //     },
+    //     root: {
+    //       background: 'transparent',
+    //       '&.MuiInputBase-sizeLarge': {
+    //         '& .MuiOutlinedInput-input': {
+    //           fontSize: 16,
+    //           lineHeight: 1.5,
+    //           paddingTop: 12,
+    //           paddingBottom: 12,
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
     MuiPopover: {
       styleOverrides: {
         paper: {
@@ -397,6 +544,7 @@ const defaultOptions: ThemeOptions = {
       },
     },
   },
+  //create by alfred ---------------------close
 };
 
 // Create a theme instance.
