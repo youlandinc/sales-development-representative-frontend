@@ -46,7 +46,7 @@ import {
 import {
   _addStepEmail,
   _deleteStepEmail,
-  _fetchChatLeads,
+  _fetchChatLeadsLocally,
   _fetchEmailByLead,
   _fetchLeadPersonalResearch,
   _fetchStepEmail,
@@ -224,7 +224,7 @@ export const CampaignProcessContentMessaging = () => {
     try {
       const {
         data: { leads, counts },
-      } = await _fetchChatLeads(chatId);
+      } = await _fetchChatLeadsLocally(chatId);
       setLeadsList(leads);
       setLeadsCount(counts);
       setExpend(true);

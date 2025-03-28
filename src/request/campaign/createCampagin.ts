@@ -22,6 +22,10 @@ export const _fetchChatLeads = (chatId: string | number) => {
   return get<ResponseCampaignLeadsInfo>(`/sdr/leads/chat/preview/${chatId}`);
 };
 
+export const _fetchChatLeadsLocally = (chatId: string | number) => {
+  return get<ResponseCampaignLeadsInfo>(`/sdr/ai/leads/${chatId}`);
+};
+
 export const _fetchCampaignInfo = (campaignId: string | number) => {
   return get<ResponseCampaignInfo>(`/sdr/campaign/info/${campaignId}`);
 };
