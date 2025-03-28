@@ -64,7 +64,7 @@ export const HeaderSegments = () => {
             sx={{ width: 24, height: 24 }}
           />
           <Typography color={'text.primary'} variant={'body2'}>
-            Create a lists
+            Create a list
           </Typography>
         </Stack>
       </StyledButton>
