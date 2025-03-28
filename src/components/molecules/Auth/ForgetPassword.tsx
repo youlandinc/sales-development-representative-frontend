@@ -240,6 +240,7 @@ export const ForgetPassword = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={'Email'}
                 required
+                size={'large'}
                 value={email}
               />
 
@@ -271,6 +272,7 @@ export const ForgetPassword = () => {
                 label={'New password'}
                 onChange={(e) => onPasswordChange(e)}
                 required
+                size={'large'}
                 value={newPassword}
               />
 
@@ -284,6 +286,7 @@ export const ForgetPassword = () => {
                   setConfirmPassword(e.target.value);
                 }}
                 required
+                size={'large'}
                 value={confirmPassword}
               />
 

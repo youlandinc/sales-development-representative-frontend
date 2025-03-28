@@ -75,7 +75,6 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
           },
           ...inputLabelRest,
         },
-
         htmlInput: {
           autoComplete: disabledAutoFill ? 'off' : '',
           className: size === 'large' ? 'MuiInputBase-inputSizeLarge' : '',
@@ -108,6 +107,7 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
         formHelperText: {
           component: 'div',
         },
+        ...slotProps,
       }}
       variant={variant}
       {...rest}
