@@ -2,6 +2,7 @@
 import { CSSProperties } from 'react';
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+import { inputLabelClasses } from '@mui/material';
 
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
@@ -105,6 +106,24 @@ declare module '@mui/material/Typography' {
     body3: true;
     subtitle3: true;
     h7: true;
+  }
+}
+
+declare module '@mui/material/TextField' {
+  interface TextFieldPropsSizeOverrides {
+    large: true;
+  }
+}
+
+declare module '@mui/material/InputBase' {
+  interface InputBasePropsSizeOverrides {
+    large: true;
+  }
+}
+
+declare module '@mui/material/InputLabel' {
+  interface InputLabelPropsSizeOverrides {
+    large: true;
   }
 }
 
@@ -316,58 +335,14 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
-    //create by alfred ---------------------start
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          background: 'transparent',
-        },
-      },
-    },
-    MuiInputLabel: {
-      styleOverrides: {
-        root: {
-          color: 'var(--mui-palette-text-primary)',
-          fontSize: 14,
-          lineHeight: 1.43,
-          transform: 'translate(14px, 10px) scale(1)',
-          '&.Mui-focused': {
-            color: 'var(--mui-palette-text-primary)',
-          },
-        },
-        shrink: {
-          transform: 'translate(14px, -8px) scale(0.75)',
-        },
-        sizeSmall: {
-          transform: 'translate(12px, 5px) scale(1)',
-        },
-      },
-    },
     MuiOutlinedInput: {
       styleOverrides: {
-        //input element
-        input: {
-          paddingTop: '10px',
-          paddingBottom: '10px',
-          zIndex: 1,
-          fontSize: 14,
-          lineHeight: 1.43,
-          height: 'auto',
-        },
-        inputSizeSmall: {
-          paddingTop: '6px',
-          paddingBottom: '6px',
-          fontSize: 14,
-        },
-        // border style
         notchedOutline: {
           borderColor: 'var(--mui-palette-border-default)',
           borderWidth: '1px',
           background: 'transparent',
           borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
         },
-
-        //border style when hover
         root: {
           [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
             borderColor: 'var(--mui-palette-border-hover)',
@@ -411,19 +386,6 @@ const defaultOptions: ThemeOptions = {
         tagSizeSmall: {
           maxHeight: 20,
         },
-        // option: {
-        //   padding: '12px 12px 12px 12px !important',
-        // },
-      },
-    },
-    MuiSelect: {
-      styleOverrides: {
-        icon: {
-          zIndex: 1,
-        },
-        root: {
-          background: 'transparent',
-        },
       },
     },
     MuiPopover: {
@@ -434,7 +396,6 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
-    //create by alfred ---------------------close
   },
 };
 

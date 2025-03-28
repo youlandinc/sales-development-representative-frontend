@@ -129,6 +129,7 @@ export const SignIn = () => {
             label={'Email'}
             onChange={(e) => setEmail(e.target.value)}
             required
+            size={'large'}
             value={email}
           />
           <StyledTextFieldPassword
@@ -136,6 +137,7 @@ export const SignIn = () => {
             label={'Password'}
             onChange={(e) => setPassword(e.target.value)}
             required
+            size={'large'}
             value={password}
           />
 

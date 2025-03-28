@@ -201,8 +201,8 @@ export const LayoutSide: FC = () => {
           component={ICON_LOGO_EXPEND}
           sx={{
             ml: 0.25,
-            height: expend ? 48 : 32,
-            width: expend ? 146 : 98,
+            height: 32,
+            width: 118,
             transition: 'width .3s',
           }}
         />

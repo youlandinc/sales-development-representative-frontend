@@ -21,21 +21,23 @@ export const StyledTextFieldPassword: FC<StyledTextFieldPasswordProps> = ({
   return (
     <>
       <StyledTextField
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  disableRipple
-                  edge="end"
-                  onClick={onToggleVisibleClick}
-                  tabIndex={-1}
-                >
-                  {visible ? <VisibilityOutlined /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                disableRipple
+                edge="end"
+                onClick={onToggleVisibleClick}
+                tabIndex={-1}
+              >
+                {visible ? (
+                  <VisibilityOutlined sx={{ fontSize: 20 }} />
+                ) : (
+                  <VisibilityOff sx={{ fontSize: 20 }} />
+                )}
+              </IconButton>
+            </InputAdornment>
+          ),
         }}
         type={visible ? 'text' : 'password'}
         value={value}

@@ -2,9 +2,7 @@ import { FC } from 'react';
 import { Stack, Typography } from '@mui/material';
 
 //import { useSwitch } from '@/hooks';
-
 //import { EmailDomainStateEnum } from '@/types/enum';
-
 import { SettingsEmailProfile } from './index';
 
 //import ICON_COPY from './assets/icon_copy.svg';
