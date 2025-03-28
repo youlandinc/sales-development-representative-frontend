@@ -6,7 +6,6 @@ import useSWR from 'swr';
 import { SDRToast, StyledGrid } from '@/components/atoms';
 import {
   GridActionsCard,
-  GridNoData,
   GridPagination,
   GridToolBar,
 } from '@/components/molecules';
@@ -19,7 +18,6 @@ import {
   _deleteGridRecords,
   _exportGridRecords,
   _getGridListById,
-  _setPageSize,
 } from '@/request';
 
 import {
@@ -34,15 +32,11 @@ type GridContactsProps = {
 
 export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
   const { selectedSegmentId } = useContactsStore((state) => state);
-  const { newGridData, segmentsFilters } = useContactsToolbarStore(
-    (state) => state,
-  );
+  const { segmentsFilters } = useContactsToolbarStore((state) => state);
   const {
-    totalRecords,
     setTotalRecords,
     metadataColumns,
     fetchAllColumns,
-    tableId,
     keyword,
     page,
     size,
@@ -159,14 +153,14 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
     [],
   );
 
-  const [, setPageSize] = useAsyncFn(async (param: { pageSize: number }) => {
-    try {
-      await _setPageSize(param);
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    }
-  });
+  // const [, setPageSize] = useAsyncFn(async (param: { pageSize: number }) => {
+  //   try {
+  //     await _setPageSize(param);
+  //   } catch (err) {
+  //     const { header, message, variant } = err as HttpError;
+  //     SDRToast({ message, header, variant });
+  //   }
+  // });
 
   const columns = useMemo(() => {
     return metadataColumns.length
@@ -280,9 +274,9 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
               }}
               onRowsPerPageChange={async (e) => {
                 setSize(parseInt(e.target.value));
-                await setPageSize({
-                  pageSize: parseInt(e.target.value),
-                });
+                // await setPageSize({
+                //   pageSize: parseInt(e.target.value),
+                // });
               }}
               pageCount={pageCount}
               rowCount={totalContacts}

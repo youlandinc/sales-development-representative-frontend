@@ -20,7 +20,7 @@ export const ContactsCompaniesPage: FC = () => {
   return (
     <Stack gap={3} height={'100%'} overflow={'auto'} px={8} py={6}>
       <Stack gap={1.5}>
-        <Typography variant={'h6'}>Companies</Typography>
+        <Typography variant={'h5'}>Companies</Typography>
         <HeaderFilter headerType={ContactsTableTypeEnum.companies} />
       </Stack>
       <GridContacts gridType={ContactsTableTypeEnum.companies} />

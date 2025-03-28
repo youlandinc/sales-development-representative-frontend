@@ -335,14 +335,58 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
+    //create by alfred ---------------------start
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          background: 'transparent',
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: 'var(--mui-palette-text-primary)',
+          fontSize: 14,
+          lineHeight: 1.43,
+          transform: 'translate(14px, 10px) scale(1)',
+          '&.Mui-focused': {
+            color: 'var(--mui-palette-text-primary)',
+          },
+        },
+        shrink: {
+          transform: 'translate(14px, -8px) scale(0.75)',
+        },
+        sizeSmall: {
+          transform: 'translate(12px, 5px) scale(1)',
+        },
+      },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
+        //input element
+        input: {
+          paddingTop: '10px !important',
+          paddingBottom: '10px !important',
+          zIndex: 1,
+          fontSize: 14,
+          lineHeight: 1.43,
+          height: 'auto',
+        },
+        inputSizeSmall: {
+          paddingTop: '6px !important',
+          paddingBottom: '6px !important',
+          fontSize: 14,
+        },
+        // border style
         notchedOutline: {
           borderColor: 'var(--mui-palette-border-default)',
           borderWidth: '1px',
           background: 'transparent',
           borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
         },
+
+        //border style when hover
         root: {
           [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
             borderColor: 'var(--mui-palette-border-hover)',
@@ -362,8 +406,8 @@ const defaultOptions: ThemeOptions = {
     MuiAutocomplete: {
       styleOverrides: {
         inputRoot: {
-          paddingTop: '2.5px',
-          paddingBottom: '2.5px',
+          paddingTop: '0px',
+          paddingBottom: '0px',
         },
         input: {
           paddingTop: '10px',
@@ -380,11 +424,18 @@ const defaultOptions: ThemeOptions = {
         listbox: {
           padding: '0px 0px 0px 0px',
         },
-        tagSizeMedium: {
-          maxHeight: 28,
+        // option: {
+        //   padding: '12px 12px 12px 12px !important',
+        // },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          zIndex: 1,
         },
-        tagSizeSmall: {
-          maxHeight: 20,
+        root: {
+          background: 'transparent',
         },
       },
     },
@@ -396,6 +447,7 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
+    //create by alfred ---------------------close
   },
 };
 

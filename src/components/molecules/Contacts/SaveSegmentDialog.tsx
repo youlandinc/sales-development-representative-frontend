@@ -68,7 +68,6 @@ export const SaveSegmentDialog: FC<SaveSegmentDialogProps> = ({
           <Typography color={'text.secondary'} variant={'body2'}>
             This list has {totalRecordsWithFilter}{' '}
             {totalRecordsWithFilter === 1 ? 'contact' : 'contacts'}. That&#39;s
-            100% of your total contacts.
           </Typography>
         </Stack>
       }

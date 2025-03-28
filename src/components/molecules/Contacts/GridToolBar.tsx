@@ -30,7 +30,6 @@ export const GridToolBar: FC<GridToolBarProps> = ({ totalContacts }) => {
         flexDirection={'row'}
         gap={3}
         justifyContent={'space-between'}
-        mb={1.5}
         width={'100%'}
       >
         <Typography variant={'subtitle1'}>

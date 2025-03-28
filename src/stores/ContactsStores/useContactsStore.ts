@@ -94,7 +94,7 @@ export const useContactsStore = create<
       segmentId: id,
     };
     try {
-      await _updateSelectedSegment(postData);
+      // await _updateSelectedSegment(postData);
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
