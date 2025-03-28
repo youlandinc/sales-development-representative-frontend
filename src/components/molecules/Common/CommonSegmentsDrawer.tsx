@@ -321,14 +321,14 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                       }}
                       sx={{
                         ...defaultSelectStyle,
-                        '& .MuiAutocomplete-input': {
-                          padding: '0 4px 0 8px !important',
-                        },
+                        // '& .MuiAutocomplete-input': {
+                        //   padding: '0 4px 0 8px !important',
+                        // },
                         '& .MuiAutocomplete-option': { p: 1.5 },
-                        '& .MuiAutocomplete-inputRoot': {
-                          py: '8.5px',
-                        },
-                        '& .MuiOutlinedInput-input': { zIndex: 1 },
+                        // '& .MuiAutocomplete-inputRoot': {
+                        //   py: '8.5px',
+                        // },
+                        // '& .MuiOutlinedInput-input': { zIndex: 1 },
                       }}
                       value={
                         columnOptions.find(
@@ -354,7 +354,6 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                             )?.label
                           : 'Condition';
                       }}
-                      size={'small'}
                       sx={{
                         ...defaultSelectStyle,
                         '& .MuiSelect-select': {
@@ -377,7 +376,6 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                         )
                       }
                       placeholder={'Text'}
-                      size={'small'}
                       sx={{
                         ...defaultSelectStyle,
                         '& .MuiInputBase-input': { zIndex: 1 },
