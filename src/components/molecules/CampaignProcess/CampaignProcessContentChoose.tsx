@@ -60,23 +60,60 @@ export const CampaignProcessContentChoose: FC = () => {
           gap={1}
           key={`${item.label}-${index}`}
           maxWidth={260}
-          onClick={() => setCampaignType(item.value)}
+          onClick={() => {
+            if (item.value === ProcessCreateTypeEnum.crm) {
+              return;
+            }
+            setCampaignType(item.value);
+          }}
           p={3}
           sx={{
             outline: '1px solid transparent',
             transition: 'all .3s',
-            cursor: 'pointer',
+            cursor:
+              item.value !== ProcessCreateTypeEnum.crm ? 'pointer' : 'default',
             '&:hover': {
-              borderColor: '#6E4EFB',
-              outline: '1px solid #6E4EFB',
+              borderColor:
+                item.value !== ProcessCreateTypeEnum.crm
+                  ? '#6E4EFB'
+                  : '#DFDEE6',
+              outline:
+                item.value !== ProcessCreateTypeEnum.crm
+                  ? '1px solid #6E4EFB'
+                  : '1px solid transparent',
             },
           }}
         >
           <Stack flexDirection={'row'} gap={1}>
-            <Icon component={item.icon} sx={{ width: 24, height: 24 }} />
-            <Typography variant={'subtitle2'}>{item.label}</Typography>
+            <Icon
+              component={item.icon}
+              sx={
+                item.value !== ProcessCreateTypeEnum.crm
+                  ? { width: 24, height: 24 }
+                  : { width: 24, height: 24, opacity: 0.5 }
+              }
+            />
+            <Typography
+              color={
+                item.value !== ProcessCreateTypeEnum.crm
+                  ? 'text.primary'
+                  : 'text.disabled'
+              }
+              variant={'subtitle2'}
+            >
+              {item.label}
+            </Typography>
           </Stack>
-          <Typography variant={'body3'}>{item.content}</Typography>
+          <Typography
+            color={
+              item.value !== ProcessCreateTypeEnum.crm
+                ? 'text.primary'
+                : 'text.disabled'
+            }
+            variant={'body3'}
+          >
+            {item.content}
+          </Typography>
         </Stack>
       ))}
     </Stack>
