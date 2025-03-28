@@ -224,6 +224,7 @@ export const CampaignProcessContentChat: FC = () => {
               : 'primary.main'
           }
           borderRadius={'50%'}
+          flexShrink={0}
           height={32}
           justifyContent={'center'}
           ml={'auto'}
