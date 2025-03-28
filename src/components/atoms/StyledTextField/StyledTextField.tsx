@@ -1,5 +1,13 @@
 import { FC } from 'react';
-import { StandardTextFieldProps, SxProps, TextField } from '@mui/material';
+import {
+  InputBaseComponentProps,
+  inputLabelClasses,
+  InputLabelProps,
+  outlinedInputClasses,
+  StandardTextFieldProps,
+  SxProps,
+  TextField,
+} from '@mui/material';
 
 export interface StyledTextFieldProps
   extends Omit<StandardTextFieldProps, 'variant'> {
@@ -9,102 +17,97 @@ export interface StyledTextFieldProps
 }
 
 export const StyledTextField: FC<StyledTextFieldProps> = ({
-  sx,
   onChange,
   variant = 'outlined',
   disabledAutoFill = true,
   size = 'medium',
   ...rest
 }) => {
+  const { slotProps = {} } = rest;
+  const { htmlInput = {}, inputLabel = {} } = slotProps;
+  const { sx: htmlInputSx = {}, ...htmlInputRest } =
+    htmlInput as InputBaseComponentProps;
+  const { sx: inputLabelSx = {}, ...inputLabelRest } =
+    inputLabel as InputLabelProps;
+
   return (
     <TextField
       onChange={onChange}
       size={size}
       slotProps={{
-        input: {
+        inputLabel: {
           sx: {
-            '.MuiInputBase-inputMultiline': {
-              py: 1.5,
+            color: 'text.primary',
+            fontSize: 14,
+            lineHeight: 1.5,
+            //medium
+            transform: 'translate(14px, 10px) scale(1)',
+            '&.Mui-focused': {
+              color: 'text.primary',
             },
+            [`&.${inputLabelClasses.shrink}`]: {
+              transform: 'translate(14px, -8px) scale(0.75)',
+            },
+            //large
+            '&.MuiInputLabel-sizeLarge': {
+              fontSize: 16,
+              lineHeight: 1.5,
+              transform: 'translate(14px, 12px) scale(1)',
+            },
+            [`&.${inputLabelClasses.shrink}.MuiInputLabel-sizeLarge`]: {
+              fontSize: 16,
+              lineHeight: 1.5,
+              transform: 'translate(14px, -10px) scale(0.75)',
+            },
+            //small
+
+            [`&.${inputLabelClasses.sizeSmall}`]: {
+              fontSize: 14,
+              lineHeight: 1.5,
+              transform: 'translate(12px, 5px) scale(1)',
+            },
+            [`&.${inputLabelClasses.shrink}.${inputLabelClasses.sizeSmall}`]: {
+              fontSize: 14,
+              lineHeight: 1.5,
+              transform: 'translate(12px, -9px) scale(0.75)',
+            },
+            ...inputLabelSx,
           },
-          ...rest.slotProps?.input,
-          autoComplete: disabledAutoFill ? 'off' : '',
+          ...inputLabelRest,
         },
+
         htmlInput: {
-          ...rest.slotProps?.htmlInput,
           autoComplete: disabledAutoFill ? 'off' : '',
+          className: size === 'large' ? 'MuiInputBase-inputSizeLarge' : '',
+          sx: {
+            //medium
+            paddingTop: '10px',
+            paddingBottom: '10px',
+            zIndex: 1,
+
+            //small
+            [`&.${outlinedInputClasses.inputSizeSmall}`]: {
+              paddingTop: '6px',
+              paddingBottom: '6px',
+            },
+            //large
+            ['&.MuiInputBase-inputSizeLarge']: {
+              paddingTop: '12px',
+              paddingBottom: '12px',
+              fontSize: 16,
+              maxHeight: 48,
+              height: 'auto',
+            },
+            color: 'text.primary',
+            lineHeight: 1.5,
+            fontSize: 14,
+            ...htmlInputSx,
+          },
+          ...htmlInputRest,
         },
         formHelperText: {
           component: 'div',
         },
-      }}
-      sx={{
-        width: '100%',
-        borderRadius: 2,
-        padding: 0,
-        '& label': {
-          color: 'text.primary',
-          '&.Mui-focused': {
-            color: 'text.focus',
-            '& span': {
-              color: 'text.focus',
-            },
-          },
-        },
-        '& .MuiInputLabel-outlined': {
-          // transform:
-          //   size === 'medium'
-          //     ? 'translate(14px, 10px) scale(1)'
-          //     : 'translate(12px, 5px) scale(1)',
-        },
-        '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
-          // transform:
-          //   size === 'medium'
-          //     ? 'translate(14px, -8px) scale(0.75)'
-          //     : 'translate(12px, -8px) scale(0.75)',
-        },
-        '& .MuiOutlinedInput-input': {
-          // py: size === 'medium' ? '12px' : '5px',
-        },
-        '& .MuiOutlinedInput-root': {
-          borderRadius: 2,
-          boxShadow: 'none',
-          py: 0,
-          input: {
-            '&::placeholder': {
-              color: 'text.secondary',
-            },
-            color: 'text.primary',
-            lineHeight: 1,
-          },
-          '& fieldset': {
-            // borderColor: 'border.default',
-          },
-          '&:hover fieldset': {
-            borderColor: 'border.hover',
-            color: 'text.hover',
-          },
-          '&.Mui-focused fieldset': {
-            border: '1px solid',
-            borderColor: 'border.hover',
-          },
-        },
-        '& .Mui-disabled.MuiOutlinedInput-root': {
-          '&:hover fieldset': {
-            borderColor: 'border.hover',
-          },
-        },
-        '& .Mui-disabled': {
-          cursor: 'not-allowed',
-          '&:hover fieldset': {
-            borderColor: 'border.hover',
-          },
-        },
-        '& .MuiFormHelperText-root': {
-          margin: 0,
-          fontSize: 12,
-        },
-        ...sx,
       }}
       variant={variant}
       {...rest}
