@@ -5,7 +5,6 @@ import {
   DrawerProps,
   Fade,
   Icon,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -291,6 +290,9 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                     key={`group-${index}-${filterIndex}`}
                   >
                     <Autocomplete
+                      disableClearable={
+                        !filter.columnName && filter.columnName === ''
+                      }
                       fullWidth
                       getOptionLabel={(option) => option.label}
                       onChange={(_, value) => {
@@ -401,6 +403,10 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                         height: 16,
                         flexShrink: 0,
                         cursor: 'pointer',
+                        visibility:
+                          index === 0 && filterIndex === 0
+                            ? 'hidden'
+                            : 'visible',
                       }}
                     />
                   </Stack>
@@ -419,6 +425,7 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                   size={'small'}
                   sx={{
                     mr: 'auto',
+                    borderColor: '#DFDEE6 !important',
                     borderWidth: '1px !important',
                     fontWeight: '400 !important',
                     color: '#6E4EFB !important',
@@ -426,6 +433,9 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                     gap: '4px',
                     py: '6px',
                     height: 'auto !important',
+                    '&:hover': {
+                      borderColor: '#6E4EFB !important',
+                    },
                   }}
                   variant={'outlined'}
                 >

@@ -21,6 +21,7 @@ interface StyledTextFieldInputProps
 
 export const StyledTextFieldSearch: FC<StyledTextFieldInputProps> = ({
   handleClear,
+  sx,
   ...rest
 }) => {
   const [focusVisible, setFocusVisible] = useState(false);
@@ -67,6 +68,7 @@ export const StyledTextFieldSearch: FC<StyledTextFieldInputProps> = ({
             display: 'flex',
           },
         },
+        ...sx,
       }}
       {...rest}
     />
