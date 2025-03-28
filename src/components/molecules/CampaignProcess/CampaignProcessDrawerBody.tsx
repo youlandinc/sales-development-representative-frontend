@@ -153,7 +153,9 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
         </Stack>
 
         <Stack gap={1.5}>
-          <Typography variant={'subtitle1'}>Suggested word count</Typography>
+          <Typography variant={'subtitle1'}>
+            Suggested word count : {formData.bodyWordCount}
+          </Typography>
           <Slider
             marks={WORD_COUNT_OPTIONS}
             max={400}
