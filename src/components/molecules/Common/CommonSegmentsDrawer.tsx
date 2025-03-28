@@ -456,6 +456,7 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
               size={'small'}
               sx={{
                 mr: 'auto',
+                borderColor: '#DFDEE6 !important',
                 borderWidth: '1px !important',
                 fontWeight: '400 !important',
                 color: '#6E4EFB !important',
@@ -463,6 +464,9 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                 gap: '4px',
                 py: '6px',
                 height: 'auto !important',
+                '&:hover': {
+                  borderColor: '#6E4EFB !important',
+                },
               }}
               variant={'outlined'}
             >
