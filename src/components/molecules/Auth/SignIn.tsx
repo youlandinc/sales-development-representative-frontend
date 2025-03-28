@@ -18,6 +18,7 @@ import {
 
 import { _userLogin } from '@/request';
 import { HttpError, HttpVariantEnum, LoginTypeEnum } from '@/types';
+import { COMPANY_HEADCOUNT_OPTIONS } from '@/components/molecules/CampaignProcess/data';
 
 export const SignIn = () => {
   const router = useRouter();
@@ -142,9 +143,17 @@ export const SignIn = () => {
             size={'large'}
             value={password}
           />
-          <StyledSelect label={'large'} options={[]} size={'large'} />
-          <StyledSelect label={'medium'} options={[]} />
-          <StyledSelect label={'small'} options={[]} size={'small'} />
+          <StyledSelect
+            label={'large'}
+            options={COMPANY_HEADCOUNT_OPTIONS}
+            size={'large'}
+          />
+          <StyledSelect label={'medium'} options={COMPANY_HEADCOUNT_OPTIONS} />
+          <StyledSelect
+            label={'small'}
+            options={COMPANY_HEADCOUNT_OPTIONS}
+            size={'small'}
+          />
 
           <Stack flexDirection={'row'}>
             <StyledCheckbox

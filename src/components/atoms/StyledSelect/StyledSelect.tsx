@@ -215,15 +215,14 @@ export const StyledSelect: FC<StyledSelectProps> = ({
       <InputLabel
         size={size === 'medium' ? 'normal' : size}
         sx={{
-          //large
-          '&.MuiInputLabel-sizeLarge': {
-            fontSize: 16,
-            transform: 'translate(14px, 12px) scale(1)',
-            height: 24,
+          //sizeSmall
+          [`&.${inputLabelClasses.root}.${inputLabelClasses.sizeSmall}`]: {
+            transform: 'translate(14px, 5px) scale(1)',
           },
-          [`&.${inputLabelClasses.shrink}.MuiInputLabel-sizeLarge}`]: {
-            transform: 'translate(14px, -10px) scale(0.75) !important',
+          [`&.${inputLabelClasses.shrink}.${inputLabelClasses.sizeSmall}`]: {
+            transform: 'translate(14px, -10px) scale(0.75)',
           },
+
           //medium
           transform: 'translate(14px, 10px) scale(1)',
           fontSize: 14,
@@ -232,16 +231,20 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           [`&.${inputLabelClasses.focused}`]: {
             color: 'text.primary',
           },
-          [`&.${inputLabelClasses.shrink}}`]: {
+          [`&.${inputLabelClasses.shrink}`]: {
             transform: 'translate(14px, -10px) scale(0.75)',
           },
-          //sizeSmall
-          [`&.${inputLabelClasses.sizeSmall}`]: {
-            transform: 'translate(14px, 5px) scale(1)',
+
+          //large
+          [`&.${inputLabelClasses.root}.MuiInputLabel-sizeLarge`]: {
+            fontSize: 16,
+            transform: 'translate(14px, 12px) scale(1)',
+            height: 24,
           },
-          [`&.${inputLabelClasses.shrink}}`]: {
-            transform: 'translate(14px, -10px) scale(0.75)',
-          },
+          [`&.${inputLabelClasses.root}.MuiInputLabel-sizeLarge.${inputLabelClasses.shrink}`]:
+            {
+              transform: 'translate(14px, -10px) scale(0.75)',
+            },
         }}
       >
         {label}
@@ -273,31 +276,29 @@ export const StyledSelect: FC<StyledSelectProps> = ({
               height: 24,
             },
           },
-          MenuProps: {
-            MenuListProps: {
-              sx: {
-                p: 0,
-                m: 0,
-                '& .MuiMenuItem-root:hover': {
-                  bgcolor: 'rgba(144, 149, 163, 0.1) !important',
-                },
-                '& .Mui-selected': {
-                  bgcolor: '#EFE9FB !important',
-                },
-                '& .Mui-selected:hover': {
-                  bgcolor: '#EFE9FB !important',
-                },
-                '& .MuiMenuItem-root': {
-                  fontSize: 14,
-                  color: 'text.primary',
-                  p: 1.5,
-                },
-                ...sxList,
+          MenuListProps: {
+            sx: {
+              p: 0,
+              m: 0,
+              '& .MuiMenuItem-root:hover': {
+                bgcolor: 'rgba(144, 149, 163, 0.1) !important',
               },
+              '& .Mui-selected': {
+                bgcolor: '#EFE9FB !important',
+              },
+              '& .Mui-selected:hover': {
+                bgcolor: '#EFE9FB !important',
+              },
+              '& .MuiMenuItem-root': {
+                fontSize: 14,
+                color: 'text.primary',
+                p: 1.5,
+              },
+              ...sxList,
             },
-            PaperProps: {
-              style: { marginTop: 12, borderRadius: 8 },
-            },
+          },
+          PaperProps: {
+            style: { marginTop: 12, borderRadius: 8 },
           },
         }}
         label={label}
@@ -308,7 +309,6 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         size={size}
         value={value}
         {...rest}
-        // size={['xs', 'sm', 'md'].includes(breakpoints) ? 'small' : 'medium'}
       >
         {options.map((opt) => (
           <MenuItem key={opt.key} value={opt.value}>
