@@ -162,9 +162,9 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
           disabled={loading}
           loading={loading}
           onClick={(e) => {
-            if (segmentOptions.length === 0) {
-              return;
-            }
+            // if (segmentOptions.length === 0) {
+            //   return;
+            // }
             setAnchorEl(e.currentTarget);
             setToolBarType(ToolBarTypeEnum.edit_segment);
           }}
@@ -269,12 +269,12 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
                   </MenuItem>
                 ))
               ) : (
-                <Typography color={'text.secondary'} variant={'body2'}>
+                <Typography color={'text.secondary'} variant={'body3'}>
                   We didn’t find any lists that match your search.
                 </Typography>
               )
             ) : (
-              <Typography color={'text.secondary'} variant={'body2'}>
+              <Typography color={'text.secondary'} variant={'body3'}>
                 You have not created any lists yet.
               </Typography>
             )}
