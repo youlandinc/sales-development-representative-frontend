@@ -126,8 +126,8 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
     async (recordIds: string[]) => {
       try {
         await _deleteGridRecords({
-          tableId: tableId as number,
-          recordIds,
+          tableId: gridType as number,
+          ids: recordIds,
         });
         await mutate();
         setRowSelection({});
@@ -136,13 +136,13 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
         SDRToast({ message, header, variant });
       }
     },
-    [tableId],
+    [gridType],
   );
 
   const [exportState, exportGridRecords] = useAsyncFn(
-    async (recordIds: string[], tableId: number) => {
+    async (ids: string[], tableId: number) => {
       try {
-        await _exportGridRecords(recordIds, tableId).then((res) => {
+        await _exportGridRecords(ids, tableId).then((res) => {
           const fileName = res.headers['content-disposition']
             .split(';')[1]
             .split('filename=')[1];
@@ -297,7 +297,7 @@ export const GridContacts: FC<GridContactsProps> = ({ gridType }) => {
             await deleteGridRecords(rowSelectionIds);
           }}
           handleExport={async () => {
-            await exportGridRecords(rowSelectionIds, tableId as number);
+            await exportGridRecords(rowSelectionIds, gridType as number);
           }}
           onClose={() => {
             setRowSelection({});
