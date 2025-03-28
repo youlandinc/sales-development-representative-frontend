@@ -24,19 +24,6 @@ export const SettingsEmails: FC = () => {
       <Typography component={'div'} lineHeight={1.2} variant={'h6'}>
         Email
       </Typography>
-      <StyledTextField label={'Large size'} size={'large'} />
-      {/*<StyledTextField label={'Large size'} select size={'large'}>*/}
-      {/*  <MenuItem value="">*/}
-      {/*    <em>None</em>*/}
-      {/*  </MenuItem>*/}
-      {/*  <MenuItem value={10}>Ten</MenuItem>*/}
-      {/*  <MenuItem value={20}>Twenty</MenuItem>*/}
-      {/*  <MenuItem value={30}>Thirty</MenuItem>*/}
-      {/*</StyledTextField>*/}
-      <StyledTextField label={'Small size'} size={'small'} />
-      <StyledTextField label={'Medium size'} size={'medium'} />
-      <StyledTextField label={'Medium size'} size={'medium'} />
-      <StyledSelect label={'large label'} options={[]} size={'large'} />
       {/*<Stack gap={2}>*/}
       {/*  <Stack*/}
       {/*    alignItems={'center'}*/}
