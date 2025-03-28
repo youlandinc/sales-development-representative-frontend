@@ -243,7 +243,7 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
         {!type && (
           <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
             <Typography fontWeight={600} variant={'body2'}>
-              Create a list of...
+              Create a list of
             </Typography>
             <StyledSelect
               onChange={(e) => {
