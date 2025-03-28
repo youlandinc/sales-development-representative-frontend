@@ -1,20 +1,9 @@
 import { FC } from 'react';
-import {
-  Menu,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
 //import { useSwitch } from '@/hooks';
-
 //import { EmailDomainStateEnum } from '@/types/enum';
-
 import { SettingsEmailProfile } from './index';
-import { StyledSelect, StyledTextField } from '@/components/atoms';
 
 //import ICON_COPY from './assets/icon_copy.svg';
 
