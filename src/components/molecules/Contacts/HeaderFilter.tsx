@@ -1,14 +1,16 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import {
+  Box,
   CircularProgress,
   Icon,
-  Menu,
   MenuItem,
+  Popover,
   Stack,
   Typography,
 } from '@mui/material';
+import { useRouter } from 'nextjs-toploader/app';
 
-import { useAsync, useSwitch } from '@/hooks';
+import { useAsync, useDebounceFn, useSwitch } from '@/hooks';
 
 import {
   ToolBarTypeEnum,
@@ -17,7 +19,11 @@ import {
   useGridStore,
 } from '@/stores/ContactsStores';
 
-import { SDRToast, StyledButton } from '@/components/atoms';
+import {
+  SDRToast,
+  StyledButton,
+  StyledTextFieldSearch,
+} from '@/components/atoms';
 import {
   CommonSegmentsDrawer,
   SaveSegmentDialog,
@@ -40,6 +46,7 @@ type HeaderFilterProps = {
 };
 
 export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
+  const router = useRouter();
   const {
     segmentOptions,
     fetchSegmentDetails,
@@ -71,6 +78,13 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
     close: dialogClose,
     open: dialogOpen,
   } = useSwitch();
+  const [keyword, setKeyword] = useState<string>('');
+
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  const [, , updateQueryDebounce] = useDebounceFn((value: string) => {
+    setKeyword(value);
+  }, 500);
 
   const showFilter = computedCanSaved();
 
@@ -118,6 +132,12 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const segmentOptionsByFilter = segmentOptions.filter(
+    (item) =>
+      keyword === '' ||
+      (item.label as string)?.toLowerCase()?.includes(keyword.toLowerCase()),
+  );
+
   return (
     <Stack gap={1.5} width={'100%'}>
       <Stack flexDirection={'row'} gap={3}>
@@ -158,14 +178,11 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
           />
           <Typography variant={'body2'}>View list</Typography>
         </StyledButton>
-        <Menu
+        <Popover
           anchorEl={anchorEl}
-          MenuListProps={{
-            sx: {
-              width: 280,
-              borderRadius: 2,
-              maxHeight: 500,
-            },
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
           }}
           onClose={() => setAnchorEl(null)}
           open={Boolean(anchorEl)}
@@ -186,40 +203,101 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
               p: 0,
             },
           }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
           transitionDuration={0}
         >
-          {segmentOptions.map((item, index) => (
-            <MenuItem
-              key={`segmentOption-${index}`}
-              onClick={async () => {
-                await onClickToSelect(item.value);
-              }}
-              selected={
-                parseInt(selectedSegmentId + '') > -1
-                  ? selectedSegmentId === item.value
-                  : item.isSelect
-              }
-              sx={{ p: '14px 24px' }}
-            >
-              {selectedSegmentId === item.value && selectLoading ? (
-                <CircularProgress size={20} />
+          <Box p={1.5} px={3}>
+            <Stack flexDirection={'row'} py={1.5}>
+              <StyledTextFieldSearch
+                handleClear={() => {
+                  ref.current!.value = '';
+                  updateQueryDebounce('');
+                }}
+                inputRef={ref}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  e.stopPropagation();
+                  updateQueryDebounce(e.target.value);
+                }}
+                sx={{ width: 287 }}
+                variant={'outlined'}
+              />
+            </Stack>
+            {segmentOptionsByFilter.length ? (
+              <Typography color={'text.secondary'} py={1.5} variant={'body2'}>
+                Lists saved by you
+              </Typography>
+            ) : null}
+            {segmentOptions.length ? (
+              segmentOptionsByFilter.length ? (
+                segmentOptionsByFilter.map((item, index) => (
+                  <MenuItem
+                    key={`segmentOption-${index}`}
+                    onClick={async () => {
+                      await onClickToSelect(item.value);
+                    }}
+                    selected={
+                      parseInt(selectedSegmentId + '') > -1
+                        ? selectedSegmentId === item.value
+                        : item.isSelect
+                    }
+                    sx={{
+                      p: '10px 12px',
+                      borderRadius: 2,
+                      '&:hover': { bgcolor: 'background.active' },
+                    }}
+                  >
+                    {selectedSegmentId === item.value && selectLoading ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <Typography
+                        component={'div'}
+                        sx={{
+                          width: '100%',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                        variant={'body2'}
+                      >
+                        {item.label}
+                      </Typography>
+                    )}
+                  </MenuItem>
+                ))
               ) : (
-                <Typography
-                  component={'div'}
-                  sx={{
-                    width: '100%',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                  variant={'body2'}
-                >
-                  {item.label}
+                <Typography color={'text.secondary'} variant={'body2'}>
+                  We didn’t find any lists that match your search.
                 </Typography>
-              )}
-            </MenuItem>
-          ))}
-        </Menu>
+              )
+            ) : (
+              <Typography color={'text.secondary'} variant={'body2'}>
+                You have not created any lists yet.
+              </Typography>
+            )}
+            <Box
+              bgcolor={'#EAE9EF'}
+              height={'1px'}
+              my={1.5}
+              width={'100%'}
+            ></Box>
+            <Stack flexDirection={'row'} justifyContent={'flex-end'}>
+              <StyledButton
+                onClick={() => {
+                  router.push('/contacts/lists');
+                }}
+                size={'small'}
+                sx={{ fontWeight: 400 }}
+                variant={'text'}
+              >
+                Manage lists
+              </StyledButton>
+            </Stack>
+          </Box>
+        </Popover>
         <CommonSegmentsDrawer
           onClose={close}
           open={visible}
