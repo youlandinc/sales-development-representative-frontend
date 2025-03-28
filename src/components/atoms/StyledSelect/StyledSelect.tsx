@@ -213,26 +213,31 @@ export const StyledSelect: FC<StyledSelectProps> = ({
       variant={'outlined'}
     >
       <InputLabel
-        // size={size}
+        size={size === 'medium' ? 'normal' : size}
         sx={{
+          //large
           '&.MuiInputLabel-sizeLarge': {
             fontSize: 16,
             transform: 'translate(14px, 12px) scale(1)',
+            height: 24,
+          },
+          [`&.${inputLabelClasses.shrink}.MuiInputLabel-sizeLarge}`]: {
+            transform: 'translate(14px, -10px) scale(0.75) !important',
           },
           //medium
           transform: 'translate(14px, 10px) scale(1)',
           fontSize: 14,
           lineHeight: 1.5,
+          height: 20,
           [`&.${inputLabelClasses.focused}`]: {
             color: 'text.primary',
           },
           [`&.${inputLabelClasses.shrink}}`]: {
             transform: 'translate(14px, -10px) scale(0.75)',
           },
-
           //sizeSmall
           [`&.${inputLabelClasses.sizeSmall}`]: {
-            transform: 'translate(14px, 8px) scale(1)',
+            transform: 'translate(14px, 5px) scale(1)',
           },
           [`&.${inputLabelClasses.shrink}}`]: {
             transform: 'translate(14px, -10px) scale(0.75)',
