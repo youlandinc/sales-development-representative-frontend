@@ -78,6 +78,7 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
 
         htmlInput: {
           autoComplete: disabledAutoFill ? 'off' : '',
+          className: size === 'large' ? 'MuiInputBase-inputSizeLarge' : '',
           sx: {
             //medium
             paddingTop: '10px',
@@ -90,10 +91,12 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
               paddingBottom: '6px',
             },
             //large
-            ['&.MuiInputBase-sizeLarge']: {
+            ['&.MuiInputBase-inputSizeLarge']: {
               paddingTop: '12px',
               paddingBottom: '12px',
               fontSize: 16,
+              maxHeight: 48,
+              height: 'auto',
             },
             color: 'text.primary',
             lineHeight: 1.5,

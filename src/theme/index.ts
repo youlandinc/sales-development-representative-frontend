@@ -480,16 +480,16 @@ const defaultOptions: ThemeOptions = {
         },
       },
       styleOverrides: {
-        root: {
-          background: 'transparent',
-          '& .MuiInputBase-sizeLarge': {
-            '& .MuiOutlinedInput-input': {
-              fontSize: 16,
-              paddingTop: 12,
-              paddingBottom: 12,
-            },
-          },
-        },
+        // root: {
+        //   background: 'transparent',
+        //   '& .MuiInputBase-sizeLarge': {
+        //     '& .MuiOutlinedInput-input': {
+        //       fontSize: 16,
+        //       paddingTop: 12,
+        //       paddingBottom: 12,
+        //     },
+        //   },
+        // },
       },
     },
     MuiAutocomplete: {
