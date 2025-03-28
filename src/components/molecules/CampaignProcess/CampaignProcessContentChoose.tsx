@@ -33,7 +33,12 @@ const DEFAULT_PRODUCT = [
     value: ProcessCreateTypeEnum.crm,
   },
   {
-    label: 'Agent beta',
+    label: (
+      <>
+        Agent{' '}
+        <b style={{ color: '#6E4EFB', fontSize: 12, fontWeight: 600 }}>beta</b>
+      </>
+    ),
     content:
       'Chat with an AI agent to define customer criteria. The agent automates filtering for targeted prospecting and data enrichment.',
     icon: ICON_PRODUCT_AGENT,
