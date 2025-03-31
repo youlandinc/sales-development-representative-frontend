@@ -136,7 +136,7 @@ export const LibraryCompanyEdit = () => {
           </Stack>
         </StyledTextFieldLabel>
         <StyledTextFieldLabel
-          label={'What you are selling'}
+          label={'Company description'}
           required
           toolTipTittle={
             'Describe what your company does and the value it delivers. Highlight your specialization, the industries you serve, and the unique benefits you bring to customers.'

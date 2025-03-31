@@ -180,7 +180,7 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
               onClick={handleReviewLists}
               sx={defaultBtnStyle}
             >
-              Review lists
+              Review list
             </StyledButton>
           </>
         );
@@ -239,11 +239,11 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
   return (
     <Drawer anchor={'right'} {...rest}>
       <Stack gap={3} height={'100%'} minWidth={'45vw'} px={3} py={6}>
-        <Typography fontWeight={600}> Create a lists</Typography>
+        <Typography fontWeight={600}> Create a list</Typography>
         {!type && (
           <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
             <Typography fontWeight={600} variant={'body2'}>
-              Create a list of...
+              Create a list of
             </Typography>
             <StyledSelect
               onChange={(e) => {

@@ -181,7 +181,7 @@ export const StyledGrid: FC<StyledGridProps> = ({
       muiTableHeadCellProps: () => ({
         sx: {
           opacity: 1,
-          // minHeight: 36,
+          minHeight: 40,
           px: 1,
           py: 1.25,
           justifyContent: 'center',
@@ -189,14 +189,14 @@ export const StyledGrid: FC<StyledGridProps> = ({
             pl: 0,
           },
           '& .Mui-TableHeadCell-Content-Wrapper': {
-            fontWeight: 600,
+            // fontWeight: 600,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             webkitBoxOrient: 'vertical',
             webkitLineClamp: 2,
             display: '-webkit-box',
             whiteSpace: 'normal',
-            color: '#636A7C',
+            color: '#202939',
           },
           '& .Mui-TableHeadCell-ResizeHandle-Wrapper': {
             mr: '-8px',
@@ -247,12 +247,12 @@ export const StyledGrid: FC<StyledGridProps> = ({
               },
             },
             border: 'none',
-            bgcolor: '#F8F9FC',
+            bgcolor: '#F7F4FD',
             pl: 1.5,
             py: 1.25,
           },
           '& .MuiTableCell-root:last-child': {
-            bgcolor: '#F8F9FC',
+            bgcolor: '#F7F4FD',
           },
           '& .MuiTableCell-root:first-of-type': {
             px: rest?.enableSelectAll ? 0 : 1.5,
