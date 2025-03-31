@@ -31,6 +31,7 @@ export interface StyledSearchSelectProps {
   type?: TreeNodeRenderTypeEnum;
   id: string;
   disabled?: boolean;
+  placeholder?: string;
 }
 
 export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
@@ -43,6 +44,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
   disabled,
   //type,
   id,
+  placeholder,
 }) => {
   return (
     <Autocomplete
@@ -77,6 +79,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
               ]);
             }
           }}
+          placeholder={placeholder}
         />
       )}
       renderOption={(props, option) => {

@@ -25,6 +25,7 @@ interface TreeNode {
   children: {
     label: string;
     value: string;
+    placeholder: string;
     type: TreeNodeRenderTypeEnum;
     options: TOption[];
   }[];
@@ -116,6 +117,15 @@ export const CampaignProcessContentFilter: FC = () => {
                         (filterFormData?.[child.value] as SelectWithCustomProps)
                           .inputValue
                       }
+                      onClear={() => {
+                        setFilterFormData({
+                          ...filterFormData,
+                          [child.value]: {
+                            ...filterFormData?.[child.value],
+                            selectValue: '',
+                          },
+                        });
+                      }}
                       onSelectChange={(e) => {
                         setFilterFormData({
                           ...filterFormData,
@@ -126,6 +136,7 @@ export const CampaignProcessContentFilter: FC = () => {
                         });
                       }}
                       options={child.options}
+                      placeholder={child.placeholder}
                       selectValue={
                         (filterFormData?.[child.value] as SelectWithCustomProps)
                           .selectValue
@@ -164,6 +175,7 @@ export const CampaignProcessContentFilter: FC = () => {
                         });
                       }}
                       options={child.options}
+                      placeholder={child.placeholder}
                       type={child.type}
                       value={
                         (filterFormData?.[
@@ -190,12 +202,14 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Job Title',
         value: 'jobTitle',
+        placeholder: 'Select job title(s)…',
         type: TreeNodeRenderTypeEnum.search_with_flag,
         options: [],
       },
       {
         label: 'University Name',
         value: 'universityName',
+        placeholder: 'Select one or more universities…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
@@ -208,18 +222,21 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Company Headcount',
         value: 'companyHeadcount',
+        placeholder: 'Select one or more headcount ranges…',
         type: TreeNodeRenderTypeEnum.select_with_custom,
         options: COMPANY_HEADCOUNT_OPTIONS,
       },
       {
         label: 'Industry',
         value: 'industry',
+        placeholder: 'Select industry/industries…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
       {
         label: 'Current Company',
         value: 'currentCompany',
+        placeholder: 'Select one or more companies…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
@@ -232,6 +249,7 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Person Location',
         value: 'personLocation',
+        placeholder: 'Select one or more locations…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
@@ -244,6 +262,7 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Company Revenue',
         value: 'companyRevenue',
+        placeholder: 'Select one or more revenue ranges…',
         type: TreeNodeRenderTypeEnum.select_with_custom,
         options: COMPANY_REVENUE_OPTIONS,
       },
@@ -256,12 +275,14 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Industry',
         value: 'industry',
+        placeholder: 'Select one or more industries…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
       {
         label: 'Skills',
         value: 'skills',
+        placeholder: 'Select all relevant skills…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
