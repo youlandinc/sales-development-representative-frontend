@@ -3,16 +3,19 @@ import {
   BaseSelectProps,
   //Box,
   FormControl,
+  InputAdornment,
   //FormHelperText,
   InputLabel,
   MenuItem,
   Select,
   SxProps,
+  Typography,
 } from '@mui/material';
 
 //import { useBreakpoints } from '@/hooks';
 
 import { StyledTooltip } from '@/components/atoms';
+import ClearIcon from '@mui/icons-material/Clear';
 
 export interface StyledSelectProps extends BaseSelectProps {
   validate?: undefined | string[];
@@ -22,6 +25,9 @@ export interface StyledSelectProps extends BaseSelectProps {
   tooltipTitle?: string;
   tooltipSx?: SxProps;
   isTooltip?: boolean;
+  placeholder?: string;
+  clearable?: boolean;
+  onClear?: () => void;
 }
 
 export const StyledSelect: FC<StyledSelectProps> = ({
@@ -38,12 +44,16 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   tooltipTitle = '',
   tooltipSx = { width: '100%' },
   isTooltip = false,
-  //sxHelperText,
+  placeholder,
+  clearable = false,
+  onClear,
   ...rest
+  //sxHelperText,
 }) => {
   //const breakpoints = useBreakpoints();
 
   const [open, setOpen] = useState(false);
+  const [showClear, setShowClear] = useState(false);
 
   return isTooltip ? (
     <StyledTooltip
@@ -172,6 +182,15 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   ) : (
     <FormControl
       error={!!(validate?.length && validate[0])}
+      onMouseEnter={() => {
+        setShowClear(true);
+      }}
+      onMouseLeave={() => {
+        setShowClear(false);
+      }}
+      onMouseOver={() => {
+        setShowClear(true);
+      }}
       required={required}
       sx={{
         [disabled ? '& label' : '']: {
@@ -212,6 +231,21 @@ export const StyledSelect: FC<StyledSelectProps> = ({
       <InputLabel>{label}</InputLabel>
       <Select
         disabled={disabled}
+        displayEmpty
+        endAdornment={
+          clearable &&
+          showClear &&
+          !!value && (
+            <InputAdornment position="end" sx={{ mr: 3, cursor: 'pointer' }}>
+              <ClearIcon
+                onClick={() => {
+                  onClear?.();
+                }}
+                sx={{ fontSize: 20 }}
+              />
+            </InputAdornment>
+          )
+        }
         inputProps={{
           MenuProps: {
             MenuListProps: {
@@ -245,11 +279,28 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           disableScrollLock: true,
         }}
         onChange={onChange}
+        renderValue={(value) => {
+          if (!value) {
+            return (
+              <Typography
+                color={'text.secondary'}
+                sx={{ opacity: 0.7 }}
+                variant={'body2'}
+              >
+                {placeholder}
+              </Typography>
+            );
+          }
+          return options.find((opt) => opt.value === value)?.label;
+        }}
         size={size}
         value={value}
         {...rest}
         // size={['xs', 'sm', 'md'].includes(breakpoints) ? 'small' : 'medium'}
       >
+        <MenuItem disabled value="">
+          <Typography variant={'body2'}>{placeholder}</Typography>
+        </MenuItem>
         {options.map((opt) => (
           <MenuItem key={opt.key} value={opt.value}>
             {opt.label}
