@@ -235,9 +235,14 @@ export const LayoutSide: FC = () => {
                 expend={expend}
                 key={`${item.key}-${index}`}
                 label={item.label}
-                onClick={() => (item.url ? onClickToRedirect(item.url) : false)}
-                sx={{
-                  cursor: item.url ? 'pointer' : 'default',
+                onClick={() => {
+                  if (item.url) {
+                    onClickToRedirect(item.url);
+                    return;
+                  }
+                  if (item?.subMenus?.length) {
+                    onClickToRedirect(item.subMenus[0].url);
+                  }
                 }}
               />
             )}
