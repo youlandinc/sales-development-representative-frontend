@@ -214,7 +214,7 @@ const defaultOptions: ThemeOptions = {
     },
   },
   typography: {
-    fontFamily: 'var(--font-poppins)',
+    fontFamily: 'var(--font-red-hat-display)',
     h1: {
       fontSize: 40,
       fontWeight: 600,
