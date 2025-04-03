@@ -1,5 +1,5 @@
 import { FC, RefObject, useEffect, useImperativeHandle, useState } from 'react';
-import { CKEditor, CKEditorEventPayload, useCKEditor } from 'ckeditor4-react';
+import { CKEditor, CKEditorEventPayload } from 'ckeditor4-react';
 import { CKEditorInstance } from 'ckeditor4-react/dist/types';
 
 // import './defaultEditorCss.css';
