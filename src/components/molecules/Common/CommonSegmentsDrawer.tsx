@@ -118,13 +118,13 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
   const handleReviewLists = () => {
     rest?.onClose?.({}, 'backdropClick');
     if (!type) {
-      if (type === ContactsTableTypeEnum.companies) {
+      if (tag === ContactsTableTypeEnum.companies) {
         router.push('/contacts/companies');
         return;
       }
       router.push('/contacts/people');
     } else {
-      if (tag === ContactsTableTypeEnum.companies) {
+      if (type === ContactsTableTypeEnum.companies) {
         router.push('/contacts/companies');
         return;
       }
