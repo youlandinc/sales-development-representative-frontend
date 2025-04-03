@@ -298,9 +298,11 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         {...rest}
         // size={['xs', 'sm', 'md'].includes(breakpoints) ? 'small' : 'medium'}
       >
-        <MenuItem disabled value="">
-          <Typography variant={'body2'}>{placeholder}</Typography>
-        </MenuItem>
+        {placeholder && (
+          <MenuItem disabled value="">
+            <Typography variant={'body2'}>{placeholder}</Typography>
+          </MenuItem>
+        )}
         {options.map((opt) => (
           <MenuItem key={opt.key} value={opt.value}>
             {opt.label}

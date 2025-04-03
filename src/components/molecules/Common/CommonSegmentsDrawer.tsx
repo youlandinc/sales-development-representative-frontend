@@ -329,7 +329,9 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                           (value?.value as unknown as string | number) || '',
                         );
                       }}
-                      options={columnOptions}
+                      options={columnOptions.filter(
+                        (item) => item.value !== 'id',
+                      )}
                       renderInput={(params) => (
                         <StyledTextField
                           {...params}
@@ -365,7 +367,6 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
                       }
                     />
                     <StyledSelect
-                      displayEmpty
                       onChange={(e) => {
                         onChangeSegmentsFilters(
                           index,
