@@ -159,7 +159,7 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
           >
             {format(
               new Date(renderedCellValue as string),
-              'LLL d, yyyy, h:m aa',
+              'LLL d, yyyy, hh:mm aa',
             )}
           </Typography>
         );
