@@ -184,7 +184,10 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
             vertical: 'bottom',
             horizontal: 'left',
           }}
-          onClose={() => setAnchorEl(null)}
+          onClose={() => {
+            setAnchorEl(null);
+            updateQueryDebounce('');
+          }}
           open={Boolean(anchorEl)}
           slotProps={{
             paper: {
