@@ -229,6 +229,19 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
     }
   };
 
+  const computedTitle = () => {
+    switch (toolBarType) {
+      case ToolBarTypeEnum.new_segment:
+        return 'Create a list of';
+      case ToolBarTypeEnum.edit_segment:
+        return 'Edit list';
+      case ToolBarTypeEnum.new_filter:
+        return 'Set filter';
+      default:
+        return '';
+    }
+  };
+
   useEffect(() => {
     if (rest?.open) {
       fetchAllColumns(type || ContactsTableTypeEnum.people);
@@ -239,7 +252,20 @@ export const CommonSegmentsDrawer: FC<CommonSegmentsDrawerProps> = ({
   return (
     <Drawer anchor={'right'} {...rest}>
       <Stack gap={3} height={'100%'} minWidth={'45vw'} px={3} py={6}>
-        <Typography fontWeight={600}> Create a list</Typography>
+        <Stack
+          alignItems={'center'}
+          flexDirection={'row'}
+          justifyContent={'space-between'}
+        >
+          <Typography fontWeight={600}> {computedTitle()}</Typography>
+          <Icon
+            component={ICON_CLOSE}
+            onClick={() => {
+              handleClose();
+            }}
+            sx={{ cursor: 'pointer' }}
+          />
+        </Stack>
         {!type && (
           <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
             <Typography fontWeight={600} variant={'body2'}>
