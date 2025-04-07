@@ -23,9 +23,15 @@ export const LibraryOfferCard: FC<LibraryOfferCardProps> = ({
   productName,
   productDescription,
 }) => {
-  const { isAdd, setEditId, setIsAdd, deleteOffer, editId } = useLibraryStore(
-    (state) => state,
-  );
+  const {
+    isAdd,
+    setEditId,
+    setIsAdd,
+    deleteOffer,
+    editId,
+    setIsEdit,
+    offerList,
+  } = useLibraryStore((state) => state);
 
   const { visible: isEdit, close, open } = useSwitch();
 
@@ -40,7 +46,7 @@ export const LibraryOfferCard: FC<LibraryOfferCardProps> = ({
     }
   });
 
-  if (isAdd && id === editId) {
+  if (isAdd && editId === id) {
     return (
       <LibraryOffersEditCard
         handleCancel={async () => {
@@ -49,12 +55,12 @@ export const LibraryOfferCard: FC<LibraryOfferCardProps> = ({
           await del(id);
         }}
         id={id}
-        painPoints={[]}
+        painPoints={offerList?.[0]?.painPoints || []}
         productDescription={''}
         productName={''}
         productUrl={''}
-        proofPoints={[]}
-        solutions={[]}
+        proofPoints={offerList?.[0]?.proofPoints || []}
+        solutions={offerList?.[0]?.solutions || []}
       />
     );
   }
@@ -63,11 +69,15 @@ export const LibraryOfferCard: FC<LibraryOfferCardProps> = ({
     return (
       <LibraryOffersEditCard
         handleCancel={async () => {
-          close();
           setEditId(Infinity);
+          setIsEdit(false);
+          close();
         }}
         handleDelete={async () => {
           await del(id);
+        }}
+        handleSave={() => {
+          close();
         }}
         id={id}
         painPoints={painPoints}
@@ -84,6 +94,7 @@ export const LibraryOfferCard: FC<LibraryOfferCardProps> = ({
     <LibraryOffersInfoCard
       handleEdit={() => {
         open();
+        setIsEdit(true);
       }}
       id={id}
       painPoints={painPoints}
