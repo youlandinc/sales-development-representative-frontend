@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { HttpError } from '@/types';
+import { HttpError, LibraryTypeOfferTagTypeEnum } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import { _fetchOffersInfo } from '@/request/library/offers';
 
@@ -33,6 +33,7 @@ export type LibraryState = {
   libraryContainerType: LibraryContainerTypeEnum;
   offerList: IOfferList;
   isAdd: boolean;
+  isEdit: boolean;
   editId: number;
 };
 
@@ -41,6 +42,7 @@ export type LibraryStateStoreActions = {
   setOfferList: (offerList: IOfferList) => void;
   addOffer: (offerId: number) => void;
   setIsAdd: (isAdd: boolean) => void;
+  setIsEdit: (isEdit: boolean) => void;
   setEditId: (id: number) => void;
   fetchOffersInfo: () => Promise<void>;
   deleteTag: (tagId: number) => void;
@@ -48,6 +50,11 @@ export type LibraryStateStoreActions = {
   updateCompanyInfo: (
     key: 'companyName' | 'companyPage' | 'sellIntroduction',
     value: string,
+  ) => void;
+  addLibraryTag: (
+    type: LibraryTypeOfferTagTypeEnum,
+    offerId: number,
+    data: ITag,
   ) => void;
 };
 
@@ -60,6 +67,7 @@ export const useLibraryStore = create<InboxStoreProps>()((set) => ({
   libraryContainerType: LibraryContainerTypeEnum.company,
   isAdd: false,
   editId: Infinity,
+  isEdit: false,
   offerList: [],
   setLibraryContainerType: (libraryContainerType) =>
     set({ libraryContainerType }),
@@ -82,6 +90,7 @@ export const useLibraryStore = create<InboxStoreProps>()((set) => ({
       editId: offerId,
     })),
   setIsAdd: (isAdd) => set({ isAdd }),
+  setIsEdit: (isEdit) => set({ isEdit }),
   setEditId: (id) => set({ editId: id }),
   fetchOffersInfo: async () => {
     try {
@@ -106,4 +115,38 @@ export const useLibraryStore = create<InboxStoreProps>()((set) => ({
       offerList: state.offerList.filter((offer) => offer.id !== offerId),
     })),
   updateCompanyInfo: (key, value) => set({ [key]: value }),
+  addLibraryTag: (type, offerId, data) => {
+    set((state) => ({
+      offerList: state.offerList.map(
+        (offer) => {
+          if (offer.id === offerId) {
+            return {
+              ...offer,
+              painPoints: offer.painPoints.concat(
+                type === LibraryTypeOfferTagTypeEnum.pain_points ? data : [],
+              ),
+              solutions: offer.solutions.concat(
+                type === LibraryTypeOfferTagTypeEnum.solutions ? data : [],
+              ),
+              proofPoints: offer.proofPoints.concat(
+                type === LibraryTypeOfferTagTypeEnum.proof_points ? data : [],
+              ),
+            };
+          }
+          return offer;
+        } /*({
+        ...offer,
+        painPoints: offer.painPoints.concat(
+          type === LibraryTypeOfferTagTypeEnum.pain_points ? data : [],
+        ),
+        solutions: offer.solutions.concat(
+          type === LibraryTypeOfferTagTypeEnum.solutions ? data : [],
+        ),
+        proofPoints: offer.proofPoints.concat(
+          type === LibraryTypeOfferTagTypeEnum.proof_points ? data : [],
+        ),
+      })*/,
+      ),
+    }));
+  },
 }));

@@ -44,7 +44,9 @@ const ChipEditCard: FC<ChipsEditCardProps> = ({
   type,
 }) => {
   const { visible, open, close } = useSwitch();
-  const { fetchOffersInfo, deleteTag } = useLibraryStore((state) => state);
+  const { fetchOffersInfo, deleteTag, isAdd, addLibraryTag } = useLibraryStore(
+    (state) => state,
+  );
 
   const [editState, editTag] = useAsyncFn(async (param: ITag) => {
     try {
@@ -60,12 +62,20 @@ const ChipEditCard: FC<ChipsEditCardProps> = ({
   const [addState, addTag] = useAsyncFn(
     async (param: ITag) => {
       try {
-        await _addTag({
+        const res = await _addTag({
           offerId: param.id,
           name: param.name,
           description: param.description,
           type,
         });
+        if (isAdd) {
+          addLibraryTag(type, offerId, {
+            name: param.name,
+            description: param.description,
+            id: res.data,
+          });
+          return;
+        }
         await fetchOffersInfo();
       } catch (error) {
         close();
@@ -157,8 +167,9 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
   footer,
   id,
   handleDelete,
+  handleSave,
 }) => {
-  const { setEditId, fetchOffersInfo, setIsAdd } = useLibraryStore(
+  const { setEditId, fetchOffersInfo, setIsAdd, setIsEdit } = useLibraryStore(
     (state) => state,
   );
 
@@ -179,6 +190,8 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
         await fetchOffersInfo();
         setEditId(Infinity);
         setIsAdd(false);
+        setIsEdit(false);
+        handleSave?.(param);
       } catch (error) {
         close();
         const { message, header, variant } = error as HttpError;

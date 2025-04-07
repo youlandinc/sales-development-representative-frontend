@@ -6,7 +6,11 @@ import { LibraryCard, LibraryChip } from '@/components/molecules';
 
 import { useSwitch } from '@/hooks';
 
-import { IOfferListItem, ITag } from '@/stores/useLibraryStore';
+import {
+  IOfferListItem,
+  ITag,
+  useLibraryStore,
+} from '@/stores/useLibraryStore';
 import { PREVIEW_IMAGE_URL } from '@/constant';
 
 export enum modeEnum {
@@ -50,6 +54,8 @@ export const LibraryOffersInfoCard: FC<LibraryOffersCardProps> = ({
   proofPoints,
   handleEdit,
 }) => {
+  const { isAdd, isEdit } = useLibraryStore((state) => state);
+
   const { visible, close } = useSwitch(true);
 
   return (
@@ -84,6 +90,7 @@ export const LibraryOffersInfoCard: FC<LibraryOffersCardProps> = ({
         <ChipsCard chips={proofPoints} title={'Proof points'} />
         <StyledButton
           color={'info'}
+          disabled={isAdd || isEdit}
           onClick={handleEdit}
           size={'medium'}
           sx={{ width: 'fit-content', alignSelf: 'flex-end' }}
