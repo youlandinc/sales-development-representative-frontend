@@ -60,7 +60,7 @@ export const _addTag = (
     type: LibraryTypeOfferTagTypeEnum;
   } & Omit<ITag, 'id'>,
 ) => {
-  return post<{ id: number }>('/sdr/library/tag', param);
+  return post<number>('/sdr/library/tag', param);
 };
 
 export const _editTag = (param: ITag) => {

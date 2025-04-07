@@ -10,9 +10,8 @@ import { _createOffer } from '@/request/library/offers';
 import { useLibraryStore } from '@/stores/useLibraryStore';
 
 export const LibraryOffersMain = () => {
-  const { offerList, addOffer, isAdd, fetchOffersInfo } = useLibraryStore(
-    (state) => state,
-  );
+  const { offerList, addOffer, isAdd, fetchOffersInfo, isEdit } =
+    useLibraryStore((state) => state);
 
   const [, fetchData] = useAsyncFn(async () => {
     try {
@@ -52,7 +51,7 @@ export const LibraryOffersMain = () => {
           This is an overview of all offers stored about your business
         </Typography>
         <StyledButton
-          disabled={isAdd}
+          disabled={isAdd || isEdit}
           loading={createState.loading}
           onClick={createOffer}
           size={'medium'}
