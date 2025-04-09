@@ -36,12 +36,14 @@ type ChipsEditCardProps = ChipsCardProps & {
   handleDelete?: () => void;
   handleAddTag?: (param: ITag) => void;
   type: LibraryTypeOfferTagTypeEnum;
+  dialogHeader?: ReactNode;
 };
 const ChipEditCard: FC<ChipsEditCardProps> = ({
   title,
   chips,
   offerId,
   type,
+  dialogHeader,
 }) => {
   const { visible, open, close } = useSwitch();
   const { fetchOffersInfo, deleteTag, isAdd, addLibraryTag } = useLibraryStore(
@@ -135,7 +137,7 @@ const ChipEditCard: FC<ChipsEditCardProps> = ({
       <LibraryChipEditDialog
         description={''}
         handleSave={addTag}
-        header={'Add pain point'}
+        header={dialogHeader}
         loading={addState.loading}
         name={''}
         onClose={close}
@@ -308,18 +310,21 @@ export const LibraryOffersEditCard: FC<LibraryOffersEditCardProps> = ({
         </Stack>
         <ChipEditCard
           chips={painPoints}
+          dialogHeader={'Add pain points'}
           offerId={id}
           title={'Pain points'}
           type={LibraryTypeOfferTagTypeEnum.pain_points}
         />
         <ChipEditCard
           chips={solutions}
+          dialogHeader={'Add solutions'}
           offerId={id}
           title={'Solutions'}
           type={LibraryTypeOfferTagTypeEnum.solutions}
         />
         <ChipEditCard
           chips={proofPoints}
+          dialogHeader={'Add proof points'}
           offerId={id}
           title={'Proof points'}
           type={LibraryTypeOfferTagTypeEnum.proof_points}

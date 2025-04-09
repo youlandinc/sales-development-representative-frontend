@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { CircularProgress, Stack, Typography } from '@mui/material';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import { LibraryOfferCard } from '@/components/molecules';
@@ -10,10 +10,17 @@ import { _createOffer } from '@/request/library/offers';
 import { useLibraryStore } from '@/stores/useLibraryStore';
 
 export const LibraryOffersMain = () => {
-  const { offerList, addOffer, isAdd, fetchOffersInfo, isEdit } =
-    useLibraryStore((state) => state);
+  const {
+    offerList,
+    addOffer,
+    isAdd,
+    fetchOffersInfo,
+    isEdit,
+    setIsEdit,
+    setIsAdd,
+  } = useLibraryStore((state) => state);
 
-  const [, fetchData] = useAsyncFn(async () => {
+  const [state, fetchData] = useAsyncFn(async () => {
     try {
       await fetchOffersInfo();
     } catch (error) {
@@ -37,6 +44,10 @@ export const LibraryOffersMain = () => {
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
     fetchData();
+    return () => {
+      setIsEdit(false);
+      setIsAdd(false);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,18 +72,29 @@ export const LibraryOffersMain = () => {
         </StyledButton>
       </Stack>
       <Stack flexDirection={'row'} flexWrap={'wrap'} gap={3}>
-        {offerList.map((offer) => (
-          <LibraryOfferCard
-            id={offer.id}
-            key={offer.id}
-            painPoints={offer.painPoints}
-            productDescription={offer.productDescription}
-            productName={offer.productName}
-            productUrl={offer.productUrl}
-            proofPoints={offer.proofPoints}
-            solutions={offer.solutions}
-          />
-        ))}
+        {state.loading ? (
+          <Stack
+            alignItems={'center'}
+            height={'calc(100vh - 280px)'}
+            justifyContent={'center'}
+            width={'100%'}
+          >
+            <CircularProgress size={20} />
+          </Stack>
+        ) : (
+          offerList.map((offer) => (
+            <LibraryOfferCard
+              id={offer.id}
+              key={offer.id}
+              painPoints={offer.painPoints}
+              productDescription={offer.productDescription}
+              productName={offer.productName}
+              productUrl={offer.productUrl}
+              proofPoints={offer.proofPoints}
+              solutions={offer.solutions}
+            />
+          ))
+        )}
       </Stack>
     </Stack>
   );
