@@ -1,5 +1,6 @@
 import { del, get, post, put } from '@/request/request';
 import {
+  AIModelEnum,
   ProcessCreateTypeEnum,
   ResponseCampaignCRMLeads,
   ResponseCampaignCRMList,
@@ -54,6 +55,13 @@ export const _createCampaign = (params: {
 };
 
 // second step
+export const _switchAIModel = (params: {
+  campaignId: string | number;
+  model: AIModelEnum;
+}) => {
+  return put('/sdr/campaign/model/switch', params);
+};
+
 export const _fetchEmailByLead = (params: {
   campaignId: number | string;
   previewLeadId: number | string;

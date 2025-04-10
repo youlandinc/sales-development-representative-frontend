@@ -528,7 +528,6 @@ export const CampaignProcessContentMessaging = () => {
       ref={messagingBoxRef}
       sx={{
         transition: 'all .3s',
-        overflowY: 'hidden',
       }}
       width={'calc(100% - 510px)'}
     >
@@ -799,7 +798,7 @@ export const CampaignProcessContentMessaging = () => {
           </Stack>
 
           <Collapse in={expend}>
-            <Stack gap={1} maxHeight={160} mt={2} overflow={'auto'}>
+            <Stack gap={1} maxHeight={160} mt={2}>
               <Typography color={'text.primary'} variant={'h7'}>
                 Overview
               </Typography>
@@ -843,7 +842,6 @@ export const CampaignProcessContentMessaging = () => {
         borderRadius={4}
         flex={1}
         gap={3}
-        overflow={'auto'}
         p={3}
       >
         {computedEmail.map((step, index) => (

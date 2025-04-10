@@ -11,7 +11,7 @@ import { SDRToast, StyledLoading } from '@/components/atoms';
 import { CampaignLeadsCard } from '@/components/molecules';
 
 import { HttpError, ProcessCreateTypeEnum } from '@/types';
-import { _fetchChatLeads, _fetchCrmLeads, _fetchFilterLeads } from '@/request';
+import { _fetchChatLeads, _fetchFilterLeads } from '@/request';
 
 export const CampaignProcessContentAudience: FC = () => {
   const {
@@ -22,8 +22,6 @@ export const CampaignProcessContentAudience: FC = () => {
     returning,
     // filter
     filterFormData,
-    //crm
-    crmFormData,
 
     leadsFetchLoading,
     leadsList,

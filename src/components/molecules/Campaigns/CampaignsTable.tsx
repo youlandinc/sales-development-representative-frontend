@@ -265,6 +265,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setMessagingSteps,
     setLunchInfo,
     setOfferOptions,
+    setDetailsFetchLoading,
 
     // chat
     createChatSSE,
@@ -343,47 +344,61 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
   };
 
   const onRawClick = async (row: CampaignTableItem) => {
-    const { campaignId, campaignStatus } = row;
+    const {
+      campaignId,
+      campaignStatus,
+      startingPoint,
+      setupPhase,
+      campaignName,
+    } = row;
     if (!campaignId) {
       return;
     }
     switch (campaignStatus) {
       case CampaignStatusEnum.draft: {
+        setDetailsFetchLoading(true);
+        setIsFirst(false);
+        setCampaignId(campaignId);
+        setCampaignType(startingPoint);
+        setCampaignStatus(campaignStatus);
+        setCampaignName(campaignName || 'Untitled Campaign');
+        setActiveStep(ACTIVE_STEP_HASH[setupPhase]);
+        await setSetupPhase(setupPhase, false);
+        setLeadsVisible(true);
+        // pre open
+        openProcess();
+
         try {
           const {
             data: {
-              campaignName,
               chatId,
-              setupPhase,
-              campaignStatus,
-              startingPoint,
               data: {
                 leadInfo: { counts, leads },
                 steps,
                 launchInfo,
                 offerOptions,
-                // different types
+                // chat
                 chatRecord,
+                // filter
                 conditions,
+                // csv
                 fileInfo,
+                // crm
                 crmInfo,
               },
             },
           } = await _fetchCampaignInfo(campaignId);
 
-          setIsFirst(false);
-          setCampaignType(startingPoint);
-          setCampaignId(campaignId);
+          // chat
           setChatId(chatId);
-          setLeadsVisible(true);
-          setCampaignName(campaignName || 'Untitled Campaign');
-          setCampaignStatus(campaignStatus);
+          // step 1 & 2 leads
           setLeadsList(leads);
           setLeadsCount(counts);
-          setActiveStep(ACTIVE_STEP_HASH[setupPhase]);
-          setLunchInfo(launchInfo);
+          // step 2
           setOfferOptions(offerOptions);
-          await setSetupPhase(setupPhase, false);
+          setMessagingSteps(steps);
+          // step 3 lunch
+          setLunchInfo(launchInfo);
 
           switch (startingPoint) {
             case ProcessCreateTypeEnum.agent:
@@ -401,12 +416,11 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               await fetchProviderOptions();
               break;
           }
-
-          setMessagingSteps(steps);
-          openProcess();
         } catch (err) {
           const { message, variant, header } = err as HttpError;
           SDRToast({ message, variant, header });
+        } finally {
+          setDetailsFetchLoading(false);
         }
         break;
       }
@@ -506,6 +520,9 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           },
           '.MuiDataGrid-row': {
             borderBottom: '1px solid #DFDEE6',
+            '&:hover': {
+              cursor: 'pointer',
+            },
           },
           '.MuiDataGrid-cell': {
             overflow: 'unset !important',

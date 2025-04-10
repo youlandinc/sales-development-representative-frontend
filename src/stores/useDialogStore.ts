@@ -26,6 +26,7 @@ import {
 } from '@/request';
 
 export type DialogStoreState = {
+  detailsFetchLoading: boolean;
   campaignType: ProcessCreateTypeEnum | undefined;
   reloadTable: boolean;
   visibleProcess: boolean;
@@ -62,6 +63,7 @@ export type DialogStoreState = {
 };
 
 export type DialogStoreActions = {
+  setDetailsFetchLoading: (detailsFetchLoading: boolean) => void;
   setCampaignType: (campaignType: ProcessCreateTypeEnum) => void;
   openProcess: () => void;
   closeProcess: () => void;
@@ -104,6 +106,7 @@ export type DialogStoreActions = {
 };
 
 const InitialState: DialogStoreState = {
+  detailsFetchLoading: false,
   campaignType: void 0,
   campaignId: '',
   campaignName: 'name',
@@ -180,6 +183,7 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setDetailsFetchLoading: (detailsFetchLoading) => set({ detailsFetchLoading }),
   setCRMFormData: (formData: CRMInfo) => set({ crmFormData: formData }),
   setCSVFormData: (formData: FileInfo) => set({ csvFormData: formData }),
   setFilterFormData: (formData) => set({ filterFormData: formData }),
@@ -232,7 +236,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           campaignId: campaignId,
           setupPhase,
         });
-        set({ setupPhase });
+        set({ setupPhase, reloadTable: true });
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -260,15 +264,15 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     set({ messageList });
   },
   createChatSSE: async (chatId: number | string) => {
+    const existingSSE = get().chatSSE;
+    if (existingSSE) {
+      existingSSE.close();
+    }
     const params = chatId || get().chatId;
 
-    const initialSSE = () => {
-      return new EventSource(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/chat/subscriber/${params}`,
-      );
-    };
-
-    const eventSource = initialSSE();
+    const eventSource = new EventSource(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/chat/subscriber/${params}`,
+    );
 
     if (!eventSource) {
       return;
@@ -278,7 +282,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
 
     const { chatSSE } = get();
 
-    chatSSE!.onmessage = (e) => {
+    eventSource.onmessage = (e) => {
       if (e.data === 'heart-beating:alive' || e.data === 'heartbeat') {
         return;
       }
@@ -341,9 +345,8 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     };
 
     chatSSE!.onerror = async () => {
-      if (chatSSE?.readyState === EventSource.CLOSED) {
-        const retriedSSE = initialSSE();
-        set({ chatSSE: retriedSSE });
+      if (eventSource.readyState === EventSource.CLOSED) {
+        setTimeout(() => get().createChatSSE(chatId), 3000);
       }
     };
   },
@@ -442,17 +445,17 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     }
   },
   fetchProviderOptions: async () => {
+    if (get().fetchProviderOptionsLoading) {
+      return;
+    }
     try {
       set({ fetchProviderOptionsLoading: true });
       const { data } = await _fetchCrmProviderList();
-      const reducedData = data.reduce((acc: TOption[], cur) => {
-        acc.push({
-          label: cur.crmName,
-          value: cur.provider,
-          key: cur.id,
-        });
-        return acc;
-      }, []);
+      const reducedData = data.map((cur) => ({
+        label: cur.crmName,
+        value: cur.provider,
+        key: cur.id,
+      }));
       set({ providerOptions: reducedData });
     } catch (err) {
       const { message, header, variant } = err as HttpError;

@@ -16,6 +16,11 @@ export interface SelectWithCustomProps {
   selectValue: string;
 }
 
+export enum AIModelEnum {
+  open_ai = 'OPENAI',
+  deep_seek = 'DEEPSEEK',
+}
+
 export enum ProcessCreateTypeEnum {
   filter = 'FILTER',
   csv = 'CSV',
