@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { useAsync, useAsyncFn, useDebounceFn, useSwitch } from '@/hooks';
+import { useAsyncFn, useDebounceFn, useSwitch } from '@/hooks';
 
 import {
   ToolBarTypeEnum,
