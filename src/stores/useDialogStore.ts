@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import {
+  AIModelEnum,
   CampaignLeadItem,
   CampaignStatusEnum,
+  CRMInfo,
   FileInfo,
   HttpError,
   ProcessCreateChatEnum,
@@ -19,11 +21,13 @@ import { SDRToast } from '@/components/atoms';
 import {
   _closeSSE,
   _createCampaign,
+  _fetchCrmProviderList,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
 } from '@/request';
 
 export type DialogStoreState = {
+  detailsFetchLoading: boolean;
   campaignType: ProcessCreateTypeEnum | undefined;
   reloadTable: boolean;
   visibleProcess: boolean;
@@ -34,9 +38,13 @@ export type DialogStoreState = {
   creating: boolean;
   returning: boolean;
   messageList: ResponseCampaignChatRecord[];
+  aiModel: AIModelEnum;
 
   filterFormData: ResponseCampaignFilterFormData;
   csvFormData: FileInfo;
+  crmFormData: CRMInfo;
+  fetchProviderOptionsLoading: boolean;
+  providerOptions: TOption[];
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
@@ -57,6 +65,8 @@ export type DialogStoreState = {
 };
 
 export type DialogStoreActions = {
+  setDetailsFetchLoading: (detailsFetchLoading: boolean) => void;
+  setAiModel: (aiModel: AIModelEnum) => void;
   setCampaignType: (campaignType: ProcessCreateTypeEnum) => void;
   openProcess: () => void;
   closeProcess: () => void;
@@ -71,6 +81,8 @@ export type DialogStoreActions = {
 
   setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
   setCSVFormData: (formData: FileInfo) => void;
+  setCRMFormData: (formData: CRMInfo) => void;
+  fetchProviderOptions: () => Promise<void>;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -97,6 +109,8 @@ export type DialogStoreActions = {
 };
 
 const InitialState: DialogStoreState = {
+  detailsFetchLoading: false,
+  aiModel: AIModelEnum.open_ai,
   campaignType: void 0,
   campaignId: '',
   campaignName: 'name',
@@ -139,6 +153,13 @@ const InitialState: DialogStoreState = {
     fileName: '',
   },
 
+  crmFormData: {
+    listId: '',
+    provider: '',
+  },
+  providerOptions: [],
+  fetchProviderOptionsLoading: false,
+
   leadsFetchLoading: false,
   leadsList: [],
   leadsCount: 0,
@@ -166,6 +187,9 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setAiModel: (aiModel: AIModelEnum) => set({ aiModel }),
+  setDetailsFetchLoading: (detailsFetchLoading) => set({ detailsFetchLoading }),
+  setCRMFormData: (formData: CRMInfo) => set({ crmFormData: formData }),
   setCSVFormData: (formData: FileInfo) => set({ csvFormData: formData }),
   setFilterFormData: (formData) => set({ filterFormData: formData }),
   setIsFirst: (isFirst) => set({ isFirst }),
@@ -217,7 +241,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           campaignId: campaignId,
           setupPhase,
         });
-        set({ setupPhase });
+        set({ setupPhase, reloadTable: true });
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -245,15 +269,15 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     set({ messageList });
   },
   createChatSSE: async (chatId: number | string) => {
+    const existingSSE = get().chatSSE;
+    if (existingSSE) {
+      existingSSE.close();
+    }
     const params = chatId || get().chatId;
 
-    const initialSSE = () => {
-      return new EventSource(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/chat/subscriber/${params}`,
-      );
-    };
-
-    const eventSource = initialSSE();
+    const eventSource = new EventSource(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/chat/subscriber/${params}`,
+    );
 
     if (!eventSource) {
       return;
@@ -263,7 +287,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
 
     const { chatSSE } = get();
 
-    chatSSE!.onmessage = (e) => {
+    eventSource.onmessage = (e) => {
       if (e.data === 'heart-beating:alive' || e.data === 'heartbeat') {
         return;
       }
@@ -326,9 +350,8 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     };
 
     chatSSE!.onerror = async () => {
-      if (chatSSE?.readyState === EventSource.CLOSED) {
-        const retriedSSE = initialSSE();
-        set({ chatSSE: retriedSSE });
+      if (eventSource.readyState === EventSource.CLOSED) {
+        setTimeout(() => get().createChatSSE(chatId), 3000);
       }
     };
   },
@@ -367,6 +390,17 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
             fileInfo: csvFormData,
           },
         };
+        break;
+      }
+      case ProcessCreateTypeEnum.crm: {
+        const { crmFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.crm,
+          data: {
+            ...crmFormData,
+          },
+        };
+        break;
       }
     }
     if (!postData) {
@@ -402,12 +436,37 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           });
           break;
         }
+        case ProcessCreateTypeEnum.crm: {
+          set({
+            crmFormData: data.data.crmInfo,
+          });
+        }
       }
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
       set({ creating: false, activeStep: 2, reloadTable: true });
+    }
+  },
+  fetchProviderOptions: async () => {
+    if (get().fetchProviderOptionsLoading) {
+      return;
+    }
+    try {
+      set({ fetchProviderOptionsLoading: true });
+      const { data } = await _fetchCrmProviderList();
+      const reducedData = data.map((cur) => ({
+        label: cur.crmName,
+        value: cur.provider,
+        key: cur.id,
+      }));
+      set({ providerOptions: reducedData });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      set({ fetchProviderOptionsLoading: false });
     }
   },
   setMessagingSteps: (messagingSteps) => set({ messagingSteps }),

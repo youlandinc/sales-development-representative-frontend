@@ -1,4 +1,4 @@
-import { get, post } from '@/request/request';
+import { del, get, post } from '@/request/request';
 import { UserIntegrationItem } from '@/types';
 
 export const _fetchSettingsInfo = async (tenantId: string) => {
@@ -15,4 +15,22 @@ export const _updateSettingsInfo = async (params: {
 
 export const _fetchHubspotIntegrations = async () => {
   return get<UserIntegrationItem[]>('/sdr/settings/integrations');
+};
+
+export const _createEmailSignature = (params: {
+  id?: number;
+  name: string;
+  content: string;
+}) => {
+  return post('/sdr/settings/signature', params);
+};
+
+export const _fetchEmailSignatures = () => {
+  return get<{ id: number; name: string; content: string }[]>(
+    '/sdr/settings/signature/list',
+  );
+};
+
+export const _deleteEmailSignature = (id: number) => {
+  return del(`/sdr/settings/signature/${id}`);
 };

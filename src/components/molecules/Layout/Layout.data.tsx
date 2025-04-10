@@ -1,9 +1,6 @@
 import ICON_SIDE_CAMPAIGNS_DEFAULT from './assets/icon_side_campaigns_default.svg';
 import ICON_SIDE_CAMPAIGNS_ACTIVE from './assets/icon_side_campaigns_active.svg';
 
-import ICON_SIDE_LEADS_DEFAULT from './assets/icon_side_leads_default.svg';
-import ICON_SIDE_LEADS_ACTIVE from './assets/icon_side_leads_active.svg';
-
 import ICON_SIDE_INBOX_DEFAULT from './assets/icon_side_inbox_default.svg';
 import ICON_SIDE_INBOX_ACTIVE from './assets/icon_side_inbox_active.svg';
 
@@ -67,14 +64,6 @@ export const LAYOUT_SIDE_MENU = [
       },
     ],
   },
-  // {
-  //   label: 'Leads',
-  //   url: '/leads',
-  //   key: 'leads',
-  //   defaultIcon: ICON_SIDE_LEADS_DEFAULT,
-  //   activeIcon: ICON_SIDE_LEADS_ACTIVE,
-  //   type: 'link',
-  // },
   {
     label: 'Inbox',
     url: '/inbox',

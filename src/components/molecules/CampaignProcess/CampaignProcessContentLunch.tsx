@@ -6,7 +6,7 @@ import { useDialogStore } from '@/stores/useDialogStore';
 
 import { WORD_COUNT_OPTIONS } from '@/constant';
 
-import { ResponseCampaignLaunchInfo } from '@/types';
+import { ProcessCreateTypeEnum, ResponseCampaignLaunchInfo } from '@/types';
 import {
   StyledDatePicker,
   StyledSelect,
@@ -42,7 +42,7 @@ const INITIAL_OPTION = [
 ];
 
 export const CampaignProcessContentLunch = () => {
-  const { lunchInfo, setLunchInfo, setIsValidate, isValidate } =
+  const { lunchInfo, setLunchInfo, setIsValidate, isValidate, campaignType } =
     useDialogStore();
 
   const [formData, setFormData] = useState<
@@ -91,7 +91,11 @@ export const CampaignProcessContentLunch = () => {
 
   return (
     <Stack
-      borderLeft={'1px solid #DFDEE6'}
+      borderLeft={
+        campaignType === ProcessCreateTypeEnum.agent
+          ? '1px solid #DFDEE6'
+          : 'unset'
+      }
       flex={1}
       gap={6}
       p={3}

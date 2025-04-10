@@ -7,3 +7,4 @@ export * from './SettingsCardEmail';
 export * from './SettingsEmailProfile';
 
 export * from './SettingsEmailVerify';
+export * from './SettingsEmailSignature';

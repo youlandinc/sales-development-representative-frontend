@@ -14,9 +14,11 @@ import {
   CampaignProcessContentMessaging,
 } from './index';
 import { ProcessCreateTypeEnum } from '@/types';
+import { StyledLoading } from '@/components/atoms';
 
 export const CampaignProcessContent = () => {
-  const { activeStep, leadsVisible, campaignType } = useDialogStore();
+  const { activeStep, leadsVisible, campaignType, detailsFetchLoading } =
+    useDialogStore();
 
   const renderContent = useMemo(() => {
     switch (activeStep) {
@@ -56,13 +58,19 @@ export const CampaignProcessContent = () => {
       height={activeStep === 1 ? '60vh' : '100%'}
       justifyContent={'center'}
       minHeight={activeStep === 1 ? 480 : 'auto'}
-      minWidth={900}
-      overflow={'hidden'}
+      minWidth={activeStep === 1 ? 900 : 1100}
+      overflow={activeStep === 1 ? 'hidden' : 'unset'}
       pt={3}
       width={'100%'}
     >
-      {renderNode}
-      {renderContent}
+      {detailsFetchLoading ? (
+        <StyledLoading size={48} sx={{ my: 'auto' }} />
+      ) : (
+        <>
+          {renderNode}
+          {renderContent}
+        </>
+      )}
     </Stack>
   );
 };

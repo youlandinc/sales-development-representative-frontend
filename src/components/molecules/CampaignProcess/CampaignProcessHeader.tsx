@@ -84,6 +84,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
     campaignId,
     leadsList,
     campaignType,
+    leadsFetchLoading,
   } = useDialogStore();
 
   return (
@@ -109,7 +110,7 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
         <CampaignProcessHeaderButtonGroup />
         {leadsVisible && !campaignId && (
           <StyledButton
-            disabled={creating || leadsList.length === 0}
+            disabled={leadsFetchLoading || creating || leadsList.length === 0}
             loading={creating}
             onClick={async () => await createCampaign()}
             size={'medium'}

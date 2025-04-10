@@ -1,3 +1,5 @@
+import { ProcessCreateTypeEnum, SetupPhaseEnum } from '@/types';
+
 export enum CampaignStatusEnum {
   draft = 'DRAFT',
   active = 'ACTIVE',
@@ -9,6 +11,8 @@ export interface CampaignTableItem {
   campaignId: string | number;
   campaignName: string | null;
   campaignStatus: CampaignStatusEnum;
+  setupPhase: SetupPhaseEnum;
+  startingPoint: ProcessCreateTypeEnum;
   createdAt: string | null;
   sourced: number | null;
   activeLeads: number | null;

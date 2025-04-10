@@ -9,6 +9,7 @@ type InboxEditorProps = {
   initData?: string;
   config?: Record<string, any>;
   ref?: RefObject<InboxEditorForwardRefProps | null>;
+  onInstanceReadyCb?: (editor: CKEditorInstance) => void;
 };
 
 export type InboxEditorForwardRefProps = {
@@ -20,6 +21,7 @@ export const InboxEditor: FC<InboxEditorProps> = ({
   initData,
   config,
   ref,
+  onInstanceReadyCb,
 }) => {
   // const [initValue, setInitValue] = useState<string>('');
   const [editor, setEditor] = useState<CKEditorInstance | null>(null);
@@ -85,6 +87,7 @@ export const InboxEditor: FC<InboxEditorProps> = ({
     <CKEditor
       config={{
         versionCheck: false,
+        require: true,
         fontSize_defaultLabel: '12px',
         addCss: 'p {font-size:12px;margin:0;line-height:1.8;}',
         stylesSet: [
@@ -109,8 +112,8 @@ export const InboxEditor: FC<InboxEditorProps> = ({
         extraPlugins: 'justify,font,colorbutton,editorplaceholder',
         editorplaceholder: 'Start typing here...',
         toolbarGroups: [
-          { name: 'document', groups: ['mode', 'document', 'doctools'] },
-          { name: 'clipboard', groups: ['clipboard', 'undo'] },
+          // { name: 'document', groups: ['mode', 'document', 'doctools'] },
+          // { name: 'clipboard', groups: ['clipboard', 'undo'] },
           { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
           { name: 'forms' },
           // '/',
@@ -124,7 +127,7 @@ export const InboxEditor: FC<InboxEditorProps> = ({
           // '/',
           { name: 'styles' }, // 'font and fontsize' -> 'font' plugin
           { name: 'colors' }, // 'colors' -> 'colorbutton' plugin
-          { name: 'tools' },
+          // { name: 'tools' },
         ],
         contentsCss: ['/css/editorCss.css'],
         ...config,
@@ -141,6 +144,7 @@ export const InboxEditor: FC<InboxEditorProps> = ({
         // if (iframe) {
         //   console.log(iframe);
         // }
+        onInstanceReadyCb?.(event.editor as unknown as CKEditorInstance);
       }}
     />
   );

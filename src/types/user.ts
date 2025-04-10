@@ -47,7 +47,7 @@ export enum UserIntegrationEnum {
 export interface UserIntegrationItem {
   tenantId: string;
   account: string | null;
-  thirdParty: UserIntegrationEnum;
+  provider: UserIntegrationEnum;
   oauthUrl: string;
   connected: boolean;
   websiteUrl: string;

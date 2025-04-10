@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
@@ -47,7 +47,15 @@ const DEFAULT_PRODUCT = [
 ];
 
 export const CampaignProcessContentChoose: FC = () => {
-  const { setCampaignType } = useDialogStore();
+  const { setCampaignType, fetchProviderOptions } = useDialogStore();
+
+  useEffect(
+    () => {
+      fetchProviderOptions();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   return (
     <Stack
@@ -66,26 +74,16 @@ export const CampaignProcessContentChoose: FC = () => {
           key={`${item.label}-${index}`}
           maxWidth={260}
           onClick={() => {
-            if (item.value === ProcessCreateTypeEnum.crm) {
-              return;
-            }
             setCampaignType(item.value);
           }}
           p={3}
           sx={{
             outline: '1px solid transparent',
             transition: 'all .3s',
-            cursor:
-              item.value !== ProcessCreateTypeEnum.crm ? 'pointer' : 'default',
+            cursor: 'pointer',
             '&:hover': {
-              borderColor:
-                item.value !== ProcessCreateTypeEnum.crm
-                  ? '#6E4EFB'
-                  : '#DFDEE6',
-              outline:
-                item.value !== ProcessCreateTypeEnum.crm
-                  ? '1px solid #6E4EFB'
-                  : '1px solid transparent',
+              borderColor: '#6E4EFB',
+              outline: '1px solid #6E4EFB',
             },
           }}
         >
@@ -98,25 +96,11 @@ export const CampaignProcessContentChoose: FC = () => {
                   : { width: 24, height: 24, opacity: 0.5 }
               }
             />
-            <Typography
-              color={
-                item.value !== ProcessCreateTypeEnum.crm
-                  ? 'text.primary'
-                  : 'text.disabled'
-              }
-              variant={'subtitle2'}
-            >
+            <Typography color={'text.primary'} variant={'subtitle2'}>
               {item.label}
             </Typography>
           </Stack>
-          <Typography
-            color={
-              item.value !== ProcessCreateTypeEnum.crm
-                ? 'text.primary'
-                : 'text.disabled'
-            }
-            variant={'body3'}
-          >
+          <Typography color={'text.primary'} variant={'body3'}>
             {item.content}
           </Typography>
         </Stack>
