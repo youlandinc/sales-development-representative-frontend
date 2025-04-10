@@ -5,12 +5,13 @@ import {
   Icon,
   MenuItem,
   Popover,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { useAsync, useDebounceFn, useSwitch } from '@/hooks';
+import { useAsync, useAsyncFn, useDebounceFn, useSwitch } from '@/hooks';
 
 import {
   ToolBarTypeEnum,
@@ -88,7 +89,7 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
 
   const showFilter = computedCanSaved();
 
-  const { loading } = useAsync(async () => {
+  const [state, fetchOptions] = useAsyncFn(async () => {
     if (fromOther) {
       return setFromOther(false);
     }
@@ -159,14 +160,15 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
           <Typography variant={'body2'}>Set filter</Typography>
         </StyledButton>
         <StyledButton
-          disabled={loading}
-          loading={loading}
+          // disabled={loading}
+          // loading={loading}
           onClick={(e) => {
             // if (segmentOptions.length === 0) {
             //   return;
             // }
             setAnchorEl(e.currentTarget);
             setToolBarType(ToolBarTypeEnum.edit_segment);
+            fetchOptions();
           }}
           size={'medium'}
           sx={{ px: '12px !important', py: '8px !important', width: 106 }}
@@ -234,7 +236,9 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
                 Lists saved by you
               </Typography>
             ) : null}
-            {segmentOptions.length ? (
+            {state.loading ? (
+              <Skeleton animation={'wave'} />
+            ) : segmentOptions.length ? (
               segmentOptionsByFilter.length ? (
                 segmentOptionsByFilter.map((item, index) => (
                   <MenuItem
