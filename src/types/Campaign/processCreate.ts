@@ -143,6 +143,7 @@ export interface ResponseCampaignInfo {
   startingPoint: ProcessCreateTypeEnum;
   data: {
     // common
+    aiModel: AIModelEnum;
     leadInfo: ResponseCampaignLeadsInfo;
     steps: ResponseCampaignMessagingStep[];
     launchInfo: ResponseCampaignLaunchInfo;

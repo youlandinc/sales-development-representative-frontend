@@ -341,7 +341,7 @@ export const LayoutSide: FC = () => {
       >
         <MenuItem onClick={() => onClickToLogout()} sx={{ gap: 1.5 }}>
           <Icon component={ICON_SIDE_LOGOUT} />
-          <Typography variant={'subtitle3'}>Logout</Typography>
+          <Typography variant={'subtitle3'}>Log out</Typography>
         </MenuItem>
       </Menu>
     </Stack>

@@ -58,7 +58,7 @@ export const CampaignProcessContent = () => {
       height={activeStep === 1 ? '60vh' : '100%'}
       justifyContent={'center'}
       minHeight={activeStep === 1 ? 480 : 'auto'}
-      minWidth={900}
+      minWidth={activeStep === 1 ? 900 : 1100}
       overflow={activeStep === 1 ? 'hidden' : 'unset'}
       pt={3}
       width={'100%'}

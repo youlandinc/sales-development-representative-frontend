@@ -24,3 +24,4 @@ export * from './CampaignProcess';
 
 export * from './StyledSearchSelect';
 export * from './StyledSelectWithCustom';
+export * from './StyledSwitchModel';

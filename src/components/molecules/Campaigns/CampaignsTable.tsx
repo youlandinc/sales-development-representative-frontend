@@ -261,6 +261,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setCampaignId,
     setSetupPhase,
     setChatId,
+    setAiModel,
     // common
     setMessagingSteps,
     setLunchInfo,
@@ -374,6 +375,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               chatId,
               data: {
                 leadInfo: { counts, leads },
+                aiModel,
                 steps,
                 launchInfo,
                 offerOptions,
@@ -389,6 +391,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
             },
           } = await _fetchCampaignInfo(campaignId);
 
+          setAiModel(aiModel);
           // chat
           setChatId(chatId);
           // step 1 & 2 leads
@@ -544,12 +547,6 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
           vertical: 'bottom',
           horizontal: 'left',
         }}
-        MenuListProps={{
-          sx: {
-            //width: avatarRef.current?.offsetWidth,
-            minWidth: 120,
-          },
-        }}
         onClose={() => setAnchorEl(null)}
         open={Boolean(anchorEl)}
         slotProps={{
@@ -563,11 +560,15 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               },
             },
           },
+          list: {
+            sx: {
+              minWidth: 120,
+            },
+          },
         }}
         sx={{
           '& .MuiMenu-list': {
             p: 0,
-            // Menu item default style
             '& .MuiMenuItem-root': {
               bgcolor: 'transparent !important',
             },

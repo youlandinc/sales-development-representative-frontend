@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import {
+  AIModelEnum,
   CampaignLeadItem,
   CampaignStatusEnum,
   CRMInfo,
@@ -37,6 +38,7 @@ export type DialogStoreState = {
   creating: boolean;
   returning: boolean;
   messageList: ResponseCampaignChatRecord[];
+  aiModel: AIModelEnum;
 
   filterFormData: ResponseCampaignFilterFormData;
   csvFormData: FileInfo;
@@ -64,6 +66,7 @@ export type DialogStoreState = {
 
 export type DialogStoreActions = {
   setDetailsFetchLoading: (detailsFetchLoading: boolean) => void;
+  setAiModel: (aiModel: AIModelEnum) => void;
   setCampaignType: (campaignType: ProcessCreateTypeEnum) => void;
   openProcess: () => void;
   closeProcess: () => void;
@@ -107,6 +110,7 @@ export type DialogStoreActions = {
 
 const InitialState: DialogStoreState = {
   detailsFetchLoading: false,
+  aiModel: AIModelEnum.open_ai,
   campaignType: void 0,
   campaignId: '',
   campaignName: 'name',
@@ -183,6 +187,7 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setAiModel: (aiModel: AIModelEnum) => set({ aiModel }),
   setDetailsFetchLoading: (detailsFetchLoading) => set({ detailsFetchLoading }),
   setCRMFormData: (formData: CRMInfo) => set({ crmFormData: formData }),
   setCSVFormData: (formData: FileInfo) => set({ csvFormData: formData }),

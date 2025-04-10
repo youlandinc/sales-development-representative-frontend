@@ -59,7 +59,7 @@ export const _switchAIModel = (params: {
   campaignId: string | number;
   model: AIModelEnum;
 }) => {
-  return put('/sdr/campaign/model/switch', params);
+  return put('/sdr/campaign/switch/model', params);
 };
 
 export const _fetchEmailByLead = (params: {
