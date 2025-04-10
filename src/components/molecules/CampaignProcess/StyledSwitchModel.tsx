@@ -36,7 +36,7 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
     <Stack sx={sx}>
       <Stack
         alignItems={'center'}
-        bgcolor={'#FFF'}
+        bgcolor={loading ? '#EAE9EF' : '#FFF'}
         borderRadius={2}
         flexDirection={'row'}
         gap={'2px'}
@@ -45,13 +45,19 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
         p={'4px 12px'}
         sx={{
           '&:hover': {
-            bgcolor: loading ? '#FFF' : '#F4F4F6',
+            bgcolor: loading ? '#EAE9EF' : '#F4F4F6',
           },
         }}
       >
         <Icon
           component={DEFAULT_HASH[value].icon!}
-          sx={{ width: 24, height: 24 }}
+          sx={{
+            width: 24,
+            height: 24,
+            '& > path': {
+              fill: loading ? '#BABCBE' : '#6F6C7D',
+            },
+          }}
         />
         <Typography
           color={loading ? 'text.disabled' : 'text.secondary'}
