@@ -884,13 +884,14 @@ export const CampaignProcessContentMessaging = () => {
         position={'relative'}
       >
         <StyledSwitchModel
+          loading={fetchTemplateLoading}
           onSelect={onClickToSwitchModel}
           sx={{
             position: 'sticky',
             top: 24,
             ml: 'auto',
             width: 'calc(17.5% - 24px)',
-            cursor: 'pointer',
+            cursor: fetchTemplateLoading ? 'not-allowed' : 'pointer',
           }}
           value={aiModel}
         />
