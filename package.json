@@ -21,7 +21,7 @@
     "@mui/styled-engine-sc": "6.4.9",
     "@mui/x-data-grid": "^7.23.6",
     "@mui/x-date-pickers": "^7.23.3",
-    "axios": "^1.7.9",
+    "axios": "1.8.4",
     "ckeditor4-react": "4.3.0",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
