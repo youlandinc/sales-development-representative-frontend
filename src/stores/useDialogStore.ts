@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   CampaignLeadItem,
   CampaignStatusEnum,
+  CRMInfo,
   FileInfo,
   HttpError,
   ProcessCreateChatEnum,
@@ -19,6 +20,7 @@ import { SDRToast } from '@/components/atoms';
 import {
   _closeSSE,
   _createCampaign,
+  _fetchCrmProviderList,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
 } from '@/request';
@@ -37,6 +39,9 @@ export type DialogStoreState = {
 
   filterFormData: ResponseCampaignFilterFormData;
   csvFormData: FileInfo;
+  crmFormData: CRMInfo;
+  fetchProviderOptionsLoading: boolean;
+  providerOptions: TOption[];
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
@@ -71,6 +76,8 @@ export type DialogStoreActions = {
 
   setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
   setCSVFormData: (formData: FileInfo) => void;
+  setCRMFormData: (formData: CRMInfo) => void;
+  fetchProviderOptions: () => Promise<void>;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -139,6 +146,13 @@ const InitialState: DialogStoreState = {
     fileName: '',
   },
 
+  crmFormData: {
+    listId: '',
+    provider: '',
+  },
+  providerOptions: [],
+  fetchProviderOptionsLoading: false,
+
   leadsFetchLoading: false,
   leadsList: [],
   leadsCount: 0,
@@ -166,6 +180,7 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setCRMFormData: (formData: CRMInfo) => set({ crmFormData: formData }),
   setCSVFormData: (formData: FileInfo) => set({ csvFormData: formData }),
   setFilterFormData: (formData) => set({ filterFormData: formData }),
   setIsFirst: (isFirst) => set({ isFirst }),
@@ -367,6 +382,17 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
             fileInfo: csvFormData,
           },
         };
+        break;
+      }
+      case ProcessCreateTypeEnum.crm: {
+        const { crmFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.crm,
+          data: {
+            ...crmFormData,
+          },
+        };
+        break;
       }
     }
     if (!postData) {
@@ -402,12 +428,37 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           });
           break;
         }
+        case ProcessCreateTypeEnum.crm: {
+          set({
+            crmFormData: data.data.crmInfo,
+          });
+        }
       }
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
       set({ creating: false, activeStep: 2, reloadTable: true });
+    }
+  },
+  fetchProviderOptions: async () => {
+    try {
+      set({ fetchProviderOptionsLoading: true });
+      const { data } = await _fetchCrmProviderList();
+      const reducedData = data.reduce((acc: TOption[], cur) => {
+        acc.push({
+          label: cur.crmName,
+          value: cur.provider,
+          key: cur.id,
+        });
+        return acc;
+      }, []);
+      set({ providerOptions: reducedData });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      set({ fetchProviderOptionsLoading: false });
     }
   },
   setMessagingSteps: (messagingSteps) => set({ messagingSteps }),

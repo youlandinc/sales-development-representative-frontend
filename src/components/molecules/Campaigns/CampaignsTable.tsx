@@ -273,6 +273,9 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setFilterFormData,
     // csv
     setCSVFormData,
+    //crm
+    fetchProviderOptions,
+    setCRMFormData,
   } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -356,12 +359,14 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               startingPoint,
               data: {
                 leadInfo: { counts, leads },
-                chatRecord,
-                conditions,
                 steps,
                 launchInfo,
                 offerOptions,
+                // different types
+                chatRecord,
+                conditions,
                 fileInfo,
+                crmInfo,
               },
             },
           } = await _fetchCampaignInfo(campaignId);
@@ -390,6 +395,10 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
               break;
             case ProcessCreateTypeEnum.csv:
               setCSVFormData(fileInfo!);
+              break;
+            case ProcessCreateTypeEnum.crm:
+              setCRMFormData(crmInfo!);
+              await fetchProviderOptions();
               break;
           }
 

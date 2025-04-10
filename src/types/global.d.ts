@@ -1,7 +1,7 @@
 //type google = import('@types/google.maps');
 
 interface TOption {
-  key: string;
+  key: string | number;
   value: string | number;
   label: string;
 }

@@ -1,12 +1,16 @@
 import { del, get, post, put } from '@/request/request';
 import {
   ProcessCreateTypeEnum,
+  ResponseCampaignCRMLeads,
+  ResponseCampaignCRMList,
+  ResponseCampaignCRMProvider,
   ResponseCampaignCSVLeads,
   ResponseCampaignEmail,
   ResponseCampaignInfo,
   ResponseCampaignLeadsInfo,
   ResponseCampaignMessagingStep,
   SetupPhaseEnum,
+  UserIntegrationEnum,
 } from '@/types';
 import { ModuleEnum } from '@/types/enum';
 
@@ -183,4 +187,20 @@ export const _fetchCsvLeads = (files: FormData) => {
   return post<ResponseCampaignCSVLeads>('/sdr/leads/csv', files, {
     headers: { 'content-type': 'multipart/form-data' },
   });
+};
+
+// crm
+export const _fetchCrmProviderList = () => {
+  return get<ResponseCampaignCRMProvider[]>('/sdr/crm/provider/list');
+};
+
+export const _fetchCrmList = (params: { provider: UserIntegrationEnum }) => {
+  return get<ResponseCampaignCRMList[]>('/sdr/crm/list', { params });
+};
+
+export const _fetchCrmLeads = (params: {
+  provider: UserIntegrationEnum | string;
+  listId: string;
+}) => {
+  return post<ResponseCampaignCRMLeads>('/sdr/leads/crm', params);
 };

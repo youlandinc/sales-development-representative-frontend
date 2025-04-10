@@ -37,6 +37,7 @@ import { CampaignLeadsCard } from '@/components/molecules';
 import {
   CampaignLeadItem,
   HttpError,
+  ProcessCreateTypeEnum,
   //ModuleEnum,
   ResponseCampaignEmail,
   ResponseCampaignMessagingStepFormBody,
@@ -86,6 +87,7 @@ export const CampaignProcessContentMessaging = () => {
     setMessagingSteps,
     offerOptions,
     setOfferOptions,
+    campaignType,
   } = useDialogStore();
 
   const [personalResearchLoading, setPersonalResearchLoading] = useState(false);
@@ -514,7 +516,11 @@ export const CampaignProcessContentMessaging = () => {
 
   return (
     <Stack
-      borderLeft={'1px solid #DFDEE6'}
+      borderLeft={
+        campaignType === ProcessCreateTypeEnum.agent
+          ? '1px solid #DFDEE6'
+          : 'unset'
+      }
       flex={1}
       gap={3}
       pt={3}

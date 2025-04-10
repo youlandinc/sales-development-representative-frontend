@@ -17,7 +17,7 @@ const INTEGRATIONS_NAME_MAP: {
 
 const DEFAULT_INTEGRATION: UserIntegrationItem[] = [
   {
-    thirdParty: UserIntegrationEnum.hubspot,
+    provider: UserIntegrationEnum.hubspot,
     oauthUrl: '',
     connected: false,
     websiteUrl: '',
@@ -59,14 +59,14 @@ export const SettingsIntegrations: FC = () => {
             border={'1px solid #DFDEE6'}
             borderRadius={2}
             flexDirection={'row'}
-            key={`${integration.thirdParty}-${index}`}
+            key={`${integration.provider}-${index}`}
             maxWidth={438}
             p={1.5}
           >
             <Stack alignItems={'center'} flexDirection={'row'} gap={2}>
               <Stack border={'1px solid #DFDEE6'} borderRadius={'50%'} p={0.75}>
                 <Icon
-                  component={INTEGRATIONS_NAME_MAP[integration.thirdParty].icon}
+                  component={INTEGRATIONS_NAME_MAP[integration.provider]?.icon}
                   sx={{
                     height: 24,
                     width: 24,
@@ -75,7 +75,7 @@ export const SettingsIntegrations: FC = () => {
               </Stack>
 
               <Typography variant={'subtitle2'}>
-                {INTEGRATIONS_NAME_MAP[integration.thirdParty].name}
+                {INTEGRATIONS_NAME_MAP[integration.provider]?.name}
               </Typography>
             </Stack>
             <StyledButton

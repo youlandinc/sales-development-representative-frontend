@@ -1,4 +1,4 @@
-import { CampaignStatusEnum } from '@/types';
+import { CampaignStatusEnum, UserIntegrationEnum } from '@/types';
 
 export enum SelectWithFlagTypeEnum {
   select = 'SELECT',
@@ -149,6 +149,7 @@ export interface ResponseCampaignInfo {
     // csv
     fileInfo?: FileInfo;
     // crm
+    crmInfo?: CRMInfo;
   };
 }
 
@@ -159,9 +160,47 @@ export interface FileInfo {
   [key: string]: any;
 }
 
+export interface CRMInfo {
+  listId: string;
+  provider: UserIntegrationEnum | string;
+}
+
+export interface ResponseCampaignCRMLeads {
+  counts: number;
+  leads: CampaignLeadItem[];
+  data: { [key: string]: string };
+  crmInfo: CRMInfo;
+}
+
 export interface ResponseCampaignCSVLeads {
   counts: number;
   leads: CampaignLeadItem[];
   data: { [key: string]: string };
   fileInfo: FileInfo;
+}
+
+export interface ResponseCampaignCRMProvider {
+  id: number | string;
+  crmName: string;
+  connected: boolean;
+  provider: UserIntegrationEnum;
+}
+
+export interface ResponseCampaignCRMList {
+  listId: string;
+  name: string;
+  provider: UserIntegrationEnum;
+  createdAt: string;
+  updateAt: string;
+  filtersUpdatedAt: string;
+  processingStatus: string;
+  createdById: string;
+  updatedById: string;
+  processingType: string;
+  objectTypeId: string;
+  additionalProperties: {
+    hsListSize: string;
+    hsLastRecordAddedAt: string;
+    hsListReferenceCount: string;
+  };
 }
