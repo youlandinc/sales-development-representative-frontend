@@ -11,12 +11,14 @@ interface StyledSwitchModelProps {
   sx?: SxProps;
   value: AIModelEnum;
   onSelect: (value: AIModelEnum) => Promise<void>;
+  loading: boolean;
 }
 
 export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
   sx,
   value = AIModelEnum.open_ai,
   onSelect,
+  loading,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -34,7 +36,7 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
     <Stack sx={sx}>
       <Stack
         alignItems={'center'}
-        bgcolor={'#FFF'}
+        bgcolor={loading ? '#EAE9EF' : '#FFF'}
         borderRadius={2}
         flexDirection={'row'}
         gap={'2px'}
@@ -43,15 +45,24 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
         p={'4px 12px'}
         sx={{
           '&:hover': {
-            bgcolor: '#F4F4F6',
+            bgcolor: loading ? '#EAE9EF' : '#F4F4F6',
           },
         }}
       >
         <Icon
           component={DEFAULT_HASH[value].icon!}
-          sx={{ width: 24, height: 24 }}
+          sx={{
+            width: 24,
+            height: 24,
+            '& > path': {
+              fill: loading ? '#BABCBE' : '#6F6C7D',
+            },
+          }}
         />
-        <Typography color={'text.secondary'} variant={'body2'}>
+        <Typography
+          color={loading ? 'text.disabled' : 'text.secondary'}
+          variant={'body2'}
+        >
           {DEFAULT_HASH[value].label!}
         </Typography>
         <Icon
@@ -61,10 +72,8 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
             transition: 'all .3s',
             width: 16,
             height: 16,
-            '& svg': {
-              path: {
-                fill: '#6F6C7D',
-              },
+            '& > path': {
+              fill: loading ? '#BABCBE' : '#6F6C7D',
             },
           }}
         />
