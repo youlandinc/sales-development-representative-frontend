@@ -478,7 +478,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
                 }}
               />
               <Typography color={'text.secondary'} mt={1.5} variant={'body2'}>
-                You don&#39;t have any Campaigns yet.
+                You don&#39;t have any campaigns yet.
               </Typography>
               <Typography
                 color={'#6E4EFB'}

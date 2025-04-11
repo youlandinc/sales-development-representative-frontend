@@ -9,3 +9,5 @@ export * from './CommonPagination';
 export * from './CommonTableLoadingOverlay';
 
 export * from './CommonSegmentsDrawer';
+
+export * from './CommonSelectWithAction';

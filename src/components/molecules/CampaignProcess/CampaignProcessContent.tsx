@@ -58,6 +58,8 @@ export const CampaignProcessContent = () => {
       height={activeStep === 1 ? '60vh' : '100%'}
       justifyContent={'center'}
       minHeight={activeStep === 1 ? 480 : 'auto'}
+      // TODO : wait backend
+      //minWidth={activeStep === 1 ? 900 : !activeStep ? 1152 : 1200}
       minWidth={activeStep === 1 ? 900 : 1100}
       overflow={activeStep === 1 ? 'hidden' : 'unset'}
       pt={3}

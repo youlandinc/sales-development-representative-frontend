@@ -2,7 +2,7 @@
 
 interface TOption {
   key: string | number;
-  value: string | number;
+  value: any;
   label: string;
 }
 

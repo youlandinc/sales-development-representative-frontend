@@ -177,6 +177,7 @@ const InitialState: DialogStoreState = {
     sender: null,
     replyTo: null,
     senderName: null,
+    signatureId: null,
   },
 
   reloadTable: false,
@@ -488,6 +489,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           sender: null,
           replyTo: null,
           senderName: null,
+          signatureId: null,
         },
       },
       true,
