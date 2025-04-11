@@ -278,6 +278,9 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     //crm
     fetchProviderOptions,
     setCRMFormData,
+    //saved list
+    setSavedListFormData,
+    fetchSavedListOptions,
   } = useDialogStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -387,6 +390,8 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
                 fileInfo,
                 // crm
                 crmInfo,
+                // saved list
+                savedListInfo,
               },
             },
           } = await _fetchCampaignInfo(campaignId);
@@ -417,6 +422,10 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
             case ProcessCreateTypeEnum.crm:
               setCRMFormData(crmInfo!);
               await fetchProviderOptions();
+              break;
+            case ProcessCreateTypeEnum.saved_list:
+              setSavedListFormData(savedListInfo!);
+              await fetchSavedListOptions();
               break;
           }
         } catch (err) {

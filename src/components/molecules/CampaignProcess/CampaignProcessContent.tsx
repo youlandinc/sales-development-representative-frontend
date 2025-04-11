@@ -12,6 +12,7 @@ import {
   CampaignProcessContentFilter,
   CampaignProcessContentLunch,
   CampaignProcessContentMessaging,
+  CampaignProcessContentSavedList,
 } from './index';
 import { ProcessCreateTypeEnum } from '@/types';
 import { StyledLoading } from '@/components/atoms';
@@ -46,6 +47,8 @@ export const CampaignProcessContent = () => {
         return activeStep === 1 && <CampaignProcessContentCSV />;
       case ProcessCreateTypeEnum.agent:
         return <CampaignProcessContentChat />;
+      case ProcessCreateTypeEnum.saved_list:
+        return activeStep === 1 && <CampaignProcessContentSavedList />;
       default:
         return <></>;
     }
@@ -58,9 +61,7 @@ export const CampaignProcessContent = () => {
       height={activeStep === 1 ? '60vh' : '100%'}
       justifyContent={'center'}
       minHeight={activeStep === 1 ? 480 : 'auto'}
-      // TODO : wait backend
-      //minWidth={activeStep === 1 ? 900 : !activeStep ? 1152 : 1200}
-      minWidth={activeStep === 1 ? 900 : 1100}
+      minWidth={activeStep === 1 ? 900 : !activeStep ? 1152 : 1200}
       overflow={activeStep === 1 ? 'hidden' : 'unset'}
       pt={3}
       width={'100%'}

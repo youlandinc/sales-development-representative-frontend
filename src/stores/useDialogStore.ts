@@ -13,6 +13,7 @@ import {
   ResponseCampaignLaunchInfo,
   ResponseCampaignMessagingStep,
   ResponseOfferOption,
+  SavedListInfo,
   SetupPhaseEnum,
   SourceEnum,
 } from '@/types';
@@ -22,6 +23,7 @@ import {
   _closeSSE,
   _createCampaign,
   _fetchCrmProviderList,
+  _fetchSegmentOptions,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
 } from '@/request';
@@ -45,6 +47,9 @@ export type DialogStoreState = {
   crmFormData: CRMInfo;
   fetchProviderOptionsLoading: boolean;
   providerOptions: TOption[];
+  savedListFormData: SavedListInfo;
+  fetchSavedListLoading: boolean;
+  savedListOptions: TOption[];
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
@@ -81,8 +86,12 @@ export type DialogStoreActions = {
 
   setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
   setCSVFormData: (formData: FileInfo) => void;
+
   setCRMFormData: (formData: CRMInfo) => void;
   fetchProviderOptions: () => Promise<void>;
+
+  setSavedListFormData: (formData: SavedListInfo) => void;
+  fetchSavedListOptions: () => Promise<void>;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -160,6 +169,13 @@ const InitialState: DialogStoreState = {
   providerOptions: [],
   fetchProviderOptionsLoading: false,
 
+  savedListFormData: {
+    listId: '',
+    name: '',
+  },
+  fetchSavedListLoading: false,
+  savedListOptions: [],
+
   leadsFetchLoading: false,
   leadsList: [],
   leadsCount: 0,
@@ -188,6 +204,9 @@ export type DialogStoreProps = DialogStoreState & DialogStoreActions;
 
 export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   ...InitialState,
+  setSavedListFormData: (formData: SavedListInfo) => {
+    set({ savedListFormData: formData });
+  },
   setAiModel: (aiModel: AIModelEnum) => set({ aiModel }),
   setDetailsFetchLoading: (detailsFetchLoading) => set({ detailsFetchLoading }),
   setCRMFormData: (formData: CRMInfo) => set({ crmFormData: formData }),
@@ -197,12 +216,8 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   setLeadsFetchLoading: (leadsFetchLoading) => set({ leadsFetchLoading }),
   setCampaignType: (campaignType: ProcessCreateTypeEnum) =>
     set({ campaignType, activeStep: 1 }),
-  setIsValidate: (isValidate: undefined | boolean) => {
-    set({ isValidate });
-  },
-  setOfferOptions(offerOptions) {
-    set({ offerOptions });
-  },
+  setIsValidate: (isValidate: undefined | boolean) => set({ isValidate }),
+  setOfferOptions: (offerOptions) => set({ offerOptions }),
   setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => set({ lunchInfo }),
   openProcess: () => set({ visibleProcess: true }),
   closeProcess: () => set({ visibleProcess: false }),
@@ -255,9 +270,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   },
   setMessageList: (messageList) => set({ messageList }),
   setCampaignId: (campaignId) => set({ campaignId }),
-  setActiveStep: (activeStep) => {
-    set({ activeStep });
-  },
+  setActiveStep: (activeStep) => set({ activeStep }),
   setChatId: (chatId) => set({ chatId }),
   setReturning: (returning) => set({ returning }),
   setLeadsList: (leadsList) => set({ leadsList }),
@@ -403,6 +416,16 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         };
         break;
       }
+      case ProcessCreateTypeEnum.saved_list: {
+        const { savedListFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.saved_list,
+          data: {
+            ...savedListFormData,
+          },
+        };
+        break;
+      }
     }
     if (!postData) {
       return;
@@ -451,16 +474,16 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     }
   },
   fetchProviderOptions: async () => {
-    if (get().fetchProviderOptionsLoading) {
+    if (get().fetchProviderOptionsLoading || get().providerOptions.length > 0) {
       return;
     }
+    set({ fetchProviderOptionsLoading: true });
     try {
-      set({ fetchProviderOptionsLoading: true });
       const { data } = await _fetchCrmProviderList();
-      const reducedData = data.map((cur) => ({
-        label: cur.crmName,
-        value: cur.provider,
-        key: cur.id,
+      const reducedData = data.map((item) => ({
+        label: item.crmName,
+        value: item.provider,
+        key: item.id,
       }));
       set({ providerOptions: reducedData });
     } catch (err) {
@@ -468,6 +491,26 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       SDRToast({ message, header, variant });
     } finally {
       set({ fetchProviderOptionsLoading: false });
+    }
+  },
+  fetchSavedListOptions: async () => {
+    if (get().fetchSavedListLoading || get().savedListOptions.length > 0) {
+      return;
+    }
+    set({ fetchSavedListLoading: true });
+    try {
+      const { data } = await _fetchSegmentOptions(1);
+      const reducedData = data.map((item) => ({
+        label: item.name,
+        value: item.id,
+        key: item.id,
+      }));
+      set({ savedListOptions: reducedData });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      set({ fetchSavedListLoading: false });
     }
   },
   setMessagingSteps: (messagingSteps) => set({ messagingSteps }),
@@ -480,6 +523,8 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     set(
       {
         ...store.getInitialState(),
+        savedListOptions: [],
+        providerOptions: [],
         messageList: [],
         lunchInfo: {
           dailyLimit: 100,
