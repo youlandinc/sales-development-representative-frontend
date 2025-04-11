@@ -26,8 +26,7 @@ export enum ProcessCreateTypeEnum {
   csv = 'CSV',
   crm = 'CRM',
   agent = 'AGENT',
-  // TODO : wait backend
-  //saved_list = 'SAVED_LIST',
+  saved_list = 'SAVED_LIST',
 }
 
 export enum ProcessCreateChatEnum {
@@ -159,6 +158,8 @@ export interface ResponseCampaignInfo {
     fileInfo?: FileInfo;
     // crm
     crmInfo?: CRMInfo;
+    // saved list
+    savedListInfo?: SavedListInfo;
   };
 }
 
@@ -172,6 +173,16 @@ export interface FileInfo {
 export interface CRMInfo {
   listId: string;
   provider: UserIntegrationEnum | string;
+}
+
+export interface SavedListInfo {
+  listId: string | number;
+  name: string;
+}
+
+export interface ResponseCampaignSavedListLeads {
+  counts: number;
+  leads: CampaignLeadItem[];
 }
 
 export interface ResponseCampaignCRMLeads {

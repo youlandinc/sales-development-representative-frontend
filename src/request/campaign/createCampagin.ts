@@ -10,6 +10,7 @@ import {
   ResponseCampaignInfo,
   ResponseCampaignLeadsInfo,
   ResponseCampaignMessagingStep,
+  ResponseCampaignSavedListLeads,
   SetupPhaseEnum,
   UserIntegrationEnum,
 } from '@/types';
@@ -211,4 +212,15 @@ export const _fetchCrmLeads = (params: {
   listId: string;
 }) => {
   return post<ResponseCampaignCRMLeads>('/sdr/leads/crm', params);
+};
+
+// saved list
+export const _fetchSavedListLeads = (params: {
+  listId: string | number;
+  name: string;
+}) => {
+  return post<ResponseCampaignSavedListLeads>(
+    '/sdr/leads/savedList/preview',
+    params,
+  );
 };

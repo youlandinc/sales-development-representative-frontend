@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
@@ -8,8 +8,9 @@ import { ProcessCreateTypeEnum } from '@/types';
 import ICON_PRODUCT_FILTER from './assets/icon_product_filter.svg';
 import ICON_PRODUCT_CSV from './assets/icon_product_csv.svg';
 import ICON_PRODUCT_CRM from './assets/icon_product_crm.svg';
-//import ICON_PRODUCT_LOCAL from './assets/icon_product_local.svg';
+import ICON_PRODUCT_SAVED_LIST from './assets/icon_product_saved_list.svg';
 import ICON_PRODUCT_AGENT from './assets/icon_product_agent.svg';
+import useSWR from 'swr';
 
 const DEFAULT_PRODUCT = [
   {
@@ -33,14 +34,13 @@ const DEFAULT_PRODUCT = [
     icon: ICON_PRODUCT_CRM,
     value: ProcessCreateTypeEnum.crm,
   },
-  // TODO : wait backend
-  //{
-  //  label: 'Saved List',
-  //  content:
-  //    "Select a pre-filtered list you've already created in the system. We'll enrich it with the latest data and power personalized outreach—no extra setup needed.",
-  //  icon: ICON_PRODUCT_LOCAL,
-  //  value: ProcessCreateTypeEnum.agent,
-  //},
+  {
+    label: 'Saved List',
+    content:
+      "Select a pre-filtered list you've already created in the system. We'll enrich it with the latest data and power personalized outreach—no extra setup needed.",
+    icon: ICON_PRODUCT_SAVED_LIST,
+    value: ProcessCreateTypeEnum.saved_list,
+  },
   {
     label: (
       <>
@@ -56,14 +56,20 @@ const DEFAULT_PRODUCT = [
 ];
 
 export const CampaignProcessContentChoose: FC = () => {
-  const { setCampaignType, fetchProviderOptions } = useDialogStore();
+  const { setCampaignType, fetchProviderOptions, fetchSavedListOptions } =
+    useDialogStore();
 
-  useEffect(
-    () => {
-      fetchProviderOptions();
+  useSWR(
+    'fetchOptions',
+    async () => {
+      await Promise.allSettled([
+        fetchProviderOptions(),
+        fetchSavedListOptions(),
+      ]);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    {
+      revalidateOnFocus: false,
+    },
   );
 
   return (
@@ -81,9 +87,7 @@ export const CampaignProcessContentChoose: FC = () => {
           borderRadius={4}
           gap={1}
           key={`${item.label}-${index}`}
-          // TODO : wait backend
-          //maxWidth={200}
-          maxWidth={260}
+          maxWidth={200}
           onClick={() => {
             setCampaignType(item.value);
           }}

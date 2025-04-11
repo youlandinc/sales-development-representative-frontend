@@ -1,23 +1,18 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Fade, Icon, Stack, Typography } from '@mui/material';
 import useSWR from 'swr';
-import { useRouter } from 'nextjs-toploader/app';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { _fetchCrmLeads, _fetchCrmList } from '@/request';
-import { HttpError, UserIntegrationEnum } from '@/types';
+import { _fetchSavedListLeads } from '@/request';
+import { HttpError } from '@/types';
 
 import { SDRToast, StyledSelect } from '@/components/atoms';
 
-import ICON_HUBSPOT from './assets/icon_hubspot.svg';
-
 import ICON_CHAT_THINKING from './assets/icon_chat_thinking.svg';
-
-import ICON_EARTH from './assets/icon_earth.svg';
-import ICON_LINKEDIN from './assets/icon_linkedin.svg';
-
 import ICON_CHAT_SEARCH from './assets/icon_chat_search.svg';
+import ICON_LINKEDIN from './assets/icon_linkedin.svg';
+import ICON_EARTH from './assets/icon_earth.svg';
 import ICON_CHAT_COMPLETED from './assets/icon_chat_completed.svg';
 import ICON_CHAT_LOGO from './assets/icon_chat_logo.svg';
 
@@ -67,9 +62,7 @@ const FAKE_ANIMATE = [
   </Stack>,
 ];
 
-export const CampaignProcessContentCRM: FC = () => {
-  const router = useRouter();
-
+export const CampaignProcessContentSavedList: FC = () => {
   const {
     leadsVisible,
     setLeadsList,
@@ -78,47 +71,16 @@ export const CampaignProcessContentCRM: FC = () => {
     leadsCount,
     setLeadsFetchLoading,
     setIsFirst,
-    resetDialogState,
+    //resetDialogState,
     // crm
-    crmFormData,
-    setCRMFormData,
-    providerOptions,
-    fetchProviderOptionsLoading,
+    savedListFormData,
+    setSavedListFormData,
+    savedListOptions,
+    fetchSavedListLoading,
   } = useDialogStore();
 
-  const [listOptions, setListOptions] = useState<TOption[]>([]);
-
   const [mode, setMode] = useState<'default' | 'animating' | 'complete'>(
-    crmFormData.listId ? 'complete' : 'default',
-  );
-
-  const { isLoading } = useSWR(
-    crmFormData.provider,
-    async () => {
-      if (!crmFormData?.provider) {
-        return;
-      }
-      try {
-        const { data } = await _fetchCrmList({
-          provider: crmFormData?.provider as UserIntegrationEnum,
-        });
-        const reducedData = data.reduce((acc: TOption[], cur) => {
-          acc.push({
-            label: cur.name,
-            value: cur.listId,
-            key: cur.listId,
-          });
-          return acc;
-        }, []);
-        setListOptions(reducedData);
-      } catch (err) {
-        const { message, header, variant } = err as HttpError;
-        SDRToast({ message, header, variant });
-      }
-    },
-    {
-      revalidateOnFocus: false,
-    },
+    savedListFormData.listId ? 'complete' : 'default',
   );
 
   const timerRef = useRef<any>(null);
@@ -166,9 +128,9 @@ export const CampaignProcessContentCRM: FC = () => {
 
   const onClickToReSelect = () => {
     // global
-    setCRMFormData({
-      ...crmFormData,
+    setSavedListFormData({
       listId: '',
+      name: '',
     });
     setLeadsList([]);
     setLeadsCount(0);
@@ -183,9 +145,11 @@ export const CampaignProcessContentCRM: FC = () => {
   };
 
   useSWR(
-    crmFormData?.listId && crmFormData?.provider ? crmFormData : null,
+    savedListFormData?.listId && savedListFormData?.name
+      ? savedListFormData
+      : null,
     async () => {
-      if (!crmFormData?.listId || !crmFormData?.provider) {
+      if (!savedListFormData?.listId || !savedListFormData?.name) {
         return;
       }
       if (!leadsVisible) {
@@ -196,9 +160,9 @@ export const CampaignProcessContentCRM: FC = () => {
       try {
         const {
           data: { leads, counts },
-        } = await _fetchCrmLeads({
-          provider: crmFormData.provider,
-          listId: crmFormData.listId,
+        } = await _fetchSavedListLeads({
+          listId: savedListFormData.listId,
+          name: savedListFormData.name,
         });
         setLeadsList(leads);
         setLeadsCount(counts);
@@ -211,63 +175,6 @@ export const CampaignProcessContentCRM: FC = () => {
       revalidateOnFocus: false,
     },
   );
-
-  const renderFiledNode = () => {
-    return (
-      <>
-        <Typography fontWeight={700} variant={'body2'}>
-          CRM List
-        </Typography>
-        <Stack gap={3} mt={3} px={1.5}>
-          <Stack gap={1}>
-            <Typography
-              color={
-                fetchProviderOptionsLoading ? 'text.secondary' : 'text.primary'
-              }
-              fontWeight={700}
-              variant={'body2'}
-            >
-              Select a CRM provider
-            </Typography>
-            <StyledSelect
-              loading={fetchProviderOptionsLoading}
-              onChange={(e) => {
-                setCRMFormData({
-                  ...crmFormData,
-                  provider: e.target.value as string,
-                });
-              }}
-              options={providerOptions}
-              placeholder={'Select a CRM provider (Hubspot, Salesforce)'}
-              value={crmFormData?.provider}
-            />
-          </Stack>
-          <Stack gap={1}>
-            <Typography
-              color={!crmFormData?.provider ? 'text.disabled' : 'text.primary'}
-              fontWeight={700}
-              variant={'body2'}
-            >
-              List
-            </Typography>
-            <StyledSelect
-              disabled={!crmFormData?.provider || isLoading}
-              onChange={(e) => {
-                setCRMFormData({
-                  ...crmFormData,
-                  listId: e.target.value as string,
-                });
-                setMode('animating');
-              }}
-              options={listOptions}
-              placeholder={'Select contact list'}
-              value={crmFormData?.listId}
-            />
-          </Stack>
-        </Stack>
-      </>
-    );
-  };
 
   return (
     <>
@@ -293,19 +200,14 @@ export const CampaignProcessContentCRM: FC = () => {
             py={1}
             width={'fit-content'}
           >
-            <Icon component={ICON_HUBSPOT} />
             <Typography sx={{ transition: 'color .3s' }} variant={'body2'}>
-              {listOptions.find((item) => item.value === crmFormData?.listId)
-                ?.label || 'CRM List'}
+              {savedListFormData.name}
             </Typography>
 
             <Typography
               color={'#5B76BC'}
               onClick={() => onClickToReSelect()}
-              sx={{
-                textDecoration: 'underline',
-                cursor: 'pointer',
-              }}
+              sx={{ textDecoration: 'underline', cursor: 'pointer' }}
               variant={'body2'}
             >
               Try another list
@@ -338,37 +240,50 @@ export const CampaignProcessContentCRM: FC = () => {
         </Stack>
       </Fade>
 
-      <Stack
-        display={mode === 'default' ? 'flex' : 'none'}
-        height={'100%'}
-        width={'100%'}
+      <Fade
+        in={mode === 'default'}
+        style={{
+          display: mode === 'default' ? 'block' : 'none',
+        }}
       >
-        {providerOptions.length > 0 ? (
-          renderFiledNode()
-        ) : (
-          <Stack
-            alignItems={'center'}
-            height={'100%'}
-            justifyContent={'center'}
-            width={'100%'}
-          >
-            <Typography color={'#6F6C7D'}>
-              No CRM providers integrated yet.
-            </Typography>
-            <Typography
-              color={'#6E4EFB'}
-              mt={1.5}
-              onClick={async () => {
-                await resetDialogState();
-                router.push('/settings');
-              }}
-              sx={{ cursor: 'pointer' }}
-            >
-              Manage integrations
-            </Typography>
+        <Stack height={'100%'} width={'100%'}>
+          <Typography fontWeight={700} variant={'body2'}>
+            Saved list
+          </Typography>
+          <Stack gap={3} mt={3} px={1.5}>
+            <Stack gap={1}>
+              <Typography
+                color={
+                  fetchSavedListLoading ? 'text.secondary' : 'text.primary'
+                }
+                fontWeight={700}
+                variant={'body2'}
+              >
+                List
+              </Typography>
+              <StyledSelect
+                loading={fetchSavedListLoading}
+                onChange={(e) => {
+                  const target = savedListOptions.find(
+                    (item) => item.value === e.target.value,
+                  );
+                  if (!target) {
+                    return;
+                  }
+                  setSavedListFormData({
+                    listId: target.value,
+                    name: target.label,
+                  });
+                  setMode('animating');
+                }}
+                options={savedListOptions}
+                placeholder={'Select a list'}
+                value={savedListFormData?.listId}
+              />
+            </Stack>
           </Stack>
-        )}
-      </Stack>
+        </Stack>
+      </Fade>
     </>
   );
 };

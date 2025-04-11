@@ -11,12 +11,10 @@ export * from './CampaignProcessDrawerBody';
 
 export * from './CampaignProcessContentChat';
 export * from './CampaignProcessContentChatServerCard';
-
 export * from './CampaignProcessContentFilter';
-
 export * from './CampaignProcessContentCSV';
-
 export * from './CampaignProcessContentCRM';
+export * from './CampaignProcessContentSavedList';
 
 export * from './CampaignLeadsCard';
 
