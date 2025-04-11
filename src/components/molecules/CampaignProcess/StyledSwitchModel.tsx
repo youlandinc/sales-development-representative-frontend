@@ -25,6 +25,9 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
   const open = Boolean(anchorEl);
 
   const onClickOpenMenu = (event: MouseEvent<HTMLElement>) => {
+    if (loading) {
+      return;
+    }
     setAnchorEl(event.currentTarget);
   };
 
@@ -101,14 +104,14 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
           },
         }}
       >
-        <Stack bgcolor={'#fff'} py={1.5} width={220}>
-          <Typography color={'text.secondary'} fontSize={12} px={1.5}>
+        <Stack bgcolor={'#fff'} pb={1.5} width={220}>
+          <Typography color={'text.secondary'} fontSize={12} px={3} py={1.5}>
             Switch model
           </Typography>
           {AI_MODEL_OPTIONS.map((item, index) => (
             <Stack
               bgcolor={value === item.value ? '#F0F4FF' : '#fff'}
-              color={value === item.value ? 'primary.main' : 'text.secondary'}
+              color={value === item.value ? 'primary.main' : 'text.primary'}
               fontSize={12}
               key={`${item.label}-${index}`}
               onClick={async () => {

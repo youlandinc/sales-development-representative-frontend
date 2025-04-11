@@ -26,6 +26,8 @@ export enum ProcessCreateTypeEnum {
   csv = 'CSV',
   crm = 'CRM',
   agent = 'AGENT',
+  // TODO : wait backend
+  //saved_list = 'SAVED_LIST',
 }
 
 export enum ProcessCreateChatEnum {
@@ -114,6 +116,7 @@ export interface ResponseCampaignLaunchInfo {
   sender: string | null;
   replyTo: string | null;
   senderName: string | null;
+  signatureId: string | null;
 }
 
 export interface ResponseCampaignEmail {

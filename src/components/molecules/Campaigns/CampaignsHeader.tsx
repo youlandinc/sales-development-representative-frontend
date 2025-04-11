@@ -143,7 +143,12 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
             value={value}
           />
           <StyledButton onClick={() => openProcess()} size={'medium'}>
-            + Create new campaign
+            <Typography
+              sx={{ fontSize: '24px !important', mt: '1px', mr: 0.5 }}
+            >
+              +
+            </Typography>{' '}
+            Create new campaign
           </StyledButton>
         </Stack>
       </Stack>

@@ -944,7 +944,7 @@ export const CampaignProcessContentMessaging = () => {
 
                   <Stack flexDirection={'row'}>
                     <Stack flexDirection={'row'} gap={'.5em'}>
-                      <Typography flexShrink={0}>Subject :</Typography>
+                      <Typography flexShrink={0}>Subject:</Typography>
                       {step.loading ? (
                         <Skeleton
                           animation={'wave'}

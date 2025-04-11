@@ -1,18 +1,27 @@
 import { useEffect, useMemo, useState } from 'react';
 import { debounce, Fade, Slider, Stack, Typography } from '@mui/material';
 import { addDays, isDate, isValid } from 'date-fns';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { WORD_COUNT_OPTIONS } from '@/constant';
 
-import { ProcessCreateTypeEnum, ResponseCampaignLaunchInfo } from '@/types';
 import {
+  HttpError,
+  ProcessCreateTypeEnum,
+  ResponseCampaignLaunchInfo,
+} from '@/types';
+import {
+  SDRToast,
   StyledDatePicker,
   StyledSelect,
   StyledSwitch,
 } from '@/components/atoms';
 import { UNotUndefined } from '@/utils';
+import { CommonSelectWithAction } from '@/components/molecules';
+import useSWR from 'swr';
+import { _fetchEmailSignatures } from '@/request';
 
 const tomorrow = addDays(new Date(), 1);
 
@@ -26,6 +35,7 @@ const INITIAL_STATE: Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
   sender: 'example@site.com',
   replyTo: 'example@site.com',
   senderName: 'example',
+  signatureId: null,
 };
 
 const INITIAL_OPTION = [
@@ -42,8 +52,16 @@ const INITIAL_OPTION = [
 ];
 
 export const CampaignProcessContentLunch = () => {
-  const { lunchInfo, setLunchInfo, setIsValidate, isValidate, campaignType } =
-    useDialogStore();
+  const {
+    lunchInfo,
+    setLunchInfo,
+    setIsValidate,
+    isValidate,
+    campaignType,
+    resetDialogState,
+  } = useDialogStore();
+
+  const router = useRouter();
 
   const [formData, setFormData] = useState<
     Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
@@ -65,6 +83,7 @@ export const CampaignProcessContentLunch = () => {
         sender: lunchInfo.sender || INITIAL_STATE.sender,
         replyTo: lunchInfo.replyTo || INITIAL_STATE.replyTo,
         senderName: lunchInfo.senderName || INITIAL_STATE.senderName,
+        signatureId: lunchInfo.signatureId || INITIAL_STATE.signatureId,
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,6 +107,45 @@ export const CampaignProcessContentLunch = () => {
   useEffect(() => {
     updateLunchInfo();
   }, [formData, updateLunchInfo]);
+
+  const { isLoading } = useSWR(
+    'fetchSignature',
+    async () => {
+      try {
+        const { data } = await _fetchEmailSignatures();
+        const reducedData = data.map((item) => ({
+          label: item.name,
+          key: item.id,
+          value: item.id,
+        }));
+        setSignatureList((prev) => [...reducedData, ...prev]);
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+    {
+      revalidateOnFocus: false,
+    },
+  );
+
+  const [signatureList, setSignatureList] = useState<TOption[]>([
+    {
+      label: 'No signature',
+      value: null,
+      key: 'noSignature',
+    },
+  ]);
+
+  const onClickToChangeSignature = (value: any) => {
+    if (value === formData.signatureId) {
+      return;
+    }
+    setFormData({
+      ...formData,
+      signatureId: value,
+    });
+  };
 
   return (
     <Stack
@@ -297,6 +355,43 @@ export const CampaignProcessContentLunch = () => {
             size={'small'}
             sx={{ width: 'fit-content', ml: 'auto' }}
             value={formData.senderName}
+          />
+        </Stack>
+        <Stack alignItems={'center'} flexDirection={'row'}>
+          <Typography flexShrink={0} variant={'subtitle2'}>
+            Signature
+          </Typography>
+          <CommonSelectWithAction
+            actionsNode={
+              <>
+                <Stack bgcolor={'#EAE9EF'} height={'1px'} mt={1.5} mx={3} />
+                <Typography
+                  color={'#6E4EFB'}
+                  fontSize={14}
+                  lineHeight={1}
+                  ml={'auto'}
+                  mr={3}
+                  mt={1}
+                  onClick={async () => {
+                    await resetDialogState();
+                    router.push('/settings');
+                  }}
+                  sx={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  Manage signatures
+                </Typography>
+              </>
+            }
+            containerSx={{ width: 'fit-content', ml: 'auto' }}
+            loading={isLoading}
+            menuTips={'Signatures saved by you'}
+            onSelect={(value) => {
+              onClickToChangeSignature(value);
+            }}
+            options={signatureList}
+            value={formData.signatureId}
           />
         </Stack>
       </Stack>

@@ -26,6 +26,7 @@ interface TreeNode {
     label: string;
     value: string;
     placeholder: string;
+    defaultPlaceholder: string;
     type: TreeNodeRenderTypeEnum;
     options: TOption[];
   }[];
@@ -35,6 +36,8 @@ export const CampaignProcessContentFilter: FC = () => {
   const { filterFormData, setFilterFormData } = useDialogStore();
 
   const [renderData, setRenderData] = useState<TreeNode[]>(RENDER_DATA);
+
+  console.log(filterFormData);
 
   const { isLoading } = useSWR(
     'filter',
@@ -136,7 +139,7 @@ export const CampaignProcessContentFilter: FC = () => {
                         });
                       }}
                       options={child.options}
-                      placeholder={child.placeholder}
+                      placeholder={child.defaultPlaceholder}
                       selectValue={
                         (filterFormData?.[child.value] as SelectWithCustomProps)
                           .selectValue
@@ -175,7 +178,12 @@ export const CampaignProcessContentFilter: FC = () => {
                         });
                       }}
                       options={child.options}
-                      placeholder={child.placeholder}
+                      placeholder={
+                        (filterFormData?.[child.value] as SearchWithFlagData[])
+                          .length > 0
+                          ? child.placeholder
+                          : child.defaultPlaceholder
+                      }
                       type={child.type}
                       value={
                         (filterFormData?.[
@@ -202,14 +210,16 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Job Title',
         value: 'jobTitle',
-        placeholder: 'Select job title(s)…',
+        placeholder: 'Add job title(s)…',
+        defaultPlaceholder: 'Select job title(s)…',
         type: TreeNodeRenderTypeEnum.search_with_flag,
         options: [],
       },
       {
         label: 'University Name',
         value: 'universityName',
-        placeholder: 'Select one or more universities…',
+        placeholder: 'Add one or more universities…',
+        defaultPlaceholder: 'Select one or more universities…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
@@ -222,21 +232,24 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Company Headcount',
         value: 'companyHeadcount',
-        placeholder: 'Select one or more headcount ranges…',
+        placeholder: 'Add one or more headcount ranges…',
+        defaultPlaceholder: 'Select one or more headcount ranges…',
         type: TreeNodeRenderTypeEnum.select_with_custom,
         options: COMPANY_HEADCOUNT_OPTIONS,
       },
       {
         label: 'Industry',
         value: 'industry',
-        placeholder: 'Select industry/industries…',
+        placeholder: 'Add one or more industries…',
+        defaultPlaceholder: 'Select industry/industries…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
       {
         label: 'Current Company',
         value: 'currentCompany',
-        placeholder: 'Select one or more companies…',
+        placeholder: 'Add one or more companies…',
+        defaultPlaceholder: 'Select one or more companies…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
@@ -249,7 +262,8 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Person Location',
         value: 'personLocation',
-        placeholder: 'Select one or more locations…',
+        placeholder: 'Add one or more locations…',
+        defaultPlaceholder: 'Select one or more locations…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
@@ -262,7 +276,8 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Company Revenue',
         value: 'companyRevenue',
-        placeholder: 'Select one or more revenue ranges…',
+        placeholder: 'Add one or more revenue ranges…',
+        defaultPlaceholder: 'Select one or more revenue ranges…',
         type: TreeNodeRenderTypeEnum.select_with_custom,
         options: COMPANY_REVENUE_OPTIONS,
       },
@@ -275,14 +290,16 @@ const RENDER_DATA: TreeNode[] = [
       {
         label: 'Industry',
         value: 'industry',
-        placeholder: 'Select one or more industries…',
+        placeholder: 'Add one or more industries…',
+        defaultPlaceholder: 'Select one or more industries…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
       {
         label: 'Skills',
         value: 'skills',
-        placeholder: 'Select all relevant skills…',
+        placeholder: 'Add one or more skills…',
+        defaultPlaceholder: 'Select all relevant skills…',
         type: TreeNodeRenderTypeEnum.search_select,
         options: [],
       },
