@@ -484,6 +484,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         label: item.crmName,
         value: item.provider,
         key: item.id,
+        disabled: !item.connected,
       }));
       set({ providerOptions: reducedData });
     } catch (err) {

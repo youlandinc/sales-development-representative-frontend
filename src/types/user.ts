@@ -42,6 +42,7 @@ export interface IUserResetPasswordParams {
 
 export enum UserIntegrationEnum {
   hubspot = 'HUBSPOT',
+  salesforce = 'SALESFORCE',
 }
 
 export interface UserIntegrationItem {
