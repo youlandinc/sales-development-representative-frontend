@@ -4,7 +4,7 @@ interface TOption {
   key: string | number;
   value: any;
   label: string;
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 interface Option {
