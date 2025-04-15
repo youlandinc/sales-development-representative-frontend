@@ -191,7 +191,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         {/*)}*/}
         {!loading &&
           options.map((opt) => (
-            <MenuItem key={opt.key} value={opt.value}>
+            <MenuItem disabled={opt.disabled} key={opt.key} value={opt.value}>
               {opt.label}
             </MenuItem>
           ))}

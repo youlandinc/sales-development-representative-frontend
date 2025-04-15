@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 import useSWR from 'swr';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 
@@ -8,11 +9,16 @@ import { _fetchHubspotIntegrations } from '@/request';
 import { HttpError, UserIntegrationEnum, UserIntegrationItem } from '@/types';
 
 import ICON_HUBSPOT from './assets/icon_hubspot.svg';
+import ICON_SALESFORCE from './assets/icon_salesforce.svg';
 
 const INTEGRATIONS_NAME_MAP: {
   [key in UserIntegrationEnum]: { name: string; icon: any };
 } = {
   [UserIntegrationEnum.hubspot]: { name: 'HubSpot', icon: ICON_HUBSPOT },
+  [UserIntegrationEnum.salesforce]: {
+    name: 'Salesforce',
+    icon: ICON_SALESFORCE,
+  },
 };
 
 const DEFAULT_INTEGRATION: UserIntegrationItem[] = [
@@ -24,9 +30,18 @@ const DEFAULT_INTEGRATION: UserIntegrationItem[] = [
     account: null,
     tenantId: '',
   },
+  {
+    provider: UserIntegrationEnum.salesforce,
+    oauthUrl: '',
+    connected: false,
+    websiteUrl: '',
+    account: null,
+    tenantId: '',
+  },
 ];
 
 export const SettingsIntegrations: FC = () => {
+  const router = useRouter();
   const [integrations, setIntegrations] =
     useState<UserIntegrationItem[]>(DEFAULT_INTEGRATION);
 
@@ -52,7 +67,7 @@ export const SettingsIntegrations: FC = () => {
         Integrations
       </Typography>
 
-      <Stack>
+      <Stack flexDirection={'row'} gap={3} maxWidth={900} width={'100%'}>
         {integrations.map((integration, index) => (
           <Stack
             alignItems={'center'}
@@ -60,8 +75,8 @@ export const SettingsIntegrations: FC = () => {
             borderRadius={2}
             flexDirection={'row'}
             key={`${integration.provider}-${index}`}
-            maxWidth={438}
             p={1.5}
+            width={438}
           >
             <Stack alignItems={'center'} flexDirection={'row'} gap={2}>
               <Stack border={'1px solid #DFDEE6'} borderRadius={'50%'} p={0.75}>
@@ -86,15 +101,31 @@ export const SettingsIntegrations: FC = () => {
                 if (isLoading) {
                   return;
                 }
-                location.href = integration.connected
-                  ? integration.websiteUrl
-                  : integration.oauthUrl;
+                router.push(
+                  integration.connected
+                    ? integration.websiteUrl
+                    : integration.oauthUrl,
+                );
               }}
               size={'medium'}
-              sx={{ ml: 'auto', minWidth: 64 }}
+              sx={{
+                ml: 'auto',
+                minWidth: 64,
+                maxWidth: 220,
+              }}
               variant={'outlined'}
             >
-              {integration.connected ? integration.account : 'Add'}
+              <Typography
+                sx={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                variant={'body2'}
+                width={'fit-content'}
+              >
+                {integration.connected ? integration.account : 'Add'}
+              </Typography>
             </StyledButton>
           </Stack>
         ))}
