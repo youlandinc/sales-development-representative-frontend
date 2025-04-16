@@ -1,4 +1,4 @@
-import { ActionDispatch, FC, useState } from 'react';
+import { ActionDispatch, FC, useEffect, useReducer, useState } from 'react';
 import { Drawer, Fade, Icon, Slider, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
@@ -30,34 +30,52 @@ interface CampaignProcessDrawerBodyProps {
   onChangeTemplate: (value: any) => void;
 }
 
+type FormReducerMethods =
+  | 'update'
+  | 'reset'
+  | 'init'
+  | 'removeItem'
+  | 'addItem'
+  | 'updateItem';
+
+const FORM_BODY: ResponseCampaignMessagingStepFormBody = {
+  stepId: -1,
+  bodyInstructions: '',
+  bodyCallToAction: '',
+  bodyWordCount: 100,
+  bodyExamples: [],
+};
+
 export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
   onClose,
   container,
   visible,
   formData,
-  dispatchForm,
+  // dispatchForm,
   previewLeadId,
   onChangeTemplate,
 }) => {
   const { messagingSteps, setMessagingSteps } = useDialogStore();
 
+  const [formBody, dispatchFormBody] = useReducer(FORM_BODY_REDUCER, FORM_BODY);
+
   const [generating, setGenerating] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
 
   const onClickToGenerate = async () => {
-    if (formData.bodyExamples.every((item) => !item)) {
+    if (formBody.bodyExamples.every((item) => !item)) {
       return;
     }
 
     const postData = {
-      suggestedWordCount: formData.bodyWordCount || 0,
-      contentExamples: formData.bodyExamples,
+      suggestedWordCount: formBody.bodyWordCount || 0,
+      contentExamples: formBody.bodyExamples,
     };
 
     setGenerating(true);
     try {
       const { data } = await _updateStepEmailBodyInstructions(postData);
-      dispatchForm({
+      dispatchFormBody({
         type: 'update',
         key: 'bodyInstructions',
         value: data,
@@ -66,7 +84,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
       const temp = JSON.parse(JSON.stringify(messagingSteps));
       const target = temp.findIndex(
         (item: ResponseCampaignMessagingStep) =>
-          item.stepId === formData.stepId,
+          item.stepId === formBody.stepId,
       );
 
       temp[target] = {
@@ -87,11 +105,11 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
       return;
     }
     const postData = {
-      stepId: formData.stepId,
-      instructions: formData.bodyInstructions || '',
-      examples: formData.bodyExamples,
-      wordCount: formData.bodyWordCount || 0,
-      callToAction: formData.bodyCallToAction || '',
+      stepId: formBody.stepId,
+      instructions: formBody.bodyInstructions || '',
+      examples: formBody.bodyExamples,
+      wordCount: formBody.bodyWordCount || 0,
+      callToAction: formBody.bodyCallToAction || '',
       previewLeadId,
     };
 
@@ -101,13 +119,13 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
       const temp = JSON.parse(JSON.stringify(messagingSteps));
       const target = temp.findIndex(
         (item: ResponseCampaignMessagingStep) =>
-          item.stepId === formData.stepId,
+          item.stepId === formBody.stepId,
       );
 
       temp[target] = {
         ...temp[target],
         ...data,
-        ...formData,
+        ...formBody,
       };
 
       onChangeTemplate(data);
@@ -121,6 +139,13 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
       setRegenerating(false);
     }
   };
+
+  useEffect(() => {
+    dispatchFormBody({
+      type: 'init',
+      value: formData,
+    });
+  }, [formData]);
 
   return (
     <Drawer
@@ -154,14 +179,14 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
 
         <Stack gap={1.5}>
           <Typography variant={'subtitle1'}>
-            Suggested word count : {formData.bodyWordCount}
+            Suggested word count : {formBody.bodyWordCount}
           </Typography>
           <Slider
             marks={WORD_COUNT_OPTIONS}
             max={400}
             min={100}
             onChange={(_, v) => {
-              dispatchForm({
+              dispatchFormBody({
                 type: 'update',
                 key: 'bodyWordCount',
                 value: v,
@@ -195,7 +220,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
                 transform: 'translateY(-50%)',
               },
             }}
-            value={formData.bodyWordCount || 100}
+            value={formBody.bodyWordCount || 100}
             valueLabelDisplay={'auto'}
           />
         </Stack>
@@ -208,7 +233,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
               disabled={
                 regenerating ||
                 generating ||
-                formData.bodyExamples.every((item) => !item)
+                formBody.bodyExamples.every((item) => !item)
               }
               loading={generating}
               onClick={() => onClickToGenerate()}
@@ -224,7 +249,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
             minRows={6}
             multiline
             onChange={(e) => {
-              dispatchForm({
+              dispatchFormBody({
                 type: 'update',
                 key: 'bodyInstructions',
                 value: e.target.value,
@@ -233,7 +258,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
             placeholder={
               'Generate different email content based on the provided information.'
             }
-            value={formData.bodyInstructions || ''}
+            value={formBody.bodyInstructions || ''}
           />
         </Stack>
 
@@ -244,29 +269,29 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
             minRows={4}
             multiline
             onChange={(e) => {
-              dispatchForm({
+              dispatchFormBody({
                 type: 'update',
                 key: 'bodyCallToAction',
                 value: e.target.value,
               });
             }}
             placeholder={'Enter the link to schedule a demo meeting.'}
-            value={formData.bodyCallToAction}
+            value={formBody.bodyCallToAction}
           />
         </Stack>
 
-        {formData.bodyExamples.map((item, index) => (
+        {formBody.bodyExamples.map((item, index) => (
           <Fade in={true} key={index}>
             <Stack gap={1.5}>
               <Stack alignItems={'flex-end'} flexDirection={'row'} height={32}>
                 <Typography variant={'subtitle1'}>
                   Example #{index + 1}
                 </Typography>
-                {index !== formData.bodyExamples.length - 1 ? (
+                {index !== formBody.bodyExamples.length - 1 ? (
                   <Icon
                     component={ICON_TRASH}
                     onClick={() => {
-                      dispatchForm({
+                      dispatchFormBody({
                         type: 'removeItem',
                         index,
                       });
@@ -282,7 +307,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
                   <StyledButton
                     color={'info'}
                     onClick={() => {
-                      dispatchForm({
+                      dispatchFormBody({
                         type: 'addItem',
                       });
                     }}
@@ -300,7 +325,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
                 minRows={4}
                 multiline
                 onChange={(e) => {
-                  dispatchForm({
+                  dispatchFormBody({
                     type: 'updateItem',
                     value: e.target.value,
                     index,
@@ -334,4 +359,48 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
       </Stack>
     </Drawer>
   );
+};
+
+const FORM_BODY_REDUCER = (
+  state: ResponseCampaignMessagingStepFormBody,
+  action: {
+    type: FormReducerMethods;
+    key?: string;
+    value?: any;
+    index?: number;
+  },
+) => {
+  switch (action.type) {
+    case 'update':
+      return {
+        ...state,
+        [action.key!]: action.value,
+      };
+    case 'reset':
+      return { ...FORM_BODY };
+    case 'init':
+      return { ...state, ...action.value };
+    case 'removeItem':
+      return {
+        ...state,
+        bodyExamples: state.bodyExamples.filter(
+          (_, index) => index !== action.index,
+        ),
+      };
+    case 'addItem':
+      return {
+        ...state,
+        bodyExamples: [...state.bodyExamples, ''],
+      };
+    case 'updateItem': {
+      const { index } = action;
+      const { value } = action;
+      state.bodyExamples[index!] = value;
+      return {
+        ...state,
+      };
+    }
+    default:
+      return state;
+  }
 };
