@@ -1,4 +1,4 @@
-import { ActionDispatch, FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Drawer, Fade, Icon, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
@@ -23,7 +23,6 @@ interface CampaignProcessDrawerSubjectProps {
   container: Element | null;
   visible: boolean;
   formData: ResponseCampaignMessagingStepFormSubject;
-  dispatchForm: ActionDispatch<any>;
   previewLeadId?: string | number;
   onChangeTemplate: (value: any) => void;
 }
@@ -35,11 +34,12 @@ export const CampaignProcessDrawerSubject: FC<
   container,
   visible,
   formData,
-  dispatchForm,
   previewLeadId,
   onChangeTemplate,
 }) => {
   const { messagingSteps, setMessagingSteps } = useDialogStore();
+
+  const [insideFormData, setInsideFormData] = useState(formData);
 
   const [generating, setGenerating] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
@@ -52,11 +52,6 @@ export const CampaignProcessDrawerSubject: FC<
     setGenerating(true);
     try {
       const { data } = await _updateStepEmailSubjectInstructions(postData);
-      dispatchForm({
-        type: 'update',
-        key: 'subjectInstructions',
-        value: data,
-      });
 
       const temp = JSON.parse(JSON.stringify(messagingSteps));
       const target = temp.findIndex(
@@ -83,9 +78,9 @@ export const CampaignProcessDrawerSubject: FC<
       return;
     }
     const postData = {
-      stepId: formData.stepId,
-      instructions: formData.subjectInstructions || '',
-      examples: formData.subjectExamples,
+      stepId: insideFormData.stepId,
+      instructions: insideFormData.subjectInstructions || '',
+      examples: insideFormData.subjectExamples,
       previewLeadId,
     };
 
@@ -102,7 +97,7 @@ export const CampaignProcessDrawerSubject: FC<
       temp[index] = {
         ...messagingSteps[index],
         ...data,
-        ...formData,
+        ...insideFormData,
       };
 
       onChangeTemplate(data);
@@ -117,6 +112,10 @@ export const CampaignProcessDrawerSubject: FC<
       setRegenerating(false);
     }
   };
+
+  useEffect(() => {
+    setInsideFormData(formData);
+  }, [formData]);
 
   return (
     <Drawer
@@ -155,7 +154,7 @@ export const CampaignProcessDrawerSubject: FC<
               disabled={
                 generating ||
                 regenerating ||
-                formData.subjectExamples.every((item) => !item)
+                insideFormData.subjectExamples.every((item) => !item)
               }
               loading={generating}
               onClick={() => onClickToGenerate()}
@@ -171,33 +170,34 @@ export const CampaignProcessDrawerSubject: FC<
             minRows={6}
             multiline
             onChange={(e) => {
-              dispatchForm({
-                type: 'update',
-                key: 'subjectInstructions',
-                value: e.target.value,
+              setInsideFormData({
+                ...insideFormData,
+                subjectInstructions: e.target.value,
               });
             }}
             placeholder={
               'Generate different email content based on the provided information.'
             }
-            value={formData.subjectInstructions}
+            value={insideFormData.subjectInstructions}
           />
         </Stack>
 
-        {formData.subjectExamples.map((item, index) => (
+        {insideFormData.subjectExamples.map((item, index) => (
           <Fade in={true} key={`subject-${index}`}>
             <Stack gap={1.5}>
               <Stack alignItems={'flex-end'} flexDirection={'row'} height={32}>
                 <Typography variant={'subtitle1'}>
                   Example #{index + 1}
                 </Typography>
-                {index !== formData.subjectExamples.length - 1 ? (
+                {index !== insideFormData.subjectExamples.length - 1 ? (
                   <Icon
                     component={ICON_TRASH}
                     onClick={() => {
-                      dispatchForm({
-                        type: 'removeItem',
-                        index,
+                      setInsideFormData({
+                        ...insideFormData,
+                        subjectExamples: insideFormData.subjectExamples.filter(
+                          (_, i) => i !== index,
+                        ),
                       });
                     }}
                     sx={{
@@ -211,8 +211,12 @@ export const CampaignProcessDrawerSubject: FC<
                   <StyledButton
                     color={'info'}
                     onClick={() => {
-                      dispatchForm({
-                        type: 'addItem',
+                      setInsideFormData({
+                        ...insideFormData,
+                        subjectExamples: [
+                          ...insideFormData.subjectExamples,
+                          '',
+                        ],
                       });
                     }}
                     size={'medium'}
@@ -229,10 +233,11 @@ export const CampaignProcessDrawerSubject: FC<
                 minRows={4}
                 multiline
                 onChange={(e) => {
-                  dispatchForm({
-                    type: 'updateItem',
-                    value: e.target.value,
-                    index,
+                  setInsideFormData({
+                    ...insideFormData,
+                    subjectExamples: insideFormData.subjectExamples.map(
+                      (item, i) => (i === index ? e.target.value : item),
+                    ),
                   });
                 }}
                 placeholder={'Generate similar content based on the template.'}
