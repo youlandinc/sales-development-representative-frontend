@@ -323,23 +323,23 @@ export const CampaignProcessContentLunch = () => {
             value={formData.sender}
           />
         </Stack>
-        <Stack alignItems={'center'} flexDirection={'row'}>
-          <Typography flexShrink={0} variant={'subtitle2'}>
-            Reply-to email address
-          </Typography>
-          <StyledSelect
-            options={[
-              {
-                label: formData.replyTo!,
-                value: formData.replyTo!,
-                key: formData.replyTo!,
-              },
-            ]}
-            size={'small'}
-            sx={{ width: 'fit-content', ml: 'auto' }}
-            value={formData.replyTo}
-          />
-        </Stack>
+        {/*<Stack alignItems={'center'} flexDirection={'row'}>*/}
+        {/*  <Typography flexShrink={0} variant={'subtitle2'}>*/}
+        {/*    Reply-to email address*/}
+        {/*  </Typography>*/}
+        {/*  <StyledSelect*/}
+        {/*    options={[*/}
+        {/*      {*/}
+        {/*        label: formData.replyTo!,*/}
+        {/*        value: formData.replyTo!,*/}
+        {/*        key: formData.replyTo!,*/}
+        {/*      },*/}
+        {/*    ]}*/}
+        {/*    size={'small'}*/}
+        {/*    sx={{ width: 'fit-content', ml: 'auto' }}*/}
+        {/*    value={formData.replyTo}*/}
+        {/*  />*/}
+        {/*</Stack>*/}
         <Stack alignItems={'center'} flexDirection={'row'}>
           <Typography flexShrink={0} variant={'subtitle2'}>
             Name
