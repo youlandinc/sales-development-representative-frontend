@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Collapse,
@@ -171,39 +164,32 @@ export const CampaignProcessContentMessaging = () => {
     close: closeBody,
   } = useSwitch(false);
 
-  const [formSubject, dispatchFormSubject] = useReducer(
-    FORM_SUBJECT_REDUCER,
-    FORM_SUBJECT,
-  );
-  const [formBody, dispatchFormBody] = useReducer(FORM_BODY_REDUCER, FORM_BODY);
+  const [formSubject, setFormSubject] =
+    useState<ResponseCampaignMessagingStepFormSubject>(FORM_SUBJECT);
+  const [formBody, setFormBody] =
+    useState<ResponseCampaignMessagingStepFormBody>(FORM_BODY);
 
   const onClickToOpenSubject = (index: number) => {
     openSubject();
-    dispatchFormSubject({
-      type: 'init',
-      value: {
-        subjectInstructions: messagingSteps[index].subjectInstructions || '',
-        subjectExamples: messagingSteps[index].subjectExamples.length
-          ? messagingSteps[index].subjectExamples
-          : [''],
-        stepId: messagingSteps[index].stepId,
-      },
+    setFormSubject({
+      subjectInstructions: messagingSteps[index].subjectInstructions || '',
+      subjectExamples: messagingSteps[index].subjectExamples.length
+        ? messagingSteps[index].subjectExamples
+        : [''],
+      stepId: messagingSteps[index].stepId,
     });
   };
 
   const onClickToOpenBody = (index: number) => {
     openBody();
-    dispatchFormBody({
-      type: 'init',
-      value: {
-        bodyInstructions: messagingSteps[index].bodyInstructions || '',
-        bodyCallToAction: messagingSteps[index].bodyCallToAction || '',
-        bodyWordCount: messagingSteps[index].bodyWordCount || 0,
-        bodyExamples: messagingSteps[index].bodyExamples.length
-          ? messagingSteps[index].bodyExamples
-          : [''],
-        stepId: messagingSteps[index].stepId,
-      },
+    setFormBody({
+      bodyInstructions: messagingSteps[index].bodyInstructions || '',
+      bodyCallToAction: messagingSteps[index].bodyCallToAction || '',
+      bodyWordCount: messagingSteps[index].bodyWordCount || 0,
+      bodyExamples: messagingSteps[index].bodyExamples.length
+        ? messagingSteps[index].bodyExamples
+        : [''],
+      stepId: messagingSteps[index].stepId,
     });
   };
 
@@ -1085,7 +1071,6 @@ export const CampaignProcessContentMessaging = () => {
 
       <CampaignProcessDrawerSubject
         container={messagingBoxRef.current}
-        dispatchForm={dispatchFormSubject}
         formData={formSubject}
         onChangeTemplate={(template) => {
           const target = JSON.parse(
@@ -1111,7 +1096,6 @@ export const CampaignProcessContentMessaging = () => {
 
       <CampaignProcessDrawerBody
         container={messagingBoxRef.current}
-        dispatchForm={dispatchFormBody}
         formData={formBody}
         onChangeTemplate={(template) => {
           const target = JSON.parse(
@@ -1138,62 +1122,10 @@ export const CampaignProcessContentMessaging = () => {
   );
 };
 
-type FormReducerMethods =
-  | 'update'
-  | 'reset'
-  | 'init'
-  | 'removeItem'
-  | 'addItem'
-  | 'updateItem';
-
 const FORM_SUBJECT: ResponseCampaignMessagingStepFormSubject = {
   stepId: -1,
   subjectInstructions: '',
   subjectExamples: [],
-};
-
-const FORM_SUBJECT_REDUCER = (
-  state: ResponseCampaignMessagingStepFormSubject,
-  action: {
-    type: FormReducerMethods;
-    key?: string;
-    value?: any;
-    index?: number;
-  },
-) => {
-  switch (action.type) {
-    case 'update':
-      return {
-        ...state,
-        [action.key!]: action.value,
-      };
-    case 'reset':
-      return { ...FORM_SUBJECT };
-    case 'init':
-      return { ...state, ...action.value };
-    case 'removeItem':
-      return {
-        ...state,
-        subjectExamples: state.subjectExamples.filter(
-          (_, index) => index !== action.index,
-        ),
-      };
-    case 'addItem':
-      return {
-        ...state,
-        subjectExamples: [...state.subjectExamples, ''],
-      };
-    case 'updateItem': {
-      const { index } = action;
-      const { value } = action;
-      state.subjectExamples[index!] = value;
-      return {
-        ...state,
-      };
-    }
-    default:
-      return state;
-  }
 };
 
 const FORM_BODY: ResponseCampaignMessagingStepFormBody = {
@@ -1202,48 +1134,4 @@ const FORM_BODY: ResponseCampaignMessagingStepFormBody = {
   bodyCallToAction: '',
   bodyWordCount: 100,
   bodyExamples: [],
-};
-
-const FORM_BODY_REDUCER = (
-  state: ResponseCampaignMessagingStepFormBody,
-  action: {
-    type: FormReducerMethods;
-    key?: string;
-    value: any;
-    index?: number;
-  },
-) => {
-  switch (action.type) {
-    case 'update':
-      return {
-        ...state,
-        [action.key!]: action.value,
-      };
-    case 'reset':
-      return { ...FORM_BODY };
-    case 'init':
-      return { ...state, ...action.value };
-    case 'removeItem':
-      return {
-        ...state,
-        bodyExamples: state.bodyExamples.filter(
-          (_, index) => index !== action.index,
-        ),
-      };
-    case 'addItem':
-      return {
-        ...state,
-        bodyExamples: [...state.bodyExamples, ''],
-      };
-    case 'updateItem': {
-      const { index } = action;
-      const { value } = action;
-      state.bodyExamples[index!] = value;
-      return {
-        ...state,
-      };
-    }
-    default:
-      return state;
-  }
 };
