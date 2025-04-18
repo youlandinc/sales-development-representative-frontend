@@ -91,7 +91,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
       <Stack gap={1.5} p={1.5}>
         <CommonEmailContent
           content={emailContent}
-          style={'p {font-size:12px;margin:0;line-height:1.8;}'}
+          style={'* {font-size:12px;margin:0;line-height:1.8;}'}
         />
         <Fade in={!visible}>
           <Stack
