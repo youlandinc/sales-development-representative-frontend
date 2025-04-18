@@ -60,7 +60,9 @@ export const CampaignsPendingEmails: FC<CampaignsPendingEmailsProps> = ({
       {isNoData ? (
         <Stack alignItems={'center'} flex={1} gap={3} justifyContent={'center'}>
           <Icon component={ICON_NO_DATA} sx={{ width: 178, height: 160 }} />
-          <Typography variant={'body2'}>No emails need approval.</Typography>
+          <Typography variant={'body2'}>
+            All emails have been approved.
+          </Typography>
         </Stack>
       ) : (
         <Stack flex={1} gap={3} overflow={'auto'}>
