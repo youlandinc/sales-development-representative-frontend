@@ -186,7 +186,7 @@ export const CampaignsPendingEmailsCard: FC<
                 )}
                 <CommonEmailContent
                   content={`${emailContent}`}
-                  style={'p {font-size:12px;margin:0;line-height:1.8;}'}
+                  style={'* {font-size:12px;margin:0;line-height:1.8;}'}
                 />
               </Box>
             )}
