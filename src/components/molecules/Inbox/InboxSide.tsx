@@ -26,6 +26,10 @@ import { _fetchEmails, _fetchEmailsDetails } from '@/request';
 import { HttpError, SSE_EVENT_TYPE } from '@/types';
 import { useUserStore } from '@/provides';
 
+const computedContainerHeight = (height = 0) => {
+  return Math.floor(height / 65) + 5;
+};
+
 export const InboxSide: FC = () => {
   const {
     receiptType,
@@ -53,7 +57,6 @@ export const InboxSide: FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerHeight = useContainerHeight(scrollRef);
   const defaultPageSize = Math.floor(containerHeight / 65) + 5;
-
   const [, fetchEmails] = useAsyncFn(
     async (
       emailType: ReceiptTypeEnum,
@@ -102,7 +105,7 @@ export const InboxSide: FC = () => {
         setScrollLoading(true);
         const res = await _fetchEmails({
           page,
-          size: 10,
+          size: 15,
           emailType,
           searchContact: contacts,
         });
@@ -174,11 +177,12 @@ export const InboxSide: FC = () => {
       !scrollLoading &&
       currentNumber < totalEmails
     ) {
-      await scrollFetchEmails(receiptType, contacts, engagedPage + 1);
       if (receiptType === ReceiptTypeEnum.engaged) {
         setEngagedPage(engagedPage + 1);
+        await scrollFetchEmails(receiptType, contacts, engagedPage + 1);
       } else {
         setSentPage(sentPage + 1);
+        await scrollFetchEmails(receiptType, contacts, sentPage + 1);
       }
     }
   };
@@ -187,7 +191,12 @@ export const InboxSide: FC = () => {
     if (scrollRef.current) {
       // if (inboxSideSentList.length === 0 || inboxSideSentList.length === 0) {
       // noinspection JSIgnoredPromiseFromCall
-      fetchEmails(ReceiptTypeEnum.engaged, '', 0, defaultPageSize);
+      fetchEmails(
+        ReceiptTypeEnum.engaged,
+        '',
+        0,
+        computedContainerHeight(scrollRef.current.clientHeight),
+      );
       // }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
