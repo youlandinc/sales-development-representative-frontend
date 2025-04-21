@@ -1,5 +1,6 @@
 import { FC, useRef } from 'react';
-import { Fade, Stack, Typography } from '@mui/material';
+import { Fade, Stack } from '@mui/material';
+import { format } from 'date-fns';
 
 import { useAsyncFn, useSwitch } from '@/hooks';
 
@@ -16,7 +17,6 @@ import {
   ReceiptTypeEnum,
   useInboxStore,
 } from '@/stores/useInboxStore';
-import { format } from 'date-fns';
 import { _replyEmails, ForwardEmailsParam } from '@/request';
 import { HttpError } from '@/types';
 
@@ -30,17 +30,11 @@ type InboxReceiptCardProps = {
   avatarSrc: string;
 };
 
-const SOURCE_LABEL = {
-  [ReceiptTypeEnum.engaged]: 'FROM: ',
-  [ReceiptTypeEnum.sent]: 'TO: ',
-};
-
 export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   avatarBgcolor,
   avatarName,
   email,
   emailContent,
-  emailType,
   emailId,
   avatarSrc,
 }) => {
@@ -78,15 +72,6 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
         avatarName={avatarName}
         avatarSrc={avatarSrc?.length > 0 ? avatarSrc : undefined}
         email={email}
-        prefix={
-          <Typography
-            color={'#6F6C7D'}
-            component={'span'}
-            variant={'subtitle3'}
-          >
-            {SOURCE_LABEL[emailType] || ''}
-          </Typography>
-        }
       />
       <Stack gap={1.5} p={1.5}>
         <CommonEmailContent
