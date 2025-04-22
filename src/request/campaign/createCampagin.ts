@@ -176,7 +176,6 @@ export const _saveAndLunchCampaign = (params: {
   sendNow: boolean;
   scheduleTime: string | null;
   sender: string;
-  replyTo: string;
   senderName: string;
 }) => {
   return put('/sdr/campaign/info', params);

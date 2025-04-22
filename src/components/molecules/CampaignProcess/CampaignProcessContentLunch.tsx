@@ -33,7 +33,6 @@ const INITIAL_STATE: Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
   sendNow: false,
   scheduleTime: null,
   sender: 'example@site.com',
-  replyTo: 'example@site.com',
   senderName: 'example',
   signatureId: null,
 };
@@ -81,7 +80,6 @@ export const CampaignProcessContentLunch = () => {
           ? new Date(lunchInfo.scheduleTime)
           : INITIAL_STATE.scheduleTime,
         sender: lunchInfo.sender || INITIAL_STATE.sender,
-        replyTo: lunchInfo.replyTo || INITIAL_STATE.replyTo,
         senderName: lunchInfo.senderName || INITIAL_STATE.senderName,
         signatureId: lunchInfo.signatureId || INITIAL_STATE.signatureId,
       });
@@ -323,23 +321,7 @@ export const CampaignProcessContentLunch = () => {
             value={formData.sender}
           />
         </Stack>
-        {/*<Stack alignItems={'center'} flexDirection={'row'}>*/}
-        {/*  <Typography flexShrink={0} variant={'subtitle2'}>*/}
-        {/*    Reply-to email address*/}
-        {/*  </Typography>*/}
-        {/*  <StyledSelect*/}
-        {/*    options={[*/}
-        {/*      {*/}
-        {/*        label: formData.replyTo!,*/}
-        {/*        value: formData.replyTo!,*/}
-        {/*        key: formData.replyTo!,*/}
-        {/*      },*/}
-        {/*    ]}*/}
-        {/*    size={'small'}*/}
-        {/*    sx={{ width: 'fit-content', ml: 'auto' }}*/}
-        {/*    value={formData.replyTo}*/}
-        {/*  />*/}
-        {/*</Stack>*/}
+
         <Stack alignItems={'center'} flexDirection={'row'}>
           <Typography flexShrink={0} variant={'subtitle2'}>
             Name
