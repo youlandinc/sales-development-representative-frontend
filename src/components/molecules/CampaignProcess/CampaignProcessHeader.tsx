@@ -189,7 +189,6 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       sendNow: lunchInfo.sendNow,
       scheduleTime: lunchInfo.scheduleTime || null,
       sender: lunchInfo.sender!,
-      replyTo: lunchInfo.replyTo!,
       senderName: lunchInfo.senderName!,
     };
     setLoading(true);

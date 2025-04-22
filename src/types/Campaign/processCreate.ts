@@ -113,7 +113,6 @@ export interface ResponseCampaignLaunchInfo {
   sendNow: boolean;
   scheduleTime: string | null;
   sender: string | null;
-  replyTo: string | null;
   senderName: string | null;
   signatureId: string | null;
 }
