@@ -56,7 +56,12 @@ export const CampaignsPending = () => {
       setCampaignStatus(data.campaignStatus);
       setTimeline(data.data.timeLine);
       setPerformances(data.data.performance);
-      !!data.data.autopilot && setActiveBtn('performance');
+      if (
+        data.data.autopilot === true ||
+        data.campaignStatus === CampaignStatusEnum.done
+      ) {
+        setActiveBtn('performance');
+      }
       return data;
     } catch (err) {
       const { message, header, variant } = err as HttpError;
@@ -121,7 +126,11 @@ export const CampaignsPending = () => {
               },
             }}
           >
-            {!baseDataState.value?.data?.autopilot && (
+            {!(
+              baseDataState.value?.data?.autopilot === true ||
+              baseDataState.value?.campaignStatus === CampaignStatusEnum.done ||
+              baseDataState.loading
+            ) && (
               <StyledButton
                 className={activeBtn === 'email' ? 'active' : ''}
                 color={'info'}
@@ -133,16 +142,18 @@ export const CampaignsPending = () => {
                 Pending emails
               </StyledButton>
             )}
-            <StyledButton
-              className={activeBtn === 'performance' ? 'active' : ''}
-              color={'info'}
-              onClick={() => setActiveBtn('performance')}
-              size={'medium'}
-              sx={{ px: '12px !important', py: '8px !important' }}
-              variant={'outlined'}
-            >
-              Performance
-            </StyledButton>
+            {!baseDataState.loading && (
+              <StyledButton
+                className={activeBtn === 'performance' ? 'active' : ''}
+                color={'info'}
+                onClick={() => setActiveBtn('performance')}
+                size={'medium'}
+                sx={{ px: '12px !important', py: '8px !important' }}
+                variant={'outlined'}
+              >
+                Performance
+              </StyledButton>
+            )}
           </Stack>
           {!baseDataState.loading && baseDataState.value && (
             <>
