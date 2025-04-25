@@ -43,6 +43,7 @@ export interface IUserResetPasswordParams {
 export enum UserIntegrationEnum {
   hubspot = 'HUBSPOT',
   salesforce = 'SALESFORCE',
+  pipedrive = 'PIPEDRIVE',
 }
 
 export interface UserIntegrationItem {
