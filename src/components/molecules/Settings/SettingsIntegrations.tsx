@@ -10,6 +10,7 @@ import { HttpError, UserIntegrationEnum, UserIntegrationItem } from '@/types';
 
 import ICON_HUBSPOT from './assets/icon_hubspot.svg';
 import ICON_SALESFORCE from './assets/icon_salesforce.svg';
+import ICON_PIPEDRIVE from './assets/icon_pipedrive.svg';
 
 const INTEGRATIONS_NAME_MAP: {
   [key in UserIntegrationEnum]: { name: string; icon: any };
@@ -18,6 +19,10 @@ const INTEGRATIONS_NAME_MAP: {
   [UserIntegrationEnum.salesforce]: {
     name: 'Salesforce',
     icon: ICON_SALESFORCE,
+  },
+  [UserIntegrationEnum.pipedrive]: {
+    name: 'Pipedrive',
+    icon: ICON_PIPEDRIVE,
   },
 };
 
@@ -32,6 +37,14 @@ const DEFAULT_INTEGRATION: UserIntegrationItem[] = [
   },
   {
     provider: UserIntegrationEnum.salesforce,
+    oauthUrl: '',
+    connected: false,
+    websiteUrl: '',
+    account: null,
+    tenantId: '',
+  },
+  {
+    provider: UserIntegrationEnum.pipedrive,
     oauthUrl: '',
     connected: false,
     websiteUrl: '',
@@ -67,7 +80,13 @@ export const SettingsIntegrations: FC = () => {
         Integrations
       </Typography>
 
-      <Stack flexDirection={'row'} gap={3} maxWidth={900} width={'100%'}>
+      <Stack
+        flexDirection={'row'}
+        flexWrap={'wrap'}
+        gap={3}
+        maxWidth={900}
+        width={'100%'}
+      >
         {integrations.map((integration, index) => (
           <Stack
             alignItems={'center'}
