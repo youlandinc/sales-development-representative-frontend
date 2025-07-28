@@ -1,3 +1,5 @@
+export * from './Enrich';
+
 export * from './Campaigns';
 
 export * from './Leads';

@@ -4,6 +4,8 @@ export * from './Layout';
 
 export * from './Auth';
 
+export * from './Enrich';
+
 export * from './Campaigns';
 
 export * from './Leads';

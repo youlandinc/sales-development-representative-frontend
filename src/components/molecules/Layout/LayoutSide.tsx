@@ -23,8 +23,6 @@ import { LAYOUT_SIDE_MENU } from './Layout.data';
 import ICON_EXPEND from './assets/icon_expend.svg';
 import ICON_SIDE_LOGOUT from './assets/icon_side_logout.svg';
 
-import ICON_LOGO_EXPEND from './assets/icon_logo_expend.svg';
-
 type StyledMenuItemProps = {
   expend?: boolean;
   active?: boolean;
@@ -195,34 +193,12 @@ export const LayoutSide: FC = () => {
       }}
     >
       <ExpendIcon />
-      <Stack gap={0.5} overflow={'hidden'}>
-        <Icon
-          component={ICON_LOGO_EXPEND}
-          sx={{
-            ml: 0.25,
-            height: 32,
-            width: 118,
-            transition: 'width .3s',
-          }}
-        />
-      </Stack>
       <Stack
         sx={{
           width: '100%',
-          mt: 4,
           overflowX: 'hidden',
         }}
       >
-        <Stack mb={1.5}>
-          <StyledButton
-            color={'info'}
-            onClick={() => openProcess()}
-            size={'medium'}
-            variant={'outlined'}
-          >
-            {expend ? 'Create new campaign' : '+'}
-          </StyledButton>
-        </Stack>
         {LAYOUT_SIDE_MENU.map((item, index) => (
           <Fragment key={index}>
             {item.subMenus && !expend ? null : (
@@ -261,6 +237,16 @@ export const LayoutSide: FC = () => {
             )}
           </Fragment>
         ))}
+        <Stack mt={3}>
+          <StyledButton
+            color={'info'}
+            onClick={() => openProcess()}
+            size={'medium'}
+            variant={'outlined'}
+          >
+            {expend ? 'Create new campaign' : '+'}
+          </StyledButton>
+        </Stack>
       </Stack>
       <Stack
         alignItems={'center'}
