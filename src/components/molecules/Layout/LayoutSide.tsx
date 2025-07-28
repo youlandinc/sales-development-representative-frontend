@@ -195,7 +195,6 @@ export const LayoutSide: FC = () => {
       }}
     >
       <ExpendIcon />
-
       <Stack gap={0.5} overflow={'hidden'}>
         <Icon
           component={ICON_LOGO_EXPEND}
@@ -207,7 +206,6 @@ export const LayoutSide: FC = () => {
           }}
         />
       </Stack>
-
       <Stack
         sx={{
           width: '100%',
@@ -264,7 +262,6 @@ export const LayoutSide: FC = () => {
           </Fragment>
         ))}
       </Stack>
-
       <Stack
         alignItems={'center'}
         flexDirection={'row'}
@@ -294,18 +291,11 @@ export const LayoutSide: FC = () => {
           </Typography>
         )}
       </Stack>
-
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'left',
-        }}
-        MenuListProps={{
-          sx: {
-            width: avatarRef.current?.offsetWidth,
-            minWidth: 120,
-          },
         }}
         onClose={() => setAnchorEl(null)}
         open={Boolean(anchorEl)}
@@ -319,6 +309,12 @@ export const LayoutSide: FC = () => {
               '& .MuiList-root': {
                 padding: 0,
               },
+            },
+          },
+          list: {
+            sx: {
+              width: avatarRef.current?.offsetWidth,
+              minWidth: 120,
             },
           },
         }}

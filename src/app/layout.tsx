@@ -8,7 +8,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 

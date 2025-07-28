@@ -259,12 +259,6 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
             />
             <Menu
               anchorEl={anchorEl}
-              MenuListProps={{
-                sx: {
-                  width: 160,
-                  borderRadius: 2,
-                },
-              }}
               onClose={() => setAnchorEl(null)}
               open={Boolean(anchorEl)}
               slotProps={{
@@ -276,6 +270,12 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
                     '& .MuiList-root': {
                       padding: 0,
                     },
+                  },
+                },
+                list: {
+                  sx: {
+                    width: 160,
+                    borderRadius: 2,
                   },
                 },
               }}
@@ -304,7 +304,6 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
                 Delete list
               </MenuItem>
             </Menu>
-
             <StyledDialog
               content={
                 <Typography color={'text.secondary'} my={1.5} variant={'body2'}>

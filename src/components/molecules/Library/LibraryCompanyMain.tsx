@@ -125,7 +125,7 @@ export const LibraryCompanyMain = () => {
             {imgLoading && <Skeleton height={'100%'} variant={'rectangular'} />}
             {companyPage !== '' && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
+              (<img
                 alt={'picture'}
                 height={'auto'}
                 onLoad={() => {
@@ -134,7 +134,7 @@ export const LibraryCompanyMain = () => {
                 src={`${PREVIEW_IMAGE_URL}${companyPage}`}
                 style={{ objectFit: 'cover' }}
                 width={'100%'}
-              />
+              />)
             )}
           </Box>
         </Stack>

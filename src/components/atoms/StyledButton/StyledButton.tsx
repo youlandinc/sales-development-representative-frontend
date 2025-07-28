@@ -97,7 +97,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
             color: 'action.disabled',
           },
         },
-        '&.MuiButton-outlinedInfo, &.MuiButton-textInfo': {
+        '&.MuiButton-outlined.MuiButton-colorInfo, &.MuiButton-textInfo': {
           color: 'text.primary',
         },
         '&.MuiButton-sizeLarge': {

@@ -153,7 +153,9 @@ export const CommonCampaignUserInfo: FC<CommonCampaignUserInfoProps> = ({
       anchor={'right'}
       onClose={onClickToClose}
       open={open}
-      PaperProps={{ sx: { px: 3, py: 6, width: (1300 * 100) / 1920 + '%' } }}
+      slotProps={{
+        paper: { sx: { px: 3, py: 6, width: (1300 * 100) / 1920 + '%' } }
+      }}
     >
       <Stack minWidth={'50%'} pb={6} pt={3} px={3}>
         <Stack
