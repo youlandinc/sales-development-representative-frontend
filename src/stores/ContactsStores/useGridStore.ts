@@ -81,11 +81,11 @@ export const useGridStore = create<
 
       const columnOptions = data.metadataColumns.map(
         (column) =>
-          (({
+          ({
             value: column.columnName,
             label: column.columnLabel,
-            key: column.columnId
-          }) as TOption),
+            key: column.columnId,
+          }) as TOption,
       );
 
       set({
