@@ -25,7 +25,7 @@ import {
   CommonSkeletonLoadingOverlay,
 } from '@/components/molecules';
 
-import ICON_NO_RESULT from '@/components/molecules/Campaigns/assets/icon_no_result.svg';
+import ICON_NO_RESULT from './assets/icon_table_no_result.svg';
 
 import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_RENAME from './assets/icon_table_rename.svg';
@@ -247,22 +247,23 @@ export const ProspectTable: FC<ProspectTableProps> = ({ store }) => {
               <Icon
                 component={ICON_NO_RESULT}
                 sx={{
-                  width: 256,
-                  height: 238,
+                  width: 240,
+                  height: 240,
                 }}
               />
-              {/*todo: no result*/}
-              {/*<Typography color={'text.secondary'} mt={1.5} variant={'body2'}>*/}
-              {/*  You don&#39;t have any campaigns yet.*/}
-              {/*</Typography>*/}
-              {/*<Typography*/}
-              {/*  color={'#6E4EFB'}*/}
-              {/*  //onClick={() => openProcess()}*/}
-              {/*  sx={{ cursor: 'pointer' }}*/}
-              {/*  variant={'body2'}*/}
-              {/*>*/}
-              {/*  Create new campaign*/}
-              {/*</Typography>*/}
+              <Typography color={'text.secondary'} mt={1.5} variant={'body2'}>
+                {store.searchWord
+                  ? `No results found for ${store.searchWord}`
+                  : "You don't have any table yet."}
+              </Typography>
+              <Typography
+                color={'#6E4EFB'}
+                //onClick={() => openProcess()}
+                sx={{ cursor: 'pointer' }}
+                variant={'body2'}
+              >
+                Create new table
+              </Typography>
             </Stack>
           ),
         }}
