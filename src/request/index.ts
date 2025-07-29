@@ -1,5 +1,7 @@
 export * from './user';
 
+export * from './prospect';
+
 export * from './campaign';
 
 export * from './library';

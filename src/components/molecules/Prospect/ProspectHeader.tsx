@@ -1,5 +1,11 @@
-import { FC } from 'react';
-import { Icon, InputAdornment, Stack, Typography } from '@mui/material';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
+import {
+  debounce,
+  Icon,
+  InputAdornment,
+  Stack,
+  Typography,
+} from '@mui/material';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 
@@ -34,7 +40,30 @@ const BUTTONS = [
   },
 ];
 
-export const EnrichHeader: FC = () => {
+interface ProspectHeaderProps {
+  dispatch: any;
+  store: { searchWord: string };
+}
+
+export const ProspectHeader: FC<ProspectHeaderProps> = ({
+  dispatch,
+  store,
+}) => {
+  const [value, setValue] = useState(store.searchWord);
+
+  const debounceSearchWord = useMemo(
+    () =>
+      debounce((value) => {
+        dispatch({ type: 'change', payload: { field: 'searchWord', value } });
+      }, 500),
+    [dispatch],
+  );
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    debounceSearchWord(e.target.value);
+  };
+
   return (
     <Stack gap={3}>
       <Stack gap={1.5}>
@@ -75,7 +104,7 @@ export const EnrichHeader: FC = () => {
 
         <Stack flexDirection={'row'} gap={1}>
           <StyledTextField
-            //onChange={onChange}
+            onChange={onChange}
             size={'small'}
             slotProps={{
               input: {
@@ -96,7 +125,7 @@ export const EnrichHeader: FC = () => {
                 ),
               },
             }}
-            //value={value}
+            value={value}
           />
           <StyledButton size={'medium'}>
             <Icon
