@@ -11,7 +11,7 @@ interface Option {
   key: string | number;
   value: string | number;
   label: string | React.ReactNode;
-  disabled?:boolean
+  disabled?: boolean;
   subComponent?: React.ReactNode;
 }
 
