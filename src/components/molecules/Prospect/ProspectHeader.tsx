@@ -43,11 +43,13 @@ const BUTTONS = [
 interface ProspectHeaderProps {
   dispatch: any;
   store: { searchWord: string };
+  openDialog: () => void;
 }
 
 export const ProspectHeader: FC<ProspectHeaderProps> = ({
   dispatch,
   store,
+  openDialog,
 }) => {
   const [value, setValue] = useState(store.searchWord);
 
@@ -74,6 +76,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               color={'info'}
               disabled={item.disabled}
               key={`${item.label}-${index}`}
+              onClick={() => openDialog()}
               size={'medium'}
               sx={{
                 width: '180px !important',
@@ -127,7 +130,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
             }}
             value={value}
           />
-          <StyledButton size={'medium'}>
+          <StyledButton onClick={() => openDialog()} size={'medium'}>
             <Icon
               component={ICON_NEW_TABLE}
               sx={{ width: 20, height: 20, mr: 1 }}

@@ -1,5 +1,6 @@
 import { del, post, put } from '@/request/request';
 import { ResponseProspectTable } from '@/types/Prospect';
+import { ProspectDelimiterEnum } from '@/types';
 
 export const _fetchProspectTableData = (params: {
   size: number;
@@ -22,4 +23,10 @@ export const _renameProspectTable = (params: {
   tableId: string | number;
 }) => {
   return put('/sdr/prospect/table', params);
+};
+
+export const _createProspectTableViaCsv = (params: FormData) => {
+  return post('/sdr/prospect/table/csv', params, {
+    headers: { 'content-type': 'multipart/form-data' },
+  });
 };

@@ -37,3 +37,10 @@ export enum FilterOperationEnum {
   ends_with = 'ENDS_WITH',
   not_ends_with = 'NOT_ENDS_WITH',
 }
+
+export enum ProspectDelimiterEnum {
+  comma = 'COMMA',
+  semicolon = 'SEMICOLON',
+  tab = 'TAB',
+  pipe = 'PIPE',
+}

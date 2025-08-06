@@ -33,9 +33,13 @@ import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
 
 interface ProspectTableProps {
   store: { searchWord: string };
+  openDialog: () => void;
 }
 
-export const ProspectTable: FC<ProspectTableProps> = ({ store }) => {
+export const ProspectTable: FC<ProspectTableProps> = ({
+  store,
+  openDialog,
+}) => {
   const router = useRouter();
 
   const columns: GridColDef<ProspectTableItem>[] = [
@@ -225,8 +229,8 @@ export const ProspectTable: FC<ProspectTableProps> = ({ store }) => {
         getRowId={(row) => row.tableId}
         loading={isLoading}
         onPaginationModelChange={setPaginationModel}
-        onRowClick={async ({ row }) => {
-          //await onRawClick(row);
+        onRowClick={({ row }) => {
+          router.push(`/prospect-enrich/${row.tableId}`);
         }}
         paginationMode={'server'}
         paginationModel={paginationModel}
@@ -258,7 +262,7 @@ export const ProspectTable: FC<ProspectTableProps> = ({ store }) => {
               </Typography>
               <Typography
                 color={'#6E4EFB'}
-                //onClick={() => openProcess()}
+                onClick={() => openDialog()}
                 sx={{ cursor: 'pointer' }}
                 variant={'body2'}
               >
