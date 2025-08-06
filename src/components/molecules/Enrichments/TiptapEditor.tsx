@@ -15,7 +15,19 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { mentionSuggestionOptions } from './mentionSuggestionOptions';
 import { useSwitch } from '@/hooks';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
+
+
+import {
+
+  dT as h9,
+  dF as noe,
+  dH as DD,
+} from './vendor.js';
+
+console.log(h9)
+console.log(noe)
+console.log(DD)
 
 const DEFAULT_PROMOT = `
   #CONTEXT#\nYou are tasked with finding a Java engineer associated with a given company or website, and extracting their professional profile and email address.\n\n#OBJECTIVE#\nIdentify a Java engineer related to {{Enrich Company}}, {{Domain}}, or {{Url}}, and extract their professional profile link (such as LinkedIn) and email address.\n\n#INSTRUCTIONS#\n1. Use the provided {{Enrich Company}}, {{Domain}}, or {{Url}} to search for employees or team members who are Java engineers (titles may include \"Java Engineer,\" \"Java Developer,\" or similar).\n2. Search LinkedIn, company team pages, or other professional directories for profiles matching the criteria.\n3. Extract the profile URL (preferably LinkedIn) and the email address if publicly available.\n4. If multiple Java engineers are found, return the first relevant result.\n5. If no Java engineer or email is found, return \"No Java engineer found\" or \"No email found\" as appropriate.\n\n#EXAMPLES#\nInput:\n  Enrich Company: Acme Corp\n  Domain: acmecorp.com\n  Url: https://acmecorp.com\n\nExpected Output:\n  Java Engineer Name: John Doe\n
@@ -169,9 +181,9 @@ const PlaceholderNode = Node.create({
     };
   },
   group: 'inline',
-  inline: !0,
-  selectable: !0,
-  atom: !0,
+  inline: true,
+  selectable: true,
+  atom: true,
   addAttributes() {
     return {
       variableName: {
@@ -289,6 +301,95 @@ const PlaceholderNode = Node.create({
   },
 });
 
+const TokenComponent = ({ node: t, selected: n, deleteNode: s }) =>{
+  const a = ho(),
+      {
+        item: i,
+        defaultToggled: r,
+        tooltipProps: o,
+        renderToken: l,
+        renderTooltip: c,
+        onToggleToken: d,
+        isFallback: u,
+      } =  (t.attrs),
+      m = useMemo(
+          () =>
+              i != null && i.toggleable
+                  ? typeof r == 'function'
+                      ? r(i)
+                      : (r ?? !0)
+                  : !1,
+          [i, r],
+      ),
+      g = (h) => {
+        !i || !d || d({ item: i, value: h });
+      };
+  return  <NodeViewWrapper as="span" data-placeholder>
+    <div>123321</div>
+  </NodeViewWrapper>
+}
+
+const t8e = h9.create({
+      name: 'Token',
+      group: 'inline',
+      inline: !0,
+      atom: !0,
+      selectable: !0,
+      addAttributes() {
+        return {
+          id: {
+            default: null,
+            parseHTML: (t) => t.getAttribute('data-id'),
+            renderHTML: (t) => (t.id ? { 'data-id': t.id } : {}),
+          },
+          label: {
+            default: null,
+            parseHTML: (t) => t.getAttribute('data-label'),
+            renderHTML: (t) => (t.label ? { 'data-label': t.label } : {}),
+          },
+          path: {
+            default: null,
+            parseHTML: (t) => t.getAttribute('data-path'),
+            renderHTML: (t) => (t.path ? { 'data-path': t.path } : {}),
+          },
+        };
+      },
+      addNodeView() {
+        return ReactNodeViewRenderer(TokenComponent);
+      },
+      addOptions() {
+        return { behavior: void 0 };
+      },
+      addProseMirrorPlugins() {
+        const { behavior: t } = this.options,
+            n = this.editor;
+        if (!t)
+          throw new Error(
+              'TokenV2 extension requires a Behavior implementation to handle autocomplete actions.',
+          );
+        const s = (a) => t.autocompleteReducer(a, n);
+        return qke({
+          triggers: [
+            {
+              name: 'token',
+              trigger: RegExp('(/)$'),
+              cancelOnFirstSpace: !1,
+              allArrowKeys: !0,
+              decorationAttrs: {
+                class:
+                    'token-autocomplete text-content-action tiptap-suggestion-decoration',
+              },
+            },
+          ],
+          reducer: s,
+        });
+      },
+      renderHTML({ HTMLAttributes: t }) {
+        return ['span', { ...t }, 0];
+      },
+    }),
+
+
 export const TiptapEditor = () => {
   const [checked, setChecked] = useState<boolean>(true);
 
@@ -394,6 +495,29 @@ export const TiptapEditor = () => {
     extensions: [
       StarterKit,
       Mention.extend({
+        name: 'Token',
+        atom: !0,
+        selectable: !0,
+        addNodeView() {
+          return ReactNodeViewRenderer(PlaceholderComponent);
+        },
+        addAttributes() {
+          const  t= this.parent;
+          return {
+            ...((t  ) == null ? void 0 : t.call(this)),
+            path: {
+              default: null,
+              parseHTML: (n) => n.getAttribute('data-path'),
+              renderHTML: (n) => (n.path ? { 'data-path': n.path } : {}),
+            },
+            href: {
+              default: null,
+              parseHTML: (n) => n.getAttribute('data-href'),
+              renderHTML: (n) => (n.href ? { 'data-href': n.href } : {}),
+            },
+          };
+        },
+      })/*.extend({
         addNodeView() {
           return ReactNodeViewRenderer(PlaceholderComponent);
         },
@@ -407,7 +531,7 @@ export const TiptapEditor = () => {
         renderHTML({ HTMLAttributes }) {
           return ['mention-component', mergeAttributes(HTMLAttributes)];
         },
-      }).configure({
+      })*/.configure({
         suggestion: {
           ...mentionSuggestionOptions,
           char: '/',
