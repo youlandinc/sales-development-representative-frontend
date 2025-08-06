@@ -22,7 +22,18 @@ import ICON_SIDE_CONTACTS_COMPANIES_ACTIVE from './assets/icon_side_contacts_com
 import ICON_SIDE_CONTACTS_LISTS_DEFAULT from './assets/icon_side_contacts_lists_default.svg';
 import ICON_SIDE_CONTACTS_LISTS_ACTIVE from './assets/icon_side_contacts_lists_active.svg';
 
+import ICON_SIDE_ENRICHMENTS_DEFAULT from './assets/icon_side_enrichments_default.svg';
+import ICON_SIDE_ENRICHMENTS_ACTIVE from './assets/icon_side_enrichments_active.svg';
+
 export const LAYOUT_SIDE_MENU = [
+  {
+    label: 'Prospect & Enrich',
+    url: '/enrichments',
+    key: 'enrichments',
+    defaultIcon: ICON_SIDE_ENRICHMENTS_DEFAULT,
+    activeIcon: ICON_SIDE_ENRICHMENTS_ACTIVE,
+    type: 'link',
+  },
   {
     label: 'Campaigns',
     url: '/campaigns',
