@@ -7,9 +7,9 @@ import {
   useState,
 } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { useSwitch } from '@/hooks';
-
 import { PROSPECT_CSV_TYPE_OPTIONS } from '@/constant';
 
 import {
@@ -20,7 +20,7 @@ import {
 } from '@/components/atoms';
 import {
   ProspectHeader,
-  ProspectTable,
+  ProspectList,
   StyledCustomButtonGroup,
 } from '@/components/molecules';
 
@@ -32,7 +32,6 @@ import ICON_CSV from './assets/icon_csv.svg';
 
 import ICON_CSV_NEW from './assets/icon_csv_new.svg';
 import ICON_CSV_EXIST from './assets/icon_csv_exist.svg';
-import { useRouter } from 'nextjs-toploader/app';
 
 const reducer = (
   state: { searchWord: string },
@@ -61,6 +60,7 @@ export const Prospect: FC = () => {
   const { open, close, visible } = useSwitch();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [creating, setCreating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
@@ -168,20 +168,23 @@ export const Prospect: FC = () => {
       }),
     );
 
+    setCreating(true);
     try {
       const { data } = await _createProspectTableViaCsv(formData);
       router.push(`/prospect-enrich/${data}`);
-      resetDialog(false);
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ header, message, variant });
+    } finally {
+      setCreating(false);
+      resetDialog(false);
     }
   };
 
   return (
     <Stack gap={3} height={'100%'} width={'100%'}>
       <ProspectHeader dispatch={dispatch} openDialog={open} store={store} />
-      <ProspectTable openDialog={open} store={store} />
+      <ProspectList openDialog={open} store={store} />
 
       <StyledDialog
         content={
@@ -329,7 +332,8 @@ export const Prospect: FC = () => {
         }
         footer={
           <StyledButton
-            disabled={!selectedFile || !fileName}
+            disabled={!selectedFile || !fileName || creating}
+            loading={creating}
             onClick={async () => await onClickToCreate()}
             size={'medium'}
           >

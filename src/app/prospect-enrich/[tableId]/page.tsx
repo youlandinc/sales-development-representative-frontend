@@ -1,12 +1,11 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { ProspectDetail } from '@/components/organisms';
 
 export const fetchCache = 'force-no-store';
 
-const ProsectAndEnrichDetail = (props: any) => {
-  const { tableId } = useParams();
-  return <>{tableId}</>;
+const ProsectAndEnrichDetail = () => {
+  return <ProspectDetail />;
 };
 
 export default ProsectAndEnrichDetail;

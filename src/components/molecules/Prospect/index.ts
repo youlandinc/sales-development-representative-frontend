@@ -1,4 +1,4 @@
 export * from './ProspectHeader';
-export * from './ProspectTable';
+export * from './ProspectList';
 
 export * from './StyledCustomButtonGroup';

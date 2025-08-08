@@ -36,10 +36,7 @@ interface ProspectTableProps {
   openDialog: () => void;
 }
 
-export const ProspectTable: FC<ProspectTableProps> = ({
-  store,
-  openDialog,
-}) => {
+export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
   const router = useRouter();
 
   const columns: GridColDef<ProspectTableItem>[] = [

@@ -1,6 +1,8 @@
 import { FC } from 'react';
 import { Icon, Stack } from '@mui/material';
 
+import { LayoutUserInfo } from './index';
+
 import ICON_LOGO_EXPEND from './assets/icon_logo_expend.svg';
 
 export const LayoutHeader: FC = () => {
@@ -21,6 +23,10 @@ export const LayoutHeader: FC = () => {
           width: 118,
         }}
       />
+
+      <Stack ml={'auto'}>
+        <LayoutUserInfo />
+      </Stack>
     </Stack>
   );
 };
