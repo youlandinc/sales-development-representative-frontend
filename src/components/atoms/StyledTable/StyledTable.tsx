@@ -1,6 +1,5 @@
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import type { UIEvent } from 'react';
-import { Checkbox, Stack } from '@mui/material';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { Checkbox, Menu, MenuItem, Stack } from '@mui/material';
 
 import {
   createColumnHelper,
@@ -8,37 +7,41 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import type {
+  ColumnPinningState,
   ColumnSizingInfoState,
   ColumnSizingState,
   RowSelectionState,
 } from '@tanstack/react-table';
 
-import { StyledTableHeader, StyledTableRow } from './index';
+import {
+  StyledTableBody,
+  StyledTableBodyCell,
+  StyledTableBodyRow,
+  StyledTableContainer,
+  StyledTableHead,
+  StyledTableHeadCell,
+  StyledTableHeadRow,
+  StyledTableSpacer,
+} from './index';
 
 import { TableHeaderProps } from '@/types/Prospect/table';
 
 interface StyledTableProps {
-  columns: TableHeaderProps[];
+  columns: any[];
   rowIds: string[];
   data: any[];
   addMenuItems?: { label: string; value: string }[];
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
-  // optional: number of pinned columns on the left
   pinnedLeftCount?: number;
-  // optional: initial widths for columns
   initialColumnWidths?: Record<string, number>;
-  // optional: notify parent when widths change
-  onColumnWidthsChange?: (w: Record<string, number>) => void;
-  // optional: key for localStorage persistence (e.g., tableId)
+  onColumnWidthsChange?: (widths: Record<string, number>) => void;
   columnWidthStorageKey?: string;
+  scrolled?: boolean;
   virtualization?: {
     enabled?: boolean;
-    containerHeight?: number; // px
-    rowHeight: number; // px
-    paddingTop: number; // px
-    paddingBottom: number; // px
-    onScroll?: (e: UIEvent<HTMLDivElement>) => void;
-    onContainerRef?: (el: HTMLDivElement | null) => void;
+    rowHeight?: number;
+    scrollContainer?: React.RefObject<HTMLDivElement | null>;
+    onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
   };
 }
 
@@ -54,49 +57,65 @@ export const StyledTable: FC<StyledTableProps> = ({
   initialColumnWidths,
   onColumnWidthsChange,
   columnWidthStorageKey,
+  scrolled,
   virtualization,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
     useState<ColumnSizingInfoState>({} as ColumnSizingInfoState);
-  const [scrolled, setScrolled] = useState(false);
-  const pinnedLeftCount = pinnedLeftCountProp ?? 1; // default pin first column
-  const [visibleIndexSet, setVisibleIndexSet] = useState<
-    Set<number> | undefined
-  >(undefined);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [scrolledState, setScrolledState] = useState(false);
+  const pinnedLeftCount = pinnedLeftCountProp ?? 1;
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
+    left: ['__select'],
+    right: [],
+  });
 
-  // Map visible row index -> global index
-  const startIndex = useMemo(() => {
-    const rh = virtualization?.rowHeight ?? 0;
-    const pt = virtualization?.paddingTop ?? 0;
-    if (!rh) {
-      return 0;
-    }
-    return Math.max(0, Math.floor(pt / rh));
-  }, [virtualization?.rowHeight, virtualization?.paddingTop]);
+  // Add column menu state
+  const [addMenuAnchor, setAddMenuAnchor] = useState<null | HTMLElement>(null);
+  const addMenuItems_ = useMemo(
+    () => addMenuItems ?? [{ label: '+ Add new column', value: 'add_column' }],
+    [addMenuItems],
+  );
+
+  const rowHeight = virtualization?.rowHeight ?? 48;
+
   const table = useReactTable({
     data: data,
     columns: useMemo(() => {
-      // First column: index + checkbox on hover; header: select-all checkbox
+      // First column: selection
       const selectCol = columnHelper.display({
         id: '__select',
-        header: (ctx) => (
-          <Checkbox
-            checked={ctx.table.getIsAllRowsSelected?.()}
-            indeterminate={ctx.table.getIsSomeRowsSelected?.()}
-            onChange={(e, checked) =>
-              ctx.table.toggleAllRowsSelected?.(checked)
-            }
-            onClick={(e) => e.stopPropagation()}
-            size="small"
-          />
-        ),
+        header: () => {
+          const total = rowIds.length;
+          const selectedCount = rowIds.reduce(
+            (acc, id) => acc + (rowSelection[id] ? 1 : 0),
+            0,
+          );
+          const allChecked = total > 0 && selectedCount === total;
+          const someChecked = selectedCount > 0 && selectedCount < total;
+          return (
+            <Checkbox
+              checked={allChecked}
+              indeterminate={someChecked}
+              onChange={(e, checked) => {
+                if (checked) {
+                  const next: RowSelectionState = {};
+                  for (const id of rowIds) {
+                    next[id] = true;
+                  }
+                  setRowSelection(next);
+                } else {
+                  setRowSelection({});
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+              size="small"
+            />
+          );
+        },
         cell: (info) => {
-          const localIndex = info.row.index; // index within visible data
-          const globalIndex = startIndex + localIndex;
-          const label = `${globalIndex + 1}`;
+          const label = `${info.row.index + 1}`;
           const checked = info.row.getIsSelected?.() ?? false;
           return (
             <Stack
@@ -128,7 +147,6 @@ export const StyledTable: FC<StyledTableProps> = ({
         },
         size: 56,
         minSize: 44,
-        maxSize: 80,
         enableResizing: false,
       });
 
@@ -150,28 +168,52 @@ export const StyledTable: FC<StyledTableProps> = ({
       );
 
       return [selectCol, ...rest];
-    }, [columns, startIndex]),
+    }, [columns, rowIds, rowSelection]),
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (_row, index) =>
-      rowIds[startIndex + index] ?? String(startIndex + index),
+    getRowId: (_row, index) => rowIds[index] ?? String(index),
     defaultColumn: {
       size: 160,
       minSize: 80,
-      maxSize: 800,
     },
     enableRowSelection: true,
-    columnResizeMode: 'onChange',
+    enableColumnPinning: true,
+    columnResizeMode: 'onEnd',
     state: {
       columnSizing,
       columnSizingInfo,
       rowSelection,
+      columnPinning,
     },
     onColumnSizingChange: setColumnSizing,
     onColumnSizingInfoChange: setColumnSizingInfo,
     onRowSelectionChange: setRowSelection,
+    onColumnPinningChange: setColumnPinning,
   });
 
-  // Load persisted column sizing (backward compatible with previous storage key)
+  // Calculate sticky left offsets for pinned columns
+  const { leftPinnedColumns, centerColumns, stickyLeftMap } = useMemo(() => {
+    const visibleColumns = table.getVisibleLeafColumns();
+    const leftPinned = visibleColumns.filter(
+      (col) => col.getIsPinned() === 'left',
+    );
+    const center = visibleColumns.filter((col) => !col.getIsPinned());
+
+    const map: Record<string, number> = {};
+    let acc = 0;
+    for (let i = 0; i < leftPinned.length; i++) {
+      const col = leftPinned[i];
+      map[col.id] = acc;
+      acc += col.getSize();
+    }
+
+    return {
+      leftPinnedColumns: leftPinned,
+      centerColumns: center,
+      stickyLeftMap: map,
+    };
+  }, [table.getVisibleLeafColumns(), columnSizing]);
+
+  // Load persisted column sizing
   useEffect(() => {
     const key = columnWidthStorageKey;
     const saved = key ? localStorage.getItem(`table_colwidths_${key}`) : null;
@@ -190,7 +232,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     }
   }, [columnWidthStorageKey, initialColumnWidths]);
 
-  // Persist column sizing on change
+  // Persist column sizing
   useEffect(() => {
     if (columnWidthStorageKey) {
       localStorage.setItem(
@@ -201,46 +243,204 @@ export const StyledTable: FC<StyledTableProps> = ({
     onColumnWidthsChange?.(columnSizing as Record<string, number>);
   }, [columnSizing, columnWidthStorageKey, onColumnWidthsChange]);
 
-  // No manual measuring needed; sizes come from TanStack state
+  const handleAddMenuClick = useCallback(
+    (item: { label: string; value: string }) => {
+      onAddMenuItemClick?.(item);
+      setAddMenuAnchor(null);
+    },
+    [onAddMenuItemClick],
+  );
 
-  const stickyLeftMap = useMemo(() => {
-    const headers = table.getHeaderGroups()[0]?.headers ?? [];
-    const map: Record<string, number> = {};
-    let acc = 0;
-    for (let i = 0; i < Math.min(pinnedLeftCount, headers.length); i++) {
-      const h: any = headers[i];
-      map[h.id] = acc;
-      const w = (h.getSize?.() as number) ?? h.column.getSize?.() ?? 160;
-      acc += w;
-    }
-    return map;
-  }, [pinnedLeftCount, table, columnSizing]);
+  // Memoize render content to avoid recreation on every render
+  const renderContent = useCallback(
+    ({
+      tableContainerRef,
+      columnVirtualizer,
+      rowVirtualizer,
+      virtualColumns,
+      virtualRows,
+      virtualPaddingLeft,
+      virtualPaddingRight,
+    }: any) => (
+      <>
+        {/* Column resize indicator - positioned relative to scroll container */}
+        {columnSizingInfo.isResizingColumn && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: columnSizingInfo.startOffset || 0,
+              transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
+              height: `${rowVirtualizer.getTotalSize()}px`, // Use virtual total height
+              width: '2px',
+              backgroundColor: '#1976d2',
+              zIndex: 1000,
+              pointerEvents: 'none',
+              opacity: 0.8,
+            }}
+          />
+        )}
+        
+        <StyledTableHead scrolled={scrolled ?? scrolledState}>
+          {/* Column resize indicator for header area - higher z-index */}
+          {columnSizingInfo.isResizingColumn && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: columnSizingInfo.startOffset || 0,
+                transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
+                width: '2px',
+                backgroundColor: '#1976d2',
+                zIndex: 1001, // Higher than head cells (zIndex: 3)
+                pointerEvents: 'none',
+                opacity: 0.8,
+              }}
+            />
+          )}
+          
+          {table.getHeaderGroups().map((headerGroup) => (
+            <StyledTableHeadRow key={headerGroup.id}>
+              {/* Pinned left headers */}
+              {leftPinnedColumns.map((col, index) => {
+                const header = headerGroup.headers.find((h) => h.id === col.id);
+                if (!header) {
+                  return null;
+                }
+                return (
+                  <StyledTableHeadCell
+                    header={header}
+                    isPinned
+                    key={header.id}
+                    stickyLeft={stickyLeftMap[col.id] ?? 0}
+                    width={header.getSize()}
+                  />
+                );
+              })}
 
-  const handleScroll = (e: UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    setScrolled(target.scrollTop > 0);
-    // compute visible columns
-    const sl = target.scrollLeft;
-    const viewportW = target.clientWidth;
-    const headers = table.getHeaderGroups()[0]?.headers ?? [];
-    const overscanPx = 200; // px
-    let x = 0;
-    const indices: number[] = [];
-    for (let i = 0; i < headers.length; i++) {
-      const h: any = headers[i];
-      const w = (h.getSize?.() as number) ?? h.column.getSize?.() ?? 100;
-      const start = x;
-      const end = x + w;
-      // include if intersects with [sl-overscan, sl+viewportW+overscan]
-      if (end >= sl - overscanPx && start <= sl + viewportW + overscanPx) {
-        indices.push(i);
-      }
-      x = end;
-    }
-    setVisibleIndexSet(new Set(indices));
+              {/* Left padding spacer */}
+              {virtualPaddingLeft ? (
+                <StyledTableSpacer width={virtualPaddingLeft} />
+              ) : null}
 
-    virtualization?.onScroll?.(e);
-  };
+              {/* Virtual columns */}
+              {virtualColumns.map((virtualColumn: any) => {
+                const col = centerColumns[virtualColumn.index];
+                const header = headerGroup.headers.find((h) => h.id === col.id);
+                if (!header) {
+                  return null;
+                }
+                return (
+                  <StyledTableHeadCell
+                    dataIndex={virtualColumn.index}
+                    header={header}
+                    key={header.id}
+                    measureRef={(node) =>
+                      columnVirtualizer.measureElement(node)
+                    }
+                    width={header.getSize()}
+                  />
+                );
+              })}
+
+              {/* Right padding spacer */}
+              {virtualPaddingRight ? (
+                <StyledTableSpacer width={virtualPaddingRight} />
+              ) : null}
+
+              {/* Add column button */}
+              <StyledTableHeadCell
+                onClick={(e) => setAddMenuAnchor(e.currentTarget)}
+                width={120}
+              >
+                Add column
+              </StyledTableHeadCell>
+            </StyledTableHeadRow>
+          ))}
+        </StyledTableHead>
+
+        <StyledTableBody totalHeight={rowVirtualizer.getTotalSize()}>
+          {virtualRows.map((virtualRow: any) => {
+            const row = table.getRowModel().rows[virtualRow.index];
+            const visibleCells = row.getVisibleCells();
+
+            return (
+              <StyledTableBodyRow
+                key={row.id}
+                measureRef={(node) => rowVirtualizer.measureElement(node)}
+                rowHeight={rowHeight}
+                rowIndex={virtualRow.index}
+                virtualStart={virtualRow.start}
+              >
+                {/* Pinned left cells */}
+                {leftPinnedColumns.map((col, index) => {
+                  const cell = visibleCells.find((c) => c.column.id === col.id);
+                  if (!cell) {
+                    return null;
+                  }
+                  const isLoading = Boolean(
+                    (cell.row.original as any)?.__loading,
+                  );
+
+                  return (
+                    <StyledTableBodyCell
+                      cell={cell}
+                      isLoading={isLoading}
+                      isPinned
+                      key={cell.id}
+                      stickyLeft={stickyLeftMap[col.id] ?? 0}
+                      width={cell.column.getSize()}
+                    />
+                  );
+                })}
+
+                {/* Left padding spacer */}
+                {virtualPaddingLeft ? (
+                  <StyledTableSpacer width={virtualPaddingLeft} />
+                ) : null}
+
+                {/* Virtual cells */}
+                {virtualColumns.map((vc: any) => {
+                  const col = centerColumns[vc.index];
+                  const cell = visibleCells.find((c) => c.column.id === col.id);
+                  if (!cell) {
+                    return null;
+                  }
+                  const isLoading = Boolean(
+                    (cell.row.original as any)?.__loading,
+                  );
+
+                  return (
+                    <StyledTableBodyCell
+                      cell={cell}
+                      isLoading={isLoading}
+                      key={cell.id}
+                      width={cell.column.getSize()}
+                    />
+                  );
+                })}
+
+                {/* Right padding spacer */}
+                {virtualPaddingRight ? (
+                  <StyledTableSpacer width={virtualPaddingRight} />
+                ) : null}
+              </StyledTableBodyRow>
+            );
+          })}
+        </StyledTableBody>
+      </>
+    ),
+    [
+      scrolled ?? scrolledState,
+      table.getHeaderGroups(),
+      leftPinnedColumns,
+      centerColumns,
+      stickyLeftMap,
+      rowHeight,
+      columnSizingInfo,
+    ],
+  );
 
   return (
     <Stack
@@ -249,74 +449,31 @@ export const StyledTable: FC<StyledTableProps> = ({
         flexDirection: 'column',
         height: '100%',
         minHeight: 0,
+        position: 'relative',
       }}
     >
-      {virtualization?.enabled ? (
-        <Stack
-          onScroll={handleScroll}
-          ref={(el) => {
-            scrollRef.current = el;
-            virtualization.onContainerRef?.(el);
-          }}
-          sx={{
-            overflowY: 'auto',
-            overflowX: 'auto',
-            flex: 1,
-            minHeight: 0,
-            height: virtualization.containerHeight
-              ? `${virtualization.containerHeight}px`
-              : undefined,
-            willChange: 'scroll-position',
-            contain: 'layout paint style',
-          }}
-        >
-          <Stack
-            sx={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 1,
-              bgcolor: '#fff',
-              boxShadow: scrolled ? '0 4px 10px rgba(0,0,0,0.06)' : 'none',
-              borderBottom: '1px solid #DFDEE6',
-            }}
-          >
-            <StyledTableHeader
-              addMenuItems={addMenuItems}
-              columnsData={table.getHeaderGroups()[0].headers}
-              onAddMenuItemClick={onAddMenuItemClick}
-              pinnedLeftCount={pinnedLeftCount}
-              stickyLeftMap={stickyLeftMap}
-              visibleIndexSet={visibleIndexSet}
-            />
-          </Stack>
-          <Stack sx={{ height: `${virtualization.paddingTop}px` }} />
-          <StyledTableRow
-            pinnedLeftCount={pinnedLeftCount}
-            rowHeight={virtualization.rowHeight}
-            rows={table.getRowModel().rows}
-            stickyLeftMap={stickyLeftMap}
-            visibleIndexSet={visibleIndexSet}
-          />
-          <Stack sx={{ height: `${virtualization.paddingBottom}px` }} />
-        </Stack>
-      ) : (
-        <>
-          <StyledTableHeader
-            addMenuItems={addMenuItems}
-            columnsData={table.getHeaderGroups()[0].headers}
-            onAddMenuItemClick={onAddMenuItemClick}
-            pinnedLeftCount={pinnedLeftCount}
-            stickyLeftMap={stickyLeftMap}
-            visibleIndexSet={visibleIndexSet}
-          />
-          <StyledTableRow
-            pinnedLeftCount={pinnedLeftCount}
-            rows={table.getRowModel().rows}
-            stickyLeftMap={stickyLeftMap}
-            visibleIndexSet={visibleIndexSet}
-          />
-        </>
-      )}
+      <StyledTableContainer
+        onVisibleRangeChange={virtualization?.onVisibleRangeChange}
+        renderContent={renderContent}
+        rowHeight={rowHeight}
+        scrollContainer={virtualization?.scrollContainer}
+        table={table}
+      />
+
+      {/* Add Column Menu */}
+      <Menu
+        anchorEl={addMenuAnchor}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        onClose={() => setAddMenuAnchor(null)}
+        open={Boolean(addMenuAnchor)}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      >
+        {addMenuItems_.map((item) => (
+          <MenuItem key={item.value} onClick={() => handleAddMenuClick(item)}>
+            {item.label}
+          </MenuItem>
+        ))}
+      </Menu>
     </Stack>
   );
 };

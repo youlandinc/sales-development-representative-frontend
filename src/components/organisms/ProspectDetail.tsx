@@ -11,7 +11,14 @@ export const ProspectDetail = () => {
   const tableId = typeof params.tableId === 'string' ? params.tableId : '';
 
   return (
-    <Stack>
+    <Stack
+      sx={{
+        height: '100vh',
+        minHeight: 600,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <ProspectDetailHeader tableId={tableId} />
       <ProspectDetailContent tableId={tableId} />
     </Stack>

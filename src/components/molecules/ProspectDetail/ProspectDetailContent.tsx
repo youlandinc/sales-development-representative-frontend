@@ -1,4 +1,4 @@
-import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Stack } from '@mui/material';
 import useSWR from 'swr';
 
@@ -17,8 +17,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     (store) => store,
   );
 
-  const { isLoading, mutate } = useSWR(
-    tableId,
+  // Only fetch headers and rowIds once when tableId changes
+  const { isLoading: isMetadataLoading } = useSWR(
+    tableId ? `metadata-${tableId}` : null,
     async () => {
       await Promise.all([fetchHeaders(tableId), fetchRowIds(tableId)]);
     },
@@ -27,146 +28,175 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     },
   );
 
-  // Virtualization + lazy loading states
-  const ROW_HEIGHT = 48; // px, keep consistent with StyledTableRow
-  const PAGE_SIZE = 50;
-  const OVERSCAN = 10;
-  const [viewportHeight, setViewportHeight] = useState<number>(520);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const [scrollTop, setScrollTop] = useState(0);
-  const [loadedUntil, setLoadedUntil] = useState(0); // exclusive end index of loaded ids
+  // Virtualization + incremental loading states
+  const rowsMapRef = useRef<Record<string, any>>({});
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
   const isFetchingRef = useRef(false);
+  const [scrolled, setScrolled] = useState(false);
+  const ROW_HEIGHT = 48; // Must match StyledTableBodyRow height exactly
+  const INITIAL_BATCH_SIZE = 100; // Initial load
+  const MIN_BATCH_SIZE = 20; // Minimum batch size for small scrolls
+  const MAX_BATCH_SIZE = 300; // Maximum batch size for large scrolls
 
-  // Compute visible window
+  // Track the maximum loaded index to avoid redundant loading
+  const maxLoadedIndexRef = useRef(-1);
+
   const total = rowIds.length;
-  const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
-  const endIndex = Math.min(
-    total,
-    Math.ceil((scrollTop + viewportHeight) / ROW_HEIGHT) + OVERSCAN,
-  );
-  const paddingTop = startIndex * ROW_HEIGHT;
-  const paddingBottom = (total - endIndex) * ROW_HEIGHT;
+  const fullData = rowIds.map((id) => rowsMap[id] || { id, __loading: true });
 
-  const visibleIds = rowIds.slice(startIndex, endIndex);
-
-  const createLoadingRow = () => {
-    const obj: any = { __loading: true };
-    headers.forEach((h) => {
-      obj[h.fieldId] = undefined;
-    });
-    return obj;
-  };
-
-  const visibleData = visibleIds.map((id) => rowsMap[id] ?? createLoadingRow());
-
-  // Reset states when table changes
+  // Clear data when tableId changes
   useEffect(() => {
-    setScrollTop(0);
-    setLoadedUntil(0);
     setRowsMap({});
+    rowsMapRef.current = {};
     isFetchingRef.current = false;
+    maxLoadedIndexRef.current = -1;
   }, [tableId]);
 
-  // Measure viewport height
-  useLayoutEffect(() => {
-    const el = containerRef.current;
-    if (!el) {
+  // Incremental loading based on visible rows - ONLY fetches row data
+  const fetchBatchData = useCallback(
+    async (startIndex: number, endIndex: number) => {
+      if (!tableId || isFetchingRef.current) {
+        return;
+      }
+
+      // Only load data beyond what we've already loaded
+      const loadStartIndex = Math.max(
+        startIndex,
+        maxLoadedIndexRef.current + 1,
+      );
+      if (loadStartIndex > endIndex) {
+        return;
+      } // Nothing new to load
+
+      const batchIds = rowIds.slice(loadStartIndex, endIndex + 1);
+      if (batchIds.length === 0) {
+        return;
+      }
+
+      isFetchingRef.current = true;
+      try {
+        // Only fetch row data, NOT headers or rowIds
+        const res = await _fetchTableRowData({
+          tableId,
+          recordIds: batchIds,
+        });
+        const arr = (res?.data ?? []) as any[];
+        const newRowsMap: Record<string, any> = {};
+        arr.forEach((row) => {
+          if (row && row.id) {
+            newRowsMap[row.id] = row;
+          }
+        });
+        setRowsMap((prev) => ({ ...prev, ...newRowsMap }));
+        rowsMapRef.current = { ...rowsMapRef.current, ...newRowsMap };
+        maxLoadedIndexRef.current = Math.max(
+          maxLoadedIndexRef.current,
+          endIndex,
+        );
+      } finally {
+        isFetchingRef.current = false;
+      }
+    },
+    [tableId, rowIds], // Removed rowsMap from dependencies to avoid recreating function
+  );
+
+  // Load initial batch only after metadata (headers/rowIds) is available
+  useEffect(() => {
+    if (!tableId || total === 0 || isMetadataLoading) {
       return;
     }
-    const ro = new ResizeObserver(() => {
-      setViewportHeight(el.clientHeight);
-    });
-    setViewportHeight(el.clientHeight);
-    ro.observe(el);
-    return () => ro.disconnect();
+    // Don't preload too much - start with minimal load, let virtualizer handle the rest
+    fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
+  }, [tableId, total, fetchBatchData, isMetadataLoading]);
+
+  const handleVisibleRangeChange = useCallback(
+    (startIndex: number, endIndex: number) => {
+      // Only load if we need data beyond what's already loaded
+      if (endIndex > maxLoadedIndexRef.current) {
+        // Calculate how far user scrolled beyond loaded data
+        const loadStartIndex = maxLoadedIndexRef.current + 1;
+        const scrolledBeyondLoaded = endIndex - maxLoadedIndexRef.current;
+
+        // Dynamic batch size based on scroll behavior:
+        // - If user scrolled just 1 page beyond loaded data: load MIN_BATCH_SIZE (20)
+        // - Scale up based on how far they scrolled, max MAX_BATCH_SIZE (300)
+        let dynamicBatchSize;
+        if (scrolledBeyondLoaded <= endIndex - startIndex + 1) {
+          // Small scroll - just 1 page or less
+          dynamicBatchSize = MIN_BATCH_SIZE;
+        } else {
+          // Larger scroll - scale proportionally but cap at MAX_BATCH_SIZE
+          dynamicBatchSize = Math.min(
+            MAX_BATCH_SIZE,
+            Math.max(MIN_BATCH_SIZE, scrolledBeyondLoaded * 2),
+          );
+        }
+
+        // Load up to the calculated batch size, but not beyond total
+        const batchEndIndex = Math.min(
+          loadStartIndex + dynamicBatchSize - 1,
+          total - 1,
+        );
+
+        fetchBatchData(loadStartIndex, batchEndIndex);
+      }
+    },
+    [fetchBatchData, total],
+  );
+
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const scrollTop = scrollContainerRef.current.scrollTop;
+      setScrolled(scrollTop > 0);
+    }
+  };
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.addEventListener('scroll', handleScroll);
+      return () => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.removeEventListener(
+            'scroll',
+            handleScroll,
+          );
+        }
+      };
+    }
   }, []);
 
-  // Initial load when rowIds ready
-  useEffect(() => {
-    if (!tableId || total === 0) {
-      return;
-    }
-    if (loadedUntil > 0) {
-      return;
-    }
-    const nextEnd = Math.min(PAGE_SIZE, total);
-    const idsBatch = rowIds.slice(0, nextEnd);
-    isFetchingRef.current = true;
-    _fetchTableRowData({ tableId, recordIds: idsBatch })
-      .then((res: any) => {
-        const arr = (res?.data ?? []) as any[];
-        setRowsMap((prev) => {
-          const m = { ...prev } as Record<string, any>;
-          arr.forEach((row) => {
-            if (row && row.id) {
-              m[row.id] = row;
-            }
-          });
-          return m;
-        });
-        setLoadedUntil(nextEnd);
-      })
-      .finally(() => {
-        isFetchingRef.current = false;
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableId, total]);
-
-  // Load more when approaching the loaded boundary
-  useEffect(() => {
-    if (!tableId || total === 0) {
-      return;
-    }
-    if (isFetchingRef.current) {
-      return;
-    }
-    const buffer = 10;
-    if (endIndex > Math.max(0, loadedUntil - buffer) && loadedUntil < total) {
-      const nextEnd = Math.min(loadedUntil + PAGE_SIZE, total);
-      const idsBatch = rowIds.slice(loadedUntil, nextEnd);
-      isFetchingRef.current = true;
-      _fetchTableRowData({ tableId, recordIds: idsBatch })
-        .then((res: any) => {
-          const arr = (res?.data ?? []) as any[];
-          setRowsMap((prev) => {
-            const m = { ...prev } as Record<string, any>;
-            arr.forEach((row) => {
-              if (row && row.id) {
-                m[row.id] = row;
-              }
-            });
-            return m;
-          });
-          setLoadedUntil(nextEnd);
-        })
-        .finally(() => {
-          isFetchingRef.current = false;
-        });
-    }
-  }, [endIndex, loadedUntil, total, rowIds, tableId]);
-
   return (
-    <Stack sx={{ height: '100%', display: 'flex', minHeight: 0 }}>
-      {tableId}
-
-      <StyledTable
-        columns={headers}
-        columnWidthStorageKey={tableId}
-        data={visibleData}
-        pinnedLeftCount={1}
-        rowIds={rowIds}
-        virtualization={{
-          enabled: true,
-          // containerHeight omitted -> takes remaining space
-          rowHeight: ROW_HEIGHT,
-          paddingTop,
-          paddingBottom,
-          onScroll: (e) => setScrollTop((e.target as HTMLDivElement).scrollTop),
-          onContainerRef: (el) => (containerRef.current = el),
-        }}
-      />
+    <Stack
+      ref={scrollContainerRef}
+      sx={{
+        height: 'calc(100% - 126px)', // More precise: 24+32+24+32+12+2 = 126px
+        minHeight: '400px', // Fallback minimum height for virtualization
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'auto',
+        flex: 1, // Take remaining space
+      }}
+    >
+      {/* Always render table when we have headers and rowIds, even if data is loading */}
+      {headers.length > 0 && rowIds.length > 0 && (
+        <StyledTable
+          columns={headers}
+          columnWidthStorageKey={tableId}
+          data={fullData}
+          pinnedLeftCount={1}
+          rowIds={rowIds}
+          scrolled={scrolled}
+          virtualization={{
+            enabled: true,
+            rowHeight: ROW_HEIGHT,
+            scrollContainer: scrollContainerRef,
+            onVisibleRangeChange: handleVisibleRangeChange,
+          }}
+        />
+      )}
     </Stack>
   );
 };

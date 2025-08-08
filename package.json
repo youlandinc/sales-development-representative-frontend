@@ -22,6 +22,7 @@
     "@mui/x-data-grid": "8.9.1",
     "@mui/x-date-pickers": "8.9.0",
     "@tanstack/react-table": "8.21.3",
+    "@tanstack/react-virtual": "^3.13.12",
     "axios": "1.8.4",
     "ckeditor4-react": "4.3.0",
     "clsx": "^2.1.1",
