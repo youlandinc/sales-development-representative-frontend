@@ -280,7 +280,7 @@ export const StyledTable: FC<StyledTableProps> = ({
             }}
           />
         )}
-        
+
         <StyledTableHead scrolled={scrolled ?? scrolledState}>
           {/* Column resize indicator for header area - higher z-index */}
           {columnSizingInfo.isResizingColumn && (
@@ -299,7 +299,7 @@ export const StyledTable: FC<StyledTableProps> = ({
               }}
             />
           )}
-          
+
           {table.getHeaderGroups().map((headerGroup) => (
             <StyledTableHeadRow key={headerGroup.id}>
               {/* Pinned left headers */}
