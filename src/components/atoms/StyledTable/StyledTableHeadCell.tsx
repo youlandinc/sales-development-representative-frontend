@@ -50,6 +50,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = React.memo(
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 3 : 1,
           '&:hover': { bgcolor: '#F6F6F6' },
+          height: '100%',
+          justifyContent: 'center',
         }}
       >
         {content}
