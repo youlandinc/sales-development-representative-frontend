@@ -6,3 +6,5 @@ export * from './ExtensionStorage';
 export * from './UseAiConfigure';
 export * from './UseAiGenerate';
 export * from './CollapseCard';
+export * from './SlateEditor';
+export * from './TiptapEditor';

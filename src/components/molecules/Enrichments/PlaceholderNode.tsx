@@ -1,8 +1,9 @@
 import { NodeViewWrapper } from '@tiptap/react';
-import { Stack, Switch, Tooltip, Typography } from '@mui/material';
+import { Icon, Stack, Switch, Tooltip, Typography } from '@mui/material';
 import { ChangeEvent, FC } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
+import ICON_TEXT from './assets/icon_text.svg';
 
 export const PlaceholderNode: FC = (props: any) => {
   const { node, deleteNode, editor } = props;
@@ -36,7 +37,7 @@ export const PlaceholderNode: FC = (props: any) => {
           width={'fit-content'}
         >
           <Switch
-            checked={editor.storage.sharedSwitchStorage.checked}
+            // checked={editor.storage.sharedSwitchStorage.checked}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               // editor.storage.sharedSwitchStorage.checked = e.target.checked;
               // editor.storage.sharedSwitchStorage.onUpdate(e.target.checked);
@@ -44,10 +45,11 @@ export const PlaceholderNode: FC = (props: any) => {
             }}
             size={'small'}
           />
-          <Typography color={'primary'}>{label}</Typography>
+          <Icon component={ICON_TEXT} sx={{ width: 18, height: 18 }} />
+          <Typography color={'text.primary'}>{label}</Typography>
           <CloseIcon
             onClick={deleteNode}
-            sx={{ color: 'text.secondary', cursor: 'pointer' }}
+            sx={{ color: 'text.secondary', cursor: 'pointer', fontSize: 18 }}
           />
         </Stack>
       </Tooltip>

@@ -1,5 +1,5 @@
 import { mergeAttributes, Node } from '@tiptap/core';
-import { Plugin,PluginKey } from '@tiptap/pm/state';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
 import { PlaceholderNode } from '@/components/molecules';
@@ -35,7 +35,7 @@ export const ExtensionNode = Node.create({
   addOptions() {
     return { behavior: undefined };
   },
-/*  addProseMirrorPlugins() {
+  /*  addProseMirrorPlugins() {
     const { behavior: t } = this.options,
       n = this.editor;
     if (!t) {
@@ -64,6 +64,7 @@ export const ExtensionNode = Node.create({
     return ['span', { ...HTMLAttributes }, 0];
   },
 });
+
 export const VariableTokenNode = Node.create({
   name: 'variableToken',
   addOptions() {
