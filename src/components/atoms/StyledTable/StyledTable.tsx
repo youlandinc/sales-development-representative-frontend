@@ -179,7 +179,9 @@ export const StyledTable: FC<StyledTableProps> = ({
     if (saved) {
       try {
         next = JSON.parse(saved) || {};
-      } catch { /* empty */ }
+      } catch {
+        /* empty */
+      }
     } else if (initialColumnWidths) {
       next = initialColumnWidths;
     }

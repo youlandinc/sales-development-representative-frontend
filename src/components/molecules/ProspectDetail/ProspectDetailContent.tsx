@@ -72,7 +72,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   // Measure viewport height
   useLayoutEffect(() => {
     const el = containerRef.current;
-    if (!el) {return;}
+    if (!el) {
+      return;
+    }
     const ro = new ResizeObserver(() => {
       setViewportHeight(el.clientHeight);
     });
@@ -83,8 +85,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
   // Initial load when rowIds ready
   useEffect(() => {
-    if (!tableId || total === 0) {return;}
-    if (loadedUntil > 0) {return;}
+    if (!tableId || total === 0) {
+      return;
+    }
+    if (loadedUntil > 0) {
+      return;
+    }
     const nextEnd = Math.min(PAGE_SIZE, total);
     const idsBatch = rowIds.slice(0, nextEnd);
     isFetchingRef.current = true;
@@ -94,7 +100,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         setRowsMap((prev) => {
           const m = { ...prev } as Record<string, any>;
           arr.forEach((row) => {
-            if (row && row.id) {m[row.id] = row;}
+            if (row && row.id) {
+              m[row.id] = row;
+            }
           });
           return m;
         });
@@ -108,8 +116,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
   // Load more when approaching the loaded boundary
   useEffect(() => {
-    if (!tableId || total === 0) {return;}
-    if (isFetchingRef.current) {return;}
+    if (!tableId || total === 0) {
+      return;
+    }
+    if (isFetchingRef.current) {
+      return;
+    }
     const buffer = 10;
     if (endIndex > Math.max(0, loadedUntil - buffer) && loadedUntil < total) {
       const nextEnd = Math.min(loadedUntil + PAGE_SIZE, total);
@@ -121,7 +133,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           setRowsMap((prev) => {
             const m = { ...prev } as Record<string, any>;
             arr.forEach((row) => {
-              if (row && row.id) {m[row.id] = row;}
+              if (row && row.id) {
+                m[row.id] = row;
+              }
             });
             return m;
           });
