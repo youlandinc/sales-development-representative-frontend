@@ -1,5 +1,14 @@
 export enum TableHeaderTypeEnum {
   text = 'TEXT',
+  number = 'NUMBER',
+  email = 'EMAIL',
+  phone = 'PHONE',
+  currency = 'CURRENCY',
+  date = 'DATE',
+  url = 'URL',
+  img_url = 'IMG_URL',
+  checkbox = 'CHECKBOX',
+  select = 'SELECT',
 }
 
 export interface TableHeaderProps {
