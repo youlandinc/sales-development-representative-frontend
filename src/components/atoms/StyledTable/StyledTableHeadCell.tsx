@@ -39,8 +39,6 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = React.memo(
           userSelect: 'none',
           display: 'flex',
           width,
-          minWidth: width,
-          maxWidth: width,
           borderLeft: '1px solid #DFDEE6',
           borderBottom: '1px solid #DFDEE6',
           p: 1.5,
@@ -86,7 +84,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = React.memo(
                 backgroundColor: 'rgba(25, 118, 210, 0.12)',
                 borderRight: '2px solid #1565c0',
               },
-              // Add a visual indicator in the center
+              //Add a visual indicator in the center
               '&::after': {
                 content: '""',
                 position: 'absolute',

@@ -14,6 +14,7 @@ export type ProspectTableState = {
 export type ProspectTableActions = {
   fetchHeaders: (tableId: string) => Promise<void>;
   fetchRowIds: (tableId: string) => Promise<void>;
+  resetTable: () => void;
 };
 
 export type ProspectTableStoreProps = ProspectTableState & ProspectTableActions;
@@ -47,6 +48,9 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
       }
+    },
+    resetTable: () => {
+      set({ headers: [], rowIds: [] });
     },
   }),
 );

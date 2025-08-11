@@ -11,6 +11,10 @@ interface StyledTableBodyCellProps {
   isPinned?: boolean;
   stickyLeft?: number;
   isLoading?: boolean;
+  // used to break React.memo when edit mode toggles for this cell
+  isEditing?: boolean;
+  // used to break React.memo when the edited value changes for this cell
+  editValue?: any;
 }
 
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = React.memo(
@@ -21,6 +25,8 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = React.memo(
     isPinned = false,
     stickyLeft = 0,
     isLoading = false,
+    isEditing: _isEditing = false,
+    editValue: _editValue,
   }) => {
     const content = cell
       ? flexRender(cell.column.columnDef.cell, cell.getContext())
@@ -45,11 +51,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = React.memo(
           justifyContent: 'center',
         }}
       >
-        {isLoading ? (
-          <Skeleton height={16} variant="text" width={80} />
-        ) : (
-          content
-        )}
+        {content}
+        {/*{isLoading ? (*/}
+        {/*  <Skeleton height={16} variant="text" width={80} />*/}
+        {/*) : (*/}
+        {/*  content*/}
+        {/*)}*/}
       </Stack>
     );
   },

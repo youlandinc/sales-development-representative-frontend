@@ -148,8 +148,7 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
       ref={tableContainerRef}
       sx={{
         position: 'relative',
-        width: '100%',
-        display: 'flex',
+        width: 'fit-content',
         flexDirection: 'column',
         '& .column-resize-indicator': {
           position: 'absolute',

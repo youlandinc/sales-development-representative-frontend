@@ -13,9 +13,8 @@ interface ProspectDetailTableProps {
 export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   tableId,
 }) => {
-  const { fetchHeaders, fetchRowIds, headers, rowIds } = useProspectTableStore(
-    (store) => store,
-  );
+  const { fetchHeaders, fetchRowIds, headers, rowIds, resetTable } =
+    useProspectTableStore((store) => store);
 
   // Only fetch headers and rowIds once when tableId changes
   const { isLoading: isMetadataLoading } = useSWR(
@@ -46,11 +45,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
   // Clear data when tableId changes
   useEffect(() => {
+    resetTable();
     setRowsMap({});
     rowsMapRef.current = {};
     isFetchingRef.current = false;
     maxLoadedIndexRef.current = -1;
-  }, [tableId]);
+  }, [resetTable, tableId]);
 
   // Incremental loading based on visible rows - ONLY fetches row data
   const fetchBatchData = useCallback(
@@ -177,7 +177,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'auto',
-        flex: 1, // Take remaining space
+        //flex: 1, // Take remaining space
       }}
     >
       {/* Always render table when we have headers and rowIds, even if data is loading */}
