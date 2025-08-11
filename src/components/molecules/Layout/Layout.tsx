@@ -4,7 +4,11 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/provides';
 
-import { CampaignProcess, LayoutSide } from '@/components/molecules';
+import {
+  CampaignProcess,
+  LayoutHeader,
+  LayoutSide,
+} from '@/components/molecules';
 
 export interface StyledLayoutProps {
   sx?: SxProps;
@@ -35,10 +39,12 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
         overflow: 'hidden',
         height: '100vh',
         width: '100vw',
+        flexDirection: 'column',
         ...sx,
       }}
     >
-      <Stack flexDirection={'row'} height={'100%'} width={'100%'}>
+      <LayoutHeader />
+      <Stack flexDirection={'row'} height={'calc(100% - 72px)'} width={'100%'}>
         <LayoutSide />
         <Stack
           sx={{
@@ -46,9 +52,7 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
             display: 'flex',
             flexDirection: 'column',
             m: 0,
-            pt: 7,
-            px: 3,
-            pb: 3,
+            p: 3,
             overflow: 'auto',
             minWidth: 720,
           }}
@@ -56,7 +60,6 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
           {children}
         </Stack>
       </Stack>
-
       <CampaignProcess />
     </Box>
   );

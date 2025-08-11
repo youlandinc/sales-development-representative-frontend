@@ -1,6 +1,8 @@
 export * from './request';
 export * from './user';
 
+export * from './Prospect';
+
 export * from './Campaign';
 
 export * from './leads';

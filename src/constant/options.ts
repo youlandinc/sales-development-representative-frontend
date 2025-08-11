@@ -1,4 +1,4 @@
-import { FilterOperationEnum } from '@/types';
+import { FilterOperationEnum, ProspectDelimiterEnum } from '@/types';
 import { ReactNode } from 'react';
 
 export const WORD_COUNT_OPTIONS: {
@@ -60,5 +60,28 @@ export const FILTER_OPERATIONS: TOption[] = [
     label: 'Does not end with',
     value: FilterOperationEnum.not_ends_with,
     key: FilterOperationEnum.not_ends_with,
+  },
+];
+
+export const PROSPECT_CSV_TYPE_OPTIONS = [
+  {
+    label: 'Comma',
+    value: ProspectDelimiterEnum.comma,
+    key: ProspectDelimiterEnum.comma,
+  },
+  {
+    label: 'Semicolon',
+    value: ProspectDelimiterEnum.semicolon,
+    key: ProspectDelimiterEnum.semicolon,
+  },
+  {
+    label: 'Tab',
+    value: ProspectDelimiterEnum.tab,
+    key: ProspectDelimiterEnum.tab,
+  },
+  {
+    label: 'Pipe',
+    value: ProspectDelimiterEnum.pipe,
+    key: ProspectDelimiterEnum.pipe,
   },
 ];

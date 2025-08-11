@@ -77,7 +77,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
           },
           '&.Mui-disabled': {
             borderColor: 'action.disabled',
-            color: 'action.disabled',
+            color: '#BABCBE !important',
           },
         },
         '&.MuiButton-text': {
@@ -94,10 +94,10 @@ export const StyledButton: FC<StyledButtonProps> = ({
             //color !== 'primary' ? `${color}.hover` : `${color}.contrastHover`,
           },
           '&.Mui-disabled': {
-            color: 'action.disabled',
+            color: '#BABCBE !important',
           },
         },
-        '&.MuiButton-outlinedInfo, &.MuiButton-textInfo': {
+        '&.MuiButton-outlined.MuiButton-colorInfo, &.MuiButton-textInfo': {
           color: 'text.primary',
         },
         '&.MuiButton-sizeLarge': {

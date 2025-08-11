@@ -1,3 +1,6 @@
+export * from './Prospect';
+export * from './ProspectDetail';
+
 export * from './Campaigns';
 
 export * from './Leads';
