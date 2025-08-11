@@ -16,12 +16,11 @@ export const StyledTableHead: FC<StyledTableHeadProps> = ({
         display: 'flex',
         position: 'sticky',
         top: 0,
-        zIndex: 10, // Higher z-index to ensure it stays above content
+        zIndex: 10,
         bgcolor: '#fff',
         boxShadow: scrolled ? '0 4px 10px rgba(0,0,0,0.06)' : 'none',
         borderBottom: '1px solid #DFDEE6',
         width: '100%',
-        // Ensure proper sticking behavior
         '&::before': {
           content: '""',
           position: 'absolute',

@@ -1,6 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox, Menu, MenuItem, Stack } from '@mui/material';
-import { StyledTextField } from '@/components/atoms';
 
 import {
   createColumnHelper,
@@ -32,8 +31,6 @@ interface StyledTableProps {
   addMenuItems?: { label: string; value: string }[];
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
   pinnedLeftCount?: number;
-  initialColumnWidths?: Record<string, number>;
-  onColumnWidthsChange?: (widths: Record<string, number>) => void;
   columnWidthStorageKey?: string;
   scrolled?: boolean;
   virtualization?: {
@@ -42,6 +39,8 @@ interface StyledTableProps {
     scrollContainer?: React.RefObject<HTMLDivElement | null>;
     onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
   };
+  onColumnResize?: (fieldId: string, width: number) => void;
+  onCellEdit?: (rowId: string, fieldId: string, value: string) => void;
 }
 
 const columnHelper = createColumnHelper<any>();
@@ -53,11 +52,11 @@ export const StyledTable: FC<StyledTableProps> = ({
   addMenuItems,
   onAddMenuItemClick,
   pinnedLeftCount: pinnedLeftCountProp,
-  initialColumnWidths,
-  onColumnWidthsChange,
   columnWidthStorageKey,
   scrolled,
   virtualization,
+  onColumnResize,
+  onCellEdit,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -70,12 +69,11 @@ export const StyledTable: FC<StyledTableProps> = ({
     right: [],
   });
 
-  // Inline edit support (store edited values per rowId/columnId)
   const editsRef = useRef<Record<string, Record<string, any>>>({});
-  const [, setEditVersion] = useState(0); // trigger re-render on edits
+  const [, setEditVersion] = useState(0);
   const editingRef = useRef<Record<string, Record<string, boolean>>>({});
+  const activeRef = useRef<Record<string, Record<string, boolean>>>({});
 
-  // Add column menu state
   const [addMenuAnchor, setAddMenuAnchor] = useState<null | HTMLElement>(null);
   const addMenuItems_ = useMemo(
     () => addMenuItems ?? [{ label: '+ Add new column', value: 'add_column' }],
@@ -84,10 +82,26 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   const rowHeight = virtualization?.rowHeight ?? 48;
 
+  const handleColumnSizingChange = useCallback(
+    (updater: any) => {
+      const newColumnSizing =
+        typeof updater === 'function' ? updater(columnSizing) : updater;
+      setColumnSizing(newColumnSizing);
+
+      Object.keys(newColumnSizing).forEach((columnId) => {
+        const newSize = newColumnSizing[columnId];
+        const oldSize = columnSizing[columnId];
+        if (newSize !== oldSize && newSize != null) {
+          onColumnResize?.(columnId, newSize);
+        }
+      });
+    },
+    [columnSizing, onColumnResize],
+  );
+
   const table = useReactTable({
     data: data,
     columns: useMemo(() => {
-      // First column: selection
       const selectCol = columnHelper.display({
         id: '__select',
         header: () => {
@@ -173,43 +187,8 @@ export const StyledTable: FC<StyledTableProps> = ({
             id: column.fieldId,
             header: column.fieldName,
             cell: (info) => {
-              const rowId = String(info.row.id);
-              const colId = String(info.column.id);
-              const meta: any = info.table.options.meta;
-              const edited = meta?.getEdit?.(rowId, colId);
-              const value =
-                edited !== undefined ? edited : (info.getValue() as any);
-              const isEditing = meta?.isEditing?.(rowId, colId);
-              if (isEditing) {
-                return (
-                  <StyledTextField
-                    autoFocus
-                    onBlur={() => meta?.stopEdit?.(rowId, colId)}
-                    onChange={(e) =>
-                      meta?.updateData?.(rowId, colId, e.target.value as any)
-                    }
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === 'Escape') {
-                        meta?.stopEdit?.(rowId, colId);
-                      }
-                    }}
-                    size="small"
-                    value={value ?? ''}
-                  />
-                );
-              }
-              return (
-                <div
-                  onDoubleClick={(e) => {
-                    e.stopPropagation();
-                    meta?.startEdit?.(rowId, colId);
-                  }}
-                  style={{ width: '100%' }}
-                >
-                  {value as any}
-                </div>
-              );
+              const value = info.getValue();
+              return value as any;
             },
           },
         ),
@@ -220,7 +199,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     getCoreRowModel: getCoreRowModel(),
     getRowId: (_row, index) => rowIds[index] ?? String(index),
     defaultColumn: {
-      size: 160,
+      size: 200,
       minSize: 80,
     },
     enableRowSelection: true,
@@ -232,23 +211,29 @@ export const StyledTable: FC<StyledTableProps> = ({
       rowSelection,
       columnPinning,
     },
-    onColumnSizingChange: setColumnSizing,
+    onColumnSizingChange: handleColumnSizingChange,
     onColumnSizingInfoChange: setColumnSizingInfo,
     onRowSelectionChange: setRowSelection,
     onColumnPinningChange: setColumnPinning,
     meta: {
-      getEdit: (rowId: string, columnId: string) =>
-        editsRef.current[rowId]?.[columnId],
+      getEdit: (rowId: string, columnId: string) => {
+        return editsRef.current[rowId]?.[columnId];
+      },
       updateData: (rowId: string, columnId: string, value: any) => {
         const rowEdits = editsRef.current[rowId] || {};
         editsRef.current = {
           ...editsRef.current,
           [rowId]: { ...rowEdits, [columnId]: value },
         };
+
+        onCellEdit?.(rowId, columnId, String(value));
+
         setEditVersion((v) => v + 1);
       },
       isEditing: (rowId: string, columnId: string) =>
         Boolean(editingRef.current[rowId]?.[columnId]),
+      isActive: (rowId: string, columnId: string) =>
+        Boolean(activeRef.current[rowId]?.[columnId]),
       startEdit: (rowId: string, columnId: string) => {
         const row = editingRef.current[rowId] || {};
         editingRef.current = {
@@ -268,10 +253,28 @@ export const StyledTable: FC<StyledTableProps> = ({
           setEditVersion((v) => v + 1);
         }
       },
+      setActive: (rowId: string, columnId: string) => {
+        const currentActive = activeRef.current[rowId]?.[columnId];
+        const hasOtherActive = Object.keys(activeRef.current).some((rId) =>
+          Object.keys(activeRef.current[rId] || {}).some(
+            (cId) =>
+              activeRef.current[rId][cId] &&
+              (rId !== rowId || cId !== columnId),
+          ),
+        );
+
+        if (!currentActive || hasOtherActive) {
+          activeRef.current = { [rowId]: { [columnId]: true } };
+          setEditVersion((v) => v + 1);
+        }
+      },
+      clearActive: () => {
+        activeRef.current = {};
+        setEditVersion((v) => v + 1);
+      },
     },
   });
 
-  // Calculate sticky left offsets for pinned columns
   const { leftPinnedColumns, centerColumns, stickyLeftMap } = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();
     const leftPinned = visibleColumns.filter(
@@ -294,26 +297,30 @@ export const StyledTable: FC<StyledTableProps> = ({
     };
   }, [table.getVisibleLeafColumns(), columnSizing]);
 
-  // Load persisted column sizing
   useEffect(() => {
+    const initialSizing: ColumnSizingState = {};
+
+    columns.forEach((column) => {
+      if (column.width && column.width > 0) {
+        initialSizing[column.fieldId] = column.width;
+      }
+    });
+
     const key = columnWidthStorageKey;
     const saved = key ? localStorage.getItem(`table_colwidths_${key}`) : null;
-    let next: Record<string, number> = {};
     if (saved) {
       try {
-        next = JSON.parse(saved) || {};
+        Object.assign(initialSizing, JSON.parse(saved) || {});
       } catch {
         /* empty */
       }
-    } else if (initialColumnWidths) {
-      next = initialColumnWidths;
     }
-    if (Object.keys(next).length) {
-      setColumnSizing(next);
-    }
-  }, [columnWidthStorageKey, initialColumnWidths]);
 
-  // Persist column sizing
+    if (Object.keys(initialSizing).length) {
+      setColumnSizing(initialSizing);
+    }
+  }, [columnWidthStorageKey, columns]);
+
   useEffect(() => {
     if (columnWidthStorageKey) {
       localStorage.setItem(
@@ -321,8 +328,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         JSON.stringify(columnSizing),
       );
     }
-    onColumnWidthsChange?.(columnSizing as Record<string, number>);
-  }, [columnSizing, columnWidthStorageKey, onColumnWidthsChange]);
+  }, [columnSizing, columnWidthStorageKey]);
 
   const handleAddMenuClick = useCallback(
     (item: { label: string; value: string }) => {
@@ -332,7 +338,6 @@ export const StyledTable: FC<StyledTableProps> = ({
     [onAddMenuItemClick],
   );
 
-  // Memoize render content to avoid recreation on every render
   const renderContent = useCallback(
     ({
       tableContainerRef,
@@ -345,7 +350,6 @@ export const StyledTable: FC<StyledTableProps> = ({
     }: any) => {
       return (
         <>
-          {/* Column resize indicator - positioned relative to scroll container */}
           {columnSizingInfo.isResizingColumn && (
             <div
               style={{
@@ -355,7 +359,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   (columnSizingInfo.startOffset ?? 0) +
                     (columnVirtualizer.scrollOffset ?? 0) || 0,
                 transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
-                height: `${rowVirtualizer.getTotalSize()}px`, // Use virtual total height
+                height: `${rowVirtualizer.getTotalSize()}px`,
                 width: '2px',
                 backgroundColor: '#1976d2',
                 zIndex: 1000,
@@ -366,7 +370,6 @@ export const StyledTable: FC<StyledTableProps> = ({
           )}
 
           <StyledTableHead scrolled={scrolled ?? scrolledState}>
-            {/* Column resize indicator for header area - higher z-index */}
             {columnSizingInfo.isResizingColumn && (
               <div
                 style={{
@@ -379,7 +382,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
                   width: '2px',
                   backgroundColor: '#1976d2',
-                  zIndex: 1001, // Higher than head cells (zIndex: 3)
+                  zIndex: 1001,
                   pointerEvents: 'none',
                   opacity: 0.8,
                 }}
@@ -407,12 +410,10 @@ export const StyledTable: FC<StyledTableProps> = ({
                   );
                 })}
 
-                {/* Left padding spacer */}
                 {virtualPaddingLeft ? (
                   <StyledTableSpacer width={virtualPaddingLeft} />
                 ) : null}
 
-                {/* Virtual columns */}
                 {virtualColumns.map((virtualColumn: any) => {
                   const col = centerColumns[virtualColumn.index];
                   const header = headerGroup.headers.find(
@@ -434,12 +435,10 @@ export const StyledTable: FC<StyledTableProps> = ({
                   );
                 })}
 
-                {/* Right padding spacer */}
                 {virtualPaddingRight ? (
                   <StyledTableSpacer width={virtualPaddingRight} />
                 ) : null}
 
-                {/* Add column button */}
                 <StyledTableHeadCell
                   onClick={(e) => setAddMenuAnchor(e.currentTarget)}
                   width={120}
@@ -482,15 +481,26 @@ export const StyledTable: FC<StyledTableProps> = ({
                           String(cell.row.id),
                           String(cell.column.id),
                         )}
+                        isActive={Boolean(
+                          (table.options.meta as any)?.isActive?.(
+                            String(cell.row.id),
+                            String(cell.column.id),
+                          ),
+                        )}
                         isEditing={Boolean(
                           (table.options.meta as any)?.isEditing?.(
                             String(cell.row.id),
                             String(cell.column.id),
                           ),
                         )}
-                        isLoading={isLoading}
                         isPinned
                         key={cell.id}
+                        onCellClick={(table.options.meta as any)?.setActive}
+                        onCellDoubleClick={
+                          (table.options.meta as any)?.startEdit
+                        }
+                        onEditCommit={(table.options.meta as any)?.updateData}
+                        onEditStop={(table.options.meta as any)?.stopEdit}
                         stickyLeft={stickyLeftMap[col.id] ?? 0}
                         width={cell.column.getSize()}
                       />
@@ -522,14 +532,25 @@ export const StyledTable: FC<StyledTableProps> = ({
                           String(cell.row.id),
                           String(cell.column.id),
                         )}
+                        isActive={Boolean(
+                          (table.options.meta as any)?.isActive?.(
+                            String(cell.row.id),
+                            String(cell.column.id),
+                          ),
+                        )}
                         isEditing={Boolean(
                           (table.options.meta as any)?.isEditing?.(
                             String(cell.row.id),
                             String(cell.column.id),
                           ),
                         )}
-                        isLoading={isLoading}
                         key={cell.id}
+                        onCellClick={(table.options.meta as any)?.setActive}
+                        onCellDoubleClick={
+                          (table.options.meta as any)?.startEdit
+                        }
+                        onEditCommit={(table.options.meta as any)?.updateData}
+                        onEditStop={(table.options.meta as any)?.stopEdit}
                         width={cell.column.getSize()}
                       />
                     );
@@ -575,7 +596,6 @@ export const StyledTable: FC<StyledTableProps> = ({
         table={table}
       />
 
-      {/* Add Column Menu */}
       <Menu
         anchorEl={addMenuAnchor}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}

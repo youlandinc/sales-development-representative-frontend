@@ -90,4 +90,4 @@ service.interceptors.response.use(
   },
 );
 
-export const { get, post, put, delete: del } = service;
+export const { get, post, put, delete: del, patch } = service;

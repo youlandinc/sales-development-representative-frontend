@@ -8,7 +8,6 @@ interface StyledTableContainerProps {
   rowHeight: number;
   onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
   scrollContainer?: React.RefObject<HTMLDivElement | null>;
-  // Expose virtualizers to children via render props
   renderContent: (props: {
     tableContainerRef: React.RefObject<HTMLDivElement | null>;
     columnVirtualizer: any;
@@ -29,7 +28,6 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
 }) => {
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Wait for scroll container to be ready
   const [isScrollContainerReady, setIsScrollContainerReady] = useState(false);
 
   useEffect(() => {
@@ -38,19 +36,16 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
       const height = container?.clientHeight || container?.offsetHeight || 0;
 
       if (container && height >= 300) {
-        // Use minimum height threshold - lowered since container is smaller
         setIsScrollContainerReady(true);
         return true;
       }
       return false;
     };
 
-    // Check immediately
     if (checkContainer()) {
       return;
     }
 
-    // Check with timeout to allow layout
     const timeout = setTimeout(() => {
       checkContainer();
     }, 100);
@@ -67,14 +62,12 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     };
   }, [scrollContainer]);
 
-  // Memoize column calculations
   const { visibleColumns, centerColumns } = useMemo(() => {
     const visible = table.getVisibleLeafColumns();
     const center = visible.filter((col) => !col.getIsPinned());
     return { visibleColumns: visible, centerColumns: center };
   }, [table.getVisibleLeafColumns()]);
 
-  // Column virtualizer only for center (unpinned) columns
   const columnVirtualizer = useVirtualizer({
     count: centerColumns.length,
     estimateSize: (index) => centerColumns[index].getSize(),
@@ -84,7 +77,6 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     overscan: 3,
   });
 
-  // Row virtualizer
   const rows = table.getRowModel().rows;
 
   const rowVirtualizer = useVirtualizer({
@@ -97,12 +89,11 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     overscan: 5,
     initialRect: {
       width: 0,
-      height: isScrollContainerReady ? 0 : 600, // Use fallback when container not ready
+      height: isScrollContainerReady ? 0 : 600,
     },
-    enabled: isScrollContainerReady, // Only enable when container is ready
+    enabled: isScrollContainerReady,
   });
 
-  // Memoize virtual items and padding calculations
   const virtualData = useMemo(() => {
     const virtualColumns = columnVirtualizer.getVirtualItems();
     const virtualRows = rowVirtualizer.getVirtualItems();

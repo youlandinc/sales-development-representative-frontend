@@ -1,8 +1,6 @@
-import { FC, ReactNode } from 'react';
+import { FC, memo, MouseEvent, ReactNode } from 'react';
 import { Stack } from '@mui/material';
-import { Header } from '@tanstack/react-table';
-import { flexRender } from '@tanstack/react-table';
-import React from 'react';
+import { flexRender, Header } from '@tanstack/react-table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -12,10 +10,10 @@ interface StyledTableHeadCellProps {
   stickyLeft?: number;
   measureRef?: (node: HTMLElement | null) => void;
   dataIndex?: number;
-  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  onClick?: (e: MouseEvent<HTMLElement>) => void;
 }
 
-export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = React.memo(
+export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
   ({
     header,
     children,
@@ -54,7 +52,6 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = React.memo(
       >
         {content}
 
-        {/* Resize handle */}
         {header?.column.getCanResize?.() !== false && (
           <Stack
             onMouseDown={(e) => {
@@ -84,7 +81,6 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = React.memo(
                 backgroundColor: 'rgba(25, 118, 210, 0.12)',
                 borderRight: '2px solid #1565c0',
               },
-              //Add a visual indicator in the center
               '&::after': {
                 content: '""',
                 position: 'absolute',
