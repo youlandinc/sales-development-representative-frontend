@@ -17,6 +17,8 @@ import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
 import { WebResearch } from '@/components/molecules';
+import {useSwitch} from "@/hooks";
+import {useWebResearchStore} from "@/stores/Prospect";
 
 const BUTTONS = [
   {
@@ -53,7 +55,8 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
   openDialog,
 }) => {
   const [value, setValue] = useState(store.searchWord);
-
+  const {setOpen} = useWebResearchStore(state=>state)
+const {visible,open,close} = useSwitch()
   const debounceSearchWord = useMemo(
     () =>
       debounce((value) => {
@@ -102,7 +105,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
           ))}
           <StyledButton
             onClick={() => {
-              return;
+              setOpen(true)
             }}
             size={'medium'}
           >

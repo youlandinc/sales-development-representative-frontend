@@ -24,7 +24,9 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
       <TiptapEditor
         handleGenerate={handleGeneratePrompt}
         isLoading={isLoading}
-        placeholder={'123321321'}
+        placeholder={
+          'E.g., Find the CEO of the company and their Linkedin profile'
+        }
       />
     </Stack>
   );

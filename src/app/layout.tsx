@@ -20,12 +20,7 @@ import { lightTheme } from '@/theme';
 
 import { ToastProvider } from '@/provides/ToastProvider';
 
-const redHatDisplay = Red_Hat_Display({
-  weight: ['400', '600', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-red-hat-display',
-});
+
 
 const RootLayout = ({
   children,
@@ -38,7 +33,7 @@ const RootLayout = ({
         <link href="/favicon.svg" rel="icon" sizes={'any'} />
         <title>Attune</title>
       </head>
-      <body className={redHatDisplay.variable}>
+      <body >
         <InitColorSchemeScript attribute="class" />
         <NextTopLoader
           color="#6E4EFB"

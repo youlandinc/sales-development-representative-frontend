@@ -1,6 +1,6 @@
 import { NodeViewWrapper } from '@tiptap/react';
 import { Icon, Stack, Switch, Tooltip, Typography } from '@mui/material';
-import { ChangeEvent, FC } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
 import ICON_TEXT from './assets/icon_text.svg';
@@ -19,6 +19,24 @@ export const PlaceholderNode: FC = (props: any) => {
 
   const label = node?.attrs?.label;
 
+  const storage = editor.storage.sharedSwitch;
+
+  const [checked, setChecked] = useState(storage.checked);
+
+  useEffect(() => {
+    // 订阅存储变化
+    storage.subscribe(setChecked);
+
+    // 清理订阅
+    return () => {
+      storage.unsubscribe();
+    };
+  }, [storage]);
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    storage.setChecked(e.target.checked);
+  };
+
   return (
     <NodeViewWrapper as="span" data-placeholder>
       <Tooltip title={label}>
@@ -36,15 +54,7 @@ export const PlaceholderNode: FC = (props: any) => {
           }}
           width={'fit-content'}
         >
-          <Switch
-            // checked={editor.storage.sharedSwitchStorage.checked}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              // editor.storage.sharedSwitchStorage.checked = e.target.checked;
-              // editor.storage.sharedSwitchStorage.onUpdate(e.target.checked);
-              // editor.commands.setChecked(e.target.checked);
-            }}
-            size={'small'}
-          />
+          <Switch checked={checked} onChange={onChange} size={'small'} />
           <Icon component={ICON_TEXT} sx={{ width: 18, height: 18 }} />
           <Typography color={'text.primary'}>{label}</Typography>
           <CloseIcon

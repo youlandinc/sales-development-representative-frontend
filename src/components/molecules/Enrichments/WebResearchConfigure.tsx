@@ -109,7 +109,7 @@ export const WebResearchConfigure = () => {
     //   editor.commands.insertContent(paragraph);
     // });
   };
-  const defaultValue = insertWithPlaceholders(null, prompt);
+  const defaultValue = prompt ? insertWithPlaceholders(null, prompt) : null;
 
   // const {
   //   data: s,
@@ -138,11 +138,17 @@ export const WebResearchConfigure = () => {
   return (
     <Stack gap={4}>
       {/*<Typography>{text}</Typography>*/}
-      <Stack>
+      <Stack gap={0.5}>
         <Typography fontWeight={700} variant={'subtitle1'}>
           Prompt
         </Typography>
-        <TiptapEditor defaultValue={defaultValue} />
+        <TiptapEditor
+          defaultValue={defaultValue}
+          minHeight={200}
+          placeholder={
+            'E.g., Find the CEO of the company and their Linkedin profile'
+          }
+        />
       </Stack>
       {/*outputs*/}
       <CollapseCard title={'Define outputs'}>
@@ -179,28 +185,45 @@ export const WebResearchConfigure = () => {
             </Stack>
           </RadioGroup>
           {outPuts === 'fields' && (
-            <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
-              <StyledTextField />
-              <StyledSelect
-                options={[
-                  {
-                    label: 'Text',
-                    value: 'text',
-                    key: 'text',
-                  },
-                ]}
-                placeholder={'Text'}
-                startAdornment={
-                  <Icon component={ICON_TEXT} sx={{ width: 12, height: 12 }} />
-                }
-              />
-              <MoreHoriz
+            <Stack gap={1.5}>
+              <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
+                <StyledTextField />
+                <StyledSelect
+                  options={[
+                    {
+                      label: 'Text',
+                      value: 'text',
+                      key: 'text',
+                    },
+                  ]}
+                  placeholder={'Text'}
+                  startAdornment={
+                    <Icon
+                      component={ICON_TEXT}
+                      sx={{ width: 12, height: 12 }}
+                    />
+                  }
+                />
+                <MoreHoriz
+                  sx={{
+                    fontSize: 20,
+                    color: 'text.primary',
+                    cursor: 'pointer',
+                  }}
+                />
+              </Stack>
+              <StyledButton
+                color={'info'}
+                size={'medium'}
                 sx={{
-                  fontSize: 20,
-                  color: 'text.primary',
-                  cursor: 'pointer',
+                  color: '#6F6C7D !important',
+                  borderColor: '#E5E5E5 !important',
+                  fontWeight: 400,
                 }}
-              />
+                variant={'outlined'}
+              >
+                + Add output
+              </StyledButton>
             </Stack>
           )}
           {outPuts === 'json' && (

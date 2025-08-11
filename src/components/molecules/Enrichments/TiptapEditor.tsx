@@ -6,12 +6,16 @@ import { Content, Node } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
 
 // import { dH as DD, dT as h9, dF as noe } from './vendor.js';
-import { ExtensionMention, ExtensionNode } from '@/components/molecules';
+import {
+  ExtensionMention,
+  ExtensionNode,
+  ExtensionStorage,
+} from '@/components/molecules';
 
 type NodeType = {
   type: string;
@@ -24,12 +28,14 @@ type TiptapEditorProps = {
   placeholder?: string;
   handleGenerate?: () => void;
   isLoading?: boolean;
+  minHeight?: number;
 };
 export const TiptapEditor: FC<TiptapEditorProps> = ({
-  defaultValue = '',
+  defaultValue = null,
   placeholder = '',
   handleGenerate,
   isLoading,
+  minHeight = 150,
 }) => {
   /*   const parsePromptTextToNodes = (text: string) => {
     const nodes: any[] = [];
@@ -67,22 +73,22 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
       },
     ];
   }; */
-
   const editor = useEditor({
     extensions: [
+      Placeholder.configure({
+        placeholder,
+      }),
       StarterKit.configure({
         paragraph: {
           HTMLAttributes: {
-            style: 'margin:10px 0px ',
+            style: 'margin:0px 0px 10px 0px;line-height:1.5;font-size:12px;',
           },
         },
       }),
       ExtensionMention,
       ExtensionNode,
-      // ExtensionStorage,
-      Placeholder.configure({
-        placeholder,
-      }),
+      ExtensionStorage,
+
       // VariableTokenNode,
     ],
     content: null,
@@ -90,7 +96,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        style: 'padding:0px;outline:none;min-width:80px;',
+        style: `padding:0px;outline:none;min-height:${minHeight}px;`,
       },
     },
     onCreate: ({ editor }) => {
@@ -128,12 +134,10 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
         console.error('Error setting editor content:', error);
       }
     }
-  }, [defaultValue]);
-
+  }, [defaultValue, minHeight]);
   if (!editor) {
     return null;
   }
-
   /*  function $ae(t: string) {
     const n = t.toLowerCase();
     return n.includes('email') || n.includes('mail')
@@ -291,7 +295,22 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
 
   return (
     <Stack gap={2}>
-      <Stack border={'1px solid #ccc'} borderRadius={2} gap={1.25} p={2}>
+      <Stack
+        border={'1px solid #ccc'}
+        borderRadius={2}
+        gap={1.25}
+        p={2}
+        sx={{
+          '& .tiptap p.is-empty::before': {
+            content: 'attr(data-placeholder)',
+            color: '#aaa',
+            float: 'left' /* 避免光标错位 */,
+            height: 0,
+            pointerEvents: 'none',
+            fontSize: 12,
+          },
+        }}
+      >
         <EditorContent
           editor={editor}
           style={{
