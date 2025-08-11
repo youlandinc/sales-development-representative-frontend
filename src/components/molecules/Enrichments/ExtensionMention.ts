@@ -11,18 +11,30 @@ export const ExtensionMention = Mention.extend({
     return ReactNodeViewRenderer(PlaceholderNode);
   },
   addAttributes() {
-    const t = this.parent;
+    // 如果父类有 addAttributes 方法，先调用它获取父类的属性
+    const parentAttributes = this?.parent ? this.parent() : {};
+
     return {
-      ...(t == null ? void 0 : t.call(this)),
+      // 先继承父类的属性
+      ...parentAttributes,
+
+      // 自定义 path 属性
       path: {
-        default: null,
-        parseHTML: (n) => n.getAttribute('data-path'),
-        renderHTML: (n) => (n.path ? { 'data-path': n.path } : {}),
+        default: null, // 默认值
+        parseHTML: (element) => element.getAttribute('data-path'), // 从 HTML 中解析
+        renderHTML: (attributes) => {
+          // 如果属性存在，则渲染为 data-path
+          return attributes.path ? { 'data-path': attributes.path } : {};
+        },
       },
+
+      // 自定义 href 属性
       href: {
         default: null,
-        parseHTML: (n) => n.getAttribute('data-href'),
-        renderHTML: (n) => (n.href ? { 'data-href': n.href } : {}),
+        parseHTML: (element) => element.getAttribute('data-href'),
+        renderHTML: (attributes) => {
+          return attributes.href ? { 'data-href': attributes.href } : {};
+        },
       },
     };
   },

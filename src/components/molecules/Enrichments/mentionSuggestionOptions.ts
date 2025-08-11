@@ -52,19 +52,6 @@ export const mentionSuggestionOptions: MentionOptions['suggestion'] = {
         'Ally Sheedy',
         'Debbie Harry',
         'Olivia Newton-John',
-        'Elton John',
-        'Michael J. Fox',
-        'Axl Rose',
-        'Emilio Estevez',
-        'Ralph Macchio',
-        'Rob Lowe',
-        'Jennifer Grey',
-        'Mickey Rourke',
-        'John Cusack',
-        'Matthew Broderick',
-        'Justine Bateman',
-        'Lisa Bonet',
-        'Benicio Monserrate Rafael del Toro Sánchez',
       ]
         // Typically we'd be getting this data from an API where we'd have a
         // definitive "id" to use for each suggestion item, but for the sake of

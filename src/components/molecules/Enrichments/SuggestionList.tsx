@@ -1,7 +1,16 @@
-import { List, ListItem, ListItemButton, Paper } from '@mui/material';
+import {
+  Icon,
+  List,
+  ListItem,
+  ListItemButton,
+  Paper,
+  Typography,
+} from '@mui/material';
 import type { SuggestionOptions, SuggestionProps } from '@tiptap/suggestion';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import type { MentionSuggestion } from './mentionSuggestionOptions';
+
+import ICON_TEXT from './assets/icon_text.svg';
 
 export type SuggestionListRef = {
   // For convenience using this SuggestionList from within the
@@ -100,10 +109,11 @@ const SuggestionList = forwardRef<SuggestionListRef, SuggestionListProps>(
     return props.items.length > 0 ? (
       <Paper elevation={5}>
         <List
-          dense
+          // dense
           sx={{
             // In case there are contiguous stretches of long text that can't wrap:
-            overflow: 'hidden',
+            // overflow: 'hidden',
+            p: 0,
           }}
         >
           {props.items.map((item, index) => (
@@ -111,8 +121,10 @@ const SuggestionList = forwardRef<SuggestionListRef, SuggestionListProps>(
               <ListItemButton
                 onClick={() => selectItem(index)}
                 selected={index === selectedIndex}
+                sx={{ px: 1.5, py: 1, gap: 1 }}
               >
-                {item.mentionLabel}
+                <Icon component={ICON_TEXT} sx={{ width: 18, height: 18 }} />
+                <Typography variant={'body3'}>{item.mentionLabel}</Typography>
               </ListItemButton>
             </ListItem>
           ))}

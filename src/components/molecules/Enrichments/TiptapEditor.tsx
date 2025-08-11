@@ -1,17 +1,17 @@
 'use client';
 
 import { StyledButton } from '@/components/atoms';
-import { Box, Button, Icon, Stack, Typography } from '@mui/material';
+import { Box, Icon, Stack, Typography } from '@mui/material';
 import { Content, Node } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
 
 // import { dH as DD, dT as h9, dF as noe } from './vendor.js';
-import { ExtensionNode } from '@/components/molecules';
+import { ExtensionMention, ExtensionNode } from '@/components/molecules';
 
 type NodeType = {
   type: string;
@@ -22,10 +22,14 @@ type NodeType = {
 type TiptapEditorProps = {
   defaultValue?: Content;
   placeholder?: string;
+  handleGenerate?: () => void;
+  isLoading?: boolean;
 };
 export const TiptapEditor: FC<TiptapEditorProps> = ({
   defaultValue = '',
   placeholder = '',
+  handleGenerate,
+  isLoading,
 }) => {
   /*   const parsePromptTextToNodes = (text: string) => {
     const nodes: any[] = [];
@@ -73,7 +77,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
           },
         },
       }),
-      // ExtensionMention,
+      ExtensionMention,
       ExtensionNode,
       // ExtensionStorage,
       Placeholder.configure({
@@ -91,6 +95,28 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
     },
     onCreate: ({ editor }) => {
       // Safely set content after editor is fully initialized with schema
+      // try {
+      //   if (defaultValue) {
+      //     // Use setTimeout to ensure schema is fully registered
+      //     setTimeout(() => {
+      //       editor.commands.setContent(defaultValue);
+      //     }, 0);
+      //   }
+      // } catch (error) {
+      //   console.error('Error setting editor content:', error);
+      // }
+      // insertWithPlaceholders(editor, DEFAULT_PROMOT);
+      // const a = insertWithPlaceholders(editor, DEFAULT_PROMOT);
+      // console.log(a);
+      // editor.commands.setContent(
+      //   insertWithPlaceholders(editor, DEFAULT_PROMOT),
+      // );
+      // editor.commands.setContent(defaultValue);
+    },
+  });
+
+  useEffect(() => {
+    if (editor) {
       try {
         if (defaultValue) {
           // Use setTimeout to ensure schema is fully registered
@@ -101,18 +127,13 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
       } catch (error) {
         console.error('Error setting editor content:', error);
       }
-      // insertWithPlaceholders(editor, DEFAULT_PROMOT);
-      // const a = insertWithPlaceholders(editor, DEFAULT_PROMOT);
-      // console.log(a);
-      // editor.commands.setContent(
-      //   insertWithPlaceholders(editor, DEFAULT_PROMOT),
-      // );
-      // editor.commands.setContent(defaultValue);
-    },
-  });
+    }
+  }, [defaultValue]);
+
   if (!editor) {
     return null;
   }
+
   /*  function $ae(t: string) {
     const n = t.toLowerCase();
     return n.includes('email') || n.includes('mail')
@@ -302,8 +323,11 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
           </Stack>
           <StyledButton
             color={'info'}
+            loading={isLoading}
+            onClick={handleGenerate}
             size={'small'}
             startIcon={<Icon component={ICON_SPARKLE} />}
+            sx={{ width: 100 }}
             variant={'outlined'}
           >
             Generate

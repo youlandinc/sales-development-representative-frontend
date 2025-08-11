@@ -13,3 +13,5 @@ export * from './settings';
 export * from './inbox';
 
 export * from './contacts';
+
+export * from './enrichments';

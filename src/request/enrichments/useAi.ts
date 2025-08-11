@@ -1,7 +1,11 @@
-import { post } from '@/request/request';
-
-export const generatePrompt = () => {
-  return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/generate`, {
+export const generatePrompt = (api: string, param: Record<string, any>) => {
+  return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${api}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(param),
+  }); /*  return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/generate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,5 +18,5 @@ export const generatePrompt = () => {
           'First Name,Last Name,Full Name,Job Title, Location,Company Name,LinkedIn Profile,University',
       },
     }),
-  });
+  });*/
 };

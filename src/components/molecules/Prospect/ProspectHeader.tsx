@@ -16,6 +16,7 @@ import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
 
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
+import { WebResearch } from '@/components/molecules';
 
 const BUTTONS = [
   {
@@ -99,6 +100,14 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               {item.label}
             </StyledButton>
           ))}
+          <StyledButton
+            onClick={() => {
+              return;
+            }}
+            size={'medium'}
+          >
+            Use AI
+          </StyledButton>
         </Stack>
       </Stack>
 
@@ -139,6 +148,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
           </StyledButton>
         </Stack>
       </Stack>
+      <WebResearch />
     </Stack>
   );
 };
