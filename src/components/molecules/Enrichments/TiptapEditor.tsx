@@ -139,7 +139,7 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
             // Use setTimeout to ensure schema is fully registered
             setTimeout(() => {
               editor.commands.setContent(defaultValue);
-            }, 0);
+            }, 100);
           }
         } catch (error) {
           console.error('Error setting editor content:', error);

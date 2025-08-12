@@ -7,12 +7,14 @@ type WebResearchStoreProps = {
   prompt: string;
   schemaJson: Record<string, any>;
   open: boolean;
+  generateDescription: string;
 };
 
 type WebResearchActions = {
   setPrompt: (prompt: string) => void;
   setSchemaJson: (schemaJson: Record<string, any>) => void;
   setOpen: (b: boolean) => void;
+  setGenerateDescription: (description: string) => void;
   allClear: () => void;
   saveAiConfig: (
     tableId: string,
@@ -26,6 +28,7 @@ export const useWebResearchStore = create<
   WebResearchStoreProps & WebResearchActions
 >()((set, get) => ({
   prompt: '',
+  generateDescription: '',
   schemaJson: {
     type: 'object',
     properties: {
@@ -47,10 +50,16 @@ export const useWebResearchStore = create<
       open,
     });
   },
+  setGenerateDescription: (description: string) => {
+    set({
+      generateDescription: description,
+    });
+  },
   allClear: () => {
     set({
       prompt: '',
       schemaJson: {},
+      generateDescription: '',
     });
   },
   saveAiConfig: async (tableId: string, prompt: string, schema: string) => {

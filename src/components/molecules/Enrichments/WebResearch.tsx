@@ -14,6 +14,7 @@ import {
 import { Editor } from '@tiptap/core';
 import { FC, useState } from 'react';
 import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
+import { Node } from 'slate';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import {
@@ -24,7 +25,7 @@ import {
 
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 
-import { useWebResearchStore } from '@/stores/Prospect';
+import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
 
 import ICON_SPARK from './assets/icon_sparkle.svg';
 import ICON_ARROW from './assets/icon_arrow.svg';
@@ -69,12 +70,14 @@ type WebResearchProps = {
 };
 
 export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
+  const { headers } = useProspectTableStore((store) => store);
   const [tab, setTab] = useState<'generate' | 'configure'>('generate');
   const [text, setText] = useState('');
   const [schemaStr, setSchemaStr] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [promptEditor, setPromptEditor] = useState<null | Editor>(null);
+  const [generateEditor, setGenerateEditor] = useState<null | Editor>(null);
   const [schemaEditor, setSchemaEditor] = useState<ReactEditor | null>(null);
 
   const {
@@ -85,15 +88,9 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     allClear,
     prompt,
     saveAiConfig,
+    setGenerateDescription,
   } = useWebResearchStore((state) => state);
   const { generatePrompt: generateJson } = useGeneratePrompt(
-    '/sdr/ai/generate',
-    {
-      module: 'JSON_SCHEMA_WITH_PROMPT',
-      params: {
-        prompt,
-      },
-    },
     setSchemaStr,
     (objStr) => {
       setSchemaJson(JSON.parse(objStr));
@@ -104,19 +101,15 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     },
   );
   const { generatePrompt, isThinking } = useGeneratePrompt(
-    '/sdr/ai/generate',
-    {
-      module: 'COLUMN_ENRICHMENT_PROMPT',
-      params: {
-        useInput: "help me to find user's email and phone number",
-        columns:
-          'First Name,Last Name,Full Name,Job Title, Location,Company Name,LinkedIn Profile,University',
-      },
-    },
     setText,
-    (text) => {
+    async (text) => {
       setPrompt(text);
-      generateJson();
+      await generateJson('/sdr/ai/generate', {
+        module: 'JSON_SCHEMA_WITH_PROMPT',
+        params: {
+          prompt,
+        },
+      });
     },
   );
 
@@ -126,13 +119,21 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     allClear();
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setText('');
     setSchemaStr('');
     allClear();
     setIsLoading(true);
-    generatePrompt();
-    // console.log(promptEditor?.getJSON());
+    if (generateEditor) {
+      setGenerateDescription(generateEditor.getText());
+    }
+    await generatePrompt('/sdr/ai/generate', {
+      module: 'COLUMN_ENRICHMENT_PROMPT',
+      params: {
+        useInput: generateEditor?.getText() || '',
+        columns: headers.map((item) => item.fieldName).join(','),
+      },
+    });
   };
 
   const [state, run] = useAsyncFn(
@@ -147,14 +148,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   );
 
   return (
-    <Drawer
-      anchor={'right'}
-      onClose={() => {
-        setOpen(false);
-        setTab('generate');
-      }}
-      open={open}
-    >
+    <Drawer anchor={'right'} open={open}>
       <Stack gap={3} height={'100%'} justifyContent={'space-between'}>
         <Stack maxWidth={500} p={'24px 24px 0px 24px'} width={500}>
           {isLoading ? (
@@ -230,6 +224,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
                   <WebResearchGenerate
                     handleGeneratePrompt={handleGenerate}
                     isLoading={isLoading}
+                    onPromptEditorReady={setGenerateEditor}
                   />
                 </Box>
                 <Box
@@ -241,7 +236,6 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
                   <WebResearchConfigure
                     handleGenerate={handleGenerate}
                     onPromptEditorReady={setPromptEditor}
-                    onSchemaEditorReady={setSchemaEditor}
                   />
                 </Box>
               </Stack>
@@ -311,7 +305,13 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
             </MenuItem>
             <MenuItem
               onClick={async () => {
-                await saveAiConfig(tableId, prompt, schemaStr);
+                await saveAiConfig(
+                  tableId,
+                  promptEditor?.getText() || '',
+                  schemaEditor?.children
+                    ?.map((n) => Node.string(n))
+                    .join('\n') || '',
+                );
                 await cb?.();
                 setOpen(false);
               }}

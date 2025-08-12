@@ -199,5 +199,3 @@ export const VariableTokenNode = Node.create({
     };
   },
 });
-
-console.log(new PluginKey('custom-placeholder'));

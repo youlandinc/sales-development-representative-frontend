@@ -32,6 +32,8 @@ import { useWebResearchStore } from '@/stores/Prospect';
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 // import { useCompletion } from '@ai-sdk/react';
 import ICON_DELETE from './assets/icon_delete.svg';
+import { insertWithPlaceholders, schemaToSlate } from '@/utils';
+import { Editor } from '@tiptap/core';
 
 const initialValue = {
   type: 'object',
@@ -66,17 +68,10 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const promptEditorRef = useRef(null);
+  const promptEditorRef = useRef<null | Editor>(null);
   const schemaEditorRef = useRef(null);
 
   const { generatePrompt: generateJson, isLoading } = useGeneratePrompt(
-    '/sdr/ai/generate',
-    {
-      module: 'JSON_SCHEMA_WITH_PROMPT',
-      params: {
-        prompt: prompt,
-      },
-    },
     undefined,
     (objStr) => {
       setSchemaJson(JSON.parse(objStr));
@@ -85,67 +80,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   /*const DEFAULT_PROMOT =
     '#CONTEXT#\nYou are tasked with finding a Java engineer associated with a given company or website, and extracting their professional profile and email address.\n\n#OBJECTIVE#\nIdentify a Java engineer related to {{Enrich Company}}, {{Domain}}, or {{Url}}, and extract their professional profile link (such as LinkedIn) and email address.\n\n#INSTRUCTIONS#\n1. Use the provided {{Enrich Company}}, {{Domain}}, or {{Url}} to search for employees or team members who are Java engineers (titles may include "Java Engineer," "Java Developer," or similar).\n2. Search LinkedIn, company team pages, or other professional directories for profiles matching the criteria.\n3. Extract the profile URL (preferably LinkedIn) and the email address if publicly available.\n4. If multiple Java engineers are found, return the first relevant result.\n5. If no Java engineer or email is found, return "No Java engineer found" or "No email found" as appropriate.\n\n#EXAMPLES#\nInput:\n  Enrich Company: Acme Corp\n  Domain: acmecorp.com\n  Url: https://acmecorp.com\n\nExpected Output:\n  Java Engineer Name: John Doe\n';*/
-  const insertWithPlaceholders = (editor: any, text: string) => {
-    // editor.commands.setContent('');
-
-    const placeholderRegex = /{{(.*?)}}/g;
-    let match;
-    let lastIndex = 0;
-    const paragraphs: any[] = [];
-    let currentParagraphNodes: any[] = [];
-
-    function flushParagraph() {
-      if (currentParagraphNodes.length > 0) {
-        paragraphs.push({
-          type: 'paragraph',
-          content: currentParagraphNodes,
-        });
-        currentParagraphNodes = [];
-      }
-    }
-
-    while ((match = placeholderRegex.exec(text)) !== null) {
-      const preText = text.slice(lastIndex, match.index);
-      const lines = preText.split(/\r?\n/);
-
-      lines.forEach((line, index) => {
-        if (line) {
-          currentParagraphNodes.push({ type: 'text', text: line });
-        }
-        if (index < lines.length - 1) {
-          flushParagraph();
-        }
-      });
-
-      // 插入 placeholder 占位符
-      currentParagraphNodes.push({
-        type: 'custom-placeholder',
-        attrs: { label: match[1].trim() },
-      });
-
-      lastIndex = placeholderRegex.lastIndex;
-    }
-
-    // 处理最后一段（剩余文字）
-    const remaining = text.slice(lastIndex);
-    const remainingLines = remaining.split(/\r?\n/);
-    remainingLines.forEach((line, index) => {
-      if (line) {
-        currentParagraphNodes.push({ type: 'text', text: line });
-      }
-      if (index < remainingLines.length - 1) {
-        flushParagraph();
-      }
-    });
-
-    flushParagraph(); // 收尾
-    // 插入到 editor 中
-    return paragraphs;
-    // paragraphs.forEach((paragraph) => {
-    //   editor.commands.insertContent(paragraph);
-    // });
-  };
-  const defaultValue = prompt ? insertWithPlaceholders(null, prompt) : null;
+  const defaultValue = prompt ? insertWithPlaceholders(prompt) : null;
 
   useEffect(() => {
     if (promptEditorRef.current) {
@@ -224,7 +159,14 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
               <StyledButton
                 color={'info'}
                 loading={isLoading}
-                onClick={generateJson}
+                onClick={() =>
+                  generateJson('/sdr/ai/generate', {
+                    module: 'JSON_SCHEMA_WITH_PROMPT',
+                    params: {
+                      prompt: promptEditorRef.current?.getText() || '',
+                    },
+                  })
+                }
                 size={'small'}
                 sx={{
                   width: '177px !important',
@@ -367,7 +309,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           </Stack>
           <Box display={outPuts === 'json' ? 'block' : 'none'}>
             <SlateEditor
-              initialValue={
+              initialValue={schemaToSlate(
                 schemaJson || {
                   type: 'object',
                   properties: {
@@ -376,8 +318,8 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                     },
                   },
                   required: ['response'],
-                }
-              }
+                },
+              )}
               ref={schemaEditorRef}
             />
           </Box>
