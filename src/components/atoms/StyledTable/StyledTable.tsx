@@ -80,7 +80,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     [addMenuItems],
   );
 
-  const rowHeight = virtualization?.rowHeight ?? 48;
+  const rowHeight = virtualization?.rowHeight ?? 36;
 
   const handleColumnSizingChange = useCallback(
     (updater: any) => {

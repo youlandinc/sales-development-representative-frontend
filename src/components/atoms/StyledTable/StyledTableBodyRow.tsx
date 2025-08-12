@@ -22,7 +22,6 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
       direction="row"
       ref={measureRef}
       sx={{
-        display: 'flex',
         position: 'absolute',
         transform: `translateY(${virtualStart}px)`,
         width: '100%',

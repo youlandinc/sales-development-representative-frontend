@@ -1,4 +1,12 @@
-import { FC, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  FC,
+  ReactNode,
+  RefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Stack } from '@mui/material';
 import { Table } from '@tanstack/react-table';
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual';
@@ -7,9 +15,9 @@ interface StyledTableContainerProps {
   table: Table<any>;
   rowHeight: number;
   onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
-  scrollContainer?: React.RefObject<HTMLDivElement | null>;
+  scrollContainer?: RefObject<HTMLDivElement | null>;
   renderContent: (props: {
-    tableContainerRef: React.RefObject<HTMLDivElement | null>;
+    tableContainerRef: RefObject<HTMLDivElement | null>;
     columnVirtualizer: any;
     rowVirtualizer: any;
     virtualColumns: VirtualItem[];

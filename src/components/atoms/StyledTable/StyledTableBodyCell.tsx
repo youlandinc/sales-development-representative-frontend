@@ -1,5 +1,5 @@
 import { FC, memo, ReactNode, useEffect, useRef, useState } from 'react';
-import { InputBase, Stack } from '@mui/material';
+import { Box, InputBase, Stack } from '@mui/material';
 import { Cell, flexRender } from '@tanstack/react-table';
 
 interface StyledTableBodyCellProps {
@@ -73,6 +73,23 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
               handleEditStop();
             }
           }}
+          size={'small'}
+          sx={{
+            height: '100%',
+            width: '100%',
+            fontSize: 14,
+            display: 'flex',
+            alignItems: 'center',
+            lineHeight: '36px',
+            '& input': {
+              p: 0,
+              m: 0,
+              height: '100%',
+              boxSizing: 'border-box',
+              fontSize: 14,
+              lineHeight: '36px',
+            },
+          }}
           value={localEditValue}
         />
       ) : cell && cell.column.id === '__select' ? (
@@ -96,12 +113,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           }
         }}
         sx={{
-          display: 'flex',
           width,
           minWidth: width,
           maxWidth: width,
+          boxSizing: 'border-box',
           px: 2,
-          py: 1,
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 1 : 0,
@@ -127,7 +143,18 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           cursor: 'pointer',
         }}
       >
-        {content}
+        <Box
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            minWidth: 0,
+            width: '100%',
+            fontSize: 14,
+          }}
+        >
+          {content}
+        </Box>
       </Stack>
     );
   },
