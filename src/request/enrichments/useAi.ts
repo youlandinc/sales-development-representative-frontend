@@ -29,3 +29,28 @@ export const columnRun = (fieldId: string, recordCount: number) => {
     recordCount,
   });
 };
+
+export const _saveWebResearchConfig = (
+  tableId: string,
+  prompt: string,
+  schema: string,
+) => {
+  return post('/sdr/prospect/table/field', {
+    tableId,
+    actionKey: 'use-ai',
+    fieldType: 'TEXT',
+    fieldName: 'Use AI',
+    typeSettings: {
+      inputBinding: [
+        {
+          name: 'prompt',
+          formulaText: prompt,
+        },
+        {
+          name: 'answerSchemaType',
+          formulaText: schema,
+        },
+      ],
+    },
+  });
+};

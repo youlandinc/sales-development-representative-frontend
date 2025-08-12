@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { _saveWebResearchConfig } from '@/request';
+import { HttpError } from '@/types';
+import { SDRToast } from '@/components/atoms';
 
 type WebResearchStoreProps = {
   prompt: string;
@@ -11,6 +14,11 @@ type WebResearchActions = {
   setSchemaJson: (schemaJson: Record<string, any>) => void;
   setOpen: (b: boolean) => void;
   allClear: () => void;
+  saveAiConfig: (
+    tableId: string,
+    prompt: string,
+    schema: string,
+  ) => Promise<any>;
   // removedField: (key: string) => void;
 };
 
@@ -44,6 +52,14 @@ export const useWebResearchStore = create<
       prompt: '',
       schemaJson: {},
     });
+  },
+  saveAiConfig: async (tableId: string, prompt: string, schema: string) => {
+    try {
+      await _saveWebResearchConfig(tableId, prompt, schema);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
   },
   // removedField: (key: string) => {
   //   const { properties, ...rest } = get().schemaJson;

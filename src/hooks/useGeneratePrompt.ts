@@ -53,7 +53,7 @@ export const useGeneratePrompt = (
         close();
         closeThinking();
       });
-  }, [streamCb, setDone]);
+  }, [streamCb, setDone, api, param]);
   return {
     generatePrompt: fn,
     done,

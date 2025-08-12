@@ -198,7 +198,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         />
       )}
 
-      <WebResearch />
+      <WebResearch
+        cb={async () => {
+          await fetchHeaders(tableId);
+        }}
+        tableId={tableId}
+      />
     </Stack>
   );
 };

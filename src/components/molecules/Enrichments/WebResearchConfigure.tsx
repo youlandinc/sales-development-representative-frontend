@@ -74,7 +74,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     {
       module: 'JSON_SCHEMA_WITH_PROMPT',
       params: {
-        prompt: 'xxxx',
+        prompt: prompt,
       },
     },
     undefined,
@@ -179,7 +179,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   //   // onFinish: (l, c) => t(l, c),
   //   streamProtocol: 'data',
   // });
-  console.log(schemaJson.properties);
+
   return (
     <Stack gap={4}>
       {/*<Typography>{text}</Typography>*/}

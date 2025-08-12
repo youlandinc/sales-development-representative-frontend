@@ -24,7 +24,7 @@ import {
 
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 
-import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
+import { useWebResearchStore } from '@/stores/Prospect';
 
 import ICON_SPARK from './assets/icon_sparkle.svg';
 import ICON_ARROW from './assets/icon_arrow.svg';
@@ -63,7 +63,12 @@ export const CostCoins: FC<CostCoinsProps> = ({
   );
 };
 
-export const WebResearch = () => {
+type WebResearchProps = {
+  cb?: () => Promise<void>;
+  tableId: string;
+};
+
+export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const [tab, setTab] = useState<'generate' | 'configure'>('generate');
   const [text, setText] = useState('');
   const [schemaStr, setSchemaStr] = useState('');
@@ -72,15 +77,21 @@ export const WebResearch = () => {
   const [promptEditor, setPromptEditor] = useState<null | Editor>(null);
   const [schemaEditor, setSchemaEditor] = useState<ReactEditor | null>(null);
 
-  const { setPrompt, open, setOpen, setSchemaJson, allClear } =
-    useWebResearchStore((state) => state);
-
+  const {
+    setPrompt,
+    open,
+    setOpen,
+    setSchemaJson,
+    allClear,
+    prompt,
+    saveAiConfig,
+  } = useWebResearchStore((state) => state);
   const { generatePrompt: generateJson } = useGeneratePrompt(
     '/sdr/ai/generate',
     {
       module: 'JSON_SCHEMA_WITH_PROMPT',
       params: {
-        prompt: 'xxxx',
+        prompt,
       },
     },
     setSchemaStr,
@@ -112,6 +123,7 @@ export const WebResearch = () => {
   const handleClose = () => {
     setOpen(false);
     setTab('generate');
+    allClear();
   };
 
   const handleGenerate = () => {
@@ -120,6 +132,7 @@ export const WebResearch = () => {
     allClear();
     setIsLoading(true);
     generatePrompt();
+    // console.log(promptEditor?.getJSON());
   };
 
   const [state, run] = useAsyncFn(
@@ -142,7 +155,7 @@ export const WebResearch = () => {
       }}
       open={open}
     >
-      <Stack height={'100%'} justifyContent={'space-between'}>
+      <Stack gap={3} height={'100%'} justifyContent={'space-between'}>
         <Stack maxWidth={500} p={'24px 24px 0px 24px'} width={500}>
           {isLoading ? (
             <SculptingPrompt
@@ -298,8 +311,9 @@ export const WebResearch = () => {
             </MenuItem>
             <MenuItem
               onClick={async () => {
-                // console.log(promptEditor?.getJSON(), schemaEditor?.children);
-                // run();
+                await saveAiConfig(tableId, prompt, schemaStr);
+                await cb?.();
+                setOpen(false);
               }}
             >
               <Typography color={'text.secondary'} variant={'body2'}>
