@@ -67,15 +67,17 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
           {content}
         </Box>
 
-        {header?.column.getCanResize?.() !== false && (
+        {header && header.column.getCanResize?.() !== false && (
           <Stack
             onMouseDown={(e) => {
               e.stopPropagation();
-              header?.getResizeHandler?.()(e);
+              const handler = header.getResizeHandler?.();
+              handler?.(e);
             }}
             onTouchStart={(e) => {
               e.stopPropagation();
-              header?.getResizeHandler?.()(e);
+              const handler = header.getResizeHandler?.();
+              handler?.(e);
             }}
             sx={{
               position: 'absolute',
