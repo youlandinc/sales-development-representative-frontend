@@ -20,8 +20,6 @@ import { lightTheme } from '@/theme';
 
 import { ToastProvider } from '@/provides/ToastProvider';
 
-
-
 const RootLayout = ({
   children,
 }: Readonly<{
@@ -33,7 +31,7 @@ const RootLayout = ({
         <link href="/favicon.svg" rel="icon" sizes={'any'} />
         <title>Attune</title>
       </head>
-      <body >
+      <body>
         <InitColorSchemeScript attribute="class" />
         <NextTopLoader
           color="#6E4EFB"

@@ -127,8 +127,8 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
             _isEditing && cell?.column.id !== '__select'
               ? alpha(theme.palette.primary.main, 0.1)
               : _isActive && cell?.column.id !== '__select'
-              ? alpha(theme.palette.primary.main, 0.06)
-              : 'transparent',
+                ? alpha(theme.palette.primary.main, 0.06)
+                : 'transparent',
           borderRight: '0.5px solid #DFDEE6',
           borderTop: 'none',
           borderLeft: 'none',
