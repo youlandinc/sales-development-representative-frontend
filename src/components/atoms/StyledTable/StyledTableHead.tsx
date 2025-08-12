@@ -13,7 +13,6 @@ export const StyledTableHead: FC<StyledTableHeadProps> = ({
   return (
     <Stack
       sx={{
-        display: 'flex',
         position: 'sticky',
         top: 0,
         zIndex: 10,

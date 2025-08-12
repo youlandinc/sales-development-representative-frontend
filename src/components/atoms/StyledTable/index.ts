@@ -1,9 +1,12 @@
 export { StyledTable } from './StyledTable';
 export { StyledTableContainer } from './StyledTableContainer';
+
 export { StyledTableHead } from './StyledTableHead';
 export { StyledTableHeadRow } from './StyledTableHeadRow';
 export { StyledTableHeadCell } from './StyledTableHeadCell';
+
 export { StyledTableBody } from './StyledTableBody';
 export { StyledTableBodyRow } from './StyledTableBodyRow';
 export { StyledTableBodyCell } from './StyledTableBodyCell';
+
 export { StyledTableSpacer } from './StyledTableSpacer';

@@ -5,7 +5,6 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 import { Stack } from '@mui/material';
 import { Table } from '@tanstack/react-table';
@@ -17,7 +16,6 @@ interface StyledTableContainerProps {
   onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
   scrollContainer?: RefObject<HTMLDivElement | null>;
   renderContent: (props: {
-    tableContainerRef: RefObject<HTMLDivElement | null>;
     columnVirtualizer: any;
     rowVirtualizer: any;
     virtualColumns: VirtualItem[];
@@ -36,44 +34,9 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
 }) => {
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const [isScrollContainerReady, setIsScrollContainerReady] = useState(false);
-
-  useEffect(() => {
-    const checkContainer = () => {
-      const container = scrollContainer?.current ?? tableContainerRef.current;
-      const height = container?.clientHeight || container?.offsetHeight || 0;
-
-      if (container && height >= 300) {
-        setIsScrollContainerReady(true);
-        return true;
-      }
-      return false;
-    };
-
-    if (checkContainer()) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      checkContainer();
-    }, 100);
-
-    const interval = setInterval(() => {
-      if (checkContainer()) {
-        clearInterval(interval);
-      }
-    }, 200);
-
-    return () => {
-      clearTimeout(timeout);
-      clearInterval(interval);
-    };
-  }, [scrollContainer]);
-
-  const { visibleColumns, centerColumns } = useMemo(() => {
+  const centerColumns = useMemo(() => {
     const visible = table.getVisibleLeafColumns();
-    const center = visible.filter((col) => !col.getIsPinned());
-    return { visibleColumns: visible, centerColumns: center };
+    return visible.filter((col) => !col.getIsPinned());
   }, [table.getVisibleLeafColumns()]);
 
   const columnVirtualizer = useVirtualizer({
@@ -97,9 +60,9 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     overscan: 5,
     initialRect: {
       width: 0,
-      height: isScrollContainerReady ? 0 : 600,
+      height: 0,
     },
-    enabled: isScrollContainerReady,
+    enabled: true,
   });
 
   const virtualData = useMemo(() => {
@@ -125,22 +88,15 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
   }, [
     columnVirtualizer.getVirtualItems(),
     rowVirtualizer.getVirtualItems(),
-    isScrollContainerReady,
   ]);
 
   useEffect(() => {
-    if (isScrollContainerReady && virtualData.virtualRows.length > 0) {
+     if (onVisibleRangeChange && virtualData.virtualRows.length > 0) {
       const startIndex = virtualData.virtualRows[0].index;
-      const endIndex =
-        virtualData.virtualRows[virtualData.virtualRows.length - 1].index;
-      onVisibleRangeChange?.(startIndex, endIndex);
+      const endIndex = virtualData.virtualRows[virtualData.virtualRows.length - 1].index;
+      onVisibleRangeChange(startIndex, endIndex);
     }
-  }, [
-    virtualData.virtualRows.length,
-    onVisibleRangeChange,
-    isScrollContainerReady,
-    virtualData.virtualRows,
-  ]);
+  }, [virtualData.virtualRows, onVisibleRangeChange]);
 
   return (
     <Stack
@@ -169,16 +125,14 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
         },
       }}
     >
-      {isScrollContainerReady &&
-        renderContent({
-          tableContainerRef,
-          columnVirtualizer,
-          rowVirtualizer,
-          virtualColumns: virtualData.virtualColumns,
-          virtualRows: virtualData.virtualRows,
-          virtualPaddingLeft: virtualData.virtualPaddingLeft,
-          virtualPaddingRight: virtualData.virtualPaddingRight,
-        })}
+      {renderContent({
+        columnVirtualizer,
+        rowVirtualizer,
+        virtualColumns: virtualData.virtualColumns,
+        virtualRows: virtualData.virtualRows,
+        virtualPaddingLeft: virtualData.virtualPaddingLeft,
+        virtualPaddingRight: virtualData.virtualPaddingRight,
+      })}
     </Stack>
   );
 };

@@ -11,13 +11,7 @@ export const StyledTableBody: FC<StyledTableBodyProps> = ({
   totalHeight,
 }) => {
   return (
-    <Stack
-      sx={{
-        display: 'flex',
-        height: `${totalHeight}px`,
-        position: 'relative',
-      }}
-    >
+    <Stack height={totalHeight} position={'relative'}>
       {children}
     </Stack>
   );

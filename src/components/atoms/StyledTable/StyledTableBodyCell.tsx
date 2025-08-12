@@ -1,6 +1,5 @@
 import { FC, memo, ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, InputBase, Stack } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { Cell, flexRender } from '@tanstack/react-table';
 
 interface StyledTableBodyCellProps {
@@ -120,18 +119,10 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           minWidth: width,
           maxWidth: width,
           boxSizing: 'border-box',
-          px: 2,
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 1 : 0,
-          bgcolor: (theme) =>
-            _isActive && cell?.column.id !== '__select'
-              ? alpha(theme.palette.primary.main, 0.06)
-              : rowSelected
-                ? alpha(theme.palette.primary.main, 0.06)
-                : isPinned
-                  ? '#FFFFFF'
-                  : 'transparent',
+          bgcolor: 'transparent',
           borderRight: '0.5px solid #DFDEE6',
           borderTop: 'none',
           borderLeft: 'none',
@@ -152,6 +143,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
             minWidth: 0,
             width: '100%',
             fontSize: 14,
+            px: 1.5,
           }}
         >
           {content}

@@ -1,5 +1,5 @@
 import { FC, memo, MouseEvent, ReactNode } from 'react';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
 
 interface StyledTableHeadCellProps {
@@ -35,13 +35,11 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
         ref={measureRef}
         sx={{
           userSelect: 'none',
-          display: 'flex',
           width,
-          minWidth: width,
+          minWidth: width < 100 ? 100 : width,
           maxWidth: width,
           boxSizing: 'border-box',
           borderRight: '0.5px solid #DFDEE6',
-          px: 2,
           bgcolor: '#FFFFFF',
           cursor: 'pointer',
           position: isPinned ? 'sticky' : 'relative',
@@ -56,7 +54,18 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
           fontWeight: 600,
         }}
       >
-        {content}
+        <Box
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            minWidth: 0,
+            width: '100%',
+            px: 1.5,
+          }}
+        >
+          {content}
+        </Box>
 
         {header?.column.getCanResize?.() !== false && (
           <Stack

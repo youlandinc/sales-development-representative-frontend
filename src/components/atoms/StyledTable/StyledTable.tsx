@@ -1,5 +1,13 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Checkbox, Menu, MenuItem, Stack } from '@mui/material';
+import {
+  FC,
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Box, Checkbox, Menu, MenuItem, Stack } from '@mui/material';
 
 import {
   createColumnHelper,
@@ -30,13 +38,11 @@ interface StyledTableProps {
   data: any[];
   addMenuItems?: { label: string; value: string }[];
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
-  pinnedLeftCount?: number;
-  columnWidthStorageKey?: string;
   scrolled?: boolean;
   virtualization?: {
     enabled?: boolean;
     rowHeight?: number;
-    scrollContainer?: React.RefObject<HTMLDivElement | null>;
+    scrollContainer?: RefObject<HTMLDivElement | null>;
     onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
   };
   onColumnResize?: (fieldId: string, width: number) => void;
@@ -51,8 +57,6 @@ export const StyledTable: FC<StyledTableProps> = ({
   data,
   addMenuItems,
   onAddMenuItemClick,
-  pinnedLeftCount: pinnedLeftCountProp,
-  columnWidthStorageKey,
   scrolled,
   virtualization,
   onColumnResize,
@@ -61,18 +65,18 @@ export const StyledTable: FC<StyledTableProps> = ({
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
     useState<ColumnSizingInfoState>({} as ColumnSizingInfoState);
-  const [scrolledState, setScrolledState] = useState(false);
-  const pinnedLeftCount = pinnedLeftCountProp ?? 1;
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
     left: ['__select'],
-    right: [],
   });
 
   const editsRef = useRef<Record<string, Record<string, any>>>({});
-  const [, setEditVersion] = useState(0);
-  const editingRef = useRef<Record<string, Record<string, boolean>>>({});
-  const activeRef = useRef<Record<string, Record<string, boolean>>>({});
+  const [editingState, setEditingState] = useState<
+    Record<string, Record<string, boolean>>
+  >({});
+  const [activeState, setActiveState] = useState<
+    Record<string, Record<string, boolean>>
+  >({});
 
   const [addMenuAnchor, setAddMenuAnchor] = useState<null | HTMLElement>(null);
   const addMenuItems_ = useMemo(
@@ -128,7 +132,8 @@ export const StyledTable: FC<StyledTableProps> = ({
                 }
               }}
               onClick={(e) => e.stopPropagation()}
-              size="small"
+              size={'small'}
+              sx={{ p: 0 }}
             />
           );
         },
@@ -137,9 +142,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           const checked = info.row.getIsSelected?.() ?? false;
           return (
             <Stack
-              alignItems="center"
-              direction="row"
-              justifyContent="center"
+              flexDirection={'row'}
               sx={{
                 position: 'relative',
                 '.row-index': {
@@ -151,26 +154,25 @@ export const StyledTable: FC<StyledTableProps> = ({
                 '&:hover .row-index': { display: 'none' },
                 '&:hover .row-checkbox': { display: 'flex' },
               }}
+              width={'100%'}
             >
-              <Stack
-                className="row-index"
-                sx={{ display: 'block', lineHeight: 1 }}
-              >
+              <Box className="row-index" lineHeight={1}>
                 {label}
-              </Stack>
-              <Stack className="row-checkbox" sx={{ display: 'none' }}>
+              </Box>
+              <Box className="row-checkbox" display={'none'}>
                 <Checkbox
                   checked={checked}
                   onChange={(e, next) => info.row.toggleSelected?.(next)}
                   onClick={(e) => e.stopPropagation()}
-                  size="small"
+                  size={'small'}
+                  sx={{ p: 0 }}
                 />
-              </Stack>
+              </Box>
             </Stack>
           );
         },
-        size: 56,
-        minSize: 44,
+        size: 100,
+        minSize: 100,
         enableResizing: false,
       });
 
@@ -227,50 +229,43 @@ export const StyledTable: FC<StyledTableProps> = ({
         };
 
         onCellEdit?.(recordId, columnId, String(value));
-
-        setEditVersion((v) => v + 1);
       },
       isEditing: (recordId: string, columnId: string) =>
-        Boolean(editingRef.current[recordId]?.[columnId]),
+        Boolean(editingState[recordId]?.[columnId]),
       isActive: (recordId: string, columnId: string) =>
-        Boolean(activeRef.current[recordId]?.[columnId]),
+        Boolean(activeState[recordId]?.[columnId]),
       startEdit: (recordId: string, columnId: string) => {
-        const row = editingRef.current[recordId] || {};
-        editingRef.current = {
-          ...editingRef.current,
+        const row = editingState[recordId] || {};
+        setEditingState({
+          ...editingState,
           [recordId]: { ...row, [columnId]: true },
-        };
-        setEditVersion((v) => v + 1);
+        });
       },
       stopEdit: (recordId: string, columnId: string) => {
-        const row = editingRef.current[recordId] || {};
+        const row = editingState[recordId] || {};
         if (row[columnId]) {
           const { [columnId]: _omit, ...rest } = row;
-          editingRef.current = {
-            ...editingRef.current,
+          setEditingState({
+            ...editingState,
             [recordId]: rest,
-          };
-          setEditVersion((v) => v + 1);
+          });
         }
       },
       setActive: (recordId: string, columnId: string) => {
-        const currentActive = activeRef.current[recordId]?.[columnId];
-        const hasOtherActive = Object.keys(activeRef.current).some((rId) =>
-          Object.keys(activeRef.current[rId] || {}).some(
+        const currentActive = activeState[recordId]?.[columnId];
+        const hasOtherActive = Object.keys(activeState).some((rId) =>
+          Object.keys(activeState[rId] || {}).some(
             (cId) =>
-              activeRef.current[rId][cId] &&
-              (rId !== recordId || cId !== columnId),
+              activeState[rId][cId] && (rId !== recordId || cId !== columnId),
           ),
         );
 
         if (!currentActive || hasOtherActive) {
-          activeRef.current = { [recordId]: { [columnId]: true } };
-          setEditVersion((v) => v + 1);
+          setActiveState({ [recordId]: { [columnId]: true } });
         }
       },
       clearActive: () => {
-        activeRef.current = {};
-        setEditVersion((v) => v + 1);
+        setActiveState({});
       },
     },
   });
@@ -299,36 +294,15 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   useEffect(() => {
     const initialSizing: ColumnSizingState = {};
-
     columns.forEach((column) => {
       if (column.width && column.width > 0) {
         initialSizing[column.fieldId] = column.width;
       }
     });
-
-    const key = columnWidthStorageKey;
-    const saved = key ? localStorage.getItem(`table_colwidths_${key}`) : null;
-    if (saved) {
-      try {
-        Object.assign(initialSizing, JSON.parse(saved) || {});
-      } catch {
-        /* empty */
-      }
-    }
-
     if (Object.keys(initialSizing).length) {
       setColumnSizing(initialSizing);
     }
-  }, [columnWidthStorageKey, columns]);
-
-  useEffect(() => {
-    if (columnWidthStorageKey) {
-      localStorage.setItem(
-        `table_colwidths_${columnWidthStorageKey}`,
-        JSON.stringify(columnSizing),
-      );
-    }
-  }, [columnSizing, columnWidthStorageKey]);
+  }, [columns]);
 
   const handleAddMenuClick = useCallback(
     (item: { label: string; value: string }) => {
@@ -340,7 +314,6 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   const renderContent = useCallback(
     ({
-      tableContainerRef,
       columnVirtualizer,
       rowVirtualizer,
       virtualColumns,
@@ -369,7 +342,7 @@ export const StyledTable: FC<StyledTableProps> = ({
             />
           )}
 
-          <StyledTableHead scrolled={scrolled ?? scrolledState}>
+          <StyledTableHead scrolled={scrolled ?? false}>
             {columnSizingInfo.isResizingColumn && (
               <div
                 style={{
@@ -436,7 +409,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                 })}
 
                 {virtualPaddingRight ? (
-                  <StyledTableSpacer width={virtualPaddingRight} />
+                  <StyledTableSpacer borderRight width={virtualPaddingRight} />
                 ) : null}
 
                 <StyledTableHeadCell
@@ -560,10 +533,7 @@ export const StyledTable: FC<StyledTableProps> = ({
 
                   {/* Right padding spacer */}
                   {virtualPaddingRight ? (
-                    <StyledTableSpacer
-                      borderRight
-                      width={virtualPaddingRight}
-                    />
+                    <StyledTableSpacer borderRight width={virtualPaddingRight} />
                   ) : null}
 
                   {/* Add-column trailing spacer to align with header and draw right edge */}
@@ -576,13 +546,15 @@ export const StyledTable: FC<StyledTableProps> = ({
       );
     },
     [
-      scrolled ?? scrolledState,
-      table.getHeaderGroups(),
+      columnSizingInfo.isResizingColumn,
+      columnSizingInfo.startOffset,
+      columnSizingInfo.deltaOffset,
+      scrolled,
+      table,
       leftPinnedColumns,
-      centerColumns,
       stickyLeftMap,
+      centerColumns,
       rowHeight,
-      columnSizingInfo,
     ],
   );
 

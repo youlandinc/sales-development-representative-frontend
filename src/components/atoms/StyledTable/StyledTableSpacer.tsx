@@ -18,6 +18,7 @@ export const StyledTableSpacer: FC<StyledTableSpacerProps> = ({
         boxSizing: 'border-box',
         alignSelf: 'stretch',
         borderRight: borderRight ? '0.5px solid #DFDEE6' : 'none',
+        bgcolor: 'transparent',
       }}
     />
   );

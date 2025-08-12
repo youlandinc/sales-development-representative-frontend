@@ -10,13 +10,9 @@ export const StyledTableHeadRow: FC<StyledTableHeadRowProps> = ({
 }) => {
   return (
     <Stack
-      direction="row"
-      sx={{
-        display: 'flex',
-        width: '100%',
-        bgcolor: '#fafafa',
-        borderTop: '1px solid #DFDEE6',
-      }}
+      bgcolor={'#fafafa'}
+      borderTop={'1px solid #DFDEE6'}
+      flexDirection={'row'}
     >
       {children}
     </Stack>

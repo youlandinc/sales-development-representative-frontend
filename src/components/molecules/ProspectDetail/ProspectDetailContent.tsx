@@ -172,7 +172,6 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       {headers.length > 0 && rowIds.length > 0 && (
         <StyledTable
           columns={headers}
-          columnWidthStorageKey={tableId}
           data={fullData}
           onCellEdit={(recordId, fieldId, value) =>
             updateCellValue({ tableId, recordId, fieldId, value })
@@ -180,7 +179,6 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           onColumnResize={(fieldId, width) =>
             updateColumnWidth({ fieldId, width })
           }
-          pinnedLeftCount={1}
           rowIds={rowIds}
           scrolled={scrolled}
           virtualization={{
