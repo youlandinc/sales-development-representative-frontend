@@ -332,7 +332,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   (columnSizingInfo.startOffset ?? 0) +
                     (columnVirtualizer.scrollOffset ?? 0) || 0,
                 transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
-                height: `${rowVirtualizer.getTotalSize()}px`,
+                height: `${rowVirtualizer.getTotalSize() + 37}px`,
                 width: '2px',
                 backgroundColor: '#1976d2',
                 zIndex: 1000,
@@ -540,7 +540,11 @@ export const StyledTable: FC<StyledTableProps> = ({
                   ) : null}
 
                   {/* Add-column trailing spacer to align with header and draw right edge */}
-                  <StyledTableSpacer borderRight width={120} />
+                  <StyledTableSpacer
+                    bgcolor="background.paper"
+                    borderRight
+                    width={120}
+                  />
                 </StyledTableBodyRow>
               );
             })}

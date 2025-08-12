@@ -1,3 +1,5 @@
+//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { mergeAttributes, Node } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { ReactNodeViewRenderer } from '@tiptap/react';

@@ -2,8 +2,10 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Stack } from '@mui/material';
 import useSWR from 'swr';
 
-import { useProspectTableStore } from '@/stores/Prospect';
-import { StyledTable } from '@/components/atoms/StyledTable';
+import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
+import { StyledTable } from '@/components/atoms';
+import { WebResearch } from '@/components/molecules';
+
 import { _fetchTableRowData } from '@/request';
 
 interface ProspectDetailTableProps {
@@ -22,6 +24,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     updateColumnWidth,
     updateCellValue,
   } = useProspectTableStore((store) => store);
+  const { setOpen } = useWebResearchStore((store) => store);
 
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
@@ -173,6 +176,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         <StyledTable
           columns={headers}
           data={fullData}
+          onAddMenuItemClick={(item) => {
+            console.log(item);
+            setOpen(true);
+          }}
           onCellEdit={(recordId, fieldId, value) =>
             updateCellValue({ tableId, recordId, fieldId, value })
           }
@@ -187,8 +194,11 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             scrollContainer: scrollContainerRef,
             onVisibleRangeChange: handleVisibleRangeChange,
           }}
+          //addMenuItems={}
         />
       )}
+
+      <WebResearch />
     </Stack>
   );
 };
