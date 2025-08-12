@@ -5,7 +5,9 @@ import {
 } from '@/types/Prospect/table';
 
 export const _fetchTableColumn = (tableId: string) => {
-  return get<{ fields: TableHeaderProps[] }>(`/sdr/prospect/table/${tableId}`);
+  return get<{ fields: TableHeaderProps[]; tableName: string }>(
+    `/sdr/prospect/table/${tableId}`,
+  );
 };
 
 export const _fetchTableRowIds = (tableId: string) => {

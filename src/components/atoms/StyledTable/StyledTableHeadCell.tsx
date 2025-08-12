@@ -11,6 +11,7 @@ interface StyledTableHeadCellProps {
   measureRef?: (node: HTMLElement | null) => void;
   dataIndex?: number;
   onClick?: (e: MouseEvent<HTMLElement>) => void;
+  enableResizing?: boolean; // override to disable the resizer regardless of header settings
 }
 
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
@@ -23,6 +24,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
     measureRef,
     dataIndex,
     onClick,
+    enableResizing,
   }) => {
     const content = header
       ? flexRender(header.column.columnDef.header, header.getContext())
@@ -67,7 +69,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
           {content}
         </Box>
 
-        {header && header.column.getCanResize?.() !== false && (
+        {header && (enableResizing !== false) && header.column.getCanResize?.() !== false && (
           <Stack
             onMouseDown={(e) => {
               e.stopPropagation();

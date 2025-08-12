@@ -374,6 +374,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   }
                   return (
                     <StyledTableHeadCell
+                      enableResizing={col.id !== '__select'}
                       header={header}
                       isPinned
                       key={header.id}
@@ -413,6 +414,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                 ) : null}
 
                 <StyledTableHeadCell
+                  enableResizing={false}
                   onClick={(e) => setAddMenuAnchor(e.currentTarget)}
                   width={120}
                 >

@@ -12,6 +12,7 @@ import {
 } from '@/request';
 
 export type ProspectTableState = {
+  tableName: string;
   headers: TableHeaderProps[];
   rowIds: string[];
 };
@@ -36,6 +37,7 @@ export type ProspectTableStoreProps = ProspectTableState & ProspectTableActions;
 
 export const useProspectTableStore = create<ProspectTableStoreProps>()(
   (set, get) => ({
+    tableName: '',
     headers: [],
     rowIds: [],
     fetchHeaders: async (tableId) => {
@@ -44,9 +46,9 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
       try {
         const {
-          data: { fields },
+          data: { fields, tableName },
         } = await _fetchTableColumn(tableId);
-        set({ headers: fields });
+        set({ headers: fields, tableName });
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
