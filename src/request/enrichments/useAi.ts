@@ -1,3 +1,5 @@
+import { post } from '../request';
+
 export const generatePrompt = (api: string, param: Record<string, any>) => {
   return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${api}`, {
     method: 'POST',
@@ -19,4 +21,11 @@ export const generatePrompt = (api: string, param: Record<string, any>) => {
       },
     }),
   });*/
+};
+
+export const columnRun = (fieldId: string, recordCount: number) => {
+  return post('/sdr/prospect/table/field/run', {
+    fieldId,
+    recordCount,
+  });
 };

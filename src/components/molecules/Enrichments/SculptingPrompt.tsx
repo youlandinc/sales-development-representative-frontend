@@ -4,10 +4,12 @@ import { FC } from 'react';
 type SculptingPromptProps = {
   prompt: string;
   isLoading?: boolean;
+  schemaJsonStr: string;
 };
 export const SculptingPrompt: FC<SculptingPromptProps> = ({
   prompt,
   isLoading,
+  schemaJsonStr,
 }) => {
   if (isLoading) {
     return (
@@ -46,7 +48,9 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
       </Stack>
       <Stack gap={0.4}>
         <Typography variant={'body2'}>Suggested output format </Typography>
-        <Box></Box>
+        <Typography p={2} variant={'body3'}>
+          {schemaJsonStr}
+        </Typography>
       </Stack>
     </Stack>
   );

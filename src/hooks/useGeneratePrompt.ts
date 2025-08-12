@@ -17,6 +17,7 @@ export const useGeneratePrompt = (
   } = useSwitch();
 
   const fn = useCallback(async () => {
+    setDone(false);
     open();
     thinking();
     generatePrompt(api, param)

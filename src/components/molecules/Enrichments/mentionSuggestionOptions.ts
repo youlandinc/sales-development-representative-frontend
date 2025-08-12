@@ -36,8 +36,8 @@ export const mentionSuggestionOptions: MentionOptions['suggestion'] = {
   // of whatever sort you like (including potentially additional data beyond
   // just an ID and a label). It need not be async but is written that way for
   // the sake of example.
-  items: async ({ query }): Promise<MentionSuggestion[]> =>
-    Promise.resolve(
+  items: async ({ query }): Promise<MentionSuggestion[]> => {
+    return Promise.resolve(
       [
         'Lea Thompson',
         'Cyndi Lauper',
@@ -64,7 +64,8 @@ export const mentionSuggestionOptions: MentionOptions['suggestion'] = {
           item.mentionLabel.toLowerCase().startsWith(query.toLowerCase()),
         ),
       // .slice(0, 5)
-    ),
+    );
+  },
 
   render: () => {
     let component: ReactRenderer<SuggestionListRef> | undefined;

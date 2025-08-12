@@ -1,5 +1,13 @@
-import { CSSProperties, FC, KeyboardEvent, useCallback, useMemo } from 'react';
-import { createEditor, Descendant } from 'slate';
+import {
+  ComponentRef,
+  CSSProperties,
+  forwardRef,
+  KeyboardEvent,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+} from 'react';
+import { createEditor } from 'slate';
 import { Editable, Slate, withReact } from 'slate-react';
 
 const initialValue = {
@@ -143,62 +151,61 @@ type SlateEditorProps = {
   style?: CSSProperties;
 };
 
-export const SlateEditor: FC<SlateEditorProps> = ({
-  initialValue,
-  placeholder = 'Enter JSON',
-  style,
-}) => {
-  const handleOnKeyDown = useCallback(
-    (I: KeyboardEvent<HTMLDivElement>, _: any) => {
-      switch (I.key) {
-        case 'Enter':
-          (!I.ctrlKey || !I.metaKey || I.shiftKey) &&
-            (_ == null ||
-              _.insertText(`
+export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
+  ({ initialValue, placeholder = 'Enter JSON', style }, ref) => {
+    const handleOnKeyDown = useCallback(
+      (I: KeyboardEvent<HTMLDivElement>, _: any) => {
+        switch (I.key) {
+          case 'Enter':
+            (!I.ctrlKey || !I.metaKey || I.shiftKey) &&
+              (_ == null ||
+                _.insertText(`
 `));
-          I.preventDefault();
-          I.stopPropagation();
-          break;
-        case 'Tab':
-          I.shiftKey &&
-            (_ == null || _.insertText('	'),
-            I.preventDefault(),
-            I.stopPropagation());
-          break;
-      }
-    },
-    [],
-  );
-  // const renderElement = useCallback(
-  //   (props: RenderElementProps) => <Element {...props} />,
-  //   [],
-  // );
-  // const renderLeaf = useCallback(
-  //   (props: RenderLeafProps) => <Leaf {...props} />,
-  //   [],
-  // );
-  const editor = useMemo(() => withReact(createEditor()), []);
-  // Render the Slate context.
-  return (
-    <Slate editor={editor} initialValue={schemaToSlate(initialValue)}>
-      <Editable
-        autoFocus
-        onKeyDown={(e) => {
-          handleOnKeyDown(e, editor);
-        }}
-        placeholder={placeholder}
-        // renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        spellCheck
-        style={{
-          outline: 'none',
-          minHeight: 32,
-          borderRadius: '8px',
-          border: '1px solid #E5E5E5',
-          padding: '16px',
-          ...style,
-        }}
-      />
-    </Slate>
-  );
-};
+            I.preventDefault();
+            I.stopPropagation();
+            break;
+          case 'Tab':
+            I.shiftKey &&
+              (_ == null || _.insertText('	'),
+              I.preventDefault(),
+              I.stopPropagation());
+            break;
+        }
+      },
+      [],
+    );
+    // const renderElement = useCallback(
+    //   (props: RenderElementProps) => <Element {...props} />,
+    //   [],
+    // );
+    // const renderLeaf = useCallback(
+    //   (props: RenderLeafProps) => <Leaf {...props} />,
+    //   [],
+    // );
+    const editor = useMemo(() => withReact(createEditor()), []);
+
+    useImperativeHandle(ref, () => editor, [editor]);
+    // Render the Slate context.
+    return (
+      <Slate editor={editor} initialValue={schemaToSlate(initialValue)}>
+        <Editable
+          autoFocus
+          onKeyDown={(e) => {
+            handleOnKeyDown(e, editor);
+          }}
+          placeholder={placeholder}
+          renderLeaf={renderLeaf}
+          spellCheck
+          style={{
+            outline: 'none',
+            minHeight: 32,
+            borderRadius: '8px',
+            border: '1px solid #E5E5E5',
+            padding: '16px',
+            ...style,
+          }}
+        />
+      </Slate>
+    );
+  },
+);

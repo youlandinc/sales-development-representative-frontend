@@ -56,7 +56,9 @@ export const PlaceholderNode: FC = (props: any) => {
         >
           <Switch checked={checked} onChange={onChange} size={'small'} />
           <Icon component={ICON_TEXT} sx={{ width: 18, height: 18 }} />
-          <Typography color={'text.primary'}>{label}</Typography>
+          <Typography color={'text.primary'} variant={'body3'}>
+            {label}
+          </Typography>
           <CloseIcon
             onClick={deleteNode}
             sx={{ color: 'text.secondary', cursor: 'pointer', fontSize: 18 }}
