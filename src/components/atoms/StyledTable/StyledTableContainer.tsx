@@ -1,11 +1,4 @@
-import {
-  FC,
-  ReactNode,
-  RefObject,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { FC, ReactNode, RefObject, useEffect, useMemo, useRef } from 'react';
 import { Stack } from '@mui/material';
 import { Table } from '@tanstack/react-table';
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual';
@@ -85,15 +78,13 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
       virtualPaddingLeft,
       virtualPaddingRight,
     };
-  }, [
-    columnVirtualizer.getVirtualItems(),
-    rowVirtualizer.getVirtualItems(),
-  ]);
+  }, [columnVirtualizer.getVirtualItems(), rowVirtualizer.getVirtualItems()]);
 
   useEffect(() => {
-     if (onVisibleRangeChange && virtualData.virtualRows.length > 0) {
+    if (onVisibleRangeChange && virtualData.virtualRows.length > 0) {
       const startIndex = virtualData.virtualRows[0].index;
-      const endIndex = virtualData.virtualRows[virtualData.virtualRows.length - 1].index;
+      const endIndex =
+        virtualData.virtualRows[virtualData.virtualRows.length - 1].index;
       onVisibleRangeChange(startIndex, endIndex);
     }
   }, [virtualData.virtualRows, onVisibleRangeChange]);

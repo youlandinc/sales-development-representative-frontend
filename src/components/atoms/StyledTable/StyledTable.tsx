@@ -533,7 +533,10 @@ export const StyledTable: FC<StyledTableProps> = ({
 
                   {/* Right padding spacer */}
                   {virtualPaddingRight ? (
-                    <StyledTableSpacer borderRight width={virtualPaddingRight} />
+                    <StyledTableSpacer
+                      borderRight
+                      width={virtualPaddingRight}
+                    />
                   ) : null}
 
                   {/* Add-column trailing spacer to align with header and draw right edge */}
