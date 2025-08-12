@@ -25,3 +25,5 @@ export * from './Contacts';
 export * from './GridPagination';
 
 export * from './Segments';
+
+export * from './Enrichments';
