@@ -22,4 +22,16 @@ export interface TableHeaderProps {
   pin: boolean;
   color: string | null;
   csn: number;
+  width: number;
+}
+
+export interface UpdateTableColumnConfigParams {
+  fieldId: string;
+  fieldName: string;
+  fieldType: TableHeaderTypeEnum;
+  hidden: boolean;
+  description: string;
+  color: string;
+  pin: boolean;
+  width: number;
 }

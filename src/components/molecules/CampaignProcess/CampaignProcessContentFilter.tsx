@@ -37,8 +37,6 @@ export const CampaignProcessContentFilter: FC = () => {
 
   const [renderData, setRenderData] = useState<TreeNode[]>(RENDER_DATA);
 
-  console.log(filterFormData);
-
   const { isLoading } = useSWR(
     'filter',
     async () => {

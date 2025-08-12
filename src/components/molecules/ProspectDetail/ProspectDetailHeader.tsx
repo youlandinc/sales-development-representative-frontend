@@ -6,6 +6,7 @@ import { LayoutUserInfo } from '@/components/molecules';
 
 import ICON_BACK from './assets/header/icon-back.svg';
 import ICON_ARROW from './assets/header/icon-arrow.svg';
+import { useProspectTableStore } from '@/stores/Prospect';
 
 interface ProspectDetailHeaderProps {
   tableId: string;
@@ -14,6 +15,8 @@ interface ProspectDetailHeaderProps {
 export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   tableId,
 }) => {
+  const { resetTable } = useProspectTableStore((store) => store);
+
   const router = useRouter();
 
   return (
@@ -22,7 +25,10 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
         <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
           <Icon
             component={ICON_BACK}
-            onClick={() => router.push('/prospect-enrich')}
+            onClick={() => {
+              resetTable();
+              router.push('/prospect-enrich');
+            }}
             sx={{ width: 20, height: 20, mt: 0.25, cursor: 'pointer' }}
           />
           <Stack

@@ -1,5 +1,8 @@
-import { get, post } from '@/request/request';
-import { TableHeaderProps } from '@/types/Prospect/table';
+import { get, patch, post } from '@/request/request';
+import {
+  TableHeaderProps,
+  UpdateTableColumnConfigParams,
+} from '@/types/Prospect/table';
 
 export const _fetchTableColumn = (tableId: string) => {
   return get<{ fields: TableHeaderProps[] }>(`/sdr/prospect/table/${tableId}`);
@@ -16,4 +19,25 @@ export const _fetchTableRowData = (params: {
   return post(`/sdr/prospect/table/${params.tableId}/data`, {
     recordIds: params.recordIds,
   });
+};
+
+export const _updateTableColumnConfig = (
+  params: Partial<UpdateTableColumnConfigParams>,
+) => {
+  return patch('/sdr/prospect/table/field', params);
+};
+
+export const _updateTableCellValue = (params: {
+  tableId: string;
+  rowId: string;
+  fieldId: string;
+  value: any;
+}) => {
+  return patch(
+    `/sdr/prospect/table/${params.tableId}/records/${params.rowId}`,
+    {
+      fieldId: params.fieldId,
+      value: params.value,
+    },
+  );
 };

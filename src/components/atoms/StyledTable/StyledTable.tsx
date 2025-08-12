@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox, Menu, MenuItem, Stack } from '@mui/material';
 
 import {
@@ -24,8 +24,6 @@ import {
   StyledTableSpacer,
 } from './index';
 
-import { TableHeaderProps } from '@/types/Prospect/table';
-
 interface StyledTableProps {
   columns: any[];
   rowIds: string[];
@@ -33,8 +31,6 @@ interface StyledTableProps {
   addMenuItems?: { label: string; value: string }[];
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
   pinnedLeftCount?: number;
-  initialColumnWidths?: Record<string, number>;
-  onColumnWidthsChange?: (widths: Record<string, number>) => void;
   columnWidthStorageKey?: string;
   scrolled?: boolean;
   virtualization?: {
@@ -43,6 +39,8 @@ interface StyledTableProps {
     scrollContainer?: React.RefObject<HTMLDivElement | null>;
     onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
   };
+  onColumnResize?: (fieldId: string, width: number) => void;
+  onCellEdit?: (rowId: string, fieldId: string, value: string) => void;
 }
 
 const columnHelper = createColumnHelper<any>();
@@ -54,11 +52,11 @@ export const StyledTable: FC<StyledTableProps> = ({
   addMenuItems,
   onAddMenuItemClick,
   pinnedLeftCount: pinnedLeftCountProp,
-  initialColumnWidths,
-  onColumnWidthsChange,
   columnWidthStorageKey,
   scrolled,
   virtualization,
+  onColumnResize,
+  onCellEdit,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -71,7 +69,11 @@ export const StyledTable: FC<StyledTableProps> = ({
     right: [],
   });
 
-  // Add column menu state
+  const editsRef = useRef<Record<string, Record<string, any>>>({});
+  const [, setEditVersion] = useState(0);
+  const editingRef = useRef<Record<string, Record<string, boolean>>>({});
+  const activeRef = useRef<Record<string, Record<string, boolean>>>({});
+
   const [addMenuAnchor, setAddMenuAnchor] = useState<null | HTMLElement>(null);
   const addMenuItems_ = useMemo(
     () => addMenuItems ?? [{ label: '+ Add new column', value: 'add_column' }],
@@ -80,10 +82,26 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   const rowHeight = virtualization?.rowHeight ?? 48;
 
+  const handleColumnSizingChange = useCallback(
+    (updater: any) => {
+      const newColumnSizing =
+        typeof updater === 'function' ? updater(columnSizing) : updater;
+      setColumnSizing(newColumnSizing);
+
+      Object.keys(newColumnSizing).forEach((columnId) => {
+        const newSize = newColumnSizing[columnId];
+        const oldSize = columnSizing[columnId];
+        if (newSize !== oldSize && newSize != null) {
+          onColumnResize?.(columnId, newSize);
+        }
+      });
+    },
+    [columnSizing, onColumnResize],
+  );
+
   const table = useReactTable({
     data: data,
     columns: useMemo(() => {
-      // First column: selection
       const selectCol = columnHelper.display({
         id: '__select',
         header: () => {
@@ -124,6 +142,12 @@ export const StyledTable: FC<StyledTableProps> = ({
               justifyContent="center"
               sx={{
                 position: 'relative',
+                '.row-index': {
+                  display: checked ? 'none' : 'block',
+                },
+                '.row-checkbox': {
+                  display: checked ? 'flex' : 'none',
+                },
                 '&:hover .row-index': { display: 'none' },
                 '&:hover .row-checkbox': { display: 'flex' },
               }}
@@ -162,7 +186,10 @@ export const StyledTable: FC<StyledTableProps> = ({
           {
             id: column.fieldId,
             header: column.fieldName,
-            cell: (info) => info.getValue(),
+            cell: (info) => {
+              const value = info.getValue();
+              return value as any;
+            },
           },
         ),
       );
@@ -172,7 +199,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     getCoreRowModel: getCoreRowModel(),
     getRowId: (_row, index) => rowIds[index] ?? String(index),
     defaultColumn: {
-      size: 160,
+      size: 200,
       minSize: 80,
     },
     enableRowSelection: true,
@@ -184,13 +211,70 @@ export const StyledTable: FC<StyledTableProps> = ({
       rowSelection,
       columnPinning,
     },
-    onColumnSizingChange: setColumnSizing,
+    onColumnSizingChange: handleColumnSizingChange,
     onColumnSizingInfoChange: setColumnSizingInfo,
     onRowSelectionChange: setRowSelection,
     onColumnPinningChange: setColumnPinning,
+    meta: {
+      getEdit: (rowId: string, columnId: string) => {
+        return editsRef.current[rowId]?.[columnId];
+      },
+      updateData: (rowId: string, columnId: string, value: any) => {
+        const rowEdits = editsRef.current[rowId] || {};
+        editsRef.current = {
+          ...editsRef.current,
+          [rowId]: { ...rowEdits, [columnId]: value },
+        };
+
+        onCellEdit?.(rowId, columnId, String(value));
+
+        setEditVersion((v) => v + 1);
+      },
+      isEditing: (rowId: string, columnId: string) =>
+        Boolean(editingRef.current[rowId]?.[columnId]),
+      isActive: (rowId: string, columnId: string) =>
+        Boolean(activeRef.current[rowId]?.[columnId]),
+      startEdit: (rowId: string, columnId: string) => {
+        const row = editingRef.current[rowId] || {};
+        editingRef.current = {
+          ...editingRef.current,
+          [rowId]: { ...row, [columnId]: true },
+        };
+        setEditVersion((v) => v + 1);
+      },
+      stopEdit: (rowId: string, columnId: string) => {
+        const row = editingRef.current[rowId] || {};
+        if (row[columnId]) {
+          const { [columnId]: _omit, ...rest } = row;
+          editingRef.current = {
+            ...editingRef.current,
+            [rowId]: rest,
+          };
+          setEditVersion((v) => v + 1);
+        }
+      },
+      setActive: (rowId: string, columnId: string) => {
+        const currentActive = activeRef.current[rowId]?.[columnId];
+        const hasOtherActive = Object.keys(activeRef.current).some((rId) =>
+          Object.keys(activeRef.current[rId] || {}).some(
+            (cId) =>
+              activeRef.current[rId][cId] &&
+              (rId !== rowId || cId !== columnId),
+          ),
+        );
+
+        if (!currentActive || hasOtherActive) {
+          activeRef.current = { [rowId]: { [columnId]: true } };
+          setEditVersion((v) => v + 1);
+        }
+      },
+      clearActive: () => {
+        activeRef.current = {};
+        setEditVersion((v) => v + 1);
+      },
+    },
   });
 
-  // Calculate sticky left offsets for pinned columns
   const { leftPinnedColumns, centerColumns, stickyLeftMap } = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();
     const leftPinned = visibleColumns.filter(
@@ -213,26 +297,30 @@ export const StyledTable: FC<StyledTableProps> = ({
     };
   }, [table.getVisibleLeafColumns(), columnSizing]);
 
-  // Load persisted column sizing
   useEffect(() => {
+    const initialSizing: ColumnSizingState = {};
+
+    columns.forEach((column) => {
+      if (column.width && column.width > 0) {
+        initialSizing[column.fieldId] = column.width;
+      }
+    });
+
     const key = columnWidthStorageKey;
     const saved = key ? localStorage.getItem(`table_colwidths_${key}`) : null;
-    let next: Record<string, number> = {};
     if (saved) {
       try {
-        next = JSON.parse(saved) || {};
+        Object.assign(initialSizing, JSON.parse(saved) || {});
       } catch {
         /* empty */
       }
-    } else if (initialColumnWidths) {
-      next = initialColumnWidths;
     }
-    if (Object.keys(next).length) {
-      setColumnSizing(next);
-    }
-  }, [columnWidthStorageKey, initialColumnWidths]);
 
-  // Persist column sizing
+    if (Object.keys(initialSizing).length) {
+      setColumnSizing(initialSizing);
+    }
+  }, [columnWidthStorageKey, columns]);
+
   useEffect(() => {
     if (columnWidthStorageKey) {
       localStorage.setItem(
@@ -240,8 +328,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         JSON.stringify(columnSizing),
       );
     }
-    onColumnWidthsChange?.(columnSizing as Record<string, number>);
-  }, [columnSizing, columnWidthStorageKey, onColumnWidthsChange]);
+  }, [columnSizing, columnWidthStorageKey]);
 
   const handleAddMenuClick = useCallback(
     (item: { label: string; value: string }) => {
@@ -251,7 +338,6 @@ export const StyledTable: FC<StyledTableProps> = ({
     [onAddMenuItemClick],
   );
 
-  // Memoize render content to avoid recreation on every render
   const renderContent = useCallback(
     ({
       tableContainerRef,
@@ -261,176 +347,226 @@ export const StyledTable: FC<StyledTableProps> = ({
       virtualRows,
       virtualPaddingLeft,
       virtualPaddingRight,
-    }: any) => (
-      <>
-        {/* Column resize indicator - positioned relative to scroll container */}
-        {columnSizingInfo.isResizingColumn && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: columnSizingInfo.startOffset || 0,
-              transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
-              height: `${rowVirtualizer.getTotalSize()}px`, // Use virtual total height
-              width: '2px',
-              backgroundColor: '#1976d2',
-              zIndex: 1000,
-              pointerEvents: 'none',
-              opacity: 0.8,
-            }}
-          />
-        )}
-
-        <StyledTableHead scrolled={scrolled ?? scrolledState}>
-          {/* Column resize indicator for header area - higher z-index */}
+    }: any) => {
+      return (
+        <>
           {columnSizingInfo.isResizingColumn && (
             <div
               style={{
                 position: 'absolute',
                 top: 0,
-                bottom: 0,
-                left: columnSizingInfo.startOffset || 0,
+                left:
+                  (columnSizingInfo.startOffset ?? 0) +
+                    (columnVirtualizer.scrollOffset ?? 0) || 0,
                 transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
+                height: `${rowVirtualizer.getTotalSize()}px`,
                 width: '2px',
                 backgroundColor: '#1976d2',
-                zIndex: 1001, // Higher than head cells (zIndex: 3)
+                zIndex: 1000,
                 pointerEvents: 'none',
                 opacity: 0.8,
               }}
             />
           )}
 
-          {table.getHeaderGroups().map((headerGroup) => (
-            <StyledTableHeadRow key={headerGroup.id}>
-              {/* Pinned left headers */}
-              {leftPinnedColumns.map((col, index) => {
-                const header = headerGroup.headers.find((h) => h.id === col.id);
-                if (!header) {
-                  return null;
-                }
-                return (
-                  <StyledTableHeadCell
-                    header={header}
-                    isPinned
-                    key={header.id}
-                    stickyLeft={stickyLeftMap[col.id] ?? 0}
-                    width={header.getSize()}
-                  />
-                );
-              })}
+          <StyledTableHead scrolled={scrolled ?? scrolledState}>
+            {columnSizingInfo.isResizingColumn && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left:
+                    (columnSizingInfo.startOffset ?? 0) +
+                      (columnVirtualizer.scrollOffset ?? 0) || 0,
+                  transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
+                  width: '2px',
+                  backgroundColor: '#1976d2',
+                  zIndex: 1001,
+                  pointerEvents: 'none',
+                  opacity: 0.8,
+                }}
+              />
+            )}
 
-              {/* Left padding spacer */}
-              {virtualPaddingLeft ? (
-                <StyledTableSpacer width={virtualPaddingLeft} />
-              ) : null}
-
-              {/* Virtual columns */}
-              {virtualColumns.map((virtualColumn: any) => {
-                const col = centerColumns[virtualColumn.index];
-                const header = headerGroup.headers.find((h) => h.id === col.id);
-                if (!header) {
-                  return null;
-                }
-                return (
-                  <StyledTableHeadCell
-                    dataIndex={virtualColumn.index}
-                    header={header}
-                    key={header.id}
-                    measureRef={(node) =>
-                      columnVirtualizer.measureElement(node)
-                    }
-                    width={header.getSize()}
-                  />
-                );
-              })}
-
-              {/* Right padding spacer */}
-              {virtualPaddingRight ? (
-                <StyledTableSpacer width={virtualPaddingRight} />
-              ) : null}
-
-              {/* Add column button */}
-              <StyledTableHeadCell
-                onClick={(e) => setAddMenuAnchor(e.currentTarget)}
-                width={120}
-              >
-                Add column
-              </StyledTableHeadCell>
-            </StyledTableHeadRow>
-          ))}
-        </StyledTableHead>
-
-        <StyledTableBody totalHeight={rowVirtualizer.getTotalSize()}>
-          {virtualRows.map((virtualRow: any) => {
-            const row = table.getRowModel().rows[virtualRow.index];
-            const visibleCells = row.getVisibleCells();
-
-            return (
-              <StyledTableBodyRow
-                key={row.id}
-                measureRef={(node) => rowVirtualizer.measureElement(node)}
-                rowHeight={rowHeight}
-                rowIndex={virtualRow.index}
-                virtualStart={virtualRow.start}
-              >
-                {/* Pinned left cells */}
+            {table.getHeaderGroups().map((headerGroup) => (
+              <StyledTableHeadRow key={headerGroup.id}>
+                {/* Pinned left headers */}
                 {leftPinnedColumns.map((col, index) => {
-                  const cell = visibleCells.find((c) => c.column.id === col.id);
-                  if (!cell) {
+                  const header = headerGroup.headers.find(
+                    (h) => h.id === col.id,
+                  );
+                  if (!header) {
                     return null;
                   }
-                  const isLoading = Boolean(
-                    (cell.row.original as any)?.__loading,
-                  );
-
                   return (
-                    <StyledTableBodyCell
-                      cell={cell}
-                      isLoading={isLoading}
+                    <StyledTableHeadCell
+                      header={header}
                       isPinned
-                      key={cell.id}
+                      key={header.id}
                       stickyLeft={stickyLeftMap[col.id] ?? 0}
-                      width={cell.column.getSize()}
+                      width={header.getSize()}
                     />
                   );
                 })}
 
-                {/* Left padding spacer */}
                 {virtualPaddingLeft ? (
                   <StyledTableSpacer width={virtualPaddingLeft} />
                 ) : null}
 
-                {/* Virtual cells */}
-                {virtualColumns.map((vc: any) => {
-                  const col = centerColumns[vc.index];
-                  const cell = visibleCells.find((c) => c.column.id === col.id);
-                  if (!cell) {
+                {virtualColumns.map((virtualColumn: any) => {
+                  const col = centerColumns[virtualColumn.index];
+                  const header = headerGroup.headers.find(
+                    (h) => h.id === col.id,
+                  );
+                  if (!header) {
                     return null;
                   }
-                  const isLoading = Boolean(
-                    (cell.row.original as any)?.__loading,
-                  );
-
                   return (
-                    <StyledTableBodyCell
-                      cell={cell}
-                      isLoading={isLoading}
-                      key={cell.id}
-                      width={cell.column.getSize()}
+                    <StyledTableHeadCell
+                      dataIndex={virtualColumn.index}
+                      header={header}
+                      key={header.id}
+                      measureRef={(node) =>
+                        columnVirtualizer.measureElement(node)
+                      }
+                      width={header.getSize()}
                     />
                   );
                 })}
 
-                {/* Right padding spacer */}
                 {virtualPaddingRight ? (
                   <StyledTableSpacer width={virtualPaddingRight} />
                 ) : null}
-              </StyledTableBodyRow>
-            );
-          })}
-        </StyledTableBody>
-      </>
-    ),
+
+                <StyledTableHeadCell
+                  onClick={(e) => setAddMenuAnchor(e.currentTarget)}
+                  width={120}
+                >
+                  Add column
+                </StyledTableHeadCell>
+              </StyledTableHeadRow>
+            ))}
+          </StyledTableHead>
+
+          <StyledTableBody totalHeight={rowVirtualizer.getTotalSize()}>
+            {virtualRows.map((virtualRow: any) => {
+              const row = table.getRowModel().rows[virtualRow.index];
+              const visibleCells = row.getVisibleCells();
+
+              return (
+                <StyledTableBodyRow
+                  key={row.id}
+                  measureRef={(node) => rowVirtualizer.measureElement(node)}
+                  rowHeight={rowHeight}
+                  rowIndex={virtualRow.index}
+                  virtualStart={virtualRow.start}
+                >
+                  {/* Pinned left cells */}
+                  {leftPinnedColumns.map((col, index) => {
+                    const cell = visibleCells.find(
+                      (c) => c.column.id === col.id,
+                    );
+                    if (!cell) {
+                      return null;
+                    }
+                    const isLoading = Boolean(
+                      (cell.row.original as any)?.__loading,
+                    );
+
+                    return (
+                      <StyledTableBodyCell
+                        cell={cell}
+                        editValue={(table.options.meta as any)?.getEdit?.(
+                          String(cell.row.id),
+                          String(cell.column.id),
+                        )}
+                        isActive={Boolean(
+                          (table.options.meta as any)?.isActive?.(
+                            String(cell.row.id),
+                            String(cell.column.id),
+                          ),
+                        )}
+                        isEditing={Boolean(
+                          (table.options.meta as any)?.isEditing?.(
+                            String(cell.row.id),
+                            String(cell.column.id),
+                          ),
+                        )}
+                        isPinned
+                        key={cell.id}
+                        onCellClick={(table.options.meta as any)?.setActive}
+                        onCellDoubleClick={
+                          (table.options.meta as any)?.startEdit
+                        }
+                        onEditCommit={(table.options.meta as any)?.updateData}
+                        onEditStop={(table.options.meta as any)?.stopEdit}
+                        stickyLeft={stickyLeftMap[col.id] ?? 0}
+                        width={cell.column.getSize()}
+                      />
+                    );
+                  })}
+
+                  {/* Left padding spacer */}
+                  {virtualPaddingLeft ? (
+                    <StyledTableSpacer width={virtualPaddingLeft} />
+                  ) : null}
+
+                  {/* Virtual cells */}
+                  {virtualColumns.map((vc: any) => {
+                    const col = centerColumns[vc.index];
+                    const cell = visibleCells.find(
+                      (c) => c.column.id === col.id,
+                    );
+                    if (!cell) {
+                      return null;
+                    }
+                    const isLoading = Boolean(
+                      (cell.row.original as any)?.__loading,
+                    );
+
+                    return (
+                      <StyledTableBodyCell
+                        cell={cell}
+                        editValue={(table.options.meta as any)?.getEdit?.(
+                          String(cell.row.id),
+                          String(cell.column.id),
+                        )}
+                        isActive={Boolean(
+                          (table.options.meta as any)?.isActive?.(
+                            String(cell.row.id),
+                            String(cell.column.id),
+                          ),
+                        )}
+                        isEditing={Boolean(
+                          (table.options.meta as any)?.isEditing?.(
+                            String(cell.row.id),
+                            String(cell.column.id),
+                          ),
+                        )}
+                        key={cell.id}
+                        onCellClick={(table.options.meta as any)?.setActive}
+                        onCellDoubleClick={
+                          (table.options.meta as any)?.startEdit
+                        }
+                        onEditCommit={(table.options.meta as any)?.updateData}
+                        onEditStop={(table.options.meta as any)?.stopEdit}
+                        width={cell.column.getSize()}
+                      />
+                    );
+                  })}
+
+                  {/* Right padding spacer */}
+                  {virtualPaddingRight ? (
+                    <StyledTableSpacer width={virtualPaddingRight} />
+                  ) : null}
+                </StyledTableBodyRow>
+              );
+            })}
+          </StyledTableBody>
+        </>
+      );
+    },
     [
       scrolled ?? scrolledState,
       table.getHeaderGroups(),
@@ -460,7 +596,6 @@ export const StyledTable: FC<StyledTableProps> = ({
         table={table}
       />
 
-      {/* Add Column Menu */}
       <Menu
         anchorEl={addMenuAnchor}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
