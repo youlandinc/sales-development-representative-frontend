@@ -38,7 +38,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   const isFetchingRef = useRef(false);
   const [scrolled, setScrolled] = useState(false);
   const ROW_HEIGHT = 36;
-  const MIN_BATCH_SIZE = 25;
+  const MIN_BATCH_SIZE = 50;
   const MAX_BATCH_SIZE = 300;
 
   const maxLoadedIndexRef = useRef(-1);
