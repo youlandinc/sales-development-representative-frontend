@@ -25,7 +25,7 @@ export type ProspectTableActions = {
   }) => Promise<void>;
   updateCellValue: (data: {
     tableId: string;
-    rowId: string;
+    recordId: string;
     fieldId: string;
     value: string;
   }) => Promise<void>;

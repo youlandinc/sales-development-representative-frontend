@@ -40,7 +40,7 @@ interface StyledTableProps {
     onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
   };
   onColumnResize?: (fieldId: string, width: number) => void;
-  onCellEdit?: (rowId: string, fieldId: string, value: string) => void;
+  onCellEdit?: (recordId: string, fieldId: string, value: string) => void;
 }
 
 const columnHelper = createColumnHelper<any>();
@@ -216,55 +216,55 @@ export const StyledTable: FC<StyledTableProps> = ({
     onRowSelectionChange: setRowSelection,
     onColumnPinningChange: setColumnPinning,
     meta: {
-      getEdit: (rowId: string, columnId: string) => {
-        return editsRef.current[rowId]?.[columnId];
+      getEdit: (recordId: string, columnId: string) => {
+        return editsRef.current[recordId]?.[columnId];
       },
-      updateData: (rowId: string, columnId: string, value: any) => {
-        const rowEdits = editsRef.current[rowId] || {};
+      updateData: (recordId: string, columnId: string, value: any) => {
+        const rowEdits = editsRef.current[recordId] || {};
         editsRef.current = {
           ...editsRef.current,
-          [rowId]: { ...rowEdits, [columnId]: value },
+          [recordId]: { ...rowEdits, [columnId]: value },
         };
 
-        onCellEdit?.(rowId, columnId, String(value));
+        onCellEdit?.(recordId, columnId, String(value));
 
         setEditVersion((v) => v + 1);
       },
-      isEditing: (rowId: string, columnId: string) =>
-        Boolean(editingRef.current[rowId]?.[columnId]),
-      isActive: (rowId: string, columnId: string) =>
-        Boolean(activeRef.current[rowId]?.[columnId]),
-      startEdit: (rowId: string, columnId: string) => {
-        const row = editingRef.current[rowId] || {};
+      isEditing: (recordId: string, columnId: string) =>
+        Boolean(editingRef.current[recordId]?.[columnId]),
+      isActive: (recordId: string, columnId: string) =>
+        Boolean(activeRef.current[recordId]?.[columnId]),
+      startEdit: (recordId: string, columnId: string) => {
+        const row = editingRef.current[recordId] || {};
         editingRef.current = {
           ...editingRef.current,
-          [rowId]: { ...row, [columnId]: true },
+          [recordId]: { ...row, [columnId]: true },
         };
         setEditVersion((v) => v + 1);
       },
-      stopEdit: (rowId: string, columnId: string) => {
-        const row = editingRef.current[rowId] || {};
+      stopEdit: (recordId: string, columnId: string) => {
+        const row = editingRef.current[recordId] || {};
         if (row[columnId]) {
           const { [columnId]: _omit, ...rest } = row;
           editingRef.current = {
             ...editingRef.current,
-            [rowId]: rest,
+            [recordId]: rest,
           };
           setEditVersion((v) => v + 1);
         }
       },
-      setActive: (rowId: string, columnId: string) => {
-        const currentActive = activeRef.current[rowId]?.[columnId];
+      setActive: (recordId: string, columnId: string) => {
+        const currentActive = activeRef.current[recordId]?.[columnId];
         const hasOtherActive = Object.keys(activeRef.current).some((rId) =>
           Object.keys(activeRef.current[rId] || {}).some(
             (cId) =>
               activeRef.current[rId][cId] &&
-              (rId !== rowId || cId !== columnId),
+              (rId !== recordId || cId !== columnId),
           ),
         );
 
         if (!currentActive || hasOtherActive) {
-          activeRef.current = { [rowId]: { [columnId]: true } };
+          activeRef.current = { [recordId]: { [columnId]: true } };
           setEditVersion((v) => v + 1);
         }
       },

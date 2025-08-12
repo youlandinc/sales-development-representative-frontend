@@ -174,8 +174,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           columns={headers}
           columnWidthStorageKey={tableId}
           data={fullData}
-          onCellEdit={(rowId, fieldId, value) =>
-            updateCellValue({ tableId, rowId, fieldId, value })
+          onCellEdit={(recordId, fieldId, value) =>
+            updateCellValue({ tableId, recordId, fieldId, value })
           }
           onColumnResize={(fieldId, width) =>
             updateColumnWidth({ fieldId, width })

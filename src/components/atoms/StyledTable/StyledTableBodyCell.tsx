@@ -11,10 +11,10 @@ interface StyledTableBodyCellProps {
   isEditing?: boolean;
   editValue?: any;
   isActive?: boolean;
-  onCellClick?: (rowId: string, columnId: string) => void;
-  onCellDoubleClick?: (rowId: string, columnId: string) => void;
-  onEditCommit?: (rowId: string, columnId: string, value: any) => void;
-  onEditStop?: (rowId: string, columnId: string) => void;
+  onCellClick?: (recordId: string, columnId: string) => void;
+  onCellDoubleClick?: (recordId: string, columnId: string) => void;
+  onEditCommit?: (recordId: string, columnId: string, value: any) => void;
+  onEditStop?: (recordId: string, columnId: string) => void;
 }
 
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
@@ -32,7 +32,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     onEditCommit,
     onEditStop,
   }) => {
-    const rowId = cell ? String(cell.row.id) : '';
+    const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
     const value = cell?.getValue();
     const inputRef = useRef<HTMLInputElement>(null);
@@ -55,9 +55,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
 
     const handleEditStop = () => {
       if (localEditValue !== String(displayValue ?? '')) {
-        onEditCommit?.(rowId, columnId, localEditValue);
+        onEditCommit?.(recordId, columnId, localEditValue);
       }
-      onEditStop?.(rowId, columnId);
+      onEditStop?.(recordId, columnId);
     };
 
     const content =

@@ -29,12 +29,12 @@ export const _updateTableColumnConfig = (
 
 export const _updateTableCellValue = (params: {
   tableId: string;
-  rowId: string;
+  recordId: string;
   fieldId: string;
   value: any;
 }) => {
   return patch(
-    `/sdr/prospect/table/${params.tableId}/records/${params.rowId}`,
+    `/sdr/prospect/table/${params.tableId}/records/${params.recordId}`,
     {
       fieldId: params.fieldId,
       value: params.value,
