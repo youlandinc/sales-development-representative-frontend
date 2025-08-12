@@ -37,8 +37,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
   const isFetchingRef = useRef(false);
   const [scrolled, setScrolled] = useState(false);
-  const ROW_HEIGHT = 48;
-  const MIN_BATCH_SIZE = 25;
+  const ROW_HEIGHT = 36;
+  const MIN_BATCH_SIZE = 50;
   const MAX_BATCH_SIZE = 300;
 
   const maxLoadedIndexRef = useRef(-1);
@@ -174,8 +174,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           columns={headers}
           columnWidthStorageKey={tableId}
           data={fullData}
-          onCellEdit={(rowId, fieldId, value) =>
-            updateCellValue({ tableId, rowId, fieldId, value })
+          onCellEdit={(recordId, fieldId, value) =>
+            updateCellValue({ tableId, recordId, fieldId, value })
           }
           onColumnResize={(fieldId, width) =>
             updateColumnWidth({ fieldId, width })

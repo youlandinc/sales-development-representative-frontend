@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
 import { Stack } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 interface StyledTableBodyRowProps {
   children: ReactNode;
@@ -7,6 +8,7 @@ interface StyledTableBodyRowProps {
   virtualStart: number;
   rowIndex: number;
   measureRef?: (node: HTMLElement | null) => void;
+  isSelected?: boolean;
 }
 
 export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
@@ -15,6 +17,7 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
   virtualStart,
   rowIndex,
   measureRef,
+  isSelected = false,
 }) => {
   return (
     <Stack
@@ -22,14 +25,19 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
       direction="row"
       ref={measureRef}
       sx={{
-        display: 'flex',
         position: 'absolute',
         transform: `translateY(${virtualStart}px)`,
         width: '100%',
         height: `${rowHeight}px`,
         alignItems: 'center',
+        boxSizing: 'border-box',
         borderBottom: '1px solid #F0EFF5',
-        '&:hover': { bgcolor: '#FAFAFA' },
+        bgcolor: (theme) =>
+          isSelected ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
+        '&:hover': {
+          bgcolor: (theme) =>
+            isSelected ? alpha(theme.palette.primary.main, 0.08) : '#FAFAFA',
+        },
       }}
     >
       {children}

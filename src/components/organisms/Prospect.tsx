@@ -27,6 +27,7 @@ import {
 import { _createProspectTableViaCsv } from '@/request';
 import { HttpVariantEnum, ProspectDelimiterEnum } from '@/types';
 
+import ICON_UPLOAD from './assets/icon_upload.svg';
 import ICON_CLOSE from './assets/icon_close.svg';
 import ICON_CSV from './assets/icon_csv.svg';
 
@@ -226,8 +227,10 @@ export const Prospect: FC = () => {
                 type="file"
               />
 
+              <Icon component={ICON_UPLOAD} sx={{ width: 24, height: 24 }} />
+
               <Typography mt={1} variant={'body2'}>
-                Drag & drop your file here
+                Drop files here or click to browse
               </Typography>
 
               <Typography variant={'body2'}>

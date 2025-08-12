@@ -1,5 +1,6 @@
 import { FC, memo, ReactNode, useEffect, useRef, useState } from 'react';
-import { InputBase, Stack } from '@mui/material';
+import { Box, InputBase, Stack } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { Cell, flexRender } from '@tanstack/react-table';
 
 interface StyledTableBodyCellProps {
@@ -11,10 +12,11 @@ interface StyledTableBodyCellProps {
   isEditing?: boolean;
   editValue?: any;
   isActive?: boolean;
-  onCellClick?: (rowId: string, columnId: string) => void;
-  onCellDoubleClick?: (rowId: string, columnId: string) => void;
-  onEditCommit?: (rowId: string, columnId: string, value: any) => void;
-  onEditStop?: (rowId: string, columnId: string) => void;
+  rowSelected?: boolean;
+  onCellClick?: (recordId: string, columnId: string) => void;
+  onCellDoubleClick?: (recordId: string, columnId: string) => void;
+  onEditCommit?: (recordId: string, columnId: string, value: any) => void;
+  onEditStop?: (recordId: string, columnId: string) => void;
 }
 
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
@@ -31,8 +33,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     onCellDoubleClick,
     onEditCommit,
     onEditStop,
+    rowSelected = false,
   }) => {
-    const rowId = cell ? String(cell.row.id) : '';
+    const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
     const value = cell?.getValue();
     const inputRef = useRef<HTMLInputElement>(null);
@@ -55,9 +58,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
 
     const handleEditStop = () => {
       if (localEditValue !== String(displayValue ?? '')) {
-        onEditCommit?.(rowId, columnId, localEditValue);
+        onEditCommit?.(recordId, columnId, localEditValue);
       }
-      onEditStop?.(rowId, columnId);
+      onEditStop?.(recordId, columnId);
     };
 
     const content =
@@ -72,6 +75,23 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
             if (e.key === 'Enter' || e.key === 'Escape') {
               handleEditStop();
             }
+          }}
+          size={'small'}
+          sx={{
+            height: '100%',
+            width: '100%',
+            fontSize: 14,
+            display: 'flex',
+            alignItems: 'center',
+            lineHeight: '36px',
+            '& input': {
+              p: 0,
+              m: 0,
+              height: '100%',
+              boxSizing: 'border-box',
+              fontSize: 14,
+              lineHeight: '36px',
+            },
           }}
           value={localEditValue}
         />
@@ -96,38 +116,46 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           }
         }}
         sx={{
-          display: 'flex',
           width,
           minWidth: width,
           maxWidth: width,
+          boxSizing: 'border-box',
           px: 2,
-          py: 1,
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 1 : 0,
-          bgcolor: isPinned ? '#FFFFFF' : 'transparent',
-          borderRight:
+          bgcolor: (theme) =>
             _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
-              : '1px solid #DFDEE6',
-          borderBottom:
+              ? alpha(theme.palette.primary.main, 0.06)
+              : rowSelected
+                ? alpha(theme.palette.primary.main, 0.06)
+                : isPinned
+                  ? '#FFFFFF'
+                  : 'transparent',
+          borderRight: '0.5px solid #DFDEE6',
+          borderTop: 'none',
+          borderLeft: 'none',
+          boxShadow: (theme) =>
             _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
-              : '1px solid #F0EFF5',
-          borderTop:
-            _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
-              : 'none',
-          borderLeft:
-            _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
+              ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
               : 'none',
           height: '100%',
           justifyContent: 'center',
           cursor: 'pointer',
         }}
       >
-        {content}
+        <Box
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            minWidth: 0,
+            width: '100%',
+            fontSize: 14,
+          }}
+        >
+          {content}
+        </Box>
       </Stack>
     );
   },
