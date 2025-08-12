@@ -460,6 +460,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   measureRef={(node) => rowVirtualizer.measureElement(node)}
                   rowHeight={rowHeight}
                   rowIndex={virtualRow.index}
+                  isSelected={row.getIsSelected?.() ?? false}
                   virtualStart={virtualRow.start}
                 >
                   {/* Pinned left cells */}
@@ -544,6 +545,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                             String(cell.column.id),
                           ),
                         )}
+                        rowSelected={row.getIsSelected?.() ?? false}
                         key={cell.id}
                         onCellClick={(table.options.meta as any)?.setActive}
                         onCellDoubleClick={

@@ -1,5 +1,6 @@
 import { FC, memo, ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, InputBase, Stack } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { Cell, flexRender } from '@tanstack/react-table';
 
 interface StyledTableBodyCellProps {
@@ -11,6 +12,7 @@ interface StyledTableBodyCellProps {
   isEditing?: boolean;
   editValue?: any;
   isActive?: boolean;
+  rowSelected?: boolean;
   onCellClick?: (recordId: string, columnId: string) => void;
   onCellDoubleClick?: (recordId: string, columnId: string) => void;
   onEditCommit?: (recordId: string, columnId: string, value: any) => void;
@@ -31,6 +33,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     onCellDoubleClick,
     onEditCommit,
     onEditStop,
+    rowSelected = false,
   }) => {
     const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
@@ -121,13 +124,20 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 1 : 0,
-          bgcolor: isPinned ? '#FFFFFF' : 'transparent',
+          bgcolor: (theme) =>
+            _isActive && cell?.column.id !== '__select'
+              ? alpha(theme.palette.primary.main, 0.06)
+              : rowSelected
+                ? alpha(theme.palette.primary.main, 0.06)
+                : isPinned
+                  ? '#FFFFFF'
+                  : 'transparent',
           borderRight: '0.5px solid #DFDEE6',
           borderTop: 'none',
           borderLeft: 'none',
-          boxShadow:
+          boxShadow: (theme) =>
             _isActive && cell?.column.id !== '__select'
-              ? 'inset 0 0 0 2px #6E4EFB'
+              ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
               : 'none',
           height: '100%',
           justifyContent: 'center',
