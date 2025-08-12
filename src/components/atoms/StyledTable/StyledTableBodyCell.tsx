@@ -122,21 +122,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 1 : 0,
           bgcolor: isPinned ? '#FFFFFF' : 'transparent',
-          borderRight:
+          borderRight: '0.5px solid #DFDEE6',
+          borderTop: 'none',
+          borderLeft: 'none',
+          boxShadow:
             _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
-              : '1px solid #DFDEE6',
-          borderBottom:
-            _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
-              : '1px solid #F0EFF5',
-          borderTop:
-            _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
-              : 'none',
-          borderLeft:
-            _isActive && cell?.column.id !== '__select'
-              ? '2px solid #6E4EFB'
+              ? 'inset 0 0 0 2px #6E4EFB'
               : 'none',
           height: '100%',
           justifyContent: 'center',

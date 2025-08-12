@@ -27,6 +27,7 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
         width: '100%',
         height: `${rowHeight}px`,
         alignItems: 'center',
+        boxSizing: 'border-box',
         borderBottom: '1px solid #F0EFF5',
         '&:hover': { bgcolor: '#FAFAFA' },
       }}
