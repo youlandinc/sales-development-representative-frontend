@@ -456,11 +456,11 @@ export const StyledTable: FC<StyledTableProps> = ({
 
               return (
                 <StyledTableBodyRow
+                  isSelected={row.getIsSelected?.() ?? false}
                   key={row.id}
                   measureRef={(node) => rowVirtualizer.measureElement(node)}
                   rowHeight={rowHeight}
                   rowIndex={virtualRow.index}
-                  isSelected={row.getIsSelected?.() ?? false}
                   virtualStart={virtualRow.start}
                 >
                   {/* Pinned left cells */}
@@ -545,7 +545,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                             String(cell.column.id),
                           ),
                         )}
-                        rowSelected={row.getIsSelected?.() ?? false}
                         key={cell.id}
                         onCellClick={(table.options.meta as any)?.setActive}
                         onCellDoubleClick={
@@ -553,6 +552,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                         }
                         onEditCommit={(table.options.meta as any)?.updateData}
                         onEditStop={(table.options.meta as any)?.stopEdit}
+                        rowSelected={row.getIsSelected?.() ?? false}
                         width={cell.column.getSize()}
                       />
                     );
