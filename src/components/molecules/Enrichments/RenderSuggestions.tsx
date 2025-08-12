@@ -15,7 +15,9 @@ const RenderSuggestions = () => {
         editor: props.editor,
       });
 
-      if (!props.clientRect) return;
+      if (!props.clientRect) {
+        return;
+      }
 
       popup = tippy('body', {
         getReferenceClientRect: props.clientRect,
@@ -30,7 +32,9 @@ const RenderSuggestions = () => {
     onUpdate(props: RenderSuggestionsProps) {
       reactRenderer.updateProps(props);
 
-      if (!props.clientRect) return;
+      if (!props.clientRect) {
+        return;
+      }
 
       popup[0].setProps({
         getReferenceClientRect: props.clientRect,
