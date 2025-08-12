@@ -69,56 +69,58 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = memo(
           {content}
         </Box>
 
-        {header && (enableResizing !== false) && header.column.getCanResize?.() !== false && (
-          <Stack
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              const handler = header.getResizeHandler?.();
-              handler?.(e);
-            }}
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              const handler = header.getResizeHandler?.();
-              handler?.(e);
-            }}
-            sx={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              height: '100%',
-              width: '12px',
-              cursor: 'col-resize',
-              zIndex: 4,
-              backgroundColor: 'transparent',
-              borderRight: '2px solid transparent',
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: 'rgba(25, 118, 210, 0.08)',
-                borderRight: '2px solid #1976d2',
-              },
-              '&:active': {
-                backgroundColor: 'rgba(25, 118, 210, 0.12)',
-                borderRight: '2px solid #1565c0',
-              },
-              '&::after': {
-                content: '""',
+        {header &&
+          enableResizing !== false &&
+          header.column.getCanResize?.() !== false && (
+            <Stack
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                const handler = header.getResizeHandler?.();
+                handler?.(e);
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+                const handler = header.getResizeHandler?.();
+                handler?.(e);
+              }}
+              sx={{
                 position: 'absolute',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '3px',
-                height: '50%',
-                backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                borderRadius: '1.5px',
-                opacity: 0,
-                transition: 'opacity 0.2s ease',
-              },
-              '&:hover::after': {
-                opacity: 1,
-              },
-            }}
-          />
-        )}
+                right: 0,
+                top: 0,
+                height: '100%',
+                width: '12px',
+                cursor: 'col-resize',
+                zIndex: 4,
+                backgroundColor: 'transparent',
+                borderRight: '2px solid transparent',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                  borderRight: '2px solid #1976d2',
+                },
+                '&:active': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.12)',
+                  borderRight: '2px solid #1565c0',
+                },
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '3px',
+                  height: '50%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                  borderRadius: '1.5px',
+                  opacity: 0,
+                  transition: 'opacity 0.2s ease',
+                },
+                '&:hover::after': {
+                  opacity: 1,
+                },
+              }}
+            />
+          )}
       </Stack>
     );
   },
