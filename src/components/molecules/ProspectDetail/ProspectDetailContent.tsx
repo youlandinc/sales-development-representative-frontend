@@ -81,7 +81,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         }
 
         if (
-          aiMessage.messageType === 'message' &&
+          aiMessage.type === 'message' &&
           aiMessage.data?.data?.tableId === tableId &&
           aiMessage.data?.data?.recordId &&
           aiMessage.data?.data?.metadata
