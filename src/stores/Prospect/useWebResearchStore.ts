@@ -9,6 +9,7 @@ type WebResearchStoreProps = {
   open: boolean;
   generateDescription: string;
   excludeFields: string[];
+  promptIsEmpty: boolean;
 };
 
 type WebResearchActions = {
@@ -24,6 +25,7 @@ type WebResearchActions = {
   ) => Promise<any>;
   setExcludeFields: (fields: string) => void;
   removeExcludeFields: (fields: string) => void;
+  setPromptIsEmpty: (b: boolean) => void;
   // removedField: (key: string) => void;
 };
 
@@ -31,6 +33,7 @@ export const useWebResearchStore = create<
   WebResearchStoreProps & WebResearchActions
 >()((set, get) => ({
   prompt: '',
+  promptIsEmpty: true,
   generateDescription: '',
   schemaJson: {
     type: 'object',
@@ -97,6 +100,9 @@ export const useWebResearchStore = create<
     const ids = get().excludeFields.filter((item) => item !== field);
     const result = [...(new Set(ids) as any)] as string[];
     set({ excludeFields: result });
+  },
+  setPromptIsEmpty: (b: boolean) => {
+    set({ promptIsEmpty: b });
   },
   // removedField: (key: string) => {
   //   const { properties, ...rest } = get().schemaJson;
