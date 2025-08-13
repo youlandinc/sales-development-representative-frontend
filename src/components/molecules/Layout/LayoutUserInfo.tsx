@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Avatar, Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
 
-import { useUserStore } from '@/provides';
+import { useUserStore } from '@/providers';
 import { USystemLogout } from '@/utils';
 
 import ICON_SIDE_LOGOUT from './assets/icon_side_logout.svg';

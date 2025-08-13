@@ -185,9 +185,9 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
           promptEditor?.getText() || '',
           schemaEditor?.children?.map((n) => Node.string(n)).join('\n') || '',
         );
+        await run(res.data, recordCount);
         await cb?.();
         handleClose();
-        run(res.data, recordCount);
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });

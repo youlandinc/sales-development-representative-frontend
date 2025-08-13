@@ -47,6 +47,8 @@ interface StyledTableProps {
   };
   onColumnResize?: (fieldId: string, width: number) => void;
   onCellEdit?: (recordId: string, fieldId: string, value: string) => void;
+  onAiProcess?: (recordId: string, columnId: string) => void;
+  aiLoading?: Record<string, Record<string, boolean>>;
 }
 
 const columnHelper = createColumnHelper<any>();
@@ -61,6 +63,8 @@ export const StyledTable: FC<StyledTableProps> = ({
   virtualization,
   onColumnResize,
   onCellEdit,
+  onAiProcess,
+  aiLoading,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -188,6 +192,11 @@ export const StyledTable: FC<StyledTableProps> = ({
           {
             id: column.fieldId,
             header: column.fieldName,
+            meta: {
+              actionKey: column.actionKey,
+              fieldType: column.fieldType,
+              column: column,
+            },
             cell: (info) => {
               const value = info.getValue();
               return value as any;
@@ -234,6 +243,21 @@ export const StyledTable: FC<StyledTableProps> = ({
         Boolean(editingState[recordId]?.[columnId]),
       isActive: (recordId: string, columnId: string) =>
         Boolean(activeState[recordId]?.[columnId]),
+      canEdit: (recordId: string, columnId: string) => {
+        if (columnId === '__select') {
+          return false;
+        }
+
+        const column = table.getColumn(columnId);
+        const actionKey = (column?.columnDef?.meta as any)?.actionKey;
+
+        return actionKey !== 'use-ai';
+      },
+      isAiLoading: (recordId: string, columnId: string) =>
+        Boolean(aiLoading?.[recordId]?.[columnId]),
+      triggerAiProcess: (recordId: string, columnId: string) => {
+        onAiProcess?.(recordId, columnId);
+      },
       startEdit: (recordId: string, columnId: string) => {
         const row = editingState[recordId] || {};
         setEditingState({
@@ -252,17 +276,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         }
       },
       setActive: (recordId: string, columnId: string) => {
-        const currentActive = activeState[recordId]?.[columnId];
-        const hasOtherActive = Object.keys(activeState).some((rId) =>
-          Object.keys(activeState[rId] || {}).some(
-            (cId) =>
-              activeState[rId][cId] && (rId !== recordId || cId !== columnId),
-          ),
-        );
-
-        if (!currentActive || hasOtherActive) {
-          setActiveState({ [recordId]: { [columnId]: true } });
-        }
+        setActiveState({ [recordId]: { [columnId]: true } });
       },
       clearActive: () => {
         setActiveState({});
@@ -457,18 +471,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                           String(cell.row.id),
                           String(cell.column.id),
                         )}
-                        isActive={Boolean(
-                          (table.options.meta as any)?.isActive?.(
-                            String(cell.row.id),
-                            String(cell.column.id),
-                          ),
-                        )}
-                        isEditing={Boolean(
-                          (table.options.meta as any)?.isEditing?.(
-                            String(cell.row.id),
-                            String(cell.column.id),
-                          ),
-                        )}
                         isPinned
                         key={cell.id}
                         onCellClick={(table.options.meta as any)?.setActive}
@@ -507,18 +509,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                         editValue={(table.options.meta as any)?.getEdit?.(
                           String(cell.row.id),
                           String(cell.column.id),
-                        )}
-                        isActive={Boolean(
-                          (table.options.meta as any)?.isActive?.(
-                            String(cell.row.id),
-                            String(cell.column.id),
-                          ),
-                        )}
-                        isEditing={Boolean(
-                          (table.options.meta as any)?.isEditing?.(
-                            String(cell.row.id),
-                            String(cell.column.id),
-                          ),
                         )}
                         key={cell.id}
                         onCellClick={(table.options.meta as any)?.setActive}

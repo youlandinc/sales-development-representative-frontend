@@ -1,10 +1,11 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Stack } from '@mui/material';
 import useSWR from 'swr';
 
 import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
 import { StyledTable } from '@/components/atoms';
 import { WebResearch } from '@/components/molecules';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 import { _fetchTableRowData } from '@/request';
 
@@ -16,20 +17,22 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   tableId,
 }) => {
   const {
-    fetchHeaders,
+    fetchTable,
     fetchRowIds,
     headers,
     rowIds,
+    runRecords,
     resetTable,
     updateColumnWidth,
     updateCellValue,
   } = useProspectTableStore((store) => store);
   const { setOpen } = useWebResearchStore((store) => store);
+  const { messages, connected } = useWebSocket();
 
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
     async () => {
-      await Promise.all([fetchHeaders(tableId), fetchRowIds(tableId)]);
+      await Promise.all([fetchTable(tableId), fetchRowIds(tableId)]);
     },
     {
       revalidateOnFocus: false,
@@ -38,6 +41,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
   const rowsMapRef = useRef<Record<string, any>>({});
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
+  const [aiLoadingState, setAiLoadingState] = useState<
+    Record<string, Record<string, boolean>>
+  >({});
   const isFetchingRef = useRef(false);
   const [scrolled, setScrolled] = useState(false);
   const ROW_HEIGHT = 36;
@@ -47,7 +53,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   const maxLoadedIndexRef = useRef(-1);
 
   const total = rowIds.length;
-  const fullData = rowIds.map((id) => rowsMap[id] || { id, __loading: true });
+  const fullData = useMemo(
+    () => rowIds.map((id) => rowsMap[id] || { id, __loading: true }),
+    [rowIds, rowsMap],
+  );
 
   useEffect(() => {
     resetTable();
@@ -56,6 +65,74 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     isFetchingRef.current = false;
     maxLoadedIndexRef.current = -1;
   }, [resetTable, tableId]);
+
+  useEffect(() => {
+    if (!connected || messages.length === 0 || !tableId) {
+      return;
+    }
+
+    messages.forEach((message, index) => {
+      try {
+        let aiMessage;
+        if (typeof message === 'string') {
+          aiMessage = JSON.parse(message);
+        } else {
+          aiMessage = message;
+        }
+
+        if (
+          aiMessage.messageType === 'message' &&
+          aiMessage.data?.data?.tableId === tableId &&
+          aiMessage.data?.data?.recordId &&
+          aiMessage.data?.data?.metadata
+        ) {
+          const { recordId, metadata } = aiMessage.data.data;
+
+          if (!metadata || Object.keys(metadata).length === 0) {
+            return;
+          }
+
+          const currentRowData = rowsMapRef.current[recordId] || {
+            id: recordId,
+          };
+          const updatedRowData = { ...currentRowData };
+
+          Object.entries(metadata).forEach(([fieldId, result]) => {
+            updatedRowData[fieldId] = result;
+          });
+
+          rowsMapRef.current[recordId] = updatedRowData;
+          setRowsMap((prev) => ({
+            ...prev,
+            [recordId]: updatedRowData,
+          }));
+
+          Object.keys(metadata).forEach((columnId) => {
+            setAiLoadingState((prev) => {
+              const updated = { ...prev };
+              if (updated[recordId]?.[columnId]) {
+                delete updated[recordId][columnId];
+                if (Object.keys(updated[recordId]).length === 0) {
+                  delete updated[recordId];
+                }
+              }
+              return updated;
+            });
+          });
+        } else {
+          //console.log(`Message ${index} doesn't match:`, {
+          //  messageType: aiMessage.type,
+          //  messageTableId: aiMessage.data?.data?.tableId,
+          //  currentTableId: tableId,
+          //  hasRecordId: !!aiMessage.data?.data?.recordId,
+          //  hasMetadata: !!aiMessage.data?.data?.metadata,
+          //});
+        }
+      } catch (error) {
+        //console.error(`Error processing WebSocket message ${index}:`, error);
+      }
+    });
+  }, [connected, messages, tableId]);
 
   const fetchBatchData = useCallback(
     async (startIndex: number, endIndex: number) => {
@@ -136,6 +213,48 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     [fetchBatchData, total],
   );
 
+  const handleAiProcess = useCallback(
+    (recordId: string, columnId: string) => {
+      if (!runRecords.includes(recordId)) {
+        return;
+      }
+
+      const currentValue = rowsMap[recordId]?.[columnId];
+      if (
+        currentValue !== undefined &&
+        currentValue !== null &&
+        currentValue !== ''
+      ) {
+        return;
+      }
+
+      setAiLoadingState((prev) => ({
+        ...prev,
+        [recordId]: {
+          ...prev[recordId],
+          [columnId]: true,
+        },
+      }));
+    },
+    [runRecords, rowsMap],
+  );
+
+  useEffect(() => {
+    if (runRecords.length === 0) {
+      setAiLoadingState({});
+    } else {
+      setAiLoadingState((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach((recordId) => {
+          if (!runRecords.includes(recordId)) {
+            delete updated[recordId];
+          }
+        });
+        return updated;
+      });
+    }
+  }, [runRecords]);
+
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const handleScroll = () => {
@@ -174,12 +293,13 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     >
       {headers.length > 0 && rowIds.length > 0 && (
         <StyledTable
+          aiLoading={aiLoadingState}
           columns={headers}
           data={fullData}
           onAddMenuItemClick={(item) => {
-            console.log(item);
             setOpen(true);
           }}
+          onAiProcess={handleAiProcess}
           onCellEdit={(recordId, fieldId, value) =>
             updateCellValue({ tableId, recordId, fieldId, value })
           }
@@ -200,7 +320,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
       <WebResearch
         cb={async () => {
-          await fetchHeaders(tableId);
+          await fetchTable(tableId);
         }}
         tableId={tableId}
       />

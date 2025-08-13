@@ -3,6 +3,7 @@ const nextConfig = {
   env: {},
   reactStrictMode: false,
   trailingSlash: false,
+  compress:true,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,

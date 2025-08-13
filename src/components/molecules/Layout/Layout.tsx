@@ -2,7 +2,7 @@ import { FC, ReactNode, useEffect } from 'react';
 import { Box, Stack, SxProps } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { useUserStore } from '@/provides';
+import { useUserStore } from '@/providers';
 
 import {
   CampaignProcess,

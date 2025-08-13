@@ -15,10 +15,11 @@ export type ProspectTableState = {
   tableName: string;
   headers: TableHeaderProps[];
   rowIds: string[];
+  runRecords: string[];
 };
 
 export type ProspectTableActions = {
-  fetchHeaders: (tableId: string) => Promise<void>;
+  fetchTable: (tableId: string) => Promise<void>;
   fetchRowIds: (tableId: string) => Promise<void>;
   updateColumnWidth: (data: {
     fieldId: string;
@@ -40,15 +41,16 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     tableName: '',
     headers: [],
     rowIds: [],
-    fetchHeaders: async (tableId) => {
+    runRecords: [],
+    fetchTable: async (tableId) => {
       if (!tableId) {
         return;
       }
       try {
         const {
-          data: { fields, tableName },
+          data: { fields, tableName, runRecords },
         } = await _fetchTableColumn(tableId);
-        set({ headers: fields, tableName });
+        set({ headers: fields, tableName, runRecords: runRecords ?? [] });
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });

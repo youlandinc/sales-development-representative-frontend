@@ -1,5 +1,5 @@
 import { FC, memo, ReactNode, useEffect, useRef, useState } from 'react';
-import { Box, InputBase, Stack } from '@mui/material';
+import { Box, CircularProgress, InputBase, Stack } from '@mui/material';
 import { Cell, flexRender } from '@tanstack/react-table';
 import { alpha } from '@mui/material/styles';
 
@@ -26,7 +26,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     width,
     isPinned = false,
     stickyLeft = 0,
-    isEditing: _isEditing = false,
+    isEditing: _isEditing,
     editValue: _editValue,
     isActive: _isActive,
     onCellClick,
@@ -42,8 +42,24 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
 
     const [localEditValue, setLocalEditValue] = useState<string>('');
 
+    const tableMeta = cell?.getContext?.()?.table?.options?.meta as any;
+    const canEdit = tableMeta?.canEdit?.(recordId, columnId) ?? true;
+    const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
+    const triggerAiProcess = tableMeta?.triggerAiProcess;
+
+    const isEditingFromMeta =
+      tableMeta?.isEditing?.(recordId, columnId) ?? false;
+    const isActiveFromMeta = tableMeta?.isActive?.(recordId, columnId) ?? false;
+    const isEditing = _isEditing !== undefined ? _isEditing : isEditingFromMeta;
+    const isActive = _isActive !== undefined ? _isActive : isActiveFromMeta;
+
+    const columnMeta = cell?.column?.columnDef?.meta as any;
+    const actionKey = columnMeta?.actionKey;
+    const fieldType = columnMeta?.fieldType;
+    const isAiColumn = actionKey === 'use-ai';
+
     useEffect(() => {
-      if (_isEditing) {
+      if (isEditing) {
         const initValue = _editValue !== undefined ? _editValue : value;
         setLocalEditValue(String(initValue ?? ''));
         setTimeout(() => {
@@ -52,9 +68,22 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           }
         }, 0);
       }
-    }, [_isEditing, _editValue, value]);
+    }, [isEditing, _editValue, value]);
 
     const displayValue = _editValue !== undefined ? _editValue : value;
+
+    useEffect(() => {
+      if (isAiColumn && !isAiLoading && !displayValue && triggerAiProcess) {
+        triggerAiProcess(recordId, columnId);
+      }
+    }, [
+      isAiColumn,
+      isAiLoading,
+      displayValue,
+      triggerAiProcess,
+      recordId,
+      columnId,
+    ]);
 
     const handleEditStop = () => {
       if (localEditValue !== String(displayValue ?? '')) {
@@ -64,7 +93,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     };
 
     const content =
-      _isEditing && cell && cell.column.id !== '__select' ? (
+      isEditing && cell && cell.column.id !== '__select' && canEdit ? (
         <InputBase
           autoFocus
           inputRef={inputRef}
@@ -97,6 +126,13 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         />
       ) : cell && cell.column.id === '__select' ? (
         flexRender(cell.column.columnDef.cell, cell.getContext())
+      ) : isAiColumn && isAiLoading && !displayValue ? (
+        <Stack alignItems="center" direction="row" spacing={1}>
+          <CircularProgress size={16} />
+          <Box component="span" sx={{ fontSize: 14, color: 'text.secondary' }}>
+            Processing...
+          </Box>
+        </Stack>
       ) : (
         displayValue
       );
@@ -105,13 +141,18 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       <Stack
         onClick={(e) => {
           e.stopPropagation();
-          if (cell && cell.column.id !== '__select' && onCellClick) {
+          if (cell && cell.column.id !== '__select' && canEdit && onCellClick) {
             onCellClick(String(cell.row.id), String(cell.column.id));
           }
         }}
         onDoubleClick={(e) => {
           e.stopPropagation();
-          if (cell && cell.column.id !== '__select' && onCellDoubleClick) {
+          if (
+            cell &&
+            cell.column.id !== '__select' &&
+            canEdit &&
+            onCellDoubleClick
+          ) {
             onCellDoubleClick(String(cell.row.id), String(cell.column.id));
           }
         }}
@@ -124,21 +165,22 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 1 : 0,
           bgcolor: (theme) =>
-            _isEditing && cell?.column.id !== '__select'
+            isEditing && cell?.column.id !== '__select'
               ? alpha(theme.palette.primary.main, 0.1)
-              : _isActive && cell?.column.id !== '__select'
+              : isActive && cell?.column.id !== '__select'
                 ? alpha(theme.palette.primary.main, 0.06)
                 : '#fff',
           borderRight: '0.5px solid #DFDEE6',
           borderTop: 'none',
           borderLeft: 'none',
           boxShadow: (theme) =>
-            _isActive && cell?.column.id !== '__select'
+            isActive && cell?.column.id !== '__select'
               ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
               : 'none',
           height: '100%',
           justifyContent: 'center',
-          cursor: 'pointer',
+          cursor:
+            canEdit && cell?.column.id !== '__select' ? 'pointer' : 'default',
         }}
       >
         <Box

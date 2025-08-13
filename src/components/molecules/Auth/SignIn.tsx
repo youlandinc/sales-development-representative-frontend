@@ -5,7 +5,7 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { UDecode, UEncode } from '@/utils';
 import { APP_KEY, DEFAULT_LOGGED_IN_PATH } from '@/constant';
-import { useUserStore } from '@/provides';
+import { useUserStore } from '@/providers';
 
 import {
   SDRToast,

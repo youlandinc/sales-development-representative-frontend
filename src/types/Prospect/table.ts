@@ -16,6 +16,7 @@ export interface TableHeaderProps {
   description: string | null;
   fieldName: string;
   fieldType: TableHeaderTypeEnum;
+  actionKey: string | null;
   hidden: boolean;
   isUnique: boolean;
   nullable: boolean;

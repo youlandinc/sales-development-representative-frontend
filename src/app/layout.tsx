@@ -12,13 +12,13 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
-import { UserStoreProvider } from '@/provides';
+import { UserStoreProvider } from '@/providers';
 
 import '@/styles/global.css';
 
 import { lightTheme } from '@/theme';
 
-import { ToastProvider } from '@/provides/ToastProvider';
+import { ToastProvider } from '@/providers/ToastProvider';
 
 const RootLayout = ({
   children,

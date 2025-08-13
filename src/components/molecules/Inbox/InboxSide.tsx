@@ -24,7 +24,7 @@ import { ReceiptTypeEnum, useInboxStore } from '@/stores/useInboxStore';
 import { useAsyncFn, useContainerHeight } from '@/hooks';
 import { _fetchEmails, _fetchEmailsDetails } from '@/request';
 import { HttpError, SSE_EVENT_TYPE } from '@/types';
-import { useUserStore } from '@/provides';
+import { useUserStore } from '@/providers';
 
 const computedContainerHeight = (height = 0) => {
   return Math.floor(height / 65) + 5;
