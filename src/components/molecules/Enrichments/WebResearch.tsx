@@ -107,7 +107,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       await generateJson('/sdr/ai/generate', {
         module: 'JSON_SCHEMA_WITH_PROMPT',
         params: {
-          text,
+          prompt: text,
         },
       });
     },
