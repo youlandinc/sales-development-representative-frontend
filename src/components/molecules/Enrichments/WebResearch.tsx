@@ -133,7 +133,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     await generatePrompt('/sdr/ai/generate', {
       module: 'COLUMN_ENRICHMENT_PROMPT',
       params: {
-        useInput: extractPromptText(
+        userInput: extractPromptText(
           (generateEditor?.getJSON() || []) as DocumentType,
           headers.reduce(
             (pre, cur) => {

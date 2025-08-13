@@ -1,4 +1,3 @@
-import { ChangeEvent, FC, useMemo, useState } from 'react';
 import {
   debounce,
   Icon,
@@ -6,18 +5,18 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 
-import ICON_FIND_PEOPLE from './assets/icon_find_people.svg';
-import ICON_FIND_COMPANIES from './assets/icon_find_companies.svg';
-import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
 import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
+import ICON_FIND_COMPANIES from './assets/icon_find_companies.svg';
+import ICON_FIND_PEOPLE from './assets/icon_find_people.svg';
+import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
 
-import ICON_HEADER_SEARCH from './assets/icon_search.svg';
-import ICON_NEW_TABLE from './assets/icon_new_table.svg';
-import { WebResearch } from '@/components/molecules';
 import { useWebResearchStore } from '@/stores/Prospect';
+import ICON_NEW_TABLE from './assets/icon_new_table.svg';
+import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 
 const BUTTONS = [
   {
@@ -101,7 +100,6 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               {item.label}
             </StyledButton>
           ))}
-          <StyledButton onClick={() => setOpen(true)}>Use AI</StyledButton>
         </Stack>
       </Stack>
 
@@ -142,7 +140,6 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
           </StyledButton>
         </Stack>
       </Stack>
-      <WebResearch />
     </Stack>
   );
 };
