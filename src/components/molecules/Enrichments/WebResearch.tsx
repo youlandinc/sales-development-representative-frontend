@@ -36,7 +36,7 @@ import { COINS_PER_ROW } from '@/constant';
 import { useAsyncFn } from '@/hooks';
 import { columnRun } from '@/request';
 import { HttpError } from '@/types';
-import { extractPromptText } from '@/utils';
+import { extractPromptText, schemaToSlate } from '@/utils';
 
 type CostCoinsProps = StackProps & {
   count: string;
@@ -77,9 +77,9 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const [schemaStr, setSchemaStr] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [promptEditor, setPromptEditor] = useState<null | Editor>(null);
-  const [generateEditor, setGenerateEditor] = useState<null | Editor>(null);
-  const [schemaEditor, setSchemaEditor] = useState<ReactEditor | null>(null);
+  // const [promptEditor, setPromptEditor] = useState<null | Editor>(null);
+  // const [generateEditor, setGenerateEditor] = useState<null | Editor>(null);
+  // const [schemaEditor, setSchemaEditor] = useState<ReactEditor | null>(null);
   const {
     setPrompt,
     open,
@@ -89,12 +89,18 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     prompt,
     saveAiConfig,
     setGenerateDescription,
+    generateEditorInstance,
+    tipTapEditorInstance,
+    slateEditorInstance,
   } = useWebResearchStore((state) => state);
   const { generatePrompt: generateJson } = useGeneratePrompt(
     setSchemaStr,
     (objStr) => {
       setIsLoading(false);
       setSchemaJson(JSON.parse(objStr));
+      // if (slateEditorInstance) {
+      //   slateEditorInstance.children = schemaToSlate(JSON.parse(objStr));
+      // }
       setTimeout(() => {
         setTab('configure');
       }, 0);
@@ -127,14 +133,14 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     setIsLoading(true);
     // Add a small delay to ensure editor is ready
     // await new Promise((resolve) => setTimeout(resolve, 100));
-    if (generateEditor) {
-      setGenerateDescription(generateEditor.getText());
+    if (generateEditorInstance) {
+      setGenerateDescription(generateEditorInstance.getText());
     }
     await generatePrompt('/sdr/ai/generate', {
       module: 'COLUMN_ENRICHMENT_PROMPT',
       params: {
         userInput: extractPromptText(
-          (generateEditor?.getJSON() || []) as DocumentType,
+          (generateEditorInstance?.getJSON() || []) as DocumentType,
           headers.reduce(
             (pre, cur) => {
               pre[cur.fieldName] = cur.fieldId;
@@ -164,8 +170,10 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         setAnchorEl(null);
         await saveAiConfig(
           tableId,
-          promptEditor?.getText() || '',
-          schemaEditor?.children?.map((n) => Node.string(n)).join('\n') || '',
+          tipTapEditorInstance?.getText() || '',
+          slateEditorInstance?.children
+            ?.map((n) => Node.string(n))
+            .join('\n') || '',
         );
       } catch (err) {
         const { header, message, variant } = err as HttpError;
@@ -173,7 +181,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         return Promise.reject(err);
       }
     },
-    [promptEditor, schemaEditor],
+    [tipTapEditorInstance, slateEditorInstance],
   );
 
   const [saveAndRunState, saveAndRun] = useAsyncFn(
@@ -182,8 +190,10 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         setAnchorEl(null);
         const res = await saveAiConfig(
           tableId,
-          promptEditor?.getText() || '',
-          schemaEditor?.children?.map((n) => Node.string(n)).join('\n') || '',
+          tipTapEditorInstance?.getText() || '',
+          slateEditorInstance?.children
+            ?.map((n) => Node.string(n))
+            .join('\n') || '',
         );
         await run(res.data, recordCount);
         await cb?.();
@@ -194,7 +204,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         return Promise.reject(err);
       }
     },
-    [promptEditor, schemaEditor, cb],
+    [tipTapEditorInstance, slateEditorInstance, cb],
   );
 
   return (
@@ -277,7 +287,6 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
                 <WebResearchGenerate
                   handleGeneratePrompt={handleGenerate}
                   isLoading={isLoading}
-                  onPromptEditorReady={setGenerateEditor}
                 />
               </Box>
               <Box
@@ -286,11 +295,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
                   transition: 'all .3s',
                 }}
               >
-                <WebResearchConfigure
-                  handleGenerate={handleGenerate}
-                  onPromptEditorReady={setPromptEditor}
-                  onSchemaEditorReady={setSchemaEditor}
-                />
+                <WebResearchConfigure handleGenerate={handleGenerate} />
               </Box>
             </Stack>
           </Stack>

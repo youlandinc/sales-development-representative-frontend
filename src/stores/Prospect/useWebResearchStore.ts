@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { _saveWebResearchConfig } from '@/request';
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
+import { Editor } from '@tiptap/core';
+import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 
 type WebResearchStoreProps = {
   prompt: string;
@@ -10,6 +12,9 @@ type WebResearchStoreProps = {
   generateDescription: string;
   excludeFields: string[];
   promptIsEmpty: boolean;
+  generateEditorInstance: Editor | null;
+  tipTapEditorInstance: Editor | null;
+  slateEditorInstance: ReactEditor | null;
 };
 
 type WebResearchActions = {
@@ -26,7 +31,9 @@ type WebResearchActions = {
   setExcludeFields: (fields: string) => void;
   removeExcludeFields: (fields: string) => void;
   setPromptIsEmpty: (b: boolean) => void;
-  // removedField: (key: string) => void;
+  setGenerateEditorInstance: (instance: Editor) => void;
+  setTipTapEditorInstance: (instance: Editor) => void;
+  setSlateEditorInstance: (instance: ReactEditor) => void;
 };
 
 export const useWebResearchStore = create<
@@ -46,6 +53,9 @@ export const useWebResearchStore = create<
   },
   excludeFields: [],
   open: false,
+  generateEditorInstance: null,
+  tipTapEditorInstance: null,
+  slateEditorInstance: null,
   setPrompt: (prompt: string) => {
     set({ prompt });
   },
@@ -103,6 +113,15 @@ export const useWebResearchStore = create<
   },
   setPromptIsEmpty: (b: boolean) => {
     set({ promptIsEmpty: b });
+  },
+  setGenerateEditorInstance: (instance: Editor) => {
+    set({ generateEditorInstance: instance });
+  },
+  setTipTapEditorInstance: (instance: Editor) => {
+    set({ tipTapEditorInstance: instance });
+  },
+  setSlateEditorInstance: (instance: ReactEditor) => {
+    set({ slateEditorInstance: instance });
   },
   // removedField: (key: string) => {
   //   const { properties, ...rest } = get().schemaJson;
