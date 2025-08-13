@@ -1,3 +1,5 @@
+import { DocumentType, NodeType, TextType } from '@tiptap/core';
+
 export const insertWithPlaceholders = (text: string) => {
   // editor.commands.setContent('');
 
@@ -57,4 +59,39 @@ export const insertWithPlaceholders = (text: string) => {
   // paragraphs.forEach((paragraph) => {
   //   editor.commands.insertContent(paragraph);
   // });
+};
+
+export const extractPromptText = (
+  doc: DocumentType,
+  fieldMap: Record<string, string>,
+): string => {
+  let result = '';
+
+  function walk(nodes?: NodeType[]) {
+    if (!nodes) {
+      return;
+    }
+    for (const node of nodes) {
+      if (node.type === 'text') {
+        result += (node as unknown as TextType).text || '';
+      } else if (node.type === 'custom-placeholder') {
+        const label = node.attrs?.label;
+        const id = fieldMap[label] || label;
+        result += `{{${id}}}`;
+      } else {
+        // 递归遍历嵌套内容
+        if (node.content) {
+          walk(node.content);
+        }
+
+        // 每段后加换行，模拟段落结构
+        if (node.type === 'paragraph') {
+          result += '\n';
+        }
+      }
+    }
+  }
+
+  walk(doc.content);
+  return JSON.stringify(result.trim());
 };

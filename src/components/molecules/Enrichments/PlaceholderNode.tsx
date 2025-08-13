@@ -21,7 +21,7 @@ export const PlaceholderNode: FC = (props: any) => {
 
   const storage = editor.storage.sharedSwitch;
 
-  const [checked, setChecked] = useState(storage.checked);
+  const [checked, setChecked] = useState(storage.checked || true);
 
   useEffect(() => {
     // 订阅存储变化

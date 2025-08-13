@@ -156,53 +156,6 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
       return null;
     }
 
-    /*  function $ae(t: string) {
-    const n = t.toLowerCase();
-    return n.includes('email') || n.includes('mail')
-      ? 'email'
-      : n.includes('phone') || n.includes('mobile') || n.includes('tel')
-        ? 'phone'
-        : n.includes('url') ||
-            n.includes('link') ||
-            n.includes('website') ||
-            n.includes('site') ||
-            n.includes('domain')
-          ? 'url'
-          : n.includes('date') ||
-              n.includes('time') ||
-              n.includes('created') ||
-              n.includes('updated') ||
-              n.includes('birth') ||
-              n.includes('start') ||
-              n.includes('end')
-            ? 'date'
-            : n.startsWith('is') ||
-                n.startsWith('has') ||
-                n.startsWith('can') ||
-                n.includes('enabled') ||
-                n.includes('disabled') ||
-                n.includes('active')
-              ? 'boolean'
-              : n.includes('count') ||
-                  n.includes('number') ||
-                  n.includes('amount') ||
-                  n.includes('quantity') ||
-                  n.includes('price') ||
-                  n.includes('age') ||
-                  n.includes('score') ||
-                  n.includes('rating') ||
-                  n.includes('size')
-                ? 'number'
-                : n.endsWith('s') && !n.endsWith('ss') && !n.endsWith('us')
-                  ? 'array'
-                  : n.includes('config') ||
-                      n.includes('settings') ||
-                      n.includes('data') ||
-                      n.includes('info') ||
-                      n.includes('details')
-                    ? 'object'
-                    : 'text';
-  }*/
     /*  const k = [];
   const i = [
     {

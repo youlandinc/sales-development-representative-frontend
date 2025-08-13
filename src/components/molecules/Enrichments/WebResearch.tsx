@@ -11,7 +11,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { Editor } from '@tiptap/core';
+import { DocumentType, Editor } from '@tiptap/core';
 import { FC, useState } from 'react';
 import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 import { Node } from 'slate';
@@ -36,6 +36,7 @@ import { COINS_PER_ROW } from '@/constant';
 import { useAsyncFn } from '@/hooks';
 import { columnRun } from '@/request';
 import { HttpError } from '@/types';
+import { extractPromptText } from '@/utils';
 
 type CostCoinsProps = StackProps & {
   count: string;
@@ -79,7 +80,6 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const [promptEditor, setPromptEditor] = useState<null | Editor>(null);
   const [generateEditor, setGenerateEditor] = useState<null | Editor>(null);
   const [schemaEditor, setSchemaEditor] = useState<ReactEditor | null>(null);
-
   const {
     setPrompt,
     open,
@@ -126,14 +126,23 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     allClear();
     setIsLoading(true);
     // Add a small delay to ensure editor is ready
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // await new Promise((resolve) => setTimeout(resolve, 100));
     if (generateEditor) {
       setGenerateDescription(generateEditor.getText());
     }
     await generatePrompt('/sdr/ai/generate', {
       module: 'COLUMN_ENRICHMENT_PROMPT',
       params: {
-        useInput: generateEditor?.getText() || '',
+        useInput: extractPromptText(
+          (generateEditor?.getJSON() || []) as DocumentType,
+          headers.reduce(
+            (pre, cur) => {
+              pre[cur.fieldName] = cur.fieldId;
+              return pre;
+            },
+            {} as Record<string, string>,
+          ),
+        ),
         columns: headers.map((item) => item.fieldName).join(','),
       },
     });
