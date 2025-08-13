@@ -159,6 +159,12 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
       onEditorReady?.(editor);
     }, [editor, onEditorReady]);
 
+    useEffect(() => {
+      if (initialValue) {
+        setValue(value);
+      }
+    }, [initialValue]);
+
     useImperativeHandle(ref, () => editor, [editor]);
 
     // Render the Slate context.
@@ -167,6 +173,7 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
         editor={editor}
         initialValue={initialValue}
         onChange={(value) => setValue(value)}
+        value={value}
       >
         <Editable
           autoFocus

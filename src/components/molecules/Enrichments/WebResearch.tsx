@@ -93,8 +93,8 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const { generatePrompt: generateJson } = useGeneratePrompt(
     setSchemaStr,
     (objStr) => {
-      setSchemaJson(JSON.parse(objStr));
       setIsLoading(false);
+      setSchemaJson(JSON.parse(objStr));
       setTimeout(() => {
         setTab('configure');
       }, 0);

@@ -34,6 +34,7 @@ export const _saveWebResearchConfig = (
   tableId: string,
   prompt: string,
   schema: string,
+  excludeFields: string[][],
 ) => {
   return post<string>('/sdr/prospect/table/field', {
     tableId,
@@ -51,6 +52,9 @@ export const _saveWebResearchConfig = (
           formulaText: schema,
         },
       ],
+      optionalPathsInInputs: {
+        prompt: excludeFields,
+      },
     },
   });
 };

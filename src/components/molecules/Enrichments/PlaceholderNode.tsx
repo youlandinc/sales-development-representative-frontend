@@ -4,8 +4,12 @@ import { ChangeEvent, FC, useEffect, useState } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
 import ICON_TEXT from './assets/icon_text.svg';
+import { useWebResearchStore } from '@/stores/Prospect';
 
 export const PlaceholderNode: FC = (props: any) => {
+  const { excludeFields, setExcludeFields, removeExcludeFields } =
+    useWebResearchStore((state) => state);
+
   const { node, deleteNode, editor } = props;
   const {
     item,
@@ -18,23 +22,40 @@ export const PlaceholderNode: FC = (props: any) => {
   } = node.attrs;
 
   const label = node?.attrs?.label;
+  const id = node?.attrs?.id;
+  console.log(node?.attrs);
 
   const storage = editor.storage.sharedSwitch;
 
   const [checked, setChecked] = useState(storage.checked || true);
 
-  useEffect(() => {
-    // 订阅存储变化
-    storage.subscribe(setChecked);
+  // useEffect(() => {
+  //   // 订阅存储变化
+  //   storage.subscribe(setChecked);
+  //
+  //   // 清理订阅
+  //   return () => {
+  //     storage.unsubscribe();
+  //   };
+  // }, [storage]);
 
-    // 清理订阅
-    return () => {
-      storage.unsubscribe();
-    };
-  }, [storage]);
+  useEffect(() => {
+    if (excludeFields.includes(id)) {
+      setChecked(false);
+    } else {
+      setChecked(true);
+    }
+  }, [excludeFields.join('')]);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    storage.setChecked(e.target.checked);
+    // storage.setChecked(e.target.checked);
+    console.log(id);
+    if (!e.target.checked && id) {
+      setExcludeFields(id);
+    } else {
+      removeExcludeFields(id);
+    }
+    setChecked(e.target.checked);
   };
 
   return (

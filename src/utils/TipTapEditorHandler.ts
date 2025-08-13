@@ -1,6 +1,9 @@
 import { DocumentType, NodeType, TextType } from '@tiptap/core';
 
-export const insertWithPlaceholders = (text: string) => {
+export const insertWithPlaceholders = (
+  text: string,
+  fieldMapping: Record<string, string>,
+) => {
   // editor.commands.setContent('');
 
   const placeholderRegex = /{{(.*?)}}/g;
@@ -35,7 +38,10 @@ export const insertWithPlaceholders = (text: string) => {
     // 插入 placeholder 占位符
     currentParagraphNodes.push({
       type: 'custom-placeholder',
-      attrs: { label: match[1].trim() },
+      attrs: {
+        label: match[1].trim(),
+        id: fieldMapping?.[match[1]] || '',
+      },
     });
 
     lastIndex = placeholderRegex.lastIndex;

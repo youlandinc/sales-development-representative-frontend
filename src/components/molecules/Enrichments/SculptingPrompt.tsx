@@ -26,7 +26,7 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
         <Typography variant={'body2'}>Suggested use case</Typography>
         <Typography variant={'body2'}>
           The user prompt is requesting to find specific information about a
-          person, likely using dynamic fields （placeholders） that will be
+          person, likely using dynamic fields (placeholders) that will be
           replaced with actual data. The available columns suggest the task
           involves searching for or extracting information such as Linkedlin
           profiles, job titles, or other personal/professional details. This
