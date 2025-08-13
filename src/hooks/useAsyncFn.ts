@@ -65,7 +65,7 @@ export const useAsyncFn = <T extends FunctionReturningPromise>(
           callId === lastCallId.current &&
           set({ error, loading: false });
 
-        return error;
+        return Promise.reject(error);
       },
     ) as ReturnType<T>;
     // eslint-disable-next-line react-hooks/exhaustive-deps

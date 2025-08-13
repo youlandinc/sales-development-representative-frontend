@@ -58,16 +58,25 @@ export const useWebResearchStore = create<
   allClear: () => {
     set({
       prompt: '',
-      schemaJson: {},
+      schemaJson: {
+        type: 'object',
+        properties: {
+          response: {
+            type: 'string',
+          },
+        },
+        required: ['response'],
+      },
       generateDescription: '',
     });
   },
   saveAiConfig: async (tableId: string, prompt: string, schema: string) => {
     try {
-      await _saveWebResearchConfig(tableId, prompt, schema);
+      return await _saveWebResearchConfig(tableId, prompt, schema);
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
+      return Promise.reject(err);
     }
   },
   // removedField: (key: string) => {

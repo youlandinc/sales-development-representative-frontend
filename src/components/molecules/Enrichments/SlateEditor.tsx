@@ -4,6 +4,7 @@ import {
   forwardRef,
   KeyboardEvent,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -101,6 +102,7 @@ type SlateEditorProps = {
   initialValue?: Descendant[];
   placeholder?: string;
   style?: CSSProperties;
+  onEditorReady?: (editor: any) => void;
 };
 
 export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
@@ -117,6 +119,7 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
       ],
       placeholder = 'Enter JSON',
       style,
+      onEditorReady,
     },
     ref,
   ) => {
@@ -151,6 +154,10 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
     );
 
     const editor = useMemo(() => withReact(createEditor()), []);
+
+    useEffect(() => {
+      onEditorReady?.(editor);
+    }, [editor, onEditorReady]);
 
     useImperativeHandle(ref, () => editor, [editor]);
 

@@ -82,15 +82,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     '#CONTEXT#\nYou are tasked with finding a Java engineer associated with a given company or website, and extracting their professional profile and email address.\n\n#OBJECTIVE#\nIdentify a Java engineer related to {{Enrich Company}}, {{Domain}}, or {{Url}}, and extract their professional profile link (such as LinkedIn) and email address.\n\n#INSTRUCTIONS#\n1. Use the provided {{Enrich Company}}, {{Domain}}, or {{Url}} to search for employees or team members who are Java engineers (titles may include "Java Engineer," "Java Developer," or similar).\n2. Search LinkedIn, company team pages, or other professional directories for profiles matching the criteria.\n3. Extract the profile URL (preferably LinkedIn) and the email address if publicly available.\n4. If multiple Java engineers are found, return the first relevant result.\n5. If no Java engineer or email is found, return "No Java engineer found" or "No email found" as appropriate.\n\n#EXAMPLES#\nInput:\n  Enrich Company: Acme Corp\n  Domain: acmecorp.com\n  Url: https://acmecorp.com\n\nExpected Output:\n  Java Engineer Name: John Doe\n';*/
   const defaultValue = prompt ? insertWithPlaceholders(prompt) : null;
 
-  useEffect(() => {
-    if (promptEditorRef.current) {
-      onPromptEditorReady?.(promptEditorRef.current);
-    }
-    if (schemaEditorRef.current) {
-      onSchemaEditorReady?.(schemaEditorRef.current);
-    }
-  }, [promptEditorRef.current, schemaEditorRef.current]);
-
   // const {
   //   data: s,
   //   completion: a,
@@ -126,6 +117,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           defaultValue={defaultValue}
           handleGenerate={handleGenerate}
           minHeight={200}
+          onEditorReady={onPromptEditorReady}
           placeholder={
             'E.g., Find the CEO of the company and their Linkedin profile'
           }
@@ -309,17 +301,10 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           </Stack>
           <Box display={outPuts === 'json' ? 'block' : 'none'}>
             <SlateEditor
-              initialValue={schemaToSlate(
-                schemaJson || {
-                  type: 'object',
-                  properties: {
-                    response: {
-                      type: 'string',
-                    },
-                  },
-                  required: ['response'],
-                },
-              )}
+              initialValue={schemaToSlate(schemaJson)}
+              onEditorReady={(editor) => {
+                onSchemaEditorReady?.(editor);
+              }}
               ref={schemaEditorRef}
             />
           </Box>

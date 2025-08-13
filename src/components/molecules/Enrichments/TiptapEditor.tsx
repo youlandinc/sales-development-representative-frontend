@@ -36,6 +36,7 @@ type TiptapEditorProps = {
   handleGenerate?: () => void;
   isLoading?: boolean;
   minHeight?: number;
+  onEditorReady?: (editor: Editor) => void;
 };
 export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
   (
@@ -45,6 +46,7 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
       handleGenerate,
       isLoading,
       minHeight = 150,
+      onEditorReady,
     },
     ref,
   ) => {
@@ -111,6 +113,7 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
         },
       },
       onCreate: ({ editor }) => {
+        onEditorReady?.(editor);
         // Safely set content after editor is fully initialized with schema
         // try {
         //   if (defaultValue) {
@@ -147,7 +150,8 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
       }
     }, [defaultValue, minHeight]);
 
-    useImperativeHandle(ref, () => editor, [editor]);
+    useImperativeHandle(ref, () => editor);
+
     if (!editor) {
       return null;
     }

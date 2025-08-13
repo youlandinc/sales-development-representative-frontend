@@ -17,12 +17,6 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
   const promptEditorRef = useRef(null);
   const { generateDescription } = useWebResearchStore((state) => state);
 
-  useEffect(() => {
-    if (promptEditorRef.current) {
-      onPromptEditorReady?.(promptEditorRef.current);
-    }
-  }, [promptEditorRef.current]);
-
   return (
     <Stack gap={1.5}>
       <Stack gap={1}>
@@ -37,6 +31,7 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
         defaultValue={generateDescription}
         handleGenerate={handleGeneratePrompt}
         isLoading={isLoading}
+        onEditorReady={onPromptEditorReady}
         placeholder={
           'E.g., Find the CEO of the company and their Linkedin profile'
         }

@@ -35,7 +35,7 @@ export const _saveWebResearchConfig = (
   prompt: string,
   schema: string,
 ) => {
-  return post('/sdr/prospect/table/field', {
+  return post<string>('/sdr/prospect/table/field', {
     tableId,
     actionKey: 'use-ai',
     fieldType: 'TEXT',

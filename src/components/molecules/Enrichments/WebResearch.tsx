@@ -70,7 +70,7 @@ type WebResearchProps = {
 };
 
 export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
-  const { headers } = useProspectTableStore((store) => store);
+  const { headers, rowIds } = useProspectTableStore((store) => store);
   const [tab, setTab] = useState<'generate' | 'configure'>('generate');
   const [text, setText] = useState('');
   const [schemaStr, setSchemaStr] = useState('');
@@ -97,7 +97,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       setIsLoading(false);
       setTimeout(() => {
         setTab('configure');
-      }, 1000);
+      }, 0);
     },
   );
   const { generatePrompt, isThinking } = useGeneratePrompt(
@@ -107,7 +107,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       await generateJson('/sdr/ai/generate', {
         module: 'JSON_SCHEMA_WITH_PROMPT',
         params: {
-          prompt,
+          text,
         },
       });
     },
@@ -117,6 +117,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     setOpen(false);
     setTab('generate');
     allClear();
+    setAnchorEl(null);
   };
 
   const handleGenerate = async () => {
@@ -124,6 +125,8 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     setSchemaStr('');
     allClear();
     setIsLoading(true);
+    // Add a small delay to ensure editor is ready
+    await new Promise((resolve) => setTimeout(resolve, 100));
     if (generateEditor) {
       setGenerateDescription(generateEditor.getText());
     }
@@ -136,15 +139,53 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     });
   };
 
-  const [state, run] = useAsyncFn(
-    async (fieldId: string, recordCount: number) => {
+  const [, run] = useAsyncFn(async (fieldId: string, recordCount: number) => {
+    try {
+      await columnRun(fieldId, recordCount);
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+      return Promise.reject(err);
+    }
+  });
+
+  const [state, saveDonotRun] = useAsyncFn(
+    async (tableId: string) => {
       try {
-        await columnRun(fieldId, 0);
+        setAnchorEl(null);
+        await saveAiConfig(
+          tableId,
+          promptEditor?.getText() || '',
+          schemaEditor?.children?.map((n) => Node.string(n)).join('\n') || '',
+        );
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
+        return Promise.reject(err);
       }
     },
+    [promptEditor, schemaEditor],
+  );
+
+  const [saveAndRunState, saveAndRun] = useAsyncFn(
+    async (tableId: string, recordCount: number) => {
+      try {
+        setAnchorEl(null);
+        const res = await saveAiConfig(
+          tableId,
+          promptEditor?.getText() || '',
+          schemaEditor?.children?.map((n) => Node.string(n)).join('\n') || '',
+        );
+        await cb?.();
+        handleClose();
+        run(res.data, recordCount);
+      } catch (err) {
+        const { header, message, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+        return Promise.reject(err);
+      }
+    },
+    [promptEditor, schemaEditor, cb],
   );
 
   return (
@@ -236,6 +277,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
                   <WebResearchConfigure
                     handleGenerate={handleGenerate}
                     onPromptEditorReady={setPromptEditor}
+                    onSchemaEditorReady={setSchemaEditor}
                   />
                 </Box>
               </Stack>
@@ -263,11 +305,12 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
                 sx={{ width: 12, height: 12, '& path': { fill: '#fff' } }}
               />
             }
+            loading={state.loading || saveAndRunState.loading}
             onClick={(e) => {
               setAnchorEl(e.currentTarget);
             }}
             size={'medium'}
-            sx={{ height: '40px !important' }}
+            sx={{ height: '40px !important', width: 80 }}
             variant={'contained'}
           >
             Save
@@ -291,29 +334,28 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
               },
             }}
           >
-            <MenuItem>
+            <MenuItem onClick={() => saveAndRun(tableId, 10)}>
               <Typography color={'text.secondary'} variant={'body2'}>
                 Save and run 10 rows
               </Typography>
               <CostCoins bgcolor={'#EFE9FB'} count={`~${COINS_PER_ROW * 10}`} />
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={() => saveAndRun(tableId, rowIds.length)}>
               <Typography color={'text.secondary'} variant={'body2'}>
-                Save and run total rows in this view
+                Save and run {rowIds.length} rows in this view
               </Typography>
               <CostCoins bgcolor={'#EFE9FB'} count={'~20'} />
             </MenuItem>
             <MenuItem
               onClick={async () => {
-                await saveAiConfig(
-                  tableId,
-                  promptEditor?.getText() || '',
-                  schemaEditor?.children
-                    ?.map((n) => Node.string(n))
-                    .join('\n') || '',
-                );
-                await cb?.();
-                setOpen(false);
+                try {
+                  await saveDonotRun(tableId);
+                  await cb?.();
+                  handleClose();
+                } catch (err) {
+                  const { header, message, variant } = err as HttpError;
+                  SDRToast({ message, header, variant });
+                }
               }}
             >
               <Typography color={'text.secondary'} variant={'body2'}>
