@@ -197,8 +197,8 @@ export const Prospect: FC = () => {
               border={'2px dashed #D2D6E1'}
               borderRadius={2}
               display={!selectedFile ? 'flex' : 'none'}
-              height={400}
               justifyContent={'center'}
+              minHeight={400}
               onClick={() => {
                 fileInputRef.current?.click();
                 setIsDragging(true);
@@ -279,11 +279,14 @@ export const Prospect: FC = () => {
                 />
               </Stack>
 
-              <StyledCustomButtonGroup
-                onChange={(value) => setDelimiter(value)}
-                options={PROSPECT_CSV_TYPE_OPTIONS}
-                value={delimiter}
-              />
+              <Stack gap={1}>
+                <Typography fontWeight={600}>Delimiter</Typography>
+                <StyledCustomButtonGroup
+                  onChange={(value) => setDelimiter(value)}
+                  options={PROSPECT_CSV_TYPE_OPTIONS}
+                  value={delimiter}
+                />
+              </Stack>
 
               <StyledCheckbox
                 checked={hasHeader}
@@ -291,43 +294,46 @@ export const Prospect: FC = () => {
                 onChange={(e, checked) => setHasHeader(checked)}
               />
 
-              <Stack flexDirection={'row'} gap={1.5} mt={-1}>
-                <Stack
-                  sx={{
-                    borderRadius: 2,
-                    p: 1.5,
-                    flexDirection: 'row',
-                    cursor: 'pointer',
-                    outline: '1px solid #6E4EFB',
-                    border: '1px solid #6E4EFB',
-                  }}
-                >
-                  <Icon component={ICON_CSV_NEW} />
-                  New blank table
-                </Stack>
-                <Stack
-                  border={'1px solid #DFDEE6'}
-                  borderRadius={2}
-                  p={1.5}
-                  sx={{
-                    borderRadius: 2,
-                    p: 1.5,
-                    flexDirection: 'row',
-                    cursor: 'not-allowed',
-                    border: '1px solid #DFDEE6',
-                    outline: '1px solid transparent',
-                    color: '#B0ADBD',
-                  }}
-                >
-                  <Icon
-                    component={ICON_CSV_EXIST}
+              <Stack gap={1.5} mt={-1}>
+                <Typography fontWeight={600}>Type of creation</Typography>
+                <Stack flexDirection={'row'} gap={1}>
+                  <Stack
                     sx={{
-                      '& path': {
-                        fill: '#B0ADBD',
-                      },
+                      borderRadius: 2,
+                      p: 1.5,
+                      flexDirection: 'row',
+                      cursor: 'pointer',
+                      outline: '1px solid #6E4EFB',
+                      border: '1px solid #6E4EFB',
                     }}
-                  />
-                  Add to existing table
+                  >
+                    <Icon component={ICON_CSV_NEW} />
+                    New blank table
+                  </Stack>
+                  <Stack
+                    border={'1px solid #DFDEE6'}
+                    borderRadius={2}
+                    p={1.5}
+                    sx={{
+                      borderRadius: 2,
+                      p: 1.5,
+                      flexDirection: 'row',
+                      cursor: 'not-allowed',
+                      border: '1px solid #DFDEE6',
+                      outline: '1px solid transparent',
+                      color: '#B0ADBD',
+                    }}
+                  >
+                    <Icon
+                      component={ICON_CSV_EXIST}
+                      sx={{
+                        '& path': {
+                          fill: '#B0ADBD',
+                        },
+                      }}
+                    />
+                    Add to existing table
+                  </Stack>
                 </Stack>
               </Stack>
             </Stack>
