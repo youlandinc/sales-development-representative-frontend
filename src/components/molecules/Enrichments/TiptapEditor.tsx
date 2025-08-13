@@ -317,7 +317,10 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
               onClick={handleGenerate}
               size={'small'}
               startIcon={<Icon component={ICON_SPARKLE} />}
-              sx={{ width: 100 }}
+              sx={{
+                width: 100,
+                borderColor: '#D0CEDA !important',
+              }}
               variant={'outlined'}
             >
               Generate

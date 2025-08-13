@@ -177,6 +177,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                 size={'small'}
                 sx={{
                   width: '177px !important',
+                  borderColor: '#D0CEDA !important',
                 }}
                 variant={'outlined'}
               >
