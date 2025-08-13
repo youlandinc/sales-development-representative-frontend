@@ -28,11 +28,15 @@ import { MoreHoriz } from '@mui/icons-material';
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
 import ICON_TEXT from './assets/icon_text.svg';
 import ICON_WARNING from './assets/icon_warning.svg';
-import { useWebResearchStore } from '@/stores/Prospect';
+import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 // import { useCompletion } from '@ai-sdk/react';
 import ICON_DELETE from './assets/icon_delete.svg';
-import { insertWithPlaceholders, schemaToSlate } from '@/utils';
+import {
+  extractPromptText,
+  insertWithPlaceholders,
+  schemaToSlate,
+} from '@/utils';
 import { Editor } from '@tiptap/core';
 
 const initialValue = {
@@ -65,6 +69,8 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   const { prompt, schemaJson, setSchemaJson } = useWebResearchStore(
     (state) => state,
   );
+  const { headers } = useProspectTableStore((store) => store);
+
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -105,7 +111,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   //   // onFinish: (l, c) => t(l, c),
   //   streamProtocol: 'data',
   // });
-
+  // console.log(schemaToSlate(schemaJson));
   return (
     <Stack gap={4}>
       {/*<Typography>{text}</Typography>*/}
@@ -155,7 +161,16 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                   generateJson('/sdr/ai/generate', {
                     module: 'JSON_SCHEMA_WITH_PROMPT',
                     params: {
-                      prompt: promptEditorRef.current?.getText() || '',
+                      prompt: extractPromptText(
+                        (promptEditorRef?.current?.getJSON() || []) as any,
+                        headers.reduce(
+                          (pre, cur) => {
+                            pre[cur.fieldName] = cur.fieldId;
+                            return pre;
+                          },
+                          {} as Record<string, string>,
+                        ),
+                      ),
                     },
                   })
                 }

@@ -13,13 +13,14 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <Stack alignItems={'center'} justifyContent={'center'}>
+      <Stack alignItems={'center'} gap={2} justifyContent={'center'}>
+        <Typography variant={'body2'}>Sculpting your prompt...</Typography>
         <CircularProgress size={20} />
       </Stack>
     );
   }
   return (
-    <Stack gap={4}>
+    <Stack flex={1} gap={4}>
       <Typography variant={'body2'}>Sculpting your prompt...</Typography>
       <Stack gap={0.5}>
         <Typography variant={'body2'}>Suggested use case</Typography>

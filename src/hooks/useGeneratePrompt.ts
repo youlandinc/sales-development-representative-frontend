@@ -22,9 +22,47 @@ export const useGeneratePrompt = (
       open();
       thinking();
       generatePrompt(api, param)
-        .then((response) => {
+        .then(async (response) => {
           if (response.body) {
+            closeThinking();
             const reader = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+
+            let buffer = '';
+            let fullText = '';
+
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) {
+                setDone(true);
+                onFinish?.(fullText);
+                close();
+                break;
+              }
+
+              buffer += decoder.decode(value, { stream: true });
+
+              // 按 SSE 事件分割
+              const events = (buffer.split('\n\n') || ['']) as string[];
+              buffer = events.pop() || ''; // 最后可能是半截，留到下一轮解析
+
+              for (const e of events) {
+                const chunk = e.replace(/data:/g, ''); // 去掉 `data: `
+
+                // 这里有可能是 JSON，也可能是纯文本
+                try {
+                  const json = JSON.parse(chunk);
+                  const delta = json.choices?.[0]?.delta?.content ?? '';
+                  fullText += delta;
+                } catch {
+                  // 纯文本（SSE可能直接推Markdown）
+                  fullText += chunk;
+                }
+                streamCb?.(fullText);
+              }
+            }
+
+            /*const reader = response.body.getReader();
             const decoder = new TextDecoder('utf-8');
             let str = '';
             closeThinking();
@@ -37,17 +75,20 @@ export const useGeneratePrompt = (
                   return;
                 }
                 // decode
+                console.log(JSON.stringify(decoder.decode(value)));
                 const data = decoder
-                  .decode(value)
+                  .decode(value, { stream: true })
                   .replace(/data:/g, '')
-                  .replace(/\n/g, '');
+                  .replace(/\n/g, '')
+                  .replace(/^$/, '\n');
+                console.log('string', JSON.stringify(data));
                 str = str + data;
                 streamCb?.(str);
                 // continue read stream
                 readStream();
               });
             };
-            readStream();
+            readStream();*/
           }
         })
         .catch((err) => {

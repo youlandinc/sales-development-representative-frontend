@@ -77,7 +77,8 @@ export const extractPromptText = (
       } else if (node.type === 'custom-placeholder') {
         const label = node.attrs?.label;
         const id = fieldMap[label] || label;
-        result += `{{${id}}}`;
+        // result += `{{${id}}}`;
+        result += `{{${label}}}`;
       } else {
         // 递归遍历嵌套内容
         if (node.content) {

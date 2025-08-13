@@ -199,100 +199,103 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
 
   return (
     <Drawer anchor={'right'} open={open}>
-      <Stack gap={3} height={'100%'} justifyContent={'space-between'}>
-        <Stack maxWidth={500} p={'24px 24px 0px 24px'} width={500}>
-          {isLoading ? (
+      <Stack gap={4} height={'100%'} justifyContent={'space-between'}>
+        {/* header */}
+        <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>
+          <Icon
+            component={ICON_ARROW}
+            onClick={handleClose}
+            sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
+          />
+          <Icon
+            component={ICON_SPARK}
+            sx={{ width: 20, height: 20, mr: 0.5 }}
+          />
+          <Typography>Al web researcher</Typography>
+          <CloseIcon
+            onClick={handleClose}
+            sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
+          />
+        </Stack>
+        {/* content */}
+        <Stack flex={1} maxWidth={500} px={3} width={500}>
+          <Box display={isLoading ? 'block' : 'none'}>
             <SculptingPrompt
               isLoading={isThinking}
               prompt={text}
               schemaJsonStr={schemaStr}
             />
-          ) : (
-            <Stack gap={3}>
-              <Stack alignItems={'center'} flexDirection={'row'}>
-                <Icon
-                  component={ICON_ARROW}
-                  onClick={handleClose}
-                  sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
-                />
-                <Icon
-                  component={ICON_SPARK}
-                  sx={{ width: 20, height: 20, mr: 0.5 }}
-                />
-                <Typography>Al web researcher</Typography>
-                <CloseIcon
-                  onClick={handleClose}
-                  sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
-                />
-              </Stack>
-              <Stack gap={4}>
-                <ToggleButtonGroup
-                  color={'primary'}
-                  exclusive
-                  onChange={(e, value) => {
-                    setTab(value);
-                  }}
-                  translate={'no'}
-                  value={tab}
-                >
-                  <ToggleButton
-                    fullWidth
-                    sx={{
-                      fontSize: 14,
-                      textTransform: 'none',
-                      lineHeight: 1.2,
-                      py: 1,
-                      fontWeight: 600,
-                      borderRadius: '8px 0 0 8px',
-                    }}
-                    value={'generate'}
-                  >
-                    Generate
-                  </ToggleButton>
-                  <ToggleButton
-                    fullWidth
-                    sx={{
-                      fontSize: 14,
-                      textTransform: 'none',
-                      lineHeight: 1.2,
-                      py: 1,
-                      fontWeight: 600,
-                      borderRadius: '0 8px 8px 0',
-                    }}
-                    value={'configure'}
-                  >
-                    Configure
-                  </ToggleButton>
-                </ToggleButtonGroup>
+          </Box>
 
-                <Box
-                  display={tab === 'generate' ? 'block' : 'none'}
+          <Stack display={isLoading ? 'none' : 'flex'} gap={3}>
+            <Stack gap={4}>
+              <ToggleButtonGroup
+                color={'primary'}
+                exclusive
+                onChange={(e, value) => {
+                  setTab(value);
+                }}
+                translate={'no'}
+                value={tab}
+              >
+                <ToggleButton
+                  fullWidth
                   sx={{
-                    transition: 'all .3s',
+                    fontSize: 14,
+                    textTransform: 'none',
+                    lineHeight: 1.2,
+                    py: 1,
+                    fontWeight: 600,
+                    borderRadius: '8px 0 0 8px',
                   }}
+                  value={'generate'}
                 >
-                  <WebResearchGenerate
-                    handleGeneratePrompt={handleGenerate}
-                    isLoading={isLoading}
-                    onPromptEditorReady={setGenerateEditor}
-                  />
-                </Box>
-                <Box
-                  display={tab === 'configure' ? 'block' : 'none'}
+                  Generate
+                </ToggleButton>
+                <ToggleButton
+                  fullWidth
                   sx={{
-                    transition: 'all .3s',
+                    fontSize: 14,
+                    textTransform: 'none',
+                    lineHeight: 1.2,
+                    py: 1,
+                    fontWeight: 600,
+                    borderRadius: '0 8px 8px 0',
                   }}
+                  value={'configure'}
                 >
-                  <WebResearchConfigure
-                    handleGenerate={handleGenerate}
-                    onPromptEditorReady={setPromptEditor}
-                    onSchemaEditorReady={setSchemaEditor}
-                  />
-                </Box>
-              </Stack>
+                  Configure
+                </ToggleButton>
+              </ToggleButtonGroup>
+
+              <Box
+                display={tab === 'generate' ? 'block' : 'none'}
+                sx={{
+                  transition: 'all .3s',
+                }}
+              >
+                <WebResearchGenerate
+                  handleGeneratePrompt={handleGenerate}
+                  isLoading={isLoading}
+                  onPromptEditorReady={setGenerateEditor}
+                />
+              </Box>
+              <Box
+                display={tab === 'configure' ? 'block' : 'none'}
+                sx={{
+                  transition: 'all .3s',
+                }}
+              >
+                <WebResearchConfigure
+                  handleGenerate={handleGenerate}
+                  onPromptEditorReady={setPromptEditor}
+                  onSchemaEditorReady={setSchemaEditor}
+                />
+              </Box>
             </Stack>
-          )}
+          </Stack>
         </Stack>
+        {/* footer */}
         <Stack
           alignItems={'center'}
           borderTop={' 1px solid   #D0CEDA'}
