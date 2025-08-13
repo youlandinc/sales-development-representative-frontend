@@ -2,6 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import { TiptapEditor } from './TiptapEditor';
 import { FC, useEffect, useRef } from 'react';
 import { useWebResearchStore } from '@/stores/Prospect';
+import { Editor } from '@tiptap/core';
 
 type WebResearchGenerateProps = {
   handleGeneratePrompt?: () => void;
@@ -15,7 +16,16 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
   onPromptEditorReady,
 }) => {
   const promptEditorRef = useRef(null);
-  const { generateDescription } = useWebResearchStore((state) => state);
+  const {
+    generateDescription,
+    setGenerateEditorInstance,
+    generateEditorInstance,
+  } = useWebResearchStore((state) => state);
+
+  const handleEditorReady = (editor: Editor) => {
+    setGenerateEditorInstance(editor);
+    onPromptEditorReady?.(editor);
+  };
 
   return (
     <Stack gap={1.5}>
@@ -31,7 +41,7 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
         defaultValue={generateDescription}
         handleGenerate={handleGeneratePrompt}
         isLoading={isLoading}
-        onEditorReady={onPromptEditorReady}
+        onEditorReady={handleEditorReady}
         placeholder={
           'E.g., Find the CEO of the company and their Linkedin profile'
         }
