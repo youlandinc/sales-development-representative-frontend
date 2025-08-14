@@ -479,6 +479,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                         }
                         onEditCommit={(table.options.meta as any)?.updateData}
                         onEditStop={(table.options.meta as any)?.stopEdit}
+                        rowSelected={row.getIsSelected?.() ?? false}
                         stickyLeft={stickyLeftMap[col.id] ?? 0}
                         width={cell.column.getSize()}
                       />

@@ -29,11 +29,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     isEditing: _isEditing,
     editValue: _editValue,
     isActive: _isActive,
+    rowSelected = false,
     onCellClick,
     onCellDoubleClick,
     onEditCommit,
     onEditStop,
-    rowSelected = false,
   }) => {
     const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
@@ -164,12 +164,28 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 1 : 0,
-          bgcolor: (theme) =>
-            isEditing && cell?.column.id !== '__select'
-              ? alpha(theme.palette.primary.main, 0.1)
-              : isActive && cell?.column.id !== '__select'
-                ? alpha(theme.palette.primary.main, 0.06)
-                : '#fff',
+          bgcolor: '#fff',
+          '&::before':
+            rowSelected || isEditing || isActive
+              ? {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  bgcolor: (theme) =>
+                    isEditing && cell?.column.id !== '__select'
+                      ? alpha(theme.palette.primary.main, 0.1)
+                      : isActive && cell?.column.id !== '__select'
+                        ? alpha(theme.palette.primary.main, 0.06)
+                        : rowSelected
+                          ? alpha(theme.palette.primary.main, 0.06)
+                          : 'transparent',
+                  pointerEvents: 'none',
+                  zIndex: 0,
+                }
+              : {},
           borderRight: '0.5px solid #DFDEE6',
           borderTop: 'none',
           borderLeft: 'none',

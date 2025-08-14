@@ -27,10 +27,14 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
 }) => {
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const centerColumns = useMemo(() => {
-    const visible = table.getVisibleLeafColumns();
-    return visible.filter((col) => !col.getIsPinned());
-  }, [table.getVisibleLeafColumns()]);
+  const centerColumns = useMemo(
+    () => {
+      const visible = table.getVisibleLeafColumns();
+      return visible.filter((col) => !col.getIsPinned());
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [table.getVisibleLeafColumns()],
+  );
 
   const columnVirtualizer = useVirtualizer({
     count: centerColumns.length,
@@ -47,8 +51,7 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     count: rows.length,
     estimateSize: () => rowHeight,
     getScrollElement: () => {
-      const element = scrollContainer?.current ?? tableContainerRef.current;
-      return element;
+      return scrollContainer?.current ?? tableContainerRef.current;
     },
     overscan: 5,
     initialRect: {
@@ -58,27 +61,31 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     enabled: true,
   });
 
-  const virtualData = useMemo(() => {
-    const virtualColumns = columnVirtualizer.getVirtualItems();
-    const virtualRows = rowVirtualizer.getVirtualItems();
+  const virtualData = useMemo(
+    () => {
+      const virtualColumns = columnVirtualizer.getVirtualItems();
+      const virtualRows = rowVirtualizer.getVirtualItems();
 
-    let virtualPaddingLeft: number | undefined;
-    let virtualPaddingRight: number | undefined;
+      let virtualPaddingLeft: number | undefined;
+      let virtualPaddingRight: number | undefined;
 
-    if (columnVirtualizer && virtualColumns?.length) {
-      virtualPaddingLeft = virtualColumns[0]?.start ?? 0;
-      virtualPaddingRight =
-        columnVirtualizer.getTotalSize() -
-        (virtualColumns[virtualColumns.length - 1]?.end ?? 0);
-    }
+      if (columnVirtualizer && virtualColumns?.length) {
+        virtualPaddingLeft = virtualColumns[0]?.start ?? 0;
+        virtualPaddingRight =
+          columnVirtualizer.getTotalSize() -
+          (virtualColumns[virtualColumns.length - 1]?.end ?? 0);
+      }
 
-    return {
-      virtualColumns,
-      virtualRows,
-      virtualPaddingLeft,
-      virtualPaddingRight,
-    };
-  }, [columnVirtualizer.getVirtualItems(), rowVirtualizer.getVirtualItems()]);
+      return {
+        virtualColumns,
+        virtualRows,
+        virtualPaddingLeft,
+        virtualPaddingRight,
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columnVirtualizer.getVirtualItems(), rowVirtualizer.getVirtualItems()],
+  );
 
   useEffect(() => {
     if (onVisibleRangeChange && virtualData.virtualRows.length > 0) {

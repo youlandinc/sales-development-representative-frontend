@@ -8,6 +8,7 @@ import { WebResearch } from '@/components/molecules';
 import { useWebSocket } from '@/hooks/useWebSocket';
 
 import { _fetchTableRowData } from '@/request';
+import { WebSocketTypeEnum } from '@/types';
 
 interface ProspectDetailTableProps {
   tableId: string;
@@ -48,7 +49,6 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const ROW_HEIGHT = 36;
   const MIN_BATCH_SIZE = 50;
-  const MAX_BATCH_SIZE = 300;
 
   const maxLoadedIndexRef = useRef(-1);
 
@@ -81,7 +81,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         }
 
         if (
-          aiMessage.type === 'message' &&
+          aiMessage.type === WebSocketTypeEnum.message &&
           aiMessage.data?.data?.tableId === tableId &&
           aiMessage.data?.data?.recordId &&
           aiMessage.data?.data?.metadata
@@ -140,16 +140,24 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         return;
       }
 
-      const loadStartIndex = Math.max(
-        startIndex,
-        maxLoadedIndexRef.current + 1,
-      );
-      if (loadStartIndex > endIndex) {
+      const loadStartIndex = startIndex;
+      const loadEndIndex = endIndex;
+
+      if (
+        loadStartIndex > loadEndIndex ||
+        loadStartIndex < 0 ||
+        loadEndIndex >= rowIds.length
+      ) {
         return;
       }
 
-      const batchIds = rowIds.slice(loadStartIndex, endIndex + 1);
-      if (batchIds.length === 0) {
+      const batchIds = rowIds.slice(loadStartIndex, loadEndIndex + 1);
+      const unloadedIds = batchIds.filter((id, index) => {
+        const actualIndex = loadStartIndex + index;
+        return !rowsMapRef.current[id];
+      });
+
+      if (unloadedIds.length === 0) {
         return;
       }
 
@@ -157,7 +165,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       try {
         const res = await _fetchTableRowData({
           tableId,
-          recordIds: batchIds,
+          recordIds: unloadedIds,
         });
         const arr = (res?.data ?? []) as any[];
         const newRowsMap: Record<string, any> = {};
@@ -168,10 +176,14 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         });
         setRowsMap((prev) => ({ ...prev, ...newRowsMap }));
         rowsMapRef.current = { ...rowsMapRef.current, ...newRowsMap };
-        maxLoadedIndexRef.current = Math.max(
-          maxLoadedIndexRef.current,
-          endIndex,
-        );
+
+        let newMaxLoaded = -1;
+        for (let i = 0; i < rowIds.length; i++) {
+          if (rowsMapRef.current[rowIds[i]]) {
+            newMaxLoaded = i;
+          }
+        }
+        maxLoadedIndexRef.current = newMaxLoaded;
       } finally {
         isFetchingRef.current = false;
       }
@@ -188,29 +200,44 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
   const handleVisibleRangeChange = useCallback(
     (startIndex: number, endIndex: number) => {
-      if (endIndex > maxLoadedIndexRef.current) {
-        const loadStartIndex = maxLoadedIndexRef.current + 1;
-        const scrolledBeyondLoaded = endIndex - maxLoadedIndexRef.current;
+      const visibleRange = endIndex - startIndex + 1;
+      const overscan = Math.max(50, visibleRange * 2);
 
-        let dynamicBatchSize;
-        if (scrolledBeyondLoaded <= endIndex - startIndex + 1) {
-          dynamicBatchSize = MIN_BATCH_SIZE;
-        } else {
-          dynamicBatchSize = Math.min(
-            MAX_BATCH_SIZE,
-            Math.max(MIN_BATCH_SIZE, scrolledBeyondLoaded * 2),
-          );
+      const loadStartIndex = Math.max(0, startIndex - overscan);
+      const loadEndIndex = Math.min(total - 1, endIndex + overscan);
+
+      const needsLoading = [];
+      for (let i = loadStartIndex; i <= loadEndIndex; i++) {
+        const rowId = rowIds[i];
+        if (rowId && !rowsMapRef.current[rowId]) {
+          needsLoading.push(i);
         }
-
-        const batchEndIndex = Math.min(
-          loadStartIndex + dynamicBatchSize - 1,
-          total - 1,
-        );
-
-        fetchBatchData(loadStartIndex, batchEndIndex);
       }
+
+      if (needsLoading.length === 0) {
+        return;
+      }
+
+      const ranges = [];
+      let rangeStart = needsLoading[0];
+      let rangeEnd = needsLoading[0];
+
+      for (let i = 1; i < needsLoading.length; i++) {
+        if (needsLoading[i] === rangeEnd + 1) {
+          rangeEnd = needsLoading[i];
+        } else {
+          ranges.push([rangeStart, rangeEnd]);
+          rangeStart = needsLoading[i];
+          rangeEnd = needsLoading[i];
+        }
+      }
+      ranges.push([rangeStart, rangeEnd]);
+
+      ranges.forEach(([start, end]) => {
+        fetchBatchData(start, end);
+      });
     },
-    [fetchBatchData, total],
+    [fetchBatchData, total, rowIds],
   );
 
   const handleAiProcess = useCallback(
@@ -314,7 +341,6 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             scrollContainer: scrollContainerRef,
             onVisibleRangeChange: handleVisibleRangeChange,
           }}
-          //addMenuItems={}
         />
       )}
 

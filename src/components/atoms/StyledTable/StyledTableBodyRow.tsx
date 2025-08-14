@@ -32,6 +32,7 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
         alignItems: 'center',
         boxSizing: 'border-box',
         borderBottom: '1px solid #F0EFF5',
+        zIndex: 1,
         bgcolor: (theme) =>
           isSelected ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
         '&:hover': {

@@ -44,3 +44,14 @@ export enum ProspectDelimiterEnum {
   tab = 'TAB',
   pipe = 'PIPE',
 }
+
+export enum WebSocketTypeEnum {
+  message = 'MESSAGE',
+  heartbeat = 'HEARTBEAT',
+  ack = 'ACK',
+  error = 'ERROR',
+  hello = 'HELLO',
+  subscribe = 'SUBSCRIBE',
+  ping = 'PING',
+  pong = 'PONG',
+}
