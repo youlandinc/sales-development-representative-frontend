@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { WSClient } from '@/Service/WSClient';
+import { WSClient } from '@/service';
 import { useUserStore } from './index';
 
 interface WSProviderProps {

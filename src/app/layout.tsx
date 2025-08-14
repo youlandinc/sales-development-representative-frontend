@@ -1,6 +1,5 @@
 'use client';
 import { ReactNode } from 'react';
-import { Red_Hat_Display } from 'next/font/google';
 
 import NextTopLoader from 'nextjs-toploader';
 import { CssBaseline, ThemeProvider } from '@mui/material';

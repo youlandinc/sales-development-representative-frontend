@@ -1,5 +1,5 @@
 import { useWSStore } from '@/stores/useWSStore';
-import { WSClient } from '@/Service/WSClient';
+import { WSClient } from '@/service';
 
 export const useWebSocket = () => {
   const { connected, messages, clearMessages } = useWSStore();
