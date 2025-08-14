@@ -1,4 +1,4 @@
-export enum TableHeaderTypeEnum {
+export enum TableColumnTypeEnum {
   text = 'TEXT',
   number = 'NUMBER',
   email = 'EMAIL',
@@ -11,11 +11,11 @@ export enum TableHeaderTypeEnum {
   select = 'SELECT',
 }
 
-export interface TableHeaderProps {
+export interface TableColumnProps {
   fieldId: string;
   description: string | null;
   fieldName: string;
-  fieldType: TableHeaderTypeEnum;
+  fieldType: TableColumnTypeEnum;
   actionKey: string | null;
   hidden: boolean;
   isUnique: boolean;
@@ -29,10 +29,37 @@ export interface TableHeaderProps {
 export interface UpdateTableColumnConfigParams {
   fieldId: string;
   fieldName: string;
-  fieldType: TableHeaderTypeEnum;
+  fieldType: TableColumnTypeEnum;
   hidden: boolean;
   description: string;
   color: string;
   pin: boolean;
   width: number;
 }
+
+export enum TableCellConfidenceEnum {
+  low = 'LOW',
+  medium = 'MEDIUM',
+  high = 'HIGH',
+}
+
+export interface TableCellBusinessData {
+  // fieldId
+  [key: string]: {
+    value: any;
+    isFinished?: boolean;
+    externalContent?: {
+      confidence: TableCellConfidenceEnum;
+      stepsTaken: [];
+      reasoning: '';
+      [key: string]: any;
+    };
+  };
+}
+
+export interface TableCellBaseData {
+  deleted: boolean;
+  id: string;
+}
+
+export type TableCellProps = TableCellBaseData & TableCellBusinessData;

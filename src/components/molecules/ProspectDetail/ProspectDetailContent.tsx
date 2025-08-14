@@ -20,7 +20,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   const {
     fetchTable,
     fetchRowIds,
-    headers,
+    columns,
     rowIds,
     runRecords,
     resetTable,
@@ -40,6 +40,14 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     },
   );
 
+  const aiColumnIds = useMemo(() => {
+    return new Set(
+      columns
+        .filter((col) => col.actionKey === 'use-ai')
+        .map((col) => col.fieldId),
+    );
+  }, [columns]);
+
   const rowsMapRef = useRef<Record<string, any>>({});
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
   const [aiLoadingState, setAiLoadingState] = useState<
@@ -54,8 +62,37 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
   const total = rowIds.length;
   const fullData = useMemo(
-    () => rowIds.map((id) => rowsMap[id] || { id, __loading: true }),
-    [rowIds, rowsMap],
+    () =>
+      rowIds.map((id) => {
+        const rowData = rowsMap[id];
+        if (!rowData) {
+          return { id, __loading: true };
+        }
+
+        const processedRowData: any = { id };
+        Object.entries(rowData).forEach(([fieldId, fieldValue]) => {
+          if (fieldId === 'id') {
+            return;
+          }
+
+          const isAiField = aiColumnIds.has(fieldId);
+
+          if (
+            typeof fieldValue === 'object' &&
+            fieldValue !== null &&
+            'value' in fieldValue
+          ) {
+            (processedRowData as any)[fieldId] = fieldValue;
+          } else if (isAiField) {
+            (processedRowData as any)[fieldId] = { value: fieldValue };
+          } else {
+            (processedRowData as any)[fieldId] = fieldValue;
+          }
+        });
+
+        return processedRowData;
+      }),
+    [rowIds, rowsMap, aiColumnIds],
   );
 
   useEffect(() => {
@@ -242,16 +279,54 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
   const handleAiProcess = useCallback(
     (recordId: string, columnId: string) => {
-      if (!runRecords.includes(recordId)) {
+      if (!aiColumnIds.has(columnId)) {
+        return;
+      }
+
+      if (!runRecords) {
+        return;
+      }
+
+      const fieldConfig = runRecords[columnId];
+      if (!fieldConfig) {
+        return;
+      }
+
+      const shouldProcess = fieldConfig.isAll
+        ? rowIds.includes(recordId)
+        : fieldConfig.recordIds?.includes(recordId);
+
+      if (!shouldProcess) {
         return;
       }
 
       const currentValue = rowsMap[recordId]?.[columnId];
+
+      let hasValue = false;
+      let isFinished = false;
+
       if (
-        currentValue !== undefined &&
+        typeof currentValue === 'object' &&
         currentValue !== null &&
-        currentValue !== ''
+        'value' in currentValue
       ) {
+        isFinished = currentValue.isFinished === true;
+        hasValue =
+          currentValue.value !== undefined &&
+          currentValue.value !== null &&
+          currentValue.value !== '';
+
+        if (isFinished) {
+          return;
+        }
+      } else {
+        hasValue =
+          currentValue !== undefined &&
+          currentValue !== null &&
+          currentValue !== '';
+      }
+
+      if (hasValue) {
         return;
       }
 
@@ -263,24 +338,42 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         },
       }));
     },
-    [runRecords, rowsMap],
+    [aiColumnIds, runRecords, rowIds, rowsMap],
   );
 
   useEffect(() => {
-    if (runRecords.length === 0) {
+    if (!runRecords) {
       setAiLoadingState({});
-    } else {
-      setAiLoadingState((prev) => {
-        const updated = { ...prev };
-        Object.keys(updated).forEach((recordId) => {
-          if (!runRecords.includes(recordId)) {
-            delete updated[recordId];
-          }
-        });
-        return updated;
-      });
+      return;
     }
-  }, [runRecords]);
+
+    if (Object.keys(runRecords).length === 0) {
+      setAiLoadingState({});
+      return;
+    }
+
+    const validRecordIds = new Set<string>();
+
+    Object.entries(runRecords)
+      .filter(([columnId]) => aiColumnIds.has(columnId))
+      .forEach(([columnId, config]) => {
+        if (config.isAll) {
+          rowIds.forEach((id) => validRecordIds.add(id));
+        } else {
+          config.recordIds?.forEach((id) => validRecordIds.add(id));
+        }
+      });
+
+    setAiLoadingState((prev) => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach((recordId) => {
+        if (!validRecordIds.has(recordId)) {
+          delete updated[recordId];
+        }
+      });
+      return updated;
+    });
+  }, [aiColumnIds, rowIds, runRecords]);
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -318,10 +411,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         flex: 1,
       }}
     >
-      {headers.length > 0 && rowIds.length > 0 && (
+      {columns.length > 0 && rowIds.length > 0 && (
         <StyledTable
           aiLoading={aiLoadingState}
-          columns={headers}
+          columns={columns}
           data={fullData}
           onAddMenuItemClick={(item) => {
             setOpen(true);

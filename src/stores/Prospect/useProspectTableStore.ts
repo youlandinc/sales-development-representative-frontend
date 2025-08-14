@@ -2,10 +2,10 @@ import { create } from 'zustand';
 
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
-import { TableHeaderProps } from '@/types/Prospect/table';
+import { TableColumnProps } from '@/types/Prospect/table';
 
 import {
-  _fetchTableColumn,
+  _fetchTable,
   _fetchTableRowIds,
   _updateTableCellValue,
   _updateTableColumnConfig,
@@ -13,9 +13,11 @@ import {
 
 export type ProspectTableState = {
   tableName: string;
-  headers: TableHeaderProps[];
+  columns: TableColumnProps[];
   rowIds: string[];
-  runRecords: string[];
+  runRecords: {
+    [key: string]: { recordIds: string[]; isAll: boolean };
+  } | null;
 };
 
 export type ProspectTableActions = {
@@ -39,9 +41,9 @@ export type ProspectTableStoreProps = ProspectTableState & ProspectTableActions;
 export const useProspectTableStore = create<ProspectTableStoreProps>()(
   (set, get) => ({
     tableName: '',
-    headers: [],
+    columns: [],
     rowIds: [],
-    runRecords: [],
+    runRecords: null,
     fetchTable: async (tableId) => {
       if (!tableId) {
         return;
@@ -49,8 +51,8 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       try {
         const {
           data: { fields, tableName, runRecords },
-        } = await _fetchTableColumn(tableId);
-        set({ headers: fields, tableName, runRecords: runRecords ?? [] });
+        } = await _fetchTable(tableId);
+        set({ columns: fields, tableName, runRecords: runRecords ?? null });
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -78,7 +80,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       if (!fieldId || !width) {
         return;
       }
-      const target = get().headers.find((item) => item.fieldId === fieldId);
+      const target = get().columns.find((item) => item.fieldId === fieldId);
       if (!target) {
         return;
       }
@@ -99,7 +101,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
     },
     resetTable: () => {
-      set({ headers: [], rowIds: [] });
+      set({ columns: [], rowIds: [], runRecords: null });
     },
   }),
 );

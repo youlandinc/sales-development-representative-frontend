@@ -199,6 +199,13 @@ export const StyledTable: FC<StyledTableProps> = ({
             },
             cell: (info) => {
               const value = info.getValue();
+              if (
+                typeof value === 'object' &&
+                value !== null &&
+                'value' in value
+              ) {
+                return value.value;
+              }
               return value as any;
             },
           },
@@ -228,7 +235,9 @@ export const StyledTable: FC<StyledTableProps> = ({
     onColumnPinningChange: setColumnPinning,
     meta: {
       getEdit: (recordId: string, columnId: string) => {
-        return editsRef.current[recordId]?.[columnId];
+        const editValue = editsRef.current[recordId]?.[columnId];
+        // 编辑值始终是简单值，直接返回
+        return editValue;
       },
       updateData: (recordId: string, columnId: string, value: any) => {
         const rowEdits = editsRef.current[recordId] || {};
@@ -255,6 +264,24 @@ export const StyledTable: FC<StyledTableProps> = ({
       },
       isAiLoading: (recordId: string, columnId: string) =>
         Boolean(aiLoading?.[recordId]?.[columnId]),
+      isFinished: (recordId: string, columnId: string) => {
+        const rowData = data.find((row: any) => row.id === recordId);
+        const cellValue = rowData?.[columnId];
+        return typeof cellValue === 'object' &&
+          cellValue !== null &&
+          'isFinished' in cellValue
+          ? cellValue.isFinished
+          : false;
+      },
+      getExternalContent: (recordId: string, columnId: string) => {
+        const rowData = data.find((row: any) => row.id === recordId);
+        const cellValue = rowData?.[columnId];
+        return typeof cellValue === 'object' &&
+          cellValue !== null &&
+          'externalContent' in cellValue
+          ? cellValue.externalContent
+          : undefined;
+      },
       triggerAiProcess: (recordId: string, columnId: string) => {
         onAiProcess?.(recordId, columnId);
       },

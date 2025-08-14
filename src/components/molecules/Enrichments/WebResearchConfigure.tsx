@@ -75,7 +75,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     setSlateEditorInstance,
     slateEditorInstance,
   } = useWebResearchStore((state) => state);
-  const { headers } = useProspectTableStore((store) => store);
+  const { columns } = useProspectTableStore((store) => store);
   const [index, setIndex] = useState(1);
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
@@ -91,7 +91,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       setSchemaJson(JSON.parse(objStr));
     },
   );
-  const filedMapping = headers.reduce(
+  const filedMapping = columns.reduce(
     (pre, cur) => {
       pre[cur.fieldName] = cur.fieldId;
       return pre;
@@ -200,7 +200,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                     params: {
                       prompt: extractPromptText(
                         (promptEditorRef?.current?.getJSON() || []) as any,
-                        headers.reduce(
+                        columns.reduce(
                           (pre, cur) => {
                             pre[cur.fieldName] = cur.fieldId;
                             return pre;

@@ -1,4 +1,14 @@
-import { FC, memo, ReactNode, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  MouseEvent,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Box, CircularProgress, InputBase, Stack } from '@mui/material';
 import { Cell, flexRender } from '@tanstack/react-table';
 import { alpha } from '@mui/material/styles';
@@ -22,7 +32,6 @@ interface StyledTableBodyCellProps {
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
   ({
     cell,
-    children,
     width,
     isPinned = false,
     stickyLeft = 0,
@@ -38,6 +47,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
     const value = cell?.getValue();
+    const displayValue = value != null ? String(value) : '';
+    const isSelectColumn = cell?.column?.id === '__select';
+
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [localEditValue, setLocalEditValue] = useState<string>('');
@@ -45,7 +57,10 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const tableMeta = cell?.getContext?.()?.table?.options?.meta as any;
     const canEdit = tableMeta?.canEdit?.(recordId, columnId) ?? true;
     const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
+    const isFinished = tableMeta?.isFinished?.(recordId, columnId) ?? false;
+    const externalContent = tableMeta?.getExternalContent?.(recordId, columnId);
     const triggerAiProcess = tableMeta?.triggerAiProcess;
+    const canInteract = Boolean(cell && !isSelectColumn && canEdit);
 
     const isEditingFromMeta =
       tableMeta?.isEditing?.(recordId, columnId) ?? false;
@@ -57,10 +72,25 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
     const isAiColumn = actionKey === 'use-ai';
+    
+    // 调试AI状态
+    if (isAiColumn) {
+      console.log('AI Column Debug:', {
+        recordId,
+        columnId,
+        isAiColumn,
+        isAiLoading,
+        isFinished,
+        displayValue,
+        actionKey
+      });
+    }
+    
+    const resolvedMinWidth = width < 100 ? 100 : width;
 
     useEffect(() => {
       if (isEditing) {
-        const initValue = _editValue !== undefined ? _editValue : value;
+        const initValue = _editValue !== undefined ? _editValue : displayValue;
         setLocalEditValue(String(initValue ?? ''));
         setTimeout(() => {
           if (inputRef.current) {
@@ -68,97 +98,134 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           }
         }, 0);
       }
-    }, [isEditing, _editValue, value]);
-
-    const displayValue = _editValue !== undefined ? _editValue : value;
+    }, [isEditing, _editValue, displayValue]);
 
     useEffect(() => {
-      if (isAiColumn && !isAiLoading && !displayValue && triggerAiProcess) {
+      if (
+        isAiColumn &&
+        !isAiLoading &&
+        !displayValue &&
+        !isFinished &&
+        triggerAiProcess
+      ) {
         triggerAiProcess(recordId, columnId);
       }
     }, [
       isAiColumn,
       isAiLoading,
       displayValue,
+      isFinished,
       triggerAiProcess,
       recordId,
       columnId,
     ]);
 
-    const handleEditStop = () => {
+    const handleEditStop = useCallback(() => {
       if (localEditValue !== String(displayValue ?? '')) {
         onEditCommit?.(recordId, columnId, localEditValue);
       }
       onEditStop?.(recordId, columnId);
-    };
+    }, [
+      localEditValue,
+      displayValue,
+      onEditCommit,
+      recordId,
+      columnId,
+      onEditStop,
+    ]);
 
-    const content =
-      isEditing && cell && cell.column.id !== '__select' && canEdit ? (
-        <InputBase
-          autoFocus
-          inputRef={inputRef}
-          onBlur={handleEditStop}
-          onChange={(e) => setLocalEditValue(e.target.value)}
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === 'Escape') {
-              handleEditStop();
-            }
-          }}
-          size={'small'}
-          sx={{
-            height: '100%',
-            width: '100%',
-            fontSize: 14,
-            display: 'flex',
-            alignItems: 'center',
-            lineHeight: '36px',
-            '& input': {
-              p: 0,
-              m: 0,
+    const content = useMemo(() => {
+      if (isEditing && cell && !isSelectColumn && canEdit) {
+        return (
+          <InputBase
+            autoFocus
+            inputRef={inputRef}
+            onBlur={handleEditStop}
+            onChange={(e) => setLocalEditValue(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === 'Escape') {
+                handleEditStop();
+              }
+            }}
+            size={'small'}
+            sx={{
               height: '100%',
-              boxSizing: 'border-box',
+              width: '100%',
               fontSize: 14,
+              display: 'flex',
+              alignItems: 'center',
               lineHeight: '36px',
-            },
-          }}
-          value={localEditValue}
-        />
-      ) : cell && cell.column.id === '__select' ? (
-        flexRender(cell.column.columnDef.cell, cell.getContext())
-      ) : isAiColumn && isAiLoading && !displayValue ? (
-        <Stack alignItems="center" direction="row" spacing={1}>
-          <CircularProgress size={16} />
-          <Box component="span" sx={{ fontSize: 14, color: 'text.secondary' }}>
-            Processing...
-          </Box>
-        </Stack>
-      ) : (
-        displayValue
-      );
+              '& input': {
+                p: 0,
+                m: 0,
+                height: '100%',
+                boxSizing: 'border-box',
+                fontSize: 14,
+                lineHeight: '36px',
+              },
+            }}
+            value={localEditValue}
+          />
+        );
+      }
+      if (cell && isSelectColumn) {
+        return flexRender(cell.column.columnDef.cell, cell.getContext());
+      }
+      if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
+        return (
+          <Stack alignItems="center" direction="row" spacing={1}>
+            <CircularProgress size={16} />
+            <Box
+              component="span"
+              sx={{ fontSize: 14, color: 'text.secondary' }}
+            >
+              Processing...
+            </Box>
+          </Stack>
+        );
+      }
+      return displayValue;
+    }, [
+      isEditing,
+      cell,
+      isSelectColumn,
+      canEdit,
+      localEditValue,
+      handleEditStop,
+      isAiColumn,
+      isAiLoading,
+      displayValue,
+      isFinished,
+    ]);
+
+    const handleClick = useCallback(
+      (e: MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        if (canInteract && onCellClick) {
+          onCellClick(recordId, columnId);
+        }
+      },
+      [canInteract, onCellClick, recordId, columnId],
+    );
+
+    const handleDoubleClick = useCallback(
+      (e: MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        if (canInteract && onCellDoubleClick) {
+          onCellDoubleClick(recordId, columnId);
+        }
+      },
+      [canInteract, onCellDoubleClick, recordId, columnId],
+    );
 
     return (
       <Stack
-        onClick={(e) => {
-          e.stopPropagation();
-          if (cell && cell.column.id !== '__select' && canEdit && onCellClick) {
-            onCellClick(String(cell.row.id), String(cell.column.id));
-          }
-        }}
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          if (
-            cell &&
-            cell.column.id !== '__select' &&
-            canEdit &&
-            onCellDoubleClick
-          ) {
-            onCellDoubleClick(String(cell.row.id), String(cell.column.id));
-          }
-        }}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
         sx={{
           width,
-          minWidth: width < 100 ? 100 : width,
+          minWidth: resolvedMinWidth,
           maxWidth: width,
           boxSizing: 'border-box',
           position: isPinned ? 'sticky' : 'relative',
@@ -175,9 +242,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
                   right: 0,
                   bottom: 0,
                   bgcolor: (theme) =>
-                    isEditing && cell?.column.id !== '__select'
+                    isEditing && !isSelectColumn
                       ? alpha(theme.palette.primary.main, 0.1)
-                      : isActive && cell?.column.id !== '__select'
+                      : isActive && !isSelectColumn
                         ? alpha(theme.palette.primary.main, 0.06)
                         : rowSelected
                           ? alpha(theme.palette.primary.main, 0.06)
@@ -190,13 +257,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           borderTop: 'none',
           borderLeft: 'none',
           boxShadow: (theme) =>
-            isActive && cell?.column.id !== '__select'
+            isActive && !isSelectColumn
               ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
               : 'none',
           height: '100%',
           justifyContent: 'center',
-          cursor:
-            canEdit && cell?.column.id !== '__select' ? 'pointer' : 'default',
+          cursor: canInteract ? 'pointer' : 'default',
         }}
       >
         <Box

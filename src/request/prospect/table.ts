@@ -1,14 +1,17 @@
 import { get, patch, post } from '@/request/request';
 import {
-  TableHeaderProps,
+  TableCellProps,
+  TableColumnProps,
   UpdateTableColumnConfigParams,
 } from '@/types/Prospect/table';
 
-export const _fetchTableColumn = (tableId: string) => {
+export const _fetchTable = (tableId: string) => {
   return get<{
-    fields: TableHeaderProps[];
+    fields: TableColumnProps[];
     tableName: string;
-    runRecords: string[];
+    runRecords: {
+      [key: string]: { recordIds: string[]; isAll: boolean };
+    };
   }>(`/sdr/prospect/table/${tableId}`);
 };
 
@@ -20,7 +23,7 @@ export const _fetchTableRowData = (params: {
   tableId: string;
   recordIds: string[];
 }) => {
-  return post(`/sdr/prospect/table/${params.tableId}/data`, {
+  return post<TableCellProps[]>(`/sdr/prospect/table/${params.tableId}/data`, {
     recordIds: params.recordIds,
   });
 };

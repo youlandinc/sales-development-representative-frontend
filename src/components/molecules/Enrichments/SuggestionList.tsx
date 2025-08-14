@@ -35,7 +35,7 @@ interface MentionNodeAttrs {
 
 export type SuggestionListProps = SuggestionProps<MentionSuggestion>;
 
-/*const headers = [
+/*const columns = [
   {
     fieldId: 'f_-vwmuuyvcg0pfpsx9gbh',
     fieldName: 'Company Name',
@@ -183,18 +183,18 @@ export type SuggestionListProps = SuggestionProps<MentionSuggestion>;
 
 const SuggestionList = forwardRef<SuggestionListRef, SuggestionListProps>(
   (props, ref) => {
-    const { headers } = useProspectTableStore((store) => store);
+    const { columns } = useProspectTableStore((store) => store);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const selectItem = (index: number) => {
-      if (index >= headers.length) {
+      if (index >= columns.length) {
         // Make sure we actually have enough items to select the given index. For
         // instance, if a user presses "Enter" when there are no options, the index will
         // be 0 but there won't be any items, so just ignore the callback here
         return;
       }
 
-      const suggestion = headers[index];
+      const suggestion = columns[index];
 
       // Set all of the attributes of our Mention node based on the suggestion
       // data. The fields of `suggestion` will depend on whatever data you
@@ -218,18 +218,18 @@ const SuggestionList = forwardRef<SuggestionListRef, SuggestionListProps>(
     };
 
     const upHandler = () => {
-      setSelectedIndex((selectedIndex + headers.length - 1) % headers.length);
+      setSelectedIndex((selectedIndex + columns.length - 1) % columns.length);
     };
 
     const downHandler = () => {
-      setSelectedIndex((selectedIndex + 1) % headers.length);
+      setSelectedIndex((selectedIndex + 1) % columns.length);
     };
 
     const enterHandler = () => {
       selectItem(selectedIndex);
     };
 
-    useEffect(() => setSelectedIndex(0), [headers]);
+    useEffect(() => setSelectedIndex(0), [columns]);
 
     useImperativeHandle(ref, () => ({
       onKeyDown: ({ event }) => {
@@ -252,7 +252,7 @@ const SuggestionList = forwardRef<SuggestionListRef, SuggestionListProps>(
       },
     }));
 
-    return headers.length > 0 ? (
+    return columns.length > 0 ? (
       <Paper elevation={5}>
         <List
           // dense
@@ -262,7 +262,7 @@ const SuggestionList = forwardRef<SuggestionListRef, SuggestionListProps>(
             p: 0,
           }}
         >
-          {headers.map((item, index) => (
+          {columns.map((item, index) => (
             <ListItem disablePadding key={item.fieldId}>
               <ListItemButton
                 onClick={() => selectItem(index)}

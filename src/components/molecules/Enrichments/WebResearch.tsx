@@ -71,7 +71,7 @@ type WebResearchProps = {
 };
 
 export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
-  const { headers, rowIds } = useProspectTableStore((store) => store);
+  const { columns, rowIds } = useProspectTableStore((store) => store);
   const [tab, setTab] = useState<'generate' | 'configure'>('generate');
   const [text, setText] = useState('');
   const [schemaStr, setSchemaStr] = useState('');
@@ -141,7 +141,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       params: {
         userInput: extractPromptText(
           (generateEditorInstance?.getJSON() || []) as DocumentType,
-          headers.reduce(
+          columns.reduce(
             (pre, cur) => {
               pre[cur.fieldName] = cur.fieldId;
               return pre;
@@ -149,7 +149,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
             {} as Record<string, string>,
           ),
         ),
-        columns: headers.map((item) => item.fieldName).join(','),
+        columns: columns.map((item) => item.fieldName).join(','),
       },
     });
   };
