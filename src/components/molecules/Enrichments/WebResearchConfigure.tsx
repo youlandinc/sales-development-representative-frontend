@@ -12,7 +12,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   StyledButton,
@@ -38,6 +38,7 @@ import {
   schemaToSlate,
 } from '@/utils';
 import { Editor } from '@tiptap/core';
+import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 
 const initialValue = {
   type: 'object',
@@ -66,10 +67,16 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   onPromptEditorReady,
   onSchemaEditorReady,
 }) => {
-  const { prompt, schemaJson, setSchemaJson } = useWebResearchStore(
-    (state) => state,
-  );
+  const {
+    prompt,
+    schemaJson,
+    setSchemaJson,
+    setTipTapEditorInstance,
+    setSlateEditorInstance,
+    slateEditorInstance,
+  } = useWebResearchStore((state) => state);
   const { headers } = useProspectTableStore((store) => store);
+  const [index, setIndex] = useState(1);
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -121,6 +128,27 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   //   streamProtocol: 'data',
   // });
   // console.log(schemaToSlate(schemaJson));
+
+  const handleEditorReady = useCallback((editor: Editor) => {
+    if (editor) {
+      setTipTapEditorInstance(editor);
+      onPromptEditorReady?.(editor);
+    }
+  }, []);
+
+  const handleSchemaEditorReady = useCallback((editor: ReactEditor) => {
+    if (editor) {
+      setSlateEditorInstance(editor);
+      onSchemaEditorReady?.(editor);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (slateEditorInstance) {
+      slateEditorInstance.children = schemaToSlate(schemaJson);
+    }
+  }, [JSON.stringify(schemaJson)]);
+
   return (
     <Stack gap={4}>
       {/*<Typography>{text}</Typography>*/}
@@ -132,7 +160,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           defaultValue={defaultValue}
           handleGenerate={handleGenerate}
           minHeight={200}
-          onEditorReady={onPromptEditorReady}
+          onEditorReady={handleEditorReady}
           placeholder={
             'E.g., Find the CEO of the company and their Linkedin profile'
           }
@@ -210,7 +238,36 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                 gap={1.5}
                 key={index}
               >
-                <StyledTextField value={item as string} />
+                <StyledTextField
+                  /* onChange={(e) => {
+                    const newKey = e.target.value;
+                    const oldKey = item;
+
+                    // 创建新的 properties 对象，将旧键名替换为新键名
+                    const newProperties = { ...schemaJson.properties };
+                    if (oldKey !== newKey && newKey) {
+                      // 保存旧键的值
+                      const oldValue = newProperties[oldKey];
+                      // 删除旧键
+                      delete newProperties[oldKey];
+                      // 添加新键，值保持不变
+                      newProperties[newKey] = oldValue;
+
+                      // 更新 required 数组
+                      const newRequired = schemaJson.required.map(
+                        (req) => (req === oldKey ? newKey : req)
+                      );
+
+                      // 更新 schemaJson
+                      setSchemaJson({
+                        ...schemaJson,
+                        properties: newProperties,
+                        required: newRequired,
+                      });
+                    }
+                  }} */
+                  value={item as string}
+                />
                 <StyledSelect
                   options={[
                     {
@@ -243,16 +300,16 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
             <StyledButton
               color={'info'}
               onClick={() => {
-                const key = Math.random();
+                setIndex(index + 1);
                 setSchemaJson({
                   type: 'object',
                   properties: {
                     ...schemaJson.properties,
-                    [`field${key}`]: {
+                    [`field${index}`]: {
                       type: 'string',
                     },
                   },
-                  required: [...schemaJson.required, `field${key}`],
+                  required: [...schemaJson.required, `field${index}`],
                 });
               }}
               size={'medium'}
@@ -327,9 +384,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           <Box display={outPuts === 'json' ? 'block' : 'none'}>
             <SlateEditor
               initialValue={schemaToSlate(schemaJson)}
-              onEditorReady={(editor) => {
-                onSchemaEditorReady?.(editor);
-              }}
+              onEditorReady={handleSchemaEditorReady}
               ref={schemaEditorRef}
             />
           </Box>
