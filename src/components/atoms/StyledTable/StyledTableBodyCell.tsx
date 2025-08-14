@@ -72,7 +72,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
     const isAiColumn = actionKey === 'use-ai';
-    
+
     // 调试AI状态
     if (isAiColumn) {
       console.log('AI Column Debug:', {
@@ -82,10 +82,10 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         isAiLoading,
         isFinished,
         displayValue,
-        actionKey
+        actionKey,
       });
     }
-    
+
     const resolvedMinWidth = width < 100 ? 100 : width;
 
     useEffect(() => {
