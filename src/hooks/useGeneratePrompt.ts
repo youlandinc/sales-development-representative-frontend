@@ -50,14 +50,15 @@ export const useGeneratePrompt = (
                 const chunk = e.replace(/data:/g, ''); // 去掉 `data: `
 
                 // 这里有可能是 JSON，也可能是纯文本
-                try {
-                  const json = JSON.parse(chunk);
-                  const delta = json.choices?.[0]?.delta?.content ?? '';
-                  fullText += delta;
-                } catch {
-                  // 纯文本（SSE可能直接推Markdown）
-                  fullText += chunk;
-                }
+                // try {
+                //   const json = JSON.parse(chunk);
+                //   const delta = json.choices?.[0]?.delta?.content ?? '';
+                //   console.log(delta);
+                //   fullText += delta;
+                // } catch {
+                // 纯文本（SSE可能直接推Markdown）
+                fullText += chunk;
+                // }
                 streamCb?.(fullText);
               }
             }

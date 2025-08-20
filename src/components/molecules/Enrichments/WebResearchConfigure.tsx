@@ -24,14 +24,14 @@ import {
   SlateEditor,
   TiptapEditor,
 } from '@/components/molecules';
+import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
+import { useWebResearchStore } from '@/stores/Prospect';
 import { MoreHoriz } from '@mui/icons-material';
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
 import ICON_TEXT from './assets/icon_text.svg';
 import ICON_WARNING from './assets/icon_warning.svg';
-import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
-import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 // import { useCompletion } from '@ai-sdk/react';
-import ICON_DELETE from './assets/icon_delete.svg';
+import { useVariableFromStore } from '@/hooks';
 import {
   extractPromptText,
   insertWithPlaceholders,
@@ -39,6 +39,7 @@ import {
 } from '@/utils';
 import { Editor } from '@tiptap/core';
 import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
+import ICON_DELETE from './assets/icon_delete.svg';
 
 const initialValue = {
   type: 'object',
@@ -75,7 +76,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     setSlateEditorInstance,
     slateEditorInstance,
   } = useWebResearchStore((state) => state);
-  const { columns } = useProspectTableStore((store) => store);
+  const { filedMapping } = useVariableFromStore();
   const [index, setIndex] = useState(1);
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
@@ -91,13 +92,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       setSchemaJson(JSON.parse(objStr));
     },
   );
-  const filedMapping = columns.reduce(
-    (pre, cur) => {
-      pre[cur.fieldName] = cur.fieldId;
-      return pre;
-    },
-    {} as Record<string, string>,
-  );
+
   /*const DEFAULT_PROMOT =
     '#CONTEXT#\nYou are tasked with finding a Java engineer associated with a given company or website, and extracting their professional profile and email address.\n\n#OBJECTIVE#\nIdentify a Java engineer related to {{Enrich Company}}, {{Domain}}, or {{Url}}, and extract their professional profile link (such as LinkedIn) and email address.\n\n#INSTRUCTIONS#\n1. Use the provided {{Enrich Company}}, {{Domain}}, or {{Url}} to search for employees or team members who are Java engineers (titles may include "Java Engineer," "Java Developer," or similar).\n2. Search LinkedIn, company team pages, or other professional directories for profiles matching the criteria.\n3. Extract the profile URL (preferably LinkedIn) and the email address if publicly available.\n4. If multiple Java engineers are found, return the first relevant result.\n5. If no Java engineer or email is found, return "No Java engineer found" or "No email found" as appropriate.\n\n#EXAMPLES#\nInput:\n  Enrich Company: Acme Corp\n  Domain: acmecorp.com\n  Url: https://acmecorp.com\n\nExpected Output:\n  Java Engineer Name: John Doe\n';*/
   const defaultValue = prompt
@@ -200,13 +195,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                     params: {
                       prompt: extractPromptText(
                         (promptEditorRef?.current?.getJSON() || []) as any,
-                        columns.reduce(
-                          (pre, cur) => {
-                            pre[cur.fieldName] = cur.fieldId;
-                            return pre;
-                          },
-                          {} as Record<string, string>,
-                        ),
+                        filedMapping,
                       ),
                     },
                   })

@@ -4,7 +4,7 @@ import { mentionSuggestionOptions } from '@/components/molecules/Enrichments/men
 import { PlaceholderNode } from './PlaceholderNode';
 
 export const ExtensionMention = Mention.extend({
-  name: 'mention',
+  name: 'custom-placeholder',
   atom: true,
   selectable: true,
   addNodeView() {

@@ -11,9 +11,8 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { DocumentType, Editor } from '@tiptap/core';
+import { DocumentType } from '@tiptap/core';
 import { FC, useState } from 'react';
-import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 import { Node } from 'slate';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
@@ -27,16 +26,16 @@ import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 
 import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
 
-import ICON_SPARK from './assets/icon_sparkle.svg';
-import ICON_ARROW from './assets/icon_arrow.svg';
-import CloseIcon from '@mui/icons-material/Close';
-import ICON_COINS from './assets/icon_coins.svg';
-import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
 import { COINS_PER_ROW } from '@/constant';
-import { useAsyncFn } from '@/hooks';
+import { useAsyncFn, useVariableFromStore } from '@/hooks';
 import { columnRun } from '@/request';
 import { HttpError } from '@/types';
-import { extractPromptText, schemaToSlate } from '@/utils';
+import { extractPromptText } from '@/utils';
+import CloseIcon from '@mui/icons-material/Close';
+import ICON_ARROW from './assets/icon_arrow.svg';
+import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
+import ICON_COINS from './assets/icon_coins.svg';
+import ICON_SPARK from './assets/icon_sparkle.svg';
 
 type CostCoinsProps = StackProps & {
   count: string;
@@ -93,6 +92,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     tipTapEditorInstance,
     slateEditorInstance,
   } = useWebResearchStore((state) => state);
+  const { filedMapping } = useVariableFromStore();
   const { generatePrompt: generateJson } = useGeneratePrompt(
     setSchemaStr,
     (objStr) => {
@@ -141,13 +141,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       params: {
         userInput: extractPromptText(
           (generateEditorInstance?.getJSON() || []) as DocumentType,
-          columns.reduce(
-            (pre, cur) => {
-              pre[cur.fieldName] = cur.fieldId;
-              return pre;
-            },
-            {} as Record<string, string>,
-          ),
+          filedMapping,
         ),
         columns: columns.map((item) => item.fieldName).join(','),
       },

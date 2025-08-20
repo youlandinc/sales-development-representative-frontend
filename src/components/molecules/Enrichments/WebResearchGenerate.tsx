@@ -1,8 +1,8 @@
-import { Stack, Typography } from '@mui/material';
-import { TiptapEditor } from './TiptapEditor';
-import { FC, useEffect, useRef } from 'react';
 import { useWebResearchStore } from '@/stores/Prospect';
+import { Stack, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
+import { FC, useRef } from 'react';
+import { TiptapEditor } from './TiptapEditor';
 
 type WebResearchGenerateProps = {
   handleGeneratePrompt?: () => void;
@@ -16,11 +16,8 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
   onPromptEditorReady,
 }) => {
   const promptEditorRef = useRef(null);
-  const {
-    generateDescription,
-    setGenerateEditorInstance,
-    generateEditorInstance,
-  } = useWebResearchStore((state) => state);
+  const { generateDescription, setGenerateEditorInstance } =
+    useWebResearchStore((state) => state);
 
   const handleEditorReady = (editor: Editor) => {
     setGenerateEditorInstance(editor);
