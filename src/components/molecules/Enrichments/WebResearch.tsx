@@ -164,9 +164,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
             (tipTapEditorInstance?.getJSON() || []) as DocumentType,
             filedMapping,
           ) || '',
-          slateEditorInstance?.children
-            ?.map((n) => Node.string(n))
-            .join('\n') || '',
+          schemaJson,
         );
       } catch (err) {
         const { header, message, variant } = err as HttpError;
