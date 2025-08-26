@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { StyledSelect, StyledTextField } from '@/components/atoms';
 
@@ -22,10 +22,10 @@ type OutputsFieldsProps = {
   fieldDescription: string;
   saveField: (
     fieldName: string,
-    name: string,
-    description: string,
-    type: string,
-    selectOptions: any,
+    newName: string,
+    newDescription: string,
+    newType: string,
+    newSelectOptions: any,
   ) => void;
   removeField: () => void;
   selectOptions: any;
@@ -43,6 +43,12 @@ export const OutputsFields = ({
   const [type, setType] = useState(fieldType || 'text');
   const [description, setDescription] = useState(fieldDescription);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    setName(fieldName);
+    setType(fieldType || 'text');
+    setDescription(fieldDescription);
+  }, [fieldName, fieldType, fieldDescription]);
 
   const debouncedSave = useMemo(
     () =>
@@ -64,7 +70,7 @@ export const OutputsFields = ({
       <StyledTextField
         onChange={(e) => {
           setName(e.target.value);
-          debouncedSave(name, description, type, selectOptions);
+          debouncedSave(e.target.value, description, type, selectOptions);
         }}
         value={name}
       />

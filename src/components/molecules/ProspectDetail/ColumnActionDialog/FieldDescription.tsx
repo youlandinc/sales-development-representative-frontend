@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Icon, Stack, Typography } from '@mui/material';
 import React, { FC, useEffect } from 'react';
 
 import {
@@ -13,6 +13,8 @@ import { useAsyncFn } from '@/hooks';
 
 import { _updateTableColumnConfig } from '@/request';
 import { HttpError } from '@/types';
+
+import ICON_CLOSE from './assets/icon_close.svg';
 
 type FieldDescriptionProps = StyledDialogProps & {
   defaultValue?: string;
@@ -59,8 +61,8 @@ export const FieldDescription: FC<FieldDescriptionProps> = ({
     <StyledDialog
       content={
         <Stack gap={1} py={1.5}>
-          <Typography fontWeight={600} variant={'body3'}>
-            Column description
+          <Typography color={'text.secondary'} variant={'body2'}>
+            Add a description to help others understand what this view is for.
           </Typography>
           <StyledTextField
             multiline
@@ -87,14 +89,29 @@ export const FieldDescription: FC<FieldDescriptionProps> = ({
               updateDescription(description);
             }}
             size={'medium'}
-            sx={{ width: 125 }}
+            sx={{ width: 143 }}
             variant={'contained'}
           >
-            Save changes
+            Save description
           </StyledButton>
         </Stack>
       }
-      header={'Edit column description'}
+      header={
+        <Stack flexDirection={'row'} justifyContent={'space-between'}>
+          <Typography
+            color={'inherit'}
+            fontSize={'inherit'}
+            fontWeight={'inherit'}
+          >
+            Edit view description
+          </Typography>
+          <Icon
+            component={ICON_CLOSE}
+            onClick={handleClose}
+            sx={{ width: 24, height: 24, cursor: 'pointer' }}
+          />
+        </Stack>
+      }
       onClose={handleClose}
       {...rest}
     />

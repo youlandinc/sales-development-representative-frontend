@@ -10,7 +10,7 @@ export const useColumnActionCollections = () => {
   } = useDescriptionDialogParam();
 
   return {
-    descriptonDialog: {
+    descriptionDialog: {
       descriptionShow,
       handleOpenDescriptionDialog,
       closeDescriptionDialog,

@@ -42,7 +42,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   );
   const { messages, connected } = useWebSocket();
 
-  const { descriptonDialog } = useColumnActionCollections();
+  const { descriptionDialog } = useColumnActionCollections();
 
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
@@ -478,7 +478,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 if (!column) {
                   return;
                 }
-                descriptonDialog.handleOpenDescriptionDialog(
+                descriptionDialog.handleOpenDescriptionDialog(
                   columnId,
                   column.description || '',
                 );
@@ -528,10 +528,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         cb={async () => {
           await fetchTable(tableId);
         }}
-        defaultValue={descriptonDialog.defaultValue}
-        fieldId={descriptonDialog.fieldId}
-        onClose={descriptonDialog.closeDescriptionDialog}
-        open={descriptonDialog.descriptionShow}
+        defaultValue={descriptionDialog.defaultValue}
+        fieldId={descriptionDialog.fieldId}
+        onClose={descriptionDialog.closeDescriptionDialog}
+        open={descriptionDialog.descriptionShow}
       />
     </Stack>
   );
