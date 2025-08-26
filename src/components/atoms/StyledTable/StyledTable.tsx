@@ -34,6 +34,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+import { useSwitch } from '@/hooks';
+
+import { StyledButton, StyledDialog } from '@/components/atoms';
+import {
+  getColumnMenuActions,
+  TableColumnMenuEnum,
+} from '@/components/molecules';
+
 import {
   StyledTableBody,
   StyledTableBodyCell,
@@ -44,12 +52,6 @@ import {
   StyledTableHeadRow,
   StyledTableSpacer,
 } from './index';
-import {
-  getColumnMenuActions,
-  TableColumnMenuEnum,
-} from '@/components/molecules';
-import { StyledButton, StyledDialog } from '@/components/atoms';
-import { useSwitch } from '@/hooks';
 
 interface StyledTableProps {
   columns: any[];
