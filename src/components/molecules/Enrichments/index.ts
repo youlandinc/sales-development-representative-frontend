@@ -9,3 +9,5 @@ export * from './CollapseCard';
 export * from './SlateEditor';
 export * from './TiptapEditor';
 export * from './SculptingPrompt';
+export * from './OutputsFields';
+export * from './FieldDescription';

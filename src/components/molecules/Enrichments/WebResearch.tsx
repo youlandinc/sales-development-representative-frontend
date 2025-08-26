@@ -11,13 +11,13 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { DocumentType, Editor } from '@tiptap/core';
-import { FC, useState } from 'react';
-import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
+import { DocumentType } from '@tiptap/core';
+import { FC, useEffect, useState } from 'react';
 import { Node } from 'slate';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import {
+  FieldDescription,
   SculptingPrompt,
   WebResearchConfigure,
   WebResearchGenerate,
@@ -27,16 +27,16 @@ import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 
 import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
 
-import ICON_SPARK from './assets/icon_sparkle.svg';
-import ICON_ARROW from './assets/icon_arrow.svg';
-import CloseIcon from '@mui/icons-material/Close';
-import ICON_COINS from './assets/icon_coins.svg';
-import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
 import { COINS_PER_ROW } from '@/constant';
-import { useAsyncFn } from '@/hooks';
+import { useAsyncFn, useVariableFromStore } from '@/hooks';
 import { columnRun } from '@/request';
 import { HttpError } from '@/types';
-import { extractPromptText, schemaToSlate } from '@/utils';
+import { extractPromptText } from '@/utils';
+import CloseIcon from '@mui/icons-material/Close';
+import ICON_ARROW from './assets/icon_arrow.svg';
+import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
+import ICON_COINS from './assets/icon_coins.svg';
+import ICON_SPARK from './assets/icon_sparkle.svg';
 
 type CostCoinsProps = StackProps & {
   count: string;
@@ -77,9 +77,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const [schemaStr, setSchemaStr] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-  // const [promptEditor, setPromptEditor] = useState<null | Editor>(null);
-  // const [generateEditor, setGenerateEditor] = useState<null | Editor>(null);
-  // const [schemaEditor, setSchemaEditor] = useState<ReactEditor | null>(null);
+
   const {
     setPrompt,
     open,
@@ -93,6 +91,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     tipTapEditorInstance,
     slateEditorInstance,
   } = useWebResearchStore((state) => state);
+  const { filedMapping } = useVariableFromStore();
   const { generatePrompt: generateJson } = useGeneratePrompt(
     setSchemaStr,
     (objStr) => {
@@ -109,6 +108,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const { generatePrompt, isThinking } = useGeneratePrompt(
     setText,
     async (text) => {
+      console.log(text);
       setPrompt(text);
       await generateJson('/sdr/ai/generate', {
         module: 'JSON_SCHEMA_WITH_PROMPT',
@@ -141,13 +141,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       params: {
         userInput: extractPromptText(
           (generateEditorInstance?.getJSON() || []) as DocumentType,
-          columns.reduce(
-            (pre, cur) => {
-              pre[cur.fieldName] = cur.fieldId;
-              return pre;
-            },
-            {} as Record<string, string>,
-          ),
+          filedMapping,
         ),
         columns: columns.map((item) => item.fieldName).join(','),
       },
@@ -170,7 +164,10 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         setAnchorEl(null);
         await saveAiConfig(
           tableId,
-          tipTapEditorInstance?.getText() || '',
+          extractPromptText(
+            (generateEditorInstance?.getJSON() || []) as DocumentType,
+            filedMapping,
+          ) || '',
           slateEditorInstance?.children
             ?.map((n) => Node.string(n))
             .join('\n') || '',
@@ -207,8 +204,52 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     [tipTapEditorInstance, slateEditorInstance, cb],
   );
 
+  useEffect(() => {
+    if (open) {
+      setPrompt(`**CONTEXT:**  
+You are tasked with finding the CEO name of a company using available identifying details.
+
+**OBJECTIVE:**  
+Extract the CEO name of the company identified by {{company_name}}, and use additional columns such as {{first_name}}, {{last_name}}, and {{email}} to improve search accuracy.
+
+**INSTRUCTIONS:**  
+
+1. If the LinkedIn profile URL is provided, extract the CEO name from the appropriate section of the profile.
+2. If the LinkedIn profile is not provided, search LinkedIn or Google using "{{company_name}}" and auxiliary columns (such as {{first_name}}, {{last_name}}, {{email}}) to locate the correct profile, then extract the CEO name from the relevant section.
+3. If LinkedIn profile is not provided, attempt to find the CEO's name on other public company or business pages using auxiliary columns (such as {{first_name}}, {{last_name}}, {{email}}) as additional context.
+4. If multiple profiles are found, deduplicate using auxiliary columns such as {{first_name}}, {{last_name}}, and {{email}}.
+5. If the CEO name cannot be retrieved, return a fallback result in the format: **"No CEO Name information found"**. Only use publicly available information; do not access paywalled or authenticated sources.
+
+**EXAMPLES:**  
+
+Example input:
+
+company_name: Tech Innovators Inc
+
+first_name: John
+
+last_name: Doe
+
+email: john.doe@techinnovators.com
+
+Expected output:
+
+CEO Name: Jane Smith or No CEO Name information found`);
+      setSchemaJson(`{  
+  "type": "object",  
+  "properties": {  
+    "CEO Name": {  
+      "type": "string",  
+      "enum": ["John Doe", "No CEO name information found"]  
+    }  
+  },  
+  "required": ["CEO Name"]  
+}`);
+    }
+  }, [open]);
+
   return (
-    <Drawer anchor={'right'} open={open}>
+    <Drawer anchor={'right'} hideBackdrop open={open}>
       <Stack gap={4} height={'100%'} justifyContent={'space-between'}>
         {/* header */}
         <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>
@@ -382,6 +423,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
           </Menu>
         </Stack>
       </Stack>
+      {/* <FieldDescription /> */}
     </Drawer>
   );
 };

@@ -8,11 +8,9 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import {
   ComponentRef,
-  FC,
   forwardRef,
   useEffect,
   useImperativeHandle,
-  useState,
 } from 'react';
 
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
@@ -148,7 +146,7 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
           console.error('Error setting editor content:', error);
         }
       }
-    }, [defaultValue, minHeight]);
+    }, [JSON.stringify(defaultValue), minHeight]);
 
     useImperativeHandle(ref, () => editor);
 
@@ -215,11 +213,6 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
     // #CONTEXT#\nYou are tasked with finding a Java engineer associated with a given company or website, and extracting their professional profile and email address.\n\n#OBJECTIVE#\nIdentify a Java engineer related to {{Enrich Company}}, {{Domain}}, or {{Url}}, and extract their professional profile link (such as LinkedIn) and email address.\n\n#INSTRUCTIONS#\n1. Use the provided {{Enrich Company}}, {{Domain}}, or {{Url}} to search for employees or team members who are Java engineers (titles may include \"Java Engineer,\" \"Java Developer,\" or similar).\n2. Search LinkedIn, company team pages, or other professional directories for profiles matching the criteria.\n3. Extract the profile URL (preferably LinkedIn) and the email address if publicly available.\n4. If multiple Java engineers are found, return the first relevant result.\n5. If no Java engineer or email is found, return \"No Java engineer found\" or \"No email found\" as appropriate.\n\n#EXAMPLES#\nInput:\n  Enrich Company: Acme Corp\n  Domain: acmecorp.com\n  Url: https://acmecorp.com\n\nExpected Output:\n  Java Engineer Name: John Doe\n
     // `),
     //   );
-    const FIELD_MAP = {
-      'Enrich Company': 'f_0szqqc8QBTxZKg6HYr9',
-      Domain: 'f_0szqqc8XXxBN2S6jiEx',
-      Url: 'f_0szqqc8Z5mwa6iwDnqp',
-    };
 
     /*   function extractPromptText(
     doc: NodeType,
@@ -256,14 +249,6 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
     return JSON.stringify(result.trim());
   } */
 
-    const handleClick = () => {
-      // console.log(extractPromptText(editor.getJSON(), FIELD_MAP));
-    };
-
-    const handleGetText = () => {
-      // console.log(editor.getText());
-    };
-
     return (
       <Stack gap={2}>
         <Stack
@@ -272,13 +257,14 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
           gap={1.25}
           p={2}
           sx={{
-            '& .tiptap p.is-empty::before': {
+            '& .tiptap p.is-editor-empty::before': {
               content: 'attr(data-placeholder)',
-              color: '#aaa',
+              color: '#B0ADBD',
               float: 'left' /* 避免光标错位 */,
               height: 0,
               pointerEvents: 'none',
               fontSize: 12,
+              lineHeight: 1.5,
             },
           }}
         >

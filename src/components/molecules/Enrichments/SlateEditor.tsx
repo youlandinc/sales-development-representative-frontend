@@ -1,4 +1,15 @@
 import {
+  buildExpressionFromNodes,
+  copyOrCutContent,
+  decorateJson,
+  handlePasteEvent,
+  parseTextToNodes,
+  validateJson,
+} from '@/utils';
+import { Typography } from '@mui/material';
+import { compact, flatten } from 'lodash-es';
+import {
+  ClipboardEvent,
   ComponentRef,
   CSSProperties,
   forwardRef,
@@ -6,82 +17,42 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useMemo,
+  useRef,
   useState,
 } from 'react';
-import { createEditor, Descendant } from 'slate';
-import { Editable, Slate, withReact } from 'slate-react';
+import { Descendant, Element, Node, NodeEntry, Text } from 'slate';
+import { Editable, ReactEditor, RenderLeafProps, Slate } from 'slate-react';
 
-// const initialValue = {
-//   type: 'object',
-//   properties: {
-//     CEO: {
-//       type: 'string',
-//       description: "Full name of the CEO or 'No CEO or LinkedIn profile found'",
-//     },
-//     LinkedIn_Profile: {
-//       type: 'string',
-//       description:
-//         "LinkedIn profile URL of the CEO or 'No CEO or LinkedIn profile found'",
-//     },
-//   },
-//   required: ['CEO', 'LinkedIn_Profile'],
-// };
+type LeafType = {
+  type: string;
+} & Text;
 
-/*const renderElement = ({
-  attributes,
-  children,
-  element,
-}: RenderElementProps) => {
-  switch (element.type) {
-    case 'object':
-      return (
-        <div {...attributes} style={{ marginLeft: 16 }}>
-          <span>{'{'}</span>
-          {children}
-          <span>{'}'}</span>
-        </div>
-      );
-    case 'pair':
-      return (
-        <div {...attributes} style={{ marginLeft: 16 }}>
-          <span style={{ color: '#c586c0' }}>"{element.key}"</span>
-          {element.required && <span style={{ color: 'red' }}> *</span>}
-          <span>: </span>
-          {children}
-        </div>
-      );
-    case 'value':
-      return (
-        <div {...attributes} style={{ color: '#4ec9b0', marginLeft: 16 }}>
-          {children}
-          {element.description && (
-            <span style={{ color: 'gray', marginLeft: 8 }}>
-              // {element.description}
-            </span>
-          )}
-        </div>
-      );
-    default:
-      return <span {...attributes}>{children}</span>;
-  }
-};*/
-
-const renderLeaf = ({ attributes, children, leaf }: any) => {
-  let color = '#6F6C7D';
-  if (leaf.tokenType === 'key') {
-    color = '#009874';
-  }
-  if (leaf.tokenType === 'string') {
-    color = '#032F62';
-  }
-  if (leaf.tokenType === 'symbol') {
-    color = '#D73A49';
-  }
-  if (leaf.tokenType === 'number') {
-    color = '#1C00CF';
-  }
+const renderLeaf = ({ attributes, children, leaf }: RenderLeafProps) => {
+  const { type } = leaf as LeafType;
   // space 不加颜色
+  let color = '#6F6C7D';
+  switch (type) {
+    case 'json-punctuation':
+      color = '#D73A49';
+      break;
+    case 'json-boolean':
+      color = '#005CC5';
+      break;
+    case 'json-nescapeForJsonStringber':
+      color = '#005CC5';
+      break;
+    case 'json-string':
+      color = '#032F62';
+      break;
+    case 'json-key':
+      color = '#009874';
+      break;
+    case 'json-null':
+      color = '#24292E';
+      break;
+    default:
+      break;
+  }
 
   return (
     <span
@@ -98,38 +69,105 @@ const renderLeaf = ({ attributes, children, leaf }: any) => {
   );
 };
 
+const useJ1 = (t: string) => {
+  const n = useRef('');
+  useEffect(() => {
+    n.current = t;
+  });
+  return n.current;
+};
+
 type SlateEditorProps = {
-  initialValue?: Descendant[];
+  editor: ReactEditor;
+  initialValue?: string;
   placeholder?: string;
   style?: CSSProperties;
   onEditorReady?: (editor: any) => void;
+  onValueChange?: (value: string) => void;
 };
 
 export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
   (
     {
-      initialValue = [
-        {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-
-          type: 'paragraph',
-          children: [{ text: '' }],
-        },
-      ],
+      editor,
+      initialValue = '',
       placeholder = 'Enter JSON',
       style,
       onEditorReady,
+      onValueChange,
     },
     ref,
   ) => {
-    const [value, setValue] = useState<Descendant[]>([
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      { type: 'paragraph', children: [{ text: '' }] },
-    ]);
+    // const editor = useMemo(() => withReact(createEditor()), []);
+    const [error, setError] = useState<string>('');
+    const defaultValue = [
+      { type: 'paragraph', children: parseTextToNodes(initialValue) },
+    ];
+    const [value, setValue] = useState<Descendant[]>(defaultValue);
+
+    // 保存一个临时的剪贴板内容
+    const [clipboard, setClipboard] = useState<Node[] | null>(null);
+
+    // 从节点树提取 paragraph 的 children，拼接成纯文本
+    const paragraphChildren = flatten(
+      compact(
+        value.map((n) =>
+          Element.isElement(n) && (n as any).type === 'paragraph'
+            ? n.children
+            : null,
+        ),
+      ),
+    );
+
+    // 把文本转成 JSON 字符串
+    const currentString =
+      Element.isElement(value?.[0]) && (value[0] as any).type === 'paragraph'
+        ? buildExpressionFromNodes({
+            nodes: paragraphChildren,
+            isCommaSeparated: false,
+          })
+        : '';
+
+    // JSON 转换函数 j1（可能是格式化 JSON）
+    const formattedString = useJ1(currentString);
+
+    // 当 JSON 发生变化时，触发外部 setValue
+    useEffect(() => {
+      if (
+        typeof formattedString === 'string' &&
+        currentString !== formattedString
+      ) {
+        onValueChange?.(currentString);
+      }
+    }, [onValueChange, value, currentString, formattedString]);
+
+    // JSON 装饰器：用于语法高亮（调用 L8e 前面定义的）
+    const decorate = useCallback(([node, path]: NodeEntry) => {
+      const ranges: any[] = [];
+      return decorateJson({ node: node as Text, path, ranges });
+    }, []);
+
+    // 处理 Copy / Cut 事件
+    const handleCopyOrCut = useCallback(() => {
+      // o$ 看起来是一个工具函数（可能负责从 editor 里取出内容并存到 state）
+      copyOrCutContent({ editor, setClipboard });
+    }, [editor]);
+
+    // React 的 useCallback 包装，保证依赖更新时函数也更新
+    const handlePaste = useCallback(
+      (event: ClipboardEvent<HTMLDivElement>) => {
+        handlePasteEvent({
+          e: event,
+          clipboard,
+          editor,
+          setClipboard,
+        });
+      },
+      [clipboard, editor],
+    );
+
     const handleOnKeyDown = useCallback(
-      (event: KeyboardEvent<HTMLDivElement>, editor: any) => {
+      (event: KeyboardEvent<HTMLDivElement>, editor: ReactEditor) => {
         switch (event.key) {
           case 'Enter':
             // 当按下 Enter 且不是 Ctrl/Meta 组合时（并且不是 Shift+Enter）
@@ -150,20 +188,28 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
             break;
         }
       },
-      [],
+      [value],
     );
 
-    const editor = useMemo(() => withReact(createEditor()), []);
+    const handleBlur = () => {
+      const content =
+        editor?.children
+          ?.map((n) => Node.string(n))
+          .join('')
+          ?.trim() || '';
+      if (content === '') {
+        setError('');
+        return;
+      }
+      const { error } = validateJson(
+        editor?.children?.map((n) => Node.string(n)).join('\n') || '',
+      );
+      setError(error?.message || '');
+    };
 
     useEffect(() => {
       onEditorReady?.(editor);
     }, [editor, onEditorReady]);
-
-    useEffect(() => {
-      if (initialValue) {
-        setValue(value);
-      }
-    }, [initialValue]);
 
     useImperativeHandle(ref, () => editor, [editor]);
 
@@ -171,15 +217,22 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
     return (
       <Slate
         editor={editor}
-        initialValue={initialValue}
-        onChange={(value) => setValue(value)}
-        value={value}
+        initialValue={defaultValue}
+        onChange={(value) => {
+          setValue(value);
+        }}
+        // value={value}
       >
         <Editable
           autoFocus
+          decorate={decorate}
+          onBlur={handleBlur}
+          onCopy={handleCopyOrCut}
+          onCut={handleCopyOrCut}
           onKeyDown={(e) => {
             handleOnKeyDown(e, editor);
           }}
+          onPaste={handlePaste}
           placeholder={placeholder}
           renderLeaf={renderLeaf}
           spellCheck
@@ -188,11 +241,17 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
             minHeight: 32,
             borderRadius: '8px',
             border: '1px solid #E5E5E5',
+            borderColor: error ? '#D73A49' : '#E5E5E5',
             padding: '16px',
             fontSize: '12px',
             ...style,
           }}
         />
+        {error && (
+          <Typography color={'#D73A49'} variant={'body3'}>
+            {error}
+          </Typography>
+        )}
       </Slate>
     );
   },

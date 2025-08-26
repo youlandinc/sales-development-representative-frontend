@@ -5,9 +5,21 @@ import { SDRToast } from '@/components/atoms';
 import { Editor } from '@tiptap/core';
 import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 
+const defaultSchemaJsonStr = `{
+    "type": "object",
+    "properties": {
+      "response": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "response"
+    ]
+  }`;
+
 type WebResearchStoreProps = {
   prompt: string;
-  schemaJson: Record<string, any>;
+  schemaJson: string;
   open: boolean;
   generateDescription: string;
   excludeFields: string[];
@@ -19,7 +31,7 @@ type WebResearchStoreProps = {
 
 type WebResearchActions = {
   setPrompt: (prompt: string) => void;
-  setSchemaJson: (schemaJson: Record<string, any>) => void;
+  setSchemaJson: (schemaJson: string) => void;
   setOpen: (b: boolean) => void;
   setGenerateDescription: (description: string) => void;
   allClear: () => void;
@@ -42,15 +54,7 @@ export const useWebResearchStore = create<
   prompt: '',
   promptIsEmpty: true,
   generateDescription: '',
-  schemaJson: {
-    type: 'object',
-    properties: {
-      response: {
-        type: 'string',
-      },
-    },
-    required: ['response'],
-  },
+  schemaJson: defaultSchemaJsonStr,
   excludeFields: [],
   open: false,
   generateEditorInstance: null,
@@ -59,7 +63,7 @@ export const useWebResearchStore = create<
   setPrompt: (prompt: string) => {
     set({ prompt });
   },
-  setSchemaJson: (schemaJson: Record<string, any>) => {
+  setSchemaJson: (schemaJson: string) => {
     set({ schemaJson });
   },
   setOpen: (open: boolean) => {
@@ -75,15 +79,7 @@ export const useWebResearchStore = create<
   allClear: () => {
     set({
       prompt: '',
-      schemaJson: {
-        type: 'object',
-        properties: {
-          response: {
-            type: 'string',
-          },
-        },
-        required: ['response'],
-      },
+      schemaJson: defaultSchemaJsonStr,
       generateDescription: '',
     });
   },

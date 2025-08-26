@@ -23,7 +23,6 @@ export const PlaceholderNode: FC = (props: any) => {
 
   const label = node?.attrs?.label;
   const id = node?.attrs?.id;
-  console.log(node?.attrs);
 
   const storage = editor.storage.sharedSwitch;
 
@@ -49,7 +48,6 @@ export const PlaceholderNode: FC = (props: any) => {
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     // storage.setChecked(e.target.checked);
-    console.log(id);
     if (!e.target.checked && id) {
       setExcludeFields(id);
     } else {
@@ -66,6 +64,7 @@ export const PlaceholderNode: FC = (props: any) => {
           component={'span'}
           flexDirection={'row'}
           gap={0.5}
+          my={0.5}
           px={1}
           py={0.5}
           sx={{
