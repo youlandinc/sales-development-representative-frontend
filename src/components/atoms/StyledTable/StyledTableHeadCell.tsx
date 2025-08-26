@@ -49,6 +49,10 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
+  
+  
+  const isSelectColumn = header?.column?.id === '__select';
+  
 
   const content = header
     ? flexRender(header.column.columnDef.header, header.getContext())
@@ -107,16 +111,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         maxWidth: width,
         boxSizing: 'border-box',
         borderRight:
-          isPinned && showPinnedRightShadow
+          isPinned && showPinnedRightShadow && !isSelectColumn
             ? '0 solid transparent'
             : '0.5px solid #DFDEE6',
-        boxShadow: (theme) => {
-          const shadows: string[] = [];
-          if (isEditing) {
-            shadows.push(`inset 0 0 0 1px ${theme.palette.primary.main}`);
-          }
-          return shadows.length ? shadows.join(', ') : 'none';
-        },
+        boxShadow: (theme) =>
+          isActive && !isSelectColumn
+            ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
+            : 'none',
         bgcolor: isActive ? '#F7F4FD' : '#FFFFFF',
         cursor: 'pointer',
         position: isPinned ? 'sticky' : 'relative',

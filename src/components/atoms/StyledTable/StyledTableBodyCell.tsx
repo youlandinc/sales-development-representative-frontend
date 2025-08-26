@@ -213,11 +213,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
                   ? '#F7F4FD'
                   : '#fff',
           borderRight:
-            isPinned && showPinnedRightShadow
+            isPinned && showPinnedRightShadow && !isSelectColumn
               ? '3px solid #DFDEE6'
               : '0.5px solid #DFDEE6',
           ...(isPinned &&
-            showPinnedRightShadow && {
+            showPinnedRightShadow && !isSelectColumn &&{
               '&::after': {
                 content: '""',
                 position: 'absolute',
