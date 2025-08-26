@@ -81,6 +81,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     setPrompt,
     open,
     setOpen,
+    schemaJson,
     setSchemaJson,
     allClear,
     prompt,
@@ -173,7 +174,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         return Promise.reject(err);
       }
     },
-    [tipTapEditorInstance, slateEditorInstance],
+    [tipTapEditorInstance, slateEditorInstance, schemaJson],
   );
 
   const [saveAndRunState, saveAndRun] = useAsyncFn(
@@ -186,9 +187,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
             (tipTapEditorInstance?.getJSON() || []) as DocumentType,
             filedMapping,
           ) || '',
-          slateEditorInstance?.children
-            ?.map((n) => Node.string(n))
-            .join('\n') || '',
+          schemaJson,
         );
         await run(res.data, recordCount);
         await cb?.();
@@ -199,7 +198,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         return Promise.reject(err);
       }
     },
-    [tipTapEditorInstance, slateEditorInstance, cb],
+    [tipTapEditorInstance, slateEditorInstance, cb, schemaJson],
   );
 
   return (
