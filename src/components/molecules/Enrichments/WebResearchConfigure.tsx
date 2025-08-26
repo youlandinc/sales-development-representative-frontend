@@ -126,7 +126,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       return {};
     }
   }, [schemaJson, transformToObject]);
-
+  console.log(schemaJson);
   /*   const s = ['reasoning', 'evidence', 'confidence', 'didFindData'];
 
   const r = useMemo(

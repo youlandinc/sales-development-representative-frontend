@@ -17,7 +17,6 @@ import { Node } from 'slate';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import {
-  FieldDescription,
   SculptingPrompt,
   WebResearchConfigure,
   WebResearchGenerate,
@@ -96,10 +95,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     setSchemaStr,
     (objStr) => {
       setIsLoading(false);
-      setSchemaJson(JSON.parse(objStr));
-      // if (slateEditorInstance) {
-      //   slateEditorInstance.children = schemaToSlate(JSON.parse(objStr));
-      // }
+      setSchemaJson(objStr);
       setTimeout(() => {
         setTab('configure');
       }, 0);
@@ -108,7 +104,6 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const { generatePrompt, isThinking } = useGeneratePrompt(
     setText,
     async (text) => {
-      console.log(text);
       setPrompt(text);
       await generateJson('/sdr/ai/generate', {
         module: 'JSON_SCHEMA_WITH_PROMPT',
