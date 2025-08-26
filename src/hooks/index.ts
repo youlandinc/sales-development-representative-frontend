@@ -10,3 +10,4 @@ export * from './useDebounceFn';
 export * from './useAsync';
 export * from './useThrottleFn';
 export * from './useVariableFromStore';
+export * from './useWebSocket';

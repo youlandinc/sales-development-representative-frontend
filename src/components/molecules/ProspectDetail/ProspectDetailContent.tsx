@@ -3,9 +3,13 @@ import { Stack } from '@mui/material';
 import useSWR from 'swr';
 
 import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
+
+import { useWebSocket } from '@/hooks';
+
 import { StyledTable } from '@/components/atoms';
 import { WebResearch } from '@/components/molecules';
-import { useWebSocket } from '@/hooks/useWebSocket';
+
+import { TableColumnMenuEnum } from './index';
 
 import { _fetchTableRowData } from '@/request';
 import { WebSocketTypeEnum } from '@/types';
@@ -24,8 +28,13 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     rowIds,
     runRecords,
     resetTable,
-    updateColumnWidth,
+    columnDeleting,
     updateCellValue,
+    updateColumnWidth,
+    updateColumnName,
+    updateColumnPin,
+    updateColumnVisible,
+    deleteColumn,
   } = useProspectTableStore((store) => store);
   const { setOpen } = useWebResearchStore((store) => store);
   const { messages, connected } = useWebSocket();
@@ -414,18 +423,62 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       {columns.length > 0 && rowIds.length > 0 && (
         <StyledTable
           aiLoading={aiLoadingState}
+          columnDeleting={columnDeleting}
           columns={columns}
           data={fullData}
           onAddMenuItemClick={(item) => {
             setOpen(true);
           }}
           onAiProcess={handleAiProcess}
-          onCellEdit={(recordId, fieldId, value) =>
-            updateCellValue({ tableId, recordId, fieldId, value })
-          }
-          onColumnResize={(fieldId, width) =>
-            updateColumnWidth({ fieldId, width })
-          }
+          onCellEdit={async (recordId, fieldId, value) => {
+            setRowsMap((prev) => {
+              const currentRowData = prev[recordId] || {};
+              return {
+                ...prev,
+                [recordId]: {
+                  ...currentRowData,
+                  [fieldId]: value,
+                },
+              };
+            });
+
+            if (rowsMapRef.current[recordId]) {
+              rowsMapRef.current[recordId][fieldId] = value;
+            }
+
+            await updateCellValue({ tableId, recordId, fieldId, value });
+          }}
+          onColumnResize={(fieldId, width) => updateColumnWidth(fieldId, width)}
+          onHeaderMenuClick={async ({ type, columnId, value, cb }) => {
+            switch (type) {
+              case TableColumnMenuEnum.ai_agent: {
+                console.log(columnId);
+                setOpen(true);
+                break;
+              }
+              case TableColumnMenuEnum.rename_column: {
+                if (value) {
+                  await updateColumnName(columnId, value);
+                }
+                break;
+              }
+              case TableColumnMenuEnum.pin: {
+                await updateColumnPin(columnId, value);
+                break;
+              }
+              case TableColumnMenuEnum.visible: {
+                await updateColumnVisible(columnId, value);
+                break;
+              }
+              case TableColumnMenuEnum.delete: {
+                await deleteColumn(columnId, cb);
+                break;
+              }
+              default: {
+                return;
+              }
+            }
+          }}
           rowIds={rowIds}
           scrolled={scrolled}
           virtualization={{

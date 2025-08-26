@@ -1,2 +1,4 @@
+export * from './data';
+
 export * from './ProspectDetailHeader';
 export * from './ProspectDetailContent';

@@ -11,7 +11,6 @@ import {
 } from 'react';
 import { Box, CircularProgress, InputBase, Stack } from '@mui/material';
 import { Cell, flexRender } from '@tanstack/react-table';
-import { alpha } from '@mui/material/styles';
 
 interface StyledTableBodyCellProps {
   cell?: Cell<any, unknown>;
@@ -23,10 +22,7 @@ interface StyledTableBodyCellProps {
   editValue?: any;
   isActive?: boolean;
   rowSelected?: boolean;
-  onCellClick?: (recordId: string, columnId: string) => void;
-  onCellDoubleClick?: (recordId: string, columnId: string) => void;
-  onEditCommit?: (recordId: string, columnId: string, value: any) => void;
-  onEditStop?: (recordId: string, columnId: string) => void;
+  showPinnedRightShadow?: boolean;
 }
 
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
@@ -39,10 +35,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     editValue: _editValue,
     isActive: _isActive,
     rowSelected = false,
-    onCellClick,
-    onCellDoubleClick,
-    onEditCommit,
-    onEditStop,
+    showPinnedRightShadow,
   }) => {
     const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
@@ -72,19 +65,6 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
     const isAiColumn = actionKey === 'use-ai';
-
-    // 调试AI状态
-    if (isAiColumn) {
-      // console.log('AI Column Debug:', {
-      //   recordId,
-      //   columnId,
-      //   isAiColumn,
-      //   isAiLoading,
-      //   isFinished,
-      //   displayValue,
-      //   actionKey,
-      // });
-    }
 
     const resolvedMinWidth = width < 100 ? 100 : width;
 
@@ -122,17 +102,10 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
 
     const handleEditStop = useCallback(() => {
       if (localEditValue !== String(displayValue ?? '')) {
-        onEditCommit?.(recordId, columnId, localEditValue);
+        tableMeta?.updateData?.(recordId, columnId, localEditValue);
       }
-      onEditStop?.(recordId, columnId);
-    }, [
-      localEditValue,
-      displayValue,
-      onEditCommit,
-      recordId,
-      columnId,
-      onEditStop,
-    ]);
+      tableMeta?.setCellMode?.(recordId, columnId, 'clear');
+    }, [localEditValue, displayValue, tableMeta, recordId, columnId]);
 
     const content = useMemo(() => {
       if (isEditing && cell && !isSelectColumn && canEdit) {
@@ -202,21 +175,21 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const handleClick = useCallback(
       (e: MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
-        if (canInteract && onCellClick) {
-          onCellClick(recordId, columnId);
+        if (canInteract) {
+          tableMeta?.setCellMode?.(recordId, columnId, 'active');
         }
       },
-      [canInteract, onCellClick, recordId, columnId],
+      [canInteract, tableMeta, recordId, columnId],
     );
 
     const handleDoubleClick = useCallback(
       (e: MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
-        if (canInteract && onCellDoubleClick) {
-          onCellDoubleClick(recordId, columnId);
+        if (canInteract) {
+          tableMeta?.setCellMode?.(recordId, columnId, 'edit');
         }
       },
-      [canInteract, onCellDoubleClick, recordId, columnId],
+      [canInteract, tableMeta, recordId, columnId],
     );
 
     return (
@@ -230,30 +203,19 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           boxSizing: 'border-box',
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
-          zIndex: isPinned ? 1 : 0,
-          bgcolor: '#fff',
-          '&::before':
-            rowSelected || isEditing || isActive
-              ? {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  bgcolor: (theme) =>
-                    isEditing && !isSelectColumn
-                      ? alpha(theme.palette.primary.main, 0.1)
-                      : isActive && !isSelectColumn
-                        ? alpha(theme.palette.primary.main, 0.06)
-                        : rowSelected
-                          ? alpha(theme.palette.primary.main, 0.06)
-                          : 'transparent',
-                  pointerEvents: 'none',
-                  zIndex: 0,
-                }
-              : {},
-          borderRight: '0.5px solid #DFDEE6',
+          zIndex: isPinned ? 20 : 1,
+          bgcolor:
+            isEditing && !isSelectColumn
+              ? '#F7F4FD'
+              : isActive && !isSelectColumn
+                ? '#F7F4FD'
+                : rowSelected
+                  ? '#F7F4FD'
+                  : '#fff',
+          borderRight:
+            isPinned && showPinnedRightShadow
+              ? '3px solid #DFDEE6'
+              : '0.5px solid #DFDEE6',
           borderTop: 'none',
           borderLeft: 'none',
           boxShadow: (theme) =>
@@ -278,6 +240,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         >
           {content}
         </Box>
+        {/* No overlay: the 2px borderRight acts as the separator for the last pinned column */}
       </Stack>
     );
   },

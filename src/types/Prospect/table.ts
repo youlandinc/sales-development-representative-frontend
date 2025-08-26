@@ -17,7 +17,7 @@ export interface TableColumnProps {
   fieldName: string;
   fieldType: TableColumnTypeEnum;
   actionKey: string | null;
-  hidden: boolean;
+  visible: boolean;
   isUnique: boolean;
   nullable: boolean;
   pin: boolean;
@@ -30,7 +30,7 @@ export interface UpdateTableColumnConfigParams {
   fieldId: string;
   fieldName: string;
   fieldType: TableColumnTypeEnum;
-  hidden: boolean;
+  visible: boolean;
   description: string;
   color: string;
   pin: boolean;

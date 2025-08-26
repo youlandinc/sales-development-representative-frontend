@@ -1,4 +1,4 @@
-import { get, patch, post } from '@/request/request';
+import { del, get, patch, post } from '@/request/request';
 import {
   TableCellProps,
   TableColumnProps,
@@ -32,6 +32,10 @@ export const _updateTableColumnConfig = (
   params: Partial<UpdateTableColumnConfigParams>,
 ) => {
   return patch('/sdr/prospect/table/field', params);
+};
+
+export const _deleteTableColumn = (fieldId: string) => {
+  return del(`/sdr/prospect/table/field/${fieldId}`);
 };
 
 export const _updateTableCellValue = (params: {
