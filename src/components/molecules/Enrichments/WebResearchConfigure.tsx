@@ -16,6 +16,7 @@ import { Editor } from '@tiptap/core';
 import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { createEditor } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import {
@@ -116,6 +117,8 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     }
   }, [schemaJson, transformToObject]);
 
+  console.log(filedsMapping);
+
   /*   const s = ['reasoning', 'evidence', 'confidence', 'didFindData'];
 
   const r = useMemo(
@@ -151,7 +154,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   // const a = useMemo(() => {}, [schemaJson]);
 
-  /*   const i = useMemo(
+  const i = useMemo(
     () =>
       Object.fromEntries(
         Object.entries(filedsMapping).map(
@@ -197,7 +200,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     },
     [i],
   );
- */
+
   return (
     <Stack gap={4}>
       <Stack gap={0.5}>
@@ -288,7 +291,21 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                   fieldName={item}
                   fieldType={'text'}
                   removeField={() => {}}
-                  saveField={() => {}}
+                  saveField={(
+                    fieldName: string,
+                    newName: string,
+                    newDescription: string,
+                    newType: string,
+                    newSelectOptions: any,
+                  ) => {
+                    updateSchema(
+                      fieldName,
+                      newName,
+                      newDescription,
+                      newType,
+                      newSelectOptions,
+                    );
+                  }}
                   selectOptions={[
                     {
                       label: 'Text',
