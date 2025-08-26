@@ -12,7 +12,13 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useMemo, useRef, useState } from 'react';
+import { Editor } from '@tiptap/core';
+import { ReactEditor } from 'slate-react';
+import { withReact } from 'slate-react';
+import { createEditor } from 'slate';
+import { v4 as uuidv4 } from 'uuid';
+import { debounce } from 'lodash-es';
 
 import {
   StyledButton,
@@ -21,41 +27,22 @@ import {
 } from '@/components/atoms';
 import {
   CollapseCard,
+  OutputsFields,
   SlateEditor,
   TiptapEditor,
 } from '@/components/molecules';
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 import { useWebResearchStore } from '@/stores/Prospect';
+import { useVariableFromStore } from '@/hooks';
+
+import { extractPromptText, insertWithPlaceholders } from '@/utils';
+
 import { MoreHoriz } from '@mui/icons-material';
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
 import ICON_TEXT from './assets/icon_text.svg';
 import ICON_WARNING from './assets/icon_warning.svg';
 // import { useCompletion } from '@ai-sdk/react';
-import { useVariableFromStore } from '@/hooks';
-import {
-  extractPromptText,
-  insertWithPlaceholders,
-  schemaToSlate,
-} from '@/utils';
-import { Editor } from '@tiptap/core';
-import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 import ICON_DELETE from './assets/icon_delete.svg';
-
-const initialValue = {
-  type: 'object',
-  properties: {
-    CEO: {
-      type: 'string',
-      description: "Full name of the CEO or 'No CEO or LinkedIn profile found'",
-    },
-    LinkedIn_Profile: {
-      type: 'string',
-      description:
-        "LinkedIn profile URL of the CEO or 'No CEO or LinkedIn profile found'",
-    },
-  },
-  required: ['CEO', 'LinkedIn_Profile'],
-};
 
 type WebResearchConfigureProps = {
   handleGenerate?: () => void;
@@ -81,15 +68,17 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [schemaJsonStr, setSchemaJsonStr] = useState('');
 
   const promptEditorRef = useRef<null | Editor>(null);
   const schemaEditorRef = useRef(null);
+  const editor = useMemo(() => withReact(createEditor()), []);
 
   const { generatePrompt: generateJson, isLoading } = useGeneratePrompt(
     undefined,
     (objStr) => {
-      console.log(objStr);
-      setSchemaJson(JSON.parse(objStr));
+      setSchemaJson(objStr);
+      setOutPuts('fields');
     },
   );
 
@@ -98,31 +87,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   const defaultValue = prompt
     ? insertWithPlaceholders(prompt, filedMapping)
     : null;
-
-  // const {
-  //   data: s,
-  //   completion: a,
-  //   isLoading: i,
-  //   complete: r,
-  // } = useCompletion({
-  //   api: '/sdr/ai/generate',
-  //   credentials: 'include',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: {
-  //     module: 'COLUMN_ENRICHMENT_PROMPT',
-  //     params: {
-  //       useInput: "help me to find user's email and phone number",
-  //       columns:
-  //         'First Name,Last Name,Full Name,Job Title, Location,Company Name,LinkedIn Profile,University',
-  //     },
-  //   },
-  //   // onError: (l) => n(l),
-  //   // onFinish: (l, c) => t(l, c),
-  //   streamProtocol: 'data',
-  // });
-  // console.log(schemaToSlate(schemaJson));
 
   const handleEditorReady = useCallback((editor: Editor) => {
     if (editor) {
@@ -138,12 +102,113 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     }
   }, []);
 
-  useEffect(() => {
-    if (slateEditorInstance) {
-      slateEditorInstance.children = schemaToSlate(schemaJson);
+  const transformToObject = useCallback((str: string) => {
+    try {
+      if (typeof JSON.parse(str) === 'string') {
+        return transformToObject(JSON.parse(str));
+      }
+      return JSON.parse(str);
+    } catch {
+      return;
     }
-  }, [JSON.stringify(schemaJson)]);
+  }, []);
 
+  const filedsMapping = useMemo(() => {
+    try {
+      if (
+        schemaJson?.trim() !== '' &&
+        typeof transformToObject(schemaJson) === 'object'
+      ) {
+        return transformToObject(schemaJson).properties;
+      }
+      return transformToObject(schemaJson)?.properties || {};
+    } catch {
+      return {};
+    }
+  }, [schemaJson, transformToObject]);
+
+  /*   const s = ['reasoning', 'evidence', 'confidence', 'didFindData'];
+
+  const r = useMemo(
+    () =>
+      s && (s == null ? void 0 : s.length) > 0
+        ? Object.fromEntries(
+            Object.entries(filedsMapping).filter(
+              ([d, u]) => !(s != null && s.includes(d)),
+            ),
+          )
+        : filedsMapping,
+    [filedsMapping, s],
+  );
+
+  console.log(r); */
+
+  //   const a = useMemo(
+  //   () =>
+  //     t.fields
+  //       ? typeof t.fields == 'string'
+  //         ? JSON.parse(t.fields)
+  //         : t.fields
+  //       : {},
+  //   [t],
+  // ); */
+
+  /*{
+    "type": "string",
+    "description": "",
+    "id": "f02d31d1-1f1f-48f5-8c08-abda862ce722",
+    "options": ""
+} */
+
+  // const a = useMemo(() => {}, [schemaJson]);
+
+  /*   const i = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(filedsMapping).map(
+          ([d, { type, description, options, id }]) => [
+            d,
+            {
+              type: type || '',
+              description: description || '',
+              id: id ?? uuidv4(),
+              options: options || [],
+            },
+          ],
+        ),
+      ),
+    [filedsMapping],
+  );
+
+  const updateSchema = useCallback(
+    (d, u, m, g, h) => {
+      const f = Object.fromEntries(
+        Object.entries(i).map(([x, y]) => {
+          if (x === d) {
+            let b = u;
+            if (u !== d) {
+              const A = Object.keys(i);
+              let S = 1;
+              for (; A.includes(b); ) (b = `${u}-${S}`), S++;
+            }
+            const w = i[x];
+            return [b, { ...w, description: m, options: h, type: g }];
+          }
+          return [x, y];
+        }),
+      );
+      console.log(JSON.stringify(f));
+      // n((x) => ({
+      //   ...x,
+      //   answerSchemaType: {
+      //     ...x.answerSchemaType,
+      //     fields: JSON.stringify(f),
+      //   },
+      // }));
+    },
+    [i],
+  );
+ */
   return (
     <Stack gap={4}>
       {/*<Typography>{text}</Typography>*/}
@@ -167,7 +232,15 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         <Stack gap={1.5}>
           <RadioGroup
             onChange={(e) => {
-              setOutPuts((e.target as HTMLInputElement).value as any);
+              try {
+                schemaJsonStr && JSON.parse(schemaJsonStr);
+                setOutPuts((e.target as HTMLInputElement).value as any);
+                if (schemaJsonStr.trim() !== '') {
+                  setSchemaJson(schemaJsonStr);
+                }
+              } catch {
+                return false;
+              }
             }}
             value={outPuts}
           >
@@ -219,164 +292,120 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
               </StyledButton>
             </Stack>
           </RadioGroup>
-          <Stack display={outPuts === 'fields' ? 'flex' : 'none'} gap={1.5}>
-            {Object.keys(schemaJson?.properties || {}).map((item, index) => (
-              <Stack
-                alignItems={'center'}
-                flexDirection={'row'}
-                gap={1.5}
-                key={index}
-              >
-                <StyledTextField
-                  /* onChange={(e) => {
-                    const newKey = e.target.value;
-                    const oldKey = item;
-
-                    // 创建新的 properties 对象，将旧键名替换为新键名
-                    const newProperties = { ...schemaJson.properties };
-                    if (oldKey !== newKey && newKey) {
-                      // 保存旧键的值
-                      const oldValue = newProperties[oldKey];
-                      // 删除旧键
-                      delete newProperties[oldKey];
-                      // 添加新键，值保持不变
-                      newProperties[newKey] = oldValue;
-
-                      // 更新 required 数组
-                      const newRequired = schemaJson.required.map(
-                        (req) => (req === oldKey ? newKey : req)
-                      );
-
-                      // 更新 schemaJson
-                      setSchemaJson({
-                        ...schemaJson,
-                        properties: newProperties,
-                        required: newRequired,
-                      });
-                    }
-                  }} */
-                  value={item as string}
-                />
-                <StyledSelect
-                  options={[
+          {outPuts === 'fields' && (
+            <Stack gap={1.5}>
+              {Object.entries(filedsMapping).map(([item, config]) => (
+                <OutputsFields
+                  fieldDescription={''}
+                  fieldName={item}
+                  fieldType={'text'}
+                  removeField={() => {}}
+                  saveField={() => {}}
+                  selectOptions={[
                     {
                       label: 'Text',
                       value: 'text',
                       key: 'text',
                     },
                   ]}
-                  placeholder={'Text'}
-                  startAdornment={
-                    <Icon
-                      component={ICON_TEXT}
-                      sx={{ width: 12, height: 12 }}
-                    />
-                  }
-                  value={'text'}
                 />
-                <MoreHoriz
-                  onClick={(e) => {
-                    setAnchorEl((e as any).currentTarget);
-                  }}
-                  sx={{
-                    fontSize: 20,
-                    color: 'text.primary',
-                    cursor: 'pointer',
-                  }}
-                />
-              </Stack>
-            ))}
-            <StyledButton
-              color={'info'}
-              onClick={() => {
-                setIndex(index + 1);
-                setSchemaJson({
-                  type: 'object',
-                  properties: {
-                    ...schemaJson.properties,
-                    [`field${index}`]: {
-                      type: 'string',
-                    },
-                  },
-                  required: [...schemaJson.required, `field${index}`],
-                });
-              }}
-              size={'medium'}
-              sx={{
-                color: '#6F6C7D !important',
-                borderColor: '#E5E5E5 !important',
-                fontWeight: 400,
-              }}
-              variant={'outlined'}
-            >
-              + Add output
-            </StyledButton>
-            <Menu
-              anchorEl={anchorEl}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              onClose={() => {
-                setAnchorEl(null);
-              }}
-              open={Boolean(anchorEl)}
-              slotProps={{
-                list: {
-                  sx: {
-                    p: 1.5,
-                    width: 240,
-                    [`& .${menuItemClasses.root}`]: {
-                      gap: 1,
-                      '&:hover': {
-                        bgcolor: 'unset !important',
-                        cursor: 'unset',
+              ))}
+              <StyledButton
+                color={'info'}
+                // onClick={() => {
+                //   setIndex(index + 1);
+                //   setSchemaJson({
+                //     type: 'object',
+                //     properties: {
+                //       ...schemaJson.properties,
+                //       [`field${index}`]: {
+                //         type: 'string',
+                //       },
+                //     },
+                //     required: [...schemaJson.required, `field${index}`],
+                //   });
+                // }}
+                size={'medium'}
+                sx={{
+                  color: '#6F6C7D !important',
+                  borderColor: '#E5E5E5 !important',
+                  fontWeight: 400,
+                }}
+                variant={'outlined'}
+              >
+                + Add output
+              </StyledButton>
+              <Menu
+                anchorEl={anchorEl}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                onClose={() => {
+                  setAnchorEl(null);
+                }}
+                open={Boolean(anchorEl)}
+                slotProps={{
+                  list: {
+                    sx: {
+                      p: 1.5,
+                      width: 240,
+                      [`& .${menuItemClasses.root}`]: {
+                        gap: 1,
+                        '&:hover': {
+                          bgcolor: 'unset !important',
+                          cursor: 'unset',
+                        },
                       },
                     },
                   },
-                },
-              }}
-            >
-              <MenuItem>
-                <Stack gap={1.25} width={200}>
-                  <Typography variant={'body3'}>
-                    Output description (helps Al)
-                  </Typography>
-                  <StyledTextField
-                    maxRows={3}
-                    minRows={3}
-                    multiline
-                    sx={{
-                      '& .MuiOutlinedInput-input': {
-                        fontSize: 12,
-                      },
-                    }}
-                  />
-
-                  <Box bgcolor={'#D0CEDA'} height={'1px'}></Box>
-                  <Stack
-                    alignItems={'center'}
-                    flexDirection={'row'}
-                    gap={1}
-                    onClick={() => {}}
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    <Icon
-                      component={ICON_DELETE}
-                      sx={{ width: 20, height: 20 }}
-                    />
-                    <Typography color={'#D75B5B'} variant={'body2'}>
-                      Delete
+                }}
+              >
+                <MenuItem>
+                  <Stack gap={1.25} width={200}>
+                    <Typography variant={'body3'}>
+                      Output description (helps Al)
                     </Typography>
+                    <StyledTextField
+                      maxRows={3}
+                      minRows={3}
+                      multiline
+                      sx={{
+                        '& .MuiOutlinedInput-input': {
+                          fontSize: 12,
+                        },
+                      }}
+                    />
+
+                    <Box bgcolor={'#D0CEDA'} height={'1px'}></Box>
+                    <Stack
+                      alignItems={'center'}
+                      flexDirection={'row'}
+                      gap={1}
+                      onClick={() => {}}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <Icon
+                        component={ICON_DELETE}
+                        sx={{ width: 20, height: 20 }}
+                      />
+                      <Typography color={'#D75B5B'} variant={'body2'}>
+                        Delete
+                      </Typography>
+                    </Stack>
                   </Stack>
-                </Stack>
-              </MenuItem>
-            </Menu>
-          </Stack>
-          <Box display={outPuts === 'json' ? 'block' : 'none'}>
+                </MenuItem>
+              </Menu>
+            </Stack>
+          )}
+          {/* <Box display={outPuts === 'json' ? 'block' : 'none'}> */}
+          {!isLoading && outPuts === 'json' && (
             <SlateEditor
-              initialValue={schemaToSlate(schemaJson)}
+              editor={editor}
+              initialValue={schemaJson}
               onEditorReady={handleSchemaEditorReady}
+              onValueChange={setSchemaJsonStr}
               ref={schemaEditorRef}
             />
-          </Box>
+          )}
+          {/* </Box> */}
         </Stack>
       </CollapseCard>
       {/*Run settings*/}

@@ -75,15 +75,15 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
 
     // 调试AI状态
     if (isAiColumn) {
-      console.log('AI Column Debug:', {
-        recordId,
-        columnId,
-        isAiColumn,
-        isAiLoading,
-        isFinished,
-        displayValue,
-        actionKey,
-      });
+      // console.log('AI Column Debug:', {
+      //   recordId,
+      //   columnId,
+      //   isAiColumn,
+      //   isAiLoading,
+      //   isFinished,
+      //   displayValue,
+      //   actionKey,
+      // });
     }
 
     const resolvedMinWidth = width < 100 ? 100 : width;

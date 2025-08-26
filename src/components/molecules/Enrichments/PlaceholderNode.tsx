@@ -64,6 +64,7 @@ export const PlaceholderNode: FC = (props: any) => {
           component={'span'}
           flexDirection={'row'}
           gap={0.5}
+          my={0.5}
           px={1}
           py={0.5}
           sx={{
