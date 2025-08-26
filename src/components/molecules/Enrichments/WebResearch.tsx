@@ -135,7 +135,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       module: 'COLUMN_ENRICHMENT_PROMPT',
       params: {
         userInput: extractPromptText(
-          (tipTapEditorInstance?.getJSON() || []) as DocumentType,
+          (generateEditorInstance?.getJSON() || []) as DocumentType,
           filedMapping,
         ),
         columns: columns.map((item) => item.fieldName).join(','),

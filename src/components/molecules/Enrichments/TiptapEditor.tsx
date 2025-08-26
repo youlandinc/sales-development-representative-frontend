@@ -143,10 +143,12 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
             }, 100);
           }
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('Error setting editor content:', error);
         }
       }
-    }, [JSON.stringify(defaultValue), minHeight]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [JSON.stringify(defaultValue), minHeight, editor]);
 
     useImperativeHandle(ref, () => editor);
 

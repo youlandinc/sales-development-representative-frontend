@@ -1,15 +1,16 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Stack } from '@mui/material';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
 
 import { useWebSocket } from '@/hooks';
+import { useColumnActionCollections } from './hooks';
 
 import { StyledTable } from '@/components/atoms';
 import { WebResearch } from '@/components/molecules';
 
-import { TableColumnMenuEnum } from './index';
+import { FieldDescription, TableColumnMenuEnum } from './index';
 
 import { _fetchTableRowData } from '@/request';
 import { WebSocketTypeEnum } from '@/types';
@@ -36,8 +37,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     updateColumnVisible,
     deleteColumn,
   } = useProspectTableStore((store) => store);
-  const { setOpen } = useWebResearchStore((store) => store);
+  const { setOpen, setSchemaJson, setPrompt } = useWebResearchStore(
+    (store) => store,
+  );
   const { messages, connected } = useWebSocket();
+
+  const { descriptonDialog } = useColumnActionCollections();
 
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
@@ -451,9 +456,32 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           onColumnResize={(fieldId, width) => updateColumnWidth(fieldId, width)}
           onHeaderMenuClick={async ({ type, columnId, value, cb }) => {
             switch (type) {
-              case TableColumnMenuEnum.ai_agent: {
-                console.log(columnId);
+              case TableColumnMenuEnum.edit_column: {
+                const column = columns.find((col) => col.fieldId === columnId);
+                if (!column || column.actionKey !== 'use-ai') {
+                  return;
+                }
+                const schema = column.typeSettings.inputBinding.find(
+                  (item) => item.name === 'answerSchemaType',
+                )?.formulaText;
+                const prompt = column.typeSettings.inputBinding.find(
+                  (item) => item.name === 'prompt',
+                )?.formulaText;
+
+                prompt && setPrompt(prompt);
+                schema && setSchemaJson(schema);
                 setOpen(true);
+                break;
+              }
+              case TableColumnMenuEnum.edit_description: {
+                const column = columns.find((col) => col.fieldId === columnId);
+                if (!column) {
+                  return;
+                }
+                descriptonDialog.handleOpenDescriptionDialog(
+                  columnId,
+                  column.description || '',
+                );
                 break;
               }
               case TableColumnMenuEnum.rename_column: {
@@ -495,6 +523,15 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           await fetchTable(tableId);
         }}
         tableId={tableId}
+      />
+      <FieldDescription
+        cb={async () => {
+          await fetchTable(tableId);
+        }}
+        defaultValue={descriptonDialog.defaultValue}
+        fieldId={descriptonDialog.fieldId}
+        onClose={descriptonDialog.closeDescriptionDialog}
+        open={descriptonDialog.descriptionShow}
       />
     </Stack>
   );

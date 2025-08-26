@@ -426,6 +426,20 @@ export const StyledTable: FC<StyledTableProps> = ({
   const handleHeaderMenuClick = useCallback(
     (item: { label: string; value: TableColumnMenuEnum }) => {
       switch (item.value) {
+        case TableColumnMenuEnum.edit_description: {
+          onHeaderMenuClick?.({
+            type: TableColumnMenuEnum.edit_description,
+            columnId: selectedColumnId,
+          });
+          break;
+        }
+        case TableColumnMenuEnum.edit_column: {
+          onHeaderMenuClick?.({
+            type: TableColumnMenuEnum.edit_column,
+            columnId: selectedColumnId,
+          });
+          break;
+        }
         case TableColumnMenuEnum.ai_agent: {
           onHeaderMenuClick?.({
             type: TableColumnMenuEnum.ai_agent,

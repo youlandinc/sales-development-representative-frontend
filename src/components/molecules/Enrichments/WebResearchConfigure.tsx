@@ -12,34 +12,25 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { Editor } from '@tiptap/core';
-import { ReactEditor } from 'slate-react';
-import { withReact } from 'slate-react';
+import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { createEditor } from 'slate';
-import { v4 as uuidv4 } from 'uuid';
-import { debounce } from 'lodash-es';
+import { ReactEditor, withReact } from 'slate-react';
 
-import {
-  StyledButton,
-  StyledSelect,
-  StyledTextField,
-} from '@/components/atoms';
+import { StyledButton, StyledTextField } from '@/components/atoms';
 import {
   CollapseCard,
   OutputsFields,
   SlateEditor,
   TiptapEditor,
 } from '@/components/molecules';
+import { useVariableFromStore } from '@/hooks';
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 import { useWebResearchStore } from '@/stores/Prospect';
-import { useVariableFromStore } from '@/hooks';
 
 import { extractPromptText, insertWithPlaceholders } from '@/utils';
 
-import { MoreHoriz } from '@mui/icons-material';
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
-import ICON_TEXT from './assets/icon_text.svg';
 import ICON_WARNING from './assets/icon_warning.svg';
 // import { useCompletion } from '@ai-sdk/react';
 import ICON_DELETE from './assets/icon_delete.svg';
@@ -61,10 +52,8 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     setSchemaJson,
     setTipTapEditorInstance,
     setSlateEditorInstance,
-    slateEditorInstance,
   } = useWebResearchStore((state) => state);
   const { filedMapping } = useVariableFromStore();
-  const [index, setIndex] = useState(1);
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -126,7 +115,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       return {};
     }
   }, [schemaJson, transformToObject]);
-  console.log(schemaJson);
+
   /*   const s = ['reasoning', 'evidence', 'confidence', 'didFindData'];
 
   const r = useMemo(
@@ -211,7 +200,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
  */
   return (
     <Stack gap={4}>
-      {/*<Typography>{text}</Typography>*/}
       <Stack gap={0.5}>
         <Typography fontWeight={700} variant={'subtitle1'}>
           Prompt

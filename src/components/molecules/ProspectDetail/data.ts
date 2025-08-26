@@ -1,4 +1,6 @@
 import ICON_COLUMN_USE_AI from './assets/table/icon-column-use-ai.svg';
+import IOCN_COLUMN_EDIT from './assets/table/icon-column-edit.svg';
+import ICON_COLUMN_DESCRIPTION from './assets/table/icon-column-description.svg';
 import ICON_COLUMN_RENAME from './assets/table/icon-column-rename.svg';
 import ICON_COLUMN_HIDE from './assets/table/icon-column-hide.svg';
 import ICON_COLUMN_DELETE from './assets/table/icon-column-delete.svg';
@@ -45,7 +47,7 @@ export const getColumnMenuActions = (
   },
   {
     label: 'Edit column',
-    icon: '',
+    icon: IOCN_COLUMN_EDIT,
     value: TableColumnMenuEnum.edit_column,
   },
   {
@@ -55,7 +57,7 @@ export const getColumnMenuActions = (
   },
   {
     label: 'Edit description',
-    icon: '',
+    icon: ICON_COLUMN_DESCRIPTION,
     value: TableColumnMenuEnum.edit_description,
   },
   {

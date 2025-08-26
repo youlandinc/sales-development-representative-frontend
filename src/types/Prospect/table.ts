@@ -24,6 +24,15 @@ export interface TableColumnProps {
   color: string | null;
   csn: number;
   width: number;
+  typeSettings: {
+    inputBinding: {
+      formulaText: string;
+      name: string;
+    }[];
+    optionalPathsInInputs: {
+      prompt: string[];
+    };
+  };
 }
 
 export interface UpdateTableColumnConfigParams {
