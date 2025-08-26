@@ -212,12 +212,20 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
                 : rowSelected
                   ? '#F7F4FD'
                   : '#fff',
-          borderRight:
-            isPinned && showPinnedRightShadow
-              ? '3px solid #DFDEE6'
-              : '0.5px solid #DFDEE6',
-          borderTop: 'none',
-          borderLeft: 'none',
+          borderRight: isPinned && showPinnedRightShadow ? '3px solid #DFDEE6' :'0.5px solid #DFDEE6',
+          ...(isPinned && showPinnedRightShadow && {
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: -1,
+              right: -3,
+              width: '3px',
+              height: '1px',
+              backgroundColor: '#DFDEE6',
+              zIndex: 10,
+              pointerEvents: 'none',
+            },
+          }),
           boxShadow: (theme) =>
             isActive && !isSelectColumn
               ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
@@ -240,7 +248,6 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         >
           {content}
         </Box>
-        {/* No overlay: the 2px borderRight acts as the separator for the last pinned column */}
       </Stack>
     );
   },
