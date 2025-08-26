@@ -17,7 +17,6 @@ import { Node } from 'slate';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import {
-  FieldDescription,
   SculptingPrompt,
   WebResearchConfigure,
   WebResearchGenerate,
@@ -96,10 +95,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     setSchemaStr,
     (objStr) => {
       setIsLoading(false);
-      setSchemaJson(JSON.parse(objStr));
-      // if (slateEditorInstance) {
-      //   slateEditorInstance.children = schemaToSlate(JSON.parse(objStr));
-      // }
+      setSchemaJson(objStr);
       setTimeout(() => {
         setTab('configure');
       }, 0);
@@ -108,7 +104,6 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const { generatePrompt, isThinking } = useGeneratePrompt(
     setText,
     async (text) => {
-      console.log(text);
       setPrompt(text);
       await generateJson('/sdr/ai/generate', {
         module: 'JSON_SCHEMA_WITH_PROMPT',
@@ -140,7 +135,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       module: 'COLUMN_ENRICHMENT_PROMPT',
       params: {
         userInput: extractPromptText(
-          (generateEditorInstance?.getJSON() || []) as DocumentType,
+          (tipTapEditorInstance?.getJSON() || []) as DocumentType,
           filedMapping,
         ),
         columns: columns.map((item) => item.fieldName).join(','),
@@ -165,7 +160,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         await saveAiConfig(
           tableId,
           extractPromptText(
-            (generateEditorInstance?.getJSON() || []) as DocumentType,
+            (tipTapEditorInstance?.getJSON() || []) as DocumentType,
             filedMapping,
           ) || '',
           slateEditorInstance?.children
@@ -187,7 +182,10 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         setAnchorEl(null);
         const res = await saveAiConfig(
           tableId,
-          tipTapEditorInstance?.getText() || '',
+          extractPromptText(
+            (tipTapEditorInstance?.getJSON() || []) as DocumentType,
+            filedMapping,
+          ) || '',
           slateEditorInstance?.children
             ?.map((n) => Node.string(n))
             .join('\n') || '',
@@ -203,50 +201,6 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     },
     [tipTapEditorInstance, slateEditorInstance, cb],
   );
-
-  useEffect(() => {
-    if (open) {
-      setPrompt(`**CONTEXT:**  
-You are tasked with finding the CEO name of a company using available identifying details.
-
-**OBJECTIVE:**  
-Extract the CEO name of the company identified by {{company_name}}, and use additional columns such as {{first_name}}, {{last_name}}, and {{email}} to improve search accuracy.
-
-**INSTRUCTIONS:**  
-
-1. If the LinkedIn profile URL is provided, extract the CEO name from the appropriate section of the profile.
-2. If the LinkedIn profile is not provided, search LinkedIn or Google using "{{company_name}}" and auxiliary columns (such as {{first_name}}, {{last_name}}, {{email}}) to locate the correct profile, then extract the CEO name from the relevant section.
-3. If LinkedIn profile is not provided, attempt to find the CEO's name on other public company or business pages using auxiliary columns (such as {{first_name}}, {{last_name}}, {{email}}) as additional context.
-4. If multiple profiles are found, deduplicate using auxiliary columns such as {{first_name}}, {{last_name}}, and {{email}}.
-5. If the CEO name cannot be retrieved, return a fallback result in the format: **"No CEO Name information found"**. Only use publicly available information; do not access paywalled or authenticated sources.
-
-**EXAMPLES:**  
-
-Example input:
-
-company_name: Tech Innovators Inc
-
-first_name: John
-
-last_name: Doe
-
-email: john.doe@techinnovators.com
-
-Expected output:
-
-CEO Name: Jane Smith or No CEO Name information found`);
-      setSchemaJson(`{  
-  "type": "object",  
-  "properties": {  
-    "CEO Name": {  
-      "type": "string",  
-      "enum": ["John Doe", "No CEO name information found"]  
-    }  
-  },  
-  "required": ["CEO Name"]  
-}`);
-    }
-  }, [open]);
 
   return (
     <Drawer anchor={'right'} hideBackdrop open={open}>
