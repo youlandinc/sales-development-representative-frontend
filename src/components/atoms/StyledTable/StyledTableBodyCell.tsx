@@ -217,7 +217,8 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
               ? '3px solid #DFDEE6'
               : '0.5px solid #DFDEE6',
           ...(isPinned &&
-            showPinnedRightShadow && !isSelectColumn &&{
+            showPinnedRightShadow &&
+            !isSelectColumn && {
               '&::after': {
                 content: '""',
                 position: 'absolute',

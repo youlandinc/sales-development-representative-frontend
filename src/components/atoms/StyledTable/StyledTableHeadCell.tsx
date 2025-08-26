@@ -49,10 +49,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
-  
-  
+
   const isSelectColumn = header?.column?.id === '__select';
-  
 
   const content = header
     ? flexRender(header.column.columnDef.header, header.getContext())
