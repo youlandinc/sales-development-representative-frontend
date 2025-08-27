@@ -115,7 +115,7 @@ export const LayoutUserInfo = () => {
       >
         <MenuItem onClick={() => onClickToLogout()} sx={{ gap: 1.5 }}>
           <Icon component={ICON_SIDE_LOGOUT} />
-          <Typography variant={'subtitle3'}>Log out</Typography>
+          <Typography variant={'subtitle3'}>Sign out</Typography>
         </MenuItem>
       </Menu>
     </>

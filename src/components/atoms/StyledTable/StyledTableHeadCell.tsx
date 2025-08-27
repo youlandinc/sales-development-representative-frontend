@@ -50,6 +50,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
 
+  const isSelectColumn = header?.column?.id === '__select';
+
   const content = header
     ? flexRender(header.column.columnDef.header, header.getContext())
     : children;
@@ -107,23 +109,16 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         maxWidth: width,
         boxSizing: 'border-box',
         borderRight:
-          isPinned && showPinnedRightShadow
-            ? '0 solid transparent'
+          isPinned && showPinnedRightShadow && !isSelectColumn
+            ? 'none'
             : '0.5px solid #DFDEE6',
-        boxShadow: (theme) => {
-          const shadows: string[] = [];
-          if (isEditing) {
-            shadows.push(`inset 0 0 0 1px ${theme.palette.primary.main}`);
-          }
-          return shadows.length ? shadows.join(', ') : 'none';
-        },
         bgcolor: isActive ? '#F7F4FD' : '#FFFFFF',
         cursor: 'pointer',
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
         '&:hover': {
-          bgcolor: isActive ? '#BBDEFB' : '#F6F6F6',
+          bgcolor: !isEditing ? '#BBDEFB' : '#F6F6F6',
         },
         height: '36px',
         justifyContent: 'center',
@@ -139,8 +134,15 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           minWidth: 0,
-          width: '100%',
+          width:
+            isPinned && showPinnedRightShadow && isEditing
+              ? 'calc(100% - 3px)'
+              : '100%',
           px: 1.5,
+          boxShadow: (theme) =>
+            isEditing
+              ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
+              : 'none',
         }}
       >
         {isEditing ? (
@@ -182,11 +184,14 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
 
       {header &&
         enableResizing !== false &&
-        header.column.getCanResize?.() !== false &&
-        !isEditing && (
+        header.column.getCanResize?.() !== false && (
           <Stack
             onMouseDown={(e) => {
+              if (e.button !== 0) {
+                return;
+              }
               e.stopPropagation();
+              e.preventDefault();
               const handler = header.getResizeHandler?.();
               handler?.(e);
             }}
@@ -204,26 +209,21 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               cursor: 'col-resize',
               zIndex: 4,
               backgroundColor: 'transparent',
+              pointerEvents: 'auto',
               borderRight:
                 isPinned && showPinnedRightShadow
                   ? '3px solid #DFDEE6'
                   : '2px solid transparent',
               transition: 'all 0.2s ease',
               '&:hover': {
-                backgroundColor:
-                  isPinned && showPinnedRightShadow
-                    ? 'transparent'
-                    : 'rgba(25, 118, 210, 0.08)',
+                backgroundColor: 'transparent',
               },
               '&:active': {
-                backgroundColor:
-                  isPinned && showPinnedRightShadow
-                    ? 'transparent'
-                    : 'rgba(25, 118, 210, 0.12)',
+                backgroundColor: 'transparent',
                 borderRight:
                   isPinned && showPinnedRightShadow
-                    ? '3px solid #1565c0'
-                    : '2px solid #1565c0',
+                    ? '3px solid #DFDEE6'
+                    : 'transparent',
               },
               '&::after': {
                 content: '""',

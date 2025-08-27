@@ -1,18 +1,25 @@
 import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
-import { debounce, Icon, Stack, Typography } from '@mui/material';
+import { debounce, Icon, Stack } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
-import ICON_BACK from './assets/header/icon-back.svg';
-import ICON_COLUMN from './assets/header/icon-column.svg';
+import ICON_BACK from './assets/head/icon-back.svg';
+import ICON_COLUMN from './assets/head/icon-column.svg';
 
-import ICON_VIEW from './assets/header/icon-view.svg';
-import ICON_ROW from './assets/header/icon-row.svg';
-import ICON_FILTER from './assets/header/icon-filter.svg';
-import ICON_SEARCH from './assets/header/icon-search.svg';
+import ICON_VIEW from './assets/head/icon-view.svg';
+import ICON_ROW from './assets/head/icon-row.svg';
+import ICON_FILTER from './assets/head/icon-filter.svg';
+import ICON_SEARCH from './assets/head/icon-search.svg';
+
+import {
+  HeadColumnsPanel,
+  HeadFilterPanel,
+  HeadRowsPanel,
+  HeadViewPanel,
+} from './Panel';
 
 interface ProspectDetailHeaderProps {
   tableId: string;
@@ -21,7 +28,7 @@ interface ProspectDetailHeaderProps {
 export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   tableId,
 }) => {
-  const { resetTable, tableName, renameTable, columns } = useProspectTableStore(
+  const { resetTable, tableName, renameTable } = useProspectTableStore(
     (store) => store,
   );
 
@@ -45,10 +52,6 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   useEffect(() => {
     setRename(tableName);
   }, [tableName]);
-
-  const columnsVisible = useMemo(() => {
-    return columns.filter((col) => col.visible).length;
-  }, [columns]);
 
   return (
     <Stack gap={3} pb={1.5} pt={3} px={4}>
@@ -94,78 +97,27 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
       </Stack>
 
       <Stack flexDirection={'row'} gap={1.5} height={32} ml={-1.5}>
-        <Stack
-          sx={{
-            gap: 0.5,
-            px: 1.5,
-            borderRadius: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            cursor: 'pointer',
-            '&:hover': { bgcolor: '#EDEDED' },
-          }}
-        >
-          <Icon component={ICON_VIEW} sx={{ width: 20, height: 20 }} />
-          <Typography fontSize={14}>Default view</Typography>
-        </Stack>
-        <Stack
-          sx={{
-            gap: 0.5,
-            px: 1.5,
-            borderRadius: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            cursor: 'pointer',
-            '&:hover': { bgcolor: '#EDEDED' },
-          }}
-        >
-          <Icon component={ICON_COLUMN} sx={{ width: 20, height: 20 }} />
-          <Typography fontSize={14}>
-            {columnsVisible}/{columns.length} columns
-          </Typography>
-        </Stack>
-        <Stack
-          sx={{
-            gap: 0.5,
-            px: 1.5,
-            borderRadius: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            cursor: 'pointer',
-            '&:hover': { bgcolor: '#EDEDED' },
-          }}
-        >
-          <Icon component={ICON_ROW} sx={{ width: 20, height: 20 }} />
-          <Typography fontSize={14}>0/0 rows</Typography>
-        </Stack>
-        <Stack
-          sx={{
-            gap: 0.5,
-            px: 1.5,
-            borderRadius: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            cursor: 'pointer',
-            '&:hover': { bgcolor: '#EDEDED' },
-          }}
-        >
-          <Icon component={ICON_FILTER} sx={{ width: 20, height: 20 }} />
-          <Typography fontSize={14}>No filters</Typography>
-        </Stack>
-        <Stack
-          sx={{
-            gap: 0.5,
-            px: 1.5,
-            borderRadius: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            cursor: 'pointer',
-            '&:hover': { bgcolor: '#EDEDED' },
-          }}
-        >
-          <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />
-          <Typography fontSize={14}>Search</Typography>
-        </Stack>
+        <HeadViewPanel />
+        <HeadColumnsPanel />
+        <HeadRowsPanel />
+        <HeadFilterPanel />
+
+        {/*<Stack*/}
+        {/*  data-toolbar-button*/}
+        {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
+        {/*  sx={{*/}
+        {/*    gap: 0.5,*/}
+        {/*    px: 1.5,*/}
+        {/*    borderRadius: 1,*/}
+        {/*    flexDirection: 'row',*/}
+        {/*    alignItems: 'center',*/}
+        {/*    cursor: 'pointer',*/}
+        {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
+        {/*  <Typography fontSize={14}>Search</Typography>*/}
+        {/*</Stack>*/}
       </Stack>
     </Stack>
   );
