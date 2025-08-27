@@ -8,13 +8,13 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
+import { debounce } from 'lodash-es';
 
 import { StyledSelect, StyledTextField } from '@/components/atoms';
 
 import { MoreHoriz } from '@mui/icons-material';
 import ICON_TEXT from './assets/icon_text.svg';
 import ICON_DELETE from './assets/icon_delete.svg';
-import { debounce } from 'lodash-es';
 
 type OutputsFieldsProps = {
   fieldName: string;

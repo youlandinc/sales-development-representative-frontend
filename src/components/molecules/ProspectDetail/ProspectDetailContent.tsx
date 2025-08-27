@@ -2,19 +2,18 @@ import { Stack } from '@mui/material';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
-import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
+import {
+  ActiveTypeEnum,
+  useProspectTableStore,
+  useWebResearchStore,
+} from '@/stores/Prospect';
 
 import { useWebSocket } from '@/hooks';
-import { useColumnActionCollections } from './hooks';
 
 import { StyledTable } from '@/components/atoms';
-import { WebResearch } from '@/components/molecules';
+import { DialogEditDescription, WebResearch } from '@/components/molecules';
 
-import {
-  DialogDeleteColumn,
-  FieldDescription,
-  TableColumnMenuEnum,
-} from './index';
+import { DialogDeleteColumn, TableColumnMenuEnum } from './index';
 
 import { _fetchTableRowData } from '@/request';
 import { WebSocketTypeEnum } from '@/types';
@@ -41,11 +40,13 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     openDialog,
     setActiveColumnId,
   } = useProspectTableStore((store) => store);
-  const { setOpen, setSchemaJson, setPrompt, setGenerateDescription } =
-    useWebResearchStore((store) => store);
+  const {
+    setWebResearchVisible,
+    setSchemaJson,
+    setPrompt,
+    setGenerateDescription,
+  } = useWebResearchStore((store) => store);
   const { messages, connected } = useWebSocket();
-
-  const { descriptionDialog } = useColumnActionCollections();
 
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
@@ -434,7 +435,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           columns={columns}
           data={fullData}
           onAddMenuItemClick={(item) => {
-            setOpen(true);
+            setWebResearchVisible(true, ActiveTypeEnum.add);
           }}
           onAiProcess={handleAiProcess}
           onCellClick={(columnId, rowId, data) => {
@@ -485,7 +486,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 metaprompt && setGenerateDescription(metaprompt);
                 // todo : extra params
                 //findParams(column,['answerSchemaType','prompt','metaprompt']
-                setOpen(true);
+                setWebResearchVisible(true, ActiveTypeEnum.edit);
                 break;
               }
               case TableColumnMenuEnum.edit_description: {
@@ -493,10 +494,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 if (!column) {
                   return;
                 }
-                descriptionDialog.handleOpenDescriptionDialog(
-                  columnId,
-                  column.description || '',
-                );
+                openDialog(TableColumnMenuEnum.edit_description);
                 break;
               }
               case TableColumnMenuEnum.rename_column: {
@@ -539,14 +537,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         }}
         tableId={tableId}
       />
-      <FieldDescription
+      <DialogEditDescription
         cb={async () => {
           await fetchTable(tableId);
         }}
-        defaultValue={descriptionDialog.defaultValue}
-        fieldId={descriptionDialog.fieldId}
-        onClose={descriptionDialog.closeDescriptionDialog}
-        open={descriptionDialog.descriptionShow}
       />
 
       <DialogDeleteColumn />
