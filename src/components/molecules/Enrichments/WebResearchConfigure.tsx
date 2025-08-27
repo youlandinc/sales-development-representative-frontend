@@ -103,7 +103,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     }
   }, []);
 
-  const filedsMapping = useMemo(() => {
+  const fieldsMapping: Record<string, any> = useMemo(() => {
     try {
       if (
         schemaJson?.trim() !== '' &&
@@ -123,12 +123,12 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     () =>
       s && (s == null ? void 0 : s.length) > 0
         ? Object.fromEntries(
-            Object.entries(filedsMapping).filter(
+            Object.entries(fieldsMapping).filter(
               ([d, u]) => !(s != null && s.includes(d)),
             ),
           )
-        : filedsMapping,
-    [filedsMapping, s],
+        : fieldsMapping,
+    [fieldsMapping, s],
   );
 
   console.log(r); */
@@ -152,10 +152,10 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   // const a = useMemo(() => {}, [schemaJson]);
 
-  /* const i = useMemo(
+  const i = useMemo(
     () =>
       Object.fromEntries(
-        Object.entries(filedsMapping).map(
+        Object.entries(fieldsMapping).map(
           ([d, { type, description, options, id }]) => [
             d,
             {
@@ -167,11 +167,11 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           ],
         ),
       ),
-    [filedsMapping],
+    [fieldsMapping],
   );
 
   const updateSchema = useCallback(
-    (d, u, m, g, h) => {
+    (d: string, u: string, m: string, g: string, h: string) => {
       const f = Object.fromEntries(
         Object.entries(i).map(([x, y]) => {
           if (x === d) {
@@ -179,7 +179,10 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
             if (u !== d) {
               const A = Object.keys(i);
               let S = 1;
-              for (; A.includes(b); ) (b = `${u}-${S}`), S++;
+              for (; A.includes(b); ) {
+                b = `${u}-${S}`;
+                S++;
+              }
             }
             const w = i[x];
             return [b, { ...w, description: m, options: h, type: g }];
@@ -197,7 +200,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       // }));
     },
     [i],
-  ); */
+  );
 
   return (
     <Stack gap={4}>
@@ -283,7 +286,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           </RadioGroup>
           {outPuts === 'fields' && (
             <Stack gap={1.5}>
-              {Object.entries(filedsMapping).map(([item, config]) => (
+              {Object.entries(fieldsMapping).map(([item, config]) => (
                 <OutputsFields
                   fieldDescription={''}
                   fieldName={item}

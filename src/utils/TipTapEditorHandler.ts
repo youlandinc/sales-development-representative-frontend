@@ -100,5 +100,5 @@ export const extractPromptText = (
   }
 
   walk(doc.content);
-  return JSON.stringify(result.trim());
+  return result.trim();
 };
