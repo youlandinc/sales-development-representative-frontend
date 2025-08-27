@@ -8,10 +8,14 @@ import {
   useWebResearchStore,
 } from '@/stores/Prospect';
 
-import { useWebSocket } from '@/hooks';
+import { useSwitch, useWebSocket } from '@/hooks';
 
 import { StyledTable } from '@/components/atoms';
-import { DialogEditDescription, WebResearch } from '@/components/molecules';
+import {
+  CellDetails,
+  DialogEditDescription,
+  WebResearch,
+} from '@/components/molecules';
 
 import { DialogDeleteColumn, TableColumnMenuEnum } from './index';
 
@@ -47,6 +51,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     setGenerateDescription,
   } = useWebResearchStore((store) => store);
   const { messages, connected } = useWebSocket();
+
+  const { visible, toggle, close } = useSwitch();
+  const [activeCell, setActiveCell] = useState<Record<string, any>>({});
 
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
@@ -440,6 +447,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           onAiProcess={handleAiProcess}
           onCellClick={(columnId, rowId, data) => {
             console.log(columnId, rowId, data);
+            if (data.original?.[columnId]?.externalContent) {
+              setActiveCell(data.original?.[columnId]?.externalContent || {});
+              !visible && toggle();
+              return;
+            }
+            close();
           }}
           onCellEdit={async (recordId, fieldId, value) => {
             setRowsMap((prev) => {
@@ -544,6 +557,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       />
 
       <DialogDeleteColumn />
+      <CellDetails data={activeCell} onClose={toggle} open={visible} />
     </Stack>
   );
 };

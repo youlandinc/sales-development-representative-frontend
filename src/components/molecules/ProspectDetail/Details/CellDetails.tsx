@@ -1,6 +1,8 @@
 import { FC, PropsWithChildren, useMemo, useState } from 'react';
 import {
   Drawer,
+  DrawerProps,
+  Icon,
   IconButton,
   Stack,
   StackProps,
@@ -12,11 +14,13 @@ import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 
 import { useSwitch } from '@/hooks/useSwitch';
 
+import { HttpVariantEnum } from '@/types';
+
 import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SearchIcon from '@mui/icons-material/Search';
-import { HttpVariantEnum } from '@/types';
+import ICON_SPARK from './assets/icon_sparkle.svg';
 
 const mockData = {
   reasoning:
@@ -29,27 +33,53 @@ const mockData = {
   'Phone  Number': '602-793-8888',
 };
 
-const CellItemContainer: FC<PropsWithChildren & StackProps> = ({
-  children,
-  ...rest
-}) => {
+const CellItemContainer: FC<
+  PropsWithChildren & StackProps & { showCopy?: boolean; copyContent?: string }
+> = ({ children, showCopy = true, copyContent, ...rest }) => {
   return (
     <Stack
       alignItems={'center'}
-      bgcolor={'#FFFFFF'}
-      border={'1px solid ##1525431a'}
-      borderRadius={1}
+      bgcolor={'#F8F8FA'}
+      border={'1px solid #E5E5E5'}
+      borderRadius={2}
       flexDirection={'row'}
+      position={'relative'}
       px={1}
       py={0.5}
       sx={{
         cursor: 'pointer',
         userSelect: 'none',
+        '&:hover': {
+          borderColor: '#6E4EFB',
+          bgcolor: '#F7F4FD',
+          '& .icon_copy': {
+            display: 'block',
+          },
+        },
       }}
-      width={'fit-content'}
       {...rest}
     >
       {children}
+      {showCopy && (
+        <ContentCopyIcon
+          className={'icon_copy'}
+          onClick={async () => {
+            await navigator.clipboard.writeText(copyContent || '');
+            SDRToast({
+              message: 'Copied to Clipboard',
+              header: false,
+              variant: 'success' as HttpVariantEnum,
+            });
+          }}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            fontSize: 12,
+            display: 'none',
+          }}
+        />
+      )}
     </Stack>
   );
 };
@@ -74,7 +104,7 @@ export const CellDetailsArray: FC<CellDetailsArrayProps> = ({
             }}
           />
         </IconButton>
-        <CellItemContainer>
+        <CellItemContainer showCopy={false}>
           <Stack
             alignItems={'center'}
             flexDirection={'row'}
@@ -97,7 +127,7 @@ export const CellDetailsArray: FC<CellDetailsArrayProps> = ({
       {visible && (
         <Stack ml={2}>
           {value.map((item, index) => (
-            <CellItemContainer key={index}>
+            <CellItemContainer copyContent={item} key={index}>
               <Typography color={'text.secondary'} variant={'body2'}>
                 {item}
               </Typography>
@@ -109,7 +139,10 @@ export const CellDetailsArray: FC<CellDetailsArrayProps> = ({
   );
 };
 
-export const CellDetails = () => {
+type CellDetailsProps = {
+  data: Record<string, any>;
+} & DrawerProps;
+export const CellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
   const [text, setText] = useState('');
   const [filter, setFilter] = useState('');
   const debounceSearch = useMemo(() => {
@@ -119,7 +152,14 @@ export const CellDetails = () => {
   }, []);
 
   return (
-    <Drawer anchor={'right'} hideBackdrop open>
+    <Drawer
+      anchor={'right'}
+      hideBackdrop
+      sx={{
+        left: 'unset',
+      }}
+      {...rest}
+    >
       <Stack height={'100%'} justifyContent={'space-between'}>
         {/* header */}
         <Stack
@@ -129,16 +169,18 @@ export const CellDetails = () => {
           py={2}
           width={500}
         >
-          {/* <Icon
-            component={ICON_ARROW}
-            onClick={handleClose}
-            sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
-          />
+          {/* <Icon*/}
+          {/*  component={ICON_ARROW}*/}
+          {/*  onClick={handleClose}*/}
+          {/*  sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}*/}
+          {/*/>*/}
           <Icon
             component={ICON_SPARK}
             sx={{ width: 20, height: 20, mr: 0.5 }}
-          /> */}
-          <Typography mr={1}>Cell details</Typography>
+          />
+          <Typography fontWeight={600} mr={1}>
+            Cell details
+          </Typography>
           <StyledButton
             color={'info'}
             endIcon={<ContentCopyIcon sx={{ width: 12, height: 12 }} />}
@@ -156,20 +198,14 @@ export const CellDetails = () => {
             Copy JSON
           </StyledButton>
           <CloseIcon
-            // onClick={handleClose}
+            onClick={() => {
+              rest?.onClose?.({}, 'backdropClick');
+            }}
             sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
           />
         </Stack>
         {/* content */}
-        <Stack
-          bgcolor={'#F5F5F5'}
-          flex={1}
-          gap={1}
-          maxWidth={500}
-          px={3}
-          py={1}
-          width={500}
-        >
+        <Stack flex={1} gap={1.5} maxWidth={500} px={3} py={1} width={500}>
           <StyledTextField
             onChange={(e) => {
               setText(e.target.value);
@@ -187,7 +223,7 @@ export const CellDetails = () => {
             value={text}
             variant={'outlined'}
           />
-          {Object.entries(mockData)
+          {Object.entries(data)
             .filter(([key, value]) => {
               const text = filter.toLowerCase();
               if (Array.isArray(value)) {
@@ -209,15 +245,10 @@ export const CellDetails = () => {
                 );
               }
               return (
-                <CellItemContainer key={key}>
-                  <Stack
-                    flexDirection={'row'}
-                    gap={1}
-                    key={key}
-                    width={'fit-content'}
-                  >
-                    <Typography variant={'subtitle2'}>{key}</Typography>
-                    <Typography color={'text.secondary'} variant={'body2'}>
+                <CellItemContainer copyContent={value} key={key}>
+                  <Stack gap={1} key={key} width={'fit-content'}>
+                    <Typography variant={'body2'}>{key}</Typography>
+                    <Typography color={'text.secondary'} variant={'body3'}>
                       {value}
                     </Typography>
                   </Stack>
