@@ -5,12 +5,11 @@ import useSWR from 'swr';
 import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
 
 import { useWebSocket } from '@/hooks';
-import { useColumnActionCollections } from './hooks';
 
 import { StyledTable } from '@/components/atoms';
-import { WebResearch } from '@/components/molecules';
+import { DialogEditDescription, WebResearch } from '@/components/molecules';
 
-import { FieldDescription, TableColumnMenuEnum } from './index';
+import { TableColumnMenuEnum } from './index';
 
 import { _fetchTableRowData } from '@/request';
 import { WebSocketTypeEnum } from '@/types';
@@ -36,12 +35,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     updateColumnPin,
     updateColumnVisible,
     deleteColumn,
+    setActiveColumnId,
+    openDialog,
   } = useProspectTableStore((store) => store);
   const { setOpen, setSchemaJson, setPrompt, setGenerateDescription } =
     useWebResearchStore((store) => store);
   const { messages, connected } = useWebSocket();
-
-  const { descriptionDialog } = useColumnActionCollections();
 
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
@@ -482,10 +481,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 if (!column) {
                   return;
                 }
-                descriptionDialog.handleOpenDescriptionDialog(
-                  columnId,
-                  column.description || '',
-                );
+                setActiveColumnId(columnId);
+                openDialog(true, TableColumnMenuEnum.edit_description);
                 break;
               }
               case TableColumnMenuEnum.rename_column: {
@@ -528,14 +525,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         }}
         tableId={tableId}
       />
-      <FieldDescription
+      <DialogEditDescription
         cb={async () => {
           await fetchTable(tableId);
         }}
-        defaultValue={descriptionDialog.defaultValue}
-        fieldId={descriptionDialog.fieldId}
-        onClose={descriptionDialog.closeDescriptionDialog}
-        open={descriptionDialog.descriptionShow}
       />
     </Stack>
   );
