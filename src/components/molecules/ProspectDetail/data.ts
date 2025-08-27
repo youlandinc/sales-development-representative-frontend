@@ -66,12 +66,12 @@ export const getColumnMenuActions = (
     value: TableColumnMenuEnum.divider,
   },
   {
-    label: 'Sort A -> Z',
+    label: 'Sort A → Z',
     icon: '',
     value: TableColumnMenuEnum.sort_a_z,
   },
   {
-    label: 'Sort Z -> A',
+    label: 'Sort Z → A',
     icon: '',
     value: TableColumnMenuEnum.sort_z_a,
   },

@@ -140,7 +140,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               : '100%',
           px: 1.5,
           boxShadow: (theme) =>
-            isActive && !isSelectColumn && isEditing
+            isEditing
               ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
               : 'none',
         }}
@@ -187,7 +187,11 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         header.column.getCanResize?.() !== false && (
           <Stack
             onMouseDown={(e) => {
+              if (e.button !== 0) {
+                return;
+              }
               e.stopPropagation();
+              e.preventDefault();
               const handler = header.getResizeHandler?.();
               handler?.(e);
             }}
@@ -205,6 +209,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               cursor: 'col-resize',
               zIndex: 4,
               backgroundColor: 'transparent',
+              pointerEvents: 'auto',
               borderRight:
                 isPinned && showPinnedRightShadow
                   ? '3px solid #DFDEE6'

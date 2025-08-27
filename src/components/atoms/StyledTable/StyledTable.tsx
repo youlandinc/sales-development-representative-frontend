@@ -503,15 +503,28 @@ export const StyledTable: FC<StyledTableProps> = ({
           break;
       }
       setHeaderMenuAnchor(null);
-      setSelectedColumnId('');
-      setHeaderState(null);
     },
     [onHeaderMenuClick, open, selectedColumnId, table],
   );
 
   const handleHeaderClick = useCallback(
     (e: MouseEvent, columnId: string) => {
+      const headerElement = e.currentTarget as HTMLElement;
+      const rect = headerElement.getBoundingClientRect();
+      const clickX = e.clientX;
+      const rightEdge = rect.right;
+
+      if (clickX > rightEdge - 12) {
+        return;
+      }
+
       if (columnSizingInfo.isResizingColumn) {
+        setHeaderState({
+          columnId,
+          isActive: true,
+          isEditing: false,
+          isShowMenu: false,
+        });
         return;
       }
 
@@ -595,7 +608,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   const handleHeaderRightClick = useCallback(
     (e: MouseEvent, columnId: string) => {
       e.preventDefault();
-      if (headerState?.isEditing) {
+      if (columnSizingInfo.isResizingColumn || headerState?.isEditing) {
         return;
       }
       setHeaderState({ columnId, isActive: true, isShowMenu: true });
@@ -603,7 +616,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       setHeaderMenuAnchor(e.currentTarget as HTMLElement);
       setSelectedColumnId(columnId);
     },
-    [headerState],
+    [columnSizingInfo.isResizingColumn, headerState],
   );
 
   const renderContent = useCallback(
@@ -969,8 +982,6 @@ export const StyledTable: FC<StyledTableProps> = ({
             const target = event.target as HTMLElement;
             const isHeaderClick =
               target.closest('[data-table-header]') !== null;
-
-            console.log(headerState);
 
             if (!isHeaderClick) {
               setHeaderState(null);
