@@ -16,7 +16,6 @@ import {
   Paper,
   Popper,
   Stack,
-  Typography,
 } from '@mui/material';
 
 import type {
@@ -33,9 +32,6 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { useSwitch } from '@/hooks';
-
-import { StyledButton, StyledDialog } from '@/components/atoms';
 import {
   getColumnMenuActions,
   TableColumnMenuEnum,
@@ -56,19 +52,16 @@ interface StyledTableProps {
   columns: any[];
   rowIds: string[];
   data: any[];
-  columnDeleting: boolean;
   addMenuItems?: { label: string; value: string }[];
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
   onHeaderMenuClick?: ({
     type,
     columnId,
     value,
-    cb,
   }: {
     type: TableColumnMenuEnum;
     columnId: string;
     value?: any;
-    cb?: () => void;
   }) => void;
   scrolled?: boolean;
   virtualization?: {
@@ -89,7 +82,6 @@ export const StyledTable: FC<StyledTableProps> = ({
   columns,
   rowIds,
   data,
-  columnDeleting,
   addMenuItems,
   onAddMenuItemClick,
   onHeaderMenuClick,
@@ -100,8 +92,6 @@ export const StyledTable: FC<StyledTableProps> = ({
   onAiProcess,
   aiLoading,
 }) => {
-  const { open, visible, close } = useSwitch(false);
-
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
     useState<ColumnSizingInfoState>({} as ColumnSizingInfoState);
@@ -183,7 +173,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           sx={{ p: 0 }}
         />
       ),
-      cell: (info) => info, // 简单返回cell info
+      cell: (info) => info,
       size: 100,
       minSize: 100,
       enableResizing: false,
@@ -443,7 +433,10 @@ export const StyledTable: FC<StyledTableProps> = ({
           break;
         }
         case TableColumnMenuEnum.delete: {
-          open();
+          onHeaderMenuClick?.({
+            type: TableColumnMenuEnum.delete,
+            columnId: selectedColumnId,
+          });
           break;
         }
         default:
@@ -452,7 +445,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       }
       setHeaderMenuAnchor(null);
     },
-    [onHeaderMenuClick, open, selectedColumnId, table],
+    [onHeaderMenuClick, selectedColumnId, table],
   );
 
   const handleHeaderClick = useCallback(
@@ -1020,51 +1013,6 @@ export const StyledTable: FC<StyledTableProps> = ({
             </Paper>
           </ClickAwayListener>
         </Popper>
-
-        <StyledDialog
-          content={
-            <Typography color={'text.secondary'} fontSize={14} my={1.5}>
-              Are you sure you want to delete{' '}
-              <Typography component={'span'} fontWeight={600}>
-                {columns.find((item) => item.fieldId === selectedColumnId)
-                  ?.fieldName || 'this column'}
-              </Typography>
-              ? You can&#39;t undo this.
-            </Typography>
-          }
-          footer={
-            <Stack flexDirection={'row'} gap={3}>
-              <StyledButton
-                color={'info'}
-                onClick={close}
-                size={'medium'}
-                sx={{ width: 68 }}
-                variant={'outlined'}
-              >
-                Cancel
-              </StyledButton>
-              <StyledButton
-                color={'error'}
-                disabled={columnDeleting}
-                loading={columnDeleting}
-                onClick={() => {
-                  onHeaderMenuClick?.({
-                    type: TableColumnMenuEnum.delete,
-                    columnId: selectedColumnId,
-                    cb: () => close(),
-                  });
-                }}
-                size={'medium'}
-                sx={{ width: 68 }}
-              >
-                Delete
-              </StyledButton>
-            </Stack>
-          }
-          header={'Confirm delete column'}
-          onClose={close}
-          open={visible}
-        />
       </Stack>
     </ClickAwayListener>
   );

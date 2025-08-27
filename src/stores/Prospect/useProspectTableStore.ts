@@ -30,7 +30,6 @@ const handleApiError = <T extends Record<string, any>>(
 export type ProspectTableState = {
   tableName: string;
   columns: TableColumnProps[];
-  columnDeleting: boolean;
   activeColumnId: string;
   // dialog
   dialogVisible: boolean;
@@ -50,16 +49,16 @@ export type ProspectTableActions = {
   fetchRowIds: (tableId: string) => Promise<void>;
   // helper
   setActiveColumnId: (columnId: string) => void;
-  openDialog: (state: boolean, type: ProspectTableState['dialogType']) => void;
-  resetDialog: () => void;
+  openDialog: (type: ProspectTableState['dialogType']) => void;
+  closeDialog: () => void;
   // table
   renameTable: (tableId: string, name: string) => Promise<void>;
   // table header
   updateColumnWidth: (fieldId: string, width: number) => Promise<void>;
-  updateColumnName: (fieldId: string, newName: string) => Promise<void>;
+  updateColumnName: (newName: string) => Promise<void>;
   updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
-  updateColumnPin: (fieldId: string, pin: boolean) => Promise<void>;
-  deleteColumn: (fieldId: string, cb?: () => void) => Promise<void>;
+  updateColumnPin: (pin: boolean) => Promise<void>;
+  deleteColumn: () => Promise<void>;
   // table cell
   updateCellValue: (data: {
     tableId: string;
@@ -81,7 +80,6 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     dialogType: null,
     rowIds: [],
     runRecords: null,
-    columnDeleting: false,
     fetchTable: async (tableId) => {
       if (!tableId) {
         return;
@@ -125,10 +123,10 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     setActiveColumnId: (columnId) => {
       set({ activeColumnId: columnId });
     },
-    openDialog: (state, type) => {
-      set({ dialogVisible: state, dialogType: type });
+    openDialog: (type) => {
+      set({ dialogVisible: true, dialogType: type });
     },
-    resetDialog: () => {
+    closeDialog: () => {
       set({ dialogVisible: false, dialogType: null });
     },
     // table header
@@ -148,13 +146,17 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
     },
-    updateColumnName: async (fieldId, newName) => {
-      if (!fieldId || !newName.trim()) {
+    updateColumnName: async (newName) => {
+      const fieldId = get().activeColumnId;
+      const columns = get().columns;
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      const trimmedName = newName.trim();
+      if (!fieldId || !column || !trimmedName) {
         return;
       }
 
-      const trimmedName = newName.trim();
-      const columns = get().columns;
       const updatedColumns = columns.map((col) =>
         col.fieldId === fieldId ? { ...col, fieldName: trimmedName } : col,
       );
@@ -177,17 +179,22 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
 
       set({ columns: updatedColumns });
 
-      //try {
-      //  await _updateTableColumnConfig({ fieldId, visible });
-      //} catch (err) {
-      //  handleApiError<ProspectTableState>(err, { columns }, set);
-      //}
+      try {
+        await _updateTableColumnConfig({ fieldId, visible });
+      } catch (err) {
+        handleApiError<ProspectTableState>(err, { columns }, set);
+      }
     },
-    updateColumnPin: async (fieldId, pin) => {
-      if (!fieldId || !UNotUndefined(pin)) {
+    updateColumnPin: async (pin) => {
+      const fieldId = get().activeColumnId;
+      const columns = get().columns;
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      if (!fieldId || !column || !UNotUndefined(pin)) {
         return;
       }
-      const columns = get().columns;
+
       const updatedColumns = columns.map((col) =>
         col.fieldId === fieldId ? { ...col, pin } : col,
       );
@@ -201,25 +208,23 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
     },
-    deleteColumn: async (fieldId, cb) => {
-      if (!fieldId) {
-        return;
-      }
-      const column = get().columns.find((col) => col.fieldId === fieldId);
-      if (!column) {
-        return;
-      }
+    deleteColumn: async () => {
+      const fieldId = get().activeColumnId;
       const columns = get().columns;
-      const updatedColumns = columns.filter((col) => col.fieldId !== fieldId);
-      set({ columns: updatedColumns, columnDeleting: true });
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      if (!fieldId || !column) {
+        return;
+      }
 
       try {
         await _deleteTableColumn(fieldId);
+        const updatedColumns = columns.filter((col) => col.fieldId !== fieldId);
+        get().closeDialog();
+        set({ columns: updatedColumns });
       } catch (err) {
         handleApiError<ProspectTableState>(err, { columns }, set);
-      } finally {
-        set({ columnDeleting: false });
-        cb?.();
       }
     },
     // table cell

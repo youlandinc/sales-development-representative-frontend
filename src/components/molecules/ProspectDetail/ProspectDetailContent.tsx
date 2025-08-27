@@ -10,7 +10,11 @@ import { useColumnActionCollections } from './hooks';
 import { StyledTable } from '@/components/atoms';
 import { WebResearch } from '@/components/molecules';
 
-import { FieldDescription, TableColumnMenuEnum } from './index';
+import {
+  DialogDeleteColumn,
+  FieldDescription,
+  TableColumnMenuEnum,
+} from './index';
 
 import { _fetchTableRowData } from '@/request';
 import { WebSocketTypeEnum } from '@/types';
@@ -29,13 +33,13 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     rowIds,
     runRecords,
     resetTable,
-    columnDeleting,
     updateCellValue,
     updateColumnWidth,
     updateColumnName,
     updateColumnPin,
     updateColumnVisible,
-    deleteColumn,
+    openDialog,
+    setActiveColumnId,
   } = useProspectTableStore((store) => store);
   const { setOpen, setSchemaJson, setPrompt, setGenerateDescription } =
     useWebResearchStore((store) => store);
@@ -427,7 +431,6 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       {columns.length > 0 && rowIds.length > 0 && (
         <StyledTable
           aiLoading={aiLoadingState}
-          columnDeleting={columnDeleting}
           columns={columns}
           data={fullData}
           onAddMenuItemClick={(item) => {
@@ -453,7 +456,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             await updateCellValue({ tableId, recordId, fieldId, value });
           }}
           onColumnResize={(fieldId, width) => updateColumnWidth(fieldId, width)}
-          onHeaderMenuClick={async ({ type, columnId, value, cb }) => {
+          onHeaderMenuClick={async ({ type, columnId, value }) => {
+            if (!columnId || !columns.find((col) => col.fieldId === columnId)) {
+              return;
+            }
+            setActiveColumnId(columnId);
+
             switch (type) {
               case TableColumnMenuEnum.edit_column: {
                 const column = columns.find((col) => col.fieldId === columnId);
@@ -490,12 +498,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
               }
               case TableColumnMenuEnum.rename_column: {
                 if (value) {
-                  await updateColumnName(columnId, value);
+                  await updateColumnName(value);
                 }
                 break;
               }
               case TableColumnMenuEnum.pin: {
-                await updateColumnPin(columnId, value);
+                await updateColumnPin(value);
                 break;
               }
               case TableColumnMenuEnum.visible: {
@@ -503,7 +511,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 break;
               }
               case TableColumnMenuEnum.delete: {
-                await deleteColumn(columnId, cb);
+                openDialog(TableColumnMenuEnum.delete);
                 break;
               }
               default: {
@@ -537,6 +545,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         onClose={descriptionDialog.closeDescriptionDialog}
         open={descriptionDialog.descriptionShow}
       />
+
+      <DialogDeleteColumn />
     </Stack>
   );
 };
