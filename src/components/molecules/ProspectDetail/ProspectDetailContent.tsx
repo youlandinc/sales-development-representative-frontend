@@ -2,7 +2,11 @@ import { Stack } from '@mui/material';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
-import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
+import {
+  ActiveTypeEnum,
+  useProspectTableStore,
+  useWebResearchStore,
+} from '@/stores/Prospect';
 
 import { useWebSocket } from '@/hooks';
 
@@ -36,8 +40,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     openDialog,
     setActiveColumnId,
   } = useProspectTableStore((store) => store);
-  const { setOpen, setSchemaJson, setPrompt, setGenerateDescription } =
-    useWebResearchStore((store) => store);
+  const {
+    setWebResearchVisible,
+    setSchemaJson,
+    setPrompt,
+    setGenerateDescription,
+  } = useWebResearchStore((store) => store);
   const { messages, connected } = useWebSocket();
 
   const { isLoading: isMetadataLoading } = useSWR(
@@ -427,7 +435,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           columns={columns}
           data={fullData}
           onAddMenuItemClick={(item) => {
-            setOpen(true);
+            setWebResearchVisible(true, ActiveTypeEnum.add);
           }}
           onAiProcess={handleAiProcess}
           onCellEdit={async (recordId, fieldId, value) => {
@@ -475,7 +483,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 metaprompt && setGenerateDescription(metaprompt);
                 // todo : extra params
                 //findParams(column,['answerSchemaType','prompt','metaprompt']
-                setOpen(true);
+                setWebResearchVisible(true, ActiveTypeEnum.edit);
                 break;
               }
               case TableColumnMenuEnum.edit_description: {

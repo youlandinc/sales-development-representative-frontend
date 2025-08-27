@@ -17,10 +17,16 @@ const defaultSchemaJsonStr = `{
     ]
   }`;
 
+export enum ActiveTypeEnum {
+  add = 'add',
+  edit = 'edit',
+}
+
 type WebResearchStoreProps = {
+  activeType: ActiveTypeEnum;
   prompt: string;
   schemaJson: string;
-  open: boolean;
+  webResearchVisible: boolean;
   generateDescription: string;
   excludeFields: string[];
   promptIsEmpty: boolean;
@@ -32,18 +38,18 @@ type WebResearchStoreProps = {
 type WebResearchActions = {
   setPrompt: (prompt: string) => void;
   setSchemaJson: (schemaJson: string) => void;
-  setOpen: (b: boolean) => void;
+  setWebResearchVisible: (open: boolean, activeType: ActiveTypeEnum) => void;
   setGenerateDescription: (description: string) => void;
   allClear: () => void;
   saveAiConfig: (
     tableId: string,
     prompt: string,
     schema: string,
-    geneatePrompt: string,
+    generatePrompt: string,
   ) => Promise<any>;
   setExcludeFields: (fields: string) => void;
   removeExcludeFields: (fields: string) => void;
-  setPromptIsEmpty: (b: boolean) => void;
+  setPromptIsEmpty: (bool: boolean) => void;
   setGenerateEditorInstance: (instance: Editor) => void;
   setTipTapEditorInstance: (instance: Editor) => void;
   setSlateEditorInstance: (instance: ReactEditor) => void;
@@ -52,12 +58,13 @@ type WebResearchActions = {
 export const useWebResearchStore = create<
   WebResearchStoreProps & WebResearchActions
 >()((set, get) => ({
+  activeType: ActiveTypeEnum.add,
   prompt: '',
   promptIsEmpty: true,
   generateDescription: '',
   schemaJson: defaultSchemaJsonStr,
   excludeFields: [],
-  open: false,
+  webResearchVisible: false,
   generateEditorInstance: null,
   tipTapEditorInstance: null,
   slateEditorInstance: null,
@@ -67,9 +74,10 @@ export const useWebResearchStore = create<
   setSchemaJson: (schemaJson: string) => {
     set({ schemaJson });
   },
-  setOpen: (open: boolean) => {
+  setWebResearchVisible: (open: boolean, activeType: ActiveTypeEnum) => {
     set({
-      open,
+      webResearchVisible: open,
+      activeType,
     });
   },
   setGenerateDescription: (description: string) => {
@@ -88,7 +96,7 @@ export const useWebResearchStore = create<
     tableId: string,
     prompt: string,
     schema: string,
-    geneatePrompt: string,
+    generatePrompt: string,
   ) => {
     try {
       return await _saveWebResearchConfig(
@@ -96,7 +104,7 @@ export const useWebResearchStore = create<
         prompt,
         schema,
         get().excludeFields.map((item) => [item]),
-        geneatePrompt,
+        generatePrompt,
       );
     } catch (err) {
       const { message, header, variant } = err as HttpError;
@@ -126,8 +134,4 @@ export const useWebResearchStore = create<
   setSlateEditorInstance: (instance: ReactEditor) => {
     set({ slateEditorInstance: instance });
   },
-  // removedField: (key: string) => {
-  //   const { properties, ...rest } = get().schemaJson;
-  //   const { key, ...others } = properties;
-  // },
 }));

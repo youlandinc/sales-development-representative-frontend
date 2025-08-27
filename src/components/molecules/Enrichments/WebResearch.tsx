@@ -12,8 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { DocumentType } from '@tiptap/core';
-import { FC, useEffect, useState } from 'react';
-import { Node } from 'slate';
+import { FC, useState } from 'react';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import {
@@ -24,11 +23,15 @@ import {
 
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 
-import { useProspectTableStore, useWebResearchStore } from '@/stores/Prospect';
+import {
+  ActiveTypeEnum,
+  useProspectTableStore,
+  useWebResearchStore,
+} from '@/stores/Prospect';
 
 import { COINS_PER_ROW } from '@/constant';
 import { useAsyncFn, useVariableFromStore } from '@/hooks';
-import { columnRun } from '@/request';
+import { columnRun, updateWebResearchConfig } from '@/request';
 import { HttpError } from '@/types';
 import { extractPromptText } from '@/utils';
 import CloseIcon from '@mui/icons-material/Close';
@@ -70,7 +73,9 @@ type WebResearchProps = {
 };
 
 export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
-  const { columns, rowIds } = useProspectTableStore((store) => store);
+  const { columns, rowIds, activeColumnId } = useProspectTableStore(
+    (store) => store,
+  );
   const [tab, setTab] = useState<'generate' | 'configure'>('generate');
   const [text, setText] = useState('');
   const [schemaStr, setSchemaStr] = useState('');
@@ -78,9 +83,10 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
+    activeType,
     setPrompt,
-    open,
-    setOpen,
+    webResearchVisible,
+    setWebResearchVisible,
     schemaJson,
     setSchemaJson,
     allClear,
@@ -115,7 +121,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   );
 
   const handleClose = () => {
-    setOpen(false);
+    setWebResearchVisible(false, activeType);
     setTab('generate');
     allClear();
     setAnchorEl(null);
@@ -153,7 +159,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     }
   });
 
-  const [state, saveDonotRun] = useAsyncFn(
+  const [state, saveDoNotRun] = useAsyncFn(
     async (tableId: string) => {
       try {
         setAnchorEl(null);
@@ -180,6 +186,39 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       slateEditorInstance,
       schemaJson,
       generateEditorInstance,
+    ],
+  );
+  const [updateState, updateAiConfig] = useAsyncFn(
+    async (tableId: string) => {
+      try {
+        setAnchorEl(null);
+        await updateWebResearchConfig({
+          tableId,
+          fieldId: activeColumnId,
+          prompt:
+            extractPromptText(
+              (tipTapEditorInstance?.getJSON() || []) as DocumentType,
+              filedMapping,
+            ) || '',
+          schema: schemaJson,
+          generatePrompt:
+            extractPromptText(
+              (generateEditorInstance?.getJSON() || []) as DocumentType,
+              filedMapping,
+            ) || '',
+        });
+      } catch (err) {
+        const { header, message, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+        return Promise.reject(err);
+      }
+    },
+    [
+      tipTapEditorInstance,
+      slateEditorInstance,
+      schemaJson,
+      generateEditorInstance,
+      activeColumnId,
     ],
   );
 
@@ -218,7 +257,7 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   );
 
   return (
-    <Drawer anchor={'right'} hideBackdrop open={open}>
+    <Drawer anchor={'right'} hideBackdrop open={webResearchVisible}>
       <Stack gap={4} height={'100%'} justifyContent={'space-between'}>
         {/* header */}
         <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>
@@ -332,7 +371,9 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
                 sx={{ width: 12, height: 12, '& path': { fill: '#fff' } }}
               />
             }
-            loading={state.loading || saveAndRunState.loading}
+            loading={
+              state.loading || saveAndRunState.loading || updateState.loading
+            }
             onClick={(e) => {
               setAnchorEl(e.currentTarget);
             }}
@@ -376,7 +417,12 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
             <MenuItem
               onClick={async () => {
                 try {
-                  await saveDonotRun(tableId);
+                  if (activeType === ActiveTypeEnum.add) {
+                    await saveDoNotRun(tableId);
+                  }
+                  if (activeType === ActiveTypeEnum.edit) {
+                    await updateAiConfig(tableId);
+                  }
                   await cb?.();
                   handleClose();
                 } catch (err) {

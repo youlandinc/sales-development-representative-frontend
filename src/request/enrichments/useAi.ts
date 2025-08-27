@@ -1,4 +1,4 @@
-import { post } from '../request';
+import { patch, post } from '../request';
 
 export const generatePrompt = (api: string, param: Record<string, any>) => {
   return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${api}`, {
@@ -35,7 +35,7 @@ export const _saveWebResearchConfig = (
   prompt: string,
   schema: string,
   excludeFields: string[][],
-  geneatePrompt: string,
+  generatePrompt: string,
 ) => {
   return post<string>('/sdr/prospect/table/field', {
     tableId,
@@ -57,12 +57,43 @@ export const _saveWebResearchConfig = (
         //generate prompt
         {
           name: 'metaprompt',
-          formulaText: geneatePrompt,
+          formulaText: generatePrompt,
         },
       ],
       optionalPathsInInputs: {
         prompt: excludeFields,
       },
+    },
+  });
+};
+
+export const updateWebResearchConfig = (param: {
+  tableId: string;
+  fieldId: string;
+  prompt: string;
+  schema: string;
+  generatePrompt: string;
+}) => {
+  return patch('/sdr/prospect/table/aiField', {
+    tableId: param.tableId,
+    fieldId: param.fieldId,
+    typeSettings: {
+      inputBinding: [
+        {
+          name: 'prompt',
+          formulaText: param.prompt,
+        },
+        //configure schema
+        {
+          name: 'answerSchemaType',
+          formulaText: param.schema,
+        },
+        //generate prompt
+        {
+          name: 'metaprompt',
+          formulaText: param.generatePrompt,
+        },
+      ],
     },
   });
 };
