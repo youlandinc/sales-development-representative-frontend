@@ -13,6 +13,7 @@ import {
   _updateTableColumnConfig,
 } from '@/request';
 import { UNotUndefined } from '@/utils';
+import { TableColumnMenuEnum } from '@/components/molecules';
 
 const handleApiError = <T extends Record<string, any>>(
   err: unknown,
@@ -30,6 +31,14 @@ export type ProspectTableState = {
   tableName: string;
   columns: TableColumnProps[];
   columnDeleting: boolean;
+  activeColumnId: string;
+  // dialog
+  dialogVisible: boolean;
+  dialogType:
+    | TableColumnMenuEnum.edit_description
+    | TableColumnMenuEnum.delete
+    | null;
+
   rowIds: string[];
   runRecords: {
     [key: string]: { recordIds: string[]; isAll: boolean };
@@ -39,6 +48,10 @@ export type ProspectTableState = {
 export type ProspectTableActions = {
   fetchTable: (tableId: string) => Promise<void>;
   fetchRowIds: (tableId: string) => Promise<void>;
+  // helper
+  setActiveColumnId: (columnId: string) => void;
+  openDialog: (state: boolean, type: ProspectTableState['dialogType']) => void;
+  resetDialog: () => void;
   // table
   renameTable: (tableId: string, name: string) => Promise<void>;
   // table header
@@ -63,6 +76,9 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
   (set, get) => ({
     tableName: '',
     columns: [],
+    activeColumnId: '',
+    dialogVisible: false,
+    dialogType: null,
     rowIds: [],
     runRecords: null,
     columnDeleting: false,
@@ -105,6 +121,15 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       } catch (err) {
         handleApiError<ProspectTableState>(err, { tableName }, set);
       }
+    },
+    setActiveColumnId: (columnId) => {
+      set({ activeColumnId: columnId });
+    },
+    openDialog: (state, type) => {
+      set({ dialogVisible: state, dialogType: type });
+    },
+    resetDialog: () => {
+      set({ dialogVisible: false, dialogType: null });
     },
     // table header
     updateColumnWidth: async (fieldId: string, width: number) => {
