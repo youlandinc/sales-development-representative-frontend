@@ -24,7 +24,7 @@ type DialogEditDescriptionProps = {
 export const DialogEditDescription: FC<DialogEditDescriptionProps> = ({
   cb,
 }) => {
-  const { columns, activeColumnId, dialogType, resetDialog } =
+  const { columns, activeColumnId, dialogType, closeDialog } =
     useProspectTableStore((store) => store);
 
   const column = columns.find((col) => col.fieldId === activeColumnId);
@@ -41,7 +41,7 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = ({
           description,
         });
         await cb?.();
-        resetDialog();
+        closeDialog();
       } catch (error) {
         const { message, header, variant } = error as HttpError;
         SDRToast({ message, header, variant });
@@ -51,7 +51,7 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = ({
   );
 
   const handleClose = () => {
-    resetDialog();
+    closeDialog();
     setDescription('');
   };
 

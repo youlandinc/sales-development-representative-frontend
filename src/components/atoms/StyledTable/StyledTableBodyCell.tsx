@@ -218,11 +218,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       (e: MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
         onCellClick(columnId, recordId, cell?.row);
-        if (canInteract) {
+        if (canInteract || isAiColumn) {
           tableMeta?.setCellMode?.(recordId, columnId, 'active');
         }
       },
-      [cell, onCellClick, recordId, columnId, canInteract, tableMeta],
+      [cell, onCellClick, recordId, columnId, canInteract, isAiColumn, tableMeta],
     );
 
     const handleDoubleClick = useCallback(
@@ -282,7 +282,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
               : 'none',
           height: '100%',
           justifyContent: 'center',
-          cursor: canInteract ? 'pointer' : 'default',
+          cursor: canInteract || isAiColumn ? 'pointer' : 'default',
         }}
       >
         <Box
