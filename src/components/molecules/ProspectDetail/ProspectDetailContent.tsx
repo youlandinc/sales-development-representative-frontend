@@ -472,6 +472,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 prompt && setPrompt(prompt);
                 schema && setSchemaJson(schema);
                 metaprompt && setGenerateDescription(metaprompt);
+                // todo : extra params
+                //findParams(column,['answerSchemaType','prompt','metaprompt']
                 setOpen(true);
                 break;
               }

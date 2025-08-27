@@ -9,8 +9,15 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box, CircularProgress, InputBase, Stack } from '@mui/material';
-import { Cell, flexRender } from '@tanstack/react-table';
+import {
+  Box,
+  Checkbox,
+  CircularProgress,
+  InputBase,
+  Stack,
+} from '@mui/material';
+import { Cell } from '@tanstack/react-table';
+import { useRowHover } from './StyledTableBodyRow';
 
 interface StyledTableBodyCellProps {
   cell?: Cell<any, unknown>;
@@ -23,6 +30,7 @@ interface StyledTableBodyCellProps {
   isActive?: boolean;
   rowSelected?: boolean;
   showPinnedRightShadow?: boolean;
+  hasActiveInRow?: boolean;
 }
 
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
@@ -36,18 +44,24 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     isActive: _isActive,
     rowSelected = false,
     showPinnedRightShadow,
+    hasActiveInRow = false,
   }) => {
     const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
     const value = cell?.getValue();
     const displayValue = value != null ? String(value) : '';
     const isSelectColumn = cell?.column?.id === '__select';
+    const isSelectAll =
+      (cell?.column?.columnDef?.meta as any)?.selectedColumnId === columnId;
 
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [localEditValue, setLocalEditValue] = useState<string>('');
 
     const tableMeta = cell?.getContext?.()?.table?.options?.meta as any;
+
+    const { isRowHovered } = useRowHover();
+
     const canEdit = tableMeta?.canEdit?.(recordId, columnId) ?? true;
     const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
     const isFinished = tableMeta?.isFinished?.(recordId, columnId) ?? false;
@@ -143,7 +157,32 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         );
       }
       if (cell && isSelectColumn) {
-        return flexRender(cell.column.columnDef.cell, cell.getContext());
+        const label = `${cell.row.index + 1}`;
+        const checked = cell.row.getIsSelected?.() ?? false;
+
+        return (
+          <Stack
+            flexDirection={'row'}
+            sx={{
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <Box display={checked || isRowHovered ? 'none' : 'block'}>
+              {label}
+            </Box>
+            <Box display={checked || isRowHovered ? 'block' : 'none'}>
+              <Checkbox
+                checked={checked}
+                onChange={(e, next) => cell.row.toggleSelected?.(next)}
+                onClick={(e) => e.stopPropagation()}
+                size={'small'}
+                sx={{ p: 0 }}
+              />
+            </Box>
+          </Stack>
+        );
       }
       if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
         return (
@@ -164,12 +203,13 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       cell,
       isSelectColumn,
       canEdit,
-      localEditValue,
-      handleEditStop,
       isAiColumn,
       isAiLoading,
       displayValue,
       isFinished,
+      handleEditStop,
+      localEditValue,
+      isRowHovered,
     ]);
 
     const handleClick = useCallback(
@@ -209,9 +249,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
               ? '#F7F4FD'
               : isActive && !isSelectColumn
                 ? '#F7F4FD'
-                : rowSelected
+                : isSelectColumn && hasActiveInRow // select列：当同行有active时显示背景色
                   ? '#F7F4FD'
-                  : '#fff',
+                  : rowSelected || isSelectAll
+                    ? '#F7F4FD'
+                    : '#fff',
           borderRight:
             isPinned && showPinnedRightShadow && !isSelectColumn
               ? '3px solid #DFDEE6'

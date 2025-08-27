@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 import {
-  Box,
   Checkbox,
   ClickAwayListener,
   Divider,
@@ -174,69 +173,17 @@ export const StyledTable: FC<StyledTableProps> = ({
   const reducedColumns = useMemo(() => {
     const selectCol = columnHelper.display({
       id: '__select',
-      header: () => {
-        const total = rowIds.length;
-        const selectedCount = rowIds.reduce(
-          (acc, id) => acc + (rowSelection[id] ? 1 : 0),
-          0,
-        );
-        const allChecked = total > 0 && selectedCount === total;
-        const someChecked = selectedCount > 0 && selectedCount < total;
-        return (
-          <Checkbox
-            checked={allChecked}
-            indeterminate={someChecked}
-            onChange={(e, checked) => {
-              if (checked) {
-                const next: RowSelectionState = {};
-                for (const id of rowIds) {
-                  next[id] = true;
-                }
-                setRowSelection(next);
-              } else {
-                setRowSelection({});
-              }
-            }}
-            onClick={(e) => e.stopPropagation()}
-            size={'small'}
-            sx={{ p: 0 }}
-          />
-        );
-      },
-      cell: (info) => {
-        const label = `${info.row.index + 1}`;
-        const checked = info.row.getIsSelected?.() ?? false;
-        return (
-          <Stack
-            flexDirection={'row'}
-            sx={{
-              position: 'relative',
-              '.row-index': {
-                display: checked ? 'none' : 'block',
-              },
-              '.row-checkbox': {
-                display: checked ? 'flex' : 'none',
-              },
-              '&:hover .row-index': { display: 'none' },
-              '&:hover .row-checkbox': { display: 'flex' },
-            }}
-            width={'100%'}
-          >
-            <Box className="row-index" lineHeight={1}>
-              {label}
-            </Box>
-            <Box className="row-checkbox" display={'none'}>
-              <Checkbox
-                checked={checked}
-                onChange={(e, next) => info.row.toggleSelected?.(next)}
-                onClick={(e) => e.stopPropagation()}
-                size={'small'}
-                sx={{ p: 0 }}
-              />
-            </Box>
-          </Stack>
-        );
-      },
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={table.getIsSomePageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+          onClick={(e) => e.stopPropagation()}
+          size={'small'}
+          sx={{ p: 0 }}
+        />
+      ),
+      cell: (info) => info, // 简单返回cell info
       size: 100,
       minSize: 100,
       enableResizing: false,
@@ -258,13 +205,14 @@ export const StyledTable: FC<StyledTableProps> = ({
             actionKey: column.actionKey,
             fieldType: column.fieldType,
             column: column,
+            selectedColumnId,
           },
         },
       ),
     );
 
     return [selectCol, ...rest];
-  }, [columns, rowIds, rowSelection]);
+  }, [columns, selectedColumnId]);
 
   const table = useReactTable({
     data: data,
@@ -812,10 +760,25 @@ export const StyledTable: FC<StyledTableProps> = ({
                       (cell.row.original as any)?.__loading,
                     );
 
+                    // 检查同行是否有active cell（用于select列背景色）
+                    const hasActiveInRow =
+                      cell.column.id === '__select' &&
+                      (table.options.meta as any)?.isActive
+                        ? reducedColumns.some(
+                            (col) =>
+                              col.id !== '__select' &&
+                              (table.options.meta as any).isActive(
+                                String(cell.row.id),
+                                String(col.id),
+                              ),
+                          )
+                        : false;
+
                     return (
                       <StyledTableBodyCell
                         cell={cell}
                         editValue={cell?.getValue()}
+                        hasActiveInRow={hasActiveInRow}
                         isActive={(table.options.meta as any)?.isActive?.(
                           String(cell.row.id),
                           String(cell.column.id),
@@ -857,10 +820,25 @@ export const StyledTable: FC<StyledTableProps> = ({
                       (cell.row.original as any)?.__loading,
                     );
 
+                    // 检查同行是否有active cell（用于select列背景色）
+                    const hasActiveInRow =
+                      cell.column.id === '__select' &&
+                      (table.options.meta as any)?.isActive
+                        ? reducedColumns.some(
+                            (col) =>
+                              col.id !== '__select' &&
+                              (table.options.meta as any).isActive(
+                                String(cell.row.id),
+                                String(col.id),
+                              ),
+                          )
+                        : false;
+
                     return (
                       <StyledTableBodyCell
                         cell={cell}
                         editValue={cell?.getValue()}
+                        hasActiveInRow={hasActiveInRow}
                         isActive={(table.options.meta as any)?.isActive?.(
                           String(cell.row.id),
                           String(cell.column.id),
@@ -914,172 +892,180 @@ export const StyledTable: FC<StyledTableProps> = ({
   );
 
   return (
-    <Stack
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        minHeight: 0,
-        position: 'relative',
+    <ClickAwayListener
+      onClickAway={() => {
+        setAddMenuAnchor(null);
+        setHeaderMenuAnchor(null);
+        setSelectedColumnId('');
       }}
     >
-      <StyledTableContainer
-        onVisibleRangeChange={virtualization?.onVisibleRangeChange}
-        renderContent={renderContent}
-        rowHeight={rowHeight}
-        scrollContainer={virtualization?.scrollContainer}
-        table={table}
-      />
-
-      <Popper
-        anchorEl={addMenuAnchor}
-        open={Boolean(addMenuAnchor)}
-        placement="bottom-start"
-        sx={{ zIndex: 1300 }}
+      <Stack
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          minHeight: 0,
+          position: 'relative',
+        }}
       >
-        <ClickAwayListener onClickAway={() => setAddMenuAnchor(null)}>
-          <Paper
-            sx={{
-              boxShadow: 2,
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              minWidth: 120,
-            }}
-          >
-            <Stack>
-              {addMenuItems_.map((item) => (
-                <MenuItem
-                  key={item.value}
-                  onClick={() => handleAddMenuClick(item)}
-                  sx={{
-                    minHeight: 'auto',
-                    py: 1,
-                    px: 2,
-                    fontSize: 14,
-                  }}
-                >
-                  {item.label}
-                </MenuItem>
-              ))}
-            </Stack>
-          </Paper>
-        </ClickAwayListener>
-      </Popper>
+        <StyledTableContainer
+          onVisibleRangeChange={virtualization?.onVisibleRangeChange}
+          renderContent={renderContent}
+          rowHeight={rowHeight}
+          scrollContainer={virtualization?.scrollContainer}
+          table={table}
+        />
 
-      <Popper
-        anchorEl={headerMenuAnchor}
-        open={
-          Boolean(headerMenuAnchor) &&
-          !headerState?.isEditing &&
-          !!headerState?.isActive
-        }
-        placement="bottom-start"
-        sx={{ zIndex: 1300 }}
-      >
-        <ClickAwayListener
-          onClickAway={(event) => {
-            const target = event.target as HTMLElement;
-            const isHeaderClick =
-              target.closest('[data-table-header]') !== null;
-
-            if (!isHeaderClick) {
-              setHeaderState(null);
-              setHeaderMenuAnchor(null);
-              setSelectedColumnId('');
-            }
-          }}
+        <Popper
+          anchorEl={addMenuAnchor}
+          open={Boolean(addMenuAnchor)}
+          placement="bottom-start"
+          sx={{ zIndex: 1300 }}
         >
-          <Paper
-            sx={{
-              boxShadow: 2,
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              minWidth: 260,
+          <ClickAwayListener onClickAway={() => setAddMenuAnchor(null)}>
+            <Paper
+              sx={{
+                boxShadow: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                minWidth: 120,
+              }}
+            >
+              <Stack>
+                {addMenuItems_.map((item) => (
+                  <MenuItem
+                    key={item.value}
+                    onClick={() => handleAddMenuClick(item)}
+                    sx={{
+                      minHeight: 'auto',
+                      py: 1,
+                      px: 2,
+                      fontSize: 14,
+                    }}
+                  >
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </Stack>
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
+
+        <Popper
+          anchorEl={headerMenuAnchor}
+          open={
+            Boolean(headerMenuAnchor) &&
+            !headerState?.isEditing &&
+            !!headerState?.isActive
+          }
+          placement="bottom-start"
+          sx={{ zIndex: 1300 }}
+        >
+          <ClickAwayListener
+            onClickAway={(event) => {
+              const target = event.target as HTMLElement;
+              const isHeaderClick =
+                target.closest('[data-table-header]') !== null;
+
+              if (!isHeaderClick) {
+                setHeaderState(null);
+                setHeaderMenuAnchor(null);
+                setSelectedColumnId('');
+              }
             }}
           >
-            <Stack gap={0}>
-              {getColumnMenuActions(
-                columnPinning!.left!.includes(selectedColumnId),
-              ).map((item) => {
-                if (item.value !== TableColumnMenuEnum.divider) {
-                  return (
-                    <MenuItem
-                      key={item.label}
-                      onClick={() => handleHeaderMenuClick(item)}
-                      sx={{
-                        minHeight: 'auto',
-                        px: 2,
-                        fontSize: 14,
-                        py: 1,
-                        alignItems: 'center',
-                        gap: 1,
-                      }}
-                    >
-                      {item.icon && (
-                        <Icon
-                          component={item.icon}
-                          sx={{ width: 16, height: 16 }}
-                        />
-                      )}
-                      {item.label}
-                    </MenuItem>
-                  );
-                }
-                return (
-                  <Divider key={item.label} sx={{ margin: '0 !important' }} />
-                );
-              })}
-            </Stack>
-          </Paper>
-        </ClickAwayListener>
-      </Popper>
-
-      <StyledDialog
-        content={
-          <Typography color={'text.secondary'} fontSize={14} my={1.5}>
-            Are you sure you want to delete{' '}
-            <Typography component={'span'} fontWeight={600}>
-              {columns.find((item) => item.fieldId === selectedColumnId)
-                ?.fieldName || 'this column'}
-            </Typography>
-            ? You can&#39;t undo this.
-          </Typography>
-        }
-        footer={
-          <Stack flexDirection={'row'} gap={3}>
-            <StyledButton
-              color={'info'}
-              onClick={close}
-              size={'medium'}
-              sx={{ width: 68 }}
-              variant={'outlined'}
-            >
-              Cancel
-            </StyledButton>
-            <StyledButton
-              color={'error'}
-              disabled={columnDeleting}
-              loading={columnDeleting}
-              onClick={() => {
-                onHeaderMenuClick?.({
-                  type: TableColumnMenuEnum.delete,
-                  columnId: selectedColumnId,
-                  cb: () => close(),
-                });
+            <Paper
+              sx={{
+                boxShadow: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                minWidth: 260,
               }}
-              size={'medium'}
-              sx={{ width: 68 }}
             >
-              Delete
-            </StyledButton>
-          </Stack>
-        }
-        header={'Confirm delete column'}
-        onClose={close}
-        open={visible}
-      />
-    </Stack>
+              <Stack gap={0}>
+                {getColumnMenuActions(
+                  columnPinning!.left!.includes(selectedColumnId),
+                ).map((item) => {
+                  if (item.value !== TableColumnMenuEnum.divider) {
+                    return (
+                      <MenuItem
+                        key={item.label}
+                        onClick={() => handleHeaderMenuClick(item)}
+                        sx={{
+                          minHeight: 'auto',
+                          px: 2,
+                          fontSize: 14,
+                          py: 1,
+                          alignItems: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        {item.icon && (
+                          <Icon
+                            component={item.icon}
+                            sx={{ width: 16, height: 16 }}
+                          />
+                        )}
+                        {item.label}
+                      </MenuItem>
+                    );
+                  }
+                  return (
+                    <Divider key={item.label} sx={{ margin: '0 !important' }} />
+                  );
+                })}
+              </Stack>
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
+
+        <StyledDialog
+          content={
+            <Typography color={'text.secondary'} fontSize={14} my={1.5}>
+              Are you sure you want to delete{' '}
+              <Typography component={'span'} fontWeight={600}>
+                {columns.find((item) => item.fieldId === selectedColumnId)
+                  ?.fieldName || 'this column'}
+              </Typography>
+              ? You can&#39;t undo this.
+            </Typography>
+          }
+          footer={
+            <Stack flexDirection={'row'} gap={3}>
+              <StyledButton
+                color={'info'}
+                onClick={close}
+                size={'medium'}
+                sx={{ width: 68 }}
+                variant={'outlined'}
+              >
+                Cancel
+              </StyledButton>
+              <StyledButton
+                color={'error'}
+                disabled={columnDeleting}
+                loading={columnDeleting}
+                onClick={() => {
+                  onHeaderMenuClick?.({
+                    type: TableColumnMenuEnum.delete,
+                    columnId: selectedColumnId,
+                    cb: () => close(),
+                  });
+                }}
+                size={'medium'}
+                sx={{ width: 68 }}
+              >
+                Delete
+              </StyledButton>
+            </Stack>
+          }
+          header={'Confirm delete column'}
+          onClose={close}
+          open={visible}
+        />
+      </Stack>
+    </ClickAwayListener>
   );
 };
