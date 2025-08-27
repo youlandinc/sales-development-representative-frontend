@@ -226,19 +226,39 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     async (tableId: string, recordCount: number) => {
       try {
         setAnchorEl(null);
-        const res = await saveAiConfig(
-          tableId,
-          extractPromptText(
-            (tipTapEditorInstance?.getJSON() || []) as DocumentType,
-            filedMapping,
-          ) || '',
-          schemaJson,
-          extractPromptText(
-            (generateEditorInstance?.getJSON() || []) as DocumentType,
-            filedMapping,
-          ) || '',
-        );
-        await run(res.data, recordCount);
+        if (activeType === ActiveTypeEnum.edit) {
+          await updateWebResearchConfig({
+            tableId,
+            fieldId: activeColumnId,
+            prompt:
+              extractPromptText(
+                (tipTapEditorInstance?.getJSON() || []) as DocumentType,
+                filedMapping,
+              ) || '',
+            schema: schemaJson,
+            generatePrompt:
+              extractPromptText(
+                (generateEditorInstance?.getJSON() || []) as DocumentType,
+                filedMapping,
+              ) || '',
+          });
+          await run(activeColumnId, recordCount);
+        }
+        if (activeType === ActiveTypeEnum.add) {
+          const res = await saveAiConfig(
+            tableId,
+            extractPromptText(
+              (tipTapEditorInstance?.getJSON() || []) as DocumentType,
+              filedMapping,
+            ) || '',
+            schemaJson,
+            extractPromptText(
+              (generateEditorInstance?.getJSON() || []) as DocumentType,
+              filedMapping,
+            ) || '',
+          );
+          await run(res.data, recordCount);
+        }
         await cb?.();
         handleClose();
       } catch (err) {
@@ -253,6 +273,8 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
       cb,
       schemaJson,
       generateEditorInstance,
+      activeType,
+      activeColumnId,
     ],
   );
 
@@ -402,13 +424,21 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
               },
             }}
           >
-            <MenuItem onClick={() => saveAndRun(tableId, 10)}>
+            <MenuItem
+              onClick={() => {
+                saveAndRun(tableId, 10);
+              }}
+            >
               <Typography color={'text.secondary'} variant={'body2'}>
                 Save and run 10 rows
               </Typography>
               <CostCoins bgcolor={'#EFE9FB'} count={`~${COINS_PER_ROW * 10}`} />
             </MenuItem>
-            <MenuItem onClick={() => saveAndRun(tableId, rowIds.length)}>
+            <MenuItem
+              onClick={() => {
+                saveAndRun(tableId, rowIds.length);
+              }}
+            >
               <Typography color={'text.secondary'} variant={'body2'}>
                 Save and run {rowIds.length} rows in this view
               </Typography>

@@ -209,7 +209,7 @@ export const CellDetails = () => {
                 );
               }
               return (
-                <CellItemContainer>
+                <CellItemContainer key={key}>
                   <Stack
                     flexDirection={'row'}
                     gap={1}
