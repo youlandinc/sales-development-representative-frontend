@@ -58,6 +58,7 @@ export type ProspectTableActions = {
   updateColumnName: (newName: string) => Promise<void>;
   updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
   updateColumnPin: (pin: boolean) => Promise<void>;
+  updateColumnDescription: (description: string) => Promise<void>;
   deleteColumn: () => Promise<void>;
   // table cell
   updateCellValue: (data: {
@@ -204,6 +205,35 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
 
       try {
         await _updateTableColumnConfig({ fieldId, pin });
+      } catch (err) {
+        handleApiError<ProspectTableState>(err, { columns }, set);
+      }
+    },
+    updateColumnDescription: async (description) => {
+      const fieldId = get().activeColumnId;
+      const columns = get().columns;
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      const trimmedDescription = description.trim();
+      if (!fieldId || !column || !UNotUndefined(trimmedDescription)) {
+        return;
+      }
+
+      const updatedColumns = columns.map((col) =>
+        col.fieldId === fieldId
+          ? { ...col, description: trimmedDescription }
+          : col,
+      );
+      set({
+        columns: updatedColumns,
+      });
+
+      try {
+        await _updateTableColumnConfig({
+          fieldId,
+          description: trimmedDescription,
+        });
       } catch (err) {
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
