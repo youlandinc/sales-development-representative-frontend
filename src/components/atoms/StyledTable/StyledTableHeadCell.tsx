@@ -7,8 +7,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box, InputBase, Stack } from '@mui/material';
+import { Box, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -27,6 +28,45 @@ interface StyledTableHeadCellProps {
   onEditSave?: (newName: string) => void;
   showPinnedRightShadow?: boolean;
 }
+
+//export enum TableColumnTypeEnum {
+//  text = 'TEXT',
+//  number = 'NUMBER',
+//  email = 'EMAIL',
+//  phone = 'PHONE',
+//  currency = 'CURRENCY',
+//  date = 'DATE',
+//  url = 'URL',
+//  img_url = 'IMG_URL',
+//  checkbox = 'CHECKBOX',
+//  select = 'SELECT',
+//}
+
+import ICON_TYPE_TEXT from './assets/icon-type-text.svg';
+import ICON_TYPE_NUMBER from './assets/icon-type-number.svg';
+import ICON_TYPE_EMAIL from './assets/icon-type-email.svg';
+import ICON_TYPE_PHONE from './assets/icon-type-phone.svg';
+import ICON_TYPE_CURRENCY from './assets/icon-type-currency.svg';
+import ICON_TYPE_DATE from './assets/icon-type-date.svg';
+import ICON_TYPE_URL from './assets/icon-type-url.svg';
+import ICON_TYPE_IMG_URL from './assets/icon-type-img-url.svg';
+import ICON_TYPE_CHECKBOX from './assets/icon-type-checkbox.svg';
+import ICON_TYPE_SELECT from './assets/icon-type-select.svg';
+
+const ICON_HASH: {
+  [key in TableColumnTypeEnum]: any;
+} = {
+  [TableColumnTypeEnum.text]: ICON_TYPE_TEXT,
+  [TableColumnTypeEnum.number]: ICON_TYPE_NUMBER,
+  [TableColumnTypeEnum.email]: ICON_TYPE_EMAIL,
+  [TableColumnTypeEnum.phone]: ICON_TYPE_PHONE,
+  [TableColumnTypeEnum.currency]: ICON_TYPE_CURRENCY,
+  [TableColumnTypeEnum.date]: ICON_TYPE_DATE,
+  [TableColumnTypeEnum.url]: ICON_TYPE_URL,
+  [TableColumnTypeEnum.img_url]: ICON_TYPE_IMG_URL,
+  [TableColumnTypeEnum.checkbox]: ICON_TYPE_CHECKBOX,
+  [TableColumnTypeEnum.select]: ICON_TYPE_SELECT,
+};
 
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   header,
@@ -178,7 +218,20 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             value={localEditValue}
           />
         ) : (
-          content
+          <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
+            {header && !isSelectColumn && (
+              <Icon
+                component={
+                  ICON_HASH[
+                    (header.column.columnDef.meta as any)
+                      ?.fieldType as TableColumnTypeEnum
+                  ] || ICON_TYPE_TEXT
+                }
+                sx={{ width: 16, height: 16 }}
+              />
+            )}
+            {content}
+          </Stack>
         )}
       </Box>
 
