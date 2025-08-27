@@ -2,7 +2,12 @@ import { useWebResearchStore } from '@/stores/Prospect';
 import { Stack, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
 import { FC, useRef } from 'react';
+
 import { TiptapEditor } from './TiptapEditor';
+
+import { insertWithPlaceholders } from '@/utils';
+
+import { useVariableFromStore } from '@/hooks';
 
 type WebResearchGenerateProps = {
   handleGeneratePrompt?: () => void;
@@ -18,11 +23,16 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
   const promptEditorRef = useRef(null);
   const { generateDescription, setGenerateEditorInstance } =
     useWebResearchStore((state) => state);
+  const { filedMapping } = useVariableFromStore();
 
   const handleEditorReady = (editor: Editor) => {
     setGenerateEditorInstance(editor);
     onPromptEditorReady?.(editor);
   };
+
+  const defaultValue = generateDescription
+    ? insertWithPlaceholders(generateDescription, filedMapping)
+    : null;
 
   return (
     <Stack gap={1.5}>
@@ -35,7 +45,7 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
         </Typography>
       </Stack>
       <TiptapEditor
-        defaultValue={generateDescription}
+        defaultValue={defaultValue}
         handleGenerate={handleGeneratePrompt}
         isLoading={isLoading}
         onEditorReady={handleEditorReady}

@@ -117,8 +117,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     }
   }, [schemaJson, transformToObject]);
 
-  console.log(filedsMapping);
-
   /*   const s = ['reasoning', 'evidence', 'confidence', 'didFindData'];
 
   const r = useMemo(
@@ -154,52 +152,60 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   // const a = useMemo(() => {}, [schemaJson]);
 
-  //const i = useMemo(
-  //  () =>
-  //    Object.fromEntries(
-  //      Object.entries(filedsMapping).map(
-  //        ([d, { type, description, options, id }]) => [
-  //          d,
-  //          {
-  //            type: type || '',
-  //            description: description || '',
-  //            id: id ?? uuidv4(),
-  //            options: options || [],
-  //          },
-  //        ],
-  //      ),
-  //    ),
-  //  [filedsMapping],
-  //);
+  const i = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(filedsMapping as any).map(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          ([d, { type, description, options, id }]) => [
+            d,
+            {
+              type: type || '',
+              description: description || '',
+              id: id ?? uuidv4(),
+              options: options || [],
+            },
+          ],
+        ),
+      ),
+    [filedsMapping],
+  );
 
-  //const updateSchema = useCallback(
-  //  (d, u, m, g, h) => {
-  //    const f = Object.fromEntries(
-  //      Object.entries(i).map(([x, y]) => {
-  //        if (x === d) {
-  //          let b = u;
-  //          if (u !== d) {
-  //            const A = Object.keys(i);
-  //            let S = 1;
-  //            for (; A.includes(b); ) {(b = `${u}-${S}`), S++;}
-  //          }
-  //          const w = i[x];
-  //          return [b, { ...w, description: m, options: h, type: g }];
-  //        }
-  //        return [x, y];
-  //      }),
-  //    );
-  //    console.log(JSON.stringify(f));
-  //    // n((x) => ({
-  //    //   ...x,
-  //    //   answerSchemaType: {
-  //    //     ...x.answerSchemaType,
-  //    //     fields: JSON.stringify(f),
-  //    //   },
-  //    // }));
-  //  },
-  //  [i],
-  //);
+  const updateSchema = useCallback(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    (d, u, m, g, h) => {
+      const f = Object.fromEntries(
+        Object.entries(i).map(([x, y]) => {
+          if (x === d) {
+            let b = u;
+            if (u !== d) {
+              const A = Object.keys(i);
+              let S = 1;
+
+              for (; A.includes(b); ) {
+                b = `${u}-${S}`;
+                S++;
+              }
+            }
+            const w = i[x];
+            return [b, { ...w, description: m, options: h, type: g }];
+          }
+          return [x, y];
+        }),
+      );
+      console.log(JSON.stringify(f));
+      // n((x) => ({
+      //   ...x,
+      //   answerSchemaType: {
+      //     ...x.answerSchemaType,
+      //     fields: JSON.stringify(f),
+      //   },
+      // }));
+    },
+    [i],
+  );
 
   return (
     <Stack gap={4}>
@@ -299,14 +305,13 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                     newType: string,
                     newSelectOptions: any,
                   ) => {
-                    console.log(123);
-                    //updateSchema(
-                    //  fieldName,
-                    //  newName,
-                    //  newDescription,
-                    //  newType,
-                    //  newSelectOptions,
-                    //);
+                    updateSchema(
+                      fieldName,
+                      newName,
+                      newDescription,
+                      newType,
+                      newSelectOptions,
+                    );
                   }}
                   selectOptions={[
                     {

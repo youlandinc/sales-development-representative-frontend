@@ -84,7 +84,6 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
     schemaJson,
     setSchemaJson,
     allClear,
-    prompt,
     saveAiConfig,
     setGenerateDescription,
     generateEditorInstance,
@@ -165,6 +164,10 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
             filedMapping,
           ) || '',
           schemaJson,
+          extractPromptText(
+            (generateEditorInstance?.getJSON() || []) as DocumentType,
+            filedMapping,
+          ) || '',
         );
       } catch (err) {
         const { header, message, variant } = err as HttpError;
@@ -172,7 +175,12 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         return Promise.reject(err);
       }
     },
-    [tipTapEditorInstance, slateEditorInstance, schemaJson],
+    [
+      tipTapEditorInstance,
+      slateEditorInstance,
+      schemaJson,
+      generateEditorInstance,
+    ],
   );
 
   const [saveAndRunState, saveAndRun] = useAsyncFn(
@@ -186,6 +194,10 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
             filedMapping,
           ) || '',
           schemaJson,
+          extractPromptText(
+            (generateEditorInstance?.getJSON() || []) as DocumentType,
+            filedMapping,
+          ) || '',
         );
         await run(res.data, recordCount);
         await cb?.();
@@ -196,7 +208,13 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
         return Promise.reject(err);
       }
     },
-    [tipTapEditorInstance, slateEditorInstance, cb, schemaJson],
+    [
+      tipTapEditorInstance,
+      slateEditorInstance,
+      cb,
+      schemaJson,
+      generateEditorInstance,
+    ],
   );
 
   return (

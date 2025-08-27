@@ -39,6 +39,7 @@ type WebResearchActions = {
     tableId: string,
     prompt: string,
     schema: string,
+    geneatePrompt: string,
   ) => Promise<any>;
   setExcludeFields: (fields: string) => void;
   removeExcludeFields: (fields: string) => void;
@@ -83,13 +84,19 @@ export const useWebResearchStore = create<
       generateDescription: '',
     });
   },
-  saveAiConfig: async (tableId: string, prompt: string, schema: string) => {
+  saveAiConfig: async (
+    tableId: string,
+    prompt: string,
+    schema: string,
+    geneatePrompt: string,
+  ) => {
     try {
       return await _saveWebResearchConfig(
         tableId,
         prompt,
         schema,
         get().excludeFields.map((item) => [item]),
+        geneatePrompt,
       );
     } catch (err) {
       const { message, header, variant } = err as HttpError;

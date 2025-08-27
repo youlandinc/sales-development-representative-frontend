@@ -37,9 +37,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     updateColumnVisible,
     deleteColumn,
   } = useProspectTableStore((store) => store);
-  const { setOpen, setSchemaJson, setPrompt } = useWebResearchStore(
-    (store) => store,
-  );
+  const { setOpen, setSchemaJson, setPrompt, setGenerateDescription } =
+    useWebResearchStore((store) => store);
   const { messages, connected } = useWebSocket();
 
   const { descriptionDialog } = useColumnActionCollections();
@@ -467,9 +466,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 const prompt = column.typeSettings.inputBinding.find(
                   (item) => item.name === 'prompt',
                 )?.formulaText;
-
+                const metaprompt = column.typeSettings.inputBinding.find(
+                  (item) => item.name === 'metaprompt',
+                )?.formulaText;
                 prompt && setPrompt(prompt);
                 schema && setSchemaJson(schema);
+                metaprompt && setGenerateDescription(metaprompt);
                 setOpen(true);
                 break;
               }
