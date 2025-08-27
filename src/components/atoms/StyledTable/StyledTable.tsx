@@ -118,6 +118,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     columnId: string;
     isActive?: boolean;
     isEditing?: boolean;
+    isShowMenu?: boolean;
   } | null>(null);
   const [addMenuAnchor, setAddMenuAnchor] = useState<null | HTMLElement>(null);
   const [headerMenuAnchor, setHeaderMenuAnchor] = useState<null | HTMLElement>(
@@ -309,6 +310,12 @@ export const StyledTable: FC<StyledTableProps> = ({
         switch (mode) {
           case 'active':
             setCellState({ recordId, columnId });
+            setHeaderState({
+              columnId,
+              isActive: true,
+              isEditing: false,
+              isShowMenu: false,
+            });
             break;
           case 'edit':
             setCellState({ recordId, columnId, isEditing: true });
@@ -365,7 +372,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           columnId: headerId,
           value: newName,
         });
-        setHeaderState((prev) => (prev ? { ...prev, isEditing: false } : null));
+        setHeaderState(null);
       },
     },
   });
@@ -445,17 +452,12 @@ export const StyledTable: FC<StyledTableProps> = ({
             type: TableColumnMenuEnum.ai_agent,
             columnId: selectedColumnId,
           });
-          setHeaderState({
-            columnId: selectedColumnId,
-            isActive: true,
-            isEditing: false,
-          });
           break;
         }
         case TableColumnMenuEnum.rename_column: {
           setHeaderState({
             columnId: selectedColumnId,
-            isActive: true,
+            isActive: false,
             isEditing: true,
           });
           break;
@@ -501,7 +503,8 @@ export const StyledTable: FC<StyledTableProps> = ({
           break;
       }
       setHeaderMenuAnchor(null);
-      //setSelectedColumnId('');
+      setSelectedColumnId('');
+      setHeaderState(null);
     },
     [onHeaderMenuClick, open, selectedColumnId, table],
   );
@@ -514,21 +517,78 @@ export const StyledTable: FC<StyledTableProps> = ({
 
       const isCurrentlyActive =
         headerState?.columnId === columnId && headerState?.isActive;
+      const isCurrentlyShowingMenu =
+        headerState?.columnId === columnId && headerState?.isShowMenu;
+      const hasActiveCellInCurrentColumn =
+        cellState?.columnId === columnId && cellState?.recordId;
+      const hasActiveCellInOtherColumn =
+        cellState?.columnId && cellState?.columnId !== columnId;
 
-      if (isCurrentlyActive && !headerState?.isEditing) {
-        setHeaderState({ columnId, isActive: true, isEditing: true });
-      } else {
-        setHeaderState({ columnId, isActive: true });
+      if (
+        isCurrentlyActive &&
+        isCurrentlyShowingMenu &&
+        !headerState?.isEditing
+      ) {
+        setHeaderState({
+          columnId,
+          isActive: true,
+          isEditing: true,
+          isShowMenu: false,
+        });
+        setHeaderMenuAnchor(null);
+        return;
+      }
+
+      if (hasActiveCellInCurrentColumn) {
+        setHeaderState({
+          columnId,
+          isActive: true,
+          isShowMenu: true,
+        });
         setAddMenuAnchor(null);
         setHeaderMenuAnchor(e.currentTarget as HTMLElement);
         setSelectedColumnId(columnId);
+        return;
       }
+
+      if (isCurrentlyActive && !isCurrentlyShowingMenu) {
+        setHeaderState({
+          columnId,
+          isActive: true,
+          isShowMenu: true,
+        });
+        setAddMenuAnchor(null);
+        setHeaderMenuAnchor(e.currentTarget as HTMLElement);
+        setSelectedColumnId(columnId);
+        return;
+      }
+
+      if (!cellState || hasActiveCellInOtherColumn) {
+        setHeaderState({
+          columnId,
+          isActive: true,
+          isShowMenu: true,
+        });
+        setAddMenuAnchor(null);
+        setHeaderMenuAnchor(e.currentTarget as HTMLElement);
+        setSelectedColumnId(columnId);
+        return;
+      }
+
+      setHeaderState({
+        columnId,
+        isActive: true,
+        isShowMenu: false,
+      });
     },
     [
       columnSizingInfo.isResizingColumn,
       headerState?.columnId,
       headerState?.isActive,
       headerState?.isEditing,
+      headerState?.isShowMenu,
+      cellState?.columnId,
+      cellState?.recordId,
     ],
   );
 
@@ -538,7 +598,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       if (headerState?.isEditing) {
         return;
       }
-      setHeaderState({ columnId, isActive: true });
+      setHeaderState({ columnId, isActive: true, isShowMenu: true });
       setAddMenuAnchor(null);
       setHeaderMenuAnchor(e.currentTarget as HTMLElement);
       setSelectedColumnId(columnId);
@@ -896,7 +956,11 @@ export const StyledTable: FC<StyledTableProps> = ({
 
       <Popper
         anchorEl={headerMenuAnchor}
-        open={Boolean(headerMenuAnchor) && !headerState?.isEditing}
+        open={
+          Boolean(headerMenuAnchor) &&
+          !headerState?.isEditing &&
+          !!headerState?.isActive
+        }
         placement="bottom-start"
         sx={{ zIndex: 1300 }}
       >
@@ -906,14 +970,12 @@ export const StyledTable: FC<StyledTableProps> = ({
             const isHeaderClick =
               target.closest('[data-table-header]') !== null;
 
+            console.log(headerState);
+
             if (!isHeaderClick) {
+              setHeaderState(null);
               setHeaderMenuAnchor(null);
               setSelectedColumnId('');
-              if (headerState?.isEditing) {
-                setHeaderState((prev) =>
-                  prev ? { ...prev, isEditing: false } : null,
-                );
-              }
             }
           }}
         >
