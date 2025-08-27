@@ -73,6 +73,7 @@ interface StyledTableProps {
   onColumnResize?: (fieldId: string, width: number) => void;
   onCellEdit?: (recordId: string, fieldId: string, value: string) => void;
   onAiProcess?: (recordId: string, columnId: string) => void;
+  onCellClick: (columnId: string, rowId: string, data: any) => void;
   aiLoading?: Record<string, Record<string, boolean>>;
 }
 
@@ -91,6 +92,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   onCellEdit,
   onAiProcess,
   aiLoading,
+  onCellClick,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -753,7 +755,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                       (cell.row.original as any)?.__loading,
                     );
 
-                    // 检查同行是否有active cell（用于select列背景色）
                     const hasActiveInRow =
                       cell.column.id === '__select' &&
                       (table.options.meta as any)?.isActive
@@ -782,6 +783,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                         )}
                         isPinned
                         key={cell.id}
+                        onCellClick={onCellClick}
                         rowSelected={row.getIsSelected?.() ?? false}
                         showPinnedRightShadow={
                           index === leftPinnedColumns.length - 1
@@ -813,7 +815,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                       (cell.row.original as any)?.__loading,
                     );
 
-                    // 检查同行是否有active cell（用于select列背景色）
                     const hasActiveInRow =
                       cell.column.id === '__select' &&
                       (table.options.meta as any)?.isActive
@@ -841,6 +842,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                           String(cell.column.id),
                         )}
                         key={cell.id}
+                        onCellClick={onCellClick}
                         rowSelected={row.getIsSelected?.() ?? false}
                         width={cell.column.getSize()}
                       />
@@ -875,12 +877,15 @@ export const StyledTable: FC<StyledTableProps> = ({
       scrolled,
       table,
       leftPinnedColumns,
-      headerState,
+      headerState?.columnId,
+      headerState?.isActive,
+      headerState?.isEditing,
       stickyLeftMap,
       handleHeaderClick,
       handleHeaderRightClick,
       centerColumns,
       rowHeight,
+      reducedColumns,
     ],
   );
 

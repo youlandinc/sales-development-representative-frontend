@@ -437,6 +437,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             setOpen(true);
           }}
           onAiProcess={handleAiProcess}
+          onCellClick={(columnId, rowId, data) => {
+            console.log(columnId, rowId, data);
+          }}
           onCellEdit={async (recordId, fieldId, value) => {
             setRowsMap((prev) => {
               const currentRowData = prev[recordId] || {};

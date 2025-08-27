@@ -31,6 +31,7 @@ interface StyledTableBodyCellProps {
   rowSelected?: boolean;
   showPinnedRightShadow?: boolean;
   hasActiveInRow?: boolean;
+  onCellClick: (columnId: string, rowId: string, data: any) => void;
 }
 
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
@@ -45,6 +46,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     rowSelected = false,
     showPinnedRightShadow,
     hasActiveInRow = false,
+    onCellClick,
   }) => {
     const recordId = cell ? String(cell.row.id) : '';
     const columnId = cell ? String(cell.column.id) : '';
@@ -215,11 +217,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const handleClick = useCallback(
       (e: MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
+        onCellClick(columnId, recordId, cell?.row);
         if (canInteract) {
           tableMeta?.setCellMode?.(recordId, columnId, 'active');
         }
       },
-      [canInteract, tableMeta, recordId, columnId],
+      [cell, onCellClick, recordId, columnId, canInteract, tableMeta],
     );
 
     const handleDoubleClick = useCallback(
@@ -249,7 +252,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
               ? '#F7F4FD'
               : isActive && !isSelectColumn
                 ? '#F7F4FD'
-                : isSelectColumn && hasActiveInRow // select列：当同行有active时显示背景色
+                : isSelectColumn && hasActiveInRow
                   ? '#F7F4FD'
                   : rowSelected || isSelectAll
                     ? '#F7F4FD'
