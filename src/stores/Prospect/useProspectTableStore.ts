@@ -132,7 +132,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       set({ dialogVisible: false, dialogType: null });
     },
     // table header
-    updateColumnWidth: async (fieldId: string, width: number) => {
+    updateColumnWidth: async (fieldId, width) => {
       if (!fieldId || !width) {
         return;
       }
@@ -148,7 +148,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
     },
-    updateColumnName: async (fieldId: string, newName: string) => {
+    updateColumnName: async (fieldId, newName) => {
       if (!fieldId || !newName.trim()) {
         return;
       }
@@ -166,7 +166,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
     },
-    updateColumnVisible: async (fieldId: string, visible: boolean) => {
+    updateColumnVisible: async (fieldId, visible) => {
       if (!fieldId || !UNotUndefined(visible)) {
         return;
       }
@@ -183,7 +183,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       //  handleApiError<ProspectTableState>(err, { columns }, set);
       //}
     },
-    updateColumnPin: async (fieldId: string, pin: boolean) => {
+    updateColumnPin: async (fieldId, pin) => {
       if (!fieldId || !UNotUndefined(pin)) {
         return;
       }
