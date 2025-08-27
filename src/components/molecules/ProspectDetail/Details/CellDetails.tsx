@@ -22,17 +22,6 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SearchIcon from '@mui/icons-material/Search';
 import ICON_SPARK from './assets/icon_sparkle.svg';
 
-const mockData = {
-  reasoning:
-    "Natalie Varichak's contact information, including her email and phone number, was found on RocketReach. Her LinkedIn profile confirms her current position at Absolute Resolutions Corporation, and RocketReach provides detailed contact information.",
-  confidence: 'high',
-  stepsTaken: ['https://rocketreach.co/natalie-varichak-email_686468991'],
-  'Phone Number': '602793XXXX',
-  'Email Address': 'natalie@absoluteresolutions.com',
-  'Email  Address': '[email protected]',
-  'Phone  Number': '602-793-8888',
-};
-
 const CellItemContainer: FC<
   PropsWithChildren & StackProps & { showCopy?: boolean; copyContent?: string }
 > = ({ children, showCopy = true, copyContent, ...rest }) => {
@@ -117,18 +106,18 @@ export const CellDetailsArray: FC<CellDetailsArrayProps> = ({
             width={'fit-content'}
           >
             <Typography variant={'body3'}>[ ]</Typography>
-            <Typography variant={'subtitle2'}>{title}</Typography>
-            <Typography color={'text.secondary'} variant={'body2'}>
+            <Typography variant={'body2'}>{title}</Typography>
+            <Typography color={'text.secondary'} variant={'body3'}>
               [ {value.length} ]
             </Typography>
           </Stack>
         </CellItemContainer>
       </Stack>
       {visible && (
-        <Stack ml={2}>
+        <Stack gap={1.5} ml={2}>
           {value.map((item, index) => (
             <CellItemContainer copyContent={item} key={index}>
-              <Typography color={'text.secondary'} variant={'body2'}>
+              <Typography color={'text.secondary'} variant={'body3'}>
                 {item}
               </Typography>
             </CellItemContainer>
@@ -185,7 +174,7 @@ export const CellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
             color={'info'}
             endIcon={<ContentCopyIcon sx={{ width: 12, height: 12 }} />}
             onClick={async () => {
-              await navigator.clipboard.writeText(JSON.stringify(mockData));
+              await navigator.clipboard.writeText(JSON.stringify(data));
               SDRToast({
                 message: 'Copied to Clipboard',
                 header: false,
