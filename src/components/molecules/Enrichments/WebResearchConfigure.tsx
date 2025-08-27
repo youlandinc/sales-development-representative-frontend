@@ -117,8 +117,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     }
   }, [schemaJson, transformToObject]);
 
-  console.log(filedsMapping);
-
   /*   const s = ['reasoning', 'evidence', 'confidence', 'didFindData'];
 
   const r = useMemo(
@@ -154,7 +152,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   // const a = useMemo(() => {}, [schemaJson]);
 
-  const i = useMemo(
+  /* const i = useMemo(
     () =>
       Object.fromEntries(
         Object.entries(filedsMapping).map(
@@ -199,7 +197,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       // }));
     },
     [i],
-  );
+  ); */
 
   return (
     <Stack gap={4}>

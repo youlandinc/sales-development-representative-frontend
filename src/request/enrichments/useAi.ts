@@ -35,6 +35,7 @@ export const _saveWebResearchConfig = (
   prompt: string,
   schema: string,
   excludeFields: string[][],
+  geneatePrompt: string,
 ) => {
   return post<string>('/sdr/prospect/table/field', {
     tableId,
@@ -43,13 +44,20 @@ export const _saveWebResearchConfig = (
     fieldName: 'Use AI',
     typeSettings: {
       inputBinding: [
+        //configure prompt
         {
           name: 'prompt',
           formulaText: prompt,
         },
+        //configure schema
         {
           name: 'answerSchemaType',
           formulaText: schema,
+        },
+        //generate prompt
+        {
+          name: 'metaprompt',
+          formulaText: geneatePrompt,
         },
       ],
       optionalPathsInInputs: {
