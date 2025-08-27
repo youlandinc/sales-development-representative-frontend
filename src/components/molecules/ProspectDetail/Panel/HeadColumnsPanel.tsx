@@ -10,11 +10,36 @@ import {
 } from '@mui/material';
 
 import { useProspectTableStore } from '@/stores/Prospect';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 import ICON_COLUMN from '../assets/head/icon-column.svg';
 
 import ICON_COLUMN_HIDE from '../assets/table/icon-column-hide.svg';
 import ICON_COLUMN_VISIBLE from '../assets/table/icon-column-visible.svg';
+
+import ICON_TYPE_TEXT from '../assets/head/icon-type-text.svg';
+import ICON_TYPE_NUMBER from '../assets/head/icon-type-number.svg';
+import ICON_TYPE_EMAIL from '../assets/head/icon-type-email.svg';
+import ICON_TYPE_PHONE from '../assets/head/icon-type-phone.svg';
+import ICON_TYPE_CURRENCY from '../assets/head/icon-type-currency.svg';
+import ICON_TYPE_DATE from '../assets/head/icon-type-date.svg';
+import ICON_TYPE_URL from '../assets/head/icon-type-url.svg';
+import ICON_TYPE_IMG_URL from '../assets/head/icon-type-img-url.svg';
+import ICON_TYPE_CHECKBOX from '../assets/head/icon-type-checkbox.svg';
+import ICON_TYPE_SELECT from '../assets/head/icon-type-select.svg';
+
+const ICON_HASH = {
+  [TableColumnTypeEnum.text]: ICON_TYPE_TEXT,
+  [TableColumnTypeEnum.number]: ICON_TYPE_NUMBER,
+  [TableColumnTypeEnum.email]: ICON_TYPE_EMAIL,
+  [TableColumnTypeEnum.phone]: ICON_TYPE_PHONE,
+  [TableColumnTypeEnum.currency]: ICON_TYPE_CURRENCY,
+  [TableColumnTypeEnum.date]: ICON_TYPE_DATE,
+  [TableColumnTypeEnum.url]: ICON_TYPE_URL,
+  [TableColumnTypeEnum.img_url]: ICON_TYPE_IMG_URL,
+  [TableColumnTypeEnum.checkbox]: ICON_TYPE_CHECKBOX,
+  [TableColumnTypeEnum.select]: ICON_TYPE_SELECT,
+};
 
 export const HeadColumnsPanel = () => {
   const { columns, updateColumnVisible } = useProspectTableStore(
@@ -58,6 +83,7 @@ export const HeadColumnsPanel = () => {
           <Grow {...TransitionProps} timeout={300}>
             <Paper
               sx={{
+                mt: 1,
                 boxShadow: 2,
                 border: '1px solid',
                 borderColor: 'divider',
@@ -71,25 +97,35 @@ export const HeadColumnsPanel = () => {
                     <Stack
                       alignItems={'center'}
                       flexDirection={'row'}
-                      justifyContent={'space-between'}
+                      gap={1.25}
                       key={col.fieldId}
                       onClick={async () => {
                         await updateColumnVisible(col.fieldId, !col.visible);
                       }}
                       sx={{
-                        p: 1,
                         borderRadius: 1,
                         cursor: 'pointer',
+                        px: 1,
                         '&:hover': {
-                          bgcolor: '#f7f8f9',
+                          bgcolor: '#F7F4FD',
                           '& .action': {
                             display: 'block',
                           },
                         },
                       }}
                     >
+                      <Icon
+                        component={ICON_HASH[col.fieldType]}
+                        sx={{
+                          width: 16,
+                          height: 16,
+                          '& path': {
+                            fill: !col.visible ? '#B0ADBD' : '#2A292E',
+                          },
+                        }}
+                      />
                       <Typography
-                        color={col.visible ? 'text.primary' : 'text.secondary'}
+                        color={col.visible ? 'text.primary' : '#B0ADBD'}
                         fontSize={14}
                       >
                         {col.fieldName}
@@ -97,14 +133,15 @@ export const HeadColumnsPanel = () => {
                       <Icon
                         className={'action'}
                         component={
-                          col.visible ? ICON_COLUMN_HIDE : ICON_COLUMN_VISIBLE
+                          col.visible ? ICON_COLUMN_VISIBLE : ICON_COLUMN_HIDE
                         }
                         sx={{
+                          ml: 'auto',
                           width: 16,
                           height: 16,
                           display: !col.visible ? 'block' : 'none',
                           '& path': {
-                            fill: !col.visible ? '#6F6C7D' : '#2A292E',
+                            fill: !col.visible ? '#B0ADBD' : '#2A292E',
                           },
                         }}
                       />

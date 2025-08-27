@@ -7,12 +7,7 @@ import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
 import { useProspectTableStore } from '@/stores/Prospect';
 
 import ICON_BACK from './assets/head/icon-back.svg';
-import ICON_COLUMN from './assets/head/icon-column.svg';
-
-import ICON_VIEW from './assets/head/icon-view.svg';
-import ICON_ROW from './assets/head/icon-row.svg';
-import ICON_FILTER from './assets/head/icon-filter.svg';
-import ICON_SEARCH from './assets/head/icon-search.svg';
+//import ICON_SEARCH from './assets/head/icon-search.svg';
 
 import {
   HeadColumnsPanel,
