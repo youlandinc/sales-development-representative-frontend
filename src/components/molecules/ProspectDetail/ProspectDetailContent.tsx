@@ -33,9 +33,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     updateColumnName,
     updateColumnPin,
     updateColumnVisible,
-    deleteColumn,
-    setActiveColumnId,
     openDialog,
+    setActiveColumnId,
   } = useProspectTableStore((store) => store);
   const { setOpen, setSchemaJson, setPrompt, setGenerateDescription } =
     useWebResearchStore((store) => store);
