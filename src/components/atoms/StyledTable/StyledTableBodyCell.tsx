@@ -222,7 +222,15 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           tableMeta?.setCellMode?.(recordId, columnId, 'active');
         }
       },
-      [cell, onCellClick, recordId, columnId, canInteract, isAiColumn, tableMeta],
+      [
+        cell,
+        onCellClick,
+        recordId,
+        columnId,
+        canInteract,
+        isAiColumn,
+        tableMeta,
+      ],
     );
 
     const handleDoubleClick = useCallback(
