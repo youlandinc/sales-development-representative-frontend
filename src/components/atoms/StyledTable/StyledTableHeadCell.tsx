@@ -158,7 +158,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
         '&:hover': {
-          bgcolor: !isEditing ? '#BBDEFB' : '#F6F6F6',
+          //bgcolor: !isEditing ? '#BBDEFB' : '#F6F6F6',
+          bgcolor: !isEditing ? '#F7F4FD' : '#F6F6F6',
         },
         height: '36px',
         justifyContent: 'center',
