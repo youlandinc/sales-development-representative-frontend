@@ -886,6 +886,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       centerColumns,
       rowHeight,
       reducedColumns,
+      onCellClick,
     ],
   );
 
