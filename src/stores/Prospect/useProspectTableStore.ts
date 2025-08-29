@@ -33,10 +33,7 @@ export type ProspectTableState = {
   activeColumnId: string;
   // dialog
   dialogVisible: boolean;
-  dialogType:
-    | TableColumnMenuEnum.edit_description
-    | TableColumnMenuEnum.delete
-    | null;
+  dialogType: TableColumnMenuEnum | null;
 
   rowIds: string[];
   runRecords: {
