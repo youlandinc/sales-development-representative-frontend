@@ -1,4 +1,4 @@
-import DefaultCommandItems from './DefaultCommandItems';
+import { DefaultCommandItems } from './DefaultCommandItems';
 import { CommandItem } from '@/types';
 
 export const FilterCommandItems = (

@@ -3,7 +3,7 @@ import { FC, PropsWithChildren } from 'react';
 
 import { useSwitch } from '@/hooks';
 
-import ICON_ARROW from '../assets/icon_collapse.svg';
+import ICON_ARROW from './assets/icon_collapse.svg';
 
 type CollapseCardProps = {
   title: string;

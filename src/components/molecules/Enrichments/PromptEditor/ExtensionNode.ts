@@ -1,9 +1,7 @@
-//eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { mergeAttributes, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
-import { PlaceholderNode } from '@/components/molecules';
+import { PlaceholderNode } from './PlaceholderNode';
 
 export const ExtensionNode = Node.create({
   name: 'custom-placeholder',
@@ -138,7 +136,8 @@ export const VariableTokenNode = Node.create({
       contentDOMElementTag: 'span',
     });
   },
-  addCommands() {
+
+  /* addCommands() {
     return {
       insertVariableToken:
         (t) =>
@@ -178,7 +177,7 @@ export const VariableTokenNode = Node.create({
           );
         },
     };
-  },
+  },*/
   addKeyboardShortcuts() {
     return {
       Backspace: () =>

@@ -1,111 +1,111 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { CommandsListProps } from '@/types';
 
-const CommandsList: React.FC<CommandsListProps> = ({ items, command }) => {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [isKeyboardActive, setIsKeyboardActive] = useState(false);
-  const itemsRef = useRef<HTMLDivElement>(null);
+export const CommandsList: FC<CommandsListProps> = memo(
+  ({ items, command }) => {
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    const [isKeyboardActive, setIsKeyboardActive] = useState(false);
+    const itemsRef = useRef<HTMLDivElement>(null);
 
-  const scrollToItem = useCallback((index: number) => {
-    if (itemsRef.current && itemsRef.current.children[index]) {
-      (itemsRef.current.children[index] as HTMLElement).scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-      });
-    }
-  }, []);
-
-  const selectItem = useCallback(
-    (index: number) => {
-      if (items.length > 0 && items[0].title !== 'No results found') {
-        setSelectedIndex(index);
-        scrollToItem(index);
+    const scrollToItem = useCallback((index: number) => {
+      if (itemsRef.current && itemsRef.current.children[index]) {
+        (itemsRef.current.children[index] as HTMLElement).scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
       }
-    },
-    [items, scrollToItem],
-  );
+    }, []);
 
-  const upHandler = useCallback(() => {
-    setIsKeyboardActive(true);
-    if (selectedIndex !== null) {
-      selectItem((selectedIndex - 1 + items.length) % items.length);
-    } else if (items.length > 0) {
-      selectItem(items.length - 1);
-    }
-  }, [items, selectedIndex, selectItem]);
+    const selectItem = useCallback(
+      (index: number) => {
+        if (items.length > 0 && items[0].title !== 'No results found') {
+          setSelectedIndex(index);
+          scrollToItem(index);
+        }
+      },
+      [items, scrollToItem],
+    );
 
-  const downHandler = useCallback(() => {
-    setIsKeyboardActive(true);
-    if (selectedIndex !== null) {
-      selectItem((selectedIndex + 1) % items.length);
-    } else if (items.length > 0) {
-      selectItem(0);
-    }
-  }, [items, selectedIndex, selectItem]);
-
-  const enterHandler = () => {
-    if (selectedIndex !== null) {
-      const item = items[selectedIndex];
-      if (item && !item.disabled && typeof command === 'function') {
-        command(item);
-        return true;
+    const upHandler = useCallback(() => {
+      setIsKeyboardActive(true);
+      if (selectedIndex !== null) {
+        selectItem((selectedIndex - 1 + items.length) % items.length);
+      } else if (items.length > 0) {
+        selectItem(items.length - 1);
       }
-    }
-    return false;
-  };
+    }, [items, selectedIndex, selectItem]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        upHandler();
-      } else if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        downHandler();
-      } else if (event.key === 'Enter') {
-        event.preventDefault();
-        if (enterHandler()) {
-          event.stopPropagation();
+    const downHandler = useCallback(() => {
+      setIsKeyboardActive(true);
+      if (selectedIndex !== null) {
+        selectItem((selectedIndex + 1) % items.length);
+      } else if (items.length > 0) {
+        selectItem(0);
+      }
+    }, [items, selectedIndex, selectItem]);
+
+    const enterHandler = () => {
+      if (selectedIndex !== null) {
+        const item = items[selectedIndex];
+        if (item && !item.disabled && typeof command === 'function') {
+          command(item);
+          return true;
         }
       }
+      return false;
     };
 
-    document.addEventListener('keydown', onKeyDown, true);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown, true);
-    };
-  }, [upHandler, downHandler]);
+    useEffect(() => {
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          upHandler();
+        } else if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          downHandler();
+        } else if (event.key === 'Enter') {
+          event.preventDefault();
+          if (enterHandler()) {
+            event.stopPropagation();
+          }
+        }
+      };
 
-  return (
-    <div className="slash-menu" ref={itemsRef}>
-      {items.map((item, index) => {
-        return (
-          <button
-            className={`slash-menu__item ${
-              isKeyboardActive && index === selectedIndex
-                ? 'slash-menu__item--selected'
-                : ''
-            } ${item.disabled ? 'slash-menu__item--disabled' : ''}`}
-            disabled={item.disabled}
-            key={index}
-            onClick={() => {
-              setIsKeyboardActive(false);
-              command(item);
-            }}
-            onMouseEnter={() => {
-              if (isKeyboardActive) {
+      document.addEventListener('keydown', onKeyDown, true);
+      return () => {
+        document.removeEventListener('keydown', onKeyDown, true);
+      };
+    }, [upHandler, downHandler]);
+
+    return (
+      <div className="slash-menu" ref={itemsRef}>
+        {items.map((item, index) => {
+          return (
+            <button
+              className={`slash-menu__item ${
+                isKeyboardActive && index === selectedIndex
+                  ? 'slash-menu__item--selected'
+                  : ''
+              } ${item.disabled ? 'slash-menu__item--disabled' : ''}`}
+              disabled={item.disabled}
+              key={index}
+              onClick={() => {
                 setIsKeyboardActive(false);
-                setSelectedIndex(null);
-              }
-            }}
-          >
-            {item.icon && item.icon}
-            <span className="slash-menu__item-title">{item.title}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-export default React.memo(CommandsList);
+                command(item);
+              }}
+              onMouseEnter={() => {
+                if (isKeyboardActive) {
+                  setIsKeyboardActive(false);
+                  setSelectedIndex(null);
+                }
+              }}
+            >
+              {item.icon && item.icon}
+              <span className="slash-menu__item-title">{item.title}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  },
+);

@@ -12,7 +12,7 @@ const createHeadingCommand =
       .run();
   };
 
-const DefaultCommandItems: CommandItem[] = [
+export const DefaultCommandItems: CommandItem[] = [
   {
     title: 'Heading 1',
     icon: (
@@ -155,5 +155,3 @@ const DefaultCommandItems: CommandItem[] = [
     command: createHeadingCommand(5),
   },
 ];
-
-export default DefaultCommandItems;

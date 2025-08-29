@@ -1,7 +1,7 @@
 import { Mention } from '@tiptap/extension-mention';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import { mentionSuggestionOptions } from '@/components/molecules';
 import { PlaceholderNode } from './PlaceholderNode';
+import { mentionSuggestionOptions } from './mentionSuggestionOptions';
 
 export const ExtensionMention = Mention.extend({
   name: 'custom-placeholder',

@@ -1,6 +1,5 @@
 'use client';
 
-import { StyledButton } from '@/components/atoms';
 import { Box, Icon, Stack, Typography } from '@mui/material';
 import { Content, Editor } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
@@ -13,14 +12,12 @@ import {
   useImperativeHandle,
 } from 'react';
 
-import ICON_SPARKLE from '../assets/icon_sparkle.svg';
+import { StyledButton } from '@/components/atoms';
 
-// import { dH as DD, dT as h9, dF as noe } from './vendor.js';
-import {
-  ExtensionMention,
-  ExtensionNode,
-  ExtensionStorage,
-} from '@/components/molecules';
+import ICON_SPARKLE from '../assets/icon_sparkle.svg';
+import { ExtensionMention } from './ExtensionMention';
+import { ExtensionNode } from './ExtensionNode';
+import { ExtensionStorage } from './ExtensionStorage';
 
 // type NodeType = {
 //   type: string;
