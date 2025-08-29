@@ -279,7 +279,14 @@ export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
   );
 
   return (
-    <Drawer anchor={'right'} hideBackdrop open={webResearchVisible}>
+    <Drawer
+      anchor={'right'}
+      hideBackdrop
+      open={webResearchVisible}
+      sx={{
+        left: 'unset',
+      }}
+    >
       <Stack gap={4} height={'100%'} justifyContent={'space-between'}>
         {/* header */}
         <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>

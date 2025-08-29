@@ -20,7 +20,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SearchIcon from '@mui/icons-material/Search';
-import ICON_SPARK from './assets/icon_sparkle.svg';
+import ICON_SPARK from '../assets/dialog/icon_sparkle.svg';
+import { useProspectTableStore } from '@/stores/Prospect';
+import { TableColumnMenuEnum } from '@/components/molecules';
 
 const CellItemContainer: FC<
   PropsWithChildren & StackProps & { showCopy?: boolean; copyContent?: string }
@@ -132,6 +134,10 @@ type CellDetailsProps = {
   data: Record<string, any>;
 } & DrawerProps;
 export const CellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
+  const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
+    (store) => store,
+  );
+
   const [text, setText] = useState('');
   const [filter, setFilter] = useState('');
   const debounceSearch = useMemo(() => {
@@ -140,10 +146,15 @@ export const CellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
     }, 400);
   }, []);
 
+  const handleClose = () => {
+    closeDialog();
+  };
+
   return (
     <Drawer
       anchor={'right'}
       hideBackdrop
+      open={dialogVisible && dialogType === TableColumnMenuEnum.cell_detail}
       sx={{
         left: 'unset',
       }}
@@ -158,11 +169,6 @@ export const CellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
           py={2}
           width={500}
         >
-          {/* <Icon*/}
-          {/*  component={ICON_ARROW}*/}
-          {/*  onClick={handleClose}*/}
-          {/*  sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}*/}
-          {/*/>*/}
           <Icon
             component={ICON_SPARK}
             sx={{ width: 20, height: 20, mr: 0.5 }}
@@ -187,9 +193,7 @@ export const CellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
             Copy JSON
           </StyledButton>
           <CloseIcon
-            onClick={() => {
-              rest?.onClose?.({}, 'backdropClick');
-            }}
+            onClick={handleClose}
             sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
           />
         </Stack>

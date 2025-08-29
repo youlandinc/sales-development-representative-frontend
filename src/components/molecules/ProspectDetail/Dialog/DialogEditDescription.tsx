@@ -2,30 +2,31 @@ import { Icon, Stack, Typography } from '@mui/material';
 import React, { FC, useEffect } from 'react';
 
 import {
-  SDRToast,
   StyledButton,
   StyledDialog,
   StyledTextField,
 } from '@/components/atoms';
+import { TableColumnMenuEnum } from '@/components/molecules';
 
 import { useAsyncFn } from '@/hooks';
 
-import { _updateTableColumnConfig } from '@/request';
-import { HttpError } from '@/types';
-
-import ICON_CLOSE from './assets/icon_close.svg';
 import { useProspectTableStore } from '@/stores/Prospect';
-import { TableColumnMenuEnum } from '@/components/molecules';
+
+import ICON_CLOSE from '../assets/dialog/icon_close.svg';
 
 type DialogEditDescriptionProps = {
   cb?: () => Promise<void>;
 };
 
-export const DialogEditDescription: FC<DialogEditDescriptionProps> = ({
-  cb,
-}) => {
-  const { columns, activeColumnId, dialogType, closeDialog } =
-    useProspectTableStore((store) => store);
+export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
+  const {
+    columns,
+    activeColumnId,
+    dialogType,
+    closeDialog,
+    updateColumnDescription,
+    dialogVisible,
+  } = useProspectTableStore((store) => store);
 
   const column = columns.find((col) => col.fieldId === activeColumnId);
 
@@ -35,17 +36,8 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = ({
 
   const [state, updateDescription] = useAsyncFn(
     async (description: string) => {
-      try {
-        await _updateTableColumnConfig({
-          fieldId: activeColumnId,
-          description,
-        });
-        await cb?.();
-        closeDialog();
-      } catch (error) {
-        const { message, header, variant } = error as HttpError;
-        SDRToast({ message, header, variant });
-      }
+      await updateColumnDescription(description);
+      closeDialog();
     },
     [activeColumnId],
   );
@@ -69,9 +61,10 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = ({
             Add a description to help others understand what this view is for.
           </Typography>
           <StyledTextField
+            autoFocus
             multiline
             onChange={(e) => setDescription(e.target.value)}
-            placeholder={'Briefly describe what this column contains'}
+            placeholder={'Add description...'}
             rows={3}
             value={description}
           />
@@ -117,7 +110,11 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = ({
         </Stack>
       }
       onClose={handleClose}
-      open={dialogType === TableColumnMenuEnum.edit_description}
+      open={
+        dialogType === TableColumnMenuEnum.edit_description &&
+        dialogVisible &&
+        !!column
+      }
     />
   );
 };

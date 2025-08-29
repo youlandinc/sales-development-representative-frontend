@@ -2,7 +2,7 @@
 
 import { StyledButton } from '@/components/atoms';
 import { Box, Icon, Stack, Typography } from '@mui/material';
-import { Content, Editor, Node } from '@tiptap/core';
+import { Content, Editor } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -22,12 +22,12 @@ import {
   ExtensionStorage,
 } from '@/components/molecules';
 
-type NodeType = {
-  type: string;
-  content?: Node[];
-  text?: string;
-  attrs?: { [key: string]: any };
-};
+// type NodeType = {
+//   type: string;
+//   content?: Node[];
+//   text?: string;
+//   attrs?: { [key: string]: any };
+// };
 type TiptapEditorProps = {
   defaultValue?: Content;
   placeholder?: string;

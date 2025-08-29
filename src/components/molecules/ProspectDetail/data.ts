@@ -19,6 +19,7 @@ export enum TableColumnMenuEnum {
   pin = 'PIN',
   visible = 'VISIBLE',
   delete = 'DELETE',
+  cell_detail = 'CELL_DETAIL',
 }
 
 export interface TableColumnOption {

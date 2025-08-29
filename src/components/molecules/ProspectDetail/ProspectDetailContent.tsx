@@ -42,6 +42,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     updateColumnPin,
     updateColumnVisible,
     openDialog,
+    closeDialog,
+    dialogVisible,
+    dialogType,
     setActiveColumnId,
   } = useProspectTableStore((store) => store);
   const {
@@ -419,6 +422,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             handleScroll,
           );
         }
+        closeDialog();
       };
     }
   }, []);
@@ -446,13 +450,15 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           }}
           onAiProcess={handleAiProcess}
           onCellClick={(columnId, rowId, data) => {
-            console.log(columnId, rowId, data);
             if (data.original?.[columnId]?.externalContent) {
+              setActiveColumnId(columnId);
               setActiveCell(data.original?.[columnId]?.externalContent || {});
-              !visible && toggle();
+              !dialogVisible && openDialog(TableColumnMenuEnum.cell_detail);
               return;
             }
-            close();
+            dialogVisible &&
+              dialogType === TableColumnMenuEnum.cell_detail &&
+              closeDialog();
           }}
           onCellEdit={async (recordId, fieldId, value) => {
             setRowsMap((prev) => {
@@ -503,10 +509,6 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 break;
               }
               case TableColumnMenuEnum.edit_description: {
-                const column = columns.find((col) => col.fieldId === columnId);
-                if (!column) {
-                  return;
-                }
                 openDialog(TableColumnMenuEnum.edit_description);
                 break;
               }
@@ -550,14 +552,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         }}
         tableId={tableId}
       />
-      <DialogEditDescription
-        cb={async () => {
-          await fetchTable(tableId);
-        }}
-      />
-
+      <DialogEditDescription />
       <DialogDeleteColumn />
-      <CellDetails data={activeCell} onClose={toggle} open={visible} />
+      <CellDetails data={activeCell} />
     </Stack>
   );
 };

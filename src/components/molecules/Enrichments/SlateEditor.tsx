@@ -17,11 +17,11 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useRef,
   useState,
 } from 'react';
 import { Descendant, Element, Node, NodeEntry, Text } from 'slate';
 import { Editable, ReactEditor, RenderLeafProps, Slate } from 'slate-react';
+import { useFormatString } from '@/components/molecules';
 
 type LeafType = {
   type: string;
@@ -67,14 +67,6 @@ const renderLeaf = ({ attributes, children, leaf }: RenderLeafProps) => {
       {children}
     </span>
   );
-};
-
-const useJ1 = (t: string) => {
-  const n = useRef('');
-  useEffect(() => {
-    n.current = t;
-  });
-  return n.current;
 };
 
 type SlateEditorProps = {
@@ -129,14 +121,11 @@ export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
         : '';
 
     // JSON 转换函数 j1（可能是格式化 JSON）
-    const formattedString = useJ1(currentString);
+    const formattedString = useFormatString(currentString);
 
     // 当 JSON 发生变化时，触发外部 setValue
     useEffect(() => {
-      if (
-        typeof formattedString === 'string' &&
-        currentString !== formattedString
-      ) {
+      if (currentString !== formattedString) {
         onValueChange?.(currentString);
       }
     }, [onValueChange, value, currentString, formattedString]);
