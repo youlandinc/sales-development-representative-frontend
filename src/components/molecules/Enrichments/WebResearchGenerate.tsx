@@ -3,7 +3,7 @@ import { Stack, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
 import { FC, useRef } from 'react';
 
-import { TiptapEditor } from './TiptapEditor';
+import { PromptEditor } from '@/components/molecules';
 
 import { insertWithPlaceholders } from '@/utils';
 
@@ -44,7 +44,7 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
           settings.
         </Typography>
       </Stack>
-      <TiptapEditor
+      <PromptEditor
         defaultValue={defaultValue}
         handleGenerate={handleGeneratePrompt}
         isLoading={isLoading}

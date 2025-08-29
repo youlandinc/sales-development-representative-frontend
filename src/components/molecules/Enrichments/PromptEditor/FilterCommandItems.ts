@@ -1,7 +1,7 @@
 import DefaultCommandItems from './DefaultCommandItems';
-import { CommandItem } from './types';
+import { CommandItem } from '@/types';
 
-export const filterCommandItems = (
+export const FilterCommandItems = (
   query: string | undefined,
   commandItems: CommandItem[] = DefaultCommandItems,
 ): CommandItem[] => {
@@ -23,5 +23,3 @@ export const filterCommandItems = (
     ? matchingItems
     : [{ title: 'No results found', disabled: true, command: () => {} }];
 };
-
-export default filterCommandItems;

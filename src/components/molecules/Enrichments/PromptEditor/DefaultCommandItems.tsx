@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/core';
-import { CommandItem, Range } from './types';
+import { CommandItem, Range } from '@/types';
 
 const createHeadingCommand =
   (level: number) =>

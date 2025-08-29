@@ -2,7 +2,7 @@ import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance as TippyInstance } from 'tippy.js';
 import CommandsList from './ComandsList';
 import { SuggestionKeyDownProps } from '@tiptap/suggestion';
-import { RenderSuggestionsProps } from './types';
+import { RenderSuggestionsProps } from '@/types';
 
 const RenderSuggestions = () => {
   let reactRenderer: ReactRenderer;

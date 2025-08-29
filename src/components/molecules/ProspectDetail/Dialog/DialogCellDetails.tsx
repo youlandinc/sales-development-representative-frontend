@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren, useMemo, useState } from 'react';
 import {
+  debounce,
   Drawer,
   DrawerProps,
   Icon,
@@ -8,7 +9,6 @@ import {
   StackProps,
   Typography,
 } from '@mui/material';
-import { debounce } from 'lodash-es';
 
 import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 
@@ -133,7 +133,7 @@ export const CellDetailsArray: FC<CellDetailsArrayProps> = ({
 type CellDetailsProps = {
   data: Record<string, any>;
 } & DrawerProps;
-export const CellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
+export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
   const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
     (store) => store,
   );

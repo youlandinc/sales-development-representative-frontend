@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { CommandsListProps } from './types';
+import { CommandsListProps } from '@/types';
 
 const CommandsList: React.FC<CommandsListProps> = ({ items, command }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);

@@ -8,9 +8,10 @@ import {
 } from '@mui/material';
 import type { SuggestionOptions, SuggestionProps } from '@tiptap/suggestion';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
-import ICON_TEXT from './assets/icon_text.svg';
+import ICON_TEXT from '../assets/icon_text.svg';
 import { useProspectTableStore } from '@/stores/Prospect';
 
 export type SuggestionListRef = {

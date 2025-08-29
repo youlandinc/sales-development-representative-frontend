@@ -8,16 +8,16 @@ import {
   useWebResearchStore,
 } from '@/stores/Prospect';
 
-import { useSwitch, useWebSocket } from '@/hooks';
+import { useWebSocket } from '@/hooks';
 
 import { StyledTable } from '@/components/atoms';
 import {
-  CellDetails,
+  DialogCellDetails,
+  DialogDeleteColumn,
   DialogEditDescription,
-  WebResearch,
+  DialogWebResearch,
+  TableColumnMenuEnum,
 } from '@/components/molecules';
-
-import { DialogDeleteColumn, TableColumnMenuEnum } from './index';
 
 import { _fetchTableRowData } from '@/request';
 import { WebSocketTypeEnum } from '@/types';
@@ -55,7 +55,6 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   } = useWebResearchStore((store) => store);
   const { messages, connected } = useWebSocket();
 
-  const { visible, toggle, close } = useSwitch();
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
 
   const { isLoading: isMetadataLoading } = useSWR(
@@ -546,7 +545,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
         />
       )}
 
-      <WebResearch
+      <DialogWebResearch
         cb={async () => {
           await fetchTable(tableId);
         }}
@@ -554,7 +553,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       />
       <DialogEditDescription />
       <DialogDeleteColumn />
-      <CellDetails data={activeCell} />
+      <DialogCellDetails data={activeCell} />
     </Stack>
   );
 };

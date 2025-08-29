@@ -1,3 +1,4 @@
 export * from './DialogDeleteColumn';
 export * from './DialogEditDescription';
-export * from './CellDetails';
+export * from './DialogCellDetails';
+export * from './DialogWebResearch';

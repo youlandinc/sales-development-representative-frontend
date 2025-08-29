@@ -1,11 +1,3 @@
-import {
-  buildExpressionFromNodes,
-  copyOrCutContent,
-  decorateJson,
-  handlePasteEvent,
-  parseTextToNodes,
-  validateJson,
-} from '@/utils';
 import { Typography } from '@mui/material';
 import { compact, flatten } from 'lodash-es';
 import {
@@ -21,7 +13,17 @@ import {
 } from 'react';
 import { Descendant, Element, Node, NodeEntry, Text } from 'slate';
 import { Editable, ReactEditor, RenderLeafProps, Slate } from 'slate-react';
+
 import { useFormatString } from '@/components/molecules';
+
+import {
+  buildExpressionFromNodes,
+  copyOrCutContent,
+  decorateJson,
+  handlePasteEvent,
+  parseTextToNodes,
+  validateJson,
+} from '@/utils';
 
 type LeafType = {
   type: string;
@@ -78,7 +80,7 @@ type SlateEditorProps = {
   onValueChange?: (value: string) => void;
 };
 
-export const SlateEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
+export const FormulaEditor = forwardRef<ComponentRef<any>, SlateEditorProps>(
   (
     {
       editor,
