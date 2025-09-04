@@ -34,7 +34,7 @@ interface TreeNode {
 
 export const CampaignProcessContentFilter: FC = () => {
   const { filterFormData, setFilterFormData } = useDialogStore();
-
+  console.log(filterFormData);
   const [renderData, setRenderData] = useState<TreeNode[]>(RENDER_DATA);
 
   const { isLoading } = useSWR(

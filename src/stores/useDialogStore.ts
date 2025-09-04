@@ -23,6 +23,7 @@ import {
   _closeSSE,
   _createCampaign,
   _fetchCrmProviderList,
+  _fetchEnrichmentTableData,
   _fetchSegmentOptions,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
@@ -50,6 +51,10 @@ export type DialogStoreState = {
   savedListFormData: SavedListInfo;
   fetchSavedListLoading: boolean;
   savedListOptions: TOption[];
+
+  enrichmentTableId: string;
+  fetchEnrichmentTableLoading: boolean;
+  enrichmentTableOptions: TOption[];
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
@@ -92,6 +97,9 @@ export type DialogStoreActions = {
 
   setSavedListFormData: (formData: SavedListInfo) => void;
   fetchSavedListOptions: () => Promise<void>;
+
+  fetchEnrichmentTableData: () => Promise<void>;
+  setEnrichmentTableId: (id: string) => void;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -175,6 +183,10 @@ const InitialState: DialogStoreState = {
   },
   fetchSavedListLoading: false,
   savedListOptions: [],
+
+  fetchEnrichmentTableLoading: false,
+  enrichmentTableOptions: [],
+  enrichmentTableId: '',
 
   leadsFetchLoading: false,
   leadsList: [],
@@ -425,6 +437,15 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         };
         break;
       }
+      case ProcessCreateTypeEnum.ai_table: {
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.ai_table,
+          data: {
+            tableId: get().enrichmentTableId,
+          },
+        };
+        break;
+      }
     }
     if (!postData) {
       return;
@@ -513,6 +534,24 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       set({ fetchSavedListLoading: false });
     }
   },
+  fetchEnrichmentTableData: async () => {
+    set({ fetchEnrichmentTableLoading: true });
+    try {
+      const { data } = await _fetchEnrichmentTableData();
+      const reducedData = data.content.map((item) => ({
+        label: item.tableName,
+        value: item.tableId,
+        key: item.tableId,
+      }));
+      set({ enrichmentTableOptions: reducedData });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      set({ fetchEnrichmentTableLoading: false });
+    }
+  },
+  setEnrichmentTableId: (id: string) => set({ enrichmentTableId: id }),
   setMessagingSteps: (messagingSteps) => set({ messagingSteps }),
   resetDialogState: async () => {
     const { chatSSE, chatId } = get();

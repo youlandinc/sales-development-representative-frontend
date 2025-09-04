@@ -2,7 +2,11 @@ import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import { debounce, Icon, Stack } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
+import {
+  CampaignProcess,
+  CommonRenameTextField,
+  LayoutUserInfo,
+} from '@/components/molecules';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
@@ -15,6 +19,9 @@ import {
   HeadRowsPanel,
   HeadViewPanel,
 } from './Panel';
+import { StyledButton } from '@/components/atoms';
+import { useDialogStore } from '@/stores/useDialogStore';
+import { ProcessCreateTypeEnum } from '@/types';
 
 interface ProspectDetailHeaderProps {
   tableId: string;
@@ -26,6 +33,12 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   const { resetTable, tableName, renameTable } = useProspectTableStore(
     (store) => store,
   );
+  const {
+    openProcess,
+    setCampaignType,
+    setLeadsVisible,
+    setLeadsFetchLoading,
+  } = useDialogStore();
 
   const router = useRouter();
 
@@ -96,7 +109,18 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
         <HeadColumnsPanel />
         <HeadRowsPanel />
         <HeadFilterPanel />
-
+        <StyledButton
+          onClick={() => {
+            setCampaignType(ProcessCreateTypeEnum.ai_table);
+            setLeadsFetchLoading(false);
+            setLeadsVisible(true);
+            openProcess();
+          }}
+          size={'small'}
+          variant={'outlined'}
+        >
+          Send email
+        </StyledButton>
         {/*<Stack*/}
         {/*  data-toolbar-button*/}
         {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}

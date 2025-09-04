@@ -23,3 +23,23 @@ export const _renameCampaign = (params: {
 }) => {
   return put('/sdr/campaign/name', params);
 };
+
+export const _fetchEnrichmentTableData = () => {
+  return post<{
+    content: {
+      tableId: string;
+      tableName: string;
+    }[];
+  }>('/sdr/prospect/list', {
+    size: 1000,
+    page: 0,
+  });
+};
+
+export const _fetchEnrichmentTableOptions = (tableId: string) => {
+  return get(`/sdr/prospect/table/${tableId}}/fields`);
+};
+
+export const _fetchEnrichmentTableMapping = (tableId: string) => {
+  return get(`/sdr/prospect/table/field/mapping/${tableId}`);
+};

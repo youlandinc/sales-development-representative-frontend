@@ -4,6 +4,7 @@ import { Stack } from '@mui/material';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import {
+  CampaignProcessContentAiTable,
   CampaignProcessContentAudience,
   CampaignProcessContentChat,
   CampaignProcessContentChoose,
@@ -49,6 +50,8 @@ export const CampaignProcessContent = () => {
         return <CampaignProcessContentChat />;
       case ProcessCreateTypeEnum.saved_list:
         return activeStep === 1 && <CampaignProcessContentSavedList />;
+      case ProcessCreateTypeEnum.ai_table:
+        return activeStep === 1 && <CampaignProcessContentAiTable />;
       default:
         return <></>;
     }

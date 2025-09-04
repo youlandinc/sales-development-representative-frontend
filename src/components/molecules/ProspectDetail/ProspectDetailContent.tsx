@@ -12,6 +12,7 @@ import { useWebSocket } from '@/hooks';
 
 import { StyledTable } from '@/components/atoms';
 import {
+  CampaignProcess,
   DialogCellDetails,
   DialogDeleteColumn,
   DialogEditDescription,
@@ -554,6 +555,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       <DialogEditDescription />
       <DialogDeleteColumn />
       <DialogCellDetails data={activeCell} />
+      <CampaignProcess />
     </Stack>
   );
 };

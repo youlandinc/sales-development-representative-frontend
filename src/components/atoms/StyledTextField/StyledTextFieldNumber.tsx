@@ -8,7 +8,7 @@ import {
 import { UFormatDollar, UFormatPercent, UNotUndefined } from '@/utils';
 
 import { StyledTextField } from '@/components/atoms';
-import { InputBaseProps, SxProps } from '@mui/material';
+import { InputBaseProps, SxProps, TextFieldProps } from '@mui/material';
 
 export interface StyledTextFieldNumberProps {
   allowNegative?: boolean;
@@ -29,6 +29,9 @@ export interface StyledTextFieldNumberProps {
   size?: 'small' | 'medium';
   InputProps?: any;
   onBlur?: InputBaseProps['onBlur'];
+  type?: TextFieldProps['type'];
+  max?: number;
+  isAllowed?: (values: NumberFormatValues) => boolean;
 }
 
 export const StyledTextFieldNumber: FC<StyledTextFieldNumberProps> = ({
@@ -41,6 +44,8 @@ export const StyledTextFieldNumber: FC<StyledTextFieldNumberProps> = ({
   decimalScale = 2,
   thousandSeparator = true,
   percentage = false,
+  max,
+  isAllowed,
   ...rest
 }) => {
   const [text, setText] = useState(value ?? 0);
@@ -93,13 +98,15 @@ export const StyledTextFieldNumber: FC<StyledTextFieldNumberProps> = ({
             thousandSeparator,
             fixedDecimalScale: percentage,
             autoComplete: 'off',
+            max,
+            isAllowed,
           },
         }}
         sx={{
           ...sx,
         }}
         value={text}
-        variant="outlined"
+        variant={'outlined'}
       />
     </>
   );
