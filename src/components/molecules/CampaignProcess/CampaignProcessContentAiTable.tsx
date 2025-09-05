@@ -94,8 +94,6 @@ export const CampaignProcessContentAiTable: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log(mappings, tableOptions, mappingsLoading);
-
   return (
     <>
       <Fade in>
