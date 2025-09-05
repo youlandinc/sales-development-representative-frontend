@@ -27,7 +27,7 @@ export enum ProcessCreateTypeEnum {
   crm = 'CRM',
   agent = 'AGENT',
   saved_list = 'SAVED_LIST',
-  ai_table = 'AI_TABLE',
+  ai_table = 'ENRICHMENT_TABLE',
 }
 
 export enum ProcessCreateChatEnum {

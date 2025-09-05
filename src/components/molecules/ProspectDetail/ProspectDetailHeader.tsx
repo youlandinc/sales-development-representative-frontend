@@ -104,39 +104,44 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
         </Stack>
       </Stack>
 
-      <Stack flexDirection={'row'} gap={1.5} height={32} ml={-1.5}>
-        <HeadViewPanel />
-        <HeadColumnsPanel />
-        <HeadRowsPanel />
-        <HeadFilterPanel />
-        <StyledButton
-          onClick={() => {
-            setCampaignType(ProcessCreateTypeEnum.ai_table);
-            setLeadsFetchLoading(false);
-            setLeadsVisible(true);
-            openProcess();
-          }}
-          size={'small'}
-          variant={'outlined'}
-        >
-          Send email
-        </StyledButton>
-        {/*<Stack*/}
-        {/*  data-toolbar-button*/}
-        {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
-        {/*  sx={{*/}
-        {/*    gap: 0.5,*/}
-        {/*    px: 1.5,*/}
-        {/*    borderRadius: 1,*/}
-        {/*    flexDirection: 'row',*/}
-        {/*    alignItems: 'center',*/}
-        {/*    cursor: 'pointer',*/}
-        {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
-        {/*  <Typography fontSize={14}>Search</Typography>*/}
-        {/*</Stack>*/}
+      <Stack flexDirection={'row'} justifyContent={'space-between'}>
+        <Stack flexDirection={'row'} gap={1.5} height={32} ml={-1.5}>
+          <HeadViewPanel />
+          <HeadColumnsPanel />
+          <HeadRowsPanel />
+          <HeadFilterPanel />
+
+          {/*<Stack*/}
+          {/*  data-toolbar-button*/}
+          {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
+          {/*  sx={{*/}
+          {/*    gap: 0.5,*/}
+          {/*    px: 1.5,*/}
+          {/*    borderRadius: 1,*/}
+          {/*    flexDirection: 'row',*/}
+          {/*    alignItems: 'center',*/}
+          {/*    cursor: 'pointer',*/}
+          {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
+          {/*  <Typography fontSize={14}>Search</Typography>*/}
+          {/*</Stack>*/}
+        </Stack>
+        <Stack flexDirection={'row'}>
+          <StyledButton
+            onClick={() => {
+              setCampaignType(ProcessCreateTypeEnum.ai_table);
+              setLeadsFetchLoading(false);
+              setLeadsVisible(true);
+              openProcess();
+            }}
+            size={'medium'}
+            variant={'contained'}
+          >
+            Actions
+          </StyledButton>
+        </Stack>
       </Stack>
     </Stack>
   );

@@ -1,47 +1,100 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Fade, Stack, Typography } from '@mui/material';
 import useSWR from 'swr';
 
+import { SDRToast, StyledSelect } from '@/components/atoms';
+
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { StyledSelect } from '@/components/atoms';
 import {
   _fetchEnrichmentTableMapping,
   _fetchEnrichmentTableOptions,
+  _updateMappingField,
 } from '@/request';
-
-const mockData = [
-  { fieldName: 'email', fieldId: 'xxxx', campaignRequiredColumnEnum: 'EMAIL' },
-  {
-    fieldName: 'email1',
-    fieldId: 'xxxx',
-    campaignRequiredColumnEnum: 'EMAIL1',
-  },
-  {
-    fieldName: 'email2',
-    fieldId: 'xxxx',
-    campaignRequiredColumnEnum: 'EMAIL2',
-  },
-];
+import { HttpError } from '@/types';
+import { useAsyncFn } from '@/hooks';
 
 export const CampaignProcessContentAiTable: FC = () => {
   const {
     fetchSavedListLoading,
     enrichmentTableOptions,
     fetchEnrichmentTableData,
-    enrichmentTableId,
-    setEnrichmentTableId,
+    selectedEnrichmentTableId,
+    setSelectedEnrichmentTableId,
   } = useDialogStore();
 
-  useSWR('fetchSavedListOptions', fetchEnrichmentTableData);
-  useSWR(
-    enrichmentTableId ? 'fetchEnrichmentTableOptions' : '',
-    _fetchEnrichmentTableOptions,
+  const [matchFields, setMatchFields] = useState<
+    {
+      fieldId: string | null;
+      fieldName: string;
+      campaignRequiredColumnEnum: string;
+    }[]
+  >([]);
+
+  useSWR('fetchSavedListOptions', fetchEnrichmentTableData, {
+    revalidateOnFocus: false,
+  });
+
+  const { data: mappings, isValidating: mappingsLoading } = useSWR(
+    selectedEnrichmentTableId
+      ? [selectedEnrichmentTableId, 'fetchEnrichmentTableMapping']
+      : null,
+    async ([id]) => {
+      try {
+        const { data } = await _fetchEnrichmentTableMapping(id);
+        setMatchFields(data.mappings);
+        return data.mappings;
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+    {
+      revalidateOnFocus: false,
+    },
   );
-  useSWR(
-    enrichmentTableId ? 'fetchEnrichmentTableMapping' : '',
-    _fetchEnrichmentTableMapping,
+
+  const { data: tableOptions } = useSWR(
+    mappings
+      ? [selectedEnrichmentTableId, 'fetchEnrichmentTableOptions']
+      : null,
+    async ([id]) => {
+      try {
+        const { data } = await _fetchEnrichmentTableOptions(id);
+        return data.map((item) => ({
+          label: item.fieldName,
+          value: item.fieldId,
+          key: item.fieldId,
+        }));
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+    {
+      revalidateOnFocus: false,
+    },
   );
+
+  const [, updateMappingField] = useAsyncFn(
+    async (param: { fieldId: string; requiredColumn: string }) => {
+      try {
+        await _updateMappingField(param);
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+  );
+
+  useEffect(() => {
+    return () => {
+      setSelectedEnrichmentTableId('');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  console.log(mappings, tableOptions, mappingsLoading);
 
   return (
     <>
@@ -68,75 +121,102 @@ export const CampaignProcessContentAiTable: FC = () => {
               <StyledSelect
                 loading={fetchSavedListLoading}
                 onChange={(e) => {
-                  setEnrichmentTableId(e.target.value as string);
+                  setSelectedEnrichmentTableId(e.target.value as string);
                 }}
                 options={enrichmentTableOptions}
                 placeholder={'Select a table'}
-                value={enrichmentTableId}
+                value={selectedEnrichmentTableId}
               />
             </Stack>
-            <Stack gap={1}>
-              <Typography fontWeight={700} variant={'body2'}>
-                Match corresponding fields
-              </Typography>
-              <Stack>
-                <Stack
-                  bgcolor={'#F7F4FD'}
-                  border={'1px solid #D2D6E1'}
-                  flexDirection={'row'}
-                  px={4}
-                  py={1.25}
-                  sx={{
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8,
-                  }}
-                >
-                  <Typography flex={1} fontWeight={700} variant={'body2'}>
-                    Required fields
+            {!mappingsLoading && mappings && (
+              <Fade in>
+                <Stack gap={1}>
+                  <Typography fontWeight={700} variant={'body2'}>
+                    Match corresponding fields
                   </Typography>
-                  <Typography flex={1} fontWeight={700} variant={'body2'}>
-                    Data field
-                  </Typography>
-                </Stack>
-                <Stack
-                  border={'1px solid #D2D6E1'}
-                  borderTop={'none'}
-                  gap={1.5}
-                  py={1.5}
-                  sx={{
-                    borderBottomLeftRadius: 8,
-                    borderBottomRightRadius: 8,
-                  }}
-                >
-                  {mockData.map((item, index) => (
+                  <Stack>
                     <Stack
+                      bgcolor={'#F7F4FD'}
+                      border={'1px solid #D2D6E1'}
                       flexDirection={'row'}
                       px={4}
+                      py={1.25}
                       sx={{
                         borderTopLeftRadius: 8,
                         borderTopRightRadius: 8,
                       }}
                     >
                       <Typography flex={1} fontWeight={700} variant={'body2'}>
-                        {item.fieldName}
+                        Required fields
                       </Typography>
-                      <Box flex={1}>
-                        <StyledSelect
-                          loading={fetchSavedListLoading}
-                          onChange={(e) => {
-                            setEnrichmentTableId(e.target.value as string);
-                          }}
-                          options={enrichmentTableOptions}
-                          placeholder={'Select a table'}
-                          sx={{ flex: 1, maxWidth: 320 }}
-                          value={enrichmentTableId}
-                        />
-                      </Box>
+                      <Typography flex={1} fontWeight={700} variant={'body2'}>
+                        Data field
+                      </Typography>
                     </Stack>
-                  ))}
+                    <Stack
+                      border={'1px solid #D2D6E1'}
+                      borderTop={'none'}
+                      gap={1.5}
+                      py={1.5}
+                      sx={{
+                        borderBottomLeftRadius: 8,
+                        borderBottomRightRadius: 8,
+                      }}
+                    >
+                      {matchFields.map((item, index) => (
+                        <Stack
+                          flexDirection={'row'}
+                          key={index}
+                          px={4}
+                          sx={{
+                            borderTopLeftRadius: 8,
+                            borderTopRightRadius: 8,
+                          }}
+                        >
+                          <Typography
+                            flex={1}
+                            fontWeight={700}
+                            variant={'body2'}
+                          >
+                            {item.fieldName}
+                          </Typography>
+                          <Box flex={1}>
+                            <StyledSelect
+                              loading={fetchSavedListLoading}
+                              onChange={async (e) => {
+                                setMatchFields(
+                                  matchFields.map((i) => {
+                                    if (
+                                      i.campaignRequiredColumnEnum ===
+                                      item.campaignRequiredColumnEnum
+                                    ) {
+                                      return {
+                                        ...i,
+                                        fieldId: e.target.value as string,
+                                      };
+                                    }
+                                    return i;
+                                  }),
+                                );
+                                await updateMappingField({
+                                  fieldId: e.target.value as string,
+                                  requiredColumn:
+                                    item.campaignRequiredColumnEnum,
+                                });
+                              }}
+                              options={tableOptions || []}
+                              placeholder={'Select a table'}
+                              sx={{ flex: 1, maxWidth: 320 }}
+                              value={item.fieldId || ''}
+                            />
+                          </Box>
+                        </Stack>
+                      ))}
+                    </Stack>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Stack>
+              </Fade>
+            )}
           </Stack>
         </Stack>
       </Fade>

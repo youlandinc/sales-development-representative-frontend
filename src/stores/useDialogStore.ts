@@ -52,7 +52,7 @@ export type DialogStoreState = {
   fetchSavedListLoading: boolean;
   savedListOptions: TOption[];
 
-  enrichmentTableId: string;
+  selectedEnrichmentTableId: string;
   fetchEnrichmentTableLoading: boolean;
   enrichmentTableOptions: TOption[];
 
@@ -99,7 +99,7 @@ export type DialogStoreActions = {
   fetchSavedListOptions: () => Promise<void>;
 
   fetchEnrichmentTableData: () => Promise<void>;
-  setEnrichmentTableId: (id: string) => void;
+  setSelectedEnrichmentTableId: (id: string) => void;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -186,7 +186,7 @@ const InitialState: DialogStoreState = {
 
   fetchEnrichmentTableLoading: false,
   enrichmentTableOptions: [],
-  enrichmentTableId: '',
+  selectedEnrichmentTableId: '',
 
   leadsFetchLoading: false,
   leadsList: [],
@@ -441,7 +441,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         postData = {
           startingPoint: ProcessCreateTypeEnum.ai_table,
           data: {
-            tableId: get().enrichmentTableId,
+            tableId: get().selectedEnrichmentTableId,
           },
         };
         break;
@@ -551,7 +551,8 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       set({ fetchEnrichmentTableLoading: false });
     }
   },
-  setEnrichmentTableId: (id: string) => set({ enrichmentTableId: id }),
+  setSelectedEnrichmentTableId: (id: string) =>
+    set({ selectedEnrichmentTableId: id }),
   setMessagingSteps: (messagingSteps) => set({ messagingSteps }),
   resetDialogState: async () => {
     const { chatSSE, chatId } = get();
