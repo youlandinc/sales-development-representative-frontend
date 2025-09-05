@@ -101,11 +101,15 @@ export const _fetchStepEmail = (params: {
   );
 };
 
-export const _fetchLeadPersonalResearch = (leadId: string | number) => {
+export const _fetchLeadPersonalResearch = (
+  leadId: string | number,
+  chatId: string | number,
+) => {
   return post('/sdr/ai/normal/generate', {
     module: ModuleEnum.personal_research,
     params: {
       leadId,
+      chatId,
     },
   });
 };

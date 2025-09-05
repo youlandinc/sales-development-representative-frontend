@@ -466,6 +466,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         lunchInfo: data.data.launchInfo,
         offerOptions: data.data.offerOptions,
         chatId: data.chatId,
+        activeStep: 2,
       });
       switch (campaignType) {
         case ProcessCreateTypeEnum.filter: {
@@ -490,7 +491,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
-      set({ creating: false, activeStep: 2, reloadTable: true });
+      set({ creating: false, /*activeStep: 2,*/ reloadTable: true });
     }
   },
   fetchProviderOptions: async () => {
