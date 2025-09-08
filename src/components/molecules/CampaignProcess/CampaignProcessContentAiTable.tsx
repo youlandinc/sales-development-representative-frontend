@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { Box, Fade, Stack, Typography } from '@mui/material';
 import useSWR from 'swr';
 
-import { SDRToast, StyledSelect } from '@/components/atoms';
+import { SDRToast, StyledLoading, StyledSelect } from '@/components/atoms';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
@@ -21,6 +21,10 @@ export const CampaignProcessContentAiTable: FC = () => {
     fetchEnrichmentTableData,
     selectedEnrichmentTableId,
     setSelectedEnrichmentTableId,
+    enrichmentTableDisabled,
+    setEnrichmentTableDisabled,
+    createCampaignErrorMessage,
+    setCreateCampaignErrorMessage,
   } = useDialogStore();
 
   const [matchFields, setMatchFields] = useState<
@@ -31,9 +35,14 @@ export const CampaignProcessContentAiTable: FC = () => {
     }[]
   >([]);
 
-  useSWR('fetchSavedListOptions', fetchEnrichmentTableData, {
-    revalidateOnFocus: false,
-  });
+  const { isValidating } = useSWR(
+    'fetchSavedListOptions',
+    fetchEnrichmentTableData,
+    {
+      revalidateOnFocus: false,
+      keepPreviousData: false,
+    },
+  );
 
   const { data: mappings, isValidating: mappingsLoading } = useSWR(
     selectedEnrichmentTableId
@@ -51,6 +60,7 @@ export const CampaignProcessContentAiTable: FC = () => {
     },
     {
       revalidateOnFocus: false,
+      keepPreviousData: false,
     },
   );
 
@@ -73,6 +83,7 @@ export const CampaignProcessContentAiTable: FC = () => {
     },
     {
       revalidateOnFocus: false,
+      keepPreviousData: false,
     },
   );
 
@@ -90,6 +101,8 @@ export const CampaignProcessContentAiTable: FC = () => {
   useEffect(() => {
     return () => {
       setSelectedEnrichmentTableId('');
+      setEnrichmentTableDisabled(false);
+      setCreateCampaignErrorMessage('');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -98,26 +111,18 @@ export const CampaignProcessContentAiTable: FC = () => {
     <>
       <Fade in>
         <Stack height={'100%'} width={'100%'}>
-          <Typography fontWeight={700} variant={'body2'}>
-            Saved table
-          </Typography>
-          <Typography variant={'body2'}>
-            The list must include name, full name, and email address, otherwise
-            we cannot generate accurate email content for you.
-          </Typography>
-          <Stack gap={3} mt={3} px={1.5}>
+          <Stack flex={1} gap={3} mt={3} px={1.5}>
             <Stack gap={1}>
-              <Typography
-                color={
-                  fetchSavedListLoading ? 'text.secondary' : 'text.primary'
-                }
-                fontWeight={700}
-                variant={'body2'}
-              >
-                Table
+              <Typography fontWeight={700} variant={'body2'}>
+                Saved table
+              </Typography>
+              <Typography variant={'body2'}>
+                The list must include full name and email address, otherwise we
+                cannot generate accurate email content for you.
               </Typography>
               <StyledSelect
-                loading={fetchSavedListLoading}
+                disabled={enrichmentTableDisabled || isValidating}
+                loading={isValidating}
                 onChange={(e) => {
                   setSelectedEnrichmentTableId(e.target.value as string);
                 }}
@@ -126,6 +131,11 @@ export const CampaignProcessContentAiTable: FC = () => {
                 value={selectedEnrichmentTableId}
               />
             </Stack>
+            {mappingsLoading && (
+              <Stack flex={1} justifyContent={'center'}>
+                <StyledLoading size={'large'} />
+              </Stack>
+            )}
             {!mappingsLoading && mappings && (
               <Fade in>
                 <Stack gap={1}>
@@ -163,6 +173,7 @@ export const CampaignProcessContentAiTable: FC = () => {
                     >
                       {matchFields.map((item, index) => (
                         <Stack
+                          alignItems={'center'}
                           flexDirection={'row'}
                           key={index}
                           px={4}
@@ -174,6 +185,19 @@ export const CampaignProcessContentAiTable: FC = () => {
                           <Typography
                             flex={1}
                             fontWeight={700}
+                            lineHeight={1.2}
+                            sx={{
+                              '&::before': {
+                                content: "'*'",
+                                color:
+                                  item.campaignRequiredColumnEnum === 'EMAIL' ||
+                                  item.campaignRequiredColumnEnum ===
+                                    'FULL_NAME'
+                                    ? '#E26E6E'
+                                    : 'transparent',
+                                pr: '4px',
+                              },
+                            }}
                             variant={'body2'}
                           >
                             {item.fieldName}
@@ -214,6 +238,11 @@ export const CampaignProcessContentAiTable: FC = () => {
                   </Stack>
                 </Stack>
               </Fade>
+            )}
+            {createCampaignErrorMessage && (
+              <Typography color={'#E26E6E'} variant={'body3'}>
+                {createCampaignErrorMessage}
+              </Typography>
             )}
           </Stack>
         </Stack>
