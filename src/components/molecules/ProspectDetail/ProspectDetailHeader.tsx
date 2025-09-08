@@ -6,6 +6,7 @@ import {
   CampaignProcess,
   CommonRenameTextField,
   LayoutUserInfo,
+  TableColumnMenuEnum,
 } from '@/components/molecules';
 
 import { useProspectTableStore } from '@/stores/Prospect';
@@ -33,6 +34,8 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   const { resetTable, tableName, renameTable } = useProspectTableStore(
     (store) => store,
   );
+  const { openDialog } = useProspectTableStore((store) => store);
+
   const {
     openProcess,
     setCampaignType,
@@ -132,11 +135,12 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
         <Stack flexDirection={'row'}>
           <StyledButton
             onClick={() => {
-              setCampaignType(ProcessCreateTypeEnum.ai_table);
-              openProcess();
+              // setCampaignType(ProcessCreateTypeEnum.ai_table);
+              // openProcess();
               setSelectedEnrichmentTableId(tableId);
-              setEnrichmentTableDisabled(true);
-              setLeadsVisible(true);
+              // setEnrichmentTableDisabled(true);
+              // setLeadsVisible(true);
+              openDialog(TableColumnMenuEnum.header_actions);
             }}
             size={'medium'}
             variant={'contained'}
