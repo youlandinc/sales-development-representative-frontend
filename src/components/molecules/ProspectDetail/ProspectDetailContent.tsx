@@ -16,6 +16,7 @@ import {
   DialogCellDetails,
   DialogDeleteColumn,
   DialogEditDescription,
+  DialogHeaderActions,
   DialogWebResearch,
   TableColumnMenuEnum,
 } from '@/components/molecules';
@@ -556,6 +557,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       <DialogDeleteColumn />
       <DialogCellDetails data={activeCell} />
       <CampaignProcess />
+      <DialogHeaderActions />
     </Stack>
   );
 };

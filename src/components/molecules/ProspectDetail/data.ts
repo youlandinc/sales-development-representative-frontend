@@ -20,6 +20,7 @@ export enum TableColumnMenuEnum {
   visible = 'VISIBLE',
   delete = 'DELETE',
   cell_detail = 'CELL_DETAIL',
+  header_actions = 'HEADER_ACTIONS',
 }
 
 export interface TableColumnOption {
