@@ -62,7 +62,21 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
 
   const [state, createTableByFindPeople] = useAsyncFn(async () => {
     try {
-      const { data } = await _createTableByFindPeople(filters);
+      const { data } = await _createTableByFindPeople(
+        Object.entries(filters).reduce(
+          (pre, [key, value]) => {
+            if (Array.isArray(value)) {
+              pre[key] = value.map((item) =>
+                typeof item === 'string' ? item : item.value,
+              );
+              return pre;
+            }
+            pre[key] = value;
+            return pre;
+          },
+          {} as Record<string, any>,
+        ),
+      );
       router.push(`/prospect-enrich/${data}`);
     } catch (e) {
       const { message, header, variant } = e as HttpError;
@@ -652,8 +666,8 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             />
           </FilterContainer>
           <FilterContainer
-            subTitle={'100 record max per search'}
-            title={'Maximum: 100'}
+            subTitle={'Maximum: 100'}
+            title={'Limit per company'}
           >
             <StyledTextFieldNumber
               decimalScale={0}
@@ -686,6 +700,9 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
           loading={state.loading}
           onClick={createTableByFindPeople}
           size={'medium'}
+          sx={{
+            width: 92,
+          }}
           variant={'contained'}
         >
           Continue

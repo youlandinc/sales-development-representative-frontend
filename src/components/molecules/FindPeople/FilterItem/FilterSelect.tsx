@@ -28,7 +28,14 @@ export const FilterSelect: FC<
         }}
         options={memoOptions}
         renderInput={(params) => (
-          <TextField {...params} placeholder={placeholder} />
+          <TextField
+            {...params}
+            placeholder={
+              !!value && Array.isArray(value) && value.length === 0
+                ? placeholder
+                : ''
+            }
+          />
         )}
         renderOption={(props, option) => {
           return (
@@ -46,7 +53,9 @@ export const FilterSelect: FC<
               <Box fontSize={14} key={`${option.key}-checkbox-key`}>
                 {option.label}
               </Box>
-              {props?.['aria-selected'] && <CheckIcon fontSize={'small'} />}
+              {props?.['aria-selected'] && (
+                <CheckIcon fontSize={'small'} key={`${option.key}-checked`} />
+              )}
             </Stack>
           );
         }}
