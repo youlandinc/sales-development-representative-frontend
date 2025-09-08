@@ -1,6 +1,6 @@
 import { post } from '@/request/request';
 
-export const _fetchFindPeople = (param: { limit: number }) => {
+export const _fetchFindPeople = (param: Record<string, any>) => {
   return post<{
     peopleCount: number;
     peopleList: {

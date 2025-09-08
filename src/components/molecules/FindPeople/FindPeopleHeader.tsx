@@ -2,9 +2,10 @@ import { Icon, Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import ICON_BACK from './assets/icon-back.svg';
-import ICON_CLOSE from './assets/icon-close.svg';
+import { FC } from 'react';
+// import ICON_CLOSE from './assets/icon-close.svg';
 
-export const FindPeopleHeader = () => {
+export const FindPeopleHeader: FC = () => {
   const router = useRouter();
   return (
     <Stack
@@ -27,10 +28,10 @@ export const FindPeopleHeader = () => {
           Find people
         </Typography>
       </Stack>
-      <Icon
+      {/* <Icon
         component={ICON_CLOSE}
         sx={{ width: 20, height: 20, mt: 0.25, cursor: 'pointer' }}
-      />
+      />*/}
     </Stack>
   );
 };

@@ -36,8 +36,9 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   const {
     openProcess,
     setCampaignType,
+    setSelectedEnrichmentTableId,
+    setEnrichmentTableDisabled,
     setLeadsVisible,
-    setLeadsFetchLoading,
   } = useDialogStore();
 
   const router = useRouter();
@@ -132,9 +133,10 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
           <StyledButton
             onClick={() => {
               setCampaignType(ProcessCreateTypeEnum.ai_table);
-              setLeadsFetchLoading(false);
-              setLeadsVisible(true);
               openProcess();
+              setSelectedEnrichmentTableId(tableId);
+              setEnrichmentTableDisabled(true);
+              setLeadsVisible(true);
             }}
             size={'medium'}
             variant={'contained'}
