@@ -46,6 +46,8 @@ export const FindPeople = () => {
     () => (
       <FindPeopleGrid
         isLoading={state.loading}
+        limit={params?.limit}
+        limitPerCompany={params?.limitPerCompany}
         peopleCount={state?.value?.data?.peopleCount || 0}
         peopleList={state?.value?.data?.peopleList}
       />
