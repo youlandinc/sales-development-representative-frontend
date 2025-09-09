@@ -1,4 +1,4 @@
-import { FC, memo, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import {
   Autocomplete,
   AutocompleteProps,

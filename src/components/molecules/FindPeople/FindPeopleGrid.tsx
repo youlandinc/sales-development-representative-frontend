@@ -1,6 +1,8 @@
 import { FC } from 'react';
 import { GridColDef } from '@mui/x-data-grid';
-import { Skeleton, Stack, Typography } from '@mui/material';
+import { Skeleton, Stack, Tooltip, Typography } from '@mui/material';
+
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 type FindPeopleGridProps = {
   peopleList?: {
@@ -13,12 +15,16 @@ type FindPeopleGridProps = {
   }[];
   isLoading?: boolean;
   peopleCount?: number;
+  limit?: number;
+  limitPerCompany?: number;
 };
 
 export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
   peopleList,
   isLoading,
   peopleCount,
+  limit,
+  limitPerCompany,
 }) => {
   // const { filters } = useFindPeopleStore((state) => state);
   // const params = useDebounce(filters, 400);
@@ -52,7 +58,7 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
   ];
 
   return (
-    <Stack flex={1} gap={1.5} minWidth={0} pb={6} pr={3} py={3}>
+    <Stack flex={1} gap={1.5} minWidth={0} pb={6} pr={3} pt={3}>
       {/*header*/}
       <Stack
         alignItems={'center'}
@@ -63,10 +69,41 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
         <Typography fontWeight={600} lineHeight={1.2} pl={3}>
           Preview leads
         </Typography>
-        <Typography color={'text.secondary'} lineHeight={1.2} variant={'body2'}>
-          Previewing <strong>{peopleList?.length || 0}</strong> of{' '}
-          <strong>{peopleCount || 0}</strong> leads
-        </Typography>
+        <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+          {limitPerCompany ? (
+            <Typography
+              alignItems={'center'}
+              color={'text.secondary'}
+              flexDirection={'row'}
+              lineHeight={1.2}
+              variant={'body2'}
+            >
+              Previewing {peopleList?.length || 0} people
+            </Typography>
+          ) : (
+            <Typography
+              alignItems={'center'}
+              color={'text.secondary'}
+              flexDirection={'row'}
+              lineHeight={1.2}
+              variant={'body2'}
+            >
+              Previewing <strong>{peopleList?.length || 0}</strong> of{' '}
+              <strong>{peopleCount || 0}</strong> results.{' '}
+              {(limit || 1000) as number} will be imported.
+            </Typography>
+          )}
+          <Tooltip
+            placement={'top'}
+            title={
+              limitPerCompany
+                ? `A max of ${limitPerCompany} per company will be imported`
+                : 'You can adjust your setting under "Limit Results"'
+            }
+          >
+            <ErrorOutlineIcon sx={{ fontSize: 16 }} />
+          </Tooltip>
+        </Stack>
       </Stack>
       {/*grid*/}
       {peopleList?.length === 0 ? (

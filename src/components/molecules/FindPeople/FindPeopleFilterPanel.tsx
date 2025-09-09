@@ -645,15 +645,14 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
           title={'Limit results'}
         >
           <FilterContainer
-            subTitle={'100 record max per search'}
+            subTitle={'1000 record max per search'}
             title={'Limit'}
           >
             <StyledTextFieldNumber
               decimalScale={0}
               isAllowed={({ floatValue }) => {
-                return (floatValue || 0) <= 100;
+                return (floatValue || 0) <= 1000;
               }}
-              max={100}
               onValueChange={({ floatValue }) => {
                 setFilters({
                   ...filters,
@@ -661,20 +660,18 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
                 });
               }}
               placeholder={'e.g.10'}
-              type={'number'}
               value={(filters.limit as number) || ''}
             />
           </FilterContainer>
           <FilterContainer
-            subTitle={'Maximum: 100'}
+            subTitle={'Maximum: 1000'}
             title={'Limit per company'}
           >
             <StyledTextFieldNumber
               decimalScale={0}
               isAllowed={({ floatValue }) => {
-                return (floatValue || 0) <= 100;
+                return (floatValue || 0) <= 1000;
               }}
-              max={100}
               onValueChange={({ floatValue }) => {
                 setFilters({
                   ...filters,
@@ -682,7 +679,6 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
                 });
               }}
               placeholder={'e.g.10'}
-              type={'number'}
               value={(filters.limitPerCompany as number) || ''}
             />
           </FilterContainer>
