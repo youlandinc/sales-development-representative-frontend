@@ -52,7 +52,16 @@ export const FilterTextField: FC<
           onChange?.(value);
         }}
         renderInput={(params) => (
-          <TextField {...params} placeholder={placeholder} />
+          <TextField
+            {...params}
+            placeholder={
+              !!props?.value &&
+              Array.isArray(props?.value) &&
+              props?.value.length === 0
+                ? placeholder
+                : ''
+            }
+          />
         )}
         renderValue={(value, getItemProps) => {
           return value.map((item, index) => (
