@@ -89,8 +89,8 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
               variant={'body2'}
             >
               Previewing <strong>{peopleList?.length || 0}</strong> of{' '}
-              <strong>{peopleCount || 0}</strong> results.{' '}
-              {(limit || 1000) as number} will be imported.
+              <strong>{(peopleCount || 0).toLocaleString()}</strong> results.{' '}
+              <strong>{(limit || '1,000') as number}</strong> will be imported.
             </Typography>
           )}
           <Tooltip

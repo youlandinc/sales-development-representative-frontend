@@ -1,4 +1,10 @@
-import { Stack } from '@mui/material';
+import {
+  FormControlLabel,
+  Icon,
+  Radio,
+  RadioGroup,
+  Stack,
+} from '@mui/material';
 import { FC, useEffect } from 'react';
 import { isNumber, isString } from 'lodash-es';
 import { useRouter } from 'nextjs-toploader/app';
@@ -34,6 +40,8 @@ import {
 import { useAsyncFn } from '@/hooks';
 import { _createTableByFindPeople } from '@/request';
 import { HttpError } from '@/types';
+
+import ICON_FOLDER from './assets/icon-folder.svg';
 
 type FindPeopleFilterPanelProps = {
   disabled?: boolean;
@@ -586,10 +594,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
         </CollapsePanel>
 
         <CollapsePanel
-          filterCount={computedFilterCount([
-            filters.languages,
-            filters.schoolNames,
-          ])}
+          filterCount={computedFilterCount([filters.languages])}
           title={'Languages'}
         >
           <FilterTextField
@@ -604,7 +609,10 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             value={filters.languages as Option[]}
           />
         </CollapsePanel>
-        <CollapsePanel title={'Education'}>
+        <CollapsePanel
+          filterCount={computedFilterCount([filters.schoolNames])}
+          title={'Education'}
+        >
           <FilterTextField
             onChange={(newValue) => {
               setFilters({
@@ -617,8 +625,66 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             value={filters.schoolNames as Option[]}
           />
         </CollapsePanel>
-        <CollapsePanel title={'Companies'}></CollapsePanel>
-        <CollapsePanel title={'Exclude people'}></CollapsePanel>
+        <CollapsePanel title={'Companies'}>
+          <RadioGroup defaultValue={'male'}>
+            <FormControlLabel
+              control={<Radio />}
+              label={'SDR table of companies'}
+              slotProps={{
+                typography: {
+                  fontSize: 12,
+                },
+              }}
+              value={'male'}
+            />
+            <FormControlLabel
+              control={<Radio />}
+              label={'List of company identifiers'}
+              slotProps={{
+                typography: {
+                  fontSize: 12,
+                },
+              }}
+              value={'other'}
+            />
+          </RadioGroup>
+
+          <FilterSelect
+            disabled
+            options={[]}
+            placeholder={'Select company table'}
+            popupIcon={
+              <Icon component={ICON_FOLDER} sx={{ width: 16, height: 16 }} />
+            }
+            title={'Company table'}
+          />
+          <FilterSelect
+            options={[]}
+            placeholder={'e.g. McGill University, McMaster University'}
+            title={'Company identifiers'}
+          />
+        </CollapsePanel>
+        <CollapsePanel title={'Exclude people'}>
+          <FilterSelect
+            disabled
+            options={[]}
+            placeholder={'Select people table'}
+            popupIcon={
+              <Icon component={ICON_FOLDER} sx={{ width: 16, height: 16 }} />
+            }
+            title={'Table'}
+          />
+          <FilterSelect
+            options={[]}
+            placeholder={'Select a view'}
+            title={'View'}
+          />
+          <FilterSelect
+            options={[]}
+            placeholder={'Start typing or select a column'}
+            title={'Personal LinkedIn URLs'}
+          />
+        </CollapsePanel>
         <CollapsePanel
           filterCount={computedFilterCount([filters.includePastExperiences])}
           title={'Past experiences'}
