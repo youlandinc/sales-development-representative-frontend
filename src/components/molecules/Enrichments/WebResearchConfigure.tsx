@@ -21,9 +21,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import {
   CollapseCard,
+  FormulaEditor,
   OutputsFields,
-  SlateEditor,
-  TiptapEditor,
+  PromptEditor,
 } from '@/components/molecules';
 import { useVariableFromStore } from '@/hooks';
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
@@ -83,6 +83,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       setTipTapEditorInstance(editor);
       onPromptEditorReady?.(editor);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSchemaEditorReady = useCallback((editor: ReactEditor) => {
@@ -90,6 +91,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       setSlateEditorInstance(editor);
       onSchemaEditorReady?.(editor);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const transformToObject = useCallback((str: string) => {
@@ -190,6 +192,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           return [x, y];
         }),
       );
+      //todo update fields
       console.log(JSON.stringify(f));
       // n((x) => ({
       //   ...x,
@@ -208,7 +211,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         <Typography fontWeight={700} variant={'subtitle1'}>
           Prompt
         </Typography>
-        <TiptapEditor
+        <PromptEditor
           defaultValue={defaultValue}
           handleGenerate={handleGenerate}
           minHeight={200}
@@ -404,7 +407,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           )}
           {/* <Box display={outPuts === 'json' ? 'block' : 'none'}> */}
           {!isLoading && outPuts === 'json' && (
-            <SlateEditor
+            <FormulaEditor
               editor={editor}
               initialValue={schemaJson}
               onEditorReady={handleSchemaEditorReady}
@@ -437,7 +440,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           {/*    <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />*/}
           {/*  </Tooltip>*/}
           {/*</Stack>*/}
-          {/*<SlateEditor initialValue={{}} style={{ padding: '4px' }} />*/}
+          {/*<FormulaEditor initialValue={{}} style={{ padding: '4px' }} />*/}
         </Stack>
       </CollapseCard>
     </Stack>

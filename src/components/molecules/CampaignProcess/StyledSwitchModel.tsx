@@ -43,7 +43,7 @@ export const StyledSwitchModel: FC<StyledSwitchModelProps> = ({
         borderRadius={2}
         flexDirection={'row'}
         gap={'2px'}
-        maxWidth={150}
+        maxWidth={155}
         onClick={(e) => onClickOpenMenu(e)}
         p={'4px 12px'}
         sx={{

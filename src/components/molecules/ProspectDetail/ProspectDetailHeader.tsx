@@ -2,7 +2,12 @@ import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import { debounce, Icon, Stack } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
+import {
+  CampaignProcess,
+  CommonRenameTextField,
+  LayoutUserInfo,
+  TableColumnMenuEnum,
+} from '@/components/molecules';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
@@ -15,6 +20,9 @@ import {
   HeadRowsPanel,
   HeadViewPanel,
 } from './Panel';
+import { StyledButton } from '@/components/atoms';
+import { useDialogStore } from '@/stores/useDialogStore';
+import { ProcessCreateTypeEnum } from '@/types';
 
 interface ProspectDetailHeaderProps {
   tableId: string;
@@ -26,6 +34,15 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   const { resetTable, tableName, renameTable } = useProspectTableStore(
     (store) => store,
   );
+  const { openDialog } = useProspectTableStore((store) => store);
+
+  const {
+    openProcess,
+    setCampaignType,
+    setSelectedEnrichmentTableId,
+    setEnrichmentTableDisabled,
+    setLeadsVisible,
+  } = useDialogStore();
 
   const router = useRouter();
 
@@ -91,28 +108,46 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
         </Stack>
       </Stack>
 
-      <Stack flexDirection={'row'} gap={1.5} height={32} ml={-1.5}>
-        <HeadViewPanel />
-        <HeadColumnsPanel />
-        <HeadRowsPanel />
-        <HeadFilterPanel />
+      <Stack flexDirection={'row'} justifyContent={'space-between'}>
+        <Stack flexDirection={'row'} gap={1.5} height={32} ml={-1.5}>
+          <HeadViewPanel />
+          <HeadColumnsPanel />
+          <HeadRowsPanel />
+          <HeadFilterPanel />
 
-        {/*<Stack*/}
-        {/*  data-toolbar-button*/}
-        {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
-        {/*  sx={{*/}
-        {/*    gap: 0.5,*/}
-        {/*    px: 1.5,*/}
-        {/*    borderRadius: 1,*/}
-        {/*    flexDirection: 'row',*/}
-        {/*    alignItems: 'center',*/}
-        {/*    cursor: 'pointer',*/}
-        {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
-        {/*  <Typography fontSize={14}>Search</Typography>*/}
-        {/*</Stack>*/}
+          {/*<Stack*/}
+          {/*  data-toolbar-button*/}
+          {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
+          {/*  sx={{*/}
+          {/*    gap: 0.5,*/}
+          {/*    px: 1.5,*/}
+          {/*    borderRadius: 1,*/}
+          {/*    flexDirection: 'row',*/}
+          {/*    alignItems: 'center',*/}
+          {/*    cursor: 'pointer',*/}
+          {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
+          {/*  <Typography fontSize={14}>Search</Typography>*/}
+          {/*</Stack>*/}
+        </Stack>
+        <Stack flexDirection={'row'}>
+          <StyledButton
+            onClick={() => {
+              // setCampaignType(ProcessCreateTypeEnum.ai_table);
+              // openProcess();
+              setSelectedEnrichmentTableId(tableId);
+              // setEnrichmentTableDisabled(true);
+              // setLeadsVisible(true);
+              openDialog(TableColumnMenuEnum.header_actions);
+            }}
+            size={'medium'}
+            variant={'contained'}
+          >
+            Actions
+          </StyledButton>
+        </Stack>
       </Stack>
     </Stack>
   );

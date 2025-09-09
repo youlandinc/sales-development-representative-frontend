@@ -34,11 +34,12 @@ import { useAsyncFn, useVariableFromStore } from '@/hooks';
 import { columnRun, updateWebResearchConfig } from '@/request';
 import { HttpError } from '@/types';
 import { extractPromptText } from '@/utils';
+
 import CloseIcon from '@mui/icons-material/Close';
-import ICON_ARROW from './assets/icon_arrow.svg';
-import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
-import ICON_COINS from './assets/icon_coins.svg';
-import ICON_SPARK from './assets/icon_sparkle.svg';
+import ICON_ARROW from '../assets/dialog/icon_arrow.svg';
+import ICON_ARROW_DOWN from '../assets/dialog/icon_arrow_down.svg';
+import ICON_COINS from '../assets/dialog/icon_coins.svg';
+import ICON_SPARK from '../assets/dialog/icon_sparkle.svg';
 
 type CostCoinsProps = StackProps & {
   count: string;
@@ -67,12 +68,15 @@ export const CostCoins: FC<CostCoinsProps> = ({
   );
 };
 
-type WebResearchProps = {
+type DialogWebResearchProps = {
   cb?: () => Promise<void>;
   tableId: string;
 };
 
-export const WebResearch: FC<WebResearchProps> = ({ tableId, cb }) => {
+export const DialogWebResearch: FC<DialogWebResearchProps> = ({
+  tableId,
+  cb,
+}) => {
   const { columns, rowIds, activeColumnId } = useProspectTableStore(
     (store) => store,
   );

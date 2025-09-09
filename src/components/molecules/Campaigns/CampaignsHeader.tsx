@@ -26,6 +26,7 @@ import ICON_ACTIVE_LEADS from './assets/icon_active_leads.svg';
 import ICON_OPEN_RATE from './assets/icon_open_rate.svg';
 import ICON_REPLY_RATE from './assets/icon_reply_rate.svg';
 import ICON_MEETINGS_BOOKED from './assets/icon_meetings_booked.svg';
+import ICON_PLUS from './assets/icon_plus.svg';
 
 const mock = [
   {
@@ -143,12 +144,11 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
             value={value}
           />
           <StyledButton onClick={() => openProcess()} size={'medium'}>
-            <Typography
-              sx={{ fontSize: '24px !important', mt: '1px', mr: 0.5 }}
-            >
-              +
-            </Typography>{' '}
-            Create new campaign
+            <Icon
+              component={ICON_PLUS}
+              sx={{ width: 12, height: 12, mr: 0.5 }}
+            />
+            <Typography variant={'subtitle2'}>Create new campaign</Typography>
           </StyledButton>
         </Stack>
       </Stack>

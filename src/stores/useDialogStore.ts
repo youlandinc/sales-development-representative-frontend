@@ -23,6 +23,7 @@ import {
   _closeSSE,
   _createCampaign,
   _fetchCrmProviderList,
+  _fetchEnrichmentTableData,
   _fetchSegmentOptions,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
@@ -50,6 +51,13 @@ export type DialogStoreState = {
   savedListFormData: SavedListInfo;
   fetchSavedListLoading: boolean;
   savedListOptions: TOption[];
+
+  selectedEnrichmentTableId: string;
+  fetchEnrichmentTableLoading: boolean;
+  enrichmentTableOptions: TOption[];
+  enrichmentTableDisabled: boolean;
+
+  createCampaignErrorMessage: string;
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
@@ -92,6 +100,12 @@ export type DialogStoreActions = {
 
   setSavedListFormData: (formData: SavedListInfo) => void;
   fetchSavedListOptions: () => Promise<void>;
+
+  fetchEnrichmentTableData: () => Promise<void>;
+  setSelectedEnrichmentTableId: (id: string) => void;
+  setEnrichmentTableDisabled: (disabled: boolean) => void;
+
+  setCreateCampaignErrorMessage: (errorMessage: string) => void;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
@@ -175,6 +189,13 @@ const InitialState: DialogStoreState = {
   },
   fetchSavedListLoading: false,
   savedListOptions: [],
+
+  fetchEnrichmentTableLoading: false,
+  enrichmentTableOptions: [],
+  selectedEnrichmentTableId: '',
+  enrichmentTableDisabled: false,
+
+  createCampaignErrorMessage: '',
 
   leadsFetchLoading: false,
   leadsList: [],
@@ -425,11 +446,20 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         };
         break;
       }
+      case ProcessCreateTypeEnum.ai_table: {
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.ai_table,
+          data: {
+            tableId: get().selectedEnrichmentTableId,
+          },
+        };
+        break;
+      }
     }
     if (!postData) {
       return;
     }
-    set({ creating: true });
+    set({ creating: true, createCampaignErrorMessage: '' });
     try {
       const { data } = await _createCampaign(postData);
       await _updateCampaignProcessSnapshot({
@@ -445,6 +475,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         lunchInfo: data.data.launchInfo,
         offerOptions: data.data.offerOptions,
         chatId: data.chatId,
+        activeStep: 2,
       });
       switch (campaignType) {
         case ProcessCreateTypeEnum.filter: {
@@ -467,9 +498,12 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       }
     } catch (err) {
       const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
+      campaignType === ProcessCreateTypeEnum.ai_table &&
+        set({ createCampaignErrorMessage: message || 'Error' });
+      campaignType !== ProcessCreateTypeEnum.ai_table &&
+        SDRToast({ message, header, variant });
     } finally {
-      set({ creating: false, activeStep: 2, reloadTable: true });
+      set({ creating: false, /*activeStep: 2,*/ reloadTable: true });
     }
   },
   fetchProviderOptions: async () => {
@@ -513,6 +547,29 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       set({ fetchSavedListLoading: false });
     }
   },
+  fetchEnrichmentTableData: async () => {
+    set({ fetchEnrichmentTableLoading: true });
+    try {
+      const { data } = await _fetchEnrichmentTableData();
+      const reducedData = data.content.map((item) => ({
+        label: item.tableName,
+        value: item.tableId,
+        key: item.tableId,
+      }));
+      set({ enrichmentTableOptions: reducedData });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      set({ fetchEnrichmentTableLoading: false });
+    }
+  },
+  setSelectedEnrichmentTableId: (id: string) =>
+    set({ selectedEnrichmentTableId: id }),
+  setEnrichmentTableDisabled: (disabled: boolean) =>
+    set({ enrichmentTableDisabled: disabled }),
+  setCreateCampaignErrorMessage: (errorMessage: string) =>
+    set({ createCampaignErrorMessage: errorMessage }),
   setMessagingSteps: (messagingSteps) => set({ messagingSteps }),
   resetDialogState: async () => {
     const { chatSSE, chatId } = get();

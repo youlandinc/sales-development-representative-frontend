@@ -96,7 +96,7 @@ export const CampaignProcessContentMessaging = () => {
     }
     setPersonalResearchLoading(true);
     try {
-      const { data } = await _fetchLeadPersonalResearch(id);
+      const { data } = await _fetchLeadPersonalResearch(id, chatId);
       setResearchInfo(data);
     } catch (err) {
       const { message, header, variant } = err as HttpError;

@@ -1,16 +1,17 @@
 import { Editor } from '@tiptap/core';
 import { SuggestionOptions } from '@tiptap/suggestion';
+import { ReactNode } from 'react';
 
 export interface CommandItem {
   title: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   command?: (props: { editor: Editor; range: Range }) => void;
   disabled?: boolean;
 }
 
 export interface CustomCommandItem {
   title: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   command: (props: { editor: Editor; range: Range }) => void;
 }
 

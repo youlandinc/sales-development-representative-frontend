@@ -1,6 +1,5 @@
 'use client';
 
-import { StyledButton } from '@/components/atoms';
 import { Box, Icon, Stack, Typography } from '@mui/material';
 import { Content, Editor } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
@@ -13,14 +12,12 @@ import {
   useImperativeHandle,
 } from 'react';
 
-import ICON_SPARKLE from './assets/icon_sparkle.svg';
+import { StyledButton } from '@/components/atoms';
 
-// import { dH as DD, dT as h9, dF as noe } from './vendor.js';
-import {
-  ExtensionMention,
-  ExtensionNode,
-  ExtensionStorage,
-} from '@/components/molecules';
+import ICON_SPARKLE from '../assets/icon_sparkle.svg';
+import { ExtensionMention } from './ExtensionMention';
+import { ExtensionNode } from './ExtensionNode';
+import { ExtensionStorage } from './ExtensionStorage';
 
 // type NodeType = {
 //   type: string;
@@ -28,7 +25,7 @@ import {
 //   text?: string;
 //   attrs?: { [key: string]: any };
 // };
-type TiptapEditorProps = {
+type PromptEditorProps = {
   defaultValue?: Content;
   placeholder?: string;
   handleGenerate?: () => void;
@@ -36,7 +33,7 @@ type TiptapEditorProps = {
   minHeight?: number;
   onEditorReady?: (editor: Editor) => void;
 };
-export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
+export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
   (
     {
       defaultValue = null,
@@ -49,41 +46,41 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
     ref,
   ) => {
     /*   const parsePromptTextToNodes = (text: string) => {
-    const nodes: any[] = [];
-    const regex = /{{(.*?)}}/g;
-    let lastIndex = 0;
-    let match;
+        const nodes: any[] = [];
+        const regex = /{{(.*?)}}/g;
+        let lastIndex = 0;
+        let match;
 
-    while ((match = regex.exec(text)) !== null) {
-      if (match.index > lastIndex) {
-        nodes.push({
-          type: 'text',
-          text: text.slice(lastIndex, match.index),
-        });
-      }
+        while ((match = regex.exec(text)) !== null) {
+          if (match.index > lastIndex) {
+            nodes.push({
+              type: 'text',
+              text: text.slice(lastIndex, match.index),
+            });
+          }
 
-      nodes.push({
-        type: 'placeholder',
-        attrs: { label: match[1].trim() },
-      });
+          nodes.push({
+            type: 'placeholder',
+            attrs: { label: match[1].trim() },
+          });
 
-      lastIndex = regex.lastIndex;
-    }
+          lastIndex = regex.lastIndex;
+        }
 
-    if (lastIndex < text.length) {
-      nodes.push({
-        type: 'text',
-        text: text.slice(lastIndex),
-      });
-    }
-    console.log(nodes);
-    return [
-      {
-        type: 'paragraph',
-        content: nodes,
-      },
-    ];
-  }; */
+        if (lastIndex < text.length) {
+          nodes.push({
+            type: 'text',
+            text: text.slice(lastIndex),
+          });
+        }
+        console.log(nodes);
+        return [
+          {
+            type: 'paragraph',
+            content: nodes,
+          },
+        ];
+      }; */
     const editor = useEditor({
       extensions: [
         Placeholder.configure({
@@ -157,57 +154,57 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
     }
 
     /*  const k = [];
-  const i = [
-    {
-      name: 'Enrich Company',
-      type: 'text',
-      id: 'enrichCompany',
-    },
-    {
-      name: 'Domain',
-      type: 'text',
-      id: 'f_0szqqc8XXxBN2S6jiEx',
-    },
-    { name: 'Url', type: 'text', id: 'f_0szqqc8Z5mwa6iwDnqp' },
-  ];
-  let A = false;
-  editor.state.doc.descendants((E, I) => {
-    let _;
-    if (E.isText && E.text) {
-      const T = E.text,
-        P = /\{\{([^{}]+)\}\}/g;
-      let R;
-      for (; (R = P.exec(T)) !== null; ) {
-        const M = (_ = R[1]) == null ? void 0 : _.trim();
-        if (!M) {
-          continue;
+      const i = [
+        {
+          name: 'Enrich Company',
+          type: 'text',
+          id: 'enrichCompany',
+        },
+        {
+          name: 'Domain',
+          type: 'text',
+          id: 'f_0szqqc8XXxBN2S6jiEx',
+        },
+        { name: 'Url', type: 'text', id: 'f_0szqqc8Z5mwa6iwDnqp' },
+      ];
+      let A = false;
+      editor.state.doc.descendants((E, I) => {
+        let _;
+        if (E.isText && E.text) {
+          const T = E.text,
+            P = /\{\{([^{}]+)\}\}/g;
+          let R;
+          for (; (R = P.exec(T)) !== null; ) {
+            const M = (_ = R[1]) == null ? void 0 : _.trim();
+            if (!M) {
+              continue;
+            }
+            const L = i.find((B) => B.name === M),
+              O = (L == null ? void 0 : L.type) || $ae(M);
+
+            k.push({
+              start: I + R.index,
+              end: I + R.index + R[0].length,
+              variableName: M,
+              variableType: O,
+            });
+          }
         }
-        const L = i.find((B) => B.name === M),
-          O = (L == null ? void 0 : L.type) || $ae(M);
+      });
 
-        k.push({
-          start: I + R.index,
-          end: I + R.index + R[0].length,
-          variableName: M,
-          variableType: O,
-        });
-      }
-    }
-  });
-
-  k.reverse().forEach(
-    ({ start: E, end: I, variableName: _, variableType: T }) => {
-      const P = editor.schema.nodes.variableToken;
-      console.log(E, I, _, T);
-      P &&
-        editor.state.tr.replaceWith(
-          E,
-          I,
-          P.create({ variableName: _, variableType: T }),
-        );
-      A = true;
-    },
-  );*/
+      k.reverse().forEach(
+        ({ start: E, end: I, variableName: _, variableType: T }) => {
+          const P = editor.schema.nodes.variableToken;
+          console.log(E, I, _, T);
+          P &&
+            editor.state.tr.replaceWith(
+              E,
+              I,
+              P.create({ variableName: _, variableType: T }),
+            );
+          A = true;
+        },
+      );*/
     // console.log(editor.schema.nodes.variableToken);
     // A && editor.view.dispatch(editor.state.tr);
     //   editor.commands.setContent(
@@ -217,39 +214,39 @@ export const TiptapEditor = forwardRef<ComponentRef<any>, TiptapEditorProps>(
     //   );
 
     /*   function extractPromptText(
-    doc: NodeType,
-    fieldMap: Record<string, string>,
-  ): string {
-    let result = '';
+        doc: NodeType,
+        fieldMap: Record<string, string>,
+      ): string {
+        let result = '';
 
-    function walk(nodes?: Node[]) {
-      if (!nodes) {
-        return;
-      }
-      for (const node of nodes) {
-        if (node.type === 'text') {
-          result += node.text || '';
-        } else if (node.type === 'custom-placeholder') {
-          const label = node.attrs?.label;
-          const id = fieldMap[label] || label;
-          result += `{{${id}}}`;
-        } else {
-          // 递归遍历嵌套内容
-          if (node.content) {
-            walk(node.content);
+        function walk(nodes?: Node[]) {
+          if (!nodes) {
+            return;
           }
+          for (const node of nodes) {
+            if (node.type === 'text') {
+              result += node.text || '';
+            } else if (node.type === 'custom-placeholder') {
+              const label = node.attrs?.label;
+              const id = fieldMap[label] || label;
+              result += `{{${id}}}`;
+            } else {
+              // 递归遍历嵌套内容
+              if (node.content) {
+                walk(node.content);
+              }
 
-          // 每段后加换行，模拟段落结构
-          if (node.type === 'paragraph') {
-            result += '\n';
+              // 每段后加换行，模拟段落结构
+              if (node.type === 'paragraph') {
+                result += '\n';
+              }
+            }
           }
         }
-      }
-    }
 
-    walk(doc.content);
-    return JSON.stringify(result.trim());
-  } */
+        walk(doc.content);
+        return JSON.stringify(result.trim());
+      } */
 
     return (
       <Stack gap={2}>

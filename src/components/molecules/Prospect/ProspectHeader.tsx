@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ChangeEvent, FC, useMemo, useState } from 'react';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 
@@ -16,29 +17,6 @@ import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
 
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
-
-const BUTTONS = [
-  {
-    label: 'Find people',
-    icon: ICON_FIND_PEOPLE,
-    disabled: true,
-  },
-  {
-    label: 'Find companies',
-    icon: ICON_FIND_COMPANIES,
-    disabled: true,
-  },
-  {
-    label: 'Import from CSV',
-    icon: ICON_IMPORT_CSV,
-    disabled: false,
-  },
-  {
-    label: 'Blank table',
-    icon: ICON_BLANK_TABLE,
-    disabled: true,
-  },
-];
 
 interface ProspectHeaderProps {
   dispatch: any;
@@ -52,6 +30,36 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
   openDialog,
 }) => {
   const [value, setValue] = useState(store.searchWord);
+  const router = useRouter();
+
+  const BUTTONS = useMemo(
+    () => [
+      {
+        label: 'Find people',
+        icon: ICON_FIND_PEOPLE,
+        disabled: false,
+        handleClick: () => router.push('/find-people'),
+      },
+      {
+        label: 'Find companies',
+        icon: ICON_FIND_COMPANIES,
+        disabled: true,
+      },
+      {
+        label: 'Import from CSV',
+        icon: ICON_IMPORT_CSV,
+        disabled: false,
+        handleClick: openDialog,
+      },
+      {
+        label: 'Blank table',
+        icon: ICON_BLANK_TABLE,
+        disabled: true,
+      },
+    ],
+    [],
+  );
+
   const debounceSearchWord = useMemo(
     () =>
       debounce((value) => {
@@ -75,7 +83,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               color={'info'}
               disabled={item.disabled}
               key={`${item.label}-${index}`}
-              onClick={() => openDialog()}
+              onClick={item.handleClick}
               size={'medium'}
               sx={{
                 width: '180px !important',

@@ -3,7 +3,7 @@ import { Icon, Stack, Switch, Tooltip, Typography } from '@mui/material';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
-import ICON_TEXT from './assets/icon_text.svg';
+import ICON_TEXT from '../assets/icon_text.svg';
 import { useWebResearchStore } from '@/stores/Prospect';
 
 export const PlaceholderNode: FC = (props: any) => {
