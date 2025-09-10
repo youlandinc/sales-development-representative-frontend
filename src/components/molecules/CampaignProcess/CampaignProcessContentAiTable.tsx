@@ -98,14 +98,14 @@ export const CampaignProcessContentAiTable: FC = () => {
     },
   );
 
-  useEffect(() => {
-    return () => {
-      setSelectedEnrichmentTableId('');
-      setEnrichmentTableDisabled(false);
-      setCreateCampaignErrorMessage('');
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     setSelectedEnrichmentTableId('');
+  //     setEnrichmentTableDisabled(false);
+  //     setCreateCampaignErrorMessage('');
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     <>

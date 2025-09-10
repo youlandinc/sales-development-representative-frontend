@@ -58,7 +58,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [schemaJsonStr, setSchemaJsonStr] = useState('');
+  // const [schemaJsonStr, setSchemaJsonStr] = useState('');
 
   const promptEditorRef = useRef<null | Editor>(null);
   const schemaEditorRef = useRef(null);
@@ -105,7 +105,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     }
   }, []);
 
-  const fieldsMapping: Record<string, any> = useMemo(() => {
+  const schemaFields: Record<string, any> = useMemo(() => {
     try {
       if (
         schemaJson?.trim() !== '' &&
@@ -119,90 +119,105 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     }
   }, [schemaJson, transformToObject]);
 
-  /*   const s = ['reasoning', 'evidence', 'confidence', 'didFindData'];
-
-  const r = useMemo(
-    () =>
-      s && (s == null ? void 0 : s.length) > 0
-        ? Object.fromEntries(
-            Object.entries(fieldsMapping).filter(
-              ([d, u]) => !(s != null && s.includes(d)),
-            ),
-          )
-        : fieldsMapping,
-    [fieldsMapping, s],
-  );
-
-  console.log(r); */
-
-  //   const a = useMemo(
-  //   () =>
-  //     t.fields
-  //       ? typeof t.fields == 'string'
-  //         ? JSON.parse(t.fields)
-  //         : t.fields
-  //       : {},
-  //   [t],
-  // ); */
-
-  /*{
-    "type": "string",
-    "description": "",
-    "id": "f02d31d1-1f1f-48f5-8c08-abda862ce722",
-    "options": ""
-} */
-
-  // const a = useMemo(() => {}, [schemaJson]);
-
-  const i = useMemo(
+  const fieldsMapping = useMemo(
     () =>
       Object.fromEntries(
-        Object.entries(fieldsMapping).map(
-          ([d, { type, description, options, id }]) => [
+        Object.entries(schemaFields).map(
+          ([d, { type, description, options, id, ...rest }]) => [
             d,
             {
               type: type || '',
               description: description || '',
               id: id ?? uuidv4(),
               options: options || [],
+              ...rest,
             },
           ],
         ),
       ),
-    [fieldsMapping],
+    [schemaFields],
   );
 
-  const updateSchema = useCallback(
-    (d: string, u: string, m: string, g: string, h: string) => {
-      const f = Object.fromEntries(
-        Object.entries(i).map(([x, y]) => {
-          if (x === d) {
-            let b = u;
-            if (u !== d) {
-              const A = Object.keys(i);
+  const updateSchema = useCallback((result: Record<string, any>) => {
+    //todo update fields
+    const schemaObj = {
+      type: 'object',
+      properties: Object.fromEntries(
+        Object.entries(result).map(([key, value]) => [
+          key,
+          { type: value.type, description: value.description },
+        ]),
+      ),
+      required: Object.keys(result),
+    };
+    setSchemaJson(JSON.stringify(schemaObj, null, 2));
+  }, []);
+
+  const handleFieldChange = useCallback(
+    (
+      fieldName: string,
+      newName: string,
+      newDescription: string,
+      newType: string,
+      newSelectOptions: string,
+    ) => {
+      const fieldsObj = Object.fromEntries(
+        Object.entries(fieldsMapping).map(([key, config]) => {
+          if (key === fieldName) {
+            let newKey = newName;
+            if (newName !== fieldName) {
+              const allKeys = Object.keys(fieldsMapping);
               let S = 1;
-              for (; A.includes(b); ) {
-                b = `${u}-${S}`;
+              for (; allKeys.includes(newKey); ) {
+                newKey = `${newName}-${S}`;
                 S++;
               }
             }
-            const w = i[x];
-            return [b, { ...w, description: m, options: h, type: g }];
+            const otherProps = fieldsMapping[key];
+            return [
+              newKey,
+              {
+                ...otherProps,
+                description: newDescription,
+                options: newSelectOptions,
+                type: newType,
+              },
+            ];
           }
-          return [x, y];
+          return [key, config];
         }),
       );
       //todo update fields
-      console.log(JSON.stringify(f));
-      // n((x) => ({
-      //   ...x,
-      //   answerSchemaType: {
-      //     ...x.answerSchemaType,
-      //     fields: JSON.stringify(f),
-      //   },
-      // }));
+      updateSchema(fieldsObj);
     },
-    [i],
+    [fieldsMapping],
+  );
+
+  const handleAddField = useCallback(() => {
+    // 获取已有字段数量
+    let fieldIndex = Object.keys(fieldsMapping).length;
+    let newFieldName;
+
+    // 找到一个未被占用的 field 名称（field0, field1, ...）
+    do {
+      newFieldName = `field${fieldIndex}`;
+      fieldIndex++;
+    } while (fieldsMapping[newFieldName]);
+
+    const newProperties = {
+      ...fieldsMapping,
+      [newFieldName]: { type: 'string', id: uuidv4(), description: '' },
+    };
+    updateSchema(newProperties);
+  }, [fieldsMapping]);
+
+  const handleDeleteField = useCallback(
+    (fieldName: string) => {
+      const result = { ...fieldsMapping };
+      delete result[fieldName];
+      updateSchema(result);
+    },
+    [fieldsMapping],
   );
 
   return (
@@ -228,10 +243,10 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           <RadioGroup
             onChange={(e) => {
               try {
-                schemaJsonStr && JSON.parse(schemaJsonStr);
+                schemaJson && JSON.parse(schemaJson);
                 setOutPuts((e.target as HTMLInputElement).value as any);
-                if (schemaJsonStr.trim() !== '') {
-                  setSchemaJson(schemaJsonStr);
+                if (schemaJson.trim() !== '') {
+                  setSchemaJson(schemaJson);
                 }
               } catch {
                 return false;
@@ -289,13 +304,13 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           </RadioGroup>
           {outPuts === 'fields' && (
             <Stack gap={1.5}>
-              {Object.entries(fieldsMapping).map(([item, config]) => (
+              {Object.entries(schemaFields).map(([item, config]) => (
                 <OutputsFields
-                  fieldDescription={''}
+                  fieldDescription={config?.description || ''}
                   fieldName={item}
-                  fieldType={'text'}
-                  key={item}
-                  removeField={() => {}}
+                  fieldType={'string'}
+                  key={config.id}
+                  removeField={handleDeleteField}
                   saveField={(
                     fieldName: string,
                     newName: string,
@@ -303,7 +318,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                     newType: string,
                     newSelectOptions: any,
                   ) => {
-                    updateSchema(
+                    handleFieldChange(
                       fieldName,
                       newName,
                       newDescription,
@@ -314,27 +329,15 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                   selectOptions={[
                     {
                       label: 'Text',
-                      value: 'text',
-                      key: 'text',
+                      value: 'string',
+                      key: 'string',
                     },
                   ]}
                 />
               ))}
               <StyledButton
                 color={'info'}
-                // onClick={() => {
-                //   setIndex(index + 1);
-                //   setSchemaJson({
-                //     type: 'object',
-                //     properties: {
-                //       ...schemaJson.properties,
-                //       [`field${index}`]: {
-                //         type: 'string',
-                //       },
-                //     },
-                //     required: [...schemaJson.required, `field${index}`],
-                //   });
-                // }}
+                onClick={handleAddField}
                 size={'medium'}
                 sx={{
                   color: '#6F6C7D !important',
@@ -411,7 +414,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
               editor={editor}
               initialValue={schemaJson}
               onEditorReady={handleSchemaEditorReady}
-              onValueChange={setSchemaJsonStr}
+              onValueChange={setSchemaJson}
               ref={schemaEditorRef}
             />
           )}
