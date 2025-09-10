@@ -240,7 +240,13 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   setOfferOptions: (offerOptions) => set({ offerOptions }),
   setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => set({ lunchInfo }),
   openProcess: () => set({ visibleProcess: true }),
-  closeProcess: () => set({ visibleProcess: false }),
+  closeProcess: () =>
+    set({
+      visibleProcess: false,
+      selectedEnrichmentTableId: '',
+      enrichmentTableDisabled: false,
+      createCampaignErrorMessage: '',
+    }),
   setCampaignName: (name) => set({ campaignName: name }),
   setCampaignStatus: (status) => set({ campaignStatus: status }),
   renameCampaign: async (campaignName) => {

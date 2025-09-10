@@ -27,7 +27,7 @@ type OutputsFieldsProps = {
     newType: string,
     newSelectOptions: any,
   ) => void;
-  removeField: () => void;
+  removeField: (fieldName: string) => void;
   selectOptions: any;
 };
 
@@ -40,13 +40,13 @@ export const OutputsFields = ({
   selectOptions,
 }: OutputsFieldsProps) => {
   const [name, setName] = useState(fieldName);
-  const [type, setType] = useState(fieldType || 'text');
+  const [type, setType] = useState(fieldType || 'string');
   const [description, setDescription] = useState(fieldDescription);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
     setName(fieldName);
-    setType(fieldType || 'text');
+    setType(fieldType || 'string');
     setDescription(fieldDescription);
   }, [fieldName, fieldType, fieldDescription]);
 
@@ -88,8 +88,8 @@ export const OutputsFields = ({
         options={[
           {
             label: 'Text',
-            value: 'text',
-            key: 'text',
+            value: 'string',
+            key: 'string',
           },
         ]}
         placeholder={'Text'}
@@ -140,11 +140,16 @@ export const OutputsFields = ({
               maxRows={3}
               minRows={3}
               multiline
+              onChange={(e) => {
+                setDescription(e.target.value);
+                debouncedSave(name, e.target.value, type, selectOptions);
+              }}
               sx={{
                 '& .MuiOutlinedInput-input': {
                   fontSize: 12,
                 },
               }}
+              value={description}
             />
 
             <Box bgcolor={'#D0CEDA'} height={'1px'}></Box>
@@ -156,7 +161,13 @@ export const OutputsFields = ({
               sx={{ cursor: 'pointer' }}
             >
               <Icon component={ICON_DELETE} sx={{ width: 20, height: 20 }} />
-              <Typography color={'#D75B5B'} variant={'body2'}>
+              <Typography
+                color={'#D75B5B'}
+                onClick={() => {
+                  removeField(fieldName);
+                }}
+                variant={'body2'}
+              >
                 Delete
               </Typography>
             </Stack>
