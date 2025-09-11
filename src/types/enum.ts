@@ -37,3 +37,21 @@ export enum FilterOperationEnum {
   ends_with = 'ENDS_WITH',
   not_ends_with = 'NOT_ENDS_WITH',
 }
+
+export enum ProspectDelimiterEnum {
+  comma = 'COMMA',
+  semicolon = 'SEMICOLON',
+  tab = 'TAB',
+  pipe = 'PIPE',
+}
+
+export enum WebSocketTypeEnum {
+  message = 'MESSAGE',
+  heartbeat = 'HEARTBEAT',
+  ack = 'ACK',
+  error = 'ERROR',
+  hello = 'HELLO',
+  subscribe = 'SUBSCRIBE',
+  ping = 'PING',
+  pong = 'PONG',
+}

@@ -1,3 +1,6 @@
+export * from './Prospect';
+export * from './ProspectDetail';
+
 export * from './Campaigns';
 
 export * from './Leads';
@@ -12,3 +15,5 @@ export * from './ContactsPage';
 export * from './ContactsListsPage';
 export * from './ContactsCompaniesPage';
 export * from './ContactsPeoplePage';
+
+export * from './FindPeople';

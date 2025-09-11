@@ -15,6 +15,7 @@ export * from './CampaignProcessContentFilter';
 export * from './CampaignProcessContentCSV';
 export * from './CampaignProcessContentCRM';
 export * from './CampaignProcessContentSavedList';
+export * from './CampaignProcessContentAiTable';
 
 export * from './CampaignLeadsCard';
 

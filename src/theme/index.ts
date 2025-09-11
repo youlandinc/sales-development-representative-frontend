@@ -2,6 +2,7 @@
 import { CSSProperties } from 'react';
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+import { inputBaseClasses } from '@mui/material/InputBase';
 
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
@@ -360,11 +361,6 @@ const defaultOptions: ThemeOptions = {
           lineHeight: 1.43,
           height: 'auto',
         },
-        inputSizeSmall: {
-          paddingTop: '6px',
-          paddingBottom: '6px',
-          fontSize: 14,
-        },
         // border style
         notchedOutline: {
           borderColor: 'var(--mui-palette-border-default)',
@@ -375,6 +371,11 @@ const defaultOptions: ThemeOptions = {
 
         //border style when hover
         root: {
+          [`&.${inputBaseClasses.sizeSmall} > .${inputBaseClasses.input}`]: {
+            paddingTop: '6.5px',
+            paddingBottom: '6.5px',
+            fontSize: 14,
+          },
           [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
             borderColor: 'var(--mui-palette-border-hover)',
             borderWidth: '1px',

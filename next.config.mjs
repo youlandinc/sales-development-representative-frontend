@@ -3,13 +3,14 @@ const nextConfig = {
   env: {},
   reactStrictMode: false,
   trailingSlash: false,
+  compress:true,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
-    })
-    return config
+    });
+    return config;
   },
   experimental: {
     // missingSuspenseWithCSRBailout: false,
@@ -36,10 +37,10 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/campaigns',
+        destination: '/prospect-enrich',
         statusCode: 301,
       },
-    ]
+    ];
   },
   typescript: {
     ignoreBuildErrors: true,
@@ -47,6 +48,6 @@ const nextConfig = {
   // images: {
   //   domains: ['youland-common-images.s3.us-west-1.amazonaws.com'],
   // },
-}
+};
 
-export default nextConfig
+export default nextConfig;

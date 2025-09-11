@@ -215,9 +215,6 @@ export const CampaignProcessContentCRM: FC = () => {
   const renderFiledNode = () => {
     return (
       <>
-        <Typography fontWeight={700} variant={'body2'}>
-          CRM List
-        </Typography>
         <Stack gap={3} mt={3} px={1.5}>
           <Stack gap={1}>
             <Typography
@@ -227,7 +224,7 @@ export const CampaignProcessContentCRM: FC = () => {
               fontWeight={700}
               variant={'body2'}
             >
-              Select a CRM provider
+              CRM provider
             </Typography>
             <StyledSelect
               loading={fetchProviderOptionsLoading}
@@ -248,7 +245,7 @@ export const CampaignProcessContentCRM: FC = () => {
               fontWeight={700}
               variant={'body2'}
             >
-              List
+              Contact list
             </Typography>
             <StyledSelect
               disabled={!crmFormData?.provider || isLoading}

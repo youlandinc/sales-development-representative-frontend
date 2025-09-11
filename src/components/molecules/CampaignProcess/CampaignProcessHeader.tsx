@@ -35,6 +35,8 @@ const titleTail = (
       return 'Agent';
     case ProcessCreateTypeEnum.saved_list:
       return 'Use saved list';
+    case ProcessCreateTypeEnum.ai_table:
+      return 'Use saved table';
     default:
       return '';
   }
@@ -112,7 +114,10 @@ export const CampaignProcessHeaderStepFirst: FC = () => {
         <CampaignProcessHeaderButtonGroup />
         {leadsVisible && !campaignId && (
           <StyledButton
-            disabled={leadsFetchLoading || creating || leadsList.length === 0}
+            disabled={
+              (leadsFetchLoading || creating || leadsList.length === 0) &&
+              campaignType !== ProcessCreateTypeEnum.ai_table
+            }
             loading={creating}
             onClick={async () => await createCampaign()}
             size={'medium'}

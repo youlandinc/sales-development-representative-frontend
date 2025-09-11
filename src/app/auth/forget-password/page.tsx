@@ -4,7 +4,7 @@ export const fetchCache = 'force-no-store';
 import { useEffect } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { useUserStore } from '@/provides';
+import { useUserStore } from '@/providers';
 
 import { DEFAULT_LOGGED_IN_PATH } from '@/constant';
 

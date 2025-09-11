@@ -1,6 +1,5 @@
 'use client';
 import { ReactNode } from 'react';
-import { Red_Hat_Display } from 'next/font/google';
 
 import NextTopLoader from 'nextjs-toploader';
 import { CssBaseline, ThemeProvider } from '@mui/material';
@@ -8,24 +7,17 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
-import { UserStoreProvider } from '@/provides';
+import { UserStoreProvider } from '@/providers';
 
 import '@/styles/global.css';
 
 import { lightTheme } from '@/theme';
 
-import { ToastProvider } from '@/provides/ToastProvider';
-
-const redHatDisplay = Red_Hat_Display({
-  weight: ['400', '600', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-red-hat-display',
-});
+import { ToastProvider } from '@/providers/ToastProvider';
 
 const RootLayout = ({
   children,
@@ -38,7 +30,7 @@ const RootLayout = ({
         <link href="/favicon.svg" rel="icon" sizes={'any'} />
         <title>Attune</title>
       </head>
-      <body className={redHatDisplay.variable}>
+      <body>
         <InitColorSchemeScript attribute="class" />
         <NextTopLoader
           color="#6E4EFB"

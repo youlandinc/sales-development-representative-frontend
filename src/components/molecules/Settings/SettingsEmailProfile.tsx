@@ -24,7 +24,7 @@ import {
   _updateSettingsInfo,
 } from '@/request';
 import useSWR from 'swr';
-import { useUserStore } from '@/provides';
+import { useUserStore } from '@/providers';
 
 const INITIAL_STATE = {
   avatar: '',

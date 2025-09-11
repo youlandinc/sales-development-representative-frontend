@@ -1,5 +1,12 @@
 import { FC } from 'react';
-import { Autocomplete, Box, Checkbox, Chip, TextField } from '@mui/material';
+import {
+  Autocomplete,
+  AutocompleteProps,
+  Box,
+  Checkbox,
+  Chip,
+  TextField,
+} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import { styled } from '@mui/material/styles';
 
@@ -10,7 +17,7 @@ import { SelectWithFlagTypeEnum } from '@/types';
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
-const StyledChip = styled(Chip)({
+export const StyledChip = styled(Chip)({
   '&.MuiChip-root': {
     borderRadius: '16px',
   },
@@ -24,14 +31,16 @@ const StyledChip = styled(Chip)({
 export interface StyledSearchSelectProps {
   options: TOption[];
   value: any[];
-  onInputKeyDown: (data: any[]) => void;
-  onSelect: (data: any[]) => void;
-  onDelete: (value: string) => void;
-  onReset: () => void;
+  onInputKeyDown?: (data: any[]) => void;
+  onSelect?: (data: any[]) => void;
+  onDelete?: (value: string) => void;
+  onReset?: () => void;
   type?: TreeNodeRenderTypeEnum;
   id: string;
   disabled?: boolean;
   placeholder?: string;
+  showCheckbox?: boolean;
+  onChange?: AutocompleteProps<any, true, false, false>['onChange'];
 }
 
 export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
@@ -45,6 +54,8 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
   //type,
   id,
   placeholder,
+  showCheckbox = true,
+  onChange,
 }) => {
   return (
     <Autocomplete
@@ -53,6 +64,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
       getOptionLabel={(option) => option.label}
       id={id}
       multiple
+      onChange={onChange}
       options={options}
       renderInput={(params) => (
         <TextField
@@ -68,7 +80,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
               ) {
                 return;
               }
-              onInputKeyDown([
+              onInputKeyDown?.([
                 ...value,
                 {
                   value: (e.target as HTMLInputElement).value,
@@ -92,9 +104,9 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
               e.stopPropagation();
               e.preventDefault();
               if (value.some((item) => item.value === option.value)) {
-                onDelete(option.value);
+                onDelete?.(option.value);
               } else {
-                onSelect([
+                onSelect?.([
                   ...value,
                   {
                     value: option.value,
@@ -111,17 +123,19 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
                 : 'transparent',
             }}
           >
-            <Checkbox
-              checked={value.some((item) => item.value === option.value)}
-              checkedIcon={checkedIcon}
-              icon={icon}
-              style={{ marginRight: 8 }}
-            />
+            {showCheckbox && (
+              <Checkbox
+                checked={value.some((item) => item.value === option.value)}
+                checkedIcon={checkedIcon}
+                icon={icon}
+                style={{ marginRight: 8 }}
+              />
+            )}
             {option.label}
           </Box>
         );
       }}
-      renderTags={(value, getTagProps) => {
+      renderValue={(value, getTagProps) => {
         return value.map((option, index) => (
           <StyledChip
             {...getTagProps({ index })}
@@ -129,7 +143,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
             key={`${option.key}-chip-${index}-key`}
             label={`${option.label}`}
             onDelete={() => {
-              onDelete(option.value);
+              onDelete?.(option.value);
             }}
             variant="filled"
           />
@@ -137,7 +151,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
       }}
       slotProps={{
         clearIndicator: {
-          onClick: () => onReset(),
+          onClick: () => onReset?.(),
         },
         chip: {
           color: 'primary',
