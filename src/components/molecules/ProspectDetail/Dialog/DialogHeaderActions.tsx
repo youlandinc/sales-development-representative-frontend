@@ -99,7 +99,7 @@ export const DialogHeaderActions = () => {
               value={value}
             >
               <Tab label={'Enrichments'} value={'Enrichments'} />
-              <Tab label={'Campaign'} value={'Campaign'} />
+              <Tab label={'Outreach'} value={'Campaign'} />
             </Tabs>
             <Box
               bgcolor={'#B0ADBD'}
@@ -185,7 +185,7 @@ export const DialogHeaderActions = () => {
                       sx={{ width: 20, height: 20 }}
                     />
                     <Typography lineHeight={1.2} variant={'subtitle2'}>
-                      Campaign
+                      Outreach
                     </Typography>
                   </Stack>
                   <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />

@@ -250,7 +250,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             }}
           />
         </CollapsePanel>
-        <CollapsePanel
+        {/*        <CollapsePanel
           filterCount={computedFilterCount([
             filters.currentRoleMinMonthsSinceStartDate,
             filters.currentRoleMaxMonthsSinceStartDate,
@@ -327,7 +327,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             title={'Experience description keywords'}
             value={filters.jobDescriptionKeywords as Option[]}
           />
-        </CollapsePanel>
+        </CollapsePanel>*/}
         <CollapsePanel
           filterCount={computedFilterCount([
             filters.locationCountriesInclude,
@@ -593,7 +593,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
           </FilterContainer>
         </CollapsePanel>
 
-        <CollapsePanel
+        {/*   <CollapsePanel
           filterCount={computedFilterCount([filters.languages])}
           title={'Languages'}
         >
@@ -608,8 +608,8 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             title={'Languages'}
             value={filters.languages as Option[]}
           />
-        </CollapsePanel>
-        <CollapsePanel
+        </CollapsePanel>*/}
+        {/*   <CollapsePanel
           filterCount={computedFilterCount([filters.schoolNames])}
           title={'Education'}
         >
@@ -624,8 +624,8 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             title={'School names'}
             value={filters.schoolNames as Option[]}
           />
-        </CollapsePanel>
-        <CollapsePanel title={'Companies'}>
+        </CollapsePanel>*/}
+        {/*<CollapsePanel title={'Companies'}>
           <RadioGroup defaultValue={'male'}>
             <FormControlLabel
               control={<Radio />}
@@ -663,8 +663,8 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             placeholder={'e.g. McGill University, McMaster University'}
             title={'Company identifiers'}
           />
-        </CollapsePanel>
-        <CollapsePanel title={'Exclude people'}>
+        </CollapsePanel>*/}
+        {/*       <CollapsePanel title={'Exclude people'}>
           <FilterSelect
             disabled
             options={[]}
@@ -684,7 +684,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             placeholder={'Start typing or select a column'}
             title={'Personal LinkedIn URLs'}
           />
-        </CollapsePanel>
+        </CollapsePanel>*/}
         <CollapsePanel
           filterCount={computedFilterCount([filters.includePastExperiences])}
           title={'Past experiences'}
