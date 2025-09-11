@@ -86,9 +86,9 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               onClick={item.handleClick}
               size={'medium'}
               sx={{
-                width: '180px !important',
+                // width: '180px !important',
                 fontWeight: 400,
-                justifyContent: 'flex-start',
+                // justifyContent: 'flex-start',
               }}
               variant={'outlined'}
             >
