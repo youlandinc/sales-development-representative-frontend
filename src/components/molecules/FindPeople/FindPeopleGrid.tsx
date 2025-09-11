@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { GridColDef } from '@mui/x-data-grid';
 import { Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 
@@ -90,7 +90,12 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
             >
               Previewing <strong>{peopleList?.length || 0}</strong> of{' '}
               <strong>{(peopleCount || 0).toLocaleString()}</strong> results.{' '}
-              <strong>{(limit || '1,000') as number}</strong> will be imported.
+              <strong>
+                {(peopleCount || 0) < (limit || 1000)
+                  ? peopleCount?.toLocaleString()
+                  : (limit || 1000).toLocaleString()}
+              </strong>{' '}
+              will be imported.
             </Typography>
           )}
           <Tooltip
