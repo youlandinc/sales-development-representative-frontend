@@ -90,7 +90,7 @@ export const CellDetailsArray: FC<CellDetailsArrayProps> = ({
   );
 };
 
-export const CellDetails = (props) => {
+export const CellDetails = (props: any) => {
   const [filter, setFilter] = useState('');
   return (
     <Drawer anchor={'right'} hideBackdrop open>

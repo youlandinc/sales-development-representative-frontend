@@ -549,7 +549,62 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
 
       <DialogWebResearch
         cb={async () => {
-          await fetchTable(tableId);
+          const { runRecords } = await fetchTable(tableId);
+
+          if (!runRecords) {
+            return;
+          }
+
+          const validRecordIds = new Set<string>();
+
+          Object.entries(runRecords)
+            .filter(([columnId]) => aiColumnIds.has(columnId))
+            .forEach(([columnId, config]) => {
+              console.log(config);
+              if (config.isAll) {
+                rowIds.forEach((id) => validRecordIds.add(id));
+              } else {
+                config.recordIds?.forEach((id) => validRecordIds.add(id));
+              }
+            });
+
+          const newLoadingState: Record<string, Record<string, boolean>> = {};
+          validRecordIds.forEach((recordId) => {
+            Object.entries(runRecords)
+              .filter(([columnId]) => aiColumnIds.has(columnId))
+              .forEach(([columnId, config]) => {
+                const shouldProcess = config.isAll
+                  ? rowIds.includes(recordId)
+                  : config.recordIds?.includes(recordId);
+
+                if (shouldProcess) {
+                  setRowsMap((prev) => {
+                    const currentRowData = prev[recordId] || {};
+                    return {
+                      ...prev,
+                      [recordId]: {
+                        ...currentRowData,
+                        [columnId]: { value: '', isFinished: false },
+                      },
+                    };
+                  });
+
+                  if (rowsMapRef.current[recordId]) {
+                    rowsMapRef.current[recordId][columnId] = {
+                      value: '',
+                      isFinished: false,
+                    };
+                  }
+
+                  if (!newLoadingState[recordId]) {
+                    newLoadingState[recordId] = {};
+                  }
+                  newLoadingState[recordId][columnId] = true;
+                }
+              });
+          });
+
+          setAiLoadingState(newLoadingState);
         }}
         tableId={tableId}
       />
