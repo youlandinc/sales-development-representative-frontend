@@ -5,10 +5,12 @@ import {
   ReactNode,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
+import { flushSync } from 'react-dom';
 import {
   Box,
   Checkbox,
@@ -18,6 +20,42 @@ import {
 } from '@mui/material';
 import { Cell } from '@tanstack/react-table';
 import { useRowHover } from './StyledTableBodyRow';
+
+const CELL_CONSTANTS = {
+  MIN_WIDTH: 100,
+  FONT_SIZE: 14,
+  LINE_HEIGHT: '36px',
+  PROGRESS_SIZE: 16,
+  PADDING_X: 1.5,
+} as const;
+
+const CELL_COLORS = {
+  ACTIVE_BG: '#F7F4FD',
+  DEFAULT_BG: '#fff',
+  BORDER: '#DFDEE6',
+  PINNED_BORDER: '3px solid #DFDEE6',
+  REGULAR_BORDER: '0.5px solid #DFDEE6',
+} as const;
+
+const getCellBackgroundColor = (
+  isEditing: boolean,
+  isActive: boolean,
+  isSelectColumn: boolean,
+  hasActiveInRow: boolean,
+  rowSelected: boolean,
+  isColumnSelected: boolean,
+): string => {
+  if ((isEditing || isActive) && !isSelectColumn) {
+    return CELL_COLORS.ACTIVE_BG;
+  }
+  if (isSelectColumn && hasActiveInRow) {
+    return CELL_COLORS.ACTIVE_BG;
+  }
+  if (rowSelected || isColumnSelected) {
+    return CELL_COLORS.ACTIVE_BG;
+  }
+  return CELL_COLORS.DEFAULT_BG;
+};
 
 interface StyledTableBodyCellProps {
   cell?: Cell<any, unknown>;
@@ -53,7 +91,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const value = cell?.getValue();
     const displayValue = value != null ? String(value) : '';
     const isSelectColumn = cell?.column?.id === '__select';
-    const isSelectAll =
+    const isColumnSelected =
       (cell?.column?.columnDef?.meta as any)?.selectedColumnId === columnId;
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -82,19 +120,23 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const fieldType = columnMeta?.fieldType;
     const isAiColumn = actionKey === 'use-ai';
 
-    const resolvedMinWidth = width < 100 ? 100 : width;
+    const resolvedMinWidth =
+      width < CELL_CONSTANTS.MIN_WIDTH ? CELL_CONSTANTS.MIN_WIDTH : width;
 
     useEffect(() => {
       if (isEditing) {
         const initValue = _editValue !== undefined ? _editValue : displayValue;
-        setLocalEditValue(String(initValue ?? ''));
-        setTimeout(() => {
-          if (inputRef.current) {
-            inputRef.current.select();
-          }
-        }, 0);
+        flushSync(() => {
+          setLocalEditValue(String(initValue ?? ''));
+        });
       }
     }, [isEditing, _editValue, displayValue]);
+
+    useLayoutEffect(() => {
+      if (isEditing && inputRef.current) {
+        inputRef.current.select();
+      }
+    }, [isEditing]);
 
     useEffect(() => {
       if (
@@ -141,17 +183,17 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
             sx={{
               height: '100%',
               width: '100%',
-              fontSize: 14,
+              fontSize: CELL_CONSTANTS.FONT_SIZE,
               display: 'flex',
               alignItems: 'center',
-              lineHeight: '36px',
+              lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
               '& input': {
                 p: 0,
                 m: 0,
                 height: '100%',
                 boxSizing: 'border-box',
-                fontSize: 14,
-                lineHeight: '36px',
+                fontSize: CELL_CONSTANTS.FONT_SIZE,
+                lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
               },
             }}
             value={localEditValue}
@@ -189,10 +231,13 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
         return (
           <Stack alignItems="center" direction="row" spacing={1}>
-            <CircularProgress size={16} />
+            <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
             <Box
               component="span"
-              sx={{ fontSize: 14, color: 'text.secondary' }}
+              sx={{
+                fontSize: CELL_CONSTANTS.FONT_SIZE,
+                color: 'text.secondary',
+              }}
             >
               Processing...
             </Box>
@@ -255,20 +300,18 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 20 : 1,
-          bgcolor:
-            isEditing && !isSelectColumn
-              ? '#F7F4FD'
-              : isActive && !isSelectColumn
-                ? '#F7F4FD'
-                : isSelectColumn && hasActiveInRow
-                  ? '#F7F4FD'
-                  : rowSelected || isSelectAll
-                    ? '#F7F4FD'
-                    : '#fff',
+          bgcolor: getCellBackgroundColor(
+            isEditing,
+            isActive,
+            isSelectColumn,
+            hasActiveInRow,
+            rowSelected,
+            isColumnSelected,
+          ),
           borderRight:
             isPinned && showPinnedRightShadow && !isSelectColumn
-              ? '3px solid #DFDEE6'
-              : '0.5px solid #DFDEE6',
+              ? CELL_COLORS.PINNED_BORDER
+              : CELL_COLORS.REGULAR_BORDER,
           ...(isPinned &&
             showPinnedRightShadow &&
             !isSelectColumn && {
@@ -279,7 +322,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
                 right: -3,
                 width: '3px',
                 height: '1px',
-                backgroundColor: '#DFDEE6',
+                backgroundColor: CELL_COLORS.BORDER,
                 zIndex: 10,
                 pointerEvents: 'none',
               },
@@ -300,8 +343,8 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
             whiteSpace: 'nowrap',
             minWidth: 0,
             width: '100%',
-            fontSize: 14,
-            px: 1.5,
+            fontSize: CELL_CONSTANTS.FONT_SIZE,
+            px: CELL_CONSTANTS.PADDING_X,
           }}
         >
           {content}
