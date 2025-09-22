@@ -44,6 +44,7 @@ const RootLayout = ({
           crawl={true}
           height={2}
           shadow={'none'}
+          showSpinner={false}
         />
         <AppRouterCacheProvider
           options={{ key: 'css', enableCssLayer: true, prepend: true }}
