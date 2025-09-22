@@ -55,3 +55,9 @@ export enum WebSocketTypeEnum {
   ping = 'PING',
   pong = 'PONG',
 }
+
+export enum CompanyTypeEnum {
+  customer = 'CUSTOMERS',
+  venture_capital = 'VENTURE_CAPITAL',
+  limited_partners = 'LIMITED_PARTNERS',
+}

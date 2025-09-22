@@ -5,7 +5,11 @@ import ICON_BACK from './assets/icon-back.svg';
 import { FC } from 'react';
 // import ICON_CLOSE from './assets/icon-close.svg';
 
-export const FindPeopleHeader: FC = () => {
+type FindPeopleHeaderProps = {
+  title?: string;
+};
+
+export const FindPeopleHeader: FC<FindPeopleHeaderProps> = ({ title }) => {
   const router = useRouter();
   return (
     <Stack
@@ -25,7 +29,7 @@ export const FindPeopleHeader: FC = () => {
           sx={{ width: 20, height: 20, mt: 0.25, cursor: 'pointer' }}
         />
         <Typography fontWeight={600} lineHeight={1.2}>
-          Find people
+          {title || 'Find people'}
         </Typography>
       </Stack>
       {/* <Icon

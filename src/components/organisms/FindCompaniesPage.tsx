@@ -1,31 +1,37 @@
-import { Stack } from '@mui/material';
 import { useEffect, useMemo } from 'react';
+import { Stack } from '@mui/material';
+import { GridColDef } from '@mui/x-data-grid';
 
 import {
-  FindPeopleFilterPanel,
+  FindCompaniesFilterPanel,
   FindPeopleGrid,
   FindPeopleHeader,
 } from '@/components/molecules';
 
-import { useFindPeopleStore } from '@/stores/useFindPeopleStore';
 import { useAsyncFn, useDebounce } from '@/hooks';
+import { _findCompanies } from '@/request';
+import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
+import { HttpError } from '@/types';
+import { SDRToast } from '@/components/atoms';
 
-import { _fetchFindPeople } from '@/request';
-import { GridColDef } from '@mui/x-data-grid';
+export const FindCompaniesPage = () => {
+  const { filters } = useFindCompaniesStore((state) => state);
+  const params = useDebounce({ ...filters }, 400);
 
-export const FindPeople = () => {
-  const { filters } = useFindPeopleStore((state) => state);
-  const params = useDebounce(filters, 400);
-
-  const [state, fetchFindPeople] = useAsyncFn(
+  const [state, fetchFindCompanies] = useAsyncFn(
     async (param) => {
-      return await _fetchFindPeople(param);
+      try {
+        return await _findCompanies(param);
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
     },
     [JSON.stringify(params)],
   );
 
   useEffect(() => {
-    fetchFindPeople(
+    fetchFindCompanies(
       Object.entries(params).reduce(
         (pre, [key, value]) => {
           if (Array.isArray(value)) {
@@ -41,26 +47,38 @@ export const FindPeople = () => {
       ),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(params), fetchFindPeople]);
+  }, [JSON.stringify(params), fetchFindCompanies]);
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 40 },
     { field: 'name', headerName: 'Name', flex: 1, minWidth: 200 },
     {
-      field: 'companyName',
-      headerName: 'Company name',
+      field: 'name',
+      headerName: 'Name',
       flex: 1,
       minWidth: 200,
     },
     {
-      field: 'jobTitle',
-      headerName: 'Job title',
+      field: 'description',
+      headerName: 'description',
       flex: 1,
       minWidth: 200,
     },
     {
-      field: 'linkedinUrl',
-      headerName: 'Linkedin URL',
+      field: 'Primary Industry',
+      headerName: 'primaryIndustry',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: 'Size',
+      headerName: 'size',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: 'type',
+      headerName: 'Type',
       flex: 1,
       minWidth: 200,
     },
@@ -70,37 +88,40 @@ export const FindPeople = () => {
       flex: 1,
       minWidth: 200,
     },
+    {
+      field: 'linkedUrl',
+      headerName: 'LinkedIn URL',
+      flex: 1,
+      minWidth: 200,
+    },
   ];
 
   const memoGrid = useMemo(
     () => (
       <FindPeopleGrid
         columns={columns}
-        count={state?.value?.data?.peopleCount || 0}
+        count={state?.value?.data?.companyCount || 0}
         isLoading={state.loading}
         limit={params?.limit}
         limitPerCompany={params?.limitPerCompany}
-        list={state?.value?.data?.peopleList}
+        list={state?.value?.data?.companyList}
+        title={'Preview'}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       state.loading,
-      state?.value?.data?.peopleCount,
+      state?.value?.data?.companyCount,
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      JSON.stringify(state?.value?.data?.peopleList),
+      JSON.stringify(state?.value?.data?.companyList),
     ],
   );
 
   return (
     <Stack height={'100vh'}>
-      <FindPeopleHeader />
+      <FindPeopleHeader title={'Find companies'} />
       <Stack flex={1} flexDirection={'row'} minHeight={0}>
-        <FindPeopleFilterPanel
-          disabled={
-            state.loading || state?.value?.data?.peopleList?.length === 0
-          }
-        />
+        <FindCompaniesFilterPanel />
         {memoGrid}
       </Stack>
     </Stack>

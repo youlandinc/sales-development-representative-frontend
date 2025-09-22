@@ -43,7 +43,8 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
       {
         label: 'Find companies',
         icon: ICON_FIND_COMPANIES,
-        disabled: true,
+        disabled: false,
+        handleClick: () => router.push('/find-companies'),
       },
       {
         label: 'Import from CSV',

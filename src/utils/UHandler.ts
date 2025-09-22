@@ -1,3 +1,5 @@
+import { isNumber, isString } from 'lodash-es';
+
 export const UGetRoundedCanvas = (
   sourceCanvas: HTMLCanvasElement,
   xWidth?: number,
@@ -21,3 +23,18 @@ export const UGetRoundedCanvas = (
   context.fill();
   return canvas;
 };
+
+export const computedFilterCount = (
+  t: (Option[] | boolean | string | number | undefined)[] = [],
+) =>
+  t.reduce(
+    (pre, cur) =>
+      cur == null || cur === 0 || cur === ''
+        ? pre
+        : Array.isArray(cur)
+          ? (pre as number) + cur.length
+          : cur === !0 || isNumber(cur) || isString(cur)
+            ? (pre as number) + 1
+            : pre,
+    0,
+  ) as number;

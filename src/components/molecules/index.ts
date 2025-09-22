@@ -29,3 +29,4 @@ export * from './Segments';
 export * from './Enrichments';
 
 export * from './FindPeople';
+export * from './FindCompanies';
