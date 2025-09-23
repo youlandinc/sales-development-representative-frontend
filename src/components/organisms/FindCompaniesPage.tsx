@@ -16,7 +16,7 @@ import { SDRToast } from '@/components/atoms';
 
 export const FindCompaniesPage = () => {
   const { filters } = useFindCompaniesStore((state) => state);
-  const params = useDebounce({ ...filters }, 400);
+  const params = useDebounce(filters, 400);
 
   const [state, fetchFindCompanies] = useAsyncFn(
     async (param) => {
@@ -49,6 +49,8 @@ export const FindCompaniesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(params), fetchFindCompanies]);
 
+  console.log(555);
+
   const columns: GridColDef[] = [
     { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 40 },
     {
@@ -59,19 +61,19 @@ export const FindCompaniesPage = () => {
     },
     {
       field: 'description',
-      headerName: 'description',
+      headerName: 'Description',
       flex: 1,
       minWidth: 200,
     },
     {
-      field: 'Primary Industry',
-      headerName: 'primaryIndustry',
+      field: 'primaryIndustry',
+      headerName: 'Primary Industry',
       flex: 1,
       minWidth: 200,
     },
     {
-      field: 'Size',
-      headerName: 'size',
+      field: 'size',
+      headerName: 'Size',
       flex: 1,
       minWidth: 200,
     },

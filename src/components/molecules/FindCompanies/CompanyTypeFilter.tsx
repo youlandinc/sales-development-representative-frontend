@@ -140,8 +140,8 @@ export const CompanyTypeFilter = () => {
         footer={
           <StyledButton
             onClick={() => {
-              setFilters('companyType', type);
               resetFilters();
+              setFilters('companyType', type);
               toggle();
             }}
             size={'medium'}
