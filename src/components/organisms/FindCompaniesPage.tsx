@@ -49,8 +49,6 @@ export const FindCompaniesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(params), fetchFindCompanies]);
 
-  console.log(555);
-
   const columns: GridColDef[] = [
     { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 40 },
     {
@@ -77,12 +75,12 @@ export const FindCompaniesPage = () => {
       flex: 1,
       minWidth: 200,
     },
-    {
-      field: 'type',
-      headerName: 'Type',
-      flex: 1,
-      minWidth: 200,
-    },
+    // {
+    //   field: 'type',
+    //   headerName: 'Type',
+    //   flex: 1,
+    //   minWidth: 200,
+    // },
     {
       field: 'location',
       headerName: 'Location',
