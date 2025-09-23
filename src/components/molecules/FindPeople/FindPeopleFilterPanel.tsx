@@ -82,6 +82,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
         p={3}
       >
         <CollapsePanel
+          defaultOpen
           filterCount={computedFilterCount([
             filters.companyIndustriesInclude,
             filters.companyIndustriesExclude,

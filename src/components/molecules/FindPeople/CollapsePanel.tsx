@@ -7,13 +7,15 @@ import { useSwitch } from '@/hooks';
 type CollapsePanelProps = {
   title: string;
   filterCount?: number;
+  defaultOpen?: boolean;
 };
 export const CollapsePanel: FC<PropsWithChildren<CollapsePanelProps>> = ({
   title,
   children,
   filterCount,
+  defaultOpen = false,
 }) => {
-  const { visible, toggle } = useSwitch();
+  const { visible, toggle } = useSwitch(defaultOpen);
   return (
     <Stack
       border={'1px solid #DFDEE6'}

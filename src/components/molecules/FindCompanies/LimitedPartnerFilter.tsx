@@ -23,6 +23,7 @@ export const LimitedPartnerFilter = () => {
 
   return (
     <CollapsePanel
+      defaultOpen
       filterCount={computedFilterCount([
         filters.companyIndustriesInclude,
         filters.companyIndustriesExclude,

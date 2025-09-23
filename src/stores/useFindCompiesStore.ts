@@ -63,6 +63,7 @@ type FindCompaniesStoreState = {
   >;
   industriesOpts: Option[];
   fundTypeOpts: Option[];
+  dialogCompanyTypeOpen: boolean;
 };
 
 type FindCompaniesStoreActions = {
@@ -70,6 +71,7 @@ type FindCompaniesStoreActions = {
   fetchIndustries: () => Promise<void>;
   fetchFundType: () => Promise<void>;
   resetFilters: () => void;
+  setDialogCompanyTypeOpen: (open: boolean) => void;
 };
 
 type FindCompaniesStoreProps = FindCompaniesStoreState &
@@ -80,6 +82,7 @@ export const useFindCompaniesStore = create<FindCompaniesStoreProps>()(
     filters: DEFAULT_FILTER,
     industriesOpts: [],
     fundTypeOpts: [],
+    dialogCompanyTypeOpen: false,
     setFilters: (key: CompanyFilterKeysType, value: any) =>
       set({ filters: { ...get().filters, [key]: value } }),
     fetchIndustries: async () => {
@@ -109,5 +112,7 @@ export const useFindCompaniesStore = create<FindCompaniesStoreProps>()(
       }
     },
     resetFilters: () => set({ filters: DEFAULT_FILTER }),
+    setDialogCompanyTypeOpen: (open: boolean) =>
+      set({ dialogCompanyTypeOpen: open }),
   }),
 );
