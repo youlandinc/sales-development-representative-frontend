@@ -42,6 +42,8 @@ import { _createTableByFindPeople } from '@/request';
 import { HttpError } from '@/types';
 
 import ICON_FOLDER from './assets/icon-folder.svg';
+import { computedFilterCount, handleParam } from '@/utils';
+import { LocationFilter } from '@/components/molecules/FindPeople/LocationFilter';
 
 type FindPeopleFilterPanelProps = {
   disabled?: boolean;
@@ -53,38 +55,9 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
   const { filters, setFilters } = useFindPeopleStore((state) => state);
   const router = useRouter();
 
-  const computedFilterCount = (
-    t: (Option[] | boolean | string | number | undefined)[] = [],
-  ) =>
-    t.reduce(
-      (pre, cur) =>
-        cur == null || cur === 0 || cur === ''
-          ? pre
-          : Array.isArray(cur)
-            ? (pre as number) + cur.length
-            : cur === !0 || isNumber(cur) || isString(cur)
-              ? (pre as number) + 1
-              : pre,
-      0,
-    ) as number;
-
   const [state, createTableByFindPeople] = useAsyncFn(async () => {
     try {
-      const { data } = await _createTableByFindPeople(
-        Object.entries(filters).reduce(
-          (pre, [key, value]) => {
-            if (Array.isArray(value)) {
-              pre[key] = value.map((item) =>
-                typeof item === 'string' ? item : item.value,
-              );
-              return pre;
-            }
-            pre[key] = value;
-            return pre;
-          },
-          {} as Record<string, any>,
-        ),
-      );
+      const { data } = await _createTableByFindPeople(handleParam(filters));
       router.push(`/prospect-enrich/${data}`);
     } catch (e) {
       const { message, header, variant } = e as HttpError;
@@ -328,7 +301,8 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             value={filters.jobDescriptionKeywords as Option[]}
           />
         </CollapsePanel>*/}
-        <CollapsePanel
+        <LocationFilter
+          defaultValue={filters}
           filterCount={computedFilterCount([
             filters.locationCountriesInclude,
             filters.locationCountriesExclude,
@@ -342,143 +316,13 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             filters.locations,
             filters.locationsExclude,
           ])}
-          title={'Location'}
-        >
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationCountriesInclude: value,
-              });
-            }}
-            options={LOCATION_COUNTRIES_OPTIONS}
-            placeholder={'e.g. United States, Canada'}
-            title={'Countries to include'}
-            value={filters.locationCountriesInclude as Option[]}
-          />
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationCountriesExclude: value,
-              });
-            }}
-            options={LOCATION_COUNTRIES_OPTIONS}
-            placeholder={'e.g. France, Spain'}
-            title={'Countries to exclude'}
-            value={filters.locationCountriesExclude as Option[]}
-          />
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationRegionsInclude: value,
-              });
-            }}
-            options={LOCATION_REGIONS_OPTIONS}
-            placeholder={'e.g. NAM, LATAM'}
-            title={'Regions to include'}
-            value={filters.locationRegionsInclude as Option[]}
-          />
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationRegionsExclude: value,
-              });
-            }}
-            options={LOCATION_REGIONS_OPTIONS}
-            placeholder={'e.g. APAC, EMEA'}
-            title={'Regions to exclude'}
-            value={filters.locationRegionsExclude as Option[]}
-          />
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationCitiesInclude: value,
-              });
-            }}
-            options={LOCATION_CITIES_OPTIONS}
-            placeholder={'e.g. San Francisco, London'}
-            title={'Cities to include'}
-            value={filters.locationCitiesInclude as Option[]}
-          />
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationCitiesExclude: value,
-              });
-            }}
-            options={LOCATION_CITIES_OPTIONS}
-            placeholder={'e.g. New York, Paris'}
-            title={'Cities to exclude'}
-            value={filters.locationCitiesExclude as Option[]}
-          />
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationStatesInclude: value,
-              });
-            }}
-            options={LOCATION_STATES_OPTIONS}
-            placeholder={'e.g. San Francisco, London'}
-            title={'States, provinces, or municipalities to include'}
-            value={filters.locationStatesInclude as Option[]}
-          />
-          <FilterSelect
-            onChange={(_, value) => {
-              setFilters({
-                ...filters,
-                locationStatesExclude: value,
-              });
-            }}
-            options={LOCATION_STATES_OPTIONS}
-            placeholder={'e.g. New York, Paris'}
-            title={'States, provinces, or municipalities to exclude'}
-            value={filters.locationStatesExclude as Option[]}
-          />
-          <FilterSwitch
-            checked={(filters.searchRawLocation as boolean) || false}
-            label={'Search raw location field'}
-            onChange={(_, checked) => {
-              setFilters({
-                ...filters,
-                searchRawLocation: checked,
-                locations: [],
-                locationsExclude: [],
-              });
-            }}
-          />
-          {filters.searchRawLocation && (
-            <>
-              <FilterTextField
-                onChange={(newValue) => {
-                  setFilters({
-                    ...filters,
-                    locations: newValue,
-                  });
-                }}
-                placeholder={'e.g. San Francisco, London'}
-                title={'Keywords to include for raw location field'}
-                value={filters.locations as Option[]}
-              />
-              <FilterTextField
-                onChange={(newValue) => {
-                  setFilters({
-                    ...filters,
-                    locationsExclude: newValue,
-                  });
-                }}
-                placeholder={'e.g. New York, Paris'}
-                title={'Keywords to exclude for raw location field'}
-                value={filters.locationsExclude as Option[]}
-              />
-            </>
-          )}
-        </CollapsePanel>
+          onChange={(key, value) => {
+            setFilters({
+              ...filters,
+              [key]: value,
+            });
+          }}
+        />
         <CollapsePanel
           filterCount={computedFilterCount([
             filters.names,
