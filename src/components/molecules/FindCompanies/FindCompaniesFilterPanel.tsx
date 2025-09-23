@@ -1,4 +1,7 @@
+import { FC } from 'react';
+import { useRouter } from 'next/navigation';
 import { Stack } from '@mui/material';
+
 import {
   CollapsePanel,
   CompanyTypeFilter,
@@ -7,18 +10,37 @@ import {
   VentureCapitalFilter,
 } from '@/components/molecules';
 import { FilterContainer } from '@/components/molecules/FindPeople/FilterItem';
-import { StyledButton, StyledTextFieldNumber } from '@/components/atoms';
+import {
+  SDRToast,
+  StyledButton,
+  StyledTextFieldNumber,
+} from '@/components/atoms';
 import { LocationFilter } from '@/components/molecules/FindPeople';
 
-import { computedFilterCount } from '@/utils';
+import { computedFilterCount, handleParam } from '@/utils';
 import {
   CompanyFilterKeysType,
   useFindCompaniesStore,
 } from '@/stores/useFindCompiesStore';
-import { CompanyTypeEnum } from '@/types';
+import { CompanyTypeEnum, HttpError } from '@/types';
+import { useAsyncFn } from '@/hooks';
+import { _createTableByFindCompanies } from '@/request';
 
-export const FindCompaniesFilterPanel = () => {
+export const FindCompaniesFilterPanel: FC<{ disabled?: boolean }> = ({
+  disabled,
+}) => {
+  const router = useRouter();
   const { filters, setFilters } = useFindCompaniesStore((state) => state);
+
+  const [state, createTableByFindCompanies] = useAsyncFn(async () => {
+    try {
+      const { data } = await _createTableByFindCompanies(handleParam(filters));
+      router.push(`/prospect-enrich/${data}`);
+    } catch (e) {
+      const { message, header, variant } = e as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  }, [filters]);
 
   return (
     <Stack borderRight={'1px solid #E5E5E5'}>
@@ -86,9 +108,9 @@ export const FindCompaniesFilterPanel = () => {
         py={1.5}
       >
         <StyledButton
-          // disabled={disabled}
-          // loading={state.loading}
-          // onClick={createTableByFindPeople}
+          disabled={disabled}
+          loading={state.loading}
+          onClick={createTableByFindCompanies}
           size={'medium'}
           sx={{
             width: 92,

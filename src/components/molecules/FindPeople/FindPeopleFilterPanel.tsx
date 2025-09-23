@@ -42,7 +42,7 @@ import { _createTableByFindPeople } from '@/request';
 import { HttpError } from '@/types';
 
 import ICON_FOLDER from './assets/icon-folder.svg';
-import { computedFilterCount } from '@/utils';
+import { computedFilterCount, handleParam } from '@/utils';
 import { LocationFilter } from '@/components/molecules/FindPeople/LocationFilter';
 
 type FindPeopleFilterPanelProps = {
@@ -57,21 +57,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
 
   const [state, createTableByFindPeople] = useAsyncFn(async () => {
     try {
-      const { data } = await _createTableByFindPeople(
-        Object.entries(filters).reduce(
-          (pre, [key, value]) => {
-            if (Array.isArray(value)) {
-              pre[key] = value.map((item) =>
-                typeof item === 'string' ? item : item.value,
-              );
-              return pre;
-            }
-            pre[key] = value;
-            return pre;
-          },
-          {} as Record<string, any>,
-        ),
-      );
+      const { data } = await _createTableByFindPeople(handleParam(filters));
       router.push(`/prospect-enrich/${data}`);
     } catch (e) {
       const { message, header, variant } = e as HttpError;

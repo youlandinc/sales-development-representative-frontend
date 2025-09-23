@@ -51,7 +51,6 @@ export const FindCompaniesPage = () => {
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 40 },
-    { field: 'name', headerName: 'Name', flex: 1, minWidth: 200 },
     {
       field: 'name',
       headerName: 'Name',
@@ -121,7 +120,11 @@ export const FindCompaniesPage = () => {
     <Stack height={'100vh'}>
       <FindPeopleHeader title={'Find companies'} />
       <Stack flex={1} flexDirection={'row'} minHeight={0}>
-        <FindCompaniesFilterPanel />
+        <FindCompaniesFilterPanel
+          disabled={
+            state.loading || state?.value?.data?.companyList?.length === 0
+          }
+        />
         {memoGrid}
       </Stack>
     </Stack>

@@ -38,3 +38,19 @@ export const computedFilterCount = (
             : pre,
     0,
   ) as number;
+
+export const handleParam = (param: Record<string, any>) => {
+  return Object.entries(param).reduce(
+    (pre, [key, value]) => {
+      if (Array.isArray(value)) {
+        pre[key] = value.map((item) =>
+          typeof item === 'string' ? item : item.value,
+        );
+        return pre;
+      }
+      pre[key] = value;
+      return pre;
+    },
+    {} as Record<string, any>,
+  );
+};
