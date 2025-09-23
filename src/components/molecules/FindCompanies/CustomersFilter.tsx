@@ -13,6 +13,7 @@ export const CustomersFilter = () => {
 
   return (
     <CollapsePanel
+      defaultOpen
       filterCount={computedFilterCount([
         filters.companyIndustriesInclude,
         filters.companyIndustriesExclude,
