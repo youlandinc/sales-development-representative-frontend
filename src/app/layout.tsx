@@ -1,6 +1,6 @@
 'use client';
 import { ReactNode } from 'react';
-import { Red_Hat_Display } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
 import NextTopLoader from 'nextjs-toploader';
 import { CssBaseline, ThemeProvider } from '@mui/material';
@@ -20,10 +20,10 @@ import { lightTheme } from '@/theme';
 
 import { ToastProvider } from '@/providers/ToastProvider';
 
-const redHatDisplay = Red_Hat_Display({
+const inter = Inter({
   subsets: ['latin'],
+  variable: '--font-inter',
   display: 'swap',
-  variable: '--font-red-hat-display',
 });
 
 const RootLayout = ({
@@ -37,7 +37,7 @@ const RootLayout = ({
         <link href="/favicon.svg" rel="icon" sizes={'any'} />
         <title>Attune</title>
       </head>
-      <body className={redHatDisplay.variable}>
+      <body className={inter.variable}>
         <InitColorSchemeScript attribute="class" />
         <NextTopLoader
           color="#6E4EFB"
