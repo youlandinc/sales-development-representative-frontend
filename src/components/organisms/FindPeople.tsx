@@ -44,7 +44,7 @@ export const FindPeople = () => {
   }, [JSON.stringify(params), fetchFindPeople]);
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 40 },
+    { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 60 },
     { field: 'name', headerName: 'Name', flex: 1, minWidth: 200 },
     {
       field: 'companyName',

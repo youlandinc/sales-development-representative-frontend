@@ -50,7 +50,7 @@ export const FindCompaniesPage = () => {
   }, [JSON.stringify(params), fetchFindCompanies]);
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 40 },
+    { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 60 },
     {
       field: 'name',
       headerName: 'Name',
