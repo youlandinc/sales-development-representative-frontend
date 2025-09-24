@@ -57,7 +57,8 @@ export const FindCompaniesPage = () => {
       flex: 1,
       minWidth: 200,
     },
-    {
+    //todo
+    /* {
       field: 'description',
       headerName: 'Description',
       flex: 1,
@@ -74,7 +75,7 @@ export const FindCompaniesPage = () => {
       headerName: 'Size',
       flex: 1,
       minWidth: 200,
-    },
+    },*/
     // {
     //   field: 'type',
     //   headerName: 'Type',
