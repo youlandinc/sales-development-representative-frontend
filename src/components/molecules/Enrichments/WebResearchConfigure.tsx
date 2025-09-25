@@ -309,7 +309,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                   fieldDescription={config?.description || ''}
                   fieldName={item}
                   fieldType={'string'}
-                  key={config.id||item}
+                  key={config.id || item}
                   removeField={handleDeleteField}
                   saveField={(
                     fieldName: string,
