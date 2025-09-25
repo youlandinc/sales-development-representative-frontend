@@ -221,7 +221,13 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       justifyContent={'space-between'}
       p={3}
     >
-      <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
+      <Stack
+        alignItems={'center'}
+        flexDirection={'row'}
+        gap={1}
+        height={30}
+        my={'auto'}
+      >
         <Icon
           component={ICON_BACK}
           onClick={async () => {
@@ -234,24 +240,22 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
             height: 20,
           }}
         />
-        <Stack height={36}>
-          <CommonRenameTextField
-            onChange={onChange}
-            slotProps={{
-              input: {
-                onBlur: (e) => {
-                  if (e.target.value === '') {
-                    setValue('Untitled campaign');
-                  }
-                },
+        <CommonRenameTextField
+          onChange={onChange}
+          slotProps={{
+            input: {
+              onBlur: (e) => {
+                if (e.target.value === '') {
+                  setValue('Untitled campaign');
+                }
               },
-            }}
-            value={value}
-          />
-        </Stack>
-
+            },
+          }}
+          value={value}
+        />
         <CampaignsStatusBadge status={campaignStatus} />
       </Stack>
+
       <CampaignProcessHeaderButtonGroup />
 
       <StyledButton
