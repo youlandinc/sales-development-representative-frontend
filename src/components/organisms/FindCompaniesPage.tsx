@@ -89,6 +89,12 @@ export const FindCompaniesPage = () => {
       minWidth: 200,
     },
     {
+      field: 'country',
+      headerName: 'Country',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
       field: 'linkedUrl',
       headerName: 'LinkedIn URL',
       flex: 1,
