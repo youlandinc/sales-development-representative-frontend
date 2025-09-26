@@ -227,7 +227,7 @@ export const CampaignProcessContentAiTable: FC = () => {
                                 });
                               }}
                               options={tableOptions || []}
-                              placeholder={'Select a table'}
+                              placeholder={'Select a column'}
                               sx={{ flex: 1, maxWidth: 320 }}
                               value={item.fieldId || ''}
                             />
