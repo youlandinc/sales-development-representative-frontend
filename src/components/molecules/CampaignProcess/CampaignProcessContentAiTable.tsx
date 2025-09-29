@@ -110,7 +110,7 @@ export const CampaignProcessContentAiTable: FC = () => {
   return (
     <>
       <Fade in>
-        <Stack height={'100%'} width={'100%'} overflow={'auto'}>
+        <Stack height={'100%'} overflow={'auto'} width={'100%'}>
           <Stack flex={1} gap={3} mt={3} px={1.5}>
             <Stack gap={1}>
               <Typography fontWeight={700} variant={'body2'}>
