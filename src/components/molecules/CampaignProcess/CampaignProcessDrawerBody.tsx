@@ -72,6 +72,7 @@ export const CampaignProcessDrawerBody: FC<CampaignProcessDrawerBodyProps> = ({
         ...temp[target],
         bodyInstructions: data,
       };
+
       setMessagingSteps(temp);
     } catch (err) {
       const { message, header, variant } = err as HttpError;

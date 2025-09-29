@@ -45,13 +45,21 @@ export const CampaignProcessDrawerSubject: FC<
   const [regenerating, setRegenerating] = useState(false);
 
   const onClickToGenerate = async () => {
+    if (insideFormData.subjectExamples.every((item) => !item)) {
+      return;
+    }
+
     const postData = {
-      subjectExamples: formData.subjectExamples,
+      subjectExamples: insideFormData.subjectExamples,
     };
 
     setGenerating(true);
     try {
       const { data } = await _updateStepEmailSubjectInstructions(postData);
+      setInsideFormData({
+        ...insideFormData,
+        subjectInstructions: data,
+      });
 
       const temp = JSON.parse(JSON.stringify(messagingSteps));
       const target = temp.findIndex(
