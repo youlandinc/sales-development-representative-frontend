@@ -1,5 +1,6 @@
 'use client';
 import { ReactNode } from 'react';
+import { Inter } from 'next/font/google';
 
 import NextTopLoader from 'nextjs-toploader';
 import { CssBaseline, ThemeProvider } from '@mui/material';
@@ -19,6 +20,12 @@ import { lightTheme } from '@/theme';
 
 import { ToastProvider } from '@/providers/ToastProvider';
 
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
 const RootLayout = ({
   children,
 }: Readonly<{
@@ -30,13 +37,14 @@ const RootLayout = ({
         <link href="/favicon.svg" rel="icon" sizes={'any'} />
         <title>Attune</title>
       </head>
-      <body>
+      <body className={inter.variable}>
         <InitColorSchemeScript attribute="class" />
         <NextTopLoader
           color="#6E4EFB"
           crawl={true}
           height={2}
           shadow={'none'}
+          showSpinner={false}
         />
         <AppRouterCacheProvider
           options={{ key: 'css', enableCssLayer: true, prepend: true }}

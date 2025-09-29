@@ -136,7 +136,16 @@ export const DialogHeaderActions = () => {
                       AI
                     </Typography>
                   </Stack>
-                  <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
+                  <Icon
+                    component={ICON_ARROW}
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      transform: visible ? 'rotate(0deg)' : 'rotate(-90deg)',
+                      transformOrigin: 'center',
+                      transition: 'all .3s',
+                    }}
+                  />
                 </Stack>
                 <Collapse in={visible}>
                   <Stack

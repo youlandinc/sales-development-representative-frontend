@@ -215,7 +215,7 @@ const defaultOptions: ThemeOptions = {
     },
   },
   typography: {
-    fontFamily: 'var(--font-red-hat-display)',
+    fontFamily: 'var(--font-inter)',
     h1: {
       fontSize: 40,
       fontWeight: 600,

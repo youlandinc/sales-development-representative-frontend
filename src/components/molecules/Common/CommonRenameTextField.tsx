@@ -9,32 +9,47 @@ export const CommonRenameTextField: FC<StyledTextFieldProps> = ({
   ...rest
 }) => {
   return (
-    <Box height={'fit-content'} position={'relative'}>
+    <Box position={'relative'}>
       <Box
-        component={'span'}
-        display={'inline-block'}
-        fontSize={20}
+        fontSize={18}
         fontWeight={600}
-        lineHeight={1.5}
-        minHeight={36}
+        height={30}
+        lineHeight={1}
+        minHeight={30}
         minWidth={'2em'}
-        p={'2px 6px'}
-        sx={{ opacity: 0 }}
+        p={'4px 6px'}
+        sx={{
+          opacity: 0,
+          boxSizing: 'border-box',
+        }}
       >
         {value as any}
       </Box>
       <StyledTextField
         sx={{
           '& .MuiOutlinedInput-input': {
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: 600,
-            py: '2px',
-            px: '6px ',
+            py: '4px',
+            px: '6px',
             height: 'auto',
-            lineHeight: '1.5 ',
+            lineHeight: 1,
+            boxSizing: 'border-box',
           },
           '& .MuiOutlinedInput-notchedOutline': {
             borderColor: 'transparent',
+          },
+          '& .MuiOutlinedInput-root': {
+            boxSizing: 'border-box',
+            minHeight: '30px',
+            height: '30px',
+            py: 0,
+            '& input': {
+              py: '4px',
+              px: '6px',
+              height: 'auto',
+              lineHeight: 1,
+            },
           },
           position: 'absolute',
           left: 0,

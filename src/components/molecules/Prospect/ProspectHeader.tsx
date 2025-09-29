@@ -17,6 +17,8 @@ import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
 
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
+import { DialogCompanyType } from '@/components/molecules';
+import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
 
 interface ProspectHeaderProps {
   dispatch: any;
@@ -29,6 +31,9 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
   store,
   openDialog,
 }) => {
+  const { setDialogCompanyTypeOpen, setFilters } = useFindCompaniesStore(
+    (store) => store,
+  );
   const [value, setValue] = useState(store.searchWord);
   const router = useRouter();
 
@@ -43,7 +48,8 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
       {
         label: 'Find companies',
         icon: ICON_FIND_COMPANIES,
-        disabled: true,
+        disabled: false,
+        handleClick: () => setDialogCompanyTypeOpen(true),
       },
       {
         label: 'Import from CSV',
@@ -146,6 +152,12 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
           </StyledButton>
         </Stack>
       </Stack>
+      <DialogCompanyType
+        cb={(type) => {
+          setFilters('companyType', type);
+          router.push('/find-companies');
+        }}
+      />
     </Stack>
   );
 };

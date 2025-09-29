@@ -110,7 +110,7 @@ export const CampaignProcessContentAiTable: FC = () => {
   return (
     <>
       <Fade in>
-        <Stack height={'100%'} width={'100%'}>
+        <Stack height={'100%'} width={'100%'} overflow={'auto'}>
           <Stack flex={1} gap={3} mt={3} px={1.5}>
             <Stack gap={1}>
               <Typography fontWeight={700} variant={'body2'}>
@@ -227,7 +227,7 @@ export const CampaignProcessContentAiTable: FC = () => {
                                 });
                               }}
                               options={tableOptions || []}
-                              placeholder={'Select a table'}
+                              placeholder={'Select a column'}
                               sx={{ flex: 1, maxWidth: 320 }}
                               value={item.fieldId || ''}
                             />

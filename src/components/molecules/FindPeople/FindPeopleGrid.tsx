@@ -5,58 +5,24 @@ import { Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 type FindPeopleGridProps = {
-  peopleList?: {
-    id: string;
-    name: string;
-    companyName: string;
-    jobTitle: string;
-    linkedinUrl: string;
-    location: string;
-  }[];
+  list?: Record<string, any>[];
   isLoading?: boolean;
-  peopleCount?: number;
+  count?: number;
   limit?: number;
   limitPerCompany?: number;
+  columns: GridColDef[];
+  title?: string;
 };
 
 export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
-  peopleList,
+  list,
   isLoading,
-  peopleCount,
+  count,
   limit,
   limitPerCompany,
+  columns,
+  title,
 }) => {
-  // const { filters } = useFindPeopleStore((state) => state);
-  // const params = useDebounce(filters, 400);
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 40 },
-    { field: 'name', headerName: 'Name', flex: 1, minWidth: 200 },
-    {
-      field: 'companyName',
-      headerName: 'Company name',
-      flex: 1,
-      minWidth: 200,
-    },
-    {
-      field: 'jobTitle',
-      headerName: 'Job title',
-      flex: 1,
-      minWidth: 200,
-    },
-    {
-      field: 'linkedinUrl',
-      headerName: 'Linkedin URL',
-      flex: 1,
-      minWidth: 200,
-    },
-    {
-      field: 'location',
-      headerName: 'Location',
-      flex: 1,
-      minWidth: 200,
-    },
-  ];
-
   return (
     <Stack flex={1} gap={1.5} minWidth={0} pb={6} pr={3} pt={3}>
       {/*header*/}
@@ -67,7 +33,7 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
         width={'100%'}
       >
         <Typography fontWeight={600} lineHeight={1.2} pl={3}>
-          Preview leads
+          {title || 'Preview leads'}
         </Typography>
         <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
           {limitPerCompany ? (
@@ -78,7 +44,7 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
               lineHeight={1.2}
               variant={'body2'}
             >
-              Previewing {peopleList?.length || 0} people
+              Previewing {list?.length || 0} people
             </Typography>
           ) : (
             <Typography
@@ -88,11 +54,11 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
               lineHeight={1.2}
               variant={'body2'}
             >
-              Previewing <strong>{peopleList?.length || 0}</strong> of{' '}
-              <strong>{(peopleCount || 0).toLocaleString()}</strong> results.{' '}
+              Previewing <strong>{list?.length || 0}</strong> of{' '}
+              <strong>{(count || 0).toLocaleString()}</strong> results.{' '}
               <strong>
-                {(peopleCount || 0) < (limit || 1000)
-                  ? peopleCount?.toLocaleString()
+                {(count || 0) < (limit || 1000)
+                  ? count?.toLocaleString()
                   : (limit || 1000).toLocaleString()}
               </strong>{' '}
               will be imported.
@@ -111,7 +77,7 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
         </Stack>
       </Stack>
       {/*grid*/}
-      {peopleList?.length === 0 ? (
+      {list?.length === 0 ? (
         <Typography margin={'auto'} textAlign={'center'} variant={'body2'}>
           No results found. Try simplifying your search or using fewer filters.
         </Typography>
@@ -160,7 +126,7 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
                     ))}
                   </Stack>
                 ))
-              : peopleList?.map((row, i) => (
+              : list?.map((row, i) => (
                   <Stack flexDirection={'row'} key={i} width={'100%'}>
                     {columns.map((col, j) => {
                       return (

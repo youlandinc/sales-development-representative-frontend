@@ -1,4 +1,4 @@
-import { post } from '@/request/request';
+import { get, post } from '@/request/request';
 
 export const _fetchFindPeople = (param: Record<string, any>) => {
   return post<{
