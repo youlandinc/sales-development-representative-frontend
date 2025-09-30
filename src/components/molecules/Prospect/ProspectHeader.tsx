@@ -80,7 +80,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
   };
 
   return (
-    <Stack gap={3}>
+    <Stack gap={6}>
       <Stack gap={1.5}>
         <Typography variant={'h5'}>Quick start</Typography>
         <Stack flexDirection={'row'} gap={3}>
@@ -90,11 +90,12 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               disabled={item.disabled}
               key={`${item.label}-${index}`}
               onClick={item.handleClick}
-              size={'medium'}
               sx={{
-                // width: '180px !important',
+                fontSize: '14px !important',
                 fontWeight: 400,
-                // justifyContent: 'flex-start',
+                boxShadow: 'none',
+                borderColor: '#DFDEE6 !important',
+                color: '#1E1645 !important',
               }}
               variant={'outlined'}
             >
@@ -103,9 +104,9 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
                 sx={{
                   width: 20,
                   height: 20,
-                  mr: 1,
+                  mr: 0.5,
                   '& path': {
-                    fill: item.disabled ? '#BABCBE' : '#2A292E',
+                    fill: item.disabled ? '#BABCBE' : '#1E1645',
                   },
                 }}
               />
@@ -115,7 +116,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
         </Stack>
       </Stack>
 
-      <Stack flexDirection={'row'} justifyContent={'space-between'}>
+      <Stack flexDirection={'row'} gap={3} justifyContent={'space-between'}>
         <Typography variant={'h5'}>Prospect & Enrich</Typography>
 
         <Stack flexDirection={'row'} gap={1}>
@@ -152,6 +153,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
           </StyledButton>
         </Stack>
       </Stack>
+
       <DialogCompanyType
         cb={(type) => {
           setFilters('companyType', type);

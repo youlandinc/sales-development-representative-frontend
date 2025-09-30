@@ -116,7 +116,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
   return (
     <Stack gap={3}>
       <Stack alignItems={'center'} flexDirection={'row'}>
-        <Typography variant={'h7'}>Campaigns</Typography>
+        <Typography variant={'h5'}>Campaigns</Typography>
 
         <Stack flexDirection={'row'} gap={3} ml={'auto'}>
           <StyledTextField

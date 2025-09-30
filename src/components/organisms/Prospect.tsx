@@ -183,7 +183,7 @@ export const Prospect: FC = () => {
   };
 
   return (
-    <Stack gap={3} height={'100%'} width={'100%'}>
+    <Stack gap={1} height={'100%'} width={'100%'}>
       <ProspectHeader dispatch={dispatch} openDialog={open} store={store} />
       <ProspectList openDialog={open} store={store} />
 
