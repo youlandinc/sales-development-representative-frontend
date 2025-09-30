@@ -79,6 +79,8 @@ interface StyledTableProps {
 
 const columnHelper = createColumnHelper<any>();
 
+import ICON_TYPE_ADD from './assets/icon-type-add.svg';
+
 export const StyledTable: FC<StyledTableProps> = ({
   columns,
   rowIds,
@@ -176,8 +178,8 @@ export const StyledTable: FC<StyledTableProps> = ({
         />
       ),
       cell: (info) => info,
-      size: 100,
-      minSize: 100,
+      size: 60,
+      minSize: 60,
       enableResizing: false,
     });
 
@@ -721,8 +723,12 @@ export const StyledTable: FC<StyledTableProps> = ({
                     setHeaderMenuAnchor(null);
                     setAddMenuAnchor(e.currentTarget);
                   }}
-                  width={120}
+                  width={140}
                 >
+                  <Icon
+                    component={ICON_TYPE_ADD}
+                    sx={{ width: 16, height: 16 }}
+                  />
                   Add column
                 </StyledTableHeadCell>
               </StyledTableHeadRow>
@@ -861,7 +867,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   <StyledTableSpacer
                     bgcolor="background.paper"
                     borderRight
-                    width={120}
+                    width={140}
                   />
                 </StyledTableBodyRow>
               );

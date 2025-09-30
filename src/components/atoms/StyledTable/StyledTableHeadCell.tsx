@@ -145,7 +145,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       sx={{
         userSelect: 'none',
         width,
-        minWidth: width < 100 ? 100 : width,
+        minWidth: width < 60 ? 60 : width,
         maxWidth: width,
         boxSizing: 'border-box',
         borderRight:

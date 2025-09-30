@@ -43,15 +43,22 @@ export const HeadFilterPanel = () => {
           <Grow {...TransitionProps} timeout={300}>
             <Paper
               sx={{
-                boxShadow: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
+                borderRadius: 2,
+                boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
                 minWidth: 260,
               }}
             >
               <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
-                <Stack gap={0} height={200}></Stack>
+                <Stack
+                  alignItems={'center'}
+                  color={'text.secondary'}
+                  fontSize={14}
+                  gap={0}
+                  height={200}
+                  justifyContent={'center'}
+                >
+                  No content available
+                </Stack>
               </ClickAwayListener>
             </Paper>
           </Grow>

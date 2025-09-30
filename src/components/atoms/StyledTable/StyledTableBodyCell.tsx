@@ -22,7 +22,7 @@ import { Cell } from '@tanstack/react-table';
 import { useRowHover } from './StyledTableBodyRow';
 
 const CELL_CONSTANTS = {
-  MIN_WIDTH: 100,
+  MIN_WIDTH: 60,
   FONT_SIZE: 14,
   LINE_HEIGHT: '36px',
   PROGRESS_SIZE: 16,

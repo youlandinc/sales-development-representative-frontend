@@ -84,10 +84,8 @@ export const HeadColumnsPanel = () => {
             <Paper
               sx={{
                 mt: 1,
-                boxShadow: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
+                borderRadius: 2,
+                boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
                 minWidth: 260,
               }}
             >
