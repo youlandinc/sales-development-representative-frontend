@@ -17,7 +17,7 @@ export const Library = () => {
   return (
     <Fade in>
       <Stack gap={3}>
-        <Typography variant={'h7'}>Library</Typography>
+        <Typography variant={'h5'}>Library</Typography>
         <Stack
           flexDirection={'row'}
           gap={1}

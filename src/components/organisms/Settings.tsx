@@ -9,9 +9,7 @@ import {
 export const Settings = () => {
   return (
     <Stack gap={3}>
-      <Typography lineHeight={1.2} variant={'h6'}>
-        Settings
-      </Typography>
+      <Typography variant={'h5'}>Settings</Typography>
       <SettingsEmails />
       <SettingsIntegrations />
       <SettingsPersonalInfo />
