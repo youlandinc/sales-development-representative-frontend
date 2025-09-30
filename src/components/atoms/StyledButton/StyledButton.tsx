@@ -43,7 +43,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
         borderRadius: 2,
         minWidth: 'auto',
         maxWidth: 'auto',
-        boxShadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
+        boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',

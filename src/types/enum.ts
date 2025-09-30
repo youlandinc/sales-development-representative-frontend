@@ -54,6 +54,8 @@ export enum WebSocketTypeEnum {
   subscribe = 'SUBSCRIBE',
   ping = 'PING',
   pong = 'PONG',
+  // csv
+  progress = 'PROGRESS',
 }
 
 export enum CompanyTypeEnum {

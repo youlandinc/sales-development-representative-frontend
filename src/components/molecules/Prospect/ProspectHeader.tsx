@@ -1,14 +1,20 @@
+import { ChangeEvent, FC, MouseEvent, useMemo, useState } from 'react';
 import {
   debounce,
+  Divider,
   Icon,
   InputAdornment,
+  Menu,
+  MenuItem,
   Stack,
   Typography,
 } from '@mui/material';
-import { ChangeEvent, FC, useMemo, useState } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
 
+import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
+
 import { StyledButton, StyledTextField } from '@/components/atoms';
+import { DialogCompanyType } from '@/components/molecules';
 
 import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
 import ICON_FIND_COMPANIES from './assets/icon_find_companies.svg';
@@ -17,8 +23,6 @@ import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
 
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
-import { DialogCompanyType } from '@/components/molecules';
-import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
 
 interface ProspectHeaderProps {
   dispatch: any;
@@ -37,34 +41,35 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
   const [value, setValue] = useState(store.searchWord);
   const router = useRouter();
 
-  const BUTTONS = useMemo(
-    () => [
-      {
-        label: 'Find people',
-        icon: ICON_FIND_PEOPLE,
-        disabled: false,
-        handleClick: () => router.push('/find-people'),
-      },
-      {
-        label: 'Find companies',
-        icon: ICON_FIND_COMPANIES,
-        disabled: false,
-        handleClick: () => setDialogCompanyTypeOpen(true),
-      },
-      {
-        label: 'Import from CSV',
-        icon: ICON_IMPORT_CSV,
-        disabled: false,
-        handleClick: openDialog,
-      },
-      {
-        label: 'Blank table',
-        icon: ICON_BLANK_TABLE,
-        disabled: true,
-      },
-    ],
-    [],
-  );
+  const sourceOptions = [
+    {
+      label: 'Find people',
+      icon: ICON_FIND_PEOPLE,
+      disabled: false,
+      onClick: () => router.push('/find-people'),
+    },
+    {
+      label: 'Find companies',
+      icon: ICON_FIND_COMPANIES,
+      disabled: false,
+      onClick: () => setDialogCompanyTypeOpen(true),
+    },
+    {
+      label: 'Import from CSV',
+      icon: ICON_IMPORT_CSV,
+      disabled: false,
+      onClick: openDialog,
+    },
+  ];
+
+  const tableOptions = [
+    {
+      label: 'Blank table',
+      icon: ICON_BLANK_TABLE,
+      disabled: true,
+      onClick: () => void 0,
+    },
+  ];
 
   const debounceSearchWord = useMemo(
     () =>
@@ -79,17 +84,26 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
     debounceSearchWord(e.target.value);
   };
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const onMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const onMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Stack gap={6}>
       <Stack gap={1.5}>
         <Typography variant={'h5'}>Quick start</Typography>
         <Stack flexDirection={'row'} gap={3}>
-          {BUTTONS.map((item, index) => (
+          {[...sourceOptions, ...tableOptions].map((item, index) => (
             <StyledButton
               color={'info'}
               disabled={item.disabled}
               key={`${item.label}-${index}`}
-              onClick={item.handleClick}
+              onClick={() => item?.onClick()}
               sx={{
                 fontSize: '14px !important',
                 fontWeight: 400,
@@ -144,13 +158,98 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
             }}
             value={value}
           />
-          <StyledButton onClick={() => openDialog()} size={'medium'}>
+          <StyledButton
+            aria-controls={open ? 'basic-menu' : undefined}
+            aria-expanded={open ? 'true' : undefined}
+            aria-haspopup="true"
+            id="basic-button"
+            onClick={onMenuOpen}
+            size={'medium'}
+          >
             <Icon
               component={ICON_NEW_TABLE}
               sx={{ width: 20, height: 20, mr: 1 }}
             />
             New table
           </StyledButton>
+
+          <Menu
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            id="basic-menu"
+            onClose={onMenuClose}
+            open={open}
+            slotProps={{
+              list: {
+                'aria-labelledby': 'basic-button',
+                sx: {
+                  p: 0,
+                  width: 260,
+                  gap: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                },
+              },
+              paper: {
+                sx: {
+                  p: 1.5,
+                  mt: 1.5,
+                },
+              },
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <Typography variant={'h7'}>Source</Typography>
+            {sourceOptions.map((item, index) => (
+              <MenuItem
+                key={`${item.label}-${index}`}
+                onClick={() => {
+                  item?.onClick();
+                  onMenuClose();
+                }}
+                sx={{
+                  fontSize: 14,
+                  lineHeight: 1,
+                  p: 0.5,
+                  borderRadius: 1,
+                  alignItems: 'center',
+                }}
+              >
+                <Icon
+                  component={item.icon}
+                  sx={{ width: 20, height: 20, mr: 1 }}
+                />
+                {item.label}
+              </MenuItem>
+            ))}
+            <Divider />
+            <Typography variant={'h7'}>Tables</Typography>
+            {tableOptions.map((item, index) => (
+              <MenuItem
+                disabled
+                key={`${item.label}-${index}`}
+                sx={{
+                  fontSize: 14,
+                  lineHeight: 1,
+                  p: 0.5,
+                  borderRadius: 1,
+                  alignItems: 'center',
+                }}
+              >
+                <Icon
+                  component={item.icon}
+                  sx={{ width: 20, height: 20, mr: 1 }}
+                />
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
         </Stack>
       </Stack>
 

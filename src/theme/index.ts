@@ -308,6 +308,15 @@ const defaultOptions: ThemeOptions = {
         disableRipple: true,
       },
     },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 8,
+          bgcolor: 'white',
+          boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
+        },
+      },
+    },
     MuiRadio: {
       defaultProps: {
         disableRipple: true,
@@ -406,8 +415,9 @@ const defaultOptions: ThemeOptions = {
         },
         paper: {
           fontSize: 14,
-          boxShadow:
-            '0px 10px 10px 0px rgba(17, 52, 227, 0.10),0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
+          borderRadius: 2,
+          bgcolor: 'white',
+          boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
         },
         listbox: {
           padding: '0px 0px 0px 0px',
@@ -436,8 +446,9 @@ const defaultOptions: ThemeOptions = {
     MuiPopover: {
       styleOverrides: {
         paper: {
-          boxShadow:
-            '0px 10px 10px 0px rgba(17, 52, 227, 0.10),0px 0px 2px 0px rgba(17, 52, 227, 0.10)',
+          borderRadius: 2,
+          bgcolor: 'white',
+          boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
         },
       },
     },
