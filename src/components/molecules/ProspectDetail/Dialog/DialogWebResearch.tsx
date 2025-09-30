@@ -437,11 +437,11 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           >
             <MenuItem
               onClick={() => {
-                saveAndRun(tableId, 10);
+                saveAndRun(tableId, rowIds.length > 10 ? 10 : rowIds.length);
               }}
             >
               <Typography color={'text.secondary'} variant={'body2'}>
-                Save and run 10 rows
+                Save and run {rowIds.length > 10 ? 10 : rowIds.length} rows
               </Typography>
               <CostCoins bgcolor={'#EFE9FB'} count={`~${COINS_PER_ROW * 10}`} />
             </MenuItem>
