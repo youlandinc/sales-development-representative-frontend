@@ -20,7 +20,7 @@ export const LayoutHeader: FC = () => {
         sx={{
           ml: 0.25,
           height: 32,
-          width: 118,
+          width: 141,
         }}
       />
 
