@@ -48,6 +48,7 @@ export type ProspectTableActions = {
     } | null;
   }>;
   fetchRowIds: (tableId: string) => Promise<void>;
+  setRowIds: (rowIds: string[]) => void;
   // helper
   setActiveColumnId: (columnId: string) => void;
   openDialog: (type: ProspectTableState['dialogType']) => void;
@@ -113,6 +114,9 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       } catch (err) {
         handleApiError<ProspectTableState>(err);
       }
+    },
+    setRowIds: (rowIds) => {
+      set({ rowIds });
     },
     renameTable: async (tableId, name) => {
       if (!tableId || !name) {

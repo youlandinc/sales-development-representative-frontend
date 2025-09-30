@@ -34,6 +34,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   const {
     fetchTable,
     fetchRowIds,
+    setRowIds,
     columns,
     rowIds,
     runRecords,
@@ -78,6 +79,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   }, [columns]);
 
   const rowsMapRef = useRef<Record<string, any>>({});
+  const rowIdsRef = useRef<string[]>([]);
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
   const [aiLoadingState, setAiLoadingState] = useState<
     Record<string, Record<string, boolean>>
@@ -128,77 +130,105 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     resetTable();
     setRowsMap({});
     rowsMapRef.current = {};
+    rowIdsRef.current = [];
     isFetchingRef.current = false;
     maxLoadedIndexRef.current = -1;
   }, [resetTable, tableId]);
 
-  useEffect(() => {
-    if (!connected || messages.length === 0 || !tableId) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!connected || messages.length === 0 || !tableId) {
+        return;
+      }
 
-    messages.forEach((message, index) => {
-      try {
-        let aiMessage;
-        if (typeof message === 'string') {
-          aiMessage = JSON.parse(message);
-        } else {
-          aiMessage = message;
-        }
+      messages.forEach((message, index) => {
+        try {
+          let parsedMessage;
+          if (typeof message === 'string') {
+            parsedMessage = JSON.parse(message);
+          } else {
+            parsedMessage = message;
+          }
 
-        if (
-          aiMessage.type === WebSocketTypeEnum.message &&
-          aiMessage.data?.data?.tableId === tableId &&
-          aiMessage.data?.data?.recordId &&
-          aiMessage.data?.data?.metadata
-        ) {
-          const { recordId, metadata } = aiMessage.data.data;
+          if (
+            parsedMessage.type === WebSocketTypeEnum.progress &&
+            parsedMessage.data?.id === tableId &&
+            Array.isArray(parsedMessage.data?.data)
+          ) {
+            const newRowIds = parsedMessage.data.data;
 
-          if (!metadata || Object.keys(metadata).length === 0) {
+            const currentRowIds = rowIdsRef.current;
+            const updatedRowIds = Array.from(
+              new Set([...currentRowIds, ...newRowIds]),
+            );
+
+            rowIdsRef.current = updatedRowIds;
+            setRowIds(updatedRowIds);
+
+            setRowsMap({});
+            rowsMapRef.current = {};
+            maxLoadedIndexRef.current = -1;
+
             return;
           }
 
-          const currentRowData = rowsMapRef.current[recordId] || {
-            id: recordId,
-          };
-          const updatedRowData = { ...currentRowData };
+          if (
+            parsedMessage.type === WebSocketTypeEnum.message &&
+            parsedMessage.data?.data?.tableId === tableId &&
+            parsedMessage.data?.data?.recordId &&
+            parsedMessage.data?.data?.metadata
+          ) {
+            const { recordId, metadata } = parsedMessage.data.data;
 
-          Object.entries(metadata).forEach(([fieldId, result]) => {
-            updatedRowData[fieldId] = result;
-          });
+            if (!metadata || Object.keys(metadata).length === 0) {
+              return;
+            }
 
-          rowsMapRef.current[recordId] = updatedRowData;
-          setRowsMap((prev) => ({
-            ...prev,
-            [recordId]: updatedRowData,
-          }));
+            const currentRowData = rowsMapRef.current[recordId] || {
+              id: recordId,
+            };
+            const updatedRowData = { ...currentRowData };
 
-          Object.keys(metadata).forEach((columnId) => {
-            setAiLoadingState((prev) => {
-              const updated = { ...prev };
-              if (updated[recordId]?.[columnId]) {
-                delete updated[recordId][columnId];
-                if (Object.keys(updated[recordId]).length === 0) {
-                  delete updated[recordId];
-                }
-              }
-              return updated;
+            Object.entries(metadata).forEach(([fieldId, result]) => {
+              updatedRowData[fieldId] = result;
             });
-          });
-        } else {
-          //console.log(`Message ${index} doesn't match:`, {
-          //  messageType: aiMessage.type,
-          //  messageTableId: aiMessage.data?.data?.tableId,
-          //  currentTableId: tableId,
-          //  hasRecordId: !!aiMessage.data?.data?.recordId,
-          //  hasMetadata: !!aiMessage.data?.data?.metadata,
-          //});
+
+            rowsMapRef.current[recordId] = updatedRowData;
+            setRowsMap((prev) => ({
+              ...prev,
+              [recordId]: updatedRowData,
+            }));
+
+            Object.keys(metadata).forEach((columnId) => {
+              setAiLoadingState((prev) => {
+                const updated = { ...prev };
+                if (updated[recordId]?.[columnId]) {
+                  delete updated[recordId][columnId];
+                  if (Object.keys(updated[recordId]).length === 0) {
+                    delete updated[recordId];
+                  }
+                }
+                return updated;
+              });
+            });
+          } else {
+            //console.log(`Message ${index} doesn't match:`, {
+            //  messageType: aiMessage.type,
+            //  messageTableId: aiMessage.data?.data?.tableId,
+            //  currentTableId: tableId,
+            //  hasRecordId: !!aiMessage.data?.data?.recordId,
+            //  hasMetadata: !!aiMessage.data?.data?.metadata,
+            //});
+          }
+        } catch (error) {
+          console.log(error, 'error');
+          //console.error(`Error processing WebSocket message ${index}:`, error);
         }
-      } catch (error) {
-        //console.error(`Error processing WebSocket message ${index}:`, error);
-      }
-    });
-  }, [connected, messages, tableId]);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [connected, messages, tableId],
+  );
 
   const fetchBatchData = useCallback(
     async (startIndex: number, endIndex: number) => {

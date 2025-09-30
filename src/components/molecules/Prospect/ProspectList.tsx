@@ -364,7 +364,7 @@ export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
           sx={{ alignItems: 'center' }}
         >
           <Icon component={ICON_TABLE_RENAME} sx={{ mr: 1 }} />
-          <Typography pb={0.5} variant={'subtitle3'}>
+          <Typography pb={0.5} variant={'body3'}>
             Rename
           </Typography>
         </MenuItem>
@@ -376,7 +376,7 @@ export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
           sx={{ alignItems: 'center' }}
         >
           <Icon component={ICON_TABLE_DELETE} sx={{ mr: 1 }} />
-          <Typography pb={0.5} variant={'subtitle3'}>
+          <Typography pb={0.5} variant={'body3'}>
             Delete
           </Typography>
         </MenuItem>
