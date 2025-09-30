@@ -35,7 +35,7 @@ const RootLayout = ({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link href="/favicon.svg" rel="icon" sizes={'any'} />
-        <title>Attune</title>
+        <title>Corepass</title>
       </head>
       <body className={inter.variable}>
         <InitColorSchemeScript attribute="class" />
