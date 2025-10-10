@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from 'react';
+import { ElementType, FC, SyntheticEvent, useMemo, useState } from 'react';
 import {
   Box,
   Collapse,
@@ -10,8 +10,8 @@ import {
 } from '@mui/material';
 
 import { StyledDialog } from '@/components/atoms';
-import ICON_ARROW from '../assets/dialog/icon_arrow_down.svg';
-import ICON_SPARK from '../assets/dialog/icon_sparkle_blue.svg';
+import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+import ICON_SPARK from '../../assets/dialog/icon_sparkle_blue.svg';
 import CloseIcon from '@mui/icons-material/Close';
 import { CostCoins, TableColumnMenuEnum } from '@/components/molecules';
 import {
@@ -22,6 +22,8 @@ import {
 import { useSwitch } from '@/hooks';
 import { ProcessCreateTypeEnum } from '@/types';
 import { useDialogStore } from '@/stores/useDialogStore';
+import { useDialogHeaderActionsHook } from './hooks/useDialogHeaderActionsHook';
+import { DialogHeaderActionsMenus } from './DialogHeaderActionsMenus';
 
 export const DialogHeaderActions = () => {
   const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
@@ -35,6 +37,9 @@ export const DialogHeaderActions = () => {
   } = useDialogStore();
 
   const { setWebResearchVisible } = useWebResearchStore((state) => state);
+
+  const { ENRICHMENTS_SUGGESTION_MENUS, ENRICHMENTS_AI_MENUS } =
+    useDialogHeaderActionsHook();
 
   const [value, setValue] = useState<'Enrichments' | 'Campaign'>('Enrichments');
   const handleChange = (
@@ -64,6 +69,12 @@ export const DialogHeaderActions = () => {
     handleClose();
     setWebResearchVisible(true, ActiveTypeEnum.add);
   };
+
+  const computedContent = useMemo(() => {
+    if (value === 'Enrichments') {
+      return <Stack gap={1.5}></Stack>;
+    }
+  }, [value, visible, campaignVisible]);
 
   return (
     <StyledDialog
@@ -112,64 +123,16 @@ export const DialogHeaderActions = () => {
           <Box p={3}>
             {value === 'Enrichments' ? (
               <Stack gap={1.5}>
-                <Stack
-                  alignItems={'center'}
-                  flexDirection={'row'}
-                  justifyContent={'space-between'}
-                  onClick={toggle}
-                  sx={{
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                  }}
-                >
-                  <Stack
-                    alignItems={'center'}
-                    flexDirection={'row'}
-                    gap={0.5}
-                    justifyContent={'space-between'}
-                  >
-                    <Icon
-                      component={ICON_SPARK}
-                      sx={{ width: 20, height: 20 }}
-                    />
-                    <Typography lineHeight={1.2} variant={'subtitle2'}>
-                      AI
-                    </Typography>
-                  </Stack>
-                  <Icon
-                    component={ICON_ARROW}
-                    sx={{
-                      width: 16,
-                      height: 16,
-                      transform: visible ? 'rotate(0deg)' : 'rotate(-90deg)',
-                      transformOrigin: 'center',
-                      transition: 'all .3s',
-                    }}
-                  />
-                </Stack>
-                <Collapse in={visible}>
-                  <Stack
-                    alignItems={'center'}
-                    flexDirection={'row'}
-                    justifyContent={'space-between'}
-                    onClick={handleEnrichmentClick}
-                    px={1.5}
-                    py={0.5}
-                    sx={{
-                      '&:hover': {
-                        bgcolor: '#F7F4FD',
-                      },
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Typography variant={'body2'}>AI web researcher</Typography>
-                    <CostCoins
-                      border={'1px solid #D0CEDA'}
-                      borderRadius={1}
-                      count={'0.5'}
-                    />
-                  </Stack>
-                </Collapse>
+                <DialogHeaderActionsMenus
+                  children={ENRICHMENTS_SUGGESTION_MENUS.children}
+                  icon={ENRICHMENTS_SUGGESTION_MENUS.icon}
+                  title={ENRICHMENTS_SUGGESTION_MENUS.title}
+                />
+                <DialogHeaderActionsMenus
+                  children={ENRICHMENTS_AI_MENUS.children}
+                  icon={ENRICHMENTS_AI_MENUS.icon}
+                  title={ENRICHMENTS_AI_MENUS.title}
+                />
               </Stack>
             ) : (
               <Stack gap={1.5}>

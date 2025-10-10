@@ -18,6 +18,7 @@ import {
   DialogEditDescription,
   DialogHeaderActions,
   DialogWebResearch,
+  DialogWorkEmail,
   TableColumnMenuEnum,
 } from '@/components/molecules';
 
@@ -643,6 +644,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       <DialogCellDetails data={activeCell} />
       <CampaignProcess />
       <DialogHeaderActions />
+      <DialogWorkEmail />
     </Stack>
   );
 };
