@@ -1,7 +1,13 @@
-import { create } from 'zustand/index';
-import { CompanyTypeEnum, HttpError } from '@/types';
-import { _fetchFundType, _fetchIndustries } from '@/request';
 import { SDRToast } from '@/components/atoms';
+import { _fetchFiltersByType, _fetchSearchType } from '@/request';
+import {
+  CompanyTypeEnum,
+  FilterItem,
+  FindType,
+  HttpError,
+  SourceFromOpt,
+} from '@/types';
+import { create } from 'zustand';
 
 export const DEFAULT_FILTER = {
   companyDescriptionKeywordsExclude: [],
@@ -56,41 +62,51 @@ export type CompanyFilterKeysType =
   | 'aum'
   | 'fundType';
 
-type FindCompaniesStoreState = {
-  filters: Record<
-    CompanyFilterKeysType,
-    Option[] | boolean | string | number | undefined | CompanyTypeEnum
-  >;
-  industriesOpts: Option[];
-  fundTypeOpts: Option[];
-  dialogCompanyTypeOpen: boolean;
+type FindPeopleCompanyStoreState = {
+  findType: FindType;
+  dialogSourceFromOpen: boolean;
+  checkedSource: SourceFromOpt;
+  sourceFromOpts: SourceFromOpt[];
+  filters: Record<string, FilterItem[]>;
 };
 
-type FindCompaniesStoreActions = {
-  setFilters: (key: CompanyFilterKeysType, value: any) => void;
-  fetchIndustries: () => Promise<void>;
-  fetchFundType: () => Promise<void>;
-  resetFilters: () => void;
-  setDialogCompanyTypeOpen: (open: boolean) => void;
+type FindPeopleCompanyStoreActions = {
+  setFindType: (type: FindType) => void;
+  setFilters: (filters: Record<string, FilterItem[]>) => void;
+  setDialogSourceFromOpen: (open: boolean) => void;
+  setCheckedSource: (source: SourceFromOpt) => void;
+  fetchSource: () => Promise<void>;
+  fetchFiltersByType: () => Promise<void>;
 };
 
-type FindCompaniesStoreProps = FindCompaniesStoreState &
-  FindCompaniesStoreActions;
+type FindPeopleCompanyStoreProps = FindPeopleCompanyStoreState &
+  FindPeopleCompanyStoreActions;
 
-export const useFindCompaniesStore = create<FindCompaniesStoreProps>()(
+export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
   (set, get) => ({
-    filters: DEFAULT_FILTER,
-    industriesOpts: [],
-    fundTypeOpts: [],
-    dialogCompanyTypeOpen: false,
-    setFilters: (key: CompanyFilterKeysType, value: any) =>
-      set({ filters: { ...get().filters, [key]: value } }),
-    fetchIndustries: async () => {
+    filters: {},
+    findType: FindType.find_people,
+    sourceFromOpts: [],
+    dialogSourceFromOpen: false,
+    checkedSource: {
+      bizId: '',
+      title: '',
+      logo: '',
+      description: '',
+      headers: [],
+    },
+    setFindType: (type: FindType) => {
+      set({ findType: type });
+    },
+
+    setDialogSourceFromOpen: (open: boolean) =>
+      set({ dialogSourceFromOpen: open }),
+    fetchSource: async () => {
       try {
-        const res = await _fetchIndustries();
+        const res = await _fetchSearchType(get().findType);
         if (res?.data && Array.isArray(res?.data)) {
           set({
-            industriesOpts: res.data,
+            sourceFromOpts: res.data,
           });
         }
       } catch (err) {
@@ -98,12 +114,14 @@ export const useFindCompaniesStore = create<FindCompaniesStoreProps>()(
         SDRToast({ message, header, variant });
       }
     },
-    fetchFundType: async () => {
+    setCheckedSource: (source: SourceFromOpt) => set({ checkedSource: source }),
+    setFilters: (filters: Record<string, FilterItem[]>) => set({ filters }),
+    fetchFiltersByType: async () => {
       try {
-        const res = await _fetchFundType();
-        if (res?.data && Array.isArray(res?.data)) {
+        const res = await _fetchFiltersByType(get().checkedSource.bizId);
+        if (res?.data) {
           set({
-            fundTypeOpts: res.data,
+            filters: res.data,
           });
         }
       } catch (err) {
@@ -111,8 +129,5 @@ export const useFindCompaniesStore = create<FindCompaniesStoreProps>()(
         SDRToast({ message, header, variant });
       }
     },
-    resetFilters: () => set({ filters: DEFAULT_FILTER }),
-    setDialogCompanyTypeOpen: (open: boolean) =>
-      set({ dialogCompanyTypeOpen: open }),
   }),
 );

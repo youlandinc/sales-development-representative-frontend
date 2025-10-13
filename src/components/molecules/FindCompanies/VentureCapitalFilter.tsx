@@ -4,7 +4,7 @@ import { FilterSelect } from '@/components/molecules/FindPeople/FilterItem';
 import { CollapsePanel } from '@/components/molecules';
 
 import { ASSETS_UNDER_MANAGEMENT } from '@/constant';
-import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
+import { useFindCompaniesStore } from '@/stores/useFindPeopleCompanyStore/useFindCompaniesStore';
 import { computedFilterCount } from '@/utils';
 
 export const VentureCapitalFilter = () => {

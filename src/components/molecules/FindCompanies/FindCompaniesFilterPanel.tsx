@@ -21,7 +21,7 @@ import { computedFilterCount, handleParam } from '@/utils';
 import {
   CompanyFilterKeysType,
   useFindCompaniesStore,
-} from '@/stores/useFindCompiesStore';
+} from '@/stores/useFindPeopleCompanyStore/useFindCompaniesStore';
 import { CompanyTypeEnum, HttpError } from '@/types';
 import { useAsyncFn } from '@/hooks';
 import { _createTableByFindCompanies } from '@/request';
@@ -52,7 +52,7 @@ export const FindCompaniesFilterPanel: FC<{ disabled?: boolean }> = ({
         overflow={'auto'}
         p={3}
       >
-        <CompanyTypeFilter />
+        <CompanyTypeFilter title={'Company type'} />
         {filters.companyType === CompanyTypeEnum.customer && (
           <CustomersFilter />
         )}

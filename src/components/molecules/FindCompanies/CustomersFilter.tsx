@@ -6,7 +6,7 @@ import { CollapsePanel } from '@/components/molecules';
 
 import { computedFilterCount } from '@/utils';
 import { COMPANY_INDUSTRIES, COMPANY_SIZE, FUNDING_AMOUNT } from '@/constant';
-import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
+import { useFindCompaniesStore } from '@/stores/useFindPeopleCompanyStore/useFindCompaniesStore';
 
 export const CustomersFilter = () => {
   const { filters, setFilters } = useFindCompaniesStore((state) => state);

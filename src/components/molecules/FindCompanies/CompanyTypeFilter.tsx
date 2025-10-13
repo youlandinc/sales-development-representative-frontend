@@ -1,22 +1,23 @@
-import React from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
+import { FC } from 'react';
 
 import { DialogCompanyType } from './DialogCompanyType';
 
 import ICON_ARROW from './assets/icon_arrow_left_right.svg';
 
-import { CompanyTypeEnum } from '@/types';
-import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
+import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
+import { useFindCompaniesStore } from '@/stores/useFindPeopleCompanyStore/useFindCompaniesStore';
 
-export const CompanyTypeFilter = () => {
-  const { filters, resetFilters, setDialogCompanyTypeOpen, setFilters } =
-    useFindCompaniesStore((store) => store);
+type CompanyTypeFilterProps = {
+  title: string;
+};
 
-  const TYPE_NAME: Record<CompanyTypeEnum, string> = {
-    [CompanyTypeEnum.customer]: 'Customers',
-    [CompanyTypeEnum.venture_capital]: 'Venture Capital firms',
-    [CompanyTypeEnum.limited_partners]: 'Limited Partners',
-  };
+export const CompanyTypeFilter: FC<CompanyTypeFilterProps> = ({ title }) => {
+  const { setDialogSourceFromOpen } = useFindPeopleCompanyStore(
+    (store) => store,
+  );
+
+  const { checkedSource } = useFindPeopleCompanyStore((store) => store);
 
   return (
     <Stack border={'1px solid #DFDEE6'} borderRadius={2} gap={1} p={1.5}>
@@ -27,7 +28,7 @@ export const CompanyTypeFilter = () => {
         }}
         variant={'subtitle2'}
       >
-        Company type
+        {title}
       </Typography>
       <Stack
         alignItems={'center'}
@@ -35,21 +36,15 @@ export const CompanyTypeFilter = () => {
         borderRadius={1}
         flexDirection={'row'}
         justifyContent={'space-between'}
-        onClick={() => setDialogCompanyTypeOpen(true)}
+        onClick={() => setDialogSourceFromOpen(true)}
         px={1.5}
         py={0.5}
         sx={{ cursor: 'pointer' }}
       >
-        <Typography variant={'body2'}>
-          {TYPE_NAME[filters.companyType as CompanyTypeEnum]}
-        </Typography>
+        <Typography variant={'body2'}>{checkedSource.title}</Typography>
         <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
       </Stack>
-      <DialogCompanyType
-        cb={(type) => {
-          setFilters('companyType', type);
-        }}
-      />
+      <DialogCompanyType />
     </Stack>
   );
 };

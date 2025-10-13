@@ -1,49 +1,28 @@
-import {
-  FormControlLabel,
-  Icon,
-  Radio,
-  RadioGroup,
-  Stack,
-} from '@mui/material';
-import { FC, useEffect } from 'react';
-import { isNumber, isString } from 'lodash-es';
+import { Stack } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
+import { FC, useEffect } from 'react';
 
 import {
   SDRToast,
   StyledButton,
   StyledTextFieldNumber,
 } from '@/components/atoms';
-import { CollapsePanel } from '@/components/molecules';
-import {
-  FilterContainer,
-  FilterSelect,
-  FilterSwitch,
-  FilterTextField,
-} from './FilterItem';
+import { CollapsePanel, CompanyTypeFilter } from '@/components/molecules';
+import { FilterContainer, FilterSelect, FilterTextField } from './FilterItem';
 
-import {
-  COMPANY_INDUSTRIES,
-  COMPANY_SIZE,
-  JOB_TITLE_ALL,
-  JOB_TITLE_JOB_FUNCTIONS,
-  JOB_TITLE_SENIORITY,
-  LOCATION_CITIES_OPTIONS,
-  LOCATION_COUNTRIES_OPTIONS,
-  LOCATION_REGIONS_OPTIONS,
-  LOCATION_STATES_OPTIONS,
-} from '@/constant';
+import { COMPANY_INDUSTRIES } from '@/constant';
+import { _createTableByFindPeople } from '@/request';
+
+import { useAsyncFn } from '@/hooks';
 import {
   DEFAULT_FILTER,
   useFindPeopleStore,
-} from '@/stores/useFindPeopleStore';
-import { useAsyncFn } from '@/hooks';
-import { _createTableByFindPeople } from '@/request';
-import { HttpError } from '@/types';
+} from '@/stores/useFindPeopleCompanyStore/useFindPeopleStore';
+import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
 
-import ICON_FOLDER from './assets/icon-folder.svg';
+import { FilterElementTypeEnum, FilterItem, HttpError } from '@/types';
+
 import { computedFilterCount, handleParam } from '@/utils';
-import { LocationFilter } from '@/components/molecules/FindPeople/LocationFilter';
 
 type FindPeopleFilterPanelProps = {
   disabled?: boolean;
@@ -53,6 +32,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
   disabled,
 }) => {
   const { filters, setFilters } = useFindPeopleStore((state) => state);
+  const { filters: tempFilters } = useFindPeopleCompanyStore((state) => state);
   const router = useRouter();
 
   const [state, createTableByFindPeople] = useAsyncFn(async () => {
@@ -65,11 +45,68 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
     }
   }, [filters]);
 
+  const computedComponent = (
+    type: FilterElementTypeEnum,
+    params: FilterItem,
+  ) => {
+    if (type === FilterElementTypeEnum.select) {
+      return (
+        <FilterSelect
+          onChange={(_, value) => {
+            setFilters({
+              ...filters,
+              companyIndustriesInclude: value,
+            });
+          }}
+          options={COMPANY_INDUSTRIES}
+          placeholder={'e.g. Software development'}
+          title={params.formLabel}
+          value={filters.companyIndustriesInclude as Option[]}
+        />
+      );
+    }
+    if (type === FilterElementTypeEnum.input && params.inputType === 'NUMBER') {
+      return (
+        <FilterContainer subTitle={params.description} title={params.formLabel}>
+          <StyledTextFieldNumber
+            decimalScale={0}
+            isAllowed={({ floatValue }) => {
+              return (floatValue || 0) <= 1000;
+            }}
+            onValueChange={({ floatValue }) => {
+              setFilters({
+                ...filters,
+                limit: floatValue,
+              });
+            }}
+            placeholder={'e.g.10'}
+            value={(filters.limit as number) || ''}
+          />
+        </FilterContainer>
+      );
+    }
+    if (type === FilterElementTypeEnum.input && params.inputType === 'TEXT') {
+      return <FilterTextField title={params.formLabel} />;
+    }
+    if (type === FilterElementTypeEnum.checkbox) {
+      return <FilterTextField title={params.formLabel} />;
+    }
+    if (type === FilterElementTypeEnum.radio) {
+      return <FilterTextField title={params.formLabel} />;
+    }
+    if (type === FilterElementTypeEnum.between) {
+      return <FilterTextField title={params.formLabel} />;
+    }
+    return null;
+  };
+
   useEffect(() => {
     return () => {
       setFilters(DEFAULT_FILTER);
     };
   }, []);
+
+  console.log(tempFilters);
 
   return (
     <Stack borderRight={'1px solid #E5E5E5'}>
@@ -81,7 +118,25 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
         overflow={'auto'}
         p={3}
       >
-        <CollapsePanel
+        <CompanyTypeFilter title={'Contact category'} />
+        <>
+          {Object.entries(tempFilters).map(([title, value], index) => (
+            <CollapsePanel
+              defaultOpen
+              filterCount={computedFilterCount([
+                filters.companyIndustriesInclude,
+                filters.companyIndustriesExclude,
+                filters.companySizes,
+                filters.companyDescriptionKeywords,
+                filters.companyDescriptionKeywordsExclude,
+              ])}
+              title={title}
+            >
+              {value.map((i, k) => computedComponent(i.formType, i))}
+            </CollapsePanel>
+          ))}
+        </>
+        {/* <CollapsePanel
           defaultOpen
           filterCount={computedFilterCount([
             filters.companyIndustriesInclude,
@@ -223,7 +278,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
               });
             }}
           />
-        </CollapsePanel>
+        </CollapsePanel> */}
         {/*        <CollapsePanel
           filterCount={computedFilterCount([
             filters.currentRoleMinMonthsSinceStartDate,
@@ -302,7 +357,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             value={filters.jobDescriptionKeywords as Option[]}
           />
         </CollapsePanel>*/}
-        <LocationFilter
+        {/*  <LocationFilter
           defaultValue={filters}
           filterCount={computedFilterCount([
             filters.locationCountriesInclude,
@@ -436,7 +491,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
               />
             </Stack>
           </FilterContainer>
-        </CollapsePanel>
+        </CollapsePanel> */}
 
         {/*   <CollapsePanel
           filterCount={computedFilterCount([filters.languages])}
@@ -530,7 +585,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
             title={'Personal LinkedIn URLs'}
           />
         </CollapsePanel>*/}
-        <CollapsePanel
+        {/* <CollapsePanel
           filterCount={computedFilterCount([filters.includePastExperiences])}
           title={'Past experiences'}
         >
@@ -593,7 +648,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
               value={(filters.limitPerCompany as number) || ''}
             />
           </FilterContainer>
-        </CollapsePanel>
+        </CollapsePanel> */}
       </Stack>
       <Stack
         borderTop={'1px solid #E5E5E5'}

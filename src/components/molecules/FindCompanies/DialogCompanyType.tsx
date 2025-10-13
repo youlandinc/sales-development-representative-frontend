@@ -1,39 +1,39 @@
-import React, { ElementType, FC, useState } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
+import Image from 'next/image';
+import { FC, useState } from 'react';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
 
-import { CompanyTypeEnum } from '@/types';
+import { SourceFromOpt } from '@/types';
+
+import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
 
 import ICON_CLOSE from '@/components/molecules/FindCompanies/assets/icon_close.svg';
-import ICON_RECEIPT from '@/components/molecules/FindCompanies/assets/icon_receipt.svg';
-import ICON_CHART from '@/components/molecules/FindCompanies/assets/icon_chart.svg';
-import ICON_COINS from '@/components/molecules/FindCompanies/assets/icon_coins.svg';
-import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
 
 type TypeCardProps = {
   title: string;
-  icon: ElementType;
+  icon: string;
   desc: string;
   checked?: boolean;
-  handleClick?: (type: CompanyTypeEnum) => void;
-  value: CompanyTypeEnum;
+  handleClick?: (item: SourceFromOpt) => void;
+  data: SourceFromOpt;
 };
 const TypeCard: FC<TypeCardProps> = ({
   title,
   icon,
   desc,
-  value,
   handleClick,
   checked,
+  data,
 }) => {
   return (
     <Stack
       bgcolor={'#F7F4FD'}
       borderRadius={4}
+      flex={1}
       gap={1.5}
       onClick={() => {
-        handleClick?.(value);
+        handleClick?.(data);
       }}
       p={3}
       sx={{
@@ -48,7 +48,7 @@ const TypeCard: FC<TypeCardProps> = ({
       }}
     >
       <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
-        <Icon component={icon} sx={{ width: 24, height: 24 }} />
+        <Image alt={title} height={24} src={icon} width={24} />
         <Typography lineHeight={1.2} variant={'subtitle2'}>
           {title}
         </Typography>
@@ -59,52 +59,39 @@ const TypeCard: FC<TypeCardProps> = ({
 };
 
 type DialogCompanyTypeProps = {
-  cb?: (type: CompanyTypeEnum) => void;
+  cb?: (SourceFromOpt: SourceFromOpt) => void;
 };
 
 export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
   const {
-    filters,
-    dialogCompanyTypeOpen,
-    setDialogCompanyTypeOpen,
-    resetFilters,
-  } = useFindCompaniesStore((store) => store);
-  const [type, setType] = useState<CompanyTypeEnum>(
-    filters.companyType as CompanyTypeEnum,
-  );
-  const CARD_LIST = [
-    {
-      value: CompanyTypeEnum.customer,
-      title: 'Customers',
-      icon: ICON_RECEIPT,
-      desc: 'Discover potential customers and business leads. Access profiles, contact details, and insights to help you engage the right audience and grow your business.',
-    },
-    {
-      value: CompanyTypeEnum.venture_capital,
-      title: 'Venture Capital firms',
-      icon: ICON_CHART,
-      desc: 'Explore a curated database of venture capital firms. Quickly identify the right investors, understand their focus areas, and make more informed fundraising decisions.',
-    },
-    {
-      value: CompanyTypeEnum.limited_partners,
-      title: 'Limited Partners',
-      icon: ICON_COINS,
-      desc: 'Get comprehensive insights on limited partners — including profiles, assets under management, commitments, and investment strategies — all in one place.',
-    },
-  ];
+    sourceFromOpts,
+    setCheckedSource,
+    dialogSourceFromOpen,
+    setDialogSourceFromOpen,
+    checkedSource,
+    fetchFiltersByType,
+  } = useFindPeopleCompanyStore((store) => store);
+  const [checked, setChecked] = useState<SourceFromOpt>({
+    bizId: '',
+    title: '',
+    logo: '',
+    description: '',
+    headers: [],
+  });
+
   return (
     <StyledDialog
       content={
         <Stack flexDirection={'row'} gap={3} py={3}>
-          {CARD_LIST.map((item, index) => (
+          {sourceFromOpts.map((item, index) => (
             <TypeCard
-              checked={type === item.value}
-              desc={item.desc}
-              handleClick={setType}
-              icon={item.icon}
+              checked={checked.bizId === item.bizId}
+              data={item}
+              desc={item.description}
+              handleClick={setChecked}
+              icon={item.logo}
               key={index}
               title={item.title}
-              value={item.value}
             />
           ))}
         </Stack>
@@ -112,9 +99,12 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
       footer={
         <StyledButton
           onClick={() => {
-            setDialogCompanyTypeOpen(false);
-            resetFilters();
-            cb?.(type);
+            setDialogSourceFromOpen(false);
+            setCheckedSource(checked);
+            if (checked.bizId !== checkedSource.bizId) {
+              fetchFiltersByType();
+            }
+            cb?.(checked);
           }}
           size={'medium'}
         >
@@ -128,13 +118,13 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
           </Typography>
           <Icon
             component={ICON_CLOSE}
-            onClick={() => setDialogCompanyTypeOpen(false)}
+            onClick={() => setDialogSourceFromOpen(false)}
             sx={{ width: 24, height: 24, cursor: 'pointer' }}
           />
         </Stack>
       }
-      onClose={() => setDialogCompanyTypeOpen(false)}
-      open={dialogCompanyTypeOpen}
+      onClose={() => setDialogSourceFromOpen(false)}
+      open={dialogSourceFromOpen}
       slotProps={{
         paper: {
           sx: {
