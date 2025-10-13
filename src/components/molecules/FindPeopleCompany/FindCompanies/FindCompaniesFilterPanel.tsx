@@ -1,0 +1,125 @@
+import { FC } from 'react';
+import { useRouter } from 'next/navigation';
+import { Stack } from '@mui/material';
+
+import {
+  CollapsePanel,
+  CompanyTypeFilter,
+  CustomersFilter,
+  LimitedPartnerFilter,
+  VentureCapitalFilter,
+} from '@/components/molecules';
+import { FilterContainer } from '../Common';
+import {
+  SDRToast,
+  StyledButton,
+  StyledTextFieldNumber,
+} from '@/components/atoms';
+import { LocationFilter } from '@/components/molecules/FindPeopleCompany/FindPeople';
+
+import { computedFilterCount, handleParam } from '@/utils';
+import {
+  CompanyFilterKeysType,
+  useFindCompaniesStore,
+} from '@/stores/useFindPeopleCompanyStore/useFindCompaniesStore';
+import { CompanyTypeEnum, HttpError } from '@/types';
+import { useAsyncFn } from '@/hooks';
+import { _createTableByFindCompanies } from '@/request';
+
+export const FindCompaniesFilterPanel: FC<{ disabled?: boolean }> = ({
+  disabled,
+}) => {
+  const router = useRouter();
+  const { filters, setFilters } = useFindCompaniesStore((state) => state);
+
+  const [state, createTableByFindCompanies] = useAsyncFn(async () => {
+    try {
+      const { data } = await _createTableByFindCompanies(handleParam(filters));
+      router.push(`/prospect-enrich/${data}`);
+    } catch (e) {
+      const { message, header, variant } = e as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  }, [filters]);
+
+  return (
+    <Stack borderRight={'1px solid #E5E5E5'}>
+      <Stack
+        gap={3}
+        height={'100%'}
+        maxWidth={450}
+        minWidth={450}
+        overflow={'auto'}
+        p={3}
+      >
+        <CompanyTypeFilter title={'Company type'} />
+        {filters.companyType === CompanyTypeEnum.customer && (
+          <CustomersFilter />
+        )}
+        {filters.companyType === CompanyTypeEnum.venture_capital && (
+          <VentureCapitalFilter />
+        )}
+        {filters.companyType === CompanyTypeEnum.limited_partners && (
+          <LimitedPartnerFilter />
+        )}
+        <LocationFilter
+          defaultValue={filters}
+          filterCount={computedFilterCount([
+            filters.locationCountriesInclude,
+            filters.locationCountriesExclude,
+            filters.locationCitiesInclude,
+            filters.locationCitiesExclude,
+          ])}
+          onChange={(key, value) => {
+            setFilters(key as CompanyFilterKeysType, value);
+          }}
+          type={'find_company'}
+        />
+        <CollapsePanel
+          filterCount={computedFilterCount([
+            filters.limit,
+            filters.limitPerCompany,
+          ])}
+          title={'Limit results'}
+        >
+          <FilterContainer
+            subTitle={'1000 record max per search'}
+            title={'Limit'}
+          >
+            <StyledTextFieldNumber
+              decimalScale={0}
+              isAllowed={({ floatValue }) => {
+                return (floatValue || 0) <= 1000;
+              }}
+              onValueChange={({ floatValue }) => {
+                setFilters('limit', floatValue);
+              }}
+              placeholder={'e.g.10'}
+              value={(filters.limit as number) || ''}
+            />
+          </FilterContainer>
+        </CollapsePanel>
+      </Stack>
+      <Stack
+        borderTop={'1px solid #E5E5E5'}
+        flexDirection={'row'}
+        justifyContent={'flex-end'}
+        px={3}
+        py={1.5}
+      >
+        <StyledButton
+          disabled={disabled}
+          loading={state.loading}
+          onClick={createTableByFindCompanies}
+          size={'medium'}
+          sx={{
+            width: 92,
+          }}
+          variant={'contained'}
+        >
+          Continue
+        </StyledButton>
+      </Stack>
+    </Stack>
+  );
+};

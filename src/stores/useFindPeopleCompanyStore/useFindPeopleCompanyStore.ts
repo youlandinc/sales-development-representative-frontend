@@ -1,5 +1,9 @@
+import { create } from 'zustand';
+
 import { SDRToast } from '@/components/atoms';
+
 import { _fetchFiltersByType, _fetchSearchType } from '@/request';
+
 import {
   CompanyTypeEnum,
   FilterItem,
@@ -7,7 +11,9 @@ import {
   HttpError,
   SourceFromOpt,
 } from '@/types';
-import { create } from 'zustand';
+
+import { useFindPeopleStore } from './useFindPeopleStore';
+import { useFindCompaniesStore } from './useFindCompaniesStore';
 
 export const DEFAULT_FILTER = {
   companyDescriptionKeywordsExclude: [],
@@ -68,6 +74,9 @@ type FindPeopleCompanyStoreState = {
   checkedSource: SourceFromOpt;
   sourceFromOpts: SourceFromOpt[];
   filters: Record<string, FilterItem[]>;
+  filtersParams:Record<string,string>,
+  fetchSourceLoading: boolean;
+  fetchFiltersByTypeLoading: boolean;
 };
 
 type FindPeopleCompanyStoreActions = {
@@ -82,52 +91,63 @@ type FindPeopleCompanyStoreActions = {
 type FindPeopleCompanyStoreProps = FindPeopleCompanyStoreState &
   FindPeopleCompanyStoreActions;
 
-export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
-  (set, get) => ({
-    filters: {},
-    findType: FindType.find_people,
-    sourceFromOpts: [],
-    dialogSourceFromOpen: false,
-    checkedSource: {
-      bizId: '',
-      title: '',
-      logo: '',
-      description: '',
-      headers: [],
-    },
-    setFindType: (type: FindType) => {
-      set({ findType: type });
-    },
+export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()((set, get) => ({
+  filters: {},
+  filtersParams:{},
+  fetchSourceLoading: false,
+  fetchFiltersByTypeLoading: false,
+  findType: FindType.find_people,
+  sourceFromOpts: [],
+  dialogSourceFromOpen: false,
+  checkedSource: {
+    bizId: '',
+    title: '',
+    logo: '',
+    description: '',
+    headers: [],
+  },
+  setFindType: (type: FindType) => {
+    set({ findType: type });
+  },
+  setDialogSourceFromOpen: (open: boolean) =>
+    set({ dialogSourceFromOpen: open }),
+  fetchSource: async () => {
+    try {
+      set({ fetchSourceLoading: true });
+      const res = await _fetchSearchType(get().findType);
+      if (res?.data && Array.isArray(res?.data)) {
+        set({
+          sourceFromOpts: res.data,
+        });
+      }
+      set({ fetchSourceLoading: false });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+      set({ fetchSourceLoading: false });
+    }
+  },
+  setCheckedSource: (source: SourceFromOpt) => set({ checkedSource: source }),
+  setFilters: (filters: Record<string, FilterItem[]>) => set({ filters }),
+  fetchFiltersByType: async () => {
+    try {
+      set({ fetchFiltersByTypeLoading: true });
+      const res = await _fetchFiltersByType(get().checkedSource.bizId);
+      if (res?.data) {
+        set({
+          filters: res.data,
+          filtersParams:Object.fromEntries(Object.values(res.data).flat().map((item)=>([item.formKey,item.defaultValue]))),
+        });
+      }
+      set({ fetchFiltersByTypeLoading: false });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+      set({ fetchFiltersByTypeLoading: false });
+    }
+  },
+}));
 
-    setDialogSourceFromOpen: (open: boolean) =>
-      set({ dialogSourceFromOpen: open }),
-    fetchSource: async () => {
-      try {
-        const res = await _fetchSearchType(get().findType);
-        if (res?.data && Array.isArray(res?.data)) {
-          set({
-            sourceFromOpts: res.data,
-          });
-        }
-      } catch (err) {
-        const { message, header, variant } = err as HttpError;
-        SDRToast({ message, header, variant });
-      }
-    },
-    setCheckedSource: (source: SourceFromOpt) => set({ checkedSource: source }),
-    setFilters: (filters: Record<string, FilterItem[]>) => set({ filters }),
-    fetchFiltersByType: async () => {
-      try {
-        const res = await _fetchFiltersByType(get().checkedSource.bizId);
-        if (res?.data) {
-          set({
-            filters: res.data,
-          });
-        }
-      } catch (err) {
-        const { message, header, variant } = err as HttpError;
-        SDRToast({ message, header, variant });
-      }
-    },
-  }),
-);
+/* 1. 接口拆分开
+2. header放在gird里面
+3. id */
