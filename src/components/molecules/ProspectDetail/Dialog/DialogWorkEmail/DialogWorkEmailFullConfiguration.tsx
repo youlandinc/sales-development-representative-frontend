@@ -1,11 +1,16 @@
 import { Stack } from '@mui/material';
 import { FC } from 'react';
-import { DialogWorkEmailSequence } from './index';
+
+import {
+  DialogWorkEmailQuickSetupInputs,
+  DialogWorkEmailSequence,
+} from './index';
 
 export const DialogWorkEmailFullConfiguration: FC = () => {
   return (
-    <Stack>
+    <Stack gap={3}>
       <DialogWorkEmailSequence />
+      <DialogWorkEmailQuickSetupInputs />
     </Stack>
   );
 };

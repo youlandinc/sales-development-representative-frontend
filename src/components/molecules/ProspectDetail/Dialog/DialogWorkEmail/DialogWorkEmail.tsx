@@ -1,24 +1,65 @@
+import { useMemo } from 'react';
+import { Drawer, Fade, Stack } from '@mui/material';
+
 import {
-  Drawer,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
-import { useWorkEmailStore } from '@/stores/Prospect';
-import { DialogHeader } from '../Common/DialogHeader';
-import { useState } from 'react';
-import {
-  DialogWorkEmailFullConfiguration,
-  DialogWorkEmailQuickSetup,
+  DialogWorkEmailFooter,
+  DialogWorkEmailIntegrationAccount,
+  DialogWorkEmailMain,
 } from './index';
 
-export const DialogWorkEmail = () => {
-  const { workEmailVisible, setWorkEmailVisible } = useWorkEmailStore(
-    (store) => store,
-  );
+import { DialogHeader } from '../Common';
 
-  const [tab, setTab] = useState<'setup' | 'configure'>('setup');
+import { useWorkEmailStore } from '@/stores/Prospect';
+
+export const DialogWorkEmail = () => {
+  const { workEmailVisible, setWorkEmailVisible, displayType, setDisplayType } =
+    useWorkEmailStore((store) => store);
+
+  const computedHeader = useMemo(() => {
+    switch (displayType) {
+      case 'main':
+        return (
+          <DialogHeader
+            handleBack={() => setWorkEmailVisible(false)}
+            handleClose={() => setWorkEmailVisible(false)}
+            title={'Work Email'}
+          />
+        );
+      case 'integration':
+        return (
+          <DialogHeader
+            handleBack={() => setDisplayType('main')}
+            handleClose={() => setWorkEmailVisible(false)}
+            title={'Find work email'}
+          />
+        );
+      default:
+        return null;
+    }
+  }, [displayType]);
+
+  const computedContent = useMemo(() => {
+    switch (displayType) {
+      case 'main':
+        return (
+          <Fade in>
+            <Stack flex={1} minHeight={0} overflow={'auto'} pb={3}>
+              <DialogWorkEmailMain />
+            </Stack>
+          </Fade>
+        );
+      case 'integration':
+        return (
+          <Fade in>
+            <Stack flex={1} minHeight={0} overflow={'auto'} pb={3}>
+              <DialogWorkEmailIntegrationAccount />
+            </Stack>
+          </Fade>
+        );
+      default:
+        return null;
+    }
+  }, [displayType]);
 
   return (
     <Drawer
@@ -38,68 +79,9 @@ export const DialogWorkEmail = () => {
         left: 'unset',
       }}
     >
-      <DialogHeader
-        handleBack={() => setWorkEmailVisible(false)}
-        handleClose={() => setWorkEmailVisible(false)}
-        title={'Work Email'}
-      />
-      <Stack gap={4} pt={4} px={3}>
-        <Stack gap={1}>
-          <Typography fontWeight={600} lineHeight={1.2}>
-            Action
-          </Typography>
-          <Typography fontWeight={600} lineHeight={1.2}>
-            Waterfall
-          </Typography>
-          <Typography variant={'body2'}>
-            Find a person&apos;s work email, this waterfall is optimized for
-            companies below 5,000 employees.
-          </Typography>
-        </Stack>
-
-        <Stack gap={1}>
-          <ToggleButtonGroup
-            color={'primary'}
-            exclusive
-            onChange={(e, value) => {
-              setTab(value);
-            }}
-            translate={'no'}
-            value={tab}
-          >
-            <ToggleButton
-              fullWidth
-              sx={{
-                fontSize: 14,
-                textTransform: 'none',
-                lineHeight: 1.2,
-                py: 1,
-                fontWeight: 600,
-                borderRadius: '8px 0 0 8px',
-              }}
-              value={'setup'}
-            >
-              Quick setup
-            </ToggleButton>
-            <ToggleButton
-              fullWidth
-              sx={{
-                fontSize: 14,
-                textTransform: 'none',
-                lineHeight: 1.2,
-                py: 1,
-                fontWeight: 600,
-                borderRadius: '0 8px 8px 0',
-              }}
-              value={'configure'}
-            >
-              Full configuration
-            </ToggleButton>
-          </ToggleButtonGroup>
-          {tab === 'setup' && <DialogWorkEmailQuickSetup />}
-          {tab === 'configure' && <DialogWorkEmailFullConfiguration />}
-        </Stack>
-      </Stack>
+      {computedHeader}
+      {computedContent}
+      <DialogWorkEmailFooter />
     </Drawer>
   );
 };

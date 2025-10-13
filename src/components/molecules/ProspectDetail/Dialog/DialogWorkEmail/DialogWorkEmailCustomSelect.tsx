@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ElementType, FC } from 'react';
+import { ElementType, FC, ReactNode } from 'react';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
@@ -15,7 +15,7 @@ import ICON_TEXT from '../../assets/dialog/icon_text.svg';
 type OptionType = TOption & { icon?: ElementType };
 
 export const DialogWorkEmailCustomSelect: FC<
-  { title: string } & Pick<
+  { title?: string | ReactNode } & Pick<
     AutocompleteProps<OptionType, true, false, false>,
     'value' | 'onChange'
   >
@@ -23,7 +23,11 @@ export const DialogWorkEmailCustomSelect: FC<
   const { columns } = useProspectTableStore((store) => store);
   return (
     <Stack gap={1.5}>
-      <Typography variant={'body3'}>{title}</Typography>
+      {title && (
+        <Typography component={'div'} variant={'body3'}>
+          {title}
+        </Typography>
+      )}
       <Autocomplete
         fullWidth
         onChange={onChange}
