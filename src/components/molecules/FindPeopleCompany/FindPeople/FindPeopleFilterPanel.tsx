@@ -26,14 +26,19 @@ type FindPeopleFilterPanelProps = {
 export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
   disabled,
 }) => {
-  const { filters, queryConditions, setQueryConditions, findType } =
-    useFindPeopleCompanyStore((state) => state);
+  const {
+    filters,
+    queryConditions,
+    setQueryConditions,
+    findType,
+    checkedSource,
+  } = useFindPeopleCompanyStore((state) => state);
   const router = useRouter();
-
+  console.log(queryConditions);
   const [state, createTable] = useAsyncFn(async () => {
     try {
       const { data } = await _createTableByFindPeopleCompany(
-        handleParam(queryConditions),
+        handleParam({ ...queryConditions, searchType: checkedSource.bizId }),
       );
       router.push(`/prospect-enrich/${data}`);
     } catch (e) {

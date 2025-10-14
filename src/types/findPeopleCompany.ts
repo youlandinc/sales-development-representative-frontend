@@ -9,7 +9,6 @@ export enum FilterElementTypeEnum {
   radio = 'RADIO',
   checkbox = 'CHECKBOX',
   input = 'INPUT',
-  between = 'BETWEEN',
   switch = 'SWITCH',
 }
 

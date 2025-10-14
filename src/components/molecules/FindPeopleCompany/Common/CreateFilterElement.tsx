@@ -77,13 +77,10 @@ export const CreateFilterElement: FC<CreateFilterElementProps> = ({
     );
   }
   if (type === FilterElementTypeEnum.checkbox) {
-    return <FilterTextField title={params.formLabel} />;
+    return null;
   }
   if (type === FilterElementTypeEnum.radio) {
-    return <FilterTextField title={params.formLabel} />;
-  }
-  if (type === FilterElementTypeEnum.between) {
-    return <FilterTextField title={params.formLabel} />;
+    return null;
   }
   if (params.groups) {
     return (

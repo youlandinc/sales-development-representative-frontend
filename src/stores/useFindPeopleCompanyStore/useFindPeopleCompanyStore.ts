@@ -101,9 +101,6 @@ const queryConditionDefault = (
   if (type === FilterElementTypeEnum.select) {
     return [];
   }
-  if (type === FilterElementTypeEnum.checkbox) {
-    return [];
-  }
   if (type === FilterElementTypeEnum.radio) {
     return '';
   }
@@ -119,10 +116,37 @@ const queryConditionDefault = (
   ) {
     return [];
   }
-  if (type === FilterElementTypeEnum.between) {
-    return '';
+  if (type === FilterElementTypeEnum.switch) {
+    return false;
   }
   return '';
+};
+
+// 用递归提取所有 formKey
+const extractFormKeys = (obj: Record<string, FilterItem[]>) => {
+  const result: Record<string, any> = {};
+
+  function traverse(value: any) {
+    if (Array.isArray(value)) {
+      value.forEach(traverse);
+    } else if (value && typeof value === 'object') {
+      if ((value as FilterItem).formKey) {
+        result[(value as FilterItem).formKey] = queryConditionDefault(
+          (value as FilterItem).formType,
+          (value as FilterItem).inputType,
+        );
+      }
+      // 如果有 groups，也要递归处理
+      if ((value as FilterItem).groups) {
+        traverse((value as FilterItem).groups);
+      }
+      // 遍历对象的所有字段
+      Object.values(value).forEach(traverse);
+    }
+  }
+
+  traverse(obj);
+  return result;
 };
 
 export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
@@ -173,14 +197,7 @@ export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
         if (res?.data) {
           set({
             filters: res.data,
-            queryConditions: Object.fromEntries(
-              Object.values(res.data)
-                .flat()
-                .map((item) => [
-                  item.formKey,
-                  queryConditionDefault(item.formType, item?.inputType),
-                ]),
-            ),
+            queryConditions: extractFormKeys(res.data),
           });
         }
         set({ fetchFiltersByTypeLoading: false });
