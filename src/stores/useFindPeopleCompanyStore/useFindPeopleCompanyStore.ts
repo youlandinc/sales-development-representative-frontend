@@ -173,6 +173,7 @@ export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
               state.setCheckedSource(state.checkedSource);
               state.setSourceFromOpts(state.sourceFromOpts);
               state.setFilters(state.filters);
+              state.setQueryConditions(extractFormKeys(state.filters));
             }
           };
         },
