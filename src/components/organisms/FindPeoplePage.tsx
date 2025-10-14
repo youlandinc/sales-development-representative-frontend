@@ -39,7 +39,9 @@ export const FindPeoplePage = () => {
   );
 
   useEffect(() => {
-    fetchGridHeader(checkedSource.bizId);
+    if (checkedSource.bizId) {
+      fetchGridHeader(checkedSource.bizId);
+    }
   }, [checkedSource.bizId, fetchGridHeader]);
 
   useEffect(() => {
@@ -55,17 +57,26 @@ export const FindPeoplePage = () => {
     fetchFindPeople,
     checkedSource.bizId,
     fetchFiltersByTypeLoading,
+    queryConditions,
   ]);
 
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 60 },
-    ...(stateGridHeader?.value?.data || []).map((item) => ({
-      field: item.columnKey,
-      headerName: item.columnName,
-      flex: 1,
-      minWidth: 200,
-    })),
-  ];
+  const columns: GridColDef[] = Array.isArray(stateGridHeader?.value?.data)
+    ? [
+        {
+          field: 'id',
+          headerName: '',
+          width: 70,
+          align: 'center',
+          minWidth: 60,
+        },
+        ...(stateGridHeader?.value?.data || []).map((item) => ({
+          field: item.columnKey,
+          headerName: item.columnName,
+          flex: 1,
+          minWidth: 200,
+        })),
+      ]
+    : [];
 
   const memoGrid = useMemo(
     () => (
