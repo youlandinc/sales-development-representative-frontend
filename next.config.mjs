@@ -45,9 +45,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // images: {
-  //   domains: ['youland-common-images.s3.us-west-1.amazonaws.com'],
-  // },
+  images: {
+    domains: ['public-storage-hub.s3.us-west-1.amazonaws.com'],
+  },
 };
 
 export default nextConfig;

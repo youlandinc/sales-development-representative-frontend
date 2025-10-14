@@ -1,0 +1,27 @@
+export enum IntegrationActionType {
+  work_email = 'WORK_EMAIL',
+  work_email_with_profile_url = 'WORK_EMAIL_WITH_PROFILE_URL',
+  personal_email = 'PERSONAL_EMAIL',
+  phone_number = 'PHONE_NUMBER',
+  use_ai = 'USE_AI',
+}
+
+export interface IntegrationActionInputParams {
+  displayName: string;
+  columnName: string;
+  columnType: string;
+  description: string;
+  isRequired: boolean;
+}
+
+export interface IntegrationAction {
+  actionKey: string;
+  name: string;
+  integrationName: string;
+  description: string;
+  logoUrl: string;
+  authAccountId: string;
+  score: string;
+  isDefault: boolean;
+  inputParams: IntegrationActionInputParams[];
+}

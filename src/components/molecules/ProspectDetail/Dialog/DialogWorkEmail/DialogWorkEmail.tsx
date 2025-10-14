@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Drawer, Fade, Stack } from '@mui/material';
 
 import {
@@ -12,8 +12,13 @@ import { DialogHeader } from '../Common';
 import { useWorkEmailStore } from '@/stores/Prospect';
 
 export const DialogWorkEmail = () => {
-  const { workEmailVisible, setWorkEmailVisible, displayType, setDisplayType } =
-    useWorkEmailStore((store) => store);
+  const {
+    workEmailVisible,
+    setWorkEmailVisible,
+    displayType,
+    setDisplayType,
+    fetchIntegrations,
+  } = useWorkEmailStore((store) => store);
 
   const computedHeader = useMemo(() => {
     switch (displayType) {
@@ -60,6 +65,10 @@ export const DialogWorkEmail = () => {
         return null;
     }
   }, [displayType]);
+
+  useEffect(() => {
+    fetchIntegrations();
+  }, []);
 
   return (
     <Drawer

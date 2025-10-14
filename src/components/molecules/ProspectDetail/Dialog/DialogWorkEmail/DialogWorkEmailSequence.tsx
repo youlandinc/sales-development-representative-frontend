@@ -1,13 +1,9 @@
-import { Icon, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
 import {
   closestCenter,
   DndContext,
   DragEndEvent,
   KeyboardSensor,
   PointerSensor,
-  useDraggable,
-  useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -19,6 +15,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Icon, Stack, Typography } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 
 import { StyledButton, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
@@ -33,7 +31,9 @@ import ICON_PLUS from '../../assets/dialog/icon_plus.svg';
 const DragItem = ({ id }: { id: number }) => {
   const { setDialogIntegrationsVisible, setDisplayType } = useWorkEmailStore();
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
+    useSortable({
+      id,
+    });
 
   return (
     <Stack
@@ -61,7 +61,10 @@ const DragItem = ({ id }: { id: number }) => {
           flex={1}
           flexDirection={'row'}
           justifyContent={'space-between'}
-          onClick={() => setDisplayType('integration')}
+          onClick={(e) => {
+            e.stopPropagation();
+            setDisplayType('integration');
+          }}
           px={1}
           py={0.5}
           sx={{
@@ -91,9 +94,11 @@ const DragItem = ({ id }: { id: number }) => {
 
 export const DialogWorkEmailSequence: FC = () => {
   const [items, setItems] = useState([1, 2, 3]);
-  const { setDialogIntegrationsVisible, setDisplayType } = useWorkEmailStore();
+  const { setDialogIntegrationsVisible } = useWorkEmailStore();
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
