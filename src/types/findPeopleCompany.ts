@@ -27,10 +27,10 @@ export type SourceFromOpt = {
   title: string;
   logo: string;
   description: string;
-  headers: {
-    columnKey: string;
-    columnName: string;
-  }[];
+  // headers: {
+  //   columnKey: string;
+  //   columnName: string;
+  // }[];
 };
 
 export type FetchSearchTypeResponse = SourceFromOpt[];

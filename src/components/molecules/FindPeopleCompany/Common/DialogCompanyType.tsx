@@ -1,6 +1,6 @@
 import { CircularProgress, Icon, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
 
@@ -77,14 +77,19 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
     title: '',
     logo: '',
     description: '',
-    headers: [],
   });
+
+  useEffect(() => {
+    if (sourceFromOpts.length > 0) {
+      setChecked(sourceFromOpts[0]);
+    }
+  }, [sourceFromOpts]);
 
   return (
     <StyledDialog
       content={
         fetchSourceLoading ? (
-          <Stack alignItems={'center'} height={185} justifyContent={'center'} >
+          <Stack alignItems={'center'} height={185} justifyContent={'center'}>
             <CircularProgress
               sx={{
                 color: '#DFDEE6',
@@ -109,6 +114,7 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
       }
       footer={
         <StyledButton
+          disabled={!checked.bizId || fetchSourceLoading}
           onClick={() => {
             setDialogSourceFromOpen(false);
             setCheckedSource(checked);
@@ -139,7 +145,10 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
       slotProps={{
         paper: {
           sx: {
-            maxWidth: '1200px !important',
+            maxWidth:
+              sourceFromOpts.length > 2
+                ? '1200px !important'
+                : '900px !important',
             minHeight: '290px !important',
           },
         },

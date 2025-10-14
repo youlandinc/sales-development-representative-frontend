@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM 348152033681.dkr.ecr.us-west-1.amazonaws.com/eclipse-temurin:17.0.3_7-jre/node:20-alpine
 
 WORKDIR /app
 

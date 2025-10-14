@@ -34,7 +34,7 @@ export const FindPeopleFilterPanel: FC<FindPeopleFilterPanelProps> = ({
     checkedSource,
   } = useFindPeopleCompanyStore((state) => state);
   const router = useRouter();
-  console.log(queryConditions);
+
   const [state, createTable] = useAsyncFn(async () => {
     try {
       const { data } = await _createTableByFindPeopleCompany(

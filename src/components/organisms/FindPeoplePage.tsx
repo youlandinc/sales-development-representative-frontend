@@ -16,8 +16,12 @@ import { handleParam } from '@/utils';
 import { FindType } from '@/types';
 
 export const FindPeoplePage = () => {
-  const { checkedSource, queryConditions, findType } =
-    useFindPeopleCompanyStore((state) => state);
+  const {
+    checkedSource,
+    queryConditions,
+    findType,
+    fetchFiltersByTypeLoading,
+  } = useFindPeopleCompanyStore((state) => state);
   const params = useDebounce(queryConditions, 400);
 
   const [state, fetchFindPeople] = useAsyncFn(
@@ -39,12 +43,19 @@ export const FindPeoplePage = () => {
   }, [checkedSource.bizId, fetchGridHeader]);
 
   useEffect(() => {
-    fetchFindPeople({
-      ...handleParam(params),
-      searchType: checkedSource.bizId,
-    });
+    if (Object.keys(params).length > 0 && !fetchFiltersByTypeLoading) {
+      fetchFindPeople({
+        ...handleParam(params),
+        searchType: checkedSource.bizId,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(params), fetchFindPeople, checkedSource.bizId]);
+  }, [
+    JSON.stringify(params),
+    fetchFindPeople,
+    checkedSource.bizId,
+    fetchFiltersByTypeLoading,
+  ]);
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: '', width: 70, align: 'center', minWidth: 60 },

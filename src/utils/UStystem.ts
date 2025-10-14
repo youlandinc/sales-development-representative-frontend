@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 
 export const USystemLogout = () => {
   localStorage.removeItem('PERSIST_DATA');
+  localStorage.removeItem('FIND_PEOPLE_COMPANY_SOURCE');
   location.href = '/auth/sign-in';
 };
 
