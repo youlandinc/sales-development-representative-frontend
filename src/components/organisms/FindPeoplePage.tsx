@@ -57,7 +57,6 @@ export const FindPeoplePage = () => {
     fetchFindPeople,
     checkedSource.bizId,
     fetchFiltersByTypeLoading,
-    queryConditions,
   ]);
 
   const columns: GridColDef[] = Array.isArray(stateGridHeader?.value?.data)
