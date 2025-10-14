@@ -1,6 +1,6 @@
-import { FC, useMemo } from 'react';
-import { GridColDef } from '@mui/x-data-grid';
 import { Skeleton, Stack, Tooltip, Typography } from '@mui/material';
+import { GridColDef } from '@mui/x-data-grid';
+import { FC } from 'react';
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
@@ -85,22 +85,24 @@ export const FindPeopleGrid: FC<FindPeopleGridProps> = ({
         <Stack overflow={'auto'} width={'100%'}>
           {/*header*/}
           <Stack flexDirection={'row'} width={'100%'}>
-            {columns.map((col, i) => (
-              <Typography
-                borderBottom={'1px solid #D0CEDA'}
-                borderRight={'1px solid #D0CEDA'}
-                borderTop={'1px solid #D0CEDA'}
-                flex={col.flex}
-                key={i}
-                lineHeight={1.2}
-                minWidth={col.minWidth}
-                p={1.5}
-                variant={'subtitle2'}
-                width={col.width}
-              >
-                {col.headerName}
-              </Typography>
-            ))}
+            {columns.length === 0
+              ? null
+              : columns.map((col, i) => (
+                  <Typography
+                    borderBottom={'1px solid #D0CEDA'}
+                    borderRight={'1px solid #D0CEDA'}
+                    borderTop={'1px solid #D0CEDA'}
+                    flex={col.flex}
+                    key={i}
+                    lineHeight={1.2}
+                    minWidth={col.minWidth}
+                    p={1.5}
+                    variant={'subtitle2'}
+                    width={col.width}
+                  >
+                    {col.headerName}
+                  </Typography>
+                ))}
           </Stack>
           {/*content*/}
           <Stack width={'100%'}>

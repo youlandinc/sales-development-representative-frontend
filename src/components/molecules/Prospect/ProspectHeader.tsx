@@ -279,7 +279,6 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
           if (findType === FindType.find_people) {
             router.push('/find-people');
           }
-          console.log('fetchFiltersByType');
           fetchFiltersByType();
         }}
       />

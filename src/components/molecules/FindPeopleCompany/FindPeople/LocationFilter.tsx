@@ -1,12 +1,9 @@
 import { FC } from 'react';
 
-import { CollapsePanel } from '@/components/molecules';
+import { CollapsePanel } from '../Common';
 
-import {
-  FilterSelect,
-  FilterSwitch,
-  FilterTextField,
-} from '../Common';
+import { FilterSelect, FilterSwitch, FilterTextField } from '../Common';
+
 import {
   LOCATION_CITIES_OPTIONS,
   LOCATION_COUNTRIES_OPTIONS,

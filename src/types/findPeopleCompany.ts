@@ -6,11 +6,16 @@ export enum CompanyTypeEnum {
 
 export enum FilterElementTypeEnum {
   select = 'SELECT',
-  text = 'TEXT',
   radio = 'RADIO',
   checkbox = 'CHECKBOX',
   input = 'INPUT',
   between = 'BETWEEN',
+  switch = 'SWITCH',
+}
+
+export enum FilterElementInputTypeEnum {
+  text = 'TEXT',
+  number = 'NUMBER',
 }
 
 export enum FindType {
@@ -31,18 +36,21 @@ export type SourceFromOpt = {
 
 export type FetchSearchTypeResponse = SourceFromOpt[];
 
+type FilterOptionalItem = {
+  optionMultiple?: boolean;
+  optionValues?: Option[];
+  groups?: FilterItem[];
+};
+
 export type FilterItem = {
   formType: FilterElementTypeEnum;
   formKey: string;
   formLabel: string;
   description: string;
   placeholder: string;
-  inputType: string;
+  inputType: FilterElementInputTypeEnum;
   defaultValue: string;
-  optionApiUrl: string;
-  optionMultiple: boolean;
   verifyRule: string;
-  optionValues: Option[];
-};
+} & FilterOptionalItem;
 
 export type FetchFiltersByTypeResponse = Record<string, FilterItem[]>;
