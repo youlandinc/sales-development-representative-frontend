@@ -13,11 +13,13 @@ import { useWebSocket } from '@/hooks';
 import { StyledTable } from '@/components/atoms';
 import {
   CampaignProcess,
+  DialogAllIntegrations,
   DialogCellDetails,
   DialogDeleteColumn,
   DialogEditDescription,
   DialogHeaderActions,
   DialogWebResearch,
+  DialogWorkEmail,
   TableColumnMenuEnum,
 } from '@/components/molecules';
 
@@ -643,6 +645,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       <DialogCellDetails data={activeCell} />
       <CampaignProcess />
       <DialogHeaderActions />
+      <DialogWorkEmail />
+      <DialogAllIntegrations />
     </Stack>
   );
 };

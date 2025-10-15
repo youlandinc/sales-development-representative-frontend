@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import {
   BaseSelectProps,
   FormControl,
+  Icon,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -191,7 +192,15 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         {/*)}*/}
         {!loading &&
           options.map((opt) => (
-            <MenuItem disabled={opt.disabled} key={opt.key} value={opt.value}>
+            <MenuItem
+              disabled={opt.disabled}
+              key={opt.key}
+              sx={{ gap: 1 }}
+              value={opt.value}
+            >
+              {opt.icon && (
+                <Icon component={opt.icon} sx={{ width: 16, height: 16 }} />
+              )}
               {opt.label}
             </MenuItem>
           ))}
