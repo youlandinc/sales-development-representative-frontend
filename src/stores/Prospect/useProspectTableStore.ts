@@ -46,6 +46,7 @@ export type ProspectTableActions = {
     runRecords: {
       [key: string]: { recordIds: string[]; isAll: boolean };
     } | null;
+    fields: TableColumnProps[];
   }>;
   fetchRowIds: (tableId: string) => Promise<void>;
   setRowIds: (rowIds: string[]) => void;
@@ -86,7 +87,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     fetchTable: async (tableId) => {
       let result = null;
       if (!tableId) {
-        return { runRecords: result };
+        return { runRecords: result, fields: [] };
       }
 
       try {
@@ -99,10 +100,11 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
           tableName,
           runRecords: runRecords ?? null,
         });
+        return { runRecords: result, fields };
       } catch (err) {
         handleApiError<ProspectTableState>(err);
+        return { runRecords: result, fields: [] };
       }
-      return { runRecords: result };
     },
     fetchRowIds: async (tableId) => {
       if (!tableId) {

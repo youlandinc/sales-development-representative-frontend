@@ -34,6 +34,7 @@ export interface TableColumnProps {
     };
   };
   semanticType: string;
+  groupId: string | null;
 }
 
 export interface UpdateTableColumnConfigParams {

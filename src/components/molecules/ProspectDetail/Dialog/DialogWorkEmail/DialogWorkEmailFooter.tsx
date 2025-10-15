@@ -8,19 +8,30 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { useParams } from 'next/navigation';
 import { FC, useState } from 'react';
-import { useProspectTableStore } from '@/stores/Prospect';
-import { CostCoins } from '../DialogWebResearch';
-import { useWorkEmailStore } from '@/stores/Prospect';
 
-import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+import { CostCoins } from '../DialogWebResearch';
+
+import { useProspectTableStore } from '@/stores/Prospect';
 import { useComputedInWorkEmailStore } from './hooks';
-import { useAsyncFn } from '@/hooks';
+import { useAsyncFn, useRunAi } from '@/hooks';
+import { useWorkEmailStore } from '@/stores/Prospect/useWorkEmailStore';
+
 import { _createIntegrationConfig } from '@/request/enrichments/suggestions';
 
+import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+
 export const DialogWorkEmailFooter: FC = () => {
-  const { rowIds } = useProspectTableStore((store) => store);
+  const { rowIds, fetchTable } = useProspectTableStore((store) => store);
   const { integrationsInWaterfall } = useComputedInWorkEmailStore();
+  const { setWorkEmailVisible } = useWorkEmailStore((store) => store);
+  const params = useParams();
+  const tableId =
+    typeof params.tableId === 'string' && params.tableId.trim() !== ''
+      ? params.tableId
+      : '';
+  const { runAi } = useRunAi();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   /* {
@@ -131,7 +142,18 @@ export const DialogWorkEmailFooter: FC = () => {
 
   const [state, createWaterfallConfig] = useAsyncFn(async () => {
     try {
-      await _createIntegrationConfig('t_aiefbseeirc8djthdovg', param);
+      const res = await _createIntegrationConfig(tableId, param);
+      const { fields } = await fetchTable(tableId);
+      const groupId = res.data;
+      const fieldIdsWithGroupId = fields
+        .filter((f) => f.groupId === groupId)
+        ?.map((f) => f.fieldId);
+      setWorkEmailVisible(false);
+      runAi({
+        tableId,
+        recordCount: 10,
+        fieldIds: fieldIdsWithGroupId,
+      });
     } catch (error) {
       const { header, message, variant } = error as HttpError;
       SDRToast({ message, header, variant });
@@ -155,13 +177,14 @@ export const DialogWorkEmailFooter: FC = () => {
         textColor={'text.secondary'}
       />
       <StyledButton
+        disabled={!tableId}
         endIcon={
           <Icon
             component={ICON_ARROW}
             sx={{ width: 12, height: 12, '& path': { fill: '#fff' } }}
           />
         }
-        loading={false}
+        loading={state.loading}
         onClick={(e) => {
           setAnchorEl(e.currentTarget);
         }}
@@ -193,6 +216,7 @@ export const DialogWorkEmailFooter: FC = () => {
         {rowIds.length > 10 && (
           <MenuItem
             onClick={() => {
+              setAnchorEl(null);
               createWaterfallConfig();
             }}
           >

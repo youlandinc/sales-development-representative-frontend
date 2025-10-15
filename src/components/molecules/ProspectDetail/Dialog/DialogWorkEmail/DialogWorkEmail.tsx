@@ -9,13 +9,13 @@ import {
 
 import { useWorkEmailStore } from '@/stores/Prospect';
 import { WaterfallConfigTypeEnum } from '@/types/Prospect/tableActions';
+import { useParams } from 'next/navigation';
 
 export const DialogWorkEmail = () => {
   const {
     workEmailVisible,
     setWorkEmailVisible,
     displayType,
-    fetchIntegrations,
     setWaterfallConfigType,
   } = useWorkEmailStore((store) => store);
 

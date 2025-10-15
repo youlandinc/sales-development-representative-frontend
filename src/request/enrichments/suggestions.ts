@@ -10,5 +10,5 @@ export const _createIntegrationConfig = (
   tableId: string,
   param: Record<string, any>,
 ) => {
-  return post(`/sdr/waterfall/table/${tableId}`, param);
+  return post<string>(`/sdr/waterfall/table/${tableId}`, param);
 };

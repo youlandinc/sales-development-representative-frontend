@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Icon, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { StyledButton, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
@@ -143,8 +143,7 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
 };
 
 export const DialogWorkEmailSequence: FC = () => {
-  const { setDialogIntegrationsVisible, allIntegrations, setAllIntegrations } =
-    useWorkEmailStore();
+  const { setDialogIntegrationsVisible, allIntegrations } = useWorkEmailStore();
   const { integrationsInWaterfall } = useComputedInWorkEmailStore();
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -167,6 +166,10 @@ export const DialogWorkEmailSequence: FC = () => {
     }
   };
 
+  // useEffect(() => {
+  //   setItems(integrationsInWaterfall);
+  // }, [JSON.parse(JSON.stringify(integrationsInWaterfall))]);
+
   return (
     <DialogWorkEmailCollapseCard title={'Waterfall sequence'}>
       <Stack gap={1.5}>
@@ -181,10 +184,10 @@ export const DialogWorkEmailSequence: FC = () => {
           sensors={sensors}
         >
           <SortableContext
-            items={items.map((i) => i.actionKey)}
+            items={integrationsInWaterfall.map((i) => i.actionKey)}
             strategy={verticalListSortingStrategy}
           >
-            {items.map((i) => (
+            {integrationsInWaterfall.map((i) => (
               <DragItem
                 id={i.actionKey}
                 integrationInfo={i}
