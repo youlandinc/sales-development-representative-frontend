@@ -4,14 +4,15 @@ import Image from 'next/image';
 import { StyledSelect } from '@/components/atoms';
 import {
   DialogWorkEmailCollapseCard,
-  DialogWorkEmailCustomSelect,
   DialogWorkEmailIntegrationColumnMapping,
 } from './index';
+import { DialogHeader } from '../Common';
+
+import { DisplayTypeEnum } from '@/types/Prospect/tableActions';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
 
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
-import { DialogHeader } from '../Common';
 
 export const DialogWorkEmailIntegrationAccount = () => {
   const { selectedIntegrationToConfig, setDisplayType, setWorkEmailVisible } =
@@ -20,7 +21,7 @@ export const DialogWorkEmailIntegrationAccount = () => {
   return (
     <Stack flex={1} overflow={'hidden'}>
       <DialogHeader
-        handleBack={() => setDisplayType('main')}
+        handleBack={() => setDisplayType(DisplayTypeEnum.main)}
         handleClose={() => setWorkEmailVisible(false)}
         title={selectedIntegrationToConfig?.name}
       />

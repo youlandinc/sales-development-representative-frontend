@@ -9,9 +9,11 @@ export const useComputedInWorkEmailStore = () => {
 
   const integrationsInWaterfall = allIntegrations.filter((i) => i.isDefault);
 
-  const waterfallAllInputs = Object.values(
+  const waterfallAllInputs: (IntegrationActionInputParams & {
+    actionKey: string;
+  })[] = Object.values(
     integrationsInWaterfall
-      .map((i) => i.inputParams)
+      .map((i) => i.inputParams.map((p) => ({ ...p, actionKey: i.actionKey })))
       .flat()
       .reduce(
         (acc, param) => {
@@ -20,7 +22,12 @@ export const useComputedInWorkEmailStore = () => {
           }
           return acc;
         },
-        {} as Record<string, IntegrationActionInputParams>,
+        {} as Record<
+          string,
+          IntegrationActionInputParams & {
+            actionKey: string;
+          }
+        >,
       ),
   ).map((i) => ({
     ...i,

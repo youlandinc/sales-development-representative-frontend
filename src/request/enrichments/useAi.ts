@@ -23,10 +23,16 @@ export const generatePrompt = (api: string, param: Record<string, any>) => {
   });*/
 };
 
-export const columnRun = (fieldId: string, recordCount: number) => {
-  return post('/sdr/prospect/table/field/run', {
-    fieldId,
-    recordCount,
+export const columnRun = (param: {
+  tableId: string;
+  recordCount: number;
+  fieldId?: string;
+  fieldIds?: string[];
+}) => {
+  return post(`/sdr/prospect/table/${param.tableId}/field/run`, {
+    fieldId: param.fieldId,
+    fieldIds: param.fieldIds,
+    recordCount: param.recordCount,
   });
 };
 

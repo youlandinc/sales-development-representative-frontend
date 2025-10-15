@@ -6,21 +6,20 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ElementType, FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
 import ICON_TEXT from '../../assets/dialog/icon_text.svg';
 
-type OptionType = TOption & { icon?: ElementType };
-
 export const DialogWorkEmailCustomSelect: FC<
   { title?: string | ReactNode } & Pick<
-    AutocompleteProps<TOption, true, false, false>,
+    AutocompleteProps<TOption, false, false, false>,
     'value' | 'onChange'
   >
 > = ({ title, onChange, value }) => {
   const { columns } = useProspectTableStore((store) => store);
+
   return (
     <Stack gap={1.5}>
       {title && (
@@ -30,12 +29,16 @@ export const DialogWorkEmailCustomSelect: FC<
       )}
       <Autocomplete
         fullWidth
+        getOptionLabel={(option) => option.label}
+        isOptionEqualToValue={(option, value) => option.value === value.value}
         onChange={onChange}
-        options={columns.map((item) => ({
-          label: item.fieldName,
-          value: item.fieldId,
-          key: item.fieldId,
-        }))}
+        options={
+          columns.map((item) => ({
+            label: item.fieldName,
+            value: item.fieldId,
+            key: item.fieldId,
+          })) as TOption[]
+        }
         renderInput={(params) => {
           return (
             <TextField
@@ -75,7 +78,7 @@ export const DialogWorkEmailCustomSelect: FC<
             </Stack>
           );
         }}
-        value={value}
+        value={value || null}
       />
     </Stack>
   );

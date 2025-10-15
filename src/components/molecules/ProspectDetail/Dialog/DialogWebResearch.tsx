@@ -153,15 +153,22 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     });
   };
 
-  const [, run] = useAsyncFn(async (fieldId: string, recordCount: number) => {
-    try {
-      await columnRun(fieldId, recordCount);
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-      return Promise.reject(err);
-    }
-  });
+  const [, run] = useAsyncFn(
+    async (param: {
+      tableId: string;
+      recordCount: number;
+      fieldId?: string;
+      fieldIds?: string[];
+    }) => {
+      try {
+        await columnRun(param);
+      } catch (err) {
+        const { header, message, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+        return Promise.reject(err);
+      }
+    },
+  );
 
   const [state, saveDoNotRun] = useAsyncFn(
     async (tableId: string) => {
@@ -246,7 +253,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
                 filedMapping,
               ) || '',
           });
-          await run(activeColumnId, recordCount);
+          await run({ tableId, recordCount, fieldId: activeColumnId });
         }
         if (activeType === ActiveTypeEnum.add) {
           const res = await saveAiConfig(
@@ -261,7 +268,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               filedMapping,
             ) || '',
           );
-          await run(res.data, recordCount);
+          await run({ tableId, fieldId: res.data, recordCount });
         }
         await cb?.();
         handleClose();

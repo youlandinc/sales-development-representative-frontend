@@ -1,4 +1,4 @@
-import { StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton } from '@/components/atoms';
 import { COINS_PER_ROW } from '@/constant';
 import {
   Icon,
@@ -11,12 +11,133 @@ import {
 import { FC, useState } from 'react';
 import { useProspectTableStore } from '@/stores/Prospect';
 import { CostCoins } from '../DialogWebResearch';
+import { useWorkEmailStore } from '@/stores/Prospect';
 
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+import { useComputedInWorkEmailStore } from './hooks';
+import { useAsyncFn } from '@/hooks';
+import { _createIntegrationConfig } from '@/request/enrichments/suggestions';
 
 export const DialogWorkEmailFooter: FC = () => {
   const { rowIds } = useProspectTableStore((store) => store);
+  const { integrationsInWaterfall } = useComputedInWorkEmailStore();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  /* {
+    "waterfallFieldName": "Work Email",
+    "waterfallGroupName": "Work Email",
+    "requiredInputsBinding": [
+        {
+            "name": "name",
+            "formulaText": "f_HFYMOirRPtHJ2L0ZxGpNw"
+        },
+        {
+            "name": "companyName",
+            "formulaText": "f_vyHJb2hGMZHTJCAWXM8"
+        },
+        {
+            "name": "linkedinUrl",
+            "formulaText": "f_YM8g8ULpA24Uvwmuiw4BH"
+        }
+    ],
+    "waterfallConfigs": [
+        {
+            "name": "Find Work Email",
+            "actionKey": "leadmagic-find-work-email",
+            "description": "Find person''s work email from name and company domain.",
+            "logoUrl": "https://public-storage-hub.s3.us-west-1.amazonaws.com/LeadMagic.svg",
+            "authAccountId": "aa_gTss3IIQTO9",
+            "score": "4",
+            "isSkipped": false,
+            "inputParameters": [
+                {
+                    "name": "name",
+                    "formulaText": "f_qZofqye3z4zaS41MvzfCj"
+                },
+                {
+                    "name": "companyName",
+                    "formulaText": "f_wkk09A25XMPYo8zmjKo1"
+                }
+            ]
+        },
+        {
+            "actionKey": "findymail-find-work-email",
+            "name": "Find Work Email",
+            "description": "Use Full Name + Company Domain to find a work email for a person using Findymail.",
+            "logoUrl": "https://public-storage-hub.s3.us-west-1.amazonaws.com/Findymail.svg",
+            "authAccountId": "aa_MHzUiWP1ECbw",
+            "score": "4",
+            "isSkipped": false,
+            "inputParameters": [
+                {
+                    "name": "name",
+                    "formulaText": "f_qZofqye3z4zaS41MvzfCj"
+                },
+                {
+                    "name": "domain" ,
+                    "formulaText": "f_wkk09A25XMPYo8zmjKo1"
+                }
+            ]
+        },
+        {
+            "actionKey": "forager-find-work-email",
+            "name": "Find Work Email",
+            "integrationName": "Forager",
+            "description": "Find a person's work email from their professional profile.",
+            "logoUrl": "https://public-storage-hub.s3.us-west-1.amazonaws.com/Forager.svg",
+            "authAccountId": "aa_QAabmvp2UvcA",
+            "score": "4",
+            "isSkipped": true,
+            "inputParameters": [
+                {
+                    "name": "linkedin_public_identifier",
+                    "formulaText": "f_IJ9kCrANUz0IsnoB-I3mQ"
+                }
+            ]
+        },
+        {
+            "actionKey": "wiza-find-work-email",
+            "name": "Find Work Email",
+            "integrationName": "Wiza",
+            "description": "Enrich a contact by providing a name, company.",
+            "logoUrl": "https://public-storage-hub.s3.us-west-1.amazonaws.com/wiza.png",
+            "authAccountId": "aa_NRTOnciE9ZB",
+            "score": "4",
+            "isSkipped": false,
+            "inputParameters": [
+                {
+                    "name": "name",
+                    "formulaText": "f_qZofqye3z4zaS41MvzfCj"
+                },
+                {
+                    "name": "domain",
+                    "formulaText": "f_wkk09A25XMPYo8zmjKo1"
+                }
+            ]
+        }
+    ]
+} */
+  const param = {
+    waterfallFieldName: 'Work Email',
+    waterfallGroupName: 'Work Email',
+    waterfallConfigs: integrationsInWaterfall.map((item) => ({
+      ...item,
+      inputParameters: item.inputParams.map((i) => ({
+        name: i.columnName,
+        formulaText: i.selectedOption?.value || '',
+      })),
+    })),
+  };
+
+  const [state, createWaterfallConfig] = useAsyncFn(async () => {
+    try {
+      await _createIntegrationConfig('t_aiefbseeirc8djthdovg', param);
+    } catch (error) {
+      const { header, message, variant } = error as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  });
+
   return (
     <Stack
       alignItems={'center'}
@@ -72,7 +193,7 @@ export const DialogWorkEmailFooter: FC = () => {
         {rowIds.length > 10 && (
           <MenuItem
             onClick={() => {
-              return;
+              createWaterfallConfig();
             }}
           >
             <Typography color={'text.secondary'} variant={'body2'}>

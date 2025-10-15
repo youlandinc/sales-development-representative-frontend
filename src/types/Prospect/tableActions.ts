@@ -13,6 +13,7 @@ export interface IntegrationActionInputParams {
   columnType: string;
   description: string;
   isRequired: boolean;
+  selectedOption?: TOption | null;
 }
 
 export interface IntegrationAction {
