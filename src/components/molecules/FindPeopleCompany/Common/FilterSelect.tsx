@@ -17,8 +17,7 @@ export const FilterSelect: FC<
   Omit<AutocompleteProps<any, true, false, false>, 'renderInput'> &
     FilterContainerProps & { placeholder?: string }
 > = ({ title, subTitle, placeholder, value, onChange, options, ...props }) => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const memoOptions = useMemo(() => options, []);
+  // const memoOptions = useMemo(() => options, []);
   return (
     <FilterContainer subTitle={subTitle} title={title}>
       <Autocomplete
@@ -27,7 +26,7 @@ export const FilterSelect: FC<
         onChange={(_, newValue, reason) => {
           onChange?.(_, newValue, reason);
         }}
-        options={memoOptions}
+        options={options}
         renderInput={(params) => (
           <TextField
             {...params}
