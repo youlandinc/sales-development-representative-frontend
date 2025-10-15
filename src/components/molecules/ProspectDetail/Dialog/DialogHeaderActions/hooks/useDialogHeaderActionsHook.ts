@@ -23,7 +23,9 @@ export const useDialogHeaderActionsHook = () => {
     setEnrichmentTableDisabled,
     setLeadsVisible,
   } = useDialogStore();
-  const { setWorkEmailVisible } = useWorkEmailStore((state) => state);
+  const { setWorkEmailVisible, fetchIntegrations } = useWorkEmailStore(
+    (state) => state,
+  );
 
   const { setWebResearchVisible } = useWebResearchStore((state) => state);
 
@@ -53,6 +55,7 @@ export const useDialogHeaderActionsHook = () => {
       onClick: () => {
         handleClose();
         setWorkEmailVisible(true);
+        fetchIntegrations();
       },
     },
     {

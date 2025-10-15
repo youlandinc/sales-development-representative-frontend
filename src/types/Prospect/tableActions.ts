@@ -7,6 +7,7 @@ export enum IntegrationActionType {
 }
 
 export interface IntegrationActionInputParams {
+  semanticType: string;
   displayName: string;
   columnName: string;
   columnType: string;
@@ -24,4 +25,15 @@ export interface IntegrationAction {
   score: string;
   isDefault: boolean;
   inputParams: IntegrationActionInputParams[];
+  skipped: boolean;
+}
+
+export enum WaterfallConfigTypeEnum {
+  setup = 'setup',
+  configure = 'configure',
+}
+
+export enum DisplayTypeEnum {
+  main = 'main',
+  integration = 'integration',
 }

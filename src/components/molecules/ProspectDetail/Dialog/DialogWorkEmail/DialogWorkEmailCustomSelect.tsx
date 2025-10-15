@@ -16,7 +16,7 @@ type OptionType = TOption & { icon?: ElementType };
 
 export const DialogWorkEmailCustomSelect: FC<
   { title?: string | ReactNode } & Pick<
-    AutocompleteProps<OptionType, true, false, false>,
+    AutocompleteProps<TOption, true, false, false>,
     'value' | 'onChange'
   >
 > = ({ title, onChange, value }) => {
@@ -35,7 +35,6 @@ export const DialogWorkEmailCustomSelect: FC<
           label: item.fieldName,
           value: item.fieldId,
           key: item.fieldId,
-          icon: ICON_TEXT,
         }))}
         renderInput={(params) => {
           return (
@@ -71,22 +70,13 @@ export const DialogWorkEmailCustomSelect: FC<
                 '&:hover': { bgcolor: '#F7F4FD !important' },
               }}
             >
-              <Icon component={option.icon} sx={{ width: 16, height: 16 }} />
+              <Icon component={ICON_TEXT} sx={{ width: 16, height: 16 }} />
               {option.label}
             </Stack>
           );
         }}
         value={value}
       />
-      {/* <StyledSelect
-        {...rest}
-        options={columns.map((item) => ({
-          label: item.fieldName,
-          value: item.fieldId,
-          key: item.fieldId,
-          icon: ICON_TEXT,
-        }))}
-      /> */}
     </Stack>
   );
 };

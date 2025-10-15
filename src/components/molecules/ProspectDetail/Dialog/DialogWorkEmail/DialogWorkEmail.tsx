@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react';
 import { Drawer, Fade, Stack } from '@mui/material';
+import { useEffect, useMemo } from 'react';
 
 import {
   DialogWorkEmailFooter,
@@ -7,48 +7,24 @@ import {
   DialogWorkEmailMain,
 } from './index';
 
-import { DialogHeader } from '../Common';
-
 import { useWorkEmailStore } from '@/stores/Prospect';
+import { WaterfallConfigTypeEnum } from '@/types/Prospect/tableActions';
 
 export const DialogWorkEmail = () => {
   const {
     workEmailVisible,
     setWorkEmailVisible,
     displayType,
-    setDisplayType,
     fetchIntegrations,
+    setWaterfallConfigType,
   } = useWorkEmailStore((store) => store);
-
-  const computedHeader = useMemo(() => {
-    switch (displayType) {
-      case 'main':
-        return (
-          <DialogHeader
-            handleBack={() => setWorkEmailVisible(false)}
-            handleClose={() => setWorkEmailVisible(false)}
-            title={'Work Email'}
-          />
-        );
-      case 'integration':
-        return (
-          <DialogHeader
-            handleBack={() => setDisplayType('main')}
-            handleClose={() => setWorkEmailVisible(false)}
-            title={'Find work email'}
-          />
-        );
-      default:
-        return null;
-    }
-  }, [displayType]);
 
   const computedContent = useMemo(() => {
     switch (displayType) {
       case 'main':
         return (
           <Fade in>
-            <Stack flex={1} minHeight={0} overflow={'auto'} pb={3}>
+            <Stack flex={1} overflow={'hidden'}>
               <DialogWorkEmailMain />
             </Stack>
           </Fade>
@@ -56,7 +32,7 @@ export const DialogWorkEmail = () => {
       case 'integration':
         return (
           <Fade in>
-            <Stack flex={1} minHeight={0} overflow={'auto'} pb={3}>
+            <Stack flex={1} overflow={'hidden'}>
               <DialogWorkEmailIntegrationAccount />
             </Stack>
           </Fade>
@@ -67,7 +43,7 @@ export const DialogWorkEmail = () => {
   }, [displayType]);
 
   useEffect(() => {
-    fetchIntegrations();
+    setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
   }, []);
 
   return (
@@ -88,7 +64,6 @@ export const DialogWorkEmail = () => {
         left: 'unset',
       }}
     >
-      {computedHeader}
       {computedContent}
       <DialogWorkEmailFooter />
     </Drawer>

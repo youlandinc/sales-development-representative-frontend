@@ -5,10 +5,12 @@ import {
   DialogWorkEmailCollapseCard,
   DialogWorkEmailCustomSelect,
 } from './index';
+import { useComputedInWorkEmailStore } from './hooks';
 
 export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
   title = 'Inputs',
 }) => {
+  const { waterfallAllInputs } = useComputedInWorkEmailStore();
   return (
     <DialogWorkEmailCollapseCard title={title}>
       <Stack gap={1}>
@@ -17,10 +19,9 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
           are empty, just select the columns you want to map. Once all inputs
           are filled, you&apos;re ready to save and run!
         </Typography>
-        <DialogWorkEmailCustomSelect title={'Company name'} />
-        <DialogWorkEmailCustomSelect title={'Domain'} />
-        <DialogWorkEmailCustomSelect title={'Name'} />
-        <DialogWorkEmailCustomSelect title={'Linked url'} />
+        {waterfallAllInputs.map((input, key) => (
+          <DialogWorkEmailCustomSelect key={key} title={input.displayName} />
+        ))}
       </Stack>
     </DialogWorkEmailCollapseCard>
   );

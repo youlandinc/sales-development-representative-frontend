@@ -33,6 +33,7 @@ export interface TableColumnProps {
       prompt: string[];
     };
   };
+  semanticType: string;
 }
 
 export interface UpdateTableColumnConfigParams {

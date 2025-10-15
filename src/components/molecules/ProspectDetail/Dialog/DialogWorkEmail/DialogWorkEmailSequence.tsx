@@ -16,20 +16,36 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Icon, Stack, Typography } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 
 import { StyledButton, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
 
+import {
+  DisplayTypeEnum,
+  IntegrationAction,
+} from '@/types/Prospect/tableActions';
+import Image from 'next/image';
 import ICON_DELETE from '../../assets/dialog/Icon_delete_default.svg';
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
 import ICON_DRAG from '../../assets/dialog/icon_drag.svg';
 import ICON_PLUS from '../../assets/dialog/icon_plus.svg';
+import { useComputedInWorkEmailStore } from './hooks';
 
-const DragItem = ({ id }: { id: number }) => {
-  const { setDialogIntegrationsVisible, setDisplayType } = useWorkEmailStore();
+interface DragItemProps {
+  id: string;
+  integrationInfo: IntegrationAction;
+}
+
+const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
+  const {
+    setDisplayType,
+    setAllIntegrations,
+    allIntegrations,
+    setSelectedIntegrationToConfig,
+  } = useWorkEmailStore();
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id,
@@ -63,7 +79,8 @@ const DragItem = ({ id }: { id: number }) => {
           justifyContent={'space-between'}
           onClick={(e) => {
             e.stopPropagation();
-            setDisplayType('integration');
+            setDisplayType(DisplayTypeEnum.integration);
+            setSelectedIntegrationToConfig(integrationInfo);
           }}
           px={1}
           py={0.5}
@@ -73,7 +90,17 @@ const DragItem = ({ id }: { id: number }) => {
             },
           }}
         >
-          <Typography variant={'body3'}>Drag to rearrange {id}</Typography>
+          <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+            <Image
+              alt={integrationInfo.integrationName}
+              height={18}
+              src={integrationInfo.logoUrl}
+              width={18}
+            />
+            <Typography variant={'body3'}>
+              {integrationInfo.integrationName}
+            </Typography>
+          </Stack>
           <Icon
             component={ICON_ARROW}
             sx={{
@@ -85,16 +112,40 @@ const DragItem = ({ id }: { id: number }) => {
         </Stack>
       </Stack>
       <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
-        <StyledSwitch />
-        <Icon component={ICON_DELETE} sx={{ width: 18, height: 18 }} />
+        <StyledSwitch
+          checked={!integrationInfo.skipped}
+          onChange={(e) => {
+            setAllIntegrations(
+              allIntegrations.map((i) =>
+                i.actionKey === integrationInfo.actionKey
+                  ? { ...i, skipped: !e.target.checked }
+                  : i,
+              ),
+            );
+          }}
+        />
+        <Icon
+          component={ICON_DELETE}
+          onClick={() => {
+            setAllIntegrations(
+              allIntegrations.map((i) =>
+                i.actionKey === integrationInfo.actionKey
+                  ? { ...i, isDefault: false }
+                  : i,
+              ),
+            );
+          }}
+          sx={{ width: 18, height: 18 }}
+        />
       </Stack>
     </Stack>
   );
 };
 
 export const DialogWorkEmailSequence: FC = () => {
-  const [items, setItems] = useState([1, 2, 3]);
-  const { setDialogIntegrationsVisible } = useWorkEmailStore();
+  const { setDialogIntegrationsVisible, allIntegrations, setAllIntegrations } =
+    useWorkEmailStore();
+  const { integrationsInWaterfall } = useComputedInWorkEmailStore();
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
@@ -104,16 +155,15 @@ export const DialogWorkEmailSequence: FC = () => {
     }),
   );
 
+  const [items, setItems] = useState(integrationsInWaterfall);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (active.id !== over?.id) {
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id);
-        const newIndex = items.indexOf(over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      const oldIndex = items.findIndex((i) => i.actionKey === active.id);
+      const newIndex = items.findIndex((i) => i.actionKey === over?.id);
+      const newItems = arrayMove(items, oldIndex, newIndex);
+      setItems(newItems);
     }
   };
 
@@ -130,14 +180,25 @@ export const DialogWorkEmailSequence: FC = () => {
           onDragEnd={handleDragEnd}
           sensors={sensors}
         >
-          <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            {items.map((_, index) => (
-              <DragItem id={index + 1} key={index} />
+          <SortableContext
+            items={items.map((i) => i.actionKey)}
+            strategy={verticalListSortingStrategy}
+          >
+            {items.map((i) => (
+              <DragItem
+                id={i.actionKey}
+                integrationInfo={i}
+                key={i.actionKey}
+              />
             ))}
           </SortableContext>
         </DndContext>
         <StyledButton
           color={'info'}
+          disabled={
+            allIntegrations.length ===
+            allIntegrations.filter((i) => i.isDefault).length
+          }
           onClick={() => {
             setDialogIntegrationsVisible(true);
           }}
@@ -150,8 +211,11 @@ export const DialogWorkEmailSequence: FC = () => {
           }}
           variant={'outlined'}
         >
-          <Icon component={ICON_PLUS} sx={{ width: 18, height: 18 }} /> Add
-          action
+          <Icon
+            component={ICON_PLUS}
+            sx={{ width: 18, height: 18, '& path': { fill: 'currentColor' } }}
+          />{' '}
+          Add action
         </StyledButton>
       </Stack>
     </DialogWorkEmailCollapseCard>

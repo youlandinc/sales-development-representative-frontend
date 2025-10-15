@@ -1,4 +1,5 @@
 import { Icon, Stack, Typography } from '@mui/material';
+import Image from 'next/image';
 
 import { StyledSelect } from '@/components/atoms';
 import {
@@ -10,28 +11,38 @@ import {
 import { useWorkEmailStore } from '@/stores/Prospect';
 
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+import { DialogHeader } from '../Common';
 
 export const DialogWorkEmailIntegrationAccount = () => {
-  const { setDisplayType, setWorkEmailVisible } = useWorkEmailStore(
-    (store) => store,
-  );
+  const { selectedIntegrationToConfig, setDisplayType, setWorkEmailVisible } =
+    useWorkEmailStore((store) => store);
 
   return (
-    <Stack>
-      <Stack gap={3} pt={3} px={3}>
-        <Stack gap={1}>
+    <Stack flex={1} overflow={'hidden'}>
+      <DialogHeader
+        handleBack={() => setDisplayType('main')}
+        handleClose={() => setWorkEmailVisible(false)}
+        title={selectedIntegrationToConfig?.name}
+      />
+      <Stack flex={1} gap={3} minHeight={0} overflow={'auto'} p={3}>
+        {/* <Stack gap={1}>
           <Typography fontWeight={600}>Waterfall output</Typography>
           <Typography variant={'body2'}>
             Choose what to output to your table from this waterfall
           </Typography>
           <DialogWorkEmailCustomSelect />
-        </Stack>
+        </Stack> */}
         <Stack gap={1}>
           <Typography fontWeight={600}>Action</Typography>
           <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
-            <Typography>{'{icon}'}</Typography>
+            <Image
+              alt={selectedIntegrationToConfig?.integrationName || ''}
+              height={18}
+              src={selectedIntegrationToConfig?.logoUrl || ''}
+              width={18}
+            />
             <Typography color={'text.secondary'} variant={'body3'}>
-              {'{integration name}'}
+              {selectedIntegrationToConfig?.integrationName || ''}
             </Typography>
             <Icon
               component={ICON_ARROW}
@@ -42,7 +53,9 @@ export const DialogWorkEmailIntegrationAccount = () => {
                 '& path': { fill: '#6F6C7D' },
               }}
             />
-            <Typography variant={'body3'}>{'{function name}'}</Typography>
+            <Typography variant={'body3'}>
+              {selectedIntegrationToConfig?.name || ''}
+            </Typography>
           </Stack>
           <Typography variant={'body3'}>
             Find person&apos;s work email from name and company domain.
@@ -56,7 +69,16 @@ export const DialogWorkEmailIntegrationAccount = () => {
         <DialogWorkEmailCollapseCard title={'Account'}>
           <Stack gap={1.5}>
             <Typography>Select LeadMagic account</Typography>
-            <StyledSelect options={[]} />
+            <StyledSelect
+              options={[
+                {
+                  value: `${selectedIntegrationToConfig?.authAccountId || ''}`,
+                  label: `Corepass-managed-${selectedIntegrationToConfig?.name || ''} account`,
+                  key: `${selectedIntegrationToConfig?.authAccountId || ''}`,
+                },
+              ]}
+              value={selectedIntegrationToConfig?.authAccountId || ''}
+            />
           </Stack>
         </DialogWorkEmailCollapseCard>
         <DialogWorkEmailIntegrationColumnMapping />

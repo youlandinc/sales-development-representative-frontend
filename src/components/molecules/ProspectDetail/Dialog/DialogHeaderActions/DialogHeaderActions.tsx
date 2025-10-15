@@ -1,4 +1,3 @@
-import { ElementType, FC, SyntheticEvent, useMemo, useState } from 'react';
 import {
   Box,
   Collapse,
@@ -8,22 +7,23 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
+import { SyntheticEvent, useMemo, useState } from 'react';
 
 import { StyledDialog } from '@/components/atoms';
-import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
-import ICON_SPARK from '../../assets/dialog/icon_sparkle_blue.svg';
-import CloseIcon from '@mui/icons-material/Close';
 import { CostCoins, TableColumnMenuEnum } from '@/components/molecules';
+import { useSwitch } from '@/hooks';
 import {
   ActiveTypeEnum,
   useProspectTableStore,
   useWebResearchStore,
 } from '@/stores/Prospect';
-import { useSwitch } from '@/hooks';
-import { ProcessCreateTypeEnum } from '@/types';
 import { useDialogStore } from '@/stores/useDialogStore';
-import { useDialogHeaderActionsHook } from './hooks/useDialogHeaderActionsHook';
+import { ProcessCreateTypeEnum } from '@/types';
+import CloseIcon from '@mui/icons-material/Close';
+import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+import ICON_SPARK from '../../assets/dialog/icon_sparkle_blue.svg';
 import { DialogHeaderActionsMenus } from './DialogHeaderActionsMenus';
+import { useDialogHeaderActionsHook } from './hooks/useDialogHeaderActionsHook';
 
 export const DialogHeaderActions = () => {
   const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
