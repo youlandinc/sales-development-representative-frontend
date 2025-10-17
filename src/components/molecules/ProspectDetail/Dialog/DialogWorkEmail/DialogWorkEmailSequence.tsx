@@ -16,23 +16,22 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Icon, Stack, Typography } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import Image from 'next/image';
+import { FC, useState } from 'react';
 
 import { StyledButton, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
+import { useComputedInWorkEmailStore } from './hooks';
 
-import {
-  DisplayTypeEnum,
-  IntegrationAction,
-} from '@/types/Prospect/tableActions';
-import Image from 'next/image';
+import { DisplayTypeEnum, IntegrationAction } from '@/types/Prospect';
+
 import ICON_DELETE from '../../assets/dialog/Icon_delete_default.svg';
+import ICON_VALIDATE from '../../assets/dialog/dialogWorkEmail/icon_validate_false.svg';
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
 import ICON_DRAG from '../../assets/dialog/icon_drag.svg';
 import ICON_PLUS from '../../assets/dialog/icon_plus.svg';
-import { useComputedInWorkEmailStore } from './hooks';
 
 interface DragItemProps {
   id: string;
@@ -101,14 +100,19 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
               {integrationInfo.integrationName}
             </Typography>
           </Stack>
-          <Icon
-            component={ICON_ARROW}
-            sx={{
-              width: 12,
-              height: 12,
-              transform: 'rotate(-90deg)',
-            }}
-          />
+          <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+            {integrationInfo.inputParams.some((i) => !i.selectedOption) && (
+              <Icon component={ICON_VALIDATE} sx={{ width: 18, height: 18 }} />
+            )}
+            <Icon
+              component={ICON_ARROW}
+              sx={{
+                width: 12,
+                height: 12,
+                transform: 'rotate(-90deg)',
+              }}
+            />
+          </Stack>
         </Stack>
       </Stack>
       <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
@@ -153,7 +157,6 @@ export const DialogWorkEmailSequence: FC = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-
   const [items, setItems] = useState(integrationsInWaterfall);
 
   const handleDragEnd = (event: DragEndEvent) => {

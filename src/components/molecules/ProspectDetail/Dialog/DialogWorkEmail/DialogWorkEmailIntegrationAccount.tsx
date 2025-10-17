@@ -5,10 +5,11 @@ import { StyledSelect } from '@/components/atoms';
 import {
   DialogWorkEmailCollapseCard,
   DialogWorkEmailIntegrationColumnMapping,
+  DialogWorkEmailQuickSetupInputs,
 } from './index';
 import { DialogHeader } from '../Common';
 
-import { DisplayTypeEnum } from '@/types/Prospect/tableActions';
+import { DisplayTypeEnum } from '@/types/Prospect';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
 
@@ -59,7 +60,7 @@ export const DialogWorkEmailIntegrationAccount = () => {
             </Typography>
           </Stack>
           <Typography variant={'body3'}>
-            Find person&apos;s work email from name and company domain.
+            {selectedIntegrationToConfig?.description || ''}
           </Typography>
         </Stack>
         <Typography variant={'body3'}>

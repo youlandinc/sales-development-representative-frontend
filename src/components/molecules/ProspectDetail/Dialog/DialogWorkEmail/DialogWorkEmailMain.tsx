@@ -12,7 +12,22 @@ import {
 } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
-import { WaterfallConfigTypeEnum } from '@/types/Prospect/tableActions';
+import {
+  IntegrationActionType,
+  WaterfallConfigTypeEnum,
+} from '@/types/Prospect';
+
+const WATERFALL_DESCRIPTION: Record<string, string> = {
+  [IntegrationActionType.work_email]:
+    "Find a person's work email, this waterfall is optimized for companies below 5,000 employees.",
+  [IntegrationActionType.phone_number]:
+    "Need a person's mobile phone number in the US or Canada? The system keeps searching through different sources until it finds the right one for you.",
+};
+
+const HEADER_NAME: Record<string, string> = {
+  [IntegrationActionType.work_email]: 'Work Email',
+  [IntegrationActionType.phone_number]: 'Phone Number',
+};
 
 export const DialogWorkEmailMain = () => {
   const {
@@ -20,6 +35,7 @@ export const DialogWorkEmailMain = () => {
     allIntegrations,
     setWaterfallConfigType,
     waterfallConfigType,
+    integrationActionType,
   } = useWorkEmailStore((store) => store);
 
   return (
@@ -27,7 +43,7 @@ export const DialogWorkEmailMain = () => {
       <DialogHeader
         handleBack={() => setWorkEmailVisible(false)}
         handleClose={() => setWorkEmailVisible(false)}
-        title={'Work Email'}
+        title={HEADER_NAME?.[integrationActionType] || ''}
       />
       <Stack flex={1} gap={4} minHeight={0} overflow={'auto'} p={3}>
         <Stack gap={1}>
@@ -38,13 +54,12 @@ export const DialogWorkEmailMain = () => {
             Waterfall
           </Typography>
           <Typography variant={'body2'}>
-            Find a person&apos;s work email, this waterfall is optimized for
-            companies below 5,000 employees.
+            {WATERFALL_DESCRIPTION?.[integrationActionType] || ''}
           </Typography>
         </Stack>
 
         <Stack gap={3}>
-          {allIntegrations.length > 0 && (
+          {allIntegrations.filter((i) => i.isDefault).length > 0 && (
             <ToggleButtonGroup
               color={'primary'}
               exclusive

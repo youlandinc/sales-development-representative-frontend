@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { HttpError } from '@/types';
+import { ColumnFieldGroupMap, HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import { TableColumnProps } from '@/types/Prospect/table';
 
@@ -39,6 +39,8 @@ export type ProspectTableState = {
   runRecords: {
     [key: string]: { recordIds: string[]; isAll: boolean };
   } | null;
+
+  fieldGroupMap: ColumnFieldGroupMap | null;
 };
 
 export type ProspectTableActions = {
@@ -84,6 +86,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     dialogType: null,
     rowIds: [],
     runRecords: null,
+    fieldGroupMap: null,
     fetchTable: async (tableId) => {
       let result = null;
       if (!tableId) {
@@ -92,13 +95,14 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
 
       try {
         const {
-          data: { fields, tableName, runRecords },
+          data: { fields, tableName, runRecords, fieldGroupMap },
         } = await _fetchTable(tableId);
         result = runRecords;
         set({
           columns: fields,
           tableName,
           runRecords: runRecords ?? null,
+          fieldGroupMap,
         });
         return { runRecords: result, fields };
       } catch (err) {

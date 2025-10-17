@@ -6,6 +6,7 @@ import {
   ActiveTypeEnum,
   useProspectTableStore,
   useWebResearchStore,
+  useWorkEmailStore,
 } from '@/stores/Prospect';
 
 import { useWebSocket } from '@/hooks';
@@ -25,6 +26,7 @@ import {
 
 import { _fetchTableRowData } from '@/request';
 import { WebSocketTypeEnum } from '@/types';
+import { useComputedInWorkEmailStore } from './Dialog/DialogWorkEmail/hooks';
 
 interface ProspectDetailTableProps {
   tableId: string;
@@ -38,6 +40,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     fetchRowIds,
     setRowIds,
     columns,
+    fieldGroupMap,
     rowIds,
     runRecords,
     resetTable,
@@ -58,6 +61,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     setPrompt,
     setGenerateDescription,
   } = useWebResearchStore((store) => store);
+  const { setWorkEmailVisible, fetchIntegrations } = useWorkEmailStore(
+    (store) => store,
+  );
+  const { matchActionKeyToIntegration } = useComputedInWorkEmailStore();
   const { messages, connected } = useWebSocket();
 
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
@@ -521,6 +528,33 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             switch (type) {
               case TableColumnMenuEnum.edit_column: {
                 const column = columns.find((col) => col.fieldId === columnId);
+                // work email
+                if (column?.groupId && fieldGroupMap) {
+                  const waterfallConfig = fieldGroupMap?.[
+                    column.groupId
+                  ]?.waterfallConfigs?.map((i) => ({
+                    actionKey: i.actionKey,
+                    inputParams: i.inputParameters.map((p) => {
+                      const field = columns.find(
+                        (col) => col.fieldId === p.formulaText,
+                      );
+                      return {
+                        name: p.name,
+                        selectedOption: {
+                          label: field?.fieldName || '',
+                          value: field?.fieldId || '',
+                          key: field?.fieldId || '',
+                        },
+                      };
+                    }),
+                  }));
+                  if (column.actionKey) {
+                    matchActionKeyToIntegration(column.actionKey);
+                  }
+                  fetchIntegrations(waterfallConfig);
+                  setWorkEmailVisible(true);
+                }
+                //use ai
                 if (!column || column.actionKey !== 'use-ai') {
                   return;
                 }
@@ -539,6 +573,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 // todo : extra params
                 //findParams(column,['answerSchemaType','prompt','metaprompt']
                 setWebResearchVisible(true, ActiveTypeEnum.edit);
+
                 break;
               }
               case TableColumnMenuEnum.edit_description: {

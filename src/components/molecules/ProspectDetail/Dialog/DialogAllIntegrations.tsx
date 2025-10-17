@@ -8,7 +8,7 @@ import { CostCoins, DialogHeader } from '@/components/molecules';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
 
-import { DisplayTypeEnum } from '@/types/Prospect/tableActions';
+import { DisplayTypeEnum } from '@/types/Prospect';
 
 import ICON_ARROW from '../assets/dialog/icon_arrow_down.svg';
 
