@@ -1,6 +1,5 @@
 import { get, post } from '../request';
-import { IntegrationActionType } from '@/types/Prospect/tableActions';
-import { IntegrationAction } from '@/types/Prospect/tableActions';
+import { IntegrationAction, IntegrationActionType } from '@/types/Prospect';
 
 export const _fetchAllActionsList = (actionType: IntegrationActionType) => {
   return get<IntegrationAction[]>(`/sdr/action/integration/${actionType}`);

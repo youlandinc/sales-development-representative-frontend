@@ -4,15 +4,18 @@ import { SDRToast } from '@/components/atoms';
 
 import { _fetchAllActionsList } from '@/request/enrichments/suggestions';
 
+import { HttpError } from '@/types';
 import {
   DisplayTypeEnum,
   IntegrationAction,
   IntegrationActionType,
   WaterfallConfigTypeEnum,
-} from '@/types/Prospect/tableActions';
-import { HttpError } from '@/types';
+} from '@/types/Prospect';
 
 type WorkEmailStoreProps = {
+  dialogHeaderName: string;
+  integrationActionType: IntegrationActionType;
+  waterfallDescription: string;
   workEmailVisible: boolean;
   dialogIntegrationsVisible: boolean;
   displayType: DisplayTypeEnum;
@@ -20,25 +23,41 @@ type WorkEmailStoreProps = {
   selectedIntegration: IntegrationAction | null;
   selectedIntegrationToConfig: IntegrationAction | null;
   waterfallConfigType: WaterfallConfigTypeEnum;
+  isValidatedInputParams: boolean;
 };
 
 type WorkEmailStoreActions = {
   setWorkEmailVisible: (open: boolean) => void;
+  setIntegrationActionType: (type: IntegrationActionType) => void;
   setDialogIntegrationsVisible: (open: boolean) => void;
   setDisplayType: (type: DisplayTypeEnum) => void;
+  setDialogHeaderName: (name: string) => void;
+  setWaterfallDescription: (description: string) => void;
   setSelectedIntegration: (integration: IntegrationAction | null) => void;
   setSelectedIntegrationToConfig: (
     integration: IntegrationAction | null,
   ) => void;
   setAllIntegrations: (integrations: IntegrationAction[]) => void;
   setWaterfallConfigType: (type: WaterfallConfigTypeEnum) => void;
-  fetchIntegrations: () => Promise<void>;
+  setIsValidatedInputParams: (isValidated: boolean) => void;
+  fetchIntegrations: (
+    editParam?: (Pick<IntegrationAction, 'actionKey'> & {
+      inputParams: {
+        name: string;
+        selectedOption: TOption;
+      }[];
+    })[],
+  ) => Promise<void>;
 };
 
 export const useWorkEmailStore = create<
   WorkEmailStoreProps & WorkEmailStoreActions
->((set) => ({
+>((set, get) => ({
+  dialogHeaderName: '',
+  integrationActionType: IntegrationActionType.work_email,
+  waterfallDescription: '',
   displayType: DisplayTypeEnum.main,
+  isValidatedInputParams: false,
   waterfallConfigType: WaterfallConfigTypeEnum.setup,
   workEmailVisible: false,
   dialogIntegrationsVisible: false,
@@ -80,10 +99,70 @@ export const useWorkEmailStore = create<
       waterfallConfigType: type,
     });
   },
-  fetchIntegrations: async () => {
+  setIsValidatedInputParams: (isValidated: boolean) => {
+    set({
+      isValidatedInputParams: isValidated,
+    });
+  },
+  setDialogHeaderName: (name: string) => {
+    set({
+      dialogHeaderName: name,
+    });
+  },
+  setWaterfallDescription: (description: string) => {
+    set({
+      waterfallDescription: description,
+    });
+  },
+  setIntegrationActionType: (type: IntegrationActionType) => {
+    set({
+      integrationActionType: type,
+    });
+  },
+  fetchIntegrations: async (
+    editParam?: (Pick<IntegrationAction, 'actionKey'> & {
+      inputParams: {
+        name: string;
+        selectedOption: TOption;
+      }[];
+    })[],
+  ) => {
+    // reset integrations
+    set({
+      allIntegrations: [],
+      waterfallConfigType: WaterfallConfigTypeEnum.setup,
+    });
     try {
-      const res = await _fetchAllActionsList(IntegrationActionType.work_email);
+      const res = await _fetchAllActionsList(get().integrationActionType);
       if (Array.isArray(res.data)) {
+        if (editParam) {
+          set({
+            allIntegrations: res.data.map((i) => {
+              const editItem = editParam.find(
+                (item) => item.actionKey === i.actionKey,
+              );
+              if (editItem) {
+                return {
+                  ...i,
+                  inputParams: i.inputParams.map((p) => ({
+                    ...p,
+                    ...editItem.inputParams.find(
+                      (item) => item.name === p.columnName,
+                    ),
+                  })),
+                  isDefault: true,
+                  skipped: false,
+                };
+              }
+              return {
+                ...i,
+                isDefault: false,
+                skipped: false,
+              };
+            }),
+          });
+          return;
+        }
         set({
           allIntegrations: res.data.map((i) => ({
             ...i,

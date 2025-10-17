@@ -8,8 +8,7 @@ import {
 } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
-import { WaterfallConfigTypeEnum } from '@/types/Prospect/tableActions';
-import { useParams } from 'next/navigation';
+import { WaterfallConfigTypeEnum } from '@/types/Prospect';
 
 export const DialogWorkEmail = () => {
   const {
@@ -44,6 +43,7 @@ export const DialogWorkEmail = () => {
 
   useEffect(() => {
     setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

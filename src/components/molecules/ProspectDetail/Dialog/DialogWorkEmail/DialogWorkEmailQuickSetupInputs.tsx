@@ -9,16 +9,21 @@ import {
 import { useComputedInWorkEmailStore } from './hooks';
 
 import ICON_SUCCESS from '../../assets/dialog/icon_success.svg';
+import ICON_VALIDATE from '../../assets/dialog/dialogWorkEmail/icon_validate_false.svg';
 
 export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
   title = 'Inputs',
 }) => {
-  const { waterfallAllInputs, integrationsInWaterfall } =
+  const { waterfallAllInputs, integrationsInWaterfall, isMissingConfig } =
     useComputedInWorkEmailStore();
 
   const hasConfigCount = integrationsInWaterfall.filter((item) =>
     item.inputParams.every((p) => !!p.selectedOption),
   ).length;
+
+  if (integrationsInWaterfall.length === 0) {
+    return null;
+  }
 
   return (
     <DialogWorkEmailCollapseCard title={title}>
@@ -44,24 +49,26 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
               />
             ))}
           </Stack>
-          {hasConfigCount === integrationsInWaterfall.length && (
+          {isMissingConfig && (
             <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
-              <Icon component={ICON_SUCCESS} sx={{ width: 18, height: 18 }} />
+              <Icon component={ICON_VALIDATE} sx={{ width: 18, height: 18 }} />
               <Typography color={'#6F6C7D'} variant={'body3'}>
-                You&apos;re ready to run the waterfall
+                Please configure all of the actions
               </Typography>
             </Stack>
           )}
+          {hasConfigCount === integrationsInWaterfall.length &&
+            hasConfigCount > 0 && (
+              <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+                <Icon component={ICON_SUCCESS} sx={{ width: 18, height: 18 }} />
+                <Typography color={'#6F6C7D'} variant={'body3'}>
+                  You&apos;re ready to run the waterfall
+                </Typography>
+              </Stack>
+            )}
         </Stack>
         {waterfallAllInputs.map((input, key) => (
-          <DialogWorkEmailCustomSelect
-            key={key}
-            // onChange={(_, newValue) => {
-            //   return;
-            // }}
-            title={input.displayName}
-            // value={input.selectedOption}
-          />
+          <DialogWorkEmailCustomSelect key={key} title={input.displayName} />
         ))}
       </Stack>
     </DialogWorkEmailCollapseCard>

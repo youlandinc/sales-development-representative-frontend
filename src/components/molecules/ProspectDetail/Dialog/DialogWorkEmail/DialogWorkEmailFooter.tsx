@@ -13,19 +13,27 @@ import { FC, useState } from 'react';
 
 import { CostCoins } from '../DialogWebResearch';
 
-import { useProspectTableStore } from '@/stores/Prospect';
-import { useComputedInWorkEmailStore } from './hooks';
 import { useAsyncFn, useRunAi } from '@/hooks';
+import { useProspectTableStore } from '@/stores/Prospect';
 import { useWorkEmailStore } from '@/stores/Prospect/useWorkEmailStore';
+import { useComputedInWorkEmailStore } from './hooks';
 
 import { _createIntegrationConfig } from '@/request/enrichments/suggestions';
+
+import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/Prospect';
 
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
 
 export const DialogWorkEmailFooter: FC = () => {
   const { rowIds, fetchTable } = useProspectTableStore((store) => store);
-  const { integrationsInWaterfall } = useComputedInWorkEmailStore();
-  const { setWorkEmailVisible } = useWorkEmailStore((store) => store);
+  const { integrationsInWaterfall, isMissingConfig } =
+    useComputedInWorkEmailStore();
+  const {
+    setWorkEmailVisible,
+    setWaterfallConfigType,
+    setDisplayType,
+    displayType,
+  } = useWorkEmailStore((store) => store);
   const params = useParams();
   const tableId =
     typeof params.tableId === 'string' && params.tableId.trim() !== ''
@@ -131,24 +139,28 @@ export const DialogWorkEmailFooter: FC = () => {
   const param = {
     waterfallFieldName: 'Work Email',
     waterfallGroupName: 'Work Email',
-    waterfallConfigs: integrationsInWaterfall.map((item) => ({
-      ...item,
-      inputParameters: item.inputParams.map((i) => ({
-        name: i.columnName,
-        formulaText: i.selectedOption?.value || '',
-      })),
-    })),
+    waterfallConfigs: integrationsInWaterfall.map((item) => {
+      const { inputParams, ...others } = item;
+      return {
+        ...others,
+        inputParameters: inputParams.map((i) => ({
+          name: i.columnName,
+          formulaText: i.selectedOption?.value || '',
+        })),
+      };
+    }),
   };
 
   const [state, createWaterfallConfig] = useAsyncFn(async () => {
     try {
-      const res = await _createIntegrationConfig(tableId, param);
+      const { data } = await _createIntegrationConfig(tableId, param);
       const { fields } = await fetchTable(tableId);
-      const groupId = res.data;
+      const groupId = data;
       const fieldIdsWithGroupId = fields
         .filter((f) => f.groupId === groupId)
         ?.map((f) => f.fieldId);
       setWorkEmailVisible(false);
+
       runAi({
         tableId,
         recordCount: 10,
@@ -158,7 +170,7 @@ export const DialogWorkEmailFooter: FC = () => {
       const { header, message, variant } = error as HttpError;
       SDRToast({ message, header, variant });
     }
-  });
+  }, [param]);
 
   return (
     <Stack
@@ -171,29 +183,48 @@ export const DialogWorkEmailFooter: FC = () => {
       px={3}
       py={1.5}
     >
-      <CostCoins
-        border={'1px solid #D0CEDA'}
-        count={`${COINS_PER_ROW}`}
-        textColor={'text.secondary'}
-      />
-      <StyledButton
-        disabled={!tableId}
-        endIcon={
-          <Icon
-            component={ICON_ARROW}
-            sx={{ width: 12, height: 12, '& path': { fill: '#fff' } }}
+      {displayType === DisplayTypeEnum.integration ? (
+        <StyledButton
+          onClick={() => {
+            setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
+            setDisplayType(DisplayTypeEnum.main);
+          }}
+          sx={{ height: '40px !important' }}
+          variant={'contained'}
+        >
+          Save waterfall step
+        </StyledButton>
+      ) : (
+        <>
+          <CostCoins
+            border={'1px solid #D0CEDA'}
+            count={`${COINS_PER_ROW}`}
+            textColor={'text.secondary'}
           />
-        }
-        loading={state.loading}
-        onClick={(e) => {
-          setAnchorEl(e.currentTarget);
-        }}
-        size={'medium'}
-        sx={{ height: '40px !important', width: 80 }}
-        variant={'contained'}
-      >
-        Save
-      </StyledButton>
+          <StyledButton
+            disabled={!tableId || isMissingConfig}
+            endIcon={
+              <Icon
+                component={ICON_ARROW}
+                sx={{
+                  width: 12,
+                  height: 12,
+                  '& path': { fill: 'currentColor' },
+                }}
+              />
+            }
+            loading={state.loading}
+            onClick={(e) => {
+              setAnchorEl(e.currentTarget);
+            }}
+            size={'medium'}
+            sx={{ height: '40px !important', width: 80 }}
+            variant={'contained'}
+          >
+            Save
+          </StyledButton>
+        </>
+      )}
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}

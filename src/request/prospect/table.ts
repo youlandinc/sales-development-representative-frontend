@@ -1,4 +1,5 @@
 import { del, get, patch, post } from '@/request/request';
+import { ColumnFieldGroupMap } from '@/types';
 import {
   TableCellProps,
   TableColumnProps,
@@ -12,6 +13,7 @@ export const _fetchTable = (tableId: string) => {
     runRecords: {
       [key: string]: { recordIds: string[]; isAll: boolean };
     };
+    fieldGroupMap: ColumnFieldGroupMap;
   }>(`/sdr/prospect/table/${tableId}`);
 };
 

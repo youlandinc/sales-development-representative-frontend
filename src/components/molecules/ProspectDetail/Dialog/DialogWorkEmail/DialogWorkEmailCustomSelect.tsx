@@ -20,6 +20,12 @@ export const DialogWorkEmailCustomSelect: FC<
 > = ({ title, onChange, value }) => {
   const { columns } = useProspectTableStore((store) => store);
 
+  const options = columns.map((item) => ({
+    label: item.fieldName,
+    value: item.fieldId,
+    key: item.fieldId,
+  })) as TOption[];
+
   return (
     <Stack gap={1.5}>
       {title && (
@@ -32,13 +38,7 @@ export const DialogWorkEmailCustomSelect: FC<
         getOptionLabel={(option) => option.label}
         isOptionEqualToValue={(option, value) => option.value === value.value}
         onChange={onChange}
-        options={
-          columns.map((item) => ({
-            label: item.fieldName,
-            value: item.fieldId,
-            key: item.fieldId,
-          })) as TOption[]
-        }
+        options={options}
         renderInput={(params) => {
           return (
             <TextField
@@ -69,9 +69,6 @@ export const DialogWorkEmailCustomSelect: FC<
               gap={1}
               key={key}
               {...optionProps}
-              sx={{
-                '&:hover': { bgcolor: '#F7F4FD !important' },
-              }}
             >
               <Icon component={ICON_TEXT} sx={{ width: 16, height: 16 }} />
               {option.label}

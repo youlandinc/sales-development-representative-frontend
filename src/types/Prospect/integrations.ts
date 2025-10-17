@@ -38,3 +38,14 @@ export enum DisplayTypeEnum {
   main = 'main',
   integration = 'integration',
 }
+
+export enum IntegrationSaveTypeEnum {
+  work_email = 'Work Email',
+  phone_number = 'Phone Number',
+}
+
+export enum MathIntegrationTypeEnum {
+  work_email = 'find-work-email',
+  personal_email = 'find-personal-email',
+  phone_number = 'find-phone-number',
+}

@@ -1,31 +1,26 @@
-import { SyntheticEvent, useState } from 'react';
 import {
   ActiveTypeEnum,
   useProspectTableStore,
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/Prospect';
-import { useDialogStore } from '@/stores/useDialogStore';
+import { SyntheticEvent, useState } from 'react';
 
 import ICON_SUGGESTIONS from '../../../assets/dialog/headerActions/icon_suggestions.svg';
-import ICON_WORK_EMAIL from '../../../assets/dialog/headerActions/icon_suggestions_work_email.svg';
 import ICON_PHONE_NUMBER from '../../../assets/dialog/headerActions/icon_suggestions_phone_number.svg';
+import ICON_WORK_EMAIL from '../../../assets/dialog/headerActions/icon_suggestions_work_email.svg';
 import ICON_AI from '../../../assets/dialog/icon_sparkle_blue.svg';
-import { CostCoins } from '../../DialogWebResearch';
+import { IntegrationActionType } from '@/types/Prospect';
 
 export const useDialogHeaderActionsHook = () => {
-  const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
-    (store) => store,
-  );
+  const { closeDialog } = useProspectTableStore((store) => store);
   const {
-    openProcess,
-    setCampaignType,
-    setEnrichmentTableDisabled,
-    setLeadsVisible,
-  } = useDialogStore();
-  const { setWorkEmailVisible, fetchIntegrations } = useWorkEmailStore(
-    (state) => state,
-  );
+    setWorkEmailVisible,
+    fetchIntegrations,
+    setDialogHeaderName,
+    setWaterfallDescription,
+    setIntegrationActionType,
+  } = useWorkEmailStore((state) => state);
 
   const { setWebResearchVisible } = useWebResearchStore((state) => state);
 
@@ -55,18 +50,32 @@ export const useDialogHeaderActionsHook = () => {
       onClick: () => {
         handleClose();
         setWorkEmailVisible(true);
+        setDialogHeaderName('Work Email');
+        setIntegrationActionType(IntegrationActionType.work_email);
+        setWaterfallDescription(
+          "Find a person's work email, this waterfall is optimized for companies below 5,000 employees.",
+        );
         fetchIntegrations();
       },
     },
-    {
-      icon: ICON_WORK_EMAIL,
-      title: 'Personal Email',
-      onClick: () => {},
-    },
+    // {
+    //   icon: ICON_WORK_EMAIL,
+    //   title: 'Personal Email',
+    //   onClick: () => {},
+    // },
     {
       icon: ICON_PHONE_NUMBER,
       title: 'Phone Number',
-      onClick: () => {},
+      onClick: () => {
+        handleClose();
+        setWorkEmailVisible(true);
+        setDialogHeaderName('Phone Number');
+        setIntegrationActionType(IntegrationActionType.phone_number);
+        setWaterfallDescription(
+          "Need a person's mobile phone number in the US or Canada? The system keeps searching through different sources until it finds the right one for you.",
+        );
+        fetchIntegrations();
+      },
     },
   ];
 
