@@ -8,8 +8,8 @@ import {
 } from './index';
 import { useComputedInWorkEmailStore } from './hooks';
 
-import ICON_SUCCESS from '../../assets/dialog/icon_success.svg';
-import ICON_VALIDATE from '../../assets/dialog/dialogWorkEmail/icon_validate_false.svg';
+import ICON_SUCCESS from '@/components/molecules/ProspectDetail/assets/dialog/icon_success.svg';
+import ICON_VALIDATE from '@/components/molecules/ProspectDetail/assets/dialog/dialogWorkEmail/icon_validate_false.svg';
 
 export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
   title = 'Inputs',

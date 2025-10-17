@@ -43,6 +43,10 @@ export const DialogWorkEmail = () => {
 
   useEffect(() => {
     setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
+    return () => {
+      setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
+      setWorkEmailVisible(false);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

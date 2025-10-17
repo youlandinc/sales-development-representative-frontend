@@ -39,13 +39,23 @@ export enum DisplayTypeEnum {
   integration = 'integration',
 }
 
-export enum IntegrationSaveTypeEnum {
-  work_email = 'Work Email',
-  phone_number = 'Phone Number',
-}
-
 export enum MathIntegrationTypeEnum {
   work_email = 'find-work-email',
   personal_email = 'find-personal-email',
   phone_number = 'find-phone-number',
+}
+
+export interface WaterfallConfigsRequestParam
+  extends Omit<IntegrationAction, 'inputParams'> {
+  inputParameters: { name: string; formulaText: string }[];
+}
+
+export interface CreateWaterfallConfigRequestParam {
+  waterfallFieldName: string;
+  waterfallGroupName: string;
+  waterfallConfigs: WaterfallConfigsRequestParam[];
+}
+
+export enum ActionsChildrenTypeEnum {
+  integration = 'integration',
 }

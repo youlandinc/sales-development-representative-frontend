@@ -27,11 +27,11 @@ import { useComputedInWorkEmailStore } from './hooks';
 
 import { DisplayTypeEnum, IntegrationAction } from '@/types/Prospect';
 
-import ICON_DELETE from '../../assets/dialog/Icon_delete_default.svg';
-import ICON_VALIDATE from '../../assets/dialog/dialogWorkEmail/icon_validate_false.svg';
-import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
-import ICON_DRAG from '../../assets/dialog/icon_drag.svg';
-import ICON_PLUS from '../../assets/dialog/icon_plus.svg';
+import ICON_DELETE from '@/components/molecules/ProspectDetail/assets/dialog/Icon_delete_default.svg';
+import ICON_VALIDATE from '@/components/molecules/ProspectDetail/assets/dialog/dialogWorkEmail/icon_validate_false.svg';
+import ICON_ARROW from '@/components/molecules/ProspectDetail/assets/dialog/icon_arrow_down.svg';
+import ICON_DRAG from '@/components/molecules/ProspectDetail/assets/dialog/icon_drag.svg';
+import ICON_PLUS from '@/components/molecules/ProspectDetail/assets/dialog/icon_plus.svg';
 
 interface DragItemProps {
   id: string;

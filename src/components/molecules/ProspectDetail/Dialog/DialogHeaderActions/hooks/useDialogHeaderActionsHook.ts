@@ -6,19 +6,27 @@ import {
 } from '@/stores/Prospect';
 import { SyntheticEvent, useState } from 'react';
 
-import ICON_SUGGESTIONS from '../../../assets/dialog/headerActions/icon_suggestions.svg';
-import ICON_PHONE_NUMBER from '../../../assets/dialog/headerActions/icon_suggestions_phone_number.svg';
-import ICON_WORK_EMAIL from '../../../assets/dialog/headerActions/icon_suggestions_work_email.svg';
-import ICON_AI from '../../../assets/dialog/icon_sparkle_blue.svg';
-import { IntegrationActionType } from '@/types/Prospect';
+import {
+  ActionsChildrenTypeEnum,
+  IntegrationActionType,
+} from '@/types/Prospect';
+
+import ICON_SUGGESTIONS from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_suggestions.svg';
+import ICON_PHONE_NUMBER from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_suggestions_phone_number.svg';
+import ICON_WORK_EMAIL from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_suggestions_work_email.svg';
+import ICON_AI from '@/components/molecules/ProspectDetail/assets/dialog/icon_sparkle_blue.svg';
+
+import ICON_INTEGRATION_WORK_EMAIL from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_integration_work_email.svg';
+import ICON_INTEGRATION_PERSONAL_EMAIL from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_integration_personal_email.svg';
+import ICON_INTEGRATION_PHONE_NUMBER from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_integration_phone_number.svg';
 
 export const useDialogHeaderActionsHook = () => {
   const { closeDialog } = useProspectTableStore((store) => store);
   const {
     setWorkEmailVisible,
     fetchIntegrations,
-    setDialogHeaderName,
-    setWaterfallDescription,
+    // setDialogHeaderName,
+    // setWaterfallDescription,
     setIntegrationActionType,
   } = useWorkEmailStore((state) => state);
 
@@ -50,32 +58,47 @@ export const useDialogHeaderActionsHook = () => {
       onClick: () => {
         handleClose();
         setWorkEmailVisible(true);
-        setDialogHeaderName('Work Email');
+        //TODO
+        // setDialogHeaderName('Work Email');
         setIntegrationActionType(IntegrationActionType.work_email);
-        setWaterfallDescription(
-          "Find a person's work email, this waterfall is optimized for companies below 5,000 employees.",
-        );
         fetchIntegrations();
       },
+      type: ActionsChildrenTypeEnum.integration,
+      cost: 4,
+      integrationCost: 2,
+      integrationIcon: ICON_INTEGRATION_WORK_EMAIL,
     },
-    // {
-    //   icon: ICON_WORK_EMAIL,
-    //   title: 'Personal Email',
-    //   onClick: () => {},
-    // },
+    {
+      icon: ICON_WORK_EMAIL,
+      title: 'Personal Email',
+      onClick: () => {
+        handleClose();
+        setWorkEmailVisible(true);
+        //TODO
+        // setDialogHeaderName('Work Email');
+        setIntegrationActionType(IntegrationActionType.personal_email);
+        fetchIntegrations();
+      },
+      type: ActionsChildrenTypeEnum.integration,
+      cost: 4,
+      integrationCost: 2,
+      integrationIcon: ICON_INTEGRATION_PERSONAL_EMAIL,
+    },
     {
       icon: ICON_PHONE_NUMBER,
       title: 'Phone Number',
       onClick: () => {
         handleClose();
         setWorkEmailVisible(true);
-        setDialogHeaderName('Phone Number');
+        //TODO
+        // setDialogHeaderName('Phone Number');
         setIntegrationActionType(IntegrationActionType.phone_number);
-        setWaterfallDescription(
-          "Need a person's mobile phone number in the US or Canada? The system keeps searching through different sources until it finds the right one for you.",
-        );
         fetchIntegrations();
       },
+      type: ActionsChildrenTypeEnum.integration,
+      cost: 4,
+      integrationCost: 2,
+      integrationIcon: ICON_INTEGRATION_PHONE_NUMBER,
     },
   ];
 
