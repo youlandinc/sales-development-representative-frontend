@@ -3,8 +3,8 @@ import { Icon, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { FC } from 'react';
 
-import { StyledDialog } from '@/components/atoms';
-import { CostCoins, DialogHeader } from '@/components/molecules';
+import { StyledCost, StyledDialog } from '@/components/atoms';
+import { DialogHeader } from '@/components/molecules';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
 
@@ -77,7 +77,7 @@ export const DialogAllIntegrations: FC = () => {
                   />
                   <Typography variant={'body3'}>{item.name}</Typography>
                 </Stack>
-                <CostCoins
+                <StyledCost
                   border={'1px solid #D0CEDA'}
                   count={'4'}
                   textColor={'text.secondary'}

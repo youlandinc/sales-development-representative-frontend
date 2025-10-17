@@ -10,7 +10,7 @@ import { FC, ReactNode } from 'react';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
-import ICON_TEXT from '../../assets/dialog/icon_text.svg';
+import ICON_TEXT from '@/components/molecules/ProspectDetail/assets/dialog/icon_text.svg';
 
 export const DialogWorkEmailCustomSelect: FC<
   { title?: string | ReactNode } & Pick<

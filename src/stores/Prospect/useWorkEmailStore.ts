@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import { SDRToast } from '@/components/atoms';
 
-import { _fetchAllActionsList } from '@/request/enrichments/suggestions';
+import { _fetchAllActionsList } from '@/request/enrichments/integrations';
 
 import { HttpError } from '@/types';
 import {

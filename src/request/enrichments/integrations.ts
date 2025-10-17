@@ -1,5 +1,9 @@
 import { get, post } from '../request';
-import { IntegrationAction, IntegrationActionType } from '@/types/Prospect';
+import {
+  CreateWaterfallConfigRequestParam,
+  IntegrationAction,
+  IntegrationActionType,
+} from '@/types/Prospect';
 
 export const _fetchAllActionsList = (actionType: IntegrationActionType) => {
   return get<IntegrationAction[]>(`/sdr/action/integration/${actionType}`);
@@ -7,7 +11,7 @@ export const _fetchAllActionsList = (actionType: IntegrationActionType) => {
 
 export const _createIntegrationConfig = (
   tableId: string,
-  param: Record<string, any>,
+  param: CreateWaterfallConfigRequestParam,
 ) => {
   return post<string>(`/sdr/waterfall/table/${tableId}`, param);
 };

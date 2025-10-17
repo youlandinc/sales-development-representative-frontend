@@ -3,7 +3,7 @@ import { FC, PropsWithChildren, ReactNode } from 'react';
 
 import { useSwitch } from '@/hooks';
 
-import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+import ICON_ARROW from '@/components/molecules/ProspectDetail/assets/dialog/icon_arrow_down.svg';
 
 export const DialogWorkEmailCollapseCard: FC<
   PropsWithChildren & { title: string | ReactNode }

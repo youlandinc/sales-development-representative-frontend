@@ -2,18 +2,17 @@ import { Icon, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { StyledSelect } from '@/components/atoms';
+import { DialogHeader } from '../Common';
 import {
   DialogWorkEmailCollapseCard,
   DialogWorkEmailIntegrationColumnMapping,
-  DialogWorkEmailQuickSetupInputs,
 } from './index';
-import { DialogHeader } from '../Common';
 
 import { DisplayTypeEnum } from '@/types/Prospect';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
 
-import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
+import ICON_ARROW from '@/components/molecules/ProspectDetail/assets/dialog/icon_arrow_down.svg';
 
 export const DialogWorkEmailIntegrationAccount = () => {
   const { selectedIntegrationToConfig, setDisplayType, setWorkEmailVisible } =

@@ -1,4 +1,3 @@
-import { ElementType, FC, ReactNode } from 'react';
 import {
   Collapse,
   Icon,
@@ -7,17 +6,26 @@ import {
   SxProps,
   Typography,
 } from '@mui/material';
+import { ElementType, FC, ReactNode } from 'react';
 
 import { useSwitch } from '@/hooks';
 
-import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
-import { CostCoins } from '../DialogWebResearch';
+import { StyledCost } from '@/components/atoms';
+import { StyledIntegrationCost } from './StyledIntegrationCost';
+
+import { ActionsChildrenTypeEnum } from '@/types';
+
+import ICON_ARROW from '@/components/molecules/ProspectDetail/assets/dialog/icon_arrow_down.svg';
 
 type HeaderMenuItemProps = {
   icon?: ElementType;
   title: string;
   titleSx?: SxProps;
   slot?: ReactNode;
+  type?: ActionsChildrenTypeEnum;
+  integrationCost?: number;
+  integrationIcon?: ElementType;
+  cost?: number;
 } & Omit<StackProps, 'slot' | 'children'>;
 
 type DialogHeaderActionsMenus = HeaderMenuItemProps & {
@@ -100,11 +108,19 @@ export const DialogHeaderActionsMenus: FC<DialogHeaderActionsMenus> = ({
                 key={index}
                 onClick={item?.onClick}
                 slot={
-                  <CostCoins
-                    border={'1px solid #D0CEDA'}
-                    borderRadius={1}
-                    count={'0.5'}
-                  />
+                  item?.type === 'integration' ? (
+                    <StyledIntegrationCost
+                      cost={item?.cost || 0}
+                      integrationCost={item?.integrationCost || 0}
+                      integrationIcon={item?.integrationIcon}
+                    />
+                  ) : (
+                    <StyledCost
+                      border={'1px solid #D0CEDA'}
+                      borderRadius={1}
+                      count={'0.5'}
+                    />
+                  )
                 }
                 sx={{
                   px: 1.5,

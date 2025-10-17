@@ -9,25 +9,12 @@ import { DialogHeader } from '../Common';
 import {
   DialogWorkEmailFullConfiguration,
   DialogWorkEmailQuickSetup,
+  HEADER_NAME,
+  WATERFALL_DESCRIPTION,
 } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
-import {
-  IntegrationActionType,
-  WaterfallConfigTypeEnum,
-} from '@/types/Prospect';
-
-const WATERFALL_DESCRIPTION: Record<string, string> = {
-  [IntegrationActionType.work_email]:
-    "Find a person's work email, this waterfall is optimized for companies below 5,000 employees.",
-  [IntegrationActionType.phone_number]:
-    "Need a person's mobile phone number in the US or Canada? The system keeps searching through different sources until it finds the right one for you.",
-};
-
-const HEADER_NAME: Record<string, string> = {
-  [IntegrationActionType.work_email]: 'Work Email',
-  [IntegrationActionType.phone_number]: 'Phone Number',
-};
+import { WaterfallConfigTypeEnum } from '@/types/Prospect';
 
 export const DialogWorkEmailMain = () => {
   const {

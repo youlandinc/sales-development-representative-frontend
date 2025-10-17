@@ -7,16 +7,12 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import { SyntheticEvent, useMemo, useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 
-import { StyledDialog } from '@/components/atoms';
-import { CostCoins, TableColumnMenuEnum } from '@/components/molecules';
+import { StyledCost, StyledDialog } from '@/components/atoms';
+import { TableColumnMenuEnum } from '@/components/molecules';
 import { useSwitch } from '@/hooks';
-import {
-  ActiveTypeEnum,
-  useProspectTableStore,
-  useWebResearchStore,
-} from '@/stores/Prospect';
+import { useProspectTableStore } from '@/stores/Prospect';
 import { useDialogStore } from '@/stores/useDialogStore';
 import { ProcessCreateTypeEnum } from '@/types';
 import CloseIcon from '@mui/icons-material/Close';
@@ -36,8 +32,6 @@ export const DialogHeaderActions = () => {
     setLeadsVisible,
   } = useDialogStore();
 
-  const { setWebResearchVisible } = useWebResearchStore((state) => state);
-
   const { ENRICHMENTS_SUGGESTION_MENUS, ENRICHMENTS_AI_MENUS } =
     useDialogHeaderActionsHook();
 
@@ -49,7 +43,6 @@ export const DialogHeaderActions = () => {
     setValue(value);
   };
 
-  const { visible, toggle } = useSwitch(true);
   const { visible: campaignVisible, toggle: campaignToggle } = useSwitch(true);
 
   const handleClose = () => {
@@ -64,17 +57,6 @@ export const DialogHeaderActions = () => {
     setEnrichmentTableDisabled(true);
     setLeadsVisible(true);
   };
-
-  const handleEnrichmentClick = () => {
-    handleClose();
-    setWebResearchVisible(true, ActiveTypeEnum.add);
-  };
-
-  const computedContent = useMemo(() => {
-    if (value === 'Enrichments') {
-      return <Stack gap={1.5}></Stack>;
-    }
-  }, [value, visible, campaignVisible]);
 
   return (
     <StyledDialog
@@ -178,7 +160,7 @@ export const DialogHeaderActions = () => {
                     }}
                   >
                     <Typography variant={'body2'}>Email campaign</Typography>
-                    <CostCoins
+                    <StyledCost
                       border={'1px solid #D0CEDA'}
                       borderRadius={1}
                       count={'0.5'}
