@@ -2,6 +2,8 @@ import { create } from 'zustand';
 
 import { SDRToast } from '@/components/atoms';
 
+import { useProspectTableStore } from '@/stores/Prospect';
+
 import { _fetchAllActionsList } from '@/request/enrichments/integrations';
 
 import { HttpError } from '@/types';
@@ -167,6 +169,19 @@ export const useWorkEmailStore = create<
           allIntegrations: res.data.map((i) => ({
             ...i,
             skipped: false,
+            inputParams: i.inputParams.map((p) => {
+              const column = useProspectTableStore
+                .getState()
+                .columns.find((c) => c.semanticType === p.semanticType);
+              return {
+                ...p,
+                selectedOption: {
+                  label: column?.fieldName || '',
+                  value: column?.fieldId || '',
+                  key: column?.fieldId || '',
+                },
+              };
+            }),
           })),
         });
       }

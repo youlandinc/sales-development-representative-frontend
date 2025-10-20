@@ -45,6 +45,7 @@ export const DialogWorkEmailIntegrationColumnMapping: FC = () => {
               });
               setAllIntegrations(updatedIntegrations);
             }}
+            required={i.isRequired}
             title={i.displayName}
             value={i.selectedOption}
           />

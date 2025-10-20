@@ -10,13 +10,14 @@ import { useComputedInWorkEmailStore } from './hooks';
 
 import ICON_SUCCESS from '@/components/molecules/ProspectDetail/assets/dialog/icon_success.svg';
 import ICON_VALIDATE from '@/components/molecules/ProspectDetail/assets/dialog/dialogWorkEmail/icon_validate_false.svg';
+import { useWorkEmailStore } from '@/stores/Prospect';
 
 export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
   title = 'Inputs',
 }) => {
   const { waterfallAllInputs, integrationsInWaterfall, isMissingConfig } =
     useComputedInWorkEmailStore();
-
+  const { setAllIntegrations } = useWorkEmailStore();
   const hasConfigCount = integrationsInWaterfall.filter((item) =>
     item.inputParams.every((p) => !!p.selectedOption),
   ).length;
@@ -68,7 +69,34 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
             )}
         </Stack>
         {waterfallAllInputs.map((input, key) => (
-          <DialogWorkEmailCustomSelect key={key} title={input.displayName} />
+          <DialogWorkEmailCustomSelect
+            key={key}
+            onChange={(_, newValue) => {
+              const updatedIntegrations = integrationsInWaterfall.map(
+                (item) => {
+                  if (item.actionKey === input.actionKey) {
+                    return {
+                      ...item,
+                      inputParams: item.inputParams.map((p) => {
+                        if (p.columnName === input.columnName) {
+                          return {
+                            ...p,
+                            selectedOption: newValue,
+                          };
+                        }
+                        return p;
+                      }),
+                    };
+                  }
+                  return item;
+                },
+              );
+              setAllIntegrations(updatedIntegrations);
+            }}
+            required={input.isRequired}
+            title={input.displayName}
+            value={input.selectedOption}
+          />
         ))}
       </Stack>
     </DialogWorkEmailCollapseCard>
