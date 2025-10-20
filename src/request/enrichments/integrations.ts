@@ -1,4 +1,4 @@
-import { get, post } from '../request';
+import { get, post, put } from '../request';
 import {
   CreateWaterfallConfigRequestParam,
   IntegrationAction,
@@ -14,4 +14,11 @@ export const _createIntegrationConfig = (
   param: CreateWaterfallConfigRequestParam,
 ) => {
   return post<string>(`/sdr/waterfall/table/${tableId}`, param);
+};
+
+export const _editIntegrationConfig = (
+  groupId: string,
+  param: CreateWaterfallConfigRequestParam,
+) => {
+  return put(`/sdr/waterfall/table/${groupId}`, param);
 };

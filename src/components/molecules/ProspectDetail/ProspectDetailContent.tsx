@@ -61,9 +61,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     setPrompt,
     setGenerateDescription,
   } = useWebResearchStore((store) => store);
-  const { setWorkEmailVisible, fetchIntegrations } = useWorkEmailStore(
-    (store) => store,
-  );
+  const {
+    setWorkEmailVisible,
+    fetchIntegrations,
+    setActiveType,
+    setEditConfigParams,
+  } = useWorkEmailStore((store) => store);
   const { matchActionKeyToIntegration } = useComputedInWorkEmailStore();
   const { messages, connected } = useWebSocket();
 
@@ -534,6 +537,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                     column.groupId
                   ]?.waterfallConfigs?.map((i) => ({
                     actionKey: i.actionKey,
+                    skipped: i.skipped,
                     inputParams: i.inputParameters.map((p) => {
                       const field = columns.find(
                         (col) => col.fieldId === p.formulaText,
@@ -550,9 +554,14 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                   }));
                   if (column.actionKey) {
                     matchActionKeyToIntegration(column.actionKey);
+                    setActiveType(ActiveTypeEnum.edit);
+                    setEditConfigParams({
+                      groupId: column.groupId,
+                      waterfallConfigs: waterfallConfig,
+                    });
+                    fetchIntegrations();
+                    setWorkEmailVisible(true);
                   }
-                  fetchIntegrations(waterfallConfig);
-                  setWorkEmailVisible(true);
                 }
                 //use ai
                 if (!column || column.actionKey !== 'use-ai') {

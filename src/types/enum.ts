@@ -57,3 +57,8 @@ export enum WebSocketTypeEnum {
   // csv
   progress = 'PROGRESS',
 }
+
+export enum ActiveTypeEnum {
+  add = 'add',
+  edit = 'edit',
+}

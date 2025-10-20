@@ -45,15 +45,20 @@ export enum MathIntegrationTypeEnum {
   phone_number = 'find-phone-number',
 }
 
+interface IInputParameters {
+  name: string;
+  formulaText: string;
+}
+
 export interface WaterfallConfigsRequestParam
   extends Omit<IntegrationAction, 'inputParams'> {
-  inputParameters: { name: string; formulaText: string }[];
+  inputParameters: IInputParameters[];
 }
 
 export interface CreateWaterfallConfigRequestParam {
   waterfallFieldName: string;
   waterfallGroupName: string;
-  requiredInputsBinding: { name: string; formulaText: string }[];
+  requiredInputsBinding: IInputParameters[];
   waterfallConfigs: WaterfallConfigsRequestParam[];
 }
 

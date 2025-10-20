@@ -15,7 +15,7 @@ import { COINS_PER_ROW } from '@/constant';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 import { useWorkEmailStore } from '@/stores/Prospect/useWorkEmailStore';
-import { useComputedInWorkEmailStore } from './hooks';
+import { useComputedInWorkEmailStore, useWorkEmailRequest } from './hooks';
 
 import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/Prospect';
 
@@ -26,8 +26,7 @@ export const DialogWorkEmailFooter: FC = () => {
   const { isMissingConfig } = useComputedInWorkEmailStore();
   const { setWaterfallConfigType, setDisplayType, displayType } =
     useWorkEmailStore((store) => store);
-  const { saveOrRunIntegration, saveOrRunIntegrationState } =
-    useComputedInWorkEmailStore();
+  const { requestState } = useWorkEmailRequest();
   const params = useParams();
   const tableId =
     typeof params.tableId === 'string' && params.tableId.trim() !== ''
@@ -77,7 +76,7 @@ export const DialogWorkEmailFooter: FC = () => {
                 }}
               />
             }
-            loading={saveOrRunIntegrationState.loading}
+            loading={requestState?.state?.loading}
             onClick={(e) => {
               setAnchorEl(e.currentTarget);
             }}
@@ -112,7 +111,7 @@ export const DialogWorkEmailFooter: FC = () => {
           <MenuItem
             onClick={() => {
               setAnchorEl(null);
-              saveOrRunIntegration(tableId, 10);
+              requestState?.request?.(tableId, 10);
             }}
           >
             <Typography color={'text.secondary'} variant={'body2'}>
@@ -124,7 +123,7 @@ export const DialogWorkEmailFooter: FC = () => {
         <MenuItem
           onClick={() => {
             setAnchorEl(null);
-            saveOrRunIntegration(tableId, rowIds.length);
+            requestState?.request?.(tableId, rowIds.length);
           }}
         >
           <Typography color={'text.secondary'} variant={'body2'}>
@@ -135,7 +134,7 @@ export const DialogWorkEmailFooter: FC = () => {
         <MenuItem
           onClick={async () => {
             setAnchorEl(null);
-            saveOrRunIntegration(tableId, rowIds.length, false);
+            requestState?.request?.(tableId, rowIds.length, false);
           }}
         >
           <Typography color={'text.secondary'} variant={'body2'}>

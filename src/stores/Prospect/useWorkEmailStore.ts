@@ -6,7 +6,8 @@ import { useProspectTableStore } from '@/stores/Prospect';
 
 import { _fetchAllActionsList } from '@/request/enrichments/integrations';
 
-import { HttpError } from '@/types';
+import { ActiveTypeEnum, HttpError } from '@/types';
+
 import {
   DisplayTypeEnum,
   IntegrationAction,
@@ -14,7 +15,22 @@ import {
   WaterfallConfigTypeEnum,
 } from '@/types/Prospect';
 
+interface EditWaterfallConfig
+  extends Pick<IntegrationAction, 'actionKey' | 'skipped'> {
+  inputParams: {
+    name: string;
+    selectedOption: TOption;
+  }[];
+}
+
+interface EditConfigParams {
+  groupId: string;
+  waterfallConfigs: EditWaterfallConfig[];
+}
+
 type WorkEmailStoreProps = {
+  activeType: ActiveTypeEnum;
+  editConfigParams: EditConfigParams | null;
   dialogHeaderName: string;
   integrationActionType: IntegrationActionType;
   waterfallDescription: string;
@@ -29,6 +45,7 @@ type WorkEmailStoreProps = {
 };
 
 type WorkEmailStoreActions = {
+  setActiveType: (type: ActiveTypeEnum) => void;
   setWorkEmailVisible: (open: boolean) => void;
   setIntegrationActionType: (type: IntegrationActionType) => void;
   setDialogIntegrationsVisible: (open: boolean) => void;
@@ -42,19 +59,15 @@ type WorkEmailStoreActions = {
   setAllIntegrations: (integrations: IntegrationAction[]) => void;
   setWaterfallConfigType: (type: WaterfallConfigTypeEnum) => void;
   setIsValidatedInputParams: (isValidated: boolean) => void;
-  fetchIntegrations: (
-    editParam?: (Pick<IntegrationAction, 'actionKey'> & {
-      inputParams: {
-        name: string;
-        selectedOption: TOption;
-      }[];
-    })[],
-  ) => Promise<void>;
+  setEditConfigParams: (params: EditConfigParams | null) => void;
+  fetchIntegrations: () => Promise<void>;
 };
 
 export const useWorkEmailStore = create<
   WorkEmailStoreProps & WorkEmailStoreActions
 >((set, get) => ({
+  activeType: ActiveTypeEnum.add,
+  editConfigParams: null,
   dialogHeaderName: '',
   integrationActionType: IntegrationActionType.work_email,
   waterfallDescription: '',
@@ -69,6 +82,11 @@ export const useWorkEmailStore = create<
   setAllIntegrations: (integrations: IntegrationAction[]) => {
     set({
       allIntegrations: integrations,
+    });
+  },
+  setActiveType: (type: ActiveTypeEnum) => {
+    set({
+      activeType: type,
     });
   },
   setWorkEmailVisible: (open: boolean) => {
@@ -111,6 +129,11 @@ export const useWorkEmailStore = create<
       dialogHeaderName: name,
     });
   },
+  setEditConfigParams: (params: EditConfigParams | null) => {
+    set({
+      editConfigParams: params,
+    });
+  },
   setWaterfallDescription: (description: string) => {
     set({
       waterfallDescription: description,
@@ -121,14 +144,7 @@ export const useWorkEmailStore = create<
       integrationActionType: type,
     });
   },
-  fetchIntegrations: async (
-    editParam?: (Pick<IntegrationAction, 'actionKey'> & {
-      inputParams: {
-        name: string;
-        selectedOption: TOption;
-      }[];
-    })[],
-  ) => {
+  fetchIntegrations: async () => {
     // reset integrations
     set({
       allIntegrations: [],
@@ -137,10 +153,11 @@ export const useWorkEmailStore = create<
     try {
       const res = await _fetchAllActionsList(get().integrationActionType);
       if (Array.isArray(res.data)) {
-        if (editParam) {
+        if (get().editConfigParams) {
+          const editParam = get().editConfigParams?.waterfallConfigs;
           set({
             allIntegrations: res.data.map((i) => {
-              const editItem = editParam.find(
+              const editItem = editParam?.find(
                 (item) => item.actionKey === i.actionKey,
               );
               if (editItem) {
@@ -153,13 +170,12 @@ export const useWorkEmailStore = create<
                     ),
                   })),
                   isDefault: true,
-                  skipped: false,
+                  skipped: editItem?.skipped || false,
                 };
               }
               return {
                 ...i,
                 isDefault: false,
-                skipped: false,
               };
             }),
           });
@@ -168,7 +184,6 @@ export const useWorkEmailStore = create<
         set({
           allIntegrations: res.data.map((i) => ({
             ...i,
-            skipped: false,
             inputParams: i.inputParams.map((p) => {
               const column = useProspectTableStore
                 .getState()

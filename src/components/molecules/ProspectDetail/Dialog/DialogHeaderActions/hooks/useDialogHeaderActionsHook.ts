@@ -1,5 +1,4 @@
 import {
-  ActiveTypeEnum,
   useProspectTableStore,
   useWebResearchStore,
   useWorkEmailStore,
@@ -19,6 +18,7 @@ import ICON_AI from '@/components/molecules/ProspectDetail/assets/dialog/icon_sp
 import ICON_INTEGRATION_WORK_EMAIL from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_integration_work_email.svg';
 import ICON_INTEGRATION_PERSONAL_EMAIL from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_integration_personal_email.svg';
 import ICON_INTEGRATION_PHONE_NUMBER from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_integration_phone_number.svg';
+import { ActiveTypeEnum } from '@/types';
 
 export const useDialogHeaderActionsHook = () => {
   const { closeDialog } = useProspectTableStore((store) => store);
@@ -27,7 +27,10 @@ export const useDialogHeaderActionsHook = () => {
     fetchIntegrations,
     // setDialogHeaderName,
     // setWaterfallDescription,
+    setActiveType,
     setIntegrationActionType,
+    editConfigParams,
+    setEditConfigParams,
   } = useWorkEmailStore((state) => state);
 
   const { setWebResearchVisible } = useWebResearchStore((state) => state);
@@ -55,14 +58,7 @@ export const useDialogHeaderActionsHook = () => {
     {
       icon: ICON_WORK_EMAIL,
       title: 'Work Email',
-      onClick: () => {
-        handleClose();
-        setWorkEmailVisible(true);
-        //TODO
-        // setDialogHeaderName('Work Email');
-        setIntegrationActionType(IntegrationActionType.work_email);
-        fetchIntegrations();
-      },
+      key: IntegrationActionType.work_email,
       type: ActionsChildrenTypeEnum.integration,
       cost: 4,
       integrationCost: 2,
@@ -71,14 +67,7 @@ export const useDialogHeaderActionsHook = () => {
     {
       icon: ICON_WORK_EMAIL,
       title: 'Personal Email',
-      onClick: () => {
-        handleClose();
-        setWorkEmailVisible(true);
-        //TODO
-        // setDialogHeaderName('Work Email');
-        setIntegrationActionType(IntegrationActionType.personal_email);
-        fetchIntegrations();
-      },
+      key: IntegrationActionType.personal_email,
       type: ActionsChildrenTypeEnum.integration,
       cost: 4,
       integrationCost: 2,
@@ -87,20 +76,28 @@ export const useDialogHeaderActionsHook = () => {
     {
       icon: ICON_PHONE_NUMBER,
       title: 'Phone Number',
-      onClick: () => {
-        handleClose();
-        setWorkEmailVisible(true);
-        //TODO
-        // setDialogHeaderName('Phone Number');
-        setIntegrationActionType(IntegrationActionType.phone_number);
-        fetchIntegrations();
-      },
+      key: IntegrationActionType.phone_number,
+
       type: ActionsChildrenTypeEnum.integration,
       cost: 4,
       integrationCost: 2,
       integrationIcon: ICON_INTEGRATION_PHONE_NUMBER,
     },
-  ];
+  ].map((item) => ({
+    ...item,
+    onClick: () => {
+      handleClose();
+      setWorkEmailVisible(true);
+      //TODO
+      // setDialogHeaderName('Work Email');
+      if (editConfigParams) {
+        setEditConfigParams(null);
+      }
+      setActiveType(ActiveTypeEnum.add);
+      setIntegrationActionType(item.key);
+      fetchIntegrations();
+    },
+  }));
 
   const ENRICHMENTS_SUGGESTION_MENUS = {
     icon: ICON_SUGGESTIONS,
