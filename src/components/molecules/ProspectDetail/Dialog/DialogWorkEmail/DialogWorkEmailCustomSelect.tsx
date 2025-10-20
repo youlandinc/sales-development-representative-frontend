@@ -13,11 +13,11 @@ import { useProspectTableStore } from '@/stores/Prospect';
 import ICON_TEXT from '@/components/molecules/ProspectDetail/assets/dialog/icon_text.svg';
 
 export const DialogWorkEmailCustomSelect: FC<
-  { title?: string | ReactNode } & Pick<
+  { title?: string | ReactNode; required?: boolean } & Pick<
     AutocompleteProps<TOption, false, false, false>,
     'value' | 'onChange'
   >
-> = ({ title, onChange, value }) => {
+> = ({ title, onChange, value, required }) => {
   const { columns } = useProspectTableStore((store) => store);
 
   const options = columns.map((item) => ({
@@ -29,7 +29,19 @@ export const DialogWorkEmailCustomSelect: FC<
   return (
     <Stack gap={1.5}>
       {title && (
-        <Typography component={'div'} variant={'body3'}>
+        <Typography
+          component={'div'}
+          sx={{
+            '&::after': {
+              content: '"*"',
+              color: 'red',
+              pl: 0.5,
+              visibility: required ? 'visible' : 'hidden',
+              verticalAlign: 'middle',
+            },
+          }}
+          variant={'body3'}
+        >
           {title}
         </Typography>
       )}

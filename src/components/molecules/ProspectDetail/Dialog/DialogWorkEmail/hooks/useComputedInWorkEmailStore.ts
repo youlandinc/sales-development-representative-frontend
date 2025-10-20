@@ -24,9 +24,6 @@ export const useComputedInWorkEmailStore = () => {
   const { runAi } = useRunAi();
   const { fetchTable } = useProspectTableStore();
 
-  //computed info
-  const { columns } = useProspectTableStore((store) => store);
-
   const integrationsInWaterfall = allIntegrations.filter((i) => i.isDefault);
 
   const waterfallAllInputs: (IntegrationActionInputParams & {
@@ -49,12 +46,7 @@ export const useComputedInWorkEmailStore = () => {
           }
         >,
       ),
-  ).map((i) => ({
-    ...i,
-    displayName:
-      columns.find((c) => c.semanticType === i.semanticType)?.fieldName ||
-      'Not found',
-  }));
+  );
 
   const isMissingConfig = integrationsInWaterfall
     .map((item) => item.inputParams)
@@ -82,6 +74,10 @@ export const useComputedInWorkEmailStore = () => {
   const requestParams: CreateWaterfallConfigRequestParam = {
     waterfallFieldName: integrationSaveTypeParam,
     waterfallGroupName: integrationSaveTypeParam,
+    requiredInputsBinding: waterfallAllInputs.map((i) => ({
+      name: i.columnName,
+      formulaText: i.selectedOption?.value || '',
+    })),
     waterfallConfigs: integrationsInWaterfall.map((item) => {
       const { inputParams, ...others } = item;
       return {
@@ -105,11 +101,12 @@ export const useComputedInWorkEmailStore = () => {
         setWorkEmailVisible(false);
 
         if (isRunAi) {
-          runAi({
+          await runAi({
             tableId: tableId,
             recordCount: recordCount,
             fieldIds: fieldIdsWithGroupId,
           });
+          await fetchTable(tableId);
         }
       } catch (error) {
         const { header, message, variant } = error as HttpError;

@@ -53,6 +53,7 @@ export interface WaterfallConfigsRequestParam
 export interface CreateWaterfallConfigRequestParam {
   waterfallFieldName: string;
   waterfallGroupName: string;
+  requiredInputsBinding: { name: string; formulaText: string }[];
   waterfallConfigs: WaterfallConfigsRequestParam[];
 }
 
