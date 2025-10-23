@@ -63,7 +63,7 @@ export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
         );
       },
     },
-    {
+    /*     {
       headerName: 'Contacts',
       field: 'contacts',
       sortable: false,
@@ -75,7 +75,7 @@ export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
           {UFormatNumber(value)}
         </Typography>
       ),
-    },
+    }, */
     {
       headerName: 'Last modified',
       field: 'updatedAt',
