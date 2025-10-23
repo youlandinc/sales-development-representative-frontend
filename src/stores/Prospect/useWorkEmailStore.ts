@@ -190,11 +190,13 @@ export const useWorkEmailStore = create<
                 .columns.find((c) => c.semanticType === p.semanticType);
               return {
                 ...p,
-                selectedOption: {
-                  label: column?.fieldName || '',
-                  value: column?.fieldId || '',
-                  key: column?.fieldId || '',
-                },
+                selectedOption: column?.fieldId
+                  ? {
+                      label: column?.fieldName || '',
+                      value: column?.fieldId || '',
+                      key: column?.fieldId || '',
+                    }
+                  : null,
               };
             }),
           })),

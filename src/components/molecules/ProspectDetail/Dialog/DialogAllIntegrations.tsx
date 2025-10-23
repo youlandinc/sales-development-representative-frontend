@@ -36,10 +36,17 @@ export const DialogAllIntegrations: FC = () => {
                 justifyContent={'space-between'}
                 key={index}
                 onClick={() => {
-                  setAllIntegrations([
-                    ...allIntegrations,
-                    { ...item, isDefault: true },
-                  ]);
+                  setAllIntegrations(
+                    allIntegrations.map((i) => {
+                      if (i.actionKey === item.actionKey) {
+                        return {
+                          ...i,
+                          isDefault: true,
+                        };
+                      }
+                      return i;
+                    }),
+                  );
                   setDisplayType(DisplayTypeEnum.integration);
                   setSelectedIntegrationToConfig(item);
                   setDialogIntegrationsVisible(false);
