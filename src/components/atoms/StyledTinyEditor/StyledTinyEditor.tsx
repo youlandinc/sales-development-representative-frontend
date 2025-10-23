@@ -1,10 +1,15 @@
 'use client';
 
-import { _uploadFile } from '@/request';
-import { Editor } from '@tinymce/tinymce-react';
-import { FC } from 'react';
-import { SDRToast } from '../StyledToast';
 import { Box } from '@mui/material';
+import { Editor } from '@tinymce/tinymce-react';
+import { FC, useEffect, useRef } from 'react';
+
+import { _uploadFile } from '@/request';
+
+import { SDRToast } from '@/components/atoms/StyledToast';
+
+import { useSettingsStore } from '@/stores/useSettingsStore';
+import { TOOLBAR } from './data';
 
 interface StyledTinyEditorProps {
   onChange?: (dialogApi: any, details: any) => void;
@@ -15,20 +20,40 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   onChange,
   initialValue,
 }: StyledTinyEditorProps) => {
-  if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY) {
+  const { signatures, fetchSignatures, fetchSignatureLoading } =
+    useSettingsStore();
+
+  const editorRef = useRef<any>(null);
+
+  useEffect(() => {
+    fetchSignatures();
+  }, [fetchSignatures]);
+
+  if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY || fetchSignatureLoading) {
     return null;
   }
 
   return (
-    <Box sx={{ '& .tox-promotion': { display: 'none' } }}>
+    <Box
+      sx={{
+        '& .tox-promotion': { display: 'none' },
+        '& .tox-tinymce': {
+          borderWidth: '1px !important',
+          borderColor: '#D0CEDA !important',
+        },
+      }}
+    >
       <Editor
         apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
         init={{
           // 添加自定义按钮和菜单
           setup: (editor: any) => {
+            if (signatures.length === 0) {
+              return;
+            }
             // 添加自定义按钮
             editor.ui.registry.addButton('customInsertButton', {
-              text: '自定义插入',
+              text: 'Email signature',
               icon: 'plus',
               onAction: () => {
                 // 点击按钮时打开菜单
@@ -38,35 +63,17 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
 
             // 添加自定义菜单
             editor.ui.registry.addMenuButton('customInsertMenu', {
-              text: '自定义插入',
+              text: 'Email signature',
               icon: 'plus',
               fetch: (callback: any) => {
-                const items = [
-                  {
-                    type: 'menuitem',
-                    text: '插入签名',
-                    onAction: () => {
-                      editor.insertContent(
-                        '<div class="signature">-- 您的签名 --</div>',
-                      );
-                    },
+                const menus = signatures.map((item) => ({
+                  type: 'menuitem',
+                  text: item.name,
+                  onAction: () => {
+                    editor.insertContent(item.content);
                   },
-                  {
-                    type: 'menuitem',
-                    text: '插入模板1',
-                    onAction: () => {
-                      editor.insertContent('<p>这是模板1的内容</p>');
-                    },
-                  },
-                  {
-                    type: 'menuitem',
-                    text: '插入模板2',
-                    onAction: () => {
-                      editor.insertContent('<p>这是模板2的内容</p>');
-                    },
-                  },
-                ];
-                callback(items);
+                }));
+                callback(menus);
               },
             });
           },
@@ -114,7 +121,9 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
             //   'exportpdf',
           ],
           toolbar:
-            'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment| showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat|customInsertMenu',
+            signatures && signatures.length > 0
+              ? TOOLBAR + ' | customInsertMenu'
+              : TOOLBAR,
           // toolbar:
           // 'undo redo | styles | bold italic | link image emoticons | anchor | autolink | charmap | codesample | emoticons | link | lists | media | searchreplace | table | visualblocks | wordcount',
           // toolbar: false,
@@ -145,7 +154,7 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
               if (Array.isArray(response.data)) {
                 return response.data[0].url;
               }
-              return '12323123';
+              return '';
             } catch (err) {
               const { message, header, variant } = err as HttpError;
               SDRToast({
@@ -162,6 +171,9 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
         }}
         initialValue={initialValue}
         onEditorChange={onChange}
+        onInit={(evt, editor) => {
+          editorRef.current = editor; // 保存编辑器实例
+        }}
       />
     </Box>
   );

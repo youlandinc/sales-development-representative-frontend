@@ -211,6 +211,7 @@ export const SettingsEmailSignature = () => {
             /> */}
           </Stack>
         }
+        disablePortal
         footer={
           <Stack flexDirection={'row'} gap={1.5} pt={3}>
             <StyledButton
@@ -235,6 +236,7 @@ export const SettingsEmailSignature = () => {
           </Stack>
         }
         header={'Email signature'}
+        keepMounted
         onClose={handleClose}
         open={visible}
       />
