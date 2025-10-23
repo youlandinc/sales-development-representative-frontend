@@ -29,6 +29,21 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
     fetchSignatures();
   }, [fetchSignatures]);
 
+  useEffect(() => {
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as Element;
+      if (target.closest('.tox-dialog')) {
+        e.stopImmediatePropagation();
+      }
+    };
+    document.addEventListener('focusin', handleFocusIn);
+
+    // Cleanup function to remove the event listener when the component is unmounted
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+    };
+  }, []);
+
   if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY || fetchSignatureLoading) {
     return null;
   }
@@ -46,6 +61,8 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
       <Editor
         apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
         init={{
+          toolbar_mode: 'sliding',
+          ui_mode: 'split',
           // 添加自定义按钮和菜单
           setup: (editor: any) => {
             if (signatures.length === 0) {
@@ -168,6 +185,7 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           images_file_types: 'jpeg,jpg,png,gif,webp',
           // 文件大小限制 (10MB)
           images_max_size: 10485760,
+          menubar: false,
         }}
         initialValue={initialValue}
         onEditorChange={onChange}
