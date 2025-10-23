@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import useSWR from 'swr';
+import dynamic from 'next/dynamic';
 
 import {
   SDRToast,
@@ -27,6 +28,16 @@ import { HttpError } from '@/types';
 import ICON_EDIT from './assets/icon_edit.svg';
 import ICON_DELETE from './assets/icon_delete.svg';
 
+const StyledTinyEditor = dynamic(
+  () =>
+    import('@/components/atoms/StyledTinyEditor').then(
+      (mod) => mod.StyledTinyEditor,
+    ),
+  {
+    ssr: false,
+  },
+);
+
 export const SettingsEmailSignature = () => {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [initEditorContent, setInitEditorContent] = useState<string>('');
@@ -42,6 +53,11 @@ export const SettingsEmailSignature = () => {
     setInitEditorContent('');
     setEditId(undefined);
     setContent('');
+  };
+
+  const handleClose = () => {
+    close();
+    handleClear();
   };
 
   const { isLoading, data, mutate } = useSWR(
@@ -162,7 +178,13 @@ export const SettingsEmailSignature = () => {
               placeholder={'Name'}
               value={name}
             />
-            <InboxEditor
+            <StyledTinyEditor
+              initialValue={initEditorContent}
+              onChange={(content) => {
+                setContent(content);
+              }}
+            />
+            {/* <InboxEditor
               config={{
                 height: '200px',
                 editorplaceholder: 'Autosize height based on content lines',
@@ -186,7 +208,7 @@ export const SettingsEmailSignature = () => {
                 setContent(e.editor?.getData() || '');
               }}
               initData={initEditorContent}
-            />
+            /> */}
           </Stack>
         }
         footer={
@@ -213,7 +235,7 @@ export const SettingsEmailSignature = () => {
           </Stack>
         }
         header={'Email signature'}
-        onClose={close}
+        onClose={handleClose}
         open={visible}
       />
     </Stack>

@@ -1,0 +1,1 @@
+export { StyledTinyEditor } from './StyledTinyEditor';
