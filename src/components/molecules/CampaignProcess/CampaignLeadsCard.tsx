@@ -70,7 +70,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
               {name}
             </Typography>
           </StyledTooltip>
-          <Icon component={ICON_LINKEDIN} sx={{ width: 18, height: 18 }} />
+          {/* <Icon component={ICON_LINKEDIN} sx={{ width: 18, height: 18 }} /> */}
         </Stack>
 
         <StyledTooltip mode={'hover'} title={role}>
@@ -90,7 +90,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
         </StyledTooltip>
       </Stack>
 
-      <StyledTooltip mode={'hover'} title={company}>
+      {/*   <StyledTooltip mode={'hover'} title={company}>
         <Typography
           alignSelf={'center'}
           color={disabled ? 'text.disabled' : 'text.primary'}
@@ -105,7 +105,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
         >
           {company}
         </Typography>
-      </StyledTooltip>
+      </StyledTooltip> */}
     </Stack>
   );
 };

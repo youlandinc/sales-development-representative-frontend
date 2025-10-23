@@ -1,4 +1,3 @@
-import { ChangeEvent, FC, MouseEvent, useMemo, useState } from 'react';
 import {
   debounce,
   Divider,
@@ -9,20 +8,22 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { ChangeEvent, FC, MouseEvent, useMemo, useState } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
-
-import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import { DialogCompanyType } from '@/components/molecules';
+
+import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
+
+import { FindType } from '@/types';
 
 import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
 import ICON_FIND_COMPANIES from './assets/icon_find_companies.svg';
 import ICON_FIND_PEOPLE from './assets/icon_find_people.svg';
 import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
-
-import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
+import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 
 interface ProspectHeaderProps {
   dispatch: any;
@@ -35,24 +36,41 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
   store,
   openDialog,
 }) => {
-  const { setDialogCompanyTypeOpen, setFilters } = useFindCompaniesStore(
-    (store) => store,
-  );
-  const [value, setValue] = useState(store.searchWord);
   const router = useRouter();
+  const {
+    setFindType,
+    setDialogSourceFromOpen,
+    findType,
+    fetchSource,
+    fetchFiltersByType,
+  } = useFindPeopleCompanyStore((store) => store);
+
+  const [value, setValue] = useState(store.searchWord);
 
   const sourceOptions = [
     {
       label: 'Find people',
       icon: ICON_FIND_PEOPLE,
       disabled: false,
-      onClick: () => router.push('/find-people'),
+      onClick: () => {
+        setFindType(FindType.find_people);
+        setDialogSourceFromOpen(true);
+        // if (findType !== FindType.find_people) {
+        fetchSource();
+        // }
+      },
     },
     {
       label: 'Find companies',
       icon: ICON_FIND_COMPANIES,
       disabled: false,
-      onClick: () => setDialogCompanyTypeOpen(true),
+      onClick: () => {
+        setFindType(FindType.find_company);
+        setDialogSourceFromOpen(true);
+        // if (findType !== FindType.find_company) {
+        fetchSource();
+        // }
+      },
     },
     {
       label: 'Import from CSV',
@@ -254,9 +272,14 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
       </Stack>
 
       <DialogCompanyType
-        cb={(type) => {
-          setFilters('companyType', type);
-          router.push('/find-companies');
+        cb={() => {
+          if (findType === FindType.find_company) {
+            router.push('/find-companies');
+          }
+          if (findType === FindType.find_people) {
+            router.push('/find-people');
+          }
+          fetchFiltersByType();
         }}
       />
     </Stack>

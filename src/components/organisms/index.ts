@@ -16,5 +16,5 @@ export * from './ContactsListsPage';
 export * from './ContactsCompaniesPage';
 export * from './ContactsPeoplePage';
 
-export * from './FindPeople';
+export * from './FindPeoplePage';
 export * from './FindCompaniesPage';

@@ -19,3 +19,5 @@ export * from './enrichments';
 export * from './findPeople';
 
 export * from './findCompany';
+
+export * from './findPeopleCompany';

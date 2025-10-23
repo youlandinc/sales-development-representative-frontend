@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { HttpError } from '@/types';
+import { ColumnFieldGroupMap, HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import { TableColumnProps } from '@/types/Prospect/table';
 
@@ -39,6 +39,8 @@ export type ProspectTableState = {
   runRecords: {
     [key: string]: { recordIds: string[]; isAll: boolean };
   } | null;
+
+  fieldGroupMap: ColumnFieldGroupMap | null;
 };
 
 export type ProspectTableActions = {
@@ -46,6 +48,7 @@ export type ProspectTableActions = {
     runRecords: {
       [key: string]: { recordIds: string[]; isAll: boolean };
     } | null;
+    fields: TableColumnProps[];
   }>;
   fetchRowIds: (tableId: string) => Promise<void>;
   setRowIds: (rowIds: string[]) => void;
@@ -83,26 +86,29 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     dialogType: null,
     rowIds: [],
     runRecords: null,
+    fieldGroupMap: null,
     fetchTable: async (tableId) => {
       let result = null;
       if (!tableId) {
-        return { runRecords: result };
+        return { runRecords: result, fields: [] };
       }
 
       try {
         const {
-          data: { fields, tableName, runRecords },
+          data: { fields, tableName, runRecords, fieldGroupMap },
         } = await _fetchTable(tableId);
         result = runRecords;
         set({
           columns: fields,
           tableName,
           runRecords: runRecords ?? null,
+          fieldGroupMap,
         });
+        return { runRecords: result, fields };
       } catch (err) {
         handleApiError<ProspectTableState>(err);
+        return { runRecords: result, fields: [] };
       }
-      return { runRecords: result };
     },
     fetchRowIds: async (tableId) => {
       if (!tableId) {

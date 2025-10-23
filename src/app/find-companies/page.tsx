@@ -2,8 +2,8 @@
 
 export const fetchCache = 'force-no-store';
 
-import { FindCompaniesPage } from '@/components/organisms';
+import { FindPeoplePage } from '@/components/organisms';
 
 export default () => {
-  return <FindCompaniesPage />;
+  return <FindPeoplePage />;
 };

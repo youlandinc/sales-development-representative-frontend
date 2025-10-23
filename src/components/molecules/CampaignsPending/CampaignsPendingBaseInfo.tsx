@@ -35,12 +35,14 @@ export const CampaignsPendingBaseInfo: FC<ICampaignsPendingBaseInfo> = ({
         <Typography variant={'subtitle2'}>{sender}</Typography>
       </Stack>
 
-      <Stack>
-        <Typography color={'text.secondary'} variant={'body3'}>
-          Reply to
-        </Typography>
-        <Typography variant={'subtitle2'}>{replyTo}</Typography>
-      </Stack>
+      {!!replyTo && (
+        <Stack>
+          <Typography color={'text.secondary'} variant={'body3'}>
+            Reply to
+          </Typography>
+          <Typography variant={'subtitle2'}>{replyTo}</Typography>
+        </Stack>
+      )}
     </Stack>
   );
 };

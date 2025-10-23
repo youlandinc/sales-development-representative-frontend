@@ -6,7 +6,6 @@ import {
   MenuItem,
   menuItemClasses,
   Stack,
-  StackProps,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
@@ -14,7 +13,7 @@ import {
 import { DocumentType } from '@tiptap/core';
 import { FC, useState } from 'react';
 
-import { SDRToast, StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton, StyledCost } from '@/components/atoms';
 import {
   SculptingPrompt,
   WebResearchConfigure,
@@ -38,35 +37,7 @@ import { extractPromptText } from '@/utils';
 import CloseIcon from '@mui/icons-material/Close';
 import ICON_ARROW from '../assets/dialog/icon_arrow.svg';
 import ICON_ARROW_DOWN from '../assets/dialog/icon_arrow_down.svg';
-import ICON_COINS from '../assets/dialog/icon_coins.svg';
 import ICON_SPARK from '../assets/dialog/icon_sparkle.svg';
-
-type CostCoinsProps = StackProps & {
-  count: string;
-  textColor?: string;
-};
-export const CostCoins: FC<CostCoinsProps> = ({
-  count,
-  textColor,
-  ...rest
-}) => {
-  return (
-    <Stack
-      alignItems={'center'}
-      borderRadius={1}
-      flexDirection={'row'}
-      gap={0.5}
-      px={1}
-      py={0.5}
-      {...rest}
-    >
-      <Icon component={ICON_COINS} sx={{ width: 16, height: 16 }} />
-      <Typography color={textColor || '#866BFB'} variant={'body3'}>
-        {count} / row
-      </Typography>
-    </Stack>
-  );
-};
 
 type DialogWebResearchProps = {
   cb?: () => Promise<void>;
@@ -153,15 +124,22 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     });
   };
 
-  const [, run] = useAsyncFn(async (fieldId: string, recordCount: number) => {
-    try {
-      await columnRun(fieldId, recordCount);
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-      return Promise.reject(err);
-    }
-  });
+  const [, run] = useAsyncFn(
+    async (param: {
+      tableId: string;
+      recordCount: number;
+      fieldId?: string;
+      fieldIds?: string[];
+    }) => {
+      try {
+        await columnRun(param);
+      } catch (err) {
+        const { header, message, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+        return Promise.reject(err);
+      }
+    },
+  );
 
   const [state, saveDoNotRun] = useAsyncFn(
     async (tableId: string) => {
@@ -246,7 +224,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
                 filedMapping,
               ) || '',
           });
-          await run(activeColumnId, recordCount);
+          await run({ tableId, recordCount, fieldId: activeColumnId });
         }
         if (activeType === ActiveTypeEnum.add) {
           const res = await saveAiConfig(
@@ -261,7 +239,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               filedMapping,
             ) || '',
           );
-          await run(res.data, recordCount);
+          await run({ tableId, fieldId: res.data, recordCount });
         }
         await cb?.();
         handleClose();
@@ -392,7 +370,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           px={3}
           py={1.5}
         >
-          <CostCoins
+          <StyledCost
             border={'1px solid #D0CEDA'}
             count={`${COINS_PER_ROW}`}
             textColor={'text.secondary'}
@@ -444,9 +422,10 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
                 <Typography color={'text.secondary'} variant={'body2'}>
                   Save and run 10 rows
                 </Typography>
-                <CostCoins
-                  bgcolor={'#EFE9FB'}
+                <StyledCost
+                  border={'1px solid #D0CEDA'}
                   count={`~${COINS_PER_ROW * 10}`}
+                  textColor={'text.secondary'}
                 />
               </MenuItem>
             )}
@@ -458,7 +437,11 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               <Typography color={'text.secondary'} variant={'body2'}>
                 Save and run {rowIds.length} rows in this view
               </Typography>
-              <CostCoins bgcolor={'#EFE9FB'} count={'~20'} />
+              <StyledCost
+                border={'1px solid #D0CEDA'}
+                count={'~20'}
+                textColor={'text.secondary'}
+              />
             </MenuItem>
             <MenuItem
               onClick={async () => {

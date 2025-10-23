@@ -10,7 +10,7 @@ import {
 
 import { useAsyncFn, useDebounce } from '@/hooks';
 import { _findCompanies } from '@/request';
-import { useFindCompaniesStore } from '@/stores/useFindCompiesStore';
+import { useFindCompaniesStore } from '@/stores/useFindPeopleCompanyStore/useFindCompaniesStore';
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
 

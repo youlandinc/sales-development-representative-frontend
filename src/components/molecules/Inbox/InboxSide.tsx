@@ -328,7 +328,7 @@ export const InboxSide: FC = () => {
                   }}
                   variant={'subtitle2'}
                 >
-                  You: {item.subject}
+                  {item.subject}
                 </Typography>
                 {receiptType === ReceiptTypeEnum.engaged && (
                   <Box

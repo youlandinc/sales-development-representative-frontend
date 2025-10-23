@@ -7,13 +7,15 @@ import ICON_ARROW from './assets/icon_collapse.svg';
 
 type CollapseCardProps = {
   title: string;
+  defaultOpen?: boolean;
 };
 
 export const CollapseCard: FC<PropsWithChildren<CollapseCardProps>> = ({
   title,
   children,
+  defaultOpen,
 }) => {
-  const { visible, open, close } = useSwitch(true);
+  const { visible, open, close } = useSwitch(defaultOpen);
   return (
     <Stack border={'1px solid #ccc'} borderRadius={2} gap={1.5} p={1.5}>
       <Stack

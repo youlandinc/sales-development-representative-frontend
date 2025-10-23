@@ -33,6 +33,8 @@ export interface TableColumnProps {
       prompt: string[];
     };
   };
+  semanticType: string;
+  groupId: string | null;
 }
 
 export interface UpdateTableColumnConfigParams {

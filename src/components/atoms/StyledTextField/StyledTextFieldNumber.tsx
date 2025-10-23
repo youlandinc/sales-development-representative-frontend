@@ -103,9 +103,7 @@ export const StyledTextFieldNumber: FC<StyledTextFieldNumberProps> = ({
             isAllowed,
           },
         }}
-        sx={{
-          ...sx,
-        }}
+        sx={sx}
         value={text}
         variant={'outlined'}
       />

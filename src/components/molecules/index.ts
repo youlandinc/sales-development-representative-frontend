@@ -28,5 +28,5 @@ export * from './Segments';
 
 export * from './Enrichments';
 
-export * from './FindPeople';
-export * from './FindCompanies';
+export * from './FindPeopleCompany/FindPeople';
+export * from './FindPeopleCompany/FindCompanies';

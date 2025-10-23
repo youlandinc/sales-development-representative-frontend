@@ -360,9 +360,7 @@ export const CampaignProcessContentCSV: FC = () => {
             To ensure accurate data import, make sure the file includes the
             following required fields:
           </Typography>
-          <Typography variant={'subtitle2'}>
-            Full Name, Last Name, First Name, and Email.
-          </Typography>
+          <Typography variant={'subtitle2'}>Email address.</Typography>
 
           <StyledButton size={'medium'} sx={{ width: 88, mt: 6 }}>
             Select file

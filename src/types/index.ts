@@ -10,3 +10,5 @@ export * from './leads';
 export * from './enum';
 
 export * from './Contacts';
+
+export * from './findPeopleCompany';

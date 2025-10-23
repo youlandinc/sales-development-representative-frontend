@@ -58,8 +58,7 @@ export enum WebSocketTypeEnum {
   progress = 'PROGRESS',
 }
 
-export enum CompanyTypeEnum {
-  customer = 'CUSTOMERS',
-  venture_capital = 'VENTURE_CAPITAL',
-  limited_partners = 'LIMITED_PARTNERS',
+export enum ActiveTypeEnum {
+  add = 'add',
+  edit = 'edit',
 }

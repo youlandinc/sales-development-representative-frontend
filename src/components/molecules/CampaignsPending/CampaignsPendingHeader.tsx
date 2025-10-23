@@ -153,26 +153,27 @@ export const CampaignsPendingHeader: FC<CampaignsPendingHeaderProps> = ({
       </Stack>
       {!loading && (
         <Stack flexDirection={'row'} gap={3}>
-          {campaignStatus !== CampaignStatusEnum.suspended && (
-            <>
-              <StyledButton
-                color={'error'}
-                // loading={suspendState.loading}
-                onClick={suspendOpen}
-                sx={{ width: 108 }}
-                variant={'outlined'}
-              >
-                Suspend
-              </StyledButton>
-              <StyledButton
-                // loading={approveState.loading}
-                onClick={open}
-                sx={{ width: 125 }}
-              >
-                Approve all
-              </StyledButton>
-            </>
-          )}
+          {campaignStatus !== CampaignStatusEnum.suspended &&
+            campaignStatus !== CampaignStatusEnum.done && (
+              <>
+                <StyledButton
+                  color={'error'}
+                  // loading={suspendState.loading}
+                  onClick={suspendOpen}
+                  sx={{ width: 108 }}
+                  variant={'outlined'}
+                >
+                  Suspend
+                </StyledButton>
+                <StyledButton
+                  // loading={approveState.loading}
+                  onClick={open}
+                  sx={{ width: 125 }}
+                >
+                  Approve all
+                </StyledButton>
+              </>
+            )}
           {campaignStatus === CampaignStatusEnum.suspended && (
             <StyledButton
               loading={suspendState.loading}
