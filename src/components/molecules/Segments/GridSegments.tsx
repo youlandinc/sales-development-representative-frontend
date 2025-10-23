@@ -128,13 +128,13 @@ const genColumns = (mutate: any, resetToolbarData: () => void) => {
       },
     },
     { accessorKey: 'object', header: 'List type' },
-    {
+    /*   {
       accessorKey: 'contacts',
       header: 'Contacts',
       Cell: ({ renderedCellValue }) => {
         return UFormatNumber(renderedCellValue as number);
       },
-    },
+    }, */
     {
       accessorKey: 'lastEdit',
       header: 'Last edit',

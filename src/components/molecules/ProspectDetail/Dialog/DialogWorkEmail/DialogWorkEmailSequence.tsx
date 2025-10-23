@@ -17,7 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Icon, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { StyledButton, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
@@ -147,7 +147,11 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
 };
 
 export const DialogWorkEmailSequence: FC = () => {
-  const { setDialogIntegrationsVisible, allIntegrations } = useWorkEmailStore();
+  const {
+    setDialogIntegrationsVisible,
+    allIntegrations,
+    updateIntegrationsOrder,
+  } = useWorkEmailStore();
   const { integrationsInWaterfall } = useComputedInWorkEmailStore();
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -157,15 +161,20 @@ export const DialogWorkEmailSequence: FC = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  const [items, setItems] = useState(integrationsInWaterfall);
+  // const [items, setItems] = useState(integrationsInWaterfall);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
-      const oldIndex = items.findIndex((i) => i.actionKey === active.id);
-      const newIndex = items.findIndex((i) => i.actionKey === over?.id);
-      const newItems = arrayMove(items, oldIndex, newIndex);
-      setItems(newItems);
+      const oldIndex = integrationsInWaterfall.findIndex(
+        (i) => i.actionKey === active.id,
+      );
+      const newIndex = integrationsInWaterfall.findIndex(
+        (i) => i.actionKey === over?.id,
+      );
+      const newItems = arrayMove(integrationsInWaterfall, oldIndex, newIndex);
+      // setItems(newItems);
+      updateIntegrationsOrder(newItems);
     }
   };
 
