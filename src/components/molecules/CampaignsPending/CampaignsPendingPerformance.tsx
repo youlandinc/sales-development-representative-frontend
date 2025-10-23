@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { format, isValid } from 'date-fns';
 
-import { UFormatNumber } from '@/utils/UFormater';
+import { UFormatNumber, UFormatTimeByThreshold } from '@/utils/UFormater';
 
 import { ICampaignsPendingPerformance } from '@/types';
 
@@ -346,9 +346,9 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                   Average time to open
                 </Typography>
                 <Typography variant={'subtitle1'}>
-                  {UFormatNumber(
+                  {UFormatTimeByThreshold(
                     performance?.openStatistics?.averageTimeToOpen,
-                  ) + 'min'}
+                  )}
                 </Typography>
               </Stack>
               <Stack flex={1} gap={1} minWidth={200} p={1}>
@@ -543,9 +543,9 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                   </Tooltip>
                 </Typography>
                 <Typography variant={'subtitle1'}>
-                  {UFormatNumber(
+                  {UFormatTimeByThreshold(
                     performance?.clickStatistics?.averageTimeToClick,
-                  ) + 'min'}
+                  )}
                 </Typography>
               </Stack>
               <Stack flex={1} gap={1} minWidth={200} p={1}>

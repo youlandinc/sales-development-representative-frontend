@@ -81,3 +81,38 @@ export const UFormatDate = (
   }
   return format(new Date(date), timeFormat, options);
 };
+
+/**
+ * 格式化时间：小于48小时显示小时，大于48小时显示天
+ * @param minutes 分钟数
+ * @returns 格式化后的时间字符串
+ */
+export const UFormatTimeByThreshold = (
+  minutes: number | string | null | undefined,
+): string => {
+  if (!UNotUndefined(minutes) || !UNotNull(minutes)) {
+    return '0 min';
+  }
+
+  // 转换为数字并取整
+  let mins = 0;
+  if (typeof minutes === 'string') {
+    mins = Math.round(parseFloat(minutes));
+  } else {
+    mins = Math.round(minutes as number);
+  }
+
+  if (isNaN(mins)) {
+    return '0 min';
+  }
+
+  // 48小时 = 2880分钟
+  if (mins < 2880) {
+    // 小于48小时，显示小时
+    const hours = Math.floor(mins / 60);
+    return hours > 0 ? `${hours} hr` : `${mins} min`;
+  }
+  // 大于等于48小时，显示天
+  const days = Math.floor(mins / (60 * 24));
+  return `${days} day${days > 1 ? 's' : ''}`;
+};

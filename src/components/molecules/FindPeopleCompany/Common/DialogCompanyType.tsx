@@ -131,7 +131,7 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
       header={
         <Stack flexDirection={'row'} justifyContent={'space-between'}>
           <Typography color={'inherit'} fontSize={20} fontWeight={'inherit'}>
-            What type of companies are you looking for?
+            What type of contacts are you looking for?
           </Typography>
           <Icon
             component={ICON_CLOSE}

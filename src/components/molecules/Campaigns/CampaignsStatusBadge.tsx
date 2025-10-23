@@ -20,7 +20,7 @@ const computedStyles = (status: CampaignStatusEnum) => {
       return {
         color: '#7849D7',
         backgroundColor: 'rgba(120, 73, 215, 0.20)',
-        label: 'Done',
+        label: 'Completed',
       };
     case CampaignStatusEnum.suspended:
       return {

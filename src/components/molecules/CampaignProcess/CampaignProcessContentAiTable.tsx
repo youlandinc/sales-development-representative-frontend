@@ -117,8 +117,7 @@ export const CampaignProcessContentAiTable: FC = () => {
                 Saved table
               </Typography>
               <Typography variant={'body2'}>
-                The list must include at least a first name and email address;
-                otherwise we cannot generate accurate email content for you.
+                The table must include at least a column for email address.
               </Typography>
               <StyledSelect
                 disabled={enrichmentTableDisabled || isValidating}
