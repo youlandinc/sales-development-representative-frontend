@@ -8,3 +8,5 @@ export * from './SettingsEmailProfile';
 
 export * from './SettingsEmailVerify';
 export * from './SettingsEmailSignature';
+
+export * from './SettingsEmailDomain';

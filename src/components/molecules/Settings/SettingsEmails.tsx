@@ -1,9 +1,13 @@
 import { FC } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 
 //import { useSwitch } from '@/hooks';
 //import { EmailDomainStateEnum } from '@/types/enum';
-import { SettingsEmailProfile, SettingsEmailSignature } from './index';
+import {
+  SettingsEmailDomain,
+  SettingsEmailProfile,
+  SettingsEmailSignature,
+} from './index';
 
 //import ICON_COPY from './assets/icon_copy.svg';
 
@@ -81,8 +85,11 @@ export const SettingsEmails: FC = () => {
       {/*    ))}*/}
       {/*  </Stack>*/}
       {/*</Stack>*/}
-      <SettingsEmailProfile />
-      <SettingsEmailSignature />
+      <Stack divider={<Divider sx={{ borderColor: '#D0CEDA' }} />} gap={3}>
+        <SettingsEmailProfile />
+        <SettingsEmailDomain />
+        <SettingsEmailSignature />
+      </Stack>
     </Stack>
   );
 };
