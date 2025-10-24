@@ -34,3 +34,30 @@ export const _fetchEmailSignatures = () => {
 export const _deleteEmailSignature = (id: number) => {
   return del(`/sdr/settings/signature/${id}`);
 };
+
+export const _fetchCustomEmailDomains = (tenantId: string) => {
+  return get(`/usercenter/api/customEmail/${tenantId}`);
+};
+
+export const _addCustomEmailDomain = (params: { domain: string }) => {
+  return post('/usercenter/api/customEmail', { ...params });
+};
+
+export const _fetchIdentityCustomEmailDomain = (params: { domain: string }) => {
+  return post('/usercenter/api/customEmail/identities', params);
+};
+
+export const _modifyCustomEmailDomain = (params: {
+  id: number;
+  userName: string;
+}) => {
+  return post('/usercenter/api/customEmail/modify', params);
+};
+
+export const _verifyCustomEmailDomain = (params: { domain: string }) => {
+  return post('/usercenter/api/customEmail/verify', params);
+};
+
+export const _deleteCustomEmailDomain = (id: number | string) => {
+  return del(`/usercenter/api/customEmail/${id}`);
+};

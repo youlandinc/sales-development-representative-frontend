@@ -62,3 +62,30 @@ export enum ActiveTypeEnum {
   add = 'add',
   edit = 'edit',
 }
+
+export enum DomainSource {
+  DEFAULT = 'DEFAULT',
+  CUSTOM = 'CUSTOM',
+}
+
+export enum EmailDomainState {
+  PENDING = 'PENDING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  ACTIVE = 'ACTIVE',
+}
+
+export interface EmailDomainDetails {
+  id: number;
+  email: string;
+  emailDomain: string;
+  validStatus: EmailDomainState;
+  source: DomainSource;
+  userName: string;
+}
+
+export interface EmailDomainData {
+  domainType: string;
+  recordName: string;
+  recordValue: string;
+}
