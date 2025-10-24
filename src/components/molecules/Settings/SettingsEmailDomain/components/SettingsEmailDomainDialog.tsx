@@ -260,22 +260,36 @@ export const SettingsEmailDomainDialog = ({
       case 1:
         return (
           <Stack width={'100%'}>
-            <Typography
+            <Stack
               color={'#6E4EFB'}
-              component={'div'}
-              fontSize={{ xs: 12, lg: 12 }}
+              gap={'10px'}
               sx={{
                 bgcolor: '#F7F4FD',
                 p: 1.5,
                 borderRadius: 1,
               }}
             >
-              After creating your domain identity with Easy DKIM, you must
-              complete the verification process for DKIM authentication by
-              copying the CNAME record generated below and publishing it with
-              your domain&apos;s DNS provider. Detection of these records may
-              take up to 72 hours.
-            </Typography>
+              <Typography component={'div'} fontSize={12} fontWeight={700}>
+                DNS setup instructions
+              </Typography>
+              <Typography component={'div'} fontSize={12}>
+                CNAME (for DKIM verification): Add the CNAME record below to
+                your DNS provider to verify DKIM.
+              </Typography>
+              <Typography component={'div'} fontSize={12}>
+                MX (for MAIL FROM domain): Add the MX record below to your DNS
+                provider. This record routes bounce messages correctly.
+              </Typography>
+              <Typography component={'div'} fontSize={12}>
+                TXT (for SPF authentication): Add the TXT record below to your
+                DNS provider. This record authorizes your domain to send emails
+                through Amazon SES.
+              </Typography>
+              <Typography component={'div'} fontSize={12}>
+                Verification may take up to 72 hours. Please complete the
+                verification within this period.
+              </Typography>
+            </Stack>
 
             {isSmall ? smallVerifyList : largeVerifyList}
           </Stack>
