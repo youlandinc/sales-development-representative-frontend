@@ -24,7 +24,6 @@ export const Settings = () => {
       <SettingsEmails />
       <SettingsIntegrations />
       <SettingsPersonalInfo />
-      <StyledTinyEditor />
     </Stack>
   );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { Box } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
 import { FC, useEffect, useRef } from 'react';
 
@@ -13,12 +13,12 @@ import { TOOLBAR } from './data';
 
 interface StyledTinyEditorProps {
   onChange?: (dialogApi: any, details: any) => void;
-  initialValue?: string;
+  value?: string;
 }
 
 export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   onChange,
-  initialValue,
+  value,
 }: StyledTinyEditorProps) => {
   const { signatures, fetchSignatures, fetchSignatureLoading } =
     useSettingsStore();
@@ -44,8 +44,12 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
     };
   }, []);
 
-  if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY || fetchSignatureLoading) {
+  if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY) {
     return null;
+  }
+
+  if (fetchSignatureLoading) {
+    return <Skeleton height={200} />;
   }
 
   return (
@@ -61,6 +65,11 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
       <Editor
         apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
         init={{
+          content_style:
+            'p { margin: 0;font-size:12px } body::before { font-size:12px }',
+          font_size_formats:
+            '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
+          default_font_size: '12px',
           toolbar_mode: 'sliding',
           ui_mode: 'split',
           // 添加自定义按钮和菜单
@@ -186,8 +195,26 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           // 文件大小限制 (10MB)
           images_max_size: 10485760,
           menubar: false,
+          style_formats: [
+            {
+              title: 'Image Left',
+              selector: 'img',
+              styles: {
+                float: 'left',
+                margin: '0 10px 0 10px',
+              },
+            },
+            {
+              title: 'Image Right',
+              selector: 'img',
+              styles: {
+                float: 'right',
+                margin: '0 10px 0 10px',
+              },
+            },
+          ],
         }}
-        initialValue={initialValue}
+        value={value}
         onEditorChange={onChange}
         onInit={(evt, editor) => {
           editorRef.current = editor; // 保存编辑器实例
