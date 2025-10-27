@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   CircularProgress,
   Icon,
@@ -6,6 +5,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 import {
@@ -14,7 +15,6 @@ import {
   StyledDialog,
   StyledTextField,
 } from '@/components/atoms';
-import { InboxEditor } from '@/components/molecules';
 
 import { useAsyncFn, useSwitch } from '@/hooks';
 import {
@@ -24,12 +24,21 @@ import {
 } from '@/request';
 import { HttpError } from '@/types';
 
-import ICON_EDIT from './assets/icon_edit.svg';
 import ICON_DELETE from './assets/icon_delete.svg';
+import ICON_EDIT from './assets/icon_edit.svg';
+
+const StyledTinyEditor = dynamic(
+  () =>
+    import('@/components/atoms/StyledTinyEditor').then(
+      (mod) => mod.StyledTinyEditor,
+    ),
+  {
+    ssr: false,
+  },
+);
 
 export const SettingsEmailSignature = () => {
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [initEditorContent, setInitEditorContent] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [editId, setEditId] = useState<number | undefined>();
 
@@ -39,9 +48,13 @@ export const SettingsEmailSignature = () => {
 
   const handleClear = () => {
     setName('');
-    setInitEditorContent('');
     setEditId(undefined);
     setContent('');
+  };
+
+  const handleClose = () => {
+    close();
+    handleClear();
   };
 
   const { isLoading, data, mutate } = useSWR(
@@ -128,7 +141,6 @@ export const SettingsEmailSignature = () => {
                 component={ICON_EDIT}
                 onClick={() => {
                   setEditId(item.id);
-                  setInitEditorContent(item.content);
                   setContent(item.content);
                   setName(item.name);
                   open();
@@ -162,30 +174,11 @@ export const SettingsEmailSignature = () => {
               placeholder={'Name'}
               value={name}
             />
-            <InboxEditor
-              config={{
-                height: '200px',
-                editorplaceholder: 'Autosize height based on content lines',
-                toolbarGroups: [
-                  {
-                    name: 'editing',
-                    groups: ['find', 'selection', 'spellchecker'],
-                  },
-                  { name: 'forms' },
-                  { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-                  {
-                    name: 'paragraph',
-                    groups: ['list', 'indent', 'blocks', 'align', 'bidi'], // 'align' -> 'justify' plugin
-                  },
-                  { name: 'links' },
-                  { name: 'styles' }, // 'font and fontsize' -> 'font' plugin
-                  { name: 'colors' }, // 'colors' -> 'colorbutton' plugin
-                ],
+            <StyledTinyEditor
+              onChange={(content) => {
+                setContent(content);
               }}
-              handleChange={(e) => {
-                setContent(e.editor?.getData() || '');
-              }}
-              initData={initEditorContent}
+              value={content}
             />
           </Stack>
         }
@@ -213,7 +206,7 @@ export const SettingsEmailSignature = () => {
           </Stack>
         }
         header={'Email signature'}
-        onClose={close}
+        onClose={handleClose}
         open={visible}
       />
     </Stack>

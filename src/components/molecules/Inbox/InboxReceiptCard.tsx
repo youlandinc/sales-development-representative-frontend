@@ -1,23 +1,21 @@
-import { FC, useRef } from 'react';
 import { Fade, Stack } from '@mui/material';
 import { format } from 'date-fns';
+import { FC, useState } from 'react';
 
 import { useAsyncFn, useSwitch } from '@/hooks';
 
-import { SDRToast, StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton, StyledTinyEditor } from '@/components/atoms';
 import {
   CommonEmailContent,
   CommonReceiptCardHeader,
-  InboxEditor,
-  InboxEditorForwardRefProps,
 } from '@/components/molecules';
 
+import { _replyEmails, ForwardEmailsParam } from '@/request';
 import {
   InboxContentTypeEnum,
   ReceiptTypeEnum,
   useInboxStore,
 } from '@/stores/useInboxStore';
-import { _replyEmails, ForwardEmailsParam } from '@/request';
 import { HttpError } from '@/types';
 
 type InboxReceiptCardProps = {
@@ -47,7 +45,8 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
   } = useInboxStore((state) => state);
 
   const { visible, open, close } = useSwitch();
-  const editorRef = useRef<InboxEditorForwardRefProps | null>(null);
+
+  const [content, setContent] = useState<string>('');
 
   const [state, replyEmail] = useAsyncFn(async (param: ForwardEmailsParam) => {
     try {
@@ -116,7 +115,13 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
         </Fade>
         <Fade in={visible}>
           <Stack display={visible ? 'flex' : 'none'} gap={1.5}>
-            <InboxEditor ref={editorRef} />
+            {/* <InboxEditor ref={editorRef} /> */}
+            <StyledTinyEditor
+              onChange={(content) => {
+                setContent(content);
+              }}
+              value={content}
+            />
             <Stack flexDirection={'row'} gap={1.5} justifyContent={'flex-end'}>
               <StyledButton
                 color={'info'}
@@ -135,7 +140,7 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
                     recipient: email,
                     cc: [],
                     subject: '',
-                    content: editorRef.current?.editInstance.getData() || '',
+                    content: content,
                   });
                 }}
                 size={'medium'}

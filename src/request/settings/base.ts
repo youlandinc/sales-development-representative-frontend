@@ -1,4 +1,4 @@
-import { del, get, post } from '@/request/request';
+import { del, get, post, put } from '@/request/request';
 import { UserIntegrationItem } from '@/types';
 
 export const _fetchSettingsInfo = async (tenantId: string) => {
@@ -33,6 +33,12 @@ export const _fetchEmailSignatures = () => {
 
 export const _deleteEmailSignature = (id: number) => {
   return del(`/sdr/settings/signature/${id}`);
+};
+
+export const _uploadFile = (files: FormData) => {
+  return put('/usercenter/api/common/file/upload', files, {
+    headers: { 'content-type': 'multipart/form-data' },
+  });
 };
 
 export const _fetchCustomEmailDomains = (tenantId: string) => {
