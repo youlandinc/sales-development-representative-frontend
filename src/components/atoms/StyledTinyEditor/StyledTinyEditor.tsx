@@ -214,11 +214,8 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
             },
           ],
         }}
-        value={value}
         onEditorChange={onChange}
-        onInit={(evt, editor) => {
-          editorRef.current = editor; // 保存编辑器实例
-        }}
+        value={value}
       />
     </Box>
   );
