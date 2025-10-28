@@ -176,9 +176,11 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
                 type: blobInfo.blob().type,
               });
               formData.append('files', file);
+              formData.append('bizType', 'FIRM_COMMON');
               const response = await _uploadFile(formData);
               if (Array.isArray(response.data)) {
-                return response.data[0].url;
+                const urlWithToken = response.data[0].url.split('?')[0];
+                return urlWithToken;
               }
               return '';
             } catch (err) {

@@ -21,7 +21,13 @@ import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/Prospect';
 
 import ICON_ARROW from '@/components/molecules/ProspectDetail/assets/dialog/icon_arrow_down.svg';
 
-export const DialogWorkEmailFooter: FC = () => {
+interface DialogWorkEmailFooterProps {
+  cb?: () => void;
+}
+
+export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
+  cb,
+}) => {
   const { rowIds } = useProspectTableStore((store) => store);
   const { isMissingConfig } = useComputedInWorkEmailStore();
   const { setWaterfallConfigType, setDisplayType, displayType } =

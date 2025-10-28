@@ -17,7 +17,7 @@ import { CreateWaterfallConfigRequestParam } from '@/types/Prospect';
 import { IntegrationSaveTypeParam } from '../data';
 import { useMemo } from 'react';
 
-export const useWorkEmailRequest = () => {
+export const useWorkEmailRequest = (cb?: () => void) => {
   const {
     setWorkEmailVisible,
     integrationActionType,
@@ -70,6 +70,7 @@ export const useWorkEmailRequest = () => {
             fieldIds: fieldIdsWithGroupId,
           });
           await fetchTable(tableId);
+          cb?.();
         }
       } catch (error) {
         const { header, message, variant } = error as HttpError;

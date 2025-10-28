@@ -1,5 +1,5 @@
 import { Drawer, Fade, Stack } from '@mui/material';
-import { useEffect, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 
 import {
   DialogWorkEmailFooter,
@@ -10,7 +10,11 @@ import {
 import { useWorkEmailStore } from '@/stores/Prospect';
 import { WaterfallConfigTypeEnum } from '@/types/Prospect';
 
-export const DialogWorkEmail = () => {
+interface DialogWorkEmailProps {
+  cb?: () => void;
+}
+
+export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
   const {
     workEmailVisible,
     setWorkEmailVisible,
@@ -69,7 +73,7 @@ export const DialogWorkEmail = () => {
       }}
     >
       {computedContent}
-      <DialogWorkEmailFooter />
+      <DialogWorkEmailFooter cb={cb} />
     </Drawer>
   );
 };
