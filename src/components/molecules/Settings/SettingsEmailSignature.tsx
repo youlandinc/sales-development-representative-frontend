@@ -208,6 +208,13 @@ export const SettingsEmailSignature = () => {
         header={'Email signature'}
         onClose={handleClose}
         open={visible}
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: 900,
+            },
+          },
+        }}
       />
     </Stack>
   );
