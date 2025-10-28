@@ -120,7 +120,7 @@ export const CampaignProcessContentLunch = () => {
     async () => {
       try {
         const { data } = await _fetchEmailSignatures();
-        
+
         if (!data || data.length === 0) {
           return;
         }
@@ -141,7 +141,10 @@ export const CampaignProcessContentLunch = () => {
         if (defaultSignature) {
           setFormData((prev) => ({
             ...prev,
-            signatureId: prev.signatureId === null ? defaultSignature.value : prev.signatureId,
+            signatureId:
+              prev.signatureId === null
+                ? defaultSignature.value
+                : prev.signatureId,
           }));
         }
       } catch (err) {
