@@ -118,7 +118,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const columnMeta = cell?.column?.columnDef?.meta as any;
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
-    const isAiColumn = actionKey === 'use-ai';
+    const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
 
     const resolvedMinWidth =
       width < CELL_CONSTANTS.MIN_WIDTH ? CELL_CONSTANTS.MIN_WIDTH : width;

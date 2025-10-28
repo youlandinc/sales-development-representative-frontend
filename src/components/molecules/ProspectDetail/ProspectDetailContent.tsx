@@ -85,7 +85,10 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   const aiColumnIds = useMemo(() => {
     return new Set(
       columns
-        .filter((col) => col.actionKey === 'use-ai')
+        .filter(
+          (col) =>
+            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
+        )
         .map((col) => col.fieldId),
     );
   }, [columns]);
@@ -411,6 +414,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     },
     [aiColumnIds, runRecords, rowIds, rowsMap],
   );
+
+  console.log(aiColumnIds);
 
   useEffect(() => {
     if (!runRecords) {
