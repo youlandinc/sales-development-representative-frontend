@@ -106,17 +106,44 @@ export const CampaignProcessContentLunch = () => {
     updateLunchInfo();
   }, [formData, updateLunchInfo]);
 
+  const [signatureList, setSignatureList] = useState<TOption[]>([
+    {
+      label: 'No signature',
+      value: null,
+      key: 'noSignature',
+      default: false,
+    },
+  ]);
+
   const { isLoading } = useSWR(
     'fetchSignature',
     async () => {
       try {
         const { data } = await _fetchEmailSignatures();
+        
+        if (!data || data.length === 0) {
+          return;
+        }
+
         const reducedData = data.map((item) => ({
           label: item.name,
-          key: item.id,
-          value: item.id,
+          key: String(item.id),
+          value: String(item.id),
+          default: item.default,
         }));
-        setSignatureList((prev) => [...reducedData, ...prev]);
+
+        setSignatureList((prev) => [
+          ...reducedData,
+          ...prev.filter((item) => item.key === 'noSignature'),
+        ]);
+
+        const defaultSignature = reducedData.find((item) => item.default);
+        if (defaultSignature) {
+          setFormData((prev) => ({
+            ...prev,
+            signatureId: prev.signatureId === null ? defaultSignature.value : prev.signatureId,
+          }));
+        }
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -126,14 +153,6 @@ export const CampaignProcessContentLunch = () => {
       revalidateOnFocus: false,
     },
   );
-
-  const [signatureList, setSignatureList] = useState<TOption[]>([
-    {
-      label: 'No signature',
-      value: null,
-      key: 'noSignature',
-    },
-  ]);
 
   const onClickToChangeSignature = (value: any) => {
     if (value === formData.signatureId) {

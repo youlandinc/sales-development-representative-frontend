@@ -6,6 +6,7 @@ interface TOption {
   label: string;
   disabled?: boolean;
   icon?: React.ElementType;
+  default?:boolean
 }
 
 interface Option {

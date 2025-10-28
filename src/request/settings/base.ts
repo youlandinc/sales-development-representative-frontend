@@ -26,7 +26,7 @@ export const _createEmailSignature = (params: {
 };
 
 export const _fetchEmailSignatures = () => {
-  return get<{ id: number; name: string; content: string }[]>(
+  return get<{ id: number; name: string; content: string; default: boolean }[]>(
     '/sdr/settings/signature/list',
   );
 };
