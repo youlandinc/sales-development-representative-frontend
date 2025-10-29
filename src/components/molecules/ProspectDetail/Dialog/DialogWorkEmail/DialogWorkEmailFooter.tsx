@@ -32,7 +32,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
   const { isMissingConfig } = useComputedInWorkEmailStore();
   const { setWaterfallConfigType, setDisplayType, displayType } =
     useWorkEmailStore((store) => store);
-  const { requestState } = useWorkEmailRequest();
+  const { requestState } = useWorkEmailRequest(cb);
   const params = useParams();
   const tableId =
     typeof params.tableId === 'string' && params.tableId.trim() !== ''

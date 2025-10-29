@@ -101,6 +101,7 @@ export const useWorkEmailRequest = (cb?: () => void) => {
             fieldIds: fieldIdsWithGroupId,
           });
           await fetchTable(tableId);
+          cb?.();
         }
       } catch (error) {
         const { header, message, variant } = error as HttpError;
