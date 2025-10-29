@@ -244,6 +244,8 @@ export const StyledTable: FC<StyledTableProps> = ({
         cellState?.isEditing === true,
       isActive: (recordId: string, columnId: string) =>
         cellState?.recordId === recordId && cellState?.columnId === columnId,
+      // 优化: O(1)检查该行是否有active cell，避免遍历所有columns
+      hasActiveInRow: (recordId: string) => cellState?.recordId === recordId,
       setCellMode: (
         recordId: string,
         columnId: string,
@@ -267,36 +269,10 @@ export const StyledTable: FC<StyledTableProps> = ({
             break;
         }
       },
-      canEdit: (recordId: string, columnId: string) => {
-        if (columnId === '__select') {
-          return false;
-        }
-
-        const column = table.getColumn(columnId);
-        const actionKey = (column?.columnDef?.meta as any)?.actionKey;
-
-        return actionKey !== 'use-ai';
-      },
+      // 优化: 移除canEdit，直接在StyledTableBodyCell中从cell.column.columnDef.meta获取actionKey判断
       isAiLoading: (recordId: string, columnId: string) =>
         Boolean(aiLoading?.[recordId]?.[columnId]),
-      isFinished: (recordId: string, columnId: string) => {
-        const rowData = data.find((row: any) => row.id === recordId);
-        const cellValue = rowData?.[columnId];
-        return typeof cellValue === 'object' &&
-          cellValue !== null &&
-          'isFinished' in cellValue
-          ? cellValue.isFinished
-          : false;
-      },
-      getExternalContent: (recordId: string, columnId: string) => {
-        const rowData = data.find((row: any) => row.id === recordId);
-        const cellValue = rowData?.[columnId];
-        return typeof cellValue === 'object' &&
-          cellValue !== null &&
-          'externalContent' in cellValue
-          ? cellValue.externalContent
-          : undefined;
-      },
+      // 优化: 移除isFinished和getExternalContent，直接在StyledTableBodyCell中从cell.getValue()获取
       triggerAiProcess: (recordId: string, columnId: string) => {
         onAiProcess?.(recordId, columnId);
       },
@@ -761,17 +737,12 @@ export const StyledTable: FC<StyledTableProps> = ({
                       (cell.row.original as any)?.__loading,
                     );
 
+                    // 优化: O(1)检查而不是O(M)遍历所有columns
                     const hasActiveInRow =
-                      cell.column.id === '__select' &&
-                      (table.options.meta as any)?.isActive
-                        ? reducedColumns.some(
-                            (col) =>
-                              col.id !== '__select' &&
-                              (table.options.meta as any).isActive(
-                                String(cell.row.id),
-                                String(col.id),
-                              ),
-                          )
+                      cell.column.id === '__select'
+                        ? ((table.options.meta as any)?.hasActiveInRow?.(
+                            String(cell.row.id),
+                          ) ?? false)
                         : false;
 
                     return (
@@ -821,17 +792,12 @@ export const StyledTable: FC<StyledTableProps> = ({
                       (cell.row.original as any)?.__loading,
                     );
 
+                    // 优化: O(1)检查而不是O(M)遍历所有columns
                     const hasActiveInRow =
-                      cell.column.id === '__select' &&
-                      (table.options.meta as any)?.isActive
-                        ? reducedColumns.some(
-                            (col) =>
-                              col.id !== '__select' &&
-                              (table.options.meta as any).isActive(
-                                String(cell.row.id),
-                                String(col.id),
-                              ),
-                          )
+                      cell.column.id === '__select'
+                        ? ((table.options.meta as any)?.hasActiveInRow?.(
+                            String(cell.row.id),
+                          ) ?? false)
                         : false;
 
                     return (

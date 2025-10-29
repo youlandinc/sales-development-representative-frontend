@@ -1,5 +1,5 @@
 import { del, get, post, put } from '@/request/request';
-import { UserIntegrationItem } from '@/types';
+import { BizCodeEnum, UserIntegrationItem } from '@/types';
 
 export const _fetchSettingsInfo = async (tenantId: string) => {
   return get(`/sdr/settings/info/${tenantId}`);
@@ -25,10 +25,26 @@ export const _createEmailSignature = (params: {
   return post('/sdr/settings/signature', params);
 };
 
+// deprecated
 export const _fetchEmailSignatures = () => {
-  return get<{ id: number; name: string; content: string; default: boolean }[]>(
-    '/sdr/settings/signature/list',
-  );
+  return get<
+    { id: number; name: string; content: string; default?: boolean }[]
+  >('/sdr/settings/signature/list');
+};
+
+//
+export const _commonFetchSettings = (params: { bizCode: BizCodeEnum[] }) => {
+  return get<
+    Record<
+      BizCodeEnum,
+      { key: string; value: string; label: string; selected?: boolean }[]
+    >
+  >('/sdr/settings/config/options', {
+    params,
+    paramsSerializer: {
+      indexes: null,
+    },
+  });
 };
 
 export const _deleteEmailSignature = (id: number) => {

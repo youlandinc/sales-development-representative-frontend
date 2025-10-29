@@ -10,6 +10,7 @@ import { SDRToast } from '@/components/atoms/StyledToast';
 
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { TOOLBAR } from './data';
+import { useSwitch } from '@/hooks';
 
 interface StyledTinyEditorProps {
   onChange?: (dialogApi: any, details: any) => void;
@@ -23,9 +24,8 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   const { signatures, fetchSignatures, fetchSignatureLoading } =
     useSettingsStore();
 
-  const editorRef = useRef<any>(null);
-
   useEffect(() => {
+    // close();
     fetchSignatures();
   }, [fetchSignatures]);
 
@@ -48,12 +48,9 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
     return null;
   }
 
-  if (fetchSignatureLoading) {
-    return <Skeleton height={200} />;
-  }
-
   return (
     <Box
+      minHeight={400}
       sx={{
         '& .tox-promotion': { display: 'none' },
         '& .tox-tinymce': {

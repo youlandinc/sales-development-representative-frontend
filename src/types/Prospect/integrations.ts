@@ -1,10 +1,30 @@
 export enum IntegrationActionType {
   work_email = 'WORK_EMAIL',
-  work_email_with_profile_url = 'WORK_EMAIL_WITH_PROFILE_URL',
   personal_email = 'PERSONAL_EMAIL',
   phone_number = 'PHONE_NUMBER',
-  use_ai = 'USE_AI',
+  linkedin_profile = 'LINKEDIN_PROFILE',
+  // use_ai = 'USE_AI',
 }
+
+export enum MathIntegrationTypeEnum {
+  work_email = 'find-work-email',
+  personal_email = 'find-personal-email',
+  phone_number = 'find-phone-number',
+  linkedin_profile = 'find-linkedin-profile',
+}
+
+// Mapping from MathIntegrationTypeEnum to IntegrationActionType
+export const MATH_INTEGRATION_TO_ACTION_TYPE: Record<
+  MathIntegrationTypeEnum,
+  IntegrationActionType
+> = {
+  [MathIntegrationTypeEnum.work_email]: IntegrationActionType.work_email,
+  [MathIntegrationTypeEnum.personal_email]:
+    IntegrationActionType.personal_email,
+  [MathIntegrationTypeEnum.phone_number]: IntegrationActionType.phone_number,
+  [MathIntegrationTypeEnum.linkedin_profile]:
+    IntegrationActionType.linkedin_profile,
+};
 
 export interface IntegrationActionInputParams {
   semanticType: string;
@@ -37,12 +57,6 @@ export enum WaterfallConfigTypeEnum {
 export enum DisplayTypeEnum {
   main = 'main',
   integration = 'integration',
-}
-
-export enum MathIntegrationTypeEnum {
-  work_email = 'find-work-email',
-  personal_email = 'find-personal-email',
-  phone_number = 'find-phone-number',
 }
 
 interface IInputParameters {
