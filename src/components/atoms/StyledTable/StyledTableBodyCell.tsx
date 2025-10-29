@@ -9,6 +9,7 @@ import {
   useMemo,
   useRef,
   useState,
+  startTransition,
 } from 'react';
 import { flushSync } from 'react-dom';
 import {
@@ -72,6 +73,26 @@ interface StyledTableBodyCellProps {
   onCellClick: (columnId: string, rowId: string, data: any) => void;
 }
 
+// 优化: 针对虚拟滚动优化的memo比较
+const arePropsEqual = (
+  prev: StyledTableBodyCellProps,
+  next: StyledTableBodyCellProps,
+): boolean => {
+  // 关键优化：只比较真正影响渲染的props
+  return (
+    prev.width === next.width &&
+    prev.isPinned === next.isPinned &&
+    prev.stickyLeft === next.stickyLeft &&
+    prev.isEditing === next.isEditing &&
+    prev.isActive === next.isActive &&
+    prev.rowSelected === next.rowSelected &&
+    prev.showPinnedRightShadow === next.showPinnedRightShadow &&
+    prev.hasActiveInRow === next.hasActiveInRow &&
+    prev.cell?.id === next.cell?.id &&
+    prev.cell?.getValue() === next.cell?.getValue()
+  );
+};
+
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
   ({
     cell,
@@ -102,23 +123,36 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
 
     const { isRowHovered } = useRowHover();
 
-    const canEdit = tableMeta?.canEdit?.(recordId, columnId) ?? true;
-    const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
-    const isFinished = tableMeta?.isFinished?.(recordId, columnId) ?? false;
-    const externalContent = tableMeta?.getExternalContent?.(recordId, columnId);
-    const triggerAiProcess = tableMeta?.triggerAiProcess;
-    const canInteract = Boolean(cell && !isSelectColumn && canEdit);
-
     const isEditingFromMeta =
       tableMeta?.isEditing?.(recordId, columnId) ?? false;
     const isActiveFromMeta = tableMeta?.isActive?.(recordId, columnId) ?? false;
     const isEditing = _isEditing !== undefined ? _isEditing : isEditingFromMeta;
     const isActive = _isActive !== undefined ? _isActive : isActiveFromMeta;
 
+    // 优化: 直接从column meta获取静态属性，避免通过meta方法查询
     const columnMeta = cell?.column?.columnDef?.meta as any;
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
     const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
+    
+    // 优化: 直接从columnMeta判断canEdit，不需要meta方法
+    const canEdit = columnId !== '__select' && actionKey !== 'use-ai';
+    const canInteract = Boolean(cell && !isSelectColumn && canEdit);
+
+    // 优化: 使用useMemo缓存meta函数调用结果
+    const isAiLoading = useMemo(
+      () => tableMeta?.isAiLoading?.(recordId, columnId) ?? false,
+      [tableMeta, recordId, columnId],
+    );
+
+    // 优化: 直接从cell.getValue()获取，避免遍历data数组的O(N)查找
+    const cellValueObj = useMemo(() => {
+      return typeof value === 'object' && value !== null ? value : {};
+    }, [value]);
+    const isFinished = 'isFinished' in cellValueObj ? cellValueObj.isFinished : false;
+    const externalContent = 'externalContent' in cellValueObj ? cellValueObj.externalContent : undefined;
+    
+    const triggerAiProcess = tableMeta?.triggerAiProcess;
 
     const resolvedMinWidth =
       width < CELL_CONSTANTS.MIN_WIDTH ? CELL_CONSTANTS.MIN_WIDTH : width;
@@ -159,10 +193,13 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     ]);
 
     const handleEditStop = useCallback(() => {
-      if (localEditValue !== String(displayValue ?? '')) {
-        tableMeta?.updateData?.(recordId, columnId, localEditValue);
-      }
-      tableMeta?.setCellMode?.(recordId, columnId, 'clear');
+      // 优化: 使用startTransition降低状态更新优先级，避免阻塞用户交互
+      startTransition(() => {
+        if (localEditValue !== String(displayValue ?? '')) {
+          tableMeta?.updateData?.(recordId, columnId, localEditValue);
+        }
+        tableMeta?.setCellMode?.(recordId, columnId, 'clear');
+      });
     }, [localEditValue, displayValue, tableMeta, recordId, columnId]);
 
     const content = useMemo(() => {
@@ -176,6 +213,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === 'Escape') {
+                e.preventDefault();
                 handleEditStop();
               }
             }}
@@ -352,4 +390,5 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       </Stack>
     );
   },
+  arePropsEqual, // 虚拟滚动场景下的关键优化！
 );
