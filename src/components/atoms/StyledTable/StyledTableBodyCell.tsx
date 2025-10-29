@@ -3,13 +3,13 @@ import {
   memo,
   MouseEvent,
   ReactNode,
+  startTransition,
   useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  startTransition,
 } from 'react';
 import { flushSync } from 'react-dom';
 import {
@@ -134,7 +134,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
     const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
-    
+
     // 优化: 直接从columnMeta判断canEdit，不需要meta方法
     const canEdit = columnId !== '__select' && actionKey !== 'use-ai';
     const canInteract = Boolean(cell && !isSelectColumn && canEdit);
@@ -149,9 +149,13 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const cellValueObj = useMemo(() => {
       return typeof value === 'object' && value !== null ? value : {};
     }, [value]);
-    const isFinished = 'isFinished' in cellValueObj ? cellValueObj.isFinished : false;
-    const externalContent = 'externalContent' in cellValueObj ? cellValueObj.externalContent : undefined;
-    
+    const isFinished =
+      'isFinished' in cellValueObj ? cellValueObj.isFinished : false;
+    const externalContent =
+      'externalContent' in cellValueObj
+        ? cellValueObj.externalContent
+        : undefined;
+
     const triggerAiProcess = tableMeta?.triggerAiProcess;
 
     const resolvedMinWidth =

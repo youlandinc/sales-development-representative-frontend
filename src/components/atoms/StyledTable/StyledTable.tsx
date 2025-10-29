@@ -740,9 +740,9 @@ export const StyledTable: FC<StyledTableProps> = ({
                     // 优化: O(1)检查而不是O(M)遍历所有columns
                     const hasActiveInRow =
                       cell.column.id === '__select'
-                        ? (table.options.meta as any)?.hasActiveInRow?.(
+                        ? ((table.options.meta as any)?.hasActiveInRow?.(
                             String(cell.row.id),
-                          ) ?? false
+                          ) ?? false)
                         : false;
 
                     return (
@@ -795,9 +795,9 @@ export const StyledTable: FC<StyledTableProps> = ({
                     // 优化: O(1)检查而不是O(M)遍历所有columns
                     const hasActiveInRow =
                       cell.column.id === '__select'
-                        ? (table.options.meta as any)?.hasActiveInRow?.(
+                        ? ((table.options.meta as any)?.hasActiveInRow?.(
                             String(cell.row.id),
-                          ) ?? false
+                          ) ?? false)
                         : false;
 
                     return (
