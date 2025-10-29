@@ -90,7 +90,7 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
   // Track last range to avoid redundant calls
   const lastRangeRef = useRef<{ start: number; end: number } | null>(null);
   const rangeTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Store latest callback in ref to avoid closure issues
   const onVisibleRangeChangeRef = useRef(onVisibleRangeChange);
   useEffect(() => {

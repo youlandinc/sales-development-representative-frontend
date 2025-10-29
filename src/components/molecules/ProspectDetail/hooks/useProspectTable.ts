@@ -42,7 +42,6 @@ export const useProspectTable = ({
   const {
     fetchTable,
     fetchRowIds,
-    setRowIds,
     columns,
     rowIds,
     runRecords,
@@ -60,7 +59,9 @@ export const useProspectTable = ({
   const maxLoadedIndexRef = useRef(-1);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const lastVisibleRangeRef = useRef<{ start: number; end: number } | null>(null);
+  const lastVisibleRangeRef = useRef<{ start: number; end: number } | null>(
+    null,
+  );
 
   // Fetch metadata (headers and rowIds)
   const { isLoading: isMetadataLoading } = useSWR(
@@ -213,7 +214,7 @@ export const useProspectTable = ({
     // Delay to let virtual table update
     const timer = setTimeout(() => {
       const { start, end } = lastVisibleRangeRef.current!;
-      
+
       // Re-check if current visible range needs loading
       const loadStartIndex = Math.max(0, start);
       const loadEndIndex = Math.min(rowIds.length - 1, end);
@@ -437,7 +438,7 @@ export const useProspectTable = ({
     (recordId: string, updates: Record<string, any>) => {
       const currentRowData = rowsMapRef.current[recordId] || { id: recordId };
       const updatedRowData = { ...currentRowData, ...updates };
-      
+
       rowsMapRef.current[recordId] = updatedRowData;
       setRowsMap((prev) => ({
         ...prev,
