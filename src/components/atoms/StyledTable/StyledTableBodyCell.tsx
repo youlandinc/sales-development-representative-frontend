@@ -157,6 +157,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         : undefined;
 
     const triggerAiProcess = tableMeta?.triggerAiProcess;
+    const triggerBatchAiProcess = tableMeta?.triggerBatchAiProcess;
+    const triggerRelatedAiProcess = tableMeta?.triggerRelatedAiProcess;
+    const hasAiColumnInRow = useMemo(
+      () => tableMeta?.hasAiColumnInRow?.(recordId) ?? false,
+      [tableMeta, recordId],
+    );
 
     const resolvedMinWidth =
       width < CELL_CONSTANTS.MIN_WIDTH ? CELL_CONSTANTS.MIN_WIDTH : width;
@@ -299,6 +305,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       handleEditStop,
       localEditValue,
       isRowHovered,
+      hasAiColumnInRow,
     ]);
 
     const handleClick = useCallback(
@@ -328,6 +335,29 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         }
       },
       [canInteract, tableMeta, recordId, columnId],
+    );
+
+    const handleAiIconClick = useCallback(
+      (e: MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        if (isSelectColumn) {
+          // select列icon点击：触发所有行的所有AI列
+          triggerBatchAiProcess?.();
+        } else if (isAiColumn) {
+          // AI列icon点击：触发该行的AI列和相关列
+          triggerRelatedAiProcess?.(recordId, columnId);
+        }
+      },
+      [
+        isSelectColumn,
+        isAiColumn,
+        triggerBatchAiProcess,
+        triggerRelatedAiProcess,
+        recordId,
+        columnId,
+      ],
     );
 
     return (
@@ -391,6 +421,28 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         >
           {content}
         </Box>
+        {/* AI标识：hover时在select列和AI列右侧显示 */}
+        {isRowHovered &&
+          hasAiColumnInRow &&
+          (isSelectColumn || isAiColumn) && (
+            <Box
+              onClick={handleAiIconClick}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                fontSize: 12,
+                color: 'primary.main',
+                fontWeight: 600,
+                zIndex: 10,
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.7,
+                },
+              }}
+            >
+              X
+            </Box>
+          )}
       </Stack>
     );
   },
