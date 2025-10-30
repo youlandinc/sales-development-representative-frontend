@@ -349,8 +349,5 @@ export const getAiColumnMenuActions = (
   },
 ];
 
-// Backward compatibility - defaults to normal menu
-export const getColumnMenuActions = getNormalColumnMenuActions;
-
 export const ROW_HEIGHT = 36;
 export const MIN_BATCH_SIZE = 50;

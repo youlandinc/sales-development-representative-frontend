@@ -10,3 +10,4 @@ export { StyledTableBodyRow } from './StyledTableBodyRow';
 export { StyledTableBodyCell } from './StyledTableBodyCell';
 
 export { StyledTableSpacer } from './StyledTableSpacer';
+export { StyledTableAiIcon } from './StyledTableAiIcon';

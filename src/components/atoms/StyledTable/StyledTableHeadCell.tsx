@@ -11,6 +11,7 @@ import { Box, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 import { COLUMN_TYPE_ICONS } from './columnTypeIcons';
+import { StyledTableAiIcon } from './StyledTableAiIcon';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -61,6 +62,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   showPinnedRightShadow,
 }) => {
   const [localEditValue, setLocalEditValue] = useState<string>('');
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
@@ -119,19 +121,19 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       e.preventDefault();
 
       if (isAiColumn && header) {
-        // AI列header icon点击：触发所有行的该列和相关列
         const columnId = header.column.id;
-        const rowIds = header
-          .getContext()
-          .table.getRowModel()
-          .rows.map((row) => row.id);
-        rowIds.forEach((recordId) => {
-          tableMeta?.triggerRelatedAiProcess?.(recordId, columnId);
+        tableMeta?.onRunAi?.({
+          fieldId: columnId,
+          isHeader: true,
         });
       }
     },
     [isAiColumn, tableMeta, header],
   );
+
+  // 计算背景色：选中 > hover > 默认
+  const headerBackgroundColor =
+    isActive || (isHovered && !isEditing) ? '#F7F4FD' : '#FFFFFF';
 
   return (
     <Stack
@@ -140,6 +142,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       ref={measureRef}
       sx={{
         userSelect: 'none',
@@ -234,27 +238,11 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             {content}
           </Stack>
         )}
-        {/* AI标识：在AI列header显示 */}
         {!isEditing && isAiColumn && (
-          <Box
+          <StyledTableAiIcon
+            backgroundColor={headerBackgroundColor}
             onClick={handleAiIconClick}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              fontSize: 12,
-              color: 'primary.main',
-              fontWeight: 600,
-              cursor: 'pointer',
-              zIndex: 5,
-              '&:hover': {
-                opacity: 0.7,
-              },
-            }}
-          >
-            X
-          </Box>
+          />
         )}
       </Box>
 
@@ -304,9 +292,9 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               '&::after': {
                 content: '""',
                 position: 'absolute',
-                left: '50%',
+                right: '0px',
                 top: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translateY(-50%)',
                 width: '3px',
                 height: '50%',
                 backgroundColor: 'rgba(0, 0, 0, 0.2)',

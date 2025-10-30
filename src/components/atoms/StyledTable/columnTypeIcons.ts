@@ -25,3 +25,5 @@ export const COLUMN_TYPE_ICONS: {
   [TableColumnTypeEnum.checkbox]: ICON_TYPE_CHECKBOX,
   [TableColumnTypeEnum.select]: ICON_TYPE_SELECT,
 };
+
+export { default as ICON_RUN_AI } from './assets/icon-run-ai.svg';

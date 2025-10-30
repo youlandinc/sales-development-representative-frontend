@@ -76,6 +76,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     onAiProcess,
     onCellEdit,
     onInitializeAiColumns,
+    onRunAi,
   } = useProspectTable({ tableId });
 
   return (
@@ -201,6 +202,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
               }
             }
           }}
+          onRunAi={onRunAi}
           rowIds={rowIds}
           scrolled={scrolled}
           virtualization={{

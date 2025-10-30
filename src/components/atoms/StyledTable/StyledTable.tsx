@@ -77,6 +77,11 @@ interface StyledTableProps {
   onAiProcess?: (recordId: string, columnId: string) => void;
   onCellClick: (columnId: string, rowId: string, data: any) => void;
   aiLoading?: Record<string, Record<string, boolean>>;
+  onRunAi?: (params: {
+    fieldId: string;
+    recordId?: string;
+    isHeader?: boolean;
+  }) => Promise<void>;
 }
 
 const columnHelper = createColumnHelper<any>();
@@ -97,6 +102,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   onAiProcess,
   aiLoading,
   onCellClick,
+  onRunAi,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -180,8 +186,8 @@ export const StyledTable: FC<StyledTableProps> = ({
         />
       ),
       cell: (info) => info,
-      size: 60,
-      minSize: 60,
+      size: 100,
+      minSize: 100,
       enableResizing: false,
     });
 
@@ -246,7 +252,6 @@ export const StyledTable: FC<StyledTableProps> = ({
         cellState?.isEditing === true,
       isActive: (recordId: string, columnId: string) =>
         cellState?.recordId === recordId && cellState?.columnId === columnId,
-      // 优化: O(1)检查该行是否有active cell，避免遍历所有columns
       hasActiveInRow: (recordId: string) => cellState?.recordId === recordId,
       setCellMode: (
         recordId: string,
@@ -271,22 +276,18 @@ export const StyledTable: FC<StyledTableProps> = ({
             break;
         }
       },
-      // 优化: 移除canEdit，直接在StyledTableBodyCell中从cell.column.columnDef.meta获取actionKey判断
       isAiLoading: (recordId: string, columnId: string) =>
         Boolean(aiLoading?.[recordId]?.[columnId]),
-      // 优化: 移除isFinished和getExternalContent，直接在StyledTableBodyCell中从cell.getValue()获取
       triggerAiProcess: (recordId: string, columnId: string) => {
         onAiProcess?.(recordId, columnId);
       },
       hasAiColumnInRow: (recordId: string) => {
-        // 检查该行是否有AI列（actionKey为'use-ai'或包含'find'）
         return columns.some(
           (col) =>
             col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
         );
       },
       triggerBatchAiProcess: () => {
-        // 触发所有行的所有AI列
         const aiColumns = columns.filter(
           (col) =>
             col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
@@ -298,17 +299,14 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
       triggerRelatedAiProcess: (recordId: string, columnId: string) => {
-        // 触发该行的AI列和相关列（通过dependentFieldId）
         const aiColumns = columns.filter(
           (col) =>
             col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
         );
 
         aiColumns.forEach((col) => {
-          // 触发AI列本身
           onAiProcess?.(recordId, col.fieldId);
 
-          // 如果有dependentFieldId，也触发相关列
           if (col.dependentFieldId) {
             onAiProcess?.(recordId, col.dependentFieldId);
           }
@@ -320,6 +318,7 @@ export const StyledTable: FC<StyledTableProps> = ({
             col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
         );
       },
+      onRunAi: onRunAi,
       isHeaderEditing: (headerId: string) =>
         headerState?.columnId === headerId && headerState?.isEditing === true,
       startHeaderEdit: (headerId: string) => {
@@ -1041,6 +1040,7 @@ export const StyledTable: FC<StyledTableProps> = ({
 
                     return (
                       <MenuItem
+                        component={'div'}
                         key={item.label}
                         onClick={() =>
                           !hasSubmenu && handleHeaderMenuClick(item)
@@ -1098,6 +1098,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                                   ) {
                                     return (
                                       <MenuItem
+                                        component={'div'}
                                         key={subItem.label}
                                         onClick={(e) => {
                                           e.stopPropagation();
