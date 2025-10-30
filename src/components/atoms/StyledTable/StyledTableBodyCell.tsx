@@ -341,7 +341,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       (e: MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
         e.preventDefault();
-        
+
         if (isSelectColumn) {
           // select列icon点击：触发所有行的所有AI列
           triggerBatchAiProcess?.();
@@ -422,27 +422,25 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           {content}
         </Box>
         {/* AI标识：hover时在select列和AI列右侧显示 */}
-        {isRowHovered &&
-          hasAiColumnInRow &&
-          (isSelectColumn || isAiColumn) && (
-            <Box
-              onClick={handleAiIconClick}
-              sx={{
-                position: 'absolute',
-                right: 8,
-                fontSize: 12,
-                color: 'primary.main',
-                fontWeight: 600,
-                zIndex: 10,
-                cursor: 'pointer',
-                '&:hover': {
-                  opacity: 0.7,
-                },
-              }}
-            >
-              X
-            </Box>
-          )}
+        {isRowHovered && hasAiColumnInRow && (isSelectColumn || isAiColumn) && (
+          <Box
+            onClick={handleAiIconClick}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              fontSize: 12,
+              color: 'primary.main',
+              fontWeight: 600,
+              zIndex: 10,
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.7,
+              },
+            }}
+          >
+            X
+          </Box>
+        )}
       </Stack>
     );
   },
