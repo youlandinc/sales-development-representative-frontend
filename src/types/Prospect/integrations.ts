@@ -3,6 +3,7 @@ export enum IntegrationActionType {
   work_email_with_profile_url = 'WORK_EMAIL_WITH_PROFILE_URL',
   personal_email = 'PERSONAL_EMAIL',
   phone_number = 'PHONE_NUMBER',
+  linkedin_profile = 'LINKEDIN_PROFILE',
   use_ai = 'USE_AI',
 }
 
