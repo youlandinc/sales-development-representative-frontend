@@ -89,3 +89,8 @@ export interface EmailDomainData {
   recordName: string;
   recordValue: string;
 }
+
+export enum BizCodeEnum {
+  email_domain = 'EMAIL_DOMAIN',
+  signature = 'SIGNATURE',
+}

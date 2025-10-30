@@ -2,26 +2,28 @@ import { useEffect, useMemo, useState } from 'react';
 import { debounce, Fade, Slider, Stack, Typography } from '@mui/material';
 import { addDays, isDate, isValid } from 'date-fns';
 import { useRouter } from 'nextjs-toploader/app';
+import useSWR from 'swr';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { WORD_COUNT_OPTIONS } from '@/constant';
+import { UNotUndefined } from '@/utils';
 
-import {
-  HttpError,
-  ProcessCreateTypeEnum,
-  ResponseCampaignLaunchInfo,
-} from '@/types';
 import {
   SDRToast,
   StyledDatePicker,
   StyledSelect,
   StyledSwitch,
 } from '@/components/atoms';
-import { UNotUndefined } from '@/utils';
 import { CommonSelectWithAction } from '@/components/molecules';
-import useSWR from 'swr';
-import { _fetchEmailSignatures } from '@/request';
+
+import { _commonFetchSettings } from '@/request';
+import {
+  BizCodeEnum,
+  HttpError,
+  ProcessCreateTypeEnum,
+  ResponseCampaignLaunchInfo,
+} from '@/types';
 
 const tomorrow = addDays(new Date(), 1);
 
@@ -119,25 +121,41 @@ export const CampaignProcessContentLunch = () => {
     'fetchSignature',
     async () => {
       try {
-        const { data } = await _fetchEmailSignatures();
+        const {
+          data: {
+            [BizCodeEnum.signature]: signatureList,
+            [BizCodeEnum.email_domain]: emailDomainList,
+          },
+        } = await _commonFetchSettings({
+          bizCode: [BizCodeEnum.email_domain, BizCodeEnum.signature],
+        });
 
-        if (!data || data.length === 0) {
-          return;
-        }
+        const reducedSignatureList = signatureList.map((item) => ({
+          label: item.label,
+          key: String(item.key),
+          value: String(item.value),
+          selected: item.selected,
+        }));
 
-        const reducedData = data.map((item) => ({
-          label: item.name,
-          key: String(item.id),
-          value: String(item.id),
-          default: item.default,
+        const reducedEmailDomainList = emailDomainList.map((item) => ({
+          label: item.label,
+          key: String(item.key),
+          value: String(item.value),
+          selected: item.selected,
         }));
 
         setSignatureList((prev) => [
-          ...reducedData,
+          ...reducedSignatureList,
           ...prev.filter((item) => item.key === 'noSignature'),
         ]);
 
-        const defaultSignature = reducedData.find((item) => item.default);
+        const defaultSignature = reducedSignatureList.find(
+          (item) => item.selected,
+        );
+        const defaultEmailDomain = reducedEmailDomainList.find(
+          (item) => item.selected,
+        );
+
         if (defaultSignature) {
           setFormData((prev) => ({
             ...prev,
