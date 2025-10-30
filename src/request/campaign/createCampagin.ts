@@ -181,6 +181,7 @@ export const _saveAndLunchCampaign = (params: {
   scheduleTime: string | null;
   sender: string;
   senderName: string;
+  signatureId: string | null;
 }) => {
   return put('/sdr/campaign/info', params);
 };
