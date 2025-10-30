@@ -17,6 +17,7 @@ export interface TableColumnProps {
   fieldName: string;
   fieldType: TableColumnTypeEnum;
   actionKey: string | null;
+  dependentFieldId: string | null;
   visible: boolean;
   isUnique: boolean;
   nullable: boolean;
