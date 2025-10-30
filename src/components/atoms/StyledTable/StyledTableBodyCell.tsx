@@ -164,6 +164,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       [tableMeta, recordId],
     );
 
+    // Cell级别的hover状态
+    const [isCellHovered, setIsCellHovered] = useState(false);
+
     const resolvedMinWidth =
       width < CELL_CONSTANTS.MIN_WIDTH ? CELL_CONSTANTS.MIN_WIDTH : width;
 
@@ -364,6 +367,8 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       <Stack
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
+        onMouseEnter={() => setIsCellHovered(true)}
+        onMouseLeave={() => setIsCellHovered(false)}
         sx={{
           width,
           minWidth: resolvedMinWidth,
@@ -421,8 +426,10 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         >
           {content}
         </Box>
-        {/* AI标识：hover时在select列和AI列右侧显示 */}
-        {isRowHovered && hasAiColumnInRow && (isSelectColumn || isAiColumn) && (
+        {/* AI标识：select列在行hover时显示，AI列在cell hover时显示 */}
+        {hasAiColumnInRow &&
+          ((isSelectColumn && isRowHovered) ||
+            (isAiColumn && isCellHovered)) && (
           <Box
             onClick={handleAiIconClick}
             sx={{
