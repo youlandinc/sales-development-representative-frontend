@@ -99,6 +99,17 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
                 callback(menus);
               },
             });
+            const defaultPStyle = 'margin: 0; ';
+            editor.on('GetContent', (e: any) => {
+              const wrapper = document.createElement('div');
+              wrapper.innerHTML = e.content;
+              wrapper.querySelectorAll('p').forEach((p) => {
+                if (!p.getAttribute('style')) {
+                  p.setAttribute('style', defaultPStyle);
+                }
+              });
+              e.content = wrapper.innerHTML;
+            });
           },
           plugins: [
             // Core editing features
@@ -166,6 +177,7 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           // help_tabs: [],
           // 禁用状态栏
           // statusbar: false,
+
           images_upload_handler: async (blobInfo: any) => {
             try {
               const formData = new FormData();
@@ -193,25 +205,10 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           images_file_types: 'jpeg,jpg,png,gif,webp',
           // 文件大小限制 (10MB)
           images_max_size: 10485760,
+          // 保留样式属性
+          allow_html_in_named_anchor: true,
+          paste_data_images: true,
           menubar: false,
-          style_formats: [
-            {
-              title: 'Image Left',
-              selector: 'img',
-              styles: {
-                float: 'left',
-                margin: '0 10px 0 10px',
-              },
-            },
-            {
-              title: 'Image Right',
-              selector: 'img',
-              styles: {
-                float: 'right',
-                margin: '0 10px 0 10px',
-              },
-            },
-          ],
         }}
         onEditorChange={onChange}
         value={value}

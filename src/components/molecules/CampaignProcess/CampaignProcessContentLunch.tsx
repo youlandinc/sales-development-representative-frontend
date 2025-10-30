@@ -185,6 +185,8 @@ export const CampaignProcessContentLunch = () => {
     });
   };
 
+  console.log(formData);
+
   return (
     <Stack
       borderLeft={
