@@ -25,6 +25,7 @@ import {
 } from '@/components/molecules';
 
 import { useComputedInWorkEmailStore } from './Dialog/DialogWorkEmail/hooks';
+import { MathIntegrationTypeEnum } from '@/types';
 
 interface ProspectDetailTableProps {
   tableId: string;
@@ -144,7 +145,9 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                     }),
                   }));
                   if (column.actionKey) {
-                    matchActionKeyToIntegration(column.actionKey);
+                    matchActionKeyToIntegration(
+                      column.actionKey as MathIntegrationTypeEnum,
+                    );
                     setActiveType(ActiveTypeEnum.edit);
                     setEditConfigParams({
                       groupId: column.groupId,

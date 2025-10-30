@@ -3,6 +3,7 @@ import { useWorkEmailStore } from '@/stores/Prospect';
 import {
   IntegrationActionInputParams,
   IntegrationActionType,
+  MATH_INTEGRATION_TO_ACTION_TYPE,
   MathIntegrationTypeEnum,
 } from '@/types/Prospect';
 
@@ -40,18 +41,10 @@ export const useComputedInWorkEmailStore = () => {
     .flat()
     .some((i) => !i.selectedOption);
 
-  const matchActionKeyToIntegration = (actionKey: string) => {
-    if (actionKey.includes(MathIntegrationTypeEnum.work_email)) {
-      setIntegrationActionType(IntegrationActionType.work_email);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.personal_email)) {
-      setIntegrationActionType(IntegrationActionType.personal_email);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.phone_number)) {
-      setIntegrationActionType(IntegrationActionType.phone_number);
-      return;
+  const matchActionKeyToIntegration = (actionKey: MathIntegrationTypeEnum) => {
+    const integrationActionType = MATH_INTEGRATION_TO_ACTION_TYPE[actionKey];
+    if (integrationActionType) {
+      setIntegrationActionType(integrationActionType);
     }
   };
 
