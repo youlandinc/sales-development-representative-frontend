@@ -430,24 +430,24 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         {hasAiColumnInRow &&
           ((isSelectColumn && isRowHovered) ||
             (isAiColumn && isCellHovered)) && (
-          <Box
-            onClick={handleAiIconClick}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              fontSize: 12,
-              color: 'primary.main',
-              fontWeight: 600,
-              zIndex: 10,
-              cursor: 'pointer',
-              '&:hover': {
-                opacity: 0.7,
-              },
-            }}
-          >
-            X
-          </Box>
-        )}
+            <Box
+              onClick={handleAiIconClick}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                fontSize: 12,
+                color: 'primary.main',
+                fontWeight: 600,
+                zIndex: 10,
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.7,
+                },
+              }}
+            >
+              X
+            </Box>
+          )}
       </Stack>
     );
   },
