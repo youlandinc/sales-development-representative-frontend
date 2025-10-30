@@ -41,10 +41,22 @@ export const useComputedInWorkEmailStore = () => {
     .flat()
     .some((i) => !i.selectedOption);
 
-  const matchActionKeyToIntegration = (actionKey: MathIntegrationTypeEnum) => {
-    const integrationActionType = MATH_INTEGRATION_TO_ACTION_TYPE[actionKey];
-    if (integrationActionType) {
-      setIntegrationActionType(integrationActionType);
+  const matchActionKeyToIntegration = (actionKey: string) => {
+    if (actionKey.includes(MathIntegrationTypeEnum.work_email)) {
+      setIntegrationActionType(IntegrationActionType.work_email);
+      return;
+    }
+    if (actionKey.includes(MathIntegrationTypeEnum.personal_email)) {
+      setIntegrationActionType(IntegrationActionType.personal_email);
+      return;
+    }
+    if (actionKey.includes(MathIntegrationTypeEnum.phone_number)) {
+      setIntegrationActionType(IntegrationActionType.phone_number);
+      return;
+    }
+    if (actionKey.includes(MathIntegrationTypeEnum.linkedin_profile)) {
+      setIntegrationActionType(IntegrationActionType.linkedin_profile);
+      return;
     }
   };
 
