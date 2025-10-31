@@ -8,7 +8,7 @@ import {
 } from 'react';
 import useSWR from 'swr';
 
-import { useProspectTableStore } from '@/stores/Prospect';
+import { useProspectTableStore, useWorkEmailStore } from '@/stores/Prospect';
 import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
@@ -55,6 +55,7 @@ export const useProspectTable = ({
     updateCellValue,
   } = useProspectTableStore((store) => store);
   const { runAi } = useRunAi();
+  const { fetchIntegrationMenus } = useWorkEmailStore((store) => store);
 
   // State management
   const rowsMapRef = useRef<Record<string, any>>({});
@@ -210,7 +211,14 @@ export const useProspectTable = ({
       return;
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
-  }, [tableId, total, fetchBatchData, isMetadataLoading]);
+    fetchIntegrationMenus();
+  }, [
+    tableId,
+    total,
+    fetchBatchData,
+    isMetadataLoading,
+    fetchIntegrationMenus,
+  ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)
   useEffect(() => {

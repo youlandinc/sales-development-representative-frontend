@@ -49,6 +49,15 @@ export interface IntegrationAction {
   skipped: boolean;
 }
 
+export interface IntegrationActionMenu {
+  actionKey: string;
+  name: string;
+  logoUrl: string;
+  estimatedScore: string;
+  description: string;
+  waterfallConfigs: IntegrationAction[];
+}
+
 export enum WaterfallConfigTypeEnum {
   setup = 'setup',
   configure = 'configure',

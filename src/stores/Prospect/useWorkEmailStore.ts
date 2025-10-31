@@ -4,33 +4,32 @@ import { SDRToast } from '@/components/atoms';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
-import { _fetchAllActionsList } from '@/request/enrichments/integrations';
+import { _fetchIntegrationMenus } from '@/request/enrichments/integrations';
 
 import { ActiveTypeEnum, HttpError } from '@/types';
 
 import {
   DisplayTypeEnum,
   IntegrationAction,
+  IntegrationActionMenu,
   IntegrationActionType,
   WaterfallConfigTypeEnum,
 } from '@/types/Prospect';
 
-interface EditWaterfallConfig
-  extends Pick<IntegrationAction, 'actionKey' | 'skipped'> {
-  inputParams: {
-    name: string;
-    selectedOption: TOption;
-  }[];
-}
-
-interface EditConfigParams {
-  groupId: string;
-  waterfallConfigs: EditWaterfallConfig[];
-}
+// 工具函数：构建selectedOption对象
+const buildSelectedOption = (column: any) =>
+  column?.fieldId
+    ? {
+        label: column.fieldName || '',
+        value: column.fieldId || '',
+        key: column.fieldId || '',
+      }
+    : null;
 
 type WorkEmailStoreProps = {
+  integrationMenus: IntegrationActionMenu[];
   activeType: ActiveTypeEnum;
-  editConfigParams: EditConfigParams | null;
+  groupId: string;
   dialogHeaderName: string;
   integrationActionType: IntegrationActionType;
   waterfallDescription: string;
@@ -59,17 +58,19 @@ type WorkEmailStoreActions = {
   setAllIntegrations: (integrations: IntegrationAction[]) => void;
   setWaterfallConfigType: (type: WaterfallConfigTypeEnum) => void;
   setIsValidatedInputParams: (isValidated: boolean) => void;
-  setEditConfigParams: (params: EditConfigParams | null) => void;
   updateIntegrationsOrder: (integrations: IntegrationAction[]) => void;
   addIntegrationToDefault: (integration: IntegrationAction) => void;
+  handleEditClick: (columnId: string) => void;
   fetchIntegrations: () => Promise<void>;
+  fetchIntegrationMenus: () => Promise<void>;
 };
 
 export const useWorkEmailStore = create<
   WorkEmailStoreProps & WorkEmailStoreActions
 >((set, get) => ({
+  integrationMenus: [],
   activeType: ActiveTypeEnum.add,
-  editConfigParams: null,
+  groupId: '',
   dialogHeaderName: '',
   integrationActionType: IntegrationActionType.work_email,
   waterfallDescription: '',
@@ -131,11 +132,6 @@ export const useWorkEmailStore = create<
       dialogHeaderName: name,
     });
   },
-  setEditConfigParams: (params: EditConfigParams | null) => {
-    set({
-      editConfigParams: params,
-    });
-  },
   setWaterfallDescription: (description: string) => {
     set({
       waterfallDescription: description,
@@ -183,7 +179,7 @@ export const useWorkEmailStore = create<
     });
   },
   updateIntegrationsOrder: (sortedIntegrations: IntegrationAction[]) => {
-    const { allIntegrations, editConfigParams } = get();
+    const { allIntegrations } = get();
 
     // 获取当前所有默认和非默认集成
     const currentDefaultIntegrations = allIntegrations.filter(
@@ -202,24 +198,9 @@ export const useWorkEmailStore = create<
     // 按照排序后的顺序重新排列 defaultIntegrations
     const sortedDefaultIntegrations = [...currentDefaultIntegrations].sort(
       (a, b) => {
-        const indexA = sortedMap.get(a.actionKey);
-        const indexB = sortedMap.get(b.actionKey);
-
-        // 如果两个项都在排序列表中，按照排序列表的顺序排序
-        if (indexA !== undefined && indexB !== undefined) {
-          return indexA - indexB;
-        }
-
-        // 如果只有一个项在排序列表中，将不在列表中的项放在后面
-        if (indexA !== undefined) {
-          return -1;
-        }
-        if (indexB !== undefined) {
-          return 1;
-        }
-
-        // 如果两个项都不在排序列表中，保持原顺序
-        return 0;
+        const indexA = sortedMap.get(a.actionKey) ?? Number.MAX_SAFE_INTEGER;
+        const indexB = sortedMap.get(b.actionKey) ?? Number.MAX_SAFE_INTEGER;
+        return indexA - indexB;
       },
     );
 
@@ -231,26 +212,60 @@ export const useWorkEmailStore = create<
       ],
     });
   },
-  fetchIntegrations: async () => {
-    // reset integrations
-    set({
-      allIntegrations: [],
-      waterfallConfigType: WaterfallConfigTypeEnum.setup,
-    });
-    try {
-      const res = await _fetchAllActionsList(get().integrationActionType);
-      if (Array.isArray(res.data)) {
-        if (get().editConfigParams) {
-          const editParam = get().editConfigParams?.waterfallConfigs;
+  handleEditClick: (columnId: string) => {
+    const { columns, fieldGroupMap } = useProspectTableStore.getState();
+    const column = columns.find((col) => col.fieldId === columnId);
 
-          // 创建一个映射，记录 editParam 中每个项的顺序
-          const orderMap = new Map(
-            editParam?.map((item, index) => [item.actionKey, index]),
+    if (column?.groupId && fieldGroupMap) {
+      //将requiredInputsBinding转换为选中的选项展示
+      const requiredInputsBinding =
+        fieldGroupMap?.[column.groupId]?.requiredInputsBinding || [];
+
+      const selectedOptions = requiredInputsBinding.map((i) => {
+        const field = columns.find((col) => col.fieldId === i.formulaText);
+        return {
+          label: field?.fieldName || '',
+          value: field?.fieldId || '',
+          key: field?.fieldId || '',
+        };
+      });
+
+      const waterfallConfigInField = fieldGroupMap?.[
+        column.groupId
+      ]?.waterfallConfigs?.map((i) => ({
+        actionKey: i.actionKey,
+        skipped: i.skipped,
+        inputParams: i.inputParameters.map((p) => {
+          const field = selectedOptions.find(
+            (col) => col.value === p.formulaText,
           );
+          return {
+            name: p.name,
+            selectedOption: {
+              label: field?.label || '',
+              value: field?.value || '',
+              key: field?.key || '',
+            },
+          };
+        }),
+      }));
+      //根据actionKey找到integration
+      const integration = get().integrationMenus.find(
+        (i) => column && column.actionKey?.includes(i.actionKey || ''),
+      );
 
-          // 处理 API 返回的数据
-          const processedIntegrations = res.data.map((i) => {
-            const editItem = editParam?.find(
+      if (waterfallConfigInField && integration) {
+        const editParam = waterfallConfigInField;
+
+        // 创建一个映射，记录 editParam 中每个项的顺序
+        const orderMap = new Map(
+          editParam.map((item, index) => [item.actionKey, index]),
+        );
+
+        // 处理 API 返回的数据
+        const processedIntegrations =
+          integration.waterfallConfigs?.map((i) => {
+            const editItem = editParam.find(
               (item) => item.actionKey === i.actionKey,
             );
             if (editItem) {
@@ -263,57 +278,67 @@ export const useWorkEmailStore = create<
                   ),
                 })),
                 isDefault: true,
-                skipped: editItem?.skipped || false,
+                skipped: editItem.skipped || false,
               };
             }
             return {
               ...i,
               isDefault: false,
             };
-          });
+          }) || [];
 
-          // 对集成进行排序
-          // 1. 先分离出在 editParam 中的项和不在的项
-          const inEditParam = processedIntegrations.filter((i) =>
-            editParam?.some((e) => e.actionKey === i.actionKey),
-          );
-          const notInEditParam = processedIntegrations.filter(
-            (i) => !editParam?.some((e) => e.actionKey === i.actionKey),
-          );
+        // 对集成进行排序 - 使用Set提高性能
+        const editParamKeys = new Set(editParam.map((e) => e.actionKey));
+        const inEditParam = processedIntegrations.filter((i) =>
+          editParamKeys.has(i.actionKey),
+        );
+        const notInEditParam = processedIntegrations.filter(
+          (i) => !editParamKeys.has(i.actionKey),
+        );
 
-          // 2. 按照 editParam 的顺序排序
-          inEditParam.sort((a, b) => {
-            const orderA = orderMap.get(a.actionKey) ?? Number.MAX_SAFE_INTEGER;
-            const orderB = orderMap.get(b.actionKey) ?? Number.MAX_SAFE_INTEGER;
-            return orderA - orderB;
-          });
+        // 按照 editParam 的顺序排序
+        inEditParam.sort((a, b) => {
+          const orderA = orderMap.get(a.actionKey) ?? Number.MAX_SAFE_INTEGER;
+          const orderB = orderMap.get(b.actionKey) ?? Number.MAX_SAFE_INTEGER;
+          return orderA - orderB;
+        });
 
-          // 3. 合并排序后的结果
-          set({
-            allIntegrations: [...inEditParam, ...notInEditParam],
-          });
-          return;
-        }
-
-        // 如果没有 editConfigParams，按原来的逻辑处理
+        // 合并排序后的结果
         set({
-          allIntegrations: res.data.map((i) => ({
-            ...i,
-            inputParams: i.inputParams.map((p) => {
-              const column = useProspectTableStore
-                .getState()
-                .columns.find((c) => c.semanticType === p.semanticType);
-              return {
-                ...p,
-                selectedOption: column?.fieldId
-                  ? {
-                      label: column?.fieldName || '',
-                      value: column?.fieldId || '',
-                      key: column?.fieldId || '',
-                    }
-                  : null,
-              };
-            }),
+          allIntegrations: [...inEditParam, ...notInEditParam],
+          activeType: ActiveTypeEnum.edit,
+          workEmailVisible: true,
+          dialogHeaderName: integration.name,
+          waterfallDescription: integration.description,
+          groupId: column.groupId,
+        });
+      }
+    }
+  },
+  fetchIntegrations: async () => {
+    // TODO: 实现集成列表获取逻辑
+  },
+  fetchIntegrationMenus: async () => {
+    try {
+      const res = await _fetchIntegrationMenus();
+      if (Array.isArray(res.data)) {
+        set({
+          integrationMenus: res.data.map((item) => ({
+            ...item,
+            waterfallConfigs: item.waterfallConfigs.map((i) => ({
+              ...i,
+              inputParams: i.inputParams.map((p) => {
+                const columns = useProspectTableStore.getState().columns;
+                const column = columns.find(
+                  (c) => c.semanticType === p.semanticType,
+                );
+
+                return {
+                  ...p,
+                  selectedOption: buildSelectedOption(column),
+                };
+              }),
+            })),
           })),
         });
       }

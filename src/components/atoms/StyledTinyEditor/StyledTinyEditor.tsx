@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Skeleton } from '@mui/material';
+import { Box } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect } from 'react';
 
 import { _uploadFile } from '@/request';
 
@@ -10,7 +10,6 @@ import { SDRToast } from '@/components/atoms/StyledToast';
 
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { TOOLBAR } from './data';
-import { useSwitch } from '@/hooks';
 
 interface StyledTinyEditorProps {
   onChange?: (dialogApi: any, details: any) => void;
@@ -21,8 +20,7 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   onChange,
   value,
 }: StyledTinyEditorProps) => {
-  const { signatures, fetchSignatures, fetchSignatureLoading } =
-    useSettingsStore();
+  const { signatures, fetchSignatures } = useSettingsStore();
 
   useEffect(() => {
     // close();

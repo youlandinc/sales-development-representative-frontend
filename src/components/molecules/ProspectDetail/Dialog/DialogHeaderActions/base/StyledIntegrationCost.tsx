@@ -1,12 +1,13 @@
 import { Icon, Stack, Typography } from '@mui/material';
-import { ElementType, FC } from 'react';
+import { FC } from 'react';
+import Image from 'next/image';
 
 import ICON_COST from '@/components/molecules/ProspectDetail/assets/dialog/icon_coins.svg';
 
 interface StyledIntegrationCostProps {
-  integrationIcon?: ElementType;
+  integrationIcon: string;
   integrationCost: number;
-  cost: number;
+  cost: number | string;
 }
 
 export const StyledIntegrationCost: FC<StyledIntegrationCostProps> = ({
@@ -25,10 +26,7 @@ export const StyledIntegrationCost: FC<StyledIntegrationCostProps> = ({
       py={0.5}
     >
       <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
-        <Icon
-          component={integrationIcon || ICON_COST}
-          sx={{ width: 18, height: 18 }}
-        />
+        <Image alt={''} height={18} src={integrationIcon} width={18} />
         <Typography color={'text.secondary'} variant={'body3'}>
           +{integrationCost}
         </Typography>

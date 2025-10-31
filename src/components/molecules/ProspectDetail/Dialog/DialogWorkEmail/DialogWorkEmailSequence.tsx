@@ -17,7 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Icon, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 
 import { StyledButton, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
@@ -161,7 +161,6 @@ export const DialogWorkEmailSequence: FC = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  // const [items, setItems] = useState(integrationsInWaterfall);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
