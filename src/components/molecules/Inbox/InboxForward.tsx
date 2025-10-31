@@ -1,20 +1,17 @@
 import { Autocomplete, Chip, Stack, Typography } from '@mui/material';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import {
   SDRToast,
   StyledButton,
   StyledTextFilledField,
+  StyledTinyEditor,
 } from '@/components/atoms';
-import {
-  InboxEditor,
-  InboxEditorForwardRefProps,
-} from '@/components/molecules';
 
-import { InboxContentTypeEnum, useInboxStore } from '@/stores/useInboxStore';
 import { useAsyncFn } from '@/hooks';
-import { HttpError } from '@/types';
 import { _forwardEmails, ForwardEmailsParam } from '@/request';
+import { InboxContentTypeEnum, useInboxStore } from '@/stores/useInboxStore';
+import { HttpError } from '@/types';
 
 type StyledChipFieldProps = {
   value: string[];
@@ -44,7 +41,6 @@ const StyledChipField: FC<StyledChipFieldProps> = ({
       <Typography
         color={'#6F6C7D'}
         lineHeight={1.4}
-        // position={'relative'}
         top={4}
         variant={'subtitle3'}
       >
@@ -133,8 +129,7 @@ export const InboxForward = () => {
   const [receipt, setReceipt] = useState<string[]>([]);
   const [subject, setSubject] = useState('');
   const [emailChip, setEmailChip] = useState<string[]>([]);
-
-  const editorRef = useRef<InboxEditorForwardRefProps | null>(null);
+  const [content, setContent] = useState<string>(forwardContent);
 
   const [state, sendEmail] = useAsyncFn(async (param: ForwardEmailsParam) => {
     try {
@@ -145,13 +140,6 @@ export const InboxForward = () => {
       SDRToast({ message, header, variant });
     }
   });
-
-  useEffect(() => {
-    if (editorRef.current?.editInstance) {
-      // editorRef.current.focus();
-      editorRef.current?.editInstance.initData;
-    }
-  }, [forwardContent]);
 
   useEffect(() => {
     setReceipt([forwardReceipt]);
@@ -181,7 +169,7 @@ export const InboxForward = () => {
                 recipient: receipt,
                 cc: emailChip,
                 subject: subject,
-                content: editorRef.current?.editInstance.getData() || '',
+                content: content,
               });
             }
           }}
@@ -192,11 +180,6 @@ export const InboxForward = () => {
         </StyledButton>
       </Stack>
       <Stack gap={1.5}>
-        {/* <StyledTextFilledField
-          label={'Receipt:'}
-          onChange={(e) => setReceipt(e.target.value)}
-          value={receipt}
-        />*/}
         <StyledChipField
           label={'Receipt:'}
           onChange={(value) => {
@@ -217,10 +200,11 @@ export const InboxForward = () => {
           value={subject}
         />
       </Stack>
-      <InboxEditor
-        config={{ height: '400px' }}
-        initData={forwardContent}
-        ref={editorRef}
+      <StyledTinyEditor
+        onChange={(content) => {
+          setContent(content);
+        }}
+        value={content}
       />
     </Stack>
   );

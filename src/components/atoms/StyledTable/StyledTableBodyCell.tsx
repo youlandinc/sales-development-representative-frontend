@@ -3,6 +3,7 @@ import {
   memo,
   MouseEvent,
   ReactNode,
+  startTransition,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -10,7 +11,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { flushSync } from 'react-dom';
 import {
   Box,
   Checkbox,
@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { Cell } from '@tanstack/react-table';
 import { useRowHover } from './StyledTableBodyRow';
+import { StyledTableAiIcon } from './index';
 
 const CELL_CONSTANTS = {
   MIN_WIDTH: 60,
@@ -72,6 +73,24 @@ interface StyledTableBodyCellProps {
   onCellClick: (columnId: string, rowId: string, data: any) => void;
 }
 
+const arePropsEqual = (
+  prev: StyledTableBodyCellProps,
+  next: StyledTableBodyCellProps,
+): boolean => {
+  return (
+    prev.width === next.width &&
+    prev.isPinned === next.isPinned &&
+    prev.stickyLeft === next.stickyLeft &&
+    prev.isEditing === next.isEditing &&
+    prev.isActive === next.isActive &&
+    prev.rowSelected === next.rowSelected &&
+    prev.showPinnedRightShadow === next.showPinnedRightShadow &&
+    prev.hasActiveInRow === next.hasActiveInRow &&
+    prev.cell?.id === next.cell?.id &&
+    prev.cell?.getValue() === next.cell?.getValue()
+  );
+};
+
 export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
   ({
     cell,
@@ -102,13 +121,6 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
 
     const { isRowHovered } = useRowHover();
 
-    const canEdit = tableMeta?.canEdit?.(recordId, columnId) ?? true;
-    const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
-    const isFinished = tableMeta?.isFinished?.(recordId, columnId) ?? false;
-    const externalContent = tableMeta?.getExternalContent?.(recordId, columnId);
-    const triggerAiProcess = tableMeta?.triggerAiProcess;
-    const canInteract = Boolean(cell && !isSelectColumn && canEdit);
-
     const isEditingFromMeta =
       tableMeta?.isEditing?.(recordId, columnId) ?? false;
     const isActiveFromMeta = tableMeta?.isActive?.(recordId, columnId) ?? false;
@@ -118,7 +130,35 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const columnMeta = cell?.column?.columnDef?.meta as any;
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
-    const isAiColumn = actionKey === 'use-ai';
+    const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
+
+    const canEdit = columnId !== '__select' && actionKey !== 'use-ai';
+    const canInteract = Boolean(cell && !isSelectColumn && canEdit);
+
+    const isAiLoading = useMemo(
+      () => tableMeta?.isAiLoading?.(recordId, columnId) ?? false,
+      [tableMeta, recordId, columnId],
+    );
+
+    const cellValueObj = useMemo(() => {
+      return typeof value === 'object' && value !== null ? value : {};
+    }, [value]);
+    const isFinished =
+      'isFinished' in cellValueObj ? cellValueObj.isFinished : false;
+    const externalContent =
+      'externalContent' in cellValueObj
+        ? cellValueObj.externalContent
+        : undefined;
+
+    const triggerAiProcess = tableMeta?.triggerAiProcess;
+    const triggerBatchAiProcess = tableMeta?.triggerBatchAiProcess;
+    const triggerRelatedAiProcess = tableMeta?.triggerRelatedAiProcess;
+    const hasAiColumnInRow = useMemo(
+      () => tableMeta?.hasAiColumnInRow?.(recordId) ?? false,
+      [tableMeta, recordId],
+    );
+
+    const [isCellHovered, setIsCellHovered] = useState(false);
 
     const resolvedMinWidth =
       width < CELL_CONSTANTS.MIN_WIDTH ? CELL_CONSTANTS.MIN_WIDTH : width;
@@ -126,9 +166,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     useEffect(() => {
       if (isEditing) {
         const initValue = _editValue !== undefined ? _editValue : displayValue;
-        flushSync(() => {
-          setLocalEditValue(String(initValue ?? ''));
-        });
+        setLocalEditValue(String(initValue ?? ''));
       }
     }, [isEditing, _editValue, displayValue]);
 
@@ -159,10 +197,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     ]);
 
     const handleEditStop = useCallback(() => {
-      if (localEditValue !== String(displayValue ?? '')) {
-        tableMeta?.updateData?.(recordId, columnId, localEditValue);
-      }
-      tableMeta?.setCellMode?.(recordId, columnId, 'clear');
+      startTransition(() => {
+        if (localEditValue !== String(displayValue ?? '')) {
+          tableMeta?.updateData?.(recordId, columnId, localEditValue);
+        }
+        tableMeta?.setCellMode?.(recordId, columnId, 'clear');
+      });
     }, [localEditValue, displayValue, tableMeta, recordId, columnId]);
 
     const content = useMemo(() => {
@@ -176,6 +216,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === 'Escape') {
+                e.preventDefault();
                 handleEditStop();
               }
             }}
@@ -257,6 +298,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       handleEditStop,
       localEditValue,
       isRowHovered,
+      hasAiColumnInRow,
     ]);
 
     const handleClick = useCallback(
@@ -288,10 +330,48 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
       [canInteract, tableMeta, recordId, columnId],
     );
 
+    const handleAiIconClick = useCallback(
+      (e: MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (isSelectColumn) {
+          // Select列的AI图标点击：批量处理所有行（暂不实现）
+          triggerBatchAiProcess?.();
+        } else if (isAiColumn) {
+          // AI列的单元格图标点击：只处理当前单元格
+          tableMeta?.onRunAi?.({
+            fieldId: columnId,
+            recordId: recordId,
+            isHeader: false,
+          });
+        }
+      },
+      [
+        isSelectColumn,
+        isAiColumn,
+        triggerBatchAiProcess,
+        tableMeta,
+        recordId,
+        columnId,
+      ],
+    );
+
+    const cellBackgroundColor = getCellBackgroundColor(
+      isEditing,
+      isActive,
+      isSelectColumn,
+      hasActiveInRow,
+      rowSelected,
+      isColumnSelected,
+    );
+
     return (
       <Stack
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
+        onMouseEnter={() => setIsCellHovered(true)}
+        onMouseLeave={() => setIsCellHovered(false)}
         sx={{
           width,
           minWidth: resolvedMinWidth,
@@ -300,14 +380,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
           position: isPinned ? 'sticky' : 'relative',
           left: isPinned ? stickyLeft : 'auto',
           zIndex: isPinned ? 20 : 1,
-          bgcolor: getCellBackgroundColor(
-            isEditing,
-            isActive,
-            isSelectColumn,
-            hasActiveInRow,
-            rowSelected,
-            isColumnSelected,
-          ),
+          bgcolor: cellBackgroundColor,
           borderRight:
             isPinned && showPinnedRightShadow && !isSelectColumn
               ? CELL_COLORS.PINNED_BORDER
@@ -349,7 +422,16 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
         >
           {content}
         </Box>
+        {hasAiColumnInRow &&
+          ((isSelectColumn && isRowHovered) ||
+            (isAiColumn && isCellHovered)) && (
+            <StyledTableAiIcon
+              backgroundColor={cellBackgroundColor}
+              onClick={handleAiIconClick}
+            />
+          )}
       </Stack>
     );
   },
+  arePropsEqual,
 );

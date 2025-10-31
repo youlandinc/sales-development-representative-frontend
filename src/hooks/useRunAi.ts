@@ -7,7 +7,8 @@ export const useRunAi = () => {
   const [runAiState, runAi] = useAsyncFn(
     async (param: {
       tableId: string;
-      recordCount: number;
+      recordCount?: number;
+      recordIds?: string[];
       fieldId?: string;
       fieldIds?: string[];
     }) => {

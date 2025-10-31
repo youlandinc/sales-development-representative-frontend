@@ -2,26 +2,28 @@ import { useEffect, useMemo, useState } from 'react';
 import { debounce, Fade, Slider, Stack, Typography } from '@mui/material';
 import { addDays, isDate, isValid } from 'date-fns';
 import { useRouter } from 'nextjs-toploader/app';
+import useSWR from 'swr';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { WORD_COUNT_OPTIONS } from '@/constant';
+import { UNotUndefined } from '@/utils';
 
-import {
-  HttpError,
-  ProcessCreateTypeEnum,
-  ResponseCampaignLaunchInfo,
-} from '@/types';
 import {
   SDRToast,
   StyledDatePicker,
   StyledSelect,
   StyledSwitch,
 } from '@/components/atoms';
-import { UNotUndefined } from '@/utils';
 import { CommonSelectWithAction } from '@/components/molecules';
-import useSWR from 'swr';
-import { _fetchEmailSignatures } from '@/request';
+
+import { _commonFetchSettings } from '@/request';
+import {
+  BizCodeEnum,
+  HttpError,
+  ProcessCreateTypeEnum,
+  ResponseCampaignLaunchInfo,
+} from '@/types';
 
 const tomorrow = addDays(new Date(), 1);
 
@@ -106,17 +108,63 @@ export const CampaignProcessContentLunch = () => {
     updateLunchInfo();
   }, [formData, updateLunchInfo]);
 
+  const [signatureList, setSignatureList] = useState<TOption[]>([
+    {
+      label: 'No signature',
+      value: null,
+      key: 'noSignature',
+      default: false,
+    },
+  ]);
+
   const { isLoading } = useSWR(
     'fetchSignature',
     async () => {
       try {
-        const { data } = await _fetchEmailSignatures();
-        const reducedData = data.map((item) => ({
-          label: item.name,
-          key: item.id,
-          value: item.id,
+        const {
+          data: {
+            [BizCodeEnum.signature]: signatureList,
+            [BizCodeEnum.email_domain]: emailDomainList,
+          },
+        } = await _commonFetchSettings({
+          bizCode: [BizCodeEnum.email_domain, BizCodeEnum.signature],
+        });
+
+        const reducedSignatureList = signatureList.map((item) => ({
+          label: item.label,
+          key: String(item.key),
+          value: String(item.value),
+          selected: item.selected,
         }));
-        setSignatureList((prev) => [...reducedData, ...prev]);
+
+        const reducedEmailDomainList = emailDomainList.map((item) => ({
+          label: item.label,
+          key: String(item.key),
+          value: String(item.value),
+          selected: item.selected,
+        }));
+
+        setSignatureList((prev) => [
+          ...reducedSignatureList,
+          ...prev.filter((item) => item.key === 'noSignature'),
+        ]);
+
+        const defaultSignature = reducedSignatureList.find(
+          (item) => item.selected,
+        );
+        const defaultEmailDomain = reducedEmailDomainList.find(
+          (item) => item.selected,
+        );
+
+        if (defaultSignature) {
+          setFormData((prev) => ({
+            ...prev,
+            signatureId:
+              prev.signatureId === null
+                ? defaultSignature.value
+                : prev.signatureId,
+          }));
+        }
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -127,14 +175,6 @@ export const CampaignProcessContentLunch = () => {
     },
   );
 
-  const [signatureList, setSignatureList] = useState<TOption[]>([
-    {
-      label: 'No signature',
-      value: null,
-      key: 'noSignature',
-    },
-  ]);
-
   const onClickToChangeSignature = (value: any) => {
     if (value === formData.signatureId) {
       return;
@@ -144,6 +184,8 @@ export const CampaignProcessContentLunch = () => {
       signatureId: value,
     });
   };
+
+  console.log(formData);
 
   return (
     <Stack

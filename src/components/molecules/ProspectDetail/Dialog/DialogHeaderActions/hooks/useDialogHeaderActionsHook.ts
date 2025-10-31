@@ -79,8 +79,18 @@ export const useDialogHeaderActionsHook = () => {
       key: IntegrationActionType.phone_number,
 
       type: ActionsChildrenTypeEnum.integration,
-      cost: 4,
-      integrationCost: 2,
+      cost: 6,
+      integrationCost: 3,
+      integrationIcon: ICON_INTEGRATION_PHONE_NUMBER,
+    },
+    {
+      icon: ICON_PHONE_NUMBER,
+      title: 'LinkedIn Profile',
+      key: IntegrationActionType.linkedin_profile,
+
+      type: ActionsChildrenTypeEnum.integration,
+      cost: 6,
+      integrationCost: 3,
       integrationIcon: ICON_INTEGRATION_PHONE_NUMBER,
     },
   ].map((item) => ({

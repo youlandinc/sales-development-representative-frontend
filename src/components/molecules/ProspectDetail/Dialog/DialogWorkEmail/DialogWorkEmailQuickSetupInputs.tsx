@@ -17,7 +17,7 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
 }) => {
   const { waterfallAllInputs, integrationsInWaterfall, isMissingConfig } =
     useComputedInWorkEmailStore();
-  const { setAllIntegrations } = useWorkEmailStore();
+  const { setAllIntegrations, allIntegrations } = useWorkEmailStore();
   const hasConfigCount = integrationsInWaterfall.filter((item) =>
     item.inputParams.every((p) => !!p.selectedOption),
   ).length;
@@ -72,25 +72,20 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
           <DialogWorkEmailCustomSelect
             key={key}
             onChange={(_, newValue) => {
-              const updatedIntegrations = integrationsInWaterfall.map(
-                (item) => {
-                  if (item.actionKey === input.actionKey) {
-                    return {
-                      ...item,
-                      inputParams: item.inputParams.map((p) => {
-                        if (p.columnName === input.columnName) {
-                          return {
-                            ...p,
-                            selectedOption: newValue,
-                          };
-                        }
-                        return p;
-                      }),
-                    };
-                  }
-                  return item;
-                },
-              );
+              const updatedIntegrations = allIntegrations.map((item) => {
+                return {
+                  ...item,
+                  inputParams: item.inputParams.map((p) => {
+                    if (p.semanticType === input.semanticType) {
+                      return {
+                        ...p,
+                        selectedOption: newValue,
+                      };
+                    }
+                    return p;
+                  }),
+                };
+              });
               setAllIntegrations(updatedIntegrations);
             }}
             required={input.isRequired}
