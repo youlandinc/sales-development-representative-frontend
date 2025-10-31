@@ -1,16 +1,9 @@
 import { useWorkEmailStore } from '@/stores/Prospect';
 
-import {
-  IntegrationActionInputParams,
-  IntegrationActionType,
-  MATH_INTEGRATION_TO_ACTION_TYPE,
-  MathIntegrationTypeEnum,
-} from '@/types/Prospect';
+import { IntegrationActionInputParams } from '@/types/Prospect';
 
 export const useComputedInWorkEmailStore = () => {
-  const { allIntegrations, setIntegrationActionType } = useWorkEmailStore(
-    (store) => store,
-  );
+  const { allIntegrations } = useWorkEmailStore((store) => store);
 
   const integrationsInWaterfall = allIntegrations.filter((i) => i.isDefault);
 
@@ -41,29 +34,9 @@ export const useComputedInWorkEmailStore = () => {
     .flat()
     .some((i) => !i.selectedOption);
 
-  const matchActionKeyToIntegration = (actionKey: string) => {
-    if (actionKey.includes(MathIntegrationTypeEnum.work_email)) {
-      setIntegrationActionType(IntegrationActionType.work_email);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.personal_email)) {
-      setIntegrationActionType(IntegrationActionType.personal_email);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.phone_number)) {
-      setIntegrationActionType(IntegrationActionType.phone_number);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.linkedin_profile)) {
-      setIntegrationActionType(IntegrationActionType.linkedin_profile);
-      return;
-    }
-  };
-
   return {
     integrationsInWaterfall,
     waterfallAllInputs,
     isMissingConfig,
-    matchActionKeyToIntegration,
   };
 };

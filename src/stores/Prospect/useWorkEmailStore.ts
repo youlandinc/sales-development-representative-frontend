@@ -46,7 +46,6 @@ type WorkEmailStoreProps = {
 type WorkEmailStoreActions = {
   setActiveType: (type: ActiveTypeEnum) => void;
   setWorkEmailVisible: (open: boolean) => void;
-  setIntegrationActionType: (type: IntegrationActionType) => void;
   setDialogIntegrationsVisible: (open: boolean) => void;
   setDisplayType: (type: DisplayTypeEnum) => void;
   setDialogHeaderName: (name: string) => void;
@@ -135,11 +134,6 @@ export const useWorkEmailStore = create<
   setWaterfallDescription: (description: string) => {
     set({
       waterfallDescription: description,
-    });
-  },
-  setIntegrationActionType: (type: IntegrationActionType) => {
-    set({
-      integrationActionType: type,
     });
   },
   addIntegrationToDefault: (integration: IntegrationAction) => {
