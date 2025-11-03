@@ -3,7 +3,7 @@ import { FC } from 'react';
 
 import { DialogCompanyType } from './DialogCompanyType';
 
-import ICON_ARROW from './assets/icon_arrow_left_right.svg';
+import ICON_ARROW from './assets/icon-arrow-left-right.svg';
 
 import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
 
