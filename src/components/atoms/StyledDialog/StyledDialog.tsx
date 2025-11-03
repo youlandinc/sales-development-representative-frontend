@@ -87,34 +87,36 @@ export const StyledDialog: FC<StyledDialogProps> = ({
       closeAfterTransition={false}
       fullWidth={true}
       open={open}
-      sx={{
-        '&.MuiDialog-root': {
-          '& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root':
-            {},
-          '& .MuiDialog-paper': {
-            width: rest.fullScreen
-              ? '100%'
-              : {
-                  lg: 'calc(100% - 64px)',
-                  xs: 'calc(100% - 48px)',
-                },
-            //mx: 3,
-          },
-          '& .MuiPaper-root': {
-            transition: 'all .3s',
-            borderRadius: rest.fullScreen ? 0 : 2,
-            maxWidth: rest.fullScreen
-              ? '100%'
-              : {
-                  lg: paperWidth,
-                  xs: '100%',
-                },
-            boxShadow:
-              '0px 0px 2px rgba(17, 52, 227, 0.1), 0px 10px 10px rgba(17, 52, 227, 0.1)',
+      sx={[
+        {
+          '&.MuiDialog-root': {
+            '& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root':
+              {},
+            '& .MuiDialog-paper': {
+              width: rest.fullScreen
+                ? '100%'
+                : {
+                    lg: 'calc(100% - 64px)',
+                    xs: 'calc(100% - 48px)',
+                  },
+              //mx: 3,
+            },
+            '& .MuiPaper-root': {
+              transition: 'all .3s',
+              borderRadius: rest.fullScreen ? 0 : 2,
+              maxWidth: rest.fullScreen
+                ? '100%'
+                : {
+                    lg: paperWidth,
+                    xs: '100%',
+                  },
+              boxShadow:
+                '0px 0px 2px rgba(17, 52, 227, 0.1), 0px 10px 10px rgba(17, 52, 227, 0.1)',
+            },
           },
         },
-        ...sx,
-      }}
+        ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
+      ]}
       {...rest}
     >
       {header && (

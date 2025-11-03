@@ -10,6 +10,7 @@ import useSWR from 'swr';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 import { useTableWebSocket } from './useTableWebSocket';
+import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
 import { MIN_BATCH_SIZE } from '../data';
@@ -34,6 +35,11 @@ interface UseProspectTableReturn {
   onCellEdit: (recordId: string, fieldId: string, value: any) => Promise<void>;
   onUpdateRowData: (recordId: string, updates: Record<string, any>) => void;
   onInitializeAiColumns: () => Promise<void>;
+  onRunAi: (params: {
+    fieldId: string;
+    recordId?: string;
+    isHeader?: boolean;
+  }) => Promise<void>;
 }
 
 export const useProspectTable = ({
@@ -48,6 +54,7 @@ export const useProspectTable = ({
     resetTable,
     updateCellValue,
   } = useProspectTableStore((store) => store);
+  const { runAi } = useRunAi();
 
   // State management
   const rowsMapRef = useRef<Record<string, any>>({});
@@ -493,6 +500,50 @@ export const useProspectTable = ({
     setAiLoadingState(newLoadingState);
   }, [tableId, fetchTable, aiColumnIds, rowIds, onUpdateRowData]);
 
+  const onRunAi = useCallback(
+    async (params: {
+      fieldId: string;
+      recordId?: string;
+      isHeader?: boolean;
+    }) => {
+      const { fieldId, recordId, isHeader } = params;
+
+      try {
+        if (isHeader) {
+          const recordCount = Math.min(10, rowIds.length);
+          const targetRecordIds = rowIds.slice(0, recordCount);
+
+          await runAi({
+            tableId,
+            recordCount,
+            fieldId,
+          });
+
+          targetRecordIds.forEach((rid) => {
+            onUpdateRowData(rid, {
+              [fieldId]: { value: '', isFinished: false },
+            });
+          });
+        } else if (recordId) {
+          await runAi({
+            tableId,
+            recordIds: [recordId],
+            fieldId,
+          });
+
+          onUpdateRowData(recordId, {
+            [fieldId]: { value: '', isFinished: false },
+          });
+        }
+
+        await onInitializeAiColumns();
+      } catch (error) {
+        console.error('Failed to run AI:', error);
+      }
+    },
+    [tableId, rowIds, runAi, onUpdateRowData, onInitializeAiColumns],
+  );
+
   return {
     fullData,
     aiLoadingState,
@@ -507,5 +558,6 @@ export const useProspectTable = ({
     onCellEdit,
     onUpdateRowData,
     onInitializeAiColumns,
+    onRunAi,
   };
 };

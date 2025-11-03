@@ -10,6 +10,8 @@ import {
 import { Box, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { COLUMN_TYPE_ICONS } from './columnTypeIcons';
+import { StyledTableAiIcon } from './StyledTableAiIcon';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -42,32 +44,6 @@ interface StyledTableHeadCellProps {
 //  select = 'SELECT',
 //}
 
-import ICON_TYPE_TEXT from './assets/icon-type-text.svg';
-import ICON_TYPE_NUMBER from './assets/icon-type-number.svg';
-import ICON_TYPE_EMAIL from './assets/icon-type-email.svg';
-import ICON_TYPE_PHONE from './assets/icon-type-phone.svg';
-import ICON_TYPE_CURRENCY from './assets/icon-type-currency.svg';
-import ICON_TYPE_DATE from './assets/icon-type-date.svg';
-import ICON_TYPE_URL from './assets/icon-type-url.svg';
-import ICON_TYPE_IMG_URL from './assets/icon-type-img-url.svg';
-import ICON_TYPE_CHECKBOX from './assets/icon-type-checkbox.svg';
-import ICON_TYPE_SELECT from './assets/icon-type-select.svg';
-
-const ICON_HASH: {
-  [key in TableColumnTypeEnum]: any;
-} = {
-  [TableColumnTypeEnum.text]: ICON_TYPE_TEXT,
-  [TableColumnTypeEnum.number]: ICON_TYPE_NUMBER,
-  [TableColumnTypeEnum.email]: ICON_TYPE_EMAIL,
-  [TableColumnTypeEnum.phone]: ICON_TYPE_PHONE,
-  [TableColumnTypeEnum.currency]: ICON_TYPE_CURRENCY,
-  [TableColumnTypeEnum.date]: ICON_TYPE_DATE,
-  [TableColumnTypeEnum.url]: ICON_TYPE_URL,
-  [TableColumnTypeEnum.img_url]: ICON_TYPE_IMG_URL,
-  [TableColumnTypeEnum.checkbox]: ICON_TYPE_CHECKBOX,
-  [TableColumnTypeEnum.select]: ICON_TYPE_SELECT,
-};
-
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   header,
   children,
@@ -86,11 +62,16 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   showPinnedRightShadow,
 }) => {
   const [localEditValue, setLocalEditValue] = useState<string>('');
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
 
   const isSelectColumn = header?.column?.id === '__select';
+
+  const columnMeta = header?.column?.columnDef?.meta as any;
+  const actionKey = columnMeta?.actionKey;
+  const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
 
   const content = header
     ? flexRender(header.column.columnDef.header, header.getContext())
@@ -134,6 +115,26 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
     [handleEditSave, handleEditCancel],
   );
 
+  const handleAiIconClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (isAiColumn && header) {
+        const columnId = header.column.id;
+        tableMeta?.onRunAi?.({
+          fieldId: columnId,
+          isHeader: true,
+        });
+      }
+    },
+    [isAiColumn, tableMeta, header],
+  );
+
+  // 计算背景色：选中 > hover > 默认
+  const headerBackgroundColor =
+    isActive || (isHovered && !isEditing) ? '#F7F4FD' : '#FFFFFF';
+
   return (
     <Stack
       data-index={dataIndex}
@@ -141,6 +142,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       ref={measureRef}
       sx={{
         userSelect: 'none',
@@ -184,6 +187,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             isEditing
               ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
               : 'none',
+          position: 'relative',
         }}
       >
         {isEditing ? (
@@ -223,16 +227,22 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             {header && !isSelectColumn && (
               <Icon
                 component={
-                  ICON_HASH[
+                  COLUMN_TYPE_ICONS[
                     (header.column.columnDef.meta as any)
                       ?.fieldType as TableColumnTypeEnum
-                  ] || ICON_TYPE_TEXT
+                  ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
                 }
                 sx={{ width: 16, height: 16 }}
               />
             )}
             {content}
           </Stack>
+        )}
+        {!isEditing && isAiColumn && (
+          <StyledTableAiIcon
+            backgroundColor={headerBackgroundColor}
+            onClick={handleAiIconClick}
+          />
         )}
       </Box>
 
@@ -282,9 +292,9 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               '&::after': {
                 content: '""',
                 position: 'absolute',
-                left: '50%',
+                right: '0px',
                 top: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translateY(-50%)',
                 width: '3px',
                 height: '50%',
                 backgroundColor: 'rgba(0, 0, 0, 0.2)',

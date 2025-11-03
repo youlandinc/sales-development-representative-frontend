@@ -25,7 +25,8 @@ export const generatePrompt = (api: string, param: Record<string, any>) => {
 
 export const columnRun = (param: {
   tableId: string;
-  recordCount: number;
+  recordCount?: number;
+  recordIds?: string[];
   fieldId?: string;
   fieldIds?: string[];
 }) => {
@@ -33,6 +34,7 @@ export const columnRun = (param: {
     fieldId: param.fieldId,
     fieldIds: param.fieldIds,
     recordCount: param.recordCount,
+    recordIds: param.recordIds,
   });
 };
 

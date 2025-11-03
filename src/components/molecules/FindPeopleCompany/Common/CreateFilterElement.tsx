@@ -3,6 +3,7 @@ import { Stack } from '@mui/material';
 
 import { StyledTextFieldNumber } from '@/components/atoms';
 import {
+  FilterCompanies,
   FilterContainer,
   FilterSelect,
   FilterSwitch,
@@ -24,64 +25,7 @@ export const CreateFilterElement: FC<CreateFilterElementProps> = ({
   onChange,
   value,
 }) => {
-  if (type === FilterElementTypeEnum.select) {
-    return (
-      <FilterSelect
-        onChange={(_, value) => {
-          onChange?.(value);
-        }}
-        options={params.optionValues || []}
-        placeholder={params.placeholder}
-        title={params.formLabel}
-        value={(value || []) as Option[]}
-      />
-    );
-  }
-  if (type === FilterElementTypeEnum.input && params.inputType === 'NUMBER') {
-    return (
-      <FilterContainer subTitle={params.description} title={params.formLabel}>
-        <StyledTextFieldNumber
-          decimalScale={0}
-          isAllowed={({ floatValue }) => {
-            return (floatValue || 0) <= 1000;
-          }}
-          onValueChange={({ floatValue }) => {
-            onChange?.(floatValue);
-          }}
-          placeholder={params.placeholder}
-          value={(value as number) || ''}
-        />
-      </FilterContainer>
-    );
-  }
-  if (type === FilterElementTypeEnum.input && params.inputType === 'TEXT') {
-    return (
-      <FilterTextField
-        onChange={(value) => onChange?.(value)}
-        placeholder={params.placeholder}
-        title={params.formLabel}
-        value={(value || []) as Option[]}
-      />
-    );
-  }
-  if (type === FilterElementTypeEnum.switch) {
-    return (
-      <FilterSwitch
-        checked={value as boolean}
-        description={params.description}
-        label={params.formLabel}
-        onChange={(_, checked) => {
-          onChange?.(checked);
-        }}
-      />
-    );
-  }
-  if (type === FilterElementTypeEnum.checkbox) {
-    return null;
-  }
-  if (type === FilterElementTypeEnum.radio) {
-    return null;
-  }
+  // Handle groups first as it's independent of type
   if (params.groups) {
     return (
       <Stack flexDirection={'row'} gap={1}>
@@ -97,5 +41,72 @@ export const CreateFilterElement: FC<CreateFilterElementProps> = ({
       </Stack>
     );
   }
-  return null;
+
+  switch (type) {
+    case FilterElementTypeEnum.select:
+      return (
+        <FilterSelect
+          onChange={(_, value) => {
+            onChange?.(value);
+          }}
+          options={params.optionValues || []}
+          placeholder={params.placeholder}
+          title={params.formLabel}
+          value={(value || []) as Option[]}
+        />
+      );
+
+    case FilterElementTypeEnum.input:
+      if (params.inputType === 'NUMBER') {
+        return (
+          <FilterContainer
+            subTitle={params.description}
+            title={params.formLabel}
+          >
+            <StyledTextFieldNumber
+              decimalScale={0}
+              isAllowed={({ floatValue }) => {
+                return (floatValue || 0) <= 1000;
+              }}
+              onValueChange={({ floatValue }) => {
+                onChange?.(floatValue);
+              }}
+              placeholder={params.placeholder}
+              value={(value as number) || ''}
+            />
+          </FilterContainer>
+        );
+      }
+      if (params.inputType === 'TEXT') {
+        return (
+          <FilterTextField
+            onChange={(value) => onChange?.(value)}
+            placeholder={params.placeholder}
+            title={params.formLabel}
+            value={(value || []) as Option[]}
+          />
+        );
+      }
+      return null;
+
+    case FilterElementTypeEnum.switch:
+      return (
+        <FilterSwitch
+          checked={value as boolean}
+          description={params.description}
+          label={params.formLabel}
+          onChange={(_, checked) => {
+            onChange?.(checked);
+          }}
+        />
+      );
+
+    case FilterElementTypeEnum.companies:
+      return <FilterCompanies />;
+    case FilterElementTypeEnum.exclude_people:
+    case FilterElementTypeEnum.checkbox:
+    case FilterElementTypeEnum.radio:
+    default:
+      return null;
+  }
 };
