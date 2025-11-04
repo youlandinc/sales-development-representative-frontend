@@ -8,6 +8,7 @@ import {
   TextField,
 } from '@mui/material';
 import { StyledChip } from '@/components/molecules';
+import { StyledTextField } from '@/components/atoms';
 
 export const FilterTextField: FC<
   PropsWithChildren<
@@ -52,7 +53,7 @@ export const FilterTextField: FC<
           onChange?.(value);
         }}
         renderInput={(params) => (
-          <TextField
+          <StyledTextField
             {...params}
             placeholder={
               !!props?.value &&

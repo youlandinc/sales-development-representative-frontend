@@ -153,6 +153,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
 
         <Stack flexDirection={'row'} gap={1}>
           <StyledTextField
+            label=""
             onChange={onChange}
             size={'small'}
             slotProps={{

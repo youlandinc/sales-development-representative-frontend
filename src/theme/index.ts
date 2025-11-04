@@ -340,66 +340,66 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
-    MuiInputLabel: {
-      styleOverrides: {
-        root: {
-          color: 'var(--mui-palette-text-primary)',
-          fontSize: 14,
-          lineHeight: 1.43,
-          transform: 'translate(14px, 10px) scale(1)',
-          '&.Mui-focused': {
-            color: 'var(--mui-palette-text-primary)',
-          },
-        },
-        shrink: {
-          transform: 'translate(14px, -8px) scale(0.75)',
-        },
-        sizeSmall: {
-          transform: 'translate(12px, 5px) scale(1)',
-        },
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        //input element
-        input: {
-          paddingTop: '10px',
-          paddingBottom: '10px',
-          zIndex: 1,
-          fontSize: 14,
-          lineHeight: 1.43,
-          height: 'auto',
-        },
-        // border style
-        notchedOutline: {
-          borderColor: 'var(--mui-palette-border-default)',
-          borderWidth: '1px',
-          background: 'transparent',
-          borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
-        },
+    // MuiInputLabel: {
+    //   styleOverrides: {
+    //     root: {
+    //       color: 'var(--mui-palette-text-primary)',
+    //       fontSize: 14,
+    //       lineHeight: 1.43,
+    //       transform: 'translate(14px, 10px) scale(1)',
+    //       '&.Mui-focused': {
+    //         color: 'var(--mui-palette-text-primary)',
+    //       },
+    //     },
+    //     shrink: {
+    //       transform: 'translate(14px, -8px) scale(0.75)',
+    //     },
+    //     sizeSmall: {
+    //       transform: 'translate(12px, 5px) scale(1)',
+    //     },
+    //   },
+    // },
+    // MuiOutlinedInput: {
+    //   styleOverrides: {
+    //     //input element
+    //     input: {
+    //       paddingTop: '10px',
+    //       paddingBottom: '10px',
+    //       zIndex: 1,
+    //       fontSize: 14,
+    //       lineHeight: 1.43,
+    //       height: 'auto',
+    //     },
+    //     // border style
+    //     notchedOutline: {
+    //       borderColor: 'var(--mui-palette-border-default)',
+    //       borderWidth: '1px',
+    //       background: 'transparent',
+    //       borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+    //     },
 
-        //border style when hover
-        root: {
-          [`&.${inputBaseClasses.sizeSmall} > .${inputBaseClasses.input}`]: {
-            paddingTop: '6.5px',
-            paddingBottom: '6.5px',
-            fontSize: 14,
-          },
-          [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-            borderColor: 'var(--mui-palette-border-hover)',
-            borderWidth: '1px',
-            background: 'transparent',
-            borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
-          },
-          [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
-            borderColor: 'var(--mui-palette-border-hover)',
-            borderWidth: '1px',
-            background: 'transparent',
-            borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
-          },
-        },
-      },
-    },
+    //     //border style when hover
+    //     root: {
+    //       [`&.${inputBaseClasses.sizeSmall} > .${inputBaseClasses.input}`]: {
+    //         paddingTop: '6.5px',
+    //         paddingBottom: '6.5px',
+    //         fontSize: 14,
+    //       },
+    //       [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+    //         borderColor: 'var(--mui-palette-border-hover)',
+    //         borderWidth: '1px',
+    //         background: 'transparent',
+    //         borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+    //       },
+    //       [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+    //         borderColor: 'var(--mui-palette-border-hover)',
+    //         borderWidth: '1px',
+    //         background: 'transparent',
+    //         borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+    //       },
+    //     },
+    //   },
+    // },
     MuiAutocomplete: {
       styleOverrides: {
         inputRoot: {
