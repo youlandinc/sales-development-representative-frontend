@@ -14,11 +14,10 @@ import {
 import { ActiveTypeEnum, HttpError } from '@/types';
 import { CreateWaterfallConfigRequestParam } from '@/types/Prospect';
 
-import { IntegrationSaveTypeParam } from '../data';
 import { useMemo } from 'react';
 
 export const useWorkEmailRequest = (cb?: () => void) => {
-  const { setWorkEmailVisible, integrationActionType, activeType, groupId } =
+  const { setWorkEmailVisible, dialogHeaderName, activeType, groupId } =
     useWorkEmailStore((store) => store);
   const { runAi } = useRunAi();
   const { fetchTable, columns } = useProspectTableStore();
@@ -26,8 +25,7 @@ export const useWorkEmailRequest = (cb?: () => void) => {
     useComputedInWorkEmailStore();
 
   //request
-  const integrationSaveTypeParam =
-    IntegrationSaveTypeParam[integrationActionType];
+  const integrationSaveTypeParam = dialogHeaderName;
 
   const requestParams: CreateWaterfallConfigRequestParam = {
     waterfallFieldName: integrationSaveTypeParam,
