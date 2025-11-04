@@ -14,7 +14,7 @@ export const DialogWorkEmailIntegrationColumnMapping: FC = () => {
 
   return (
     <DialogWorkEmailCollapseCard title={'Column mapping'}>
-      <Stack gap={1.5}>
+      <Stack gap={2}>
         <Typography color={'text.secondary'} variant={'body3'}>
           SETUP INPUTS
         </Typography>

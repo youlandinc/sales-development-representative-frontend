@@ -11,15 +11,22 @@ import { SyntheticEvent, useState } from 'react';
 
 import { StyledCost, StyledDialog } from '@/components/atoms';
 import { TableColumnMenuEnum } from '@/components/molecules';
+import {
+  StyledCollapseMenuContainer,
+  StyledIntegrationCost,
+  StyledMenu,
+} from './base';
+
 import { useSwitch } from '@/hooks';
 import { useProspectTableStore } from '@/stores/Prospect';
 import { useDialogStore } from '@/stores/useDialogStore';
+import { useDialogHeaderActionsHook } from './hooks/useDialogHeaderActionsHook';
+
 import { ProcessCreateTypeEnum } from '@/types';
+
 import CloseIcon from '@mui/icons-material/Close';
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
 import ICON_SPARK from '../../assets/dialog/icon_sparkle_blue.svg';
-import { DialogHeaderActionsMenus } from './DialogHeaderActionsMenus';
-import { useDialogHeaderActionsHook } from './hooks/useDialogHeaderActionsHook';
 
 export const DialogHeaderActions = () => {
   const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
@@ -105,16 +112,51 @@ export const DialogHeaderActions = () => {
           <Box p={3}>
             {value === 'Enrichments' ? (
               <Stack gap={1.5}>
-                <DialogHeaderActionsMenus
-                  children={ENRICHMENTS_SUGGESTION_MENUS.children}
+                <StyledCollapseMenuContainer
                   icon={ENRICHMENTS_SUGGESTION_MENUS.icon}
                   title={ENRICHMENTS_SUGGESTION_MENUS.title}
-                />
-                <DialogHeaderActionsMenus
-                  children={ENRICHMENTS_AI_MENUS.children}
+                >
+                  <Stack gap={1.5}>
+                    {ENRICHMENTS_SUGGESTION_MENUS.children.map(
+                      (item, index) => (
+                        <StyledMenu
+                          iconUrl={item.logoUrl}
+                          key={index}
+                          name={item.name}
+                          onClick={item.onClick}
+                          slot={
+                            <StyledIntegrationCost
+                              cost={item.estimatedScore}
+                              integrationCost={
+                                item.waterfallConfigs.length - 1 || 0
+                              }
+                              integrationIcon={item.waterfallConfigs[0].logoUrl}
+                            />
+                          }
+                        />
+                      ),
+                    )}
+                  </Stack>
+                </StyledCollapseMenuContainer>
+                <StyledCollapseMenuContainer
                   icon={ENRICHMENTS_AI_MENUS.icon}
                   title={ENRICHMENTS_AI_MENUS.title}
-                />
+                >
+                  {ENRICHMENTS_AI_MENUS.children.map((item, index) => (
+                    <StyledMenu
+                      key={index}
+                      name={item.title}
+                      onClick={item.onClick}
+                      slot={
+                        <StyledCost
+                          border={'1px solid #D0CEDA'}
+                          borderRadius={1}
+                          count={'0.5'}
+                        />
+                      }
+                    />
+                  ))}
+                </StyledCollapseMenuContainer>
               </Stack>
             ) : (
               <Stack gap={1.5}>

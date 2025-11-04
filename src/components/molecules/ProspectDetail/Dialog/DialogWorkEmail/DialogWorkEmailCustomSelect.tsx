@@ -27,7 +27,7 @@ export const DialogWorkEmailCustomSelect: FC<
   })) as TOption[];
 
   return (
-    <Stack gap={1.5}>
+    <Stack gap={0.5}>
       {title && (
         <Typography
           component={'div'}

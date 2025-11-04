@@ -25,7 +25,12 @@ export interface ColumnFieldGroupMapItem extends IntegrationAction {
 export interface ColumnFieldGroupMap {
   [key: string]: {
     groupId: string;
-    id: number;
+    name: string;
+    requiredInputsBinding: {
+      name: string;
+      formulaText: string;
+      optional: boolean;
+    }[];
     waterfallConfigs: ColumnFieldGroupMapItem[];
   };
 }

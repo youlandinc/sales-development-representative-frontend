@@ -107,12 +107,12 @@ export const StyledButton: FC<StyledButtonProps> = ({
         },
         '&.MuiButton-sizeMedium': {
           px: 2,
-          height: 32,
+          height: 40,
           fontSize: 14,
         },
         '&.MuiButton-sizeSmall': {
           px: 1.5,
-          height: 24,
+          height: 32,
           fontSize: 12,
         },
         ...sx,
