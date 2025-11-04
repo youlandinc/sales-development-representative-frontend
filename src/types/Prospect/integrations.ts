@@ -37,6 +37,7 @@ export interface IntegrationActionInputParams {
 }
 
 export interface IntegrationAction {
+  isMissingRequired?: boolean;
   actionKey: string;
   name: string;
   integrationName: string;

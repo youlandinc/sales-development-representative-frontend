@@ -94,7 +94,10 @@ export const OutputsFields = ({
         ]}
         placeholder={'Text'}
         startAdornment={
-          <Icon component={ICON_TEXT} sx={{ width: 12, height: 12 }} />
+          <Icon
+            component={ICON_TEXT}
+            sx={{ width: 12, height: 12, mr: '7.5px' }}
+          />
         }
         value={type}
       />

@@ -238,7 +238,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         />
       </Stack>
       {/*outputs*/}
-      <CollapseCard title={'Define outputs'}>
+      <CollapseCard defaultOpen title={'Define outputs'}>
         <Stack gap={1.5}>
           <RadioGroup
             onChange={(e) => {
@@ -257,6 +257,11 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
             <FormControlLabel
               control={<Radio />}
               label={'Fields'}
+              sx={{
+                '& .MuiTypography-root': {
+                  fontSize: 14,
+                },
+              }}
               value={'fields'}
             />
             <Stack
@@ -267,6 +272,11 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
               <FormControlLabel
                 control={<Radio />}
                 label={'JSON Schema'}
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontSize: 14,
+                  },
+                }}
                 value={'json'}
               />
               <StyledButton
@@ -422,7 +432,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         </Stack>
       </CollapseCard>
       {/*Run settings*/}
-      <CollapseCard title={'Run settings'}>
+      <CollapseCard defaultOpen title={'Run settings'}>
         <Stack gap={1.5}>
           <Stack flexDirection={'row'} justifyContent={'space-between'}>
             <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>

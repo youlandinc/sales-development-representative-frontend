@@ -288,7 +288,14 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           />
         </Stack>
         {/* content */}
-        <Stack flex={1} maxWidth={500} px={3} width={500}>
+        <Stack
+          flex={1}
+          maxWidth={500}
+          minHeight={0}
+          overflow={'auto'}
+          px={3}
+          width={500}
+        >
           <Box display={isLoading ? 'block' : 'none'}>
             <SculptingPrompt
               isLoading={isThinking}
