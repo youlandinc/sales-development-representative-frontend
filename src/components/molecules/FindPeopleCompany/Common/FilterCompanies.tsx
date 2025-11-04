@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
-import { StyledDialog, StyledRadioGroup } from '@/components/atoms';
+import {
+  StyledButton,
+  StyledDialog,
+  StyledRadioGroup,
+} from '@/components/atoms';
 import { FilterContainer, FilterTextField } from './index';
 
 const COMPANIES_OPTIONS = [
@@ -21,6 +25,7 @@ import ICON_CLOSE from './assets/icon-close.svg';
 import ICON_FOLDER from './assets/icon-folder.svg';
 import ICON_MORE from './assets/icon-more.svg';
 import { useSwitch } from '@/hooks';
+import { _fetchAllProspectTable } from '@/request';
 
 export const FilterCompanies = () => {
   const [radioValue, setRadioValue] = useState('list');
@@ -55,6 +60,10 @@ export const FilterCompanies = () => {
                 sx={{ width: 16, height: 16, flexShrink: 0 }}
               />
               <Typography
+                onClick={async () => {
+                  open();
+                  await _fetchAllProspectTable();
+                }}
                 sx={{
                   fontSize: 12,
                   flex: 1,
@@ -116,8 +125,24 @@ export const FilterCompanies = () => {
         </FilterContainer>
         <StyledDialog
           content={<></>}
-          footer={<></>}
-          header={<></>}
+          footer={<StyledButton>Select table</StyledButton>}
+          header={
+            <Stack
+              alignItems={'center'}
+              flexDirection={'row'}
+              justifyContent={'space-between'}
+            >
+              <Typography fontSize={20} fontWeight={600} lineHeight={1.2}>
+                Select table
+              </Typography>
+              <Icon
+                component={ICON_CLOSE}
+                onClick={() => close()}
+                sx={{ width: 24, height: 24, cursor: 'pointer' }}
+              />
+            </Stack>
+          }
+          onClose={() => close()}
           open={visible}
         />
       </Stack>

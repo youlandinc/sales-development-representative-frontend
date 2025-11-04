@@ -5,6 +5,7 @@ import { StyledTextFieldNumber } from '@/components/atoms';
 import {
   FilterCompanies,
   FilterContainer,
+  FilterExcludePeople,
   FilterSelect,
   FilterSwitch,
   FilterTextField,
@@ -104,6 +105,7 @@ export const CreateFilterElement: FC<CreateFilterElementProps> = ({
     case FilterElementTypeEnum.companies:
       return <FilterCompanies />;
     case FilterElementTypeEnum.exclude_people:
+      return <FilterExcludePeople />;
     case FilterElementTypeEnum.checkbox:
     case FilterElementTypeEnum.radio:
     default:

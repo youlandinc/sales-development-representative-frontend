@@ -23,10 +23,7 @@ import {
   StyledShadowContent,
   StyledTextField,
 } from '@/components/atoms';
-import {
-  CommonPagination,
-  CommonSkeletonLoadingOverlay,
-} from '@/components/molecules';
+import { CommonPagination } from '@/components/molecules';
 
 import { _fetchLeadsInfoByLeadId, _fetchLeadsTableData } from '@/request';
 import { HttpError, LeadsInfoCampaignsData, LeadsTableItemData } from '@/types';
@@ -320,6 +317,7 @@ export const LeadsTable: FC = () => {
       <Stack flex={1} overflow={'auto'}>
         <DataGrid
           //checkboxSelection
+          //disableMultipleRowSelection
           columnHeaderHeight={60}
           columns={columns}
           disableColumnFilter
@@ -329,7 +327,6 @@ export const LeadsTable: FC = () => {
           disableColumnSorting
           disableDensitySelector
           disableEval
-          //disableMultipleRowSelection
           disableRowSelectionOnClick
           getRowId={(row) => row.id}
           loading={isLoading}
@@ -342,9 +339,14 @@ export const LeadsTable: FC = () => {
           rowCount={totalElements}
           rowHeight={60}
           rows={data?.content || []}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'skeleton',
+              noRowsVariant: 'skeleton',
+            },
+          }}
           slots={{
             pagination: CommonPagination,
-            loadingOverlay: CommonSkeletonLoadingOverlay,
             noRowsOverlay: () => (
               <Stack
                 alignItems={'center'}

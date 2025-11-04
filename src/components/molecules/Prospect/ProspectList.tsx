@@ -5,7 +5,7 @@ import { useRouter } from 'nextjs-toploader/app';
 import useSWR from 'swr';
 
 import { useSwitch } from '@/hooks';
-import { UFormatDate, UFormatNumber } from '@/utils';
+import { UFormatDate } from '@/utils';
 
 import { HttpError, ProspectTableItem } from '@/types';
 import {
@@ -20,10 +20,7 @@ import {
   StyledDialog,
   StyledTextField,
 } from '@/components/atoms';
-import {
-  CommonPagination,
-  CommonSkeletonLoadingOverlay,
-} from '@/components/molecules';
+import { CommonPagination } from '@/components/molecules';
 
 import ICON_NO_RESULT from './assets/icon_table_no_result.svg';
 
@@ -234,9 +231,14 @@ export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
         rowCount={totalElements}
         rowHeight={40}
         rows={data?.content || []}
+        slotProps={{
+          loadingOverlay: {
+            variant: 'skeleton',
+            noRowsVariant: 'skeleton',
+          },
+        }}
         slots={{
           pagination: CommonPagination,
-          loadingOverlay: CommonSkeletonLoadingOverlay,
           noRowsOverlay: () => (
             <Stack
               alignItems={'center'}
