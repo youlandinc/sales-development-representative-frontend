@@ -37,6 +37,7 @@ export interface IntegrationActionInputParams {
 }
 
 export interface IntegrationAction {
+  isMissingRequired?: boolean;
   actionKey: string;
   name: string;
   integrationName: string;
@@ -47,6 +48,15 @@ export interface IntegrationAction {
   isDefault: boolean;
   inputParams: IntegrationActionInputParams[];
   skipped: boolean;
+}
+
+export interface IntegrationActionMenu {
+  actionKey: string;
+  name: string;
+  logoUrl: string;
+  estimatedScore: string;
+  description: string;
+  waterfallConfigs: IntegrationAction[];
 }
 
 export enum WaterfallConfigTypeEnum {

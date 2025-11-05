@@ -69,7 +69,7 @@ export const DialogWorkEmailIntegrationAccount = () => {
         </Typography>
         <DialogWorkEmailCollapseCard title={'Account'}>
           <Stack gap={1.5}>
-            <Typography>Select LeadMagic account</Typography>
+            <Typography variant={'body3'}>Select LeadMagic account</Typography>
             <StyledSelect
               options={[
                 {

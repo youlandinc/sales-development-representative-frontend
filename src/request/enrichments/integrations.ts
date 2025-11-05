@@ -2,6 +2,7 @@ import { get, post, put } from '../request';
 import {
   CreateWaterfallConfigRequestParam,
   IntegrationAction,
+  IntegrationActionMenu,
   IntegrationActionType,
 } from '@/types/Prospect';
 
@@ -21,4 +22,8 @@ export const _editIntegrationConfig = (
   param: CreateWaterfallConfigRequestParam,
 ) => {
   return put(`/sdr/waterfall/table/${groupId}`, param);
+};
+
+export const _fetchIntegrationMenus = () => {
+  return get<IntegrationActionMenu[]>('/sdr/action/list');
 };

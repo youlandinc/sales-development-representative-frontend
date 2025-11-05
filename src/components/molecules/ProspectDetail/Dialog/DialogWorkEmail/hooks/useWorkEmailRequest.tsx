@@ -14,24 +14,18 @@ import {
 import { ActiveTypeEnum, HttpError } from '@/types';
 import { CreateWaterfallConfigRequestParam } from '@/types/Prospect';
 
-import { IntegrationSaveTypeParam } from '../data';
 import { useMemo } from 'react';
 
 export const useWorkEmailRequest = (cb?: () => void) => {
-  const {
-    setWorkEmailVisible,
-    integrationActionType,
-    activeType,
-    editConfigParams,
-  } = useWorkEmailStore((store) => store);
+  const { setWorkEmailVisible, dialogHeaderName, activeType, groupId } =
+    useWorkEmailStore((store) => store);
   const { runAi } = useRunAi();
   const { fetchTable, columns } = useProspectTableStore();
   const { waterfallAllInputs, integrationsInWaterfall } =
     useComputedInWorkEmailStore();
 
   //request
-  const integrationSaveTypeParam =
-    IntegrationSaveTypeParam[integrationActionType];
+  const integrationSaveTypeParam = dialogHeaderName;
 
   const requestParams: CreateWaterfallConfigRequestParam = {
     waterfallFieldName: integrationSaveTypeParam,
@@ -82,10 +76,9 @@ export const useWorkEmailRequest = (cb?: () => void) => {
 
   const [updateIntegrationState, updateIntegration] = useAsyncFn(
     async (tableId: string, recordCount = 10, isRunAi = true) => {
-      if (!editConfigParams) {
+      if (!groupId) {
         return;
       }
-      const { groupId } = editConfigParams;
       try {
         await _editIntegrationConfig(groupId, requestParams);
         await fetchTable(tableId);
@@ -108,7 +101,7 @@ export const useWorkEmailRequest = (cb?: () => void) => {
         SDRToast({ message, header, variant });
       }
     },
-    [columns, requestParams, editConfigParams],
+    [columns, requestParams, groupId],
   );
 
   const requestState = useMemo(() => {

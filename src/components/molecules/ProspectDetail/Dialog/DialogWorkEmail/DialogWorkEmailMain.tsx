@@ -9,12 +9,10 @@ import { DialogHeader } from '../Common';
 import {
   DialogWorkEmailFullConfiguration,
   DialogWorkEmailQuickSetup,
-  HEADER_NAME,
-  WATERFALL_DESCRIPTION,
 } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
-import { WaterfallConfigTypeEnum } from '@/types/Prospect';
+import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/Prospect';
 
 export const DialogWorkEmailMain = () => {
   const {
@@ -22,15 +20,21 @@ export const DialogWorkEmailMain = () => {
     allIntegrations,
     setWaterfallConfigType,
     waterfallConfigType,
-    integrationActionType,
+    dialogHeaderName,
+    waterfallDescription,
   } = useWorkEmailStore((store) => store);
+
+  const handleClose = () => {
+    setWorkEmailVisible(false);
+    setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
+  };
 
   return (
     <Stack flex={1} overflow={'hidden'}>
       <DialogHeader
-        handleBack={() => setWorkEmailVisible(false)}
-        handleClose={() => setWorkEmailVisible(false)}
-        title={HEADER_NAME?.[integrationActionType] || ''}
+        handleBack={handleClose}
+        handleClose={handleClose}
+        title={dialogHeaderName}
       />
       <Stack flex={1} gap={4} minHeight={0} overflow={'auto'} p={3}>
         <Stack gap={1}>
@@ -40,9 +44,7 @@ export const DialogWorkEmailMain = () => {
           <Typography fontWeight={600} lineHeight={1.2} variant={'body2'}>
             Waterfall
           </Typography>
-          <Typography variant={'body2'}>
-            {WATERFALL_DESCRIPTION?.[integrationActionType] || ''}
-          </Typography>
+          <Typography variant={'body2'}>{waterfallDescription}</Typography>
         </Stack>
 
         <Stack gap={3}>

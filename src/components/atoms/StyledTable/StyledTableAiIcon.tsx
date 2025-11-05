@@ -54,7 +54,6 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
           e.stopPropagation();
           e.preventDefault();
           onClick(e);
-          console.log(onClick);
         }}
         sx={{
           position: 'absolute',

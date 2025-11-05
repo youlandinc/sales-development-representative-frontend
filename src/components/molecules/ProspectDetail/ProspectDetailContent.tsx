@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
 import { Stack } from '@mui/material';
+import { FC, useState } from 'react';
 
 import {
   ActiveTypeEnum,
@@ -23,9 +23,6 @@ import {
   DialogWorkEmail,
   TableColumnMenuEnum,
 } from '@/components/molecules';
-
-import { useComputedInWorkEmailStore } from './Dialog/DialogWorkEmail/hooks';
-import { MathIntegrationTypeEnum } from '@/types';
 
 interface ProspectDetailTableProps {
   tableId: string;
@@ -56,14 +53,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     setGenerateDescription,
   } = useWebResearchStore((store) => store);
 
-  const {
-    setWorkEmailVisible,
-    fetchIntegrations,
-    setActiveType,
-    setEditConfigParams,
-  } = useWorkEmailStore((store) => store);
-
-  const { matchActionKeyToIntegration } = useComputedInWorkEmailStore();
+  const { handleEditClick } = useWorkEmailStore((store) => store);
 
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
 
@@ -126,37 +116,8 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 const column = columns.find((col) => col.fieldId === columnId);
                 // Work Email configuration
                 if (column?.groupId && fieldGroupMap) {
-                  const waterfallConfig = fieldGroupMap?.[
-                    column.groupId
-                  ]?.waterfallConfigs?.map((i) => ({
-                    actionKey: i.actionKey,
-                    skipped: i.skipped,
-                    inputParams: i.inputParameters.map((p) => {
-                      const field = columns.find(
-                        (col) => col.fieldId === p.formulaText,
-                      );
-                      return {
-                        name: p.name,
-                        selectedOption: {
-                          label: field?.fieldName || '',
-                          value: field?.fieldId || '',
-                          key: field?.fieldId || '',
-                        },
-                      };
-                    }),
-                  }));
-                  if (column.actionKey) {
-                    matchActionKeyToIntegration(
-                      column.actionKey as MathIntegrationTypeEnum,
-                    );
-                    setActiveType(ActiveTypeEnum.edit);
-                    setEditConfigParams({
-                      groupId: column.groupId,
-                      waterfallConfigs: waterfallConfig,
-                    });
-                    fetchIntegrations();
-                    setWorkEmailVisible(true);
-                  }
+                  handleEditClick(columnId);
+                  return;
                 }
                 // AI column configuration
                 if (!column || column.actionKey !== 'use-ai') {

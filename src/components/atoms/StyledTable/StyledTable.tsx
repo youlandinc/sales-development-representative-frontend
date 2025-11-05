@@ -36,6 +36,7 @@ import {
   getAddColumnMenuActions,
   getAiColumnMenuActions,
   getNormalColumnMenuActions,
+  isAiColumn,
   TableColumnMenuEnum,
 } from '@/components/molecules';
 
@@ -81,6 +82,7 @@ interface StyledTableProps {
     fieldId: string;
     recordId?: string;
     isHeader?: boolean;
+    recordCount?: number;
   }) => Promise<void>;
 }
 
@@ -125,6 +127,10 @@ export const StyledTable: FC<StyledTableProps> = ({
   const [headerMenuAnchor, setHeaderMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
+  const [aiRunMenuAnchor, setAiRunMenuAnchor] = useState<null | HTMLElement>(
+    null,
+  );
+  const [aiRunColumnId, setAiRunColumnId] = useState<string>('');
   const [selectedColumnId, setSelectedColumnId] = useState<string>('');
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
     left: ['__select'],
@@ -282,16 +288,10 @@ export const StyledTable: FC<StyledTableProps> = ({
         onAiProcess?.(recordId, columnId);
       },
       hasAiColumnInRow: (recordId: string) => {
-        return columns.some(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        return columns.some(isAiColumn);
       },
       triggerBatchAiProcess: () => {
-        const aiColumns = columns.filter(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        const aiColumns = columns.filter(isAiColumn);
         rowIds.forEach((recordId) => {
           aiColumns.forEach((col) => {
             onAiProcess?.(recordId, col.fieldId);
@@ -299,10 +299,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
       triggerRelatedAiProcess: (recordId: string, columnId: string) => {
-        const aiColumns = columns.filter(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        const aiColumns = columns.filter(isAiColumn);
 
         aiColumns.forEach((col) => {
           onAiProcess?.(recordId, col.fieldId);
@@ -313,12 +310,15 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
       getAiColumns: () => {
-        return columns.filter(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        return columns.filter(isAiColumn);
       },
       onRunAi: onRunAi,
+      openAiRunMenu: (anchorEl: HTMLElement, columnId: string) => {
+        setAddMenuAnchor(null);
+        setHeaderMenuAnchor(null);
+        setAiRunMenuAnchor(anchorEl);
+        setAiRunColumnId(columnId);
+      },
       isHeaderEditing: (headerId: string) =>
         headerState?.columnId === headerId && headerState?.isEditing === true,
       startHeaderEdit: (headerId: string) => {
@@ -910,6 +910,8 @@ export const StyledTable: FC<StyledTableProps> = ({
       onClickAway={() => {
         setAddMenuAnchor(null);
         setHeaderMenuAnchor(null);
+        setAiRunMenuAnchor(null);
+        setAiRunColumnId('');
         setSelectedColumnId('');
       }}
     >
@@ -1144,6 +1146,94 @@ export const StyledTable: FC<StyledTableProps> = ({
                     />
                   );
                 })}
+              </Stack>
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
+
+        <Popper
+          anchorEl={aiRunMenuAnchor}
+          open={Boolean(aiRunMenuAnchor)}
+          placement="bottom-start"
+          sx={{ zIndex: 1300 }}
+        >
+          <ClickAwayListener
+            onClickAway={() => {
+              setAiRunMenuAnchor(null);
+              setAiRunColumnId('');
+            }}
+          >
+            <Paper
+              sx={{
+                boxShadow: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                minWidth: 280,
+              }}
+            >
+              <Stack gap={0}>
+                {rowIds.length > 10 ? (
+                  <>
+                    <MenuItem
+                      onClick={() => {
+                        onRunAi?.({
+                          fieldId: aiRunColumnId,
+                          isHeader: true,
+                          recordCount: 10,
+                        });
+                        setAiRunMenuAnchor(null);
+                        setAiRunColumnId('');
+                      }}
+                      sx={{
+                        minHeight: 'auto',
+                        py: 1.5,
+                        px: 2,
+                        fontSize: 14,
+                      }}
+                    >
+                      Run first 10 rows
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        onRunAi?.({
+                          fieldId: aiRunColumnId,
+                          isHeader: true,
+                        });
+                        setAiRunMenuAnchor(null);
+                        setAiRunColumnId('');
+                      }}
+                      sx={{
+                        minHeight: 'auto',
+                        py: 1.5,
+                        px: 2,
+                        fontSize: 14,
+                      }}
+                    >
+                      Run all rows that haven&#39;t run or have errors
+                    </MenuItem>
+                  </>
+                ) : (
+                  <MenuItem
+                    onClick={() => {
+                      onRunAi?.({
+                        fieldId: aiRunColumnId,
+                        isHeader: true,
+                        recordCount: rowIds.length,
+                      });
+                      setAiRunMenuAnchor(null);
+                      setAiRunColumnId('');
+                    }}
+                    sx={{
+                      minHeight: 'auto',
+                      py: 1.5,
+                      px: 2,
+                      fontSize: 14,
+                    }}
+                  >
+                    Run {rowIds.length} {rowIds.length === 1 ? 'row' : 'rows'}
+                  </MenuItem>
+                )}
               </Stack>
             </Paper>
           </ClickAwayListener>

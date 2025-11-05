@@ -1,69 +1,67 @@
+import { useMemo } from 'react';
+
 import { useWorkEmailStore } from '@/stores/Prospect';
 
-import {
-  IntegrationActionInputParams,
-  IntegrationActionType,
-  MATH_INTEGRATION_TO_ACTION_TYPE,
-  MathIntegrationTypeEnum,
-} from '@/types/Prospect';
+import { IntegrationActionInputParams } from '@/types/Prospect';
 
 export const useComputedInWorkEmailStore = () => {
-  const { allIntegrations, setIntegrationActionType } = useWorkEmailStore(
-    (store) => store,
+  const { allIntegrations } = useWorkEmailStore((store) => store);
+
+  const integrationsInWaterfall = useMemo(
+    () =>
+      allIntegrations
+        .filter((i) => i.isDefault)
+        .map((i) => ({
+          ...i,
+          isMissingRequired: i.inputParams
+            .filter((item) => item.isRequired)
+            .some((p) => !p.selectedOption),
+        })),
+    [allIntegrations],
   );
 
-  const integrationsInWaterfall = allIntegrations.filter((i) => i.isDefault);
-
-  const waterfallAllInputs: (IntegrationActionInputParams & {
+  const waterfallAllInputs = useMemo((): (IntegrationActionInputParams & {
     actionKey: string;
-  })[] = Object.values(
-    integrationsInWaterfall
-      .map((i) => i.inputParams.map((p) => ({ ...p, actionKey: i.actionKey })))
-      .flat()
-      .reduce(
-        (acc, param) => {
-          if (!acc[param.semanticType]) {
-            acc[param.semanticType] = param;
-          }
-          return acc;
-        },
-        {} as Record<
-          string,
-          IntegrationActionInputParams & {
-            actionKey: string;
-          }
-        >,
+  })[] => {
+    const inputMap = new Map<
+      string,
+      IntegrationActionInputParams & { actionKey: string }
+    >();
+
+    integrationsInWaterfall.forEach((integration) => {
+      integration.inputParams.forEach((param) => {
+        if (!inputMap.has(param.semanticType)) {
+          inputMap.set(param.semanticType, {
+            ...param,
+            actionKey: integration.actionKey,
+          });
+        }
+      });
+    });
+
+    return Array.from(inputMap.values());
+  }, [integrationsInWaterfall]);
+
+  const isMissingConfig = useMemo(
+    () =>
+      integrationsInWaterfall.some((integration) =>
+        integration.inputParams.some((param) => !param.selectedOption),
       ),
+    [integrationsInWaterfall],
   );
 
-  const isMissingConfig = integrationsInWaterfall
-    .map((item) => item.inputParams)
-    .flat()
-    .some((i) => !i.selectedOption);
-
-  const matchActionKeyToIntegration = (actionKey: string) => {
-    if (actionKey.includes(MathIntegrationTypeEnum.work_email)) {
-      setIntegrationActionType(IntegrationActionType.work_email);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.personal_email)) {
-      setIntegrationActionType(IntegrationActionType.personal_email);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.phone_number)) {
-      setIntegrationActionType(IntegrationActionType.phone_number);
-      return;
-    }
-    if (actionKey.includes(MathIntegrationTypeEnum.linkedin_profile)) {
-      setIntegrationActionType(IntegrationActionType.linkedin_profile);
-      return;
-    }
-  };
+  const hasConfigCount = useMemo(
+    () =>
+      integrationsInWaterfall.filter((item) =>
+        item.inputParams.every((p) => !!p.selectedOption),
+      ).length,
+    [integrationsInWaterfall],
+  );
 
   return {
     integrationsInWaterfall,
     waterfallAllInputs,
     isMissingConfig,
-    matchActionKeyToIntegration,
+    hasConfigCount, // 如果需要在其他地方使用
   };
 };

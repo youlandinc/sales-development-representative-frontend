@@ -1,135 +1,109 @@
-import { useState } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
+import { Stack } from '@mui/material';
 
-import { StyledDialog, StyledRadioGroup } from '@/components/atoms';
-import { FilterContainer, FilterTextField } from './index';
+import { StyledRadioGroup } from '@/components/atoms';
+import { FilterListTextArea, FilterTableSelect } from './index';
+import { FilterElementTypeEnum } from '@/types';
+import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
+
+enum CompaniesRadioEnum {
+  list = 'LIST',
+  table = 'TABLE',
+}
 
 const COMPANIES_OPTIONS = [
   {
     label: 'SalesOS table of companies',
-    key: 'table',
-    value: 'table',
+    key: CompaniesRadioEnum.table,
+    value: CompaniesRadioEnum.table,
   },
   {
     label: 'List of company identifiers',
-    key: 'list',
-    value: 'list',
+    key: CompaniesRadioEnum.list,
+    value: CompaniesRadioEnum.list,
   },
 ];
 
-import ICON_CLOSE from './assets/icon-close.svg';
-import ICON_FOLDER from './assets/icon-folder.svg';
-import ICON_MORE from './assets/icon-more.svg';
-import { useSwitch } from '@/hooks';
+interface FilterCompaniesProps {
+  type: FilterElementTypeEnum;
+}
 
-export const FilterCompanies = () => {
-  const [radioValue, setRadioValue] = useState('list');
-  const { open, visible, close } = useSwitch(false);
+export const FilterCompanies: FC<FilterCompaniesProps> = ({ type }) => {
+  const { queryConditions, setQueryConditions } = useFindPeopleCompanyStore(
+    (state) => state,
+  );
+
+  const [radioValue, setRadioValue] = useState<CompaniesRadioEnum>(
+    CompaniesRadioEnum.list,
+  );
+
+  const [companyName, setCompanyName] = useState<string[]>([]);
+  const [selectedTableId, setSelectedTableId] = useState<string>('');
+  const [selectedTableName, setSelectedTableName] = useState<string>('');
+
+  // Initialize from store on mount
+  useEffect(() => {
+    const storeKeywords = queryConditions?.tableInclude?.keywords;
+    if (Array.isArray(storeKeywords) && storeKeywords.length > 0) {
+      setCompanyName(storeKeywords);
+    }
+    const storeTableId = queryConditions?.tableInclude?.tableId;
+    if (storeTableId) {
+      setSelectedTableId(storeTableId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const renderNode = () => {
+    switch (radioValue) {
+      case CompaniesRadioEnum.table:
+        return (
+          <FilterTableSelect
+            onCompanyNamesChange={(companyNames) => {
+              setCompanyName(companyNames);
+            }}
+            onSelectedTableIdChange={(tableId) => setSelectedTableId(tableId)}
+            onSelectedTableNameChange={(tableName) =>
+              setSelectedTableName(tableName)
+            }
+            selectedTableId={selectedTableId}
+            selectedTableName={selectedTableName}
+            type={type}
+          />
+        );
+      case CompaniesRadioEnum.list:
+        return (
+          <FilterListTextArea
+            onChange={(param) => {
+              setCompanyName(param);
+              setQueryConditions({
+                ...queryConditions,
+                tableInclude: {
+                  ...queryConditions.tableInclude,
+                  keywords: param,
+                },
+              });
+            }}
+            state={companyName}
+          />
+        );
+    }
+  };
 
   return (
     <Stack gap={1.5}>
-      <StyledRadioGroup
-        onChange={(_, val) => {
-          setRadioValue(val);
-        }}
-        options={COMPANIES_OPTIONS}
-        value={radioValue}
-      />
-      <Stack>
-        <FilterContainer title={'Company table'}>
-          <Stack flexDirection={'row'} gap={1.5}>
-            <Stack
-              sx={{
-                px: 1.5,
-                gap: 1.5,
-                height: 32,
-                borderRadius: 2,
-                border: '1px solid #E5E5E5',
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-              }}
-            >
-              <Icon
-                component={ICON_FOLDER}
-                sx={{ width: 16, height: 16, flexShrink: 0 }}
-              />
-              <Typography
-                sx={{
-                  fontSize: 12,
-                  flex: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  py: 0.5,
-                  cursor: 'pointer',
-                }}
-              >
-                Select people table
-              </Typography>
-              <Stack flexDirection={'row'} gap={1.5} ml={'auto'}>
-                <Icon
-                  component={ICON_FOLDER}
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    cursor: 'pointer',
-                    '&:hover': {
-                      '& path': {
-                        fill: '#363440',
-                      },
-                    },
-                  }}
-                />
-                <Icon
-                  component={ICON_CLOSE}
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    cursor: 'pointer',
-                    '& path': {
-                      fill: '#6F6C7D',
-                    },
-                    '&:hover': {
-                      '& path': {
-                        fill: '#363440',
-                      },
-                    },
-                  }}
-                />
-              </Stack>
-            </Stack>
-            <Stack
-              sx={{
-                cursor: 'pointer',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 32,
-                width: 32,
-                borderRadius: 2,
-                border: '1px solid #E5E5E5',
-              }}
-            >
-              <Icon component={ICON_MORE} sx={{ width: 16, height: 16 }} />
-            </Stack>
-          </Stack>
-        </FilterContainer>
-        <StyledDialog
-          content={<></>}
-          footer={<></>}
-          header={<></>}
-          open={visible}
-        />
-      </Stack>
-      <Stack>
-        <FilterTextField
-          onChange={(e) => {
-            console.log(e);
+      <Stack mt={0.5}>
+        <StyledRadioGroup
+          onChange={(_, val) => {
+            const newValue = val as string as CompaniesRadioEnum;
+            setRadioValue(newValue);
           }}
-          subTitle={'Company Linkedin URLs, domains'}
-          title={'Companies'}
+          options={COMPANIES_OPTIONS}
+          value={radioValue}
         />
       </Stack>
+
+      {renderNode()}
     </Stack>
   );
 };

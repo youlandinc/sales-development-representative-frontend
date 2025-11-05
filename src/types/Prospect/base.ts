@@ -1,12 +1,16 @@
-import { IntegrationAction } from './integrations';
+import { IntegrationAction, ProspectTableEnum } from '@/types';
 
 export interface ProspectTableItem {
-  tableId: string | number;
+  tableId: string;
   tableName: string;
   createdAt: string | null;
   updatedAt: string | null;
   contacts: number;
+  source: ProspectTableEnum;
+  children: ProspectTableItem[] | null;
 }
+
+export type ResponseProspectTableViaSearch = ProspectTableItem[];
 
 export interface ResponseProspectTable {
   content: ProspectTableItem[];
@@ -25,7 +29,12 @@ export interface ColumnFieldGroupMapItem extends IntegrationAction {
 export interface ColumnFieldGroupMap {
   [key: string]: {
     groupId: string;
-    id: number;
+    name: string;
+    requiredInputsBinding: {
+      name: string;
+      formulaText: string;
+      optional: boolean;
+    }[];
     waterfallConfigs: ColumnFieldGroupMapItem[];
   };
 }

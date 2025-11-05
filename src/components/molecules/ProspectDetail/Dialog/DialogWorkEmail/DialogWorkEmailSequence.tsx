@@ -15,11 +15,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Icon, Stack, Typography } from '@mui/material';
+import { Icon, Stack, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 
-import { StyledButton, StyledSwitch } from '@/components/atoms';
+import { StyledButton, StyledCost, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
@@ -82,7 +82,7 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
             setSelectedIntegrationToConfig(integrationInfo);
           }}
           px={1}
-          py={0.5}
+          py={1}
           sx={{
             '&:hover': {
               bgcolor: 'rgb(247 248 249 / 1)',
@@ -92,17 +92,29 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
           <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
             <Image
               alt={integrationInfo.integrationName}
-              height={18}
+              height={20}
               src={integrationInfo.logoUrl}
-              width={18}
+              width={20}
             />
-            <Typography variant={'body3'}>
+            <Typography variant={'body2'}>
               {integrationInfo.integrationName}
             </Typography>
           </Stack>
           <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
-            {integrationInfo.inputParams.some((i) => !i.selectedOption) && (
-              <Icon component={ICON_VALIDATE} sx={{ width: 18, height: 18 }} />
+            {integrationInfo.isMissingRequired ? (
+              <Tooltip arrow placement="top" title={'Missing required inputs'}>
+                <Icon
+                  component={ICON_VALIDATE}
+                  sx={{ width: 18, height: 18 }}
+                />
+              </Tooltip>
+            ) : (
+              <StyledCost
+                border={'1px solid #D0CEDA'}
+                borderRadius={5}
+                count={integrationInfo.score}
+                py={'2px'}
+              />
             )}
             <Icon
               component={ICON_ARROW}
@@ -139,7 +151,7 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
               ),
             );
           }}
-          sx={{ width: 18, height: 18 }}
+          sx={{ width: 20, height: 20, '& path': { fill: '#DE6449' } }}
         />
       </Stack>
     </Stack>
@@ -161,7 +173,6 @@ export const DialogWorkEmailSequence: FC = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  // const [items, setItems] = useState(integrationsInWaterfall);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

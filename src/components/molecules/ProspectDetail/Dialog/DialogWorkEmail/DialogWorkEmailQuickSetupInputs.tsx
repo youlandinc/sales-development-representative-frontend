@@ -1,26 +1,53 @@
-import { Icon, Stack, Typography } from '@mui/material';
-import { FC } from 'react';
+import { Box, Icon, Stack, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
+import { FC, useCallback } from 'react';
 
 import {
   DialogWorkEmailCollapseCard,
   DialogWorkEmailCustomSelect,
 } from './index';
+
+import { useWorkEmailStore } from '@/stores/Prospect';
 import { useComputedInWorkEmailStore } from './hooks';
 
-import ICON_SUCCESS from '@/components/molecules/ProspectDetail/assets/dialog/icon_success.svg';
+import ICON_CHECK_CIRCLE from '@/components/molecules/ProspectDetail/assets/dialog/dialogWorkEmail/icon_check_circle.svg';
+import ICON_CHECK_SQUARE_OUTLINE from '@/components/molecules/ProspectDetail/assets/dialog/dialogWorkEmail/icon_check_square_outline.svg';
+import ICON_NO_CHECK_SQUARE_OUTLINE from '@/components/molecules/ProspectDetail/assets/dialog/dialogWorkEmail/icon_no_check_square_outline.svg';
 import ICON_VALIDATE from '@/components/molecules/ProspectDetail/assets/dialog/dialogWorkEmail/icon_validate_false.svg';
-import { useWorkEmailStore } from '@/stores/Prospect';
+import ICON_SUCCESS from '@/components/molecules/ProspectDetail/assets/dialog/icon_success.svg';
+import { IntegrationActionInputParams } from '@/types';
 
 export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
   title = 'Inputs',
 }) => {
-  const { waterfallAllInputs, integrationsInWaterfall, isMissingConfig } =
-    useComputedInWorkEmailStore();
+  const {
+    waterfallAllInputs,
+    integrationsInWaterfall,
+    isMissingConfig,
+    hasConfigCount,
+  } = useComputedInWorkEmailStore();
   const { setAllIntegrations, allIntegrations } = useWorkEmailStore();
-  const hasConfigCount = integrationsInWaterfall.filter((item) =>
-    item.inputParams.every((p) => !!p.selectedOption),
-  ).length;
+
+  const handleInputChange = useCallback(
+    (newValue: TOption | null, input: IntegrationActionInputParams) => {
+      const updatedIntegrations = allIntegrations.map((item) => {
+        return {
+          ...item,
+          inputParams: item.inputParams.map((p) => {
+            if (p.semanticType === input.semanticType) {
+              return {
+                ...p,
+                selectedOption: newValue,
+              };
+            }
+            return p;
+          }),
+        };
+      });
+      setAllIntegrations(updatedIntegrations);
+    },
+    [setAllIntegrations, allIntegrations],
+  );
 
   if (integrationsInWaterfall.length === 0) {
     return null;
@@ -28,7 +55,7 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
 
   return (
     <DialogWorkEmailCollapseCard title={title}>
-      <Stack gap={1.5}>
+      <Stack gap={2}>
         <Typography variant={'body3'}>
           We automatically try to map the correct columns for you. If any inputs
           are empty, just select the columns you want to map. Once all inputs
@@ -37,17 +64,114 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
         <Stack gap={1}>
           <Typography variant={'subtitle3'}>
             Actions configured ({hasConfigCount}/
-            {integrationsInWaterfall.length}) *
+            {integrationsInWaterfall.length}){' '}
+            <Box color={'error.main'} component={'span'}>
+              *
+            </Box>
           </Typography>
           <Stack flexDirection={'row'} gap={0.5}>
             {integrationsInWaterfall.map((item) => (
-              <Image
-                alt={item.integrationName}
-                height={18}
-                key={item.actionKey}
-                src={item.logoUrl}
-                width={18}
-              />
+              <Tooltip
+                placement={'bottom-start'}
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      bgcolor: '#FFF',
+                    },
+                  },
+                }}
+                title={
+                  <Stack
+                    border={'1px solid #D0CEDA'}
+                    borderRadius={2}
+                    gap={1.25}
+                    p={1.5}
+                  >
+                    <Typography
+                      color={'text.primary'}
+                      fontWeight={600}
+                      variant={'body2'}
+                    >
+                      {item.integrationName}
+                    </Typography>
+                    <Stack
+                      bgcolor={
+                        item.isMissingRequired ? 'transparent' : '#F0FEF4'
+                      }
+                      border={
+                        item.isMissingRequired
+                          ? '1px solid #DFDEE6'
+                          : '1px solid rgba(54, 155, 124, 0.10)'
+                      }
+                      borderRadius={2}
+                      gap={1.5}
+                      p={1.5}
+                      position={'relative'}
+                    >
+                      {item.inputParams.map((i, index) => (
+                        <Stack
+                          alignItems={'center'}
+                          flexDirection={'row'}
+                          gap={1}
+                          key={index}
+                        >
+                          <Icon
+                            component={
+                              i.selectedOption
+                                ? ICON_CHECK_SQUARE_OUTLINE
+                                : ICON_NO_CHECK_SQUARE_OUTLINE
+                            }
+                            sx={{
+                              width: 16,
+                              height: 16,
+                              '& path': {
+                                fill: item.isMissingRequired
+                                  ? '#6F6C7D'
+                                  : '#369B7C',
+                              },
+                            }}
+                          />
+                          <Typography
+                            color={
+                              item.isMissingRequired
+                                ? 'text.primary'
+                                : '#369B7C'
+                            }
+                            variant={'body2'}
+                          >
+                            {i.displayName}
+                          </Typography>
+                        </Stack>
+                      ))}
+                      <Icon
+                        component={ICON_CHECK_CIRCLE}
+                        sx={{
+                          width: 16,
+                          height: 16,
+                          position: 'absolute',
+                          right: '-8px',
+                          top: '-8px',
+                          opacity: item.isMissingRequired ? 0 : 1,
+                        }}
+                      />
+                    </Stack>
+                  </Stack>
+                }
+              >
+                <Image
+                  alt={item.integrationName}
+                  height={18}
+                  key={item.actionKey}
+                  src={item.logoUrl}
+                  style={{
+                    opacity: item.isMissingRequired ? 0.33 : 1,
+                    mixBlendMode: item.isMissingRequired
+                      ? ('luminosity' as const)
+                      : ('normal' as const),
+                  }}
+                  width={18}
+                />
+              </Tooltip>
             ))}
           </Stack>
           {isMissingConfig && (
@@ -72,21 +196,7 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
           <DialogWorkEmailCustomSelect
             key={key}
             onChange={(_, newValue) => {
-              const updatedIntegrations = allIntegrations.map((item) => {
-                return {
-                  ...item,
-                  inputParams: item.inputParams.map((p) => {
-                    if (p.semanticType === input.semanticType) {
-                      return {
-                        ...p,
-                        selectedOption: newValue,
-                      };
-                    }
-                    return p;
-                  }),
-                };
-              });
-              setAllIntegrations(updatedIntegrations);
+              handleInputChange(newValue, input);
             }}
             required={input.isRequired}
             title={input.displayName}

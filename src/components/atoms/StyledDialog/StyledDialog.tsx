@@ -15,6 +15,7 @@ export interface StyledDialogProps
   footer?: ReactNode;
   headerSx?: SxProps;
   contentSx?: SxProps;
+  footerSx?: SxProps;
   paperWidth?: CSSProperties['width'];
 }
 
@@ -26,6 +27,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
   open,
   headerSx,
   contentSx,
+  footerSx,
   paperWidth = 600,
   ...rest
 }) => {
@@ -133,7 +135,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
         </DialogContent>
       )}
       {footer && (
-        <DialogActions sx={{ ...handleSx('dialog_footer') }}>
+        <DialogActions sx={{ ...handleSx('dialog_footer'), ...footerSx }}>
           {footer}
         </DialogActions>
       )}

@@ -1,6 +1,6 @@
-import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, Fade, Skeleton, Stack, Typography } from '@mui/material';
 import { format } from 'date-fns';
+import { FC, ReactNode, useEffect, useState } from 'react';
 
 import { useAsyncFn, useSwitch } from '@/hooks';
 
@@ -8,13 +8,12 @@ import {
   SDRToast,
   StyledButton,
   StyledTextFilledField,
+  StyledTinyEditor,
 } from '@/components/atoms';
 import {
   CommonCampaignUserInfo,
   CommonEmailContent,
   CommonReceiptCardHeader,
-  InboxEditor,
-  InboxEditorForwardRefProps,
 } from '@/components/molecules';
 
 import {
@@ -73,7 +72,12 @@ export const CampaignsPendingEmailsCard: FC<
   useEffect(() => {
     setSubjectValue(subject);
   }, [subject]);
-  const editorRef = useRef<InboxEditorForwardRefProps | null>(null);
+
+  const [contentValue, setContentValue] = useState(emailContent);
+
+  useEffect(() => {
+    setContentValue(emailContent);
+  }, [emailContent]);
 
   const [rewriteState, rewrite] = useAsyncFn(async () => {
     try {
@@ -142,7 +146,7 @@ export const CampaignsPendingEmailsCard: FC<
                   component={'div'}
                   variant={'body3'}
                 >
-                  Scheduled send time: {format(time, 'MM/dd/yyyy')}
+                  Scheduled send time: {format(new Date(time), 'MM/dd/yyyy')}
                 </Typography>
               </Stack>
             )
@@ -194,7 +198,10 @@ export const CampaignsPendingEmailsCard: FC<
           {visible && (
             <Fade in={true}>
               <Box height={visible ? 'auto' : 0} mb={visible ? 0 : '-12px'}>
-                <InboxEditor initData={`${emailContent}`} ref={editorRef} />
+                <StyledTinyEditor
+                  onChange={setContentValue}
+                  value={contentValue}
+                />
               </Box>
             </Fade>
           )}
@@ -267,8 +274,7 @@ export const CampaignsPendingEmailsCard: FC<
                       await edit({
                         emailId,
                         subject: subjectValue,
-                        content:
-                          editorRef.current?.editInstance.getData() || '',
+                        content: contentValue || '',
                       });
 
                       close();
