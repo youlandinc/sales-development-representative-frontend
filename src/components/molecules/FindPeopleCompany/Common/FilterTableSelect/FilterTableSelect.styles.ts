@@ -1,11 +1,24 @@
 import { SxProps, Theme } from '@mui/material';
 
+// Common constants
+const COLORS = {
+  border: '#E5E5E5',
+  iconDefault: '#6F6C7D',
+  iconHover: '#363440',
+};
+
+const SIZES = {
+  defaultContainer: 32,
+  defaultDialog: 600,
+};
+
+// Base styles
 export const inputContainerSx: SxProps<Theme> = {
   px: 1.5,
   gap: 1.5,
-  height: 32,
+  height: SIZES.defaultContainer,
   borderRadius: 2,
-  border: '1px solid #E5E5E5',
+  border: `1px solid ${COLORS.border}`,
   flexDirection: 'row',
   alignItems: 'center',
   flex: 1,
@@ -17,6 +30,21 @@ export const iconSx = {
   large: { width: 24, height: 24 },
 };
 
+// Common icon styles
+const baseIconHoverSx = {
+  '&:hover': {
+    '& path': {
+      fill: COLORS.iconHover,
+    },
+  },
+};
+
+const clickableIconSx = {
+  cursor: 'pointer',
+  ...baseIconHoverSx,
+};
+
+// Icon variations
 export const folderIconSx: SxProps<Theme> = {
   ...iconSx.small,
   flexShrink: 0,
@@ -24,24 +52,14 @@ export const folderIconSx: SxProps<Theme> = {
 
 export const hoverableIconSx: SxProps<Theme> = {
   ...iconSx.small,
-  cursor: 'pointer',
-  '&:hover': {
-    '& path': {
-      fill: '#363440',
-    },
-  },
+  ...clickableIconSx,
 };
 
 export const closeIconSx: SxProps<Theme> = {
   ...iconSx.small,
-  cursor: 'pointer',
+  ...clickableIconSx,
   '& path': {
-    fill: '#6F6C7D',
-  },
-  '&:hover': {
-    '& path': {
-      fill: '#363440',
-    },
+    fill: COLORS.iconDefault,
   },
 };
 
@@ -70,26 +88,31 @@ export const moreButtonSx: SxProps<Theme> = {
   cursor: 'pointer',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 32,
-  width: 32,
+  height: SIZES.defaultContainer,
+  width: SIZES.defaultContainer,
   borderRadius: 2,
-  border: '1px solid #E5E5E5',
+  border: `1px solid ${COLORS.border}`,
+};
+
+// Dialog styles
+const baseDialogContentSx = {
+  height: SIZES.defaultDialog,
+  overflow: 'auto' as const,
+};
+
+const centeredContentSx = {
+  ...baseDialogContentSx,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 };
 
 export const dialogStyles = {
   headerSx: { pb: 3 },
   footerSx: { pt: 3 },
-  contentSx: {
-    height: 600,
-    overflow: 'auto',
-  },
-  loadingContentSx: {
-    height: 600,
-    overflow: 'auto',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  contentSx: baseDialogContentSx,
+  loadingContentSx: centeredContentSx,
+  emptyContentSx: centeredContentSx,
 };
 
 export const selectButtonSx: SxProps<Theme> = {

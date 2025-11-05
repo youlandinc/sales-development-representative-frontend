@@ -98,12 +98,18 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
     onSelectedTableNameChange?.('');
   };
 
+  const filterTitle =
+    type === FilterElementTypeEnum.exclude_people
+      ? 'Table'
+      : CONSTANTS.FILTER_TITLE;
+
   return (
     <Stack>
-      <FilterContainer title={CONSTANTS.FILTER_TITLE}>
+      <FilterContainer title={filterTitle}>
         <FilterTableSelectInput
           onClearSelection={onClickClearSelection}
           onOpenDialog={onClickOpenDialog}
+          selectedTableId={selectedTableId}
           selectedTableName={outerTableName}
         />
       </FilterContainer>

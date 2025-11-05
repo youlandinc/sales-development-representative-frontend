@@ -42,13 +42,19 @@ export const FilterTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
 }) => {
   const contentSx = fetchingTable
     ? dialogStyles.loadingContentSx
-    : dialogStyles.contentSx;
+    : tableList.length === 0
+      ? dialogStyles.emptyContentSx
+      : dialogStyles.contentSx;
 
   return (
     <StyledDialog
       content={
         fetchingTable ? (
           <StyledLoading size={CONSTANTS.LOADING_SIZE} />
+        ) : tableList.length === 0 ? (
+          <Typography color={'text.secondary'} fontSize={14}>
+            You don&apos;t have any table yet.
+          </Typography>
         ) : (
           <Stack gap={0.5}>
             {tableList.map((item) => (
