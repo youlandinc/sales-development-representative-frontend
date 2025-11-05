@@ -25,8 +25,6 @@ export const FindPeoplePage = () => {
     fetchFiltersByTypeLoading,
   } = useFindPeopleCompanyStore((state) => state);
 
-  console.log(queryConditions);
-
   const params = useDebounce(queryConditions, 400);
 
   // Step 1: Fetch grid header (depends on bizId)
