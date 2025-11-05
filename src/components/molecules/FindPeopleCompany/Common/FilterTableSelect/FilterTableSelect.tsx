@@ -9,27 +9,31 @@ import { FilterContainer } from '../index';
 import { FilterTableSelectInput } from './FilterTableSelectInput';
 import { FilterTableSelectDialog } from './FilterTableSelectDialog';
 
-import { FilterElementTypeEnum } from '@/types';
+import { FilterElementTypeEnum, ProspectTableEnum } from '@/types';
 import { CONSTANTS } from './FilterTableSelect.styles';
 
 interface FilterTableSelectProps {
   type: FilterElementTypeEnum;
   selectedTableId?: string;
   selectedTableName?: string;
+  selectedTableSource?: ProspectTableEnum;
   storeField?: 'tableInclude' | 'tableExclude';
   onCompanyNamesChange?: (companyNames: string[]) => void;
   onSelectedTableIdChange?: (tableId: string) => void;
   onSelectedTableNameChange?: (tableName: string) => void;
+  onSelectedTableSourceChange?: (tableSource: ProspectTableEnum | undefined) => void;
 }
 
 export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   type,
   selectedTableId,
   selectedTableName,
+  selectedTableSource,
   storeField = 'tableInclude',
   onCompanyNamesChange,
   onSelectedTableIdChange,
   onSelectedTableNameChange,
+  onSelectedTableSourceChange,
 }) => {
   const { queryConditions, setQueryConditions } = useFindPeopleCompanyStore(
     (state) => state,
@@ -40,6 +44,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
     fetchingCondition,
     innerTableId,
     outerTableName,
+    outerTableSource,
     expandedIds,
     tableList,
     toggleExpand,
@@ -50,6 +55,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   } = useTableSelect({
     outerTableId: selectedTableId,
     outerTableName: selectedTableName,
+    outerTableSource: selectedTableSource,
     type,
   });
 
@@ -59,7 +65,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   };
 
   const onClickConfirm = async () => {
-    await confirmTableSelection((data, tableName) => {
+    await confirmTableSelection((data, tableName, tableSource) => {
       // Update store with table structure (tableInclude or tableExclude)
       setQueryConditions({
         ...queryConditions,
@@ -75,6 +81,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
       onCompanyNamesChange?.(data);
       onSelectedTableIdChange?.(innerTableId);
       onSelectedTableNameChange?.(tableName);
+      onSelectedTableSourceChange?.(tableSource);
     }, close);
   };
 
@@ -96,6 +103,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
     onCompanyNamesChange?.([]);
     onSelectedTableIdChange?.('');
     onSelectedTableNameChange?.('');
+    onSelectedTableSourceChange?.(undefined);
   };
 
   const filterTitle =
@@ -111,6 +119,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
           onOpenDialog={onClickOpenDialog}
           selectedTableId={selectedTableId}
           selectedTableName={outerTableName}
+          selectedTableSource={outerTableSource}
         />
       </FilterContainer>
       <FilterTableSelectDialog

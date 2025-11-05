@@ -15,7 +15,7 @@ const SIZES = {
 // Base styles
 export const inputContainerSx: SxProps<Theme> = {
   px: 1.5,
-  gap: 1.5,
+  gap: 0.5,
   height: SIZES.defaultContainer,
   borderRadius: 2,
   border: `1px solid ${COLORS.border}`,

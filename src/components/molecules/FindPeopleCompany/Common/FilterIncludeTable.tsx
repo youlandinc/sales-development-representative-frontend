@@ -3,7 +3,7 @@ import { Stack } from '@mui/material';
 
 import { StyledRadioGroup } from '@/components/atoms';
 import { FilterListTextArea, FilterTableSelect } from './index';
-import { FilterElementTypeEnum } from '@/types';
+import { FilterElementTypeEnum, ProspectTableEnum } from '@/types';
 import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
 
 enum CompaniesRadioEnum {
@@ -28,7 +28,7 @@ interface FilterCompaniesProps {
   type: FilterElementTypeEnum;
 }
 
-export const FilterCompanies: FC<FilterCompaniesProps> = ({ type }) => {
+export const FilterIncludeTable: FC<FilterCompaniesProps> = ({ type }) => {
   const { queryConditions, setQueryConditions } = useFindPeopleCompanyStore(
     (state) => state,
   );
@@ -40,6 +40,9 @@ export const FilterCompanies: FC<FilterCompaniesProps> = ({ type }) => {
   const [companyName, setCompanyName] = useState<string[]>([]);
   const [selectedTableId, setSelectedTableId] = useState<string>('');
   const [selectedTableName, setSelectedTableName] = useState<string>('');
+  const [selectedTableSource, setSelectedTableSource] = useState<
+    ProspectTableEnum | undefined
+  >(undefined);
 
   // Initialize from store on mount
   useEffect(() => {
@@ -66,8 +69,12 @@ export const FilterCompanies: FC<FilterCompaniesProps> = ({ type }) => {
             onSelectedTableNameChange={(tableName) =>
               setSelectedTableName(tableName)
             }
+            onSelectedTableSourceChange={(tableSource) =>
+              setSelectedTableSource(tableSource)
+            }
             selectedTableId={selectedTableId}
             selectedTableName={selectedTableName}
+            selectedTableSource={selectedTableSource}
             type={type}
           />
         );

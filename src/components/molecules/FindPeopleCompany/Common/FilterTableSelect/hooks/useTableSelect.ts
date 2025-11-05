@@ -3,6 +3,7 @@ import { _fetchAllProspectTable, _fetchCompanyNameViaTableId } from '@/request';
 import {
   FilterElementTypeEnum,
   HttpError,
+  ProspectTableEnum,
   ResponseProspectTableViaSearch,
 } from '@/types';
 import { SDRToast } from '@/components/atoms';
@@ -10,6 +11,7 @@ import { SDRToast } from '@/components/atoms';
 interface UseTableSelectParams {
   outerTableId?: string;
   outerTableName?: string;
+  outerTableSource?: ProspectTableEnum;
   type?: FilterElementTypeEnum;
 }
 
@@ -20,6 +22,7 @@ interface UseTableSelectReturn {
   innerTableId: string;
   outerTableId: string;
   outerTableName: string;
+  outerTableSource: ProspectTableEnum | undefined;
   expandedIds: Set<string>;
   tableList: ResponseProspectTableViaSearch;
 
@@ -28,7 +31,7 @@ interface UseTableSelectReturn {
   setInnerTableId: (id: string) => void;
   fetchTableList: () => Promise<void>;
   confirmTableSelection: (
-    onConfirm: (data: string[], tableName: string) => void,
+    onConfirm: (data: string[], tableName: string, tableSource?: ProspectTableEnum) => void,
     onClose: () => void,
   ) => Promise<void>;
   resetSelection: () => void;
@@ -40,6 +43,7 @@ export const useTableSelect = (
   const {
     outerTableId: externalOuterTableId,
     outerTableName: externalOuterTableName,
+    outerTableSource: externalOuterTableSource,
     type,
   } = params || {};
   const [fetchingTable, setFetchingTable] = useState(false);
@@ -47,6 +51,7 @@ export const useTableSelect = (
   const [innerTableId, setInnerTableId] = useState('');
   const [outerTableId, setOuterTableId] = useState('');
   const [outerTableName, setOuterTableName] = useState('');
+  const [outerTableSource, setOuterTableSource] = useState<ProspectTableEnum | undefined>(undefined);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [tableList, setTableList] = useState<ResponseProspectTableViaSearch>(
     [],
@@ -64,19 +69,25 @@ export const useTableSelect = (
     if (externalOuterTableName !== undefined) {
       setOuterTableName(externalOuterTableName);
     }
-  }, [externalOuterTableId, externalOuterTableName]);
+    if (externalOuterTableSource !== undefined) {
+      setOuterTableSource(externalOuterTableSource);
+    }
+  }, [externalOuterTableId, externalOuterTableName, externalOuterTableSource]);
 
-  // If tableList is loaded and we have outerTableId but no outerTableName, derive it
+  // If tableList is loaded and we have outerTableId but no outerTableName or outerTableSource, derive them
   useEffect(() => {
-    if (outerTableId && !outerTableName && tableList.length > 0) {
-      const tableName =
-        tableList.flat().find((item) => item.tableId === outerTableId)
-          ?.tableName || '';
-      if (tableName) {
-        setOuterTableName(tableName);
+    if (outerTableId && tableList.length > 0) {
+      const tableItem = tableList.flat().find((item) => item.tableId === outerTableId);
+      if (tableItem) {
+        if (!outerTableName) {
+          setOuterTableName(tableItem.tableName);
+        }
+        if (!outerTableSource) {
+          setOuterTableSource(tableItem.source);
+        }
       }
     }
-  }, [outerTableId, outerTableName, tableList]);
+  }, [outerTableId, outerTableName, outerTableSource, tableList]);
 
   const toggleExpand = (tableId: string) => {
     setExpandedIds((prev) => {
@@ -104,22 +115,23 @@ export const useTableSelect = (
   };
 
   const confirmTableSelection = async (
-    onConfirm: (data: string[], tableName: string) => void,
+    onConfirm: (data: string[], tableName: string, tableSource?: ProspectTableEnum) => void,
     onClose: () => void,
   ) => {
     if (!innerTableId) {
       return;
     }
 
-    const tableName =
-      tableList.flat().find((item) => item.tableId === innerTableId)
-        ?.tableName || '';
+    const tableItem = tableList.flat().find((item) => item.tableId === innerTableId);
+    const tableName = tableItem?.tableName || '';
+    const tableSource = tableItem?.source;
 
     // For exclude_people type, skip fetching company names
     if (type === FilterElementTypeEnum.exclude_table) {
       setOuterTableId(innerTableId);
       setOuterTableName(tableName);
-      onConfirm([], tableName);
+      setOuterTableSource(tableSource);
+      onConfirm([], tableName, tableSource);
       onClose();
       return;
     }
@@ -131,7 +143,8 @@ export const useTableSelect = (
 
       setOuterTableId(innerTableId);
       setOuterTableName(tableName);
-      onConfirm(data, tableName);
+      setOuterTableSource(tableSource);
+      onConfirm(data, tableName, tableSource);
       onClose();
     } catch (err) {
       const { message, header, variant } = err as HttpError;
@@ -145,6 +158,7 @@ export const useTableSelect = (
     setInnerTableId('');
     setOuterTableId('');
     setOuterTableName('');
+    setOuterTableSource(undefined);
   };
 
   return {
@@ -153,6 +167,7 @@ export const useTableSelect = (
     innerTableId,
     outerTableId,
     outerTableName,
+    outerTableSource,
     expandedIds,
     tableList,
     toggleExpand,

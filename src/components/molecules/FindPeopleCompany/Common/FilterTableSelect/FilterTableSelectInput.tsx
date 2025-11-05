@@ -1,11 +1,7 @@
 import { FC, MouseEvent, useState } from 'react';
 import { Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
 
-import ICON_FOLDER from './assets/icon-folder.svg';
-import ICON_CLOSE from './assets/icon-close.svg';
-import ICON_MORE from './assets/icon-more.svg';
-import ICON_OPEN from './assets/icon-open.svg';
-
+import { ProspectTableEnum } from '@/types';
 import {
   closeIconSx,
   CONSTANTS,
@@ -16,11 +12,30 @@ import {
   placeholderTextSx,
 } from './FilterTableSelect.styles';
 
+import ICON_FOLDER from './assets/icon-folder.svg';
+import ICON_CLOSE from './assets/icon-close.svg';
+import ICON_MORE from './assets/icon-more.svg';
+import ICON_OPEN from './assets/icon-open.svg';
+
+import ICON_PEOPLE from './assets/icon-people.svg';
+import ICON_COMPANY from './assets/icon-company.svg';
+import ICON_CSV from './assets/icon-csv.svg';
+
+const ICON_HASH: Record<ProspectTableEnum, any> = {
+  [ProspectTableEnum.find_people]: ICON_PEOPLE,
+  [ProspectTableEnum.find_companies]: ICON_COMPANY,
+  [ProspectTableEnum.from_csv]: ICON_CSV,
+  [ProspectTableEnum.black_table]: ICON_FOLDER,
+  [ProspectTableEnum.crm_list]: ICON_FOLDER,
+  [ProspectTableEnum.agent]: ICON_FOLDER,
+};
+
 interface FilterTableSelectInputProps {
   selectedTableName: string;
   onOpenDialog: () => void;
   onClearSelection: () => void;
   selectedTableId?: string;
+  selectedTableSource?: ProspectTableEnum;
 }
 
 export const FilterTableSelectInput: FC<FilterTableSelectInputProps> = ({
@@ -28,6 +43,7 @@ export const FilterTableSelectInput: FC<FilterTableSelectInputProps> = ({
   onOpenDialog,
   onClearSelection,
   selectedTableId,
+  selectedTableSource,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -50,8 +66,16 @@ export const FilterTableSelectInput: FC<FilterTableSelectInputProps> = ({
   return (
     <Stack flexDirection={'row'} gap={1}>
       <Stack sx={inputContainerSx}>
-        <Icon component={ICON_FOLDER} sx={folderIconSx} />
-        <Typography onClick={onOpenDialog} sx={placeholderTextSx}>
+        {selectedTableName && selectedTableSource && (
+          <Icon component={ICON_HASH[selectedTableSource]} sx={folderIconSx} />
+        )}
+        <Typography
+          onClick={onOpenDialog}
+          sx={{
+            ...placeholderTextSx,
+            ...(selectedTableName ? {} : { color: 'text.secondary' }),
+          }}
+        >
           {selectedTableName || CONSTANTS.PLACEHOLDER_TEXT}
         </Typography>
         {selectedTableName && (
