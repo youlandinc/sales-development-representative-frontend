@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Stack } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import useSWR from 'swr';
@@ -23,6 +23,7 @@ export const FindPeoplePage = () => {
     queryConditions,
     findType,
     fetchFiltersByTypeLoading,
+    setGridDataLoading,
   } = useFindPeopleCompanyStore((state) => state);
 
   const params = useDebounce(queryConditions, 400);
@@ -61,7 +62,7 @@ export const FindPeoplePage = () => {
     ],
   );
 
-  const { data: gridData, isLoading: gridDataLoading } = useSWR(
+  const { data: gridData, isLoading: gridDataLoading, isValidating } = useSWR(
     gridDataKey,
     () =>
       _fetchGridDate({
@@ -69,6 +70,11 @@ export const FindPeoplePage = () => {
         searchType: checkedSource.bizId,
       }),
   );
+
+  // Sync gridDataLoading to store (use isValidating for refetch loading state)
+  useEffect(() => {
+    setGridDataLoading(gridDataLoading || isValidating);
+  }, [gridDataLoading, isValidating, setGridDataLoading]);
 
   const columns: GridColDef[] = useMemo(
     () =>
@@ -97,13 +103,13 @@ export const FindPeoplePage = () => {
       <FindPeopleGrid
         columns={columns}
         count={gridData?.data?.findCount || 0}
-        isLoading={gridDataLoading || gridHeaderLoading}
+        isLoading={gridDataLoading || gridHeaderLoading || isValidating}
         limit={params?.limit}
         limitPerCompany={params?.limitPerCompany}
         list={gridData?.data?.findList}
       />
     ),
-    [columns, gridData, gridDataLoading, gridHeaderLoading, params],
+    [columns, gridData, gridDataLoading, gridHeaderLoading, isValidating, params],
   );
 
   return (

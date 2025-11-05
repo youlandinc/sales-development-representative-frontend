@@ -23,6 +23,7 @@ type FindPeopleCompanyStoreState = {
   queryConditions: Record<string, any>;
   fetchSourceLoading: boolean;
   fetchFiltersByTypeLoading: boolean;
+  gridDataLoading: boolean;
 };
 
 type FindPeopleCompanyStoreActions = {
@@ -32,6 +33,7 @@ type FindPeopleCompanyStoreActions = {
   setCheckedSource: (source: SourceFromOpt) => void;
   setQueryConditions: (conditions: Record<string, any>) => void;
   setSourceFromOpts: (opts: SourceFromOpt[]) => void;
+  setGridDataLoading: (loading: boolean) => void;
   fetchSource: () => Promise<void>;
   fetchFiltersByType: () => Promise<void>;
 };
@@ -130,6 +132,7 @@ export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
         queryConditions: {},
         fetchSourceLoading: false,
         fetchFiltersByTypeLoading: false,
+        gridDataLoading: false,
         findType: FindType.find_people,
         sourceFromOpts: [],
         dialogSourceFromOpen: false,
@@ -168,6 +171,8 @@ export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
           set({ queryConditions: conditions }),
         setSourceFromOpts: (opts: SourceFromOpt[]) =>
           set({ sourceFromOpts: opts }),
+        setGridDataLoading: (loading: boolean) =>
+          set({ gridDataLoading: loading }),
         fetchFiltersByType: async () => {
           try {
             set({ fetchFiltersByTypeLoading: true });
