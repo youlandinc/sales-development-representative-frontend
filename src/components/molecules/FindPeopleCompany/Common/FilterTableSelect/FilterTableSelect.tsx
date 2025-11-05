@@ -21,7 +21,9 @@ interface FilterTableSelectProps {
   onCompanyNamesChange?: (companyNames: string[]) => void;
   onSelectedTableIdChange?: (tableId: string) => void;
   onSelectedTableNameChange?: (tableName: string) => void;
-  onSelectedTableSourceChange?: (tableSource: ProspectTableEnum | undefined) => void;
+  onSelectedTableSourceChange?: (
+    tableSource: ProspectTableEnum | undefined,
+  ) => void;
 }
 
 export const FilterTableSelect: FC<FilterTableSelectProps> = ({

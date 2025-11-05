@@ -31,7 +31,11 @@ interface UseTableSelectReturn {
   setInnerTableId: (id: string) => void;
   fetchTableList: () => Promise<void>;
   confirmTableSelection: (
-    onConfirm: (data: string[], tableName: string, tableSource?: ProspectTableEnum) => void,
+    onConfirm: (
+      data: string[],
+      tableName: string,
+      tableSource?: ProspectTableEnum,
+    ) => void,
     onClose: () => void,
   ) => Promise<void>;
   resetSelection: () => void;
@@ -51,7 +55,9 @@ export const useTableSelect = (
   const [innerTableId, setInnerTableId] = useState('');
   const [outerTableId, setOuterTableId] = useState('');
   const [outerTableName, setOuterTableName] = useState('');
-  const [outerTableSource, setOuterTableSource] = useState<ProspectTableEnum | undefined>(undefined);
+  const [outerTableSource, setOuterTableSource] = useState<
+    ProspectTableEnum | undefined
+  >(undefined);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [tableList, setTableList] = useState<ResponseProspectTableViaSearch>(
     [],
@@ -77,7 +83,9 @@ export const useTableSelect = (
   // If tableList is loaded and we have outerTableId but no outerTableName or outerTableSource, derive them
   useEffect(() => {
     if (outerTableId && tableList.length > 0) {
-      const tableItem = tableList.flat().find((item) => item.tableId === outerTableId);
+      const tableItem = tableList
+        .flat()
+        .find((item) => item.tableId === outerTableId);
       if (tableItem) {
         if (!outerTableName) {
           setOuterTableName(tableItem.tableName);
@@ -115,14 +123,20 @@ export const useTableSelect = (
   };
 
   const confirmTableSelection = async (
-    onConfirm: (data: string[], tableName: string, tableSource?: ProspectTableEnum) => void,
+    onConfirm: (
+      data: string[],
+      tableName: string,
+      tableSource?: ProspectTableEnum,
+    ) => void,
     onClose: () => void,
   ) => {
     if (!innerTableId) {
       return;
     }
 
-    const tableItem = tableList.flat().find((item) => item.tableId === innerTableId);
+    const tableItem = tableList
+      .flat()
+      .find((item) => item.tableId === innerTableId);
     const tableName = tableItem?.tableName || '';
     const tableSource = tableItem?.source;
 
