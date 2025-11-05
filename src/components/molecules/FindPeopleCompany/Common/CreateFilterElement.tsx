@@ -3,9 +3,9 @@ import { Stack } from '@mui/material';
 
 import { StyledTextFieldNumber } from '@/components/atoms';
 import {
-  FilterCompanies,
   FilterContainer,
-  FilterExcludePeople,
+  FilterExcludeTable,
+  FilterIncludeTable,
   FilterSelect,
   FilterSwitch,
   FilterTextField,
@@ -103,9 +103,9 @@ export const CreateFilterElement: FC<CreateFilterElementProps> = ({
       );
 
     case FilterElementTypeEnum.include_table:
-      return <FilterCompanies type={type} />;
+      return <FilterIncludeTable type={type} />;
     case FilterElementTypeEnum.exclude_table:
-      return <FilterExcludePeople type={type} />;
+      return <FilterExcludeTable type={type} />;
     case FilterElementTypeEnum.checkbox:
     case FilterElementTypeEnum.radio:
     default:

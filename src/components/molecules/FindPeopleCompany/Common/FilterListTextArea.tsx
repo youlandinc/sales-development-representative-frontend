@@ -19,7 +19,7 @@ export const FilterListTextArea: FC<FilterListTextAreaProps> = ({
           onChange(e);
         }}
         placeholder={'e.g. Amazon'}
-        subTitle={'Company Linkedin URLs, domains'}
+        //subTitle={'Company name'}
         title={'Companies'}
         value={state}
       />

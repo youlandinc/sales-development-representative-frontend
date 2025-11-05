@@ -15,5 +15,5 @@ export * from './FilterListTextArea';
 
 // compose
 export * from './CompanyTypeFilter';
-export * from './FilterCompanies';
-export * from './FilterExcludePeople';
+export * from './FilterIncludeTable';
+export * from './FilterExcludeTable';
