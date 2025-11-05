@@ -19,7 +19,7 @@ export const _fetchFiltersByType = (bizId: string) => {
 };
 
 export const _fetchFindPeopleCompanyGridHeader = (bizId: string) => {
-  return get<{ columnKey: string; columnName: string }[]>(
+  return post<{ columnKey: string; columnName: string }[]>(
     `/sdr/prospect/search/tables/${bizId}`,
   );
 };

@@ -116,7 +116,7 @@ export const useTableSelect = (
         ?.tableName || '';
 
     // For exclude_people type, skip fetching company names
-    if (type === FilterElementTypeEnum.exclude_people) {
+    if (type === FilterElementTypeEnum.exclude_table) {
       setOuterTableId(innerTableId);
       setOuterTableName(tableName);
       onConfirm([], tableName);

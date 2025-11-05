@@ -99,7 +99,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   };
 
   const filterTitle =
-    type === FilterElementTypeEnum.exclude_people
+    type === FilterElementTypeEnum.exclude_table
       ? 'Table'
       : CONSTANTS.FILTER_TITLE;
 

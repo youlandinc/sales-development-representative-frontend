@@ -1,5 +1,6 @@
 import {
   FC,
+  KeyboardEvent,
   MouseEvent,
   ReactNode,
   useCallback,
@@ -11,7 +12,7 @@ import { Box, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 import { COLUMN_TYPE_ICONS } from './columnTypeIcons';
-import { StyledTableAiIcon } from './StyledTableAiIcon';
+import { StyledTableAiIcon } from './index';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -30,19 +31,6 @@ interface StyledTableHeadCellProps {
   onEditSave?: (newName: string) => void;
   showPinnedRightShadow?: boolean;
 }
-
-//export enum TableColumnTypeEnum {
-//  text = 'TEXT',
-//  number = 'NUMBER',
-//  email = 'EMAIL',
-//  phone = 'PHONE',
-//  currency = 'CURRENCY',
-//  date = 'DATE',
-//  url = 'URL',
-//  img_url = 'IMG_URL',
-//  checkbox = 'CHECKBOX',
-//  select = 'SELECT',
-//}
 
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   header,
@@ -103,7 +91,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   }, [tableMeta]);
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
+    (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         handleEditSave();
@@ -116,16 +104,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   );
 
   const handleAiIconClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       e.preventDefault();
 
       if (isAiColumn && header) {
         const columnId = header.column.id;
-        tableMeta?.onRunAi?.({
-          fieldId: columnId,
-          isHeader: true,
-        });
+        tableMeta?.openAiRunMenu?.(e.currentTarget as HTMLElement, columnId);
       }
     },
     [isAiColumn, tableMeta, header],

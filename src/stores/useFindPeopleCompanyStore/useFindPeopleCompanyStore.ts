@@ -98,7 +98,7 @@ const extractFormKeys = (obj: Record<string, FilterItem[]>) => {
     Object.values(obj).forEach((items) => {
       if (Array.isArray(items)) {
         items.forEach((item) => {
-          if (item.formType === FilterElementTypeEnum.companies) {
+          if (item.formType === FilterElementTypeEnum.include_table) {
             result.tableInclude = {
               tableId: '',
               tableFieldId: '',
@@ -106,7 +106,7 @@ const extractFormKeys = (obj: Record<string, FilterItem[]>) => {
               keywords: [],
             };
           }
-          if (item.formType === FilterElementTypeEnum.exclude_people) {
+          if (item.formType === FilterElementTypeEnum.exclude_table) {
             result.tableExclude = {
               tableId: '',
               tableFieldId: '',
