@@ -127,7 +127,9 @@ export const StyledTable: FC<StyledTableProps> = ({
   const [headerMenuAnchor, setHeaderMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
-  const [aiRunMenuAnchor, setAiRunMenuAnchor] = useState<null | HTMLElement>(null);
+  const [aiRunMenuAnchor, setAiRunMenuAnchor] = useState<null | HTMLElement>(
+    null,
+  );
   const [aiRunColumnId, setAiRunColumnId] = useState<string>('');
   const [selectedColumnId, setSelectedColumnId] = useState<string>('');
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
@@ -1155,10 +1157,12 @@ export const StyledTable: FC<StyledTableProps> = ({
           placement="bottom-start"
           sx={{ zIndex: 1300 }}
         >
-          <ClickAwayListener onClickAway={() => {
-            setAiRunMenuAnchor(null);
-            setAiRunColumnId('');
-          }}>
+          <ClickAwayListener
+            onClickAway={() => {
+              setAiRunMenuAnchor(null);
+              setAiRunColumnId('');
+            }}
+          >
             <Paper
               sx={{
                 boxShadow: 2,

@@ -542,13 +542,13 @@ export const useProspectTable = ({
             tableId,
             fieldId,
           };
-          
+
           if (recordCount !== undefined) {
             apiParams.recordCount = recordCount;
             const targetRecordIds = rowIds.slice(0, recordCount);
-            
+
             await runAi(apiParams);
-            
+
             targetRecordIds.forEach((rid) => {
               onUpdateRowData(rid, {
                 [fieldId]: { value: '', isFinished: false },
@@ -557,7 +557,7 @@ export const useProspectTable = ({
           } else {
             // Run all rows
             await runAi(apiParams);
-            
+
             rowIds.forEach((rid) => {
               onUpdateRowData(rid, {
                 [fieldId]: { value: '', isFinished: false },

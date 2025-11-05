@@ -176,78 +176,76 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   if (isEditing && cell && !isSelectColumn && canEdit) {
     content = (
       <InputBase
-          autoFocus
-          inputRef={inputRef}
-          onBlur={onStopEdit}
-          onChange={(e) => setLocalEditValue(e.target.value)}
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === 'Escape') {
-              e.preventDefault();
-              onStopEdit();
-            }
-          }}
-          size={'small'}
-          sx={{
+        autoFocus
+        inputRef={inputRef}
+        onBlur={onStopEdit}
+        onChange={(e) => setLocalEditValue(e.target.value)}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === 'Escape') {
+            e.preventDefault();
+            onStopEdit();
+          }
+        }}
+        size={'small'}
+        sx={{
+          height: '100%',
+          width: '100%',
+          fontSize: CELL_CONSTANTS.FONT_SIZE,
+          display: 'flex',
+          alignItems: 'center',
+          lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
+          '& input': {
+            p: 0,
+            m: 0,
             height: '100%',
-            width: '100%',
+            boxSizing: 'border-box',
             fontSize: CELL_CONSTANTS.FONT_SIZE,
-            display: 'flex',
-            alignItems: 'center',
             lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
-            '& input': {
-              p: 0,
-              m: 0,
-              height: '100%',
-              boxSizing: 'border-box',
-              fontSize: CELL_CONSTANTS.FONT_SIZE,
-              lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
-            },
-          }}
-          value={localEditValue}
-        />
+          },
+        }}
+        value={localEditValue}
+      />
     );
   } else if (cell && isSelectColumn) {
     const label = `${cell.row.index + 1}`;
     const checked = cell.row.getIsSelected?.() ?? false;
 
     content = (
-        <Stack
-          flexDirection={'row'}
-          sx={{
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-          }}
-        >
-          <Box display={checked || isRowHovered ? 'none' : 'block'}>
-            {label}
-          </Box>
-          <Box display={checked || isRowHovered ? 'block' : 'none'}>
-            <Checkbox
-              checked={checked}
-              onChange={(e, next) => cell.row.toggleSelected?.(next)}
-              onClick={(e) => e.stopPropagation()}
-              size={'small'}
-              sx={{ p: 0 }}
-            />
-          </Box>
-        </Stack>
+      <Stack
+        flexDirection={'row'}
+        sx={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        <Box display={checked || isRowHovered ? 'none' : 'block'}>{label}</Box>
+        <Box display={checked || isRowHovered ? 'block' : 'none'}>
+          <Checkbox
+            checked={checked}
+            onChange={(e, next) => cell.row.toggleSelected?.(next)}
+            onClick={(e) => e.stopPropagation()}
+            size={'small'}
+            sx={{ p: 0 }}
+          />
+        </Box>
+      </Stack>
     );
   } else if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
     content = (
-        <Stack alignItems="center" direction="row" spacing={1}>
-          <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
-          <Box
-            component="span"
-            sx={{
-              fontSize: CELL_CONSTANTS.FONT_SIZE,
-              color: 'text.secondary',
-            }}
-          >
-            Processing...
-          </Box>
-        </Stack>
+      <Stack alignItems="center" direction="row" spacing={1}>
+        <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
+        <Box
+          component="span"
+          sx={{
+            fontSize: CELL_CONSTANTS.FONT_SIZE,
+            color: 'text.secondary',
+          }}
+        >
+          Processing...
+        </Box>
+      </Stack>
     );
   } else {
     content = displayValue;
