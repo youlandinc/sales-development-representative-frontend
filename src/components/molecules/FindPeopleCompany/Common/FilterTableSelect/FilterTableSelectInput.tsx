@@ -54,18 +54,20 @@ export const FilterTableSelectInput: FC<FilterTableSelectInputProps> = ({
         <Typography onClick={onOpenDialog} sx={placeholderTextSx}>
           {selectedTableName || CONSTANTS.PLACEHOLDER_TEXT}
         </Typography>
-        <Stack flexDirection={'row'} gap={1.5} ml={'auto'}>
-          <Icon
-            component={ICON_FOLDER}
-            onClick={onOpenDialog}
-            sx={hoverableIconSx}
-          />
-          <Icon
-            component={ICON_CLOSE}
-            onClick={onClearSelection}
-            sx={closeIconSx}
-          />
-        </Stack>
+        {selectedTableName && (
+          <Stack flexDirection={'row'} gap={1.5} ml={'auto'}>
+            <Icon
+              component={ICON_FOLDER}
+              onClick={onOpenDialog}
+              sx={hoverableIconSx}
+            />
+            <Icon
+              component={ICON_CLOSE}
+              onClick={onClearSelection}
+              sx={closeIconSx}
+            />
+          </Stack>
+        )}
       </Stack>
       {selectedTableName && (
         <>
