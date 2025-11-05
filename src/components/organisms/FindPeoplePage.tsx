@@ -62,13 +62,15 @@ export const FindPeoplePage = () => {
     ],
   );
 
-  const { data: gridData, isLoading: gridDataLoading, isValidating } = useSWR(
-    gridDataKey,
-    () =>
-      _fetchGridDate({
-        ...handleParam(params),
-        searchType: checkedSource.bizId,
-      }),
+  const {
+    data: gridData,
+    isLoading: gridDataLoading,
+    isValidating,
+  } = useSWR(gridDataKey, () =>
+    _fetchGridDate({
+      ...handleParam(params),
+      searchType: checkedSource.bizId,
+    }),
   );
 
   // Sync gridDataLoading to store (use isValidating for refetch loading state)
@@ -109,7 +111,14 @@ export const FindPeoplePage = () => {
         list={gridData?.data?.findList}
       />
     ),
-    [columns, gridData, gridDataLoading, gridHeaderLoading, isValidating, params],
+    [
+      columns,
+      gridData,
+      gridDataLoading,
+      gridHeaderLoading,
+      isValidating,
+      params,
+    ],
   );
 
   return (

@@ -1,5 +1,12 @@
 import { FC, MouseEvent, useState } from 'react';
-import { CircularProgress, Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import {
+  CircularProgress,
+  Icon,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from '@mui/material';
 
 import { ProspectTableEnum } from '@/types';
 import {

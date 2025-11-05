@@ -39,9 +39,8 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   onSelectedTableNameChange,
   onSelectedTableSourceChange,
 }) => {
-  const { queryConditions, setQueryConditions, gridDataLoading } = useFindPeopleCompanyStore(
-    (state) => state,
-  );
+  const { queryConditions, setQueryConditions, gridDataLoading } =
+    useFindPeopleCompanyStore((state) => state);
   const { open, visible, close } = useSwitch(false);
   const {
     fetchingTable,
