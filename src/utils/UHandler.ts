@@ -42,6 +42,10 @@ export const computedFilterCount = (
 export const handleParam = (param: Record<string, any>) => {
   return Object.entries(param).reduce(
     (pre, [key, value]) => {
+      // Always include tableInclude if it exists in queryConditions
+      // Don't skip even if both tableId and keywords are empty
+      // This allows clearing the filter properly
+
       if (Array.isArray(value)) {
         pre[key] = value.map((item) =>
           typeof item === 'string' ? item : item.value,

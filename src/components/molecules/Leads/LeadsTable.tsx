@@ -316,8 +316,6 @@ export const LeadsTable: FC = () => {
       </Stack>
       <Stack flex={1} overflow={'auto'}>
         <DataGrid
-          //checkboxSelection
-          //disableMultipleRowSelection
           columnHeaderHeight={60}
           columns={columns}
           disableColumnFilter

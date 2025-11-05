@@ -3,6 +3,7 @@ import {
   FetchFiltersByTypeResponse,
   FetchSearchTypeResponse,
   FindType,
+  ResponseProspectTableViaSearch,
 } from '@/types';
 
 export const _fetchSearchType = (type: FindType) => {
@@ -42,5 +43,11 @@ export const _createTableByFindPeopleCompany = (param: Record<string, any>) => {
 };
 
 export const _fetchAllProspectTable = () => {
-  return get('/sdr/prospect/all', { params: { size: 1000, page: 0 } });
+  return post<ResponseProspectTableViaSearch>('/sdr/prospect/all', {
+    params: { size: 1000, page: 0 },
+  });
+};
+
+export const _fetchCompanyNameViaTableId = (tableId: string) => {
+  return get<string[]>(`/sdr/prospect/table/companyName/${tableId}`);
 };

@@ -91,6 +91,26 @@ const extractFormKeys = (obj: Record<string, FilterItem[]>) => {
   }
 
   traverse(obj);
+
+  // Initialize special fields for COMPANIES and EXCLUDE_PEOPLE filter types
+  if (result) {
+    // Check if there's a COMPANIES filter type
+    Object.values(obj).forEach((items) => {
+      if (Array.isArray(items)) {
+        items.forEach((item) => {
+          if (item.formType === FilterElementTypeEnum.companies) {
+            result.tableInclude = {
+              tableId: '',
+              tableFieldId: '',
+              tableViewId: '',
+              keywords: [],
+            };
+          }
+        });
+      }
+    });
+  }
+
   return result;
 };
 

@@ -1,19 +1,9 @@
-// import { dirname } from 'path';
-// import { FlatCompat } from '@eslint/eslintrc';
-// import { fileURLToPath } from 'url';
 import js from '@eslint/js'
 import reactPlugin from 'eslint-plugin-react'
 import hooksPlugin from 'eslint-plugin-react-hooks'
 import tseslint from 'typescript-eslint'
 import nextPlugin from '@next/eslint-plugin-next'
 import eslintConfigPrettier from 'eslint-config-prettier'
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-//
-// const compat = new FlatCompat({
-//   baseDirectory: __dirname,
-// });
 
 const eslintConfig = [
   {
@@ -22,15 +12,13 @@ const eslintConfig = [
       '**/out/*',
       '**/.next/*',
       '**/public/*',
+      'next-env.d.ts',
       '*.json',
       '*.md',
       '*.svg',
     ],
   },
-  {
-    name: 'eslint/recommended',
-    rules: js.configs.recommended.rules,
-  },
+  js.configs.recommended,
   ...tseslint.configs.recommended,
   {
     name: 'react/jsx-runtime',

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3333",
+    "dev": "next dev -p 3333 --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -77,6 +77,8 @@
     "@types/react-dom": "19.2.2",
     "@types/slate": "^0.47.16",
     "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "8.19.1",
+    "@typescript-eslint/parser": "8.19.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "9.17.0",
     "eslint-config-next": "15.5.6",
