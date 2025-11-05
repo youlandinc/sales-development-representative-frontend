@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { _fetchAllProspectTable, _fetchCompanyNameViaTableId } from '@/request';
-import { FilterElementTypeEnum, HttpError, ResponseProspectTableViaSearch } from '@/types';
+import {
+  FilterElementTypeEnum,
+  HttpError,
+  ResponseProspectTableViaSearch,
+} from '@/types';
 import { SDRToast } from '@/components/atoms';
 
 interface UseTableSelectParams {
