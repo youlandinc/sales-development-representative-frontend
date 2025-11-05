@@ -16,14 +16,17 @@ interface FilterTableSelectProps {
   type: FilterElementTypeEnum;
   selectedTableId?: string;
   selectedTableName?: string;
+  storeField?: 'tableInclude' | 'tableExclude';
   onCompanyNamesChange?: (companyNames: string[]) => void;
   onSelectedTableIdChange?: (tableId: string) => void;
   onSelectedTableNameChange?: (tableName: string) => void;
 }
 
 export const FilterTableSelect: FC<FilterTableSelectProps> = ({
+  type,
   selectedTableId,
   selectedTableName,
+  storeField = 'tableInclude',
   onCompanyNamesChange,
   onSelectedTableIdChange,
   onSelectedTableNameChange,
@@ -47,6 +50,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   } = useTableSelect({
     outerTableId: selectedTableId,
     outerTableName: selectedTableName,
+    type,
   });
 
   const onClickOpenDialog = async () => {
@@ -56,14 +60,14 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
 
   const onClickConfirm = async () => {
     await confirmTableSelection((data, tableName) => {
-      // Update store with tableInclude structure
+      // Update store with table structure (tableInclude or tableExclude)
       setQueryConditions({
         ...queryConditions,
-        tableInclude: {
+        [storeField]: {
           tableId: innerTableId,
           tableFieldId: '',
           tableViewId: '',
-          keywords: data,
+          keywords: storeField === 'tableExclude' ? [] : data,
         },
       });
 
@@ -77,10 +81,10 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   const onClickClearSelection = () => {
     resetSelection();
 
-    // Clear store value
+    // Clear store value (tableInclude or tableExclude)
     setQueryConditions({
       ...queryConditions,
-      tableInclude: {
+      [storeField]: {
         tableId: '',
         tableFieldId: '',
         tableViewId: '',

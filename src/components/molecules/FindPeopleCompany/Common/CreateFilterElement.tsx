@@ -105,7 +105,7 @@ export const CreateFilterElement: FC<CreateFilterElementProps> = ({
     case FilterElementTypeEnum.companies:
       return <FilterCompanies type={type} />;
     case FilterElementTypeEnum.exclude_people:
-      return <FilterExcludePeople />;
+      return <FilterExcludePeople type={type} />;
     case FilterElementTypeEnum.checkbox:
     case FilterElementTypeEnum.radio:
     default:

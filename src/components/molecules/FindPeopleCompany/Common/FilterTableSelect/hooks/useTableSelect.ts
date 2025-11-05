@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import { _fetchAllProspectTable, _fetchCompanyNameViaTableId } from '@/request';
-import { HttpError, ResponseProspectTableViaSearch } from '@/types';
+import {
+  FilterElementTypeEnum,
+  HttpError,
+  ResponseProspectTableViaSearch,
+} from '@/types';
 import { SDRToast } from '@/components/atoms';
 
 interface UseTableSelectParams {
   outerTableId?: string;
   outerTableName?: string;
+  type?: FilterElementTypeEnum;
 }
 
 interface UseTableSelectReturn {
@@ -35,6 +40,7 @@ export const useTableSelect = (
   const {
     outerTableId: externalOuterTableId,
     outerTableName: externalOuterTableName,
+    type,
   } = params || {};
   const [fetchingTable, setFetchingTable] = useState(false);
   const [fetchingCondition, setFetchingCondition] = useState(false);
@@ -105,12 +111,23 @@ export const useTableSelect = (
       return;
     }
 
+    const tableName =
+      tableList.flat().find((item) => item.tableId === innerTableId)
+        ?.tableName || '';
+
+    // For exclude_people type, skip fetching company names
+    if (type === FilterElementTypeEnum.exclude_people) {
+      setOuterTableId(innerTableId);
+      setOuterTableName(tableName);
+      onConfirm([], tableName);
+      onClose();
+      return;
+    }
+
+    // For companies type, fetch company names from the table
     setFetchingCondition(true);
     try {
       const { data } = await _fetchCompanyNameViaTableId(innerTableId);
-      const tableName =
-        tableList.flat().find((item) => item.tableId === innerTableId)
-          ?.tableName || '';
 
       setOuterTableId(innerTableId);
       setOuterTableName(tableName);
