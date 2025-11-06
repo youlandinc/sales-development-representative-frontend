@@ -25,6 +25,7 @@ import {
 } from '@/components/molecules';
 
 import { _createTableRows } from '@/request';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 interface ProspectDetailTableProps {
   tableId: string;
@@ -47,6 +48,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     dialogVisible,
     dialogType,
     setActiveColumnId,
+    addColumn,
   } = useProspectTableStore((store) => store);
 
   const {
@@ -74,7 +76,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   } = useProspectTable({ tableId });
 
   // Add rows callback
-  const onAddRowsToDo = async (count: number) => {
+  const onClickToAddRows = async (count: number) => {
     try {
       const { data } = await _createTableRows({
         tableId,
@@ -89,6 +91,32 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       }
     } catch (error) {
       console.error('Failed to create rows:', error);
+    }
+  };
+
+  // Add column callback
+  const onClickToAddColumn = async (params: {
+    fieldType: TableColumnTypeEnum;
+    beforeFieldId?: string; // Insert before this field
+    afterFieldId?: string; // Insert after this field
+    // If neither provided, insert at end
+  }) => {
+    try {
+      const newColumn = await addColumn({
+        tableId,
+        ...params,
+      });
+
+      if (newColumn) {
+        console.log('Column added:', newColumn);
+
+        // If it's an AI column, initialize it
+        if (newColumn.actionKey === 'use-ai') {
+          await onInitializeAiColumns();
+        }
+      }
+    } catch (error) {
+      console.error('Failed to add column:', error);
     }
   };
 
@@ -111,9 +139,22 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           columns={columns}
           data={fullData}
           onAddMenuItemClick={(item) => {
-            setWebResearchVisible(true, ActiveTypeEnum.add);
+            // AI Agent opens configuration dialog
+            if (item.value === TableColumnMenuEnum.ai_agent) {
+              setWebResearchVisible(true, ActiveTypeEnum.add);
+              return;
+            }
+
+            // Other column types: add to end (no beforeFieldId or afterFieldId)
+            const validTypes = Object.values(TableColumnTypeEnum);
+            if (validTypes.includes(item.value as TableColumnTypeEnum)) {
+              onClickToAddColumn({
+                fieldType: item.value as TableColumnTypeEnum,
+                // No beforeFieldId or afterFieldId = insert at end
+              });
+            }
           }}
-          onAddRows={onAddRowsToDo}
+          onAddRows={onClickToAddRows}
           onAiProcess={onAiProcess}
           onCellClick={(columnId, rowId, data) => {
             if (data.original?.[columnId]?.externalContent) {
@@ -128,7 +169,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           }}
           onCellEdit={onCellEdit}
           onColumnResize={(fieldId, width) => updateColumnWidth(fieldId, width)}
-          onHeaderMenuClick={async ({ type, columnId, value }) => {
+          onHeaderMenuClick={async ({
+            type,
+            columnId,
+            value,
+            parentValue,
+          }: any) => {
             if (!columnId || !columns.find((col) => col.fieldId === columnId)) {
               return;
             }
@@ -143,7 +189,11 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                   return;
                 }
                 // AI column configuration
-                if (!column || column.actionKey !== 'use-ai') {
+                if (
+                  !column ||
+                  column.actionKey !== 'use-ai' ||
+                  !column.typeSettings
+                ) {
                   return;
                 }
                 const schema = column.typeSettings.inputBinding.find(
@@ -185,6 +235,30 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 break;
               }
               default: {
+                // Handle insert column (from submenu)
+                if (
+                  parentValue === TableColumnMenuEnum.insert_column_left ||
+                  parentValue === TableColumnMenuEnum.insert_column_right
+                ) {
+                  const validTypes = Object.values(TableColumnTypeEnum);
+                  if (validTypes.includes(value as TableColumnTypeEnum)) {
+                    if (
+                      parentValue === TableColumnMenuEnum.insert_column_left
+                    ) {
+                      // Insert left: use beforeFieldId with current column's ID
+                      await onClickToAddColumn({
+                        fieldType: value as TableColumnTypeEnum,
+                        beforeFieldId: columnId,
+                      });
+                    } else {
+                      // Insert right: use afterFieldId with current column's ID
+                      await onClickToAddColumn({
+                        fieldType: value as TableColumnTypeEnum,
+                        afterFieldId: columnId,
+                      });
+                    }
+                  }
+                }
                 return;
               }
             }

@@ -2,9 +2,10 @@ import { create } from 'zustand';
 
 import { ColumnFieldGroupMap, HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
-import { TableColumnProps } from '@/types/Prospect/table';
+import { TableColumnProps, TableColumnTypeEnum } from '@/types/Prospect/table';
 
 import {
+  _createTableColumn,
   _deleteTableColumn,
   _fetchTable,
   _fetchTableRowIds,
@@ -65,6 +66,13 @@ export type ProspectTableActions = {
   updateColumnPin: (pin: boolean) => Promise<void>;
   updateColumnDescription: (description: string) => Promise<void>;
   deleteColumn: () => Promise<void>;
+  addColumn: (params: {
+    tableId: string;
+    fieldType: TableColumnTypeEnum;
+    beforeFieldId?: string;
+    afterFieldId?: string;
+    fieldName?: string;
+  }) => Promise<TableColumnProps | null>;
   // table cell
   updateCellValue: (data: {
     tableId: string;
@@ -270,6 +278,56 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         set({ columns: updatedColumns });
       } catch (err) {
         handleApiError<ProspectTableState>(err, { columns }, set);
+      }
+    },
+    addColumn: async (params) => {
+      try {
+        const { data: newColumn } = await _createTableColumn(params);
+        if (!newColumn) {
+          return null;
+        }
+
+        // Insert the new column at the correct position
+        const columns = get().columns;
+        const { beforeFieldId, afterFieldId } = params;
+        
+        let newColumns: TableColumnProps[];
+        if (beforeFieldId) {
+          // Insert before specified column
+          const index = columns.findIndex(col => col.fieldId === beforeFieldId);
+          if (index >= 0) {
+            newColumns = [
+              ...columns.slice(0, index),
+              newColumn,
+              ...columns.slice(index),
+            ];
+          } else {
+            // Fallback: insert at end if not found
+            newColumns = [...columns, newColumn];
+          }
+        } else if (afterFieldId) {
+          // Insert after specified column
+          const index = columns.findIndex(col => col.fieldId === afterFieldId);
+          if (index >= 0) {
+            newColumns = [
+              ...columns.slice(0, index + 1),
+              newColumn,
+              ...columns.slice(index + 1),
+            ];
+          } else {
+            // Fallback: insert at end if not found
+            newColumns = [...columns, newColumn];
+          }
+        } else {
+          // Insert at end
+          newColumns = [...columns, newColumn];
+        }
+        
+        set({ columns: newColumns });
+        return newColumn;
+      } catch (err) {
+        handleApiError<ProspectTableState>(err);
+        return null;
       }
     },
     // table cell

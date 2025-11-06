@@ -33,9 +33,12 @@ export interface TableColumnProps {
     optionalPathsInInputs: {
       prompt: string[];
     };
-  };
-  semanticType: string;
+  } | null;
+  semanticType: string | null;
   groupId: string | null;
+  actionDefinition: any | null;
+  isExtractedField: boolean | null;
+  mappingField: string | null;
 }
 
 export interface UpdateTableColumnConfigParams {
