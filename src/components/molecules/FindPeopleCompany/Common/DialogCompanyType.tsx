@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from 'react';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
 
-import { SourceFromOpt } from '@/types';
+import { FindType, SourceFromOpt } from '@/types';
 
 import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
 
@@ -71,6 +71,7 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
     checkedSource,
     fetchFiltersByType,
     fetchSourceLoading,
+    findType,
   } = useFindPeopleCompanyStore((store) => store);
   const [checked, setChecked] = useState<SourceFromOpt>({
     bizId: '',
@@ -131,7 +132,9 @@ export const DialogCompanyType: FC<DialogCompanyTypeProps> = ({ cb }) => {
       header={
         <Stack flexDirection={'row'} justifyContent={'space-between'}>
           <Typography color={'inherit'} fontSize={20} fontWeight={'inherit'}>
-            What type of contacts are you looking for?
+            What type of{' '}
+            {findType === FindType.find_people ? 'contacts' : 'companies'} are
+            you looking for?
           </Typography>
           <Icon
             component={ICON_CLOSE}

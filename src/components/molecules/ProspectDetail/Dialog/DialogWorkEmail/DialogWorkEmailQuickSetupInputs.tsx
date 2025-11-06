@@ -72,11 +72,13 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
           <Stack flexDirection={'row'} gap={0.5}>
             {integrationsInWaterfall.map((item) => (
               <Tooltip
+                key={item.actionKey}
                 placement={'bottom-start'}
                 slotProps={{
                   tooltip: {
                     sx: {
                       bgcolor: '#FFF',
+                      p: 0,
                     },
                   },
                 }}
@@ -149,7 +151,7 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
                           width: 16,
                           height: 16,
                           position: 'absolute',
-                          right: '-8px',
+                          right: '-4px',
                           top: '-8px',
                           opacity: item.isMissingRequired ? 0 : 1,
                         }}

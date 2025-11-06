@@ -5,6 +5,7 @@ import {
   Icon,
   InputAdornment,
   InputLabel,
+  inputLabelClasses,
   MenuItem,
   Select,
   SxProps,
@@ -67,46 +68,81 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         setShowClear(true);
       }}
       required={required}
-      sx={{
-        [disabled ? '& label' : '']: {
-          color: 'text.disabled',
-        },
-        width: '100%',
-        '& .Mui-disabled': {
-          color: 'text.disabled',
-          cursor: 'not-allowed',
-        },
-        '& .MuiInputBase-formControl': {
-          borderRadius: 2,
-        },
-        '& .MuiInputLabel-formControl.Mui-focused': {
-          color: 'text.primary',
-        },
-        '& .Mui-focused': {
-          '& .MuiOutlinedInput-notchedOutline': {
-            border: '1px solid #202939 !important',
+      size={size}
+      sx={[
+        {
+          [disabled ? '& label' : '']: {
+            color: 'text.disabled',
           },
-          '& .MuiOutlinedInput-input': {
-            background: 'transparent',
+          width: '100%',
+          '& .Mui-disabled': {
+            color: 'text.disabled',
+            cursor: 'not-allowed',
+          },
+          '& .MuiInputBase-formControl': {
+            borderRadius: 2,
+          },
+          '& .MuiInputLabel-formControl.Mui-focused': {
+            color: 'text.primary',
+          },
+          '& .Mui-focused': {
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: '1px solid #202939 !important',
+            },
+            '& .MuiOutlinedInput-input': {
+              background: 'transparent',
+            },
+          },
+          '& .MuiInputLabel-sizeMedium': {
+            transform: 'translate(14px, 8px) scale(1)',
+          },
+          '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
+            transform:
+              size === 'medium'
+                ? 'translate(14px, -8px) scale(0.75)'
+                : 'translate(12px, -8px) scale(0.75)',
+            color: 'text.primary',
+          },
+          '& .MuiSelect-outlined': {
+            py: '9.5px',
+            fontSize: 14,
+            lineHeight: 1.5,
+          },
+          '& .MuiInputBase-sizeSmall .MuiSelect-outlined': {
+            py: '5.5px',
+            fontSize: 14,
+            lineHeight: 1.5,
+          },
+          '& .MuiInputBase-sizeLarge .MuiSelect-outlined': {
+            py: '12px',
+            fontSize: 16,
+            lineHeight: 1.5,
+          },
+          //label
+          '& .MuiInputLabel-root': {
+            transform: 'translate(14px, 9px) scale(1)',
+            fontSize: 14,
+            lineHeight: 1.5,
+          },
+          //label - small
+          [`& .${inputLabelClasses.sizeSmall}`]: {
+            transform: 'translate(14px, 5px) scale(1)',
+          },
+          //large
+          '& .MuiInputLabel-sizeLarge ': {
+            transform: 'translate(14px, 12px) scale(1)',
+            fontSize: 16,
+            lineHeight: 1.5,
           },
         },
-        '& .MuiInputLabel-sizeMedium': {
-          // transform: 'translate(14px, 8px) scale(1)',
-        },
-        '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
-          // transform:
-          //   size === 'medium'
-          //     ? 'translate(14px, -8px) scale(0.75)'
-          //     : 'translate(12px, -8px) scale(0.75)',
-        },
-        ...sx,
-      }}
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
       variant={'outlined'}
     >
-      <InputLabel>{label}</InputLabel>
+      <InputLabel id="styled-select-label">{label}</InputLabel>
       <Select
         disabled={disabled}
-        displayEmpty
+        // displayEmpty
         endAdornment={
           clearable &&
           showClear &&
@@ -121,6 +157,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             </InputAdornment>
           )
         }
+        id="styled-select"
         inputProps={{
           MenuProps: {
             MenuListProps: {
@@ -150,6 +187,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           },
         }}
         label={label}
+        labelId="styled-select-label"
         MenuProps={{
           disableScrollLock: true,
         }}

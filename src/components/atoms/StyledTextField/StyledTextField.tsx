@@ -1,12 +1,12 @@
 import {
   inputClasses,
   inputLabelClasses,
-  SlotProps,
   StandardTextFieldProps,
   SxProps,
   TextField,
 } from '@mui/material';
-import { FC, useMemo } from 'react';
+import { FC } from 'react';
+import { inputBaseClasses } from '@mui/material';
 
 export interface StyledTextFieldProps
   extends Omit<StandardTextFieldProps, 'variant'> {
@@ -15,100 +15,85 @@ export interface StyledTextFieldProps
   variant?: 'outlined' | 'standard' | 'filled';
 }
 
+const DEFAULT_STYLE: SxProps = {
+  width: '100%',
+  padding: 0,
+  //  border
+  borderColor: 'border.default',
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 2,
+  },
+  //border - focus
+  [`& .${inputClasses.focused}`]: {
+    color: 'text.focus',
+  },
+  [`& .${inputClasses.focused} .MuiOutlinedInput-notchedOutline`]: {
+    borderColor: 'border.hover',
+    borderWidth: '1px',
+  },
+  [`& .${inputBaseClasses.input}`]: {
+    // medium
+    lineHeight: 1.5,
+    height: 24,
+    color: 'text.primary',
+    '&::placeholder': {
+      color: 'text.secondary',
+    },
+    paddingTop: '8px',
+    paddingBottom: '8px',
+    fontSize: 14,
+  },
+  //small
+  '& .MuiInputBase-inputSizeSmall': {
+    paddingTop: '6px',
+    paddingBottom: '6px',
+    height: '20px',
+  },
+  //large
+  '& .MuiInputBase-sizeLarge .MuiInputBase-input': {
+    paddingTop: '12px',
+    paddingBottom: '12px',
+    fontSize: 16,
+  },
+  //label
+  [`& .${inputLabelClasses.root}`]: {
+    transform: 'translate(14px, 9px) scale(1)',
+    fontSize: 14,
+    lineHeight: 1.5,
+  },
+  //label - small
+  [`& .${inputLabelClasses.sizeSmall}`]: {
+    transform: 'translate(14px, 5px) scale(1)',
+    fontSize: 14,
+  },
+  //large
+  '& .MuiInputLabel-sizeLarge ': {
+    transform: 'translate(14px, 12px) scale(1)',
+    fontSize: 16,
+    lineHeight: 1.5,
+  },
+  //label - shrink
+  [`& .${inputLabelClasses.shrink}`]: {
+    transform: 'translate(14px, -8px) scale(0.75)',
+    color: 'text.primary',
+  },
+};
+
 export const StyledTextField: FC<StyledTextFieldProps> = ({
   onChange,
   variant = 'outlined',
   disabledAutoFill = true,
   size = 'medium',
-  slotProps,
   sx,
   ...rest
 }) => {
-  const mergedSlotProps: any = useMemo(
-    () =>
-      slotProps
-        ? {
-            ...slotProps,
-            input: {
-              ...slotProps?.input,
-              sx: {
-                '.MuiInputBase-inputMultiline': {
-                  py: 1.5,
-                },
-                //border
-                borderColor: 'border.default',
-                borderRadius: 2,
-                //border - focus
-                [`&.${inputClasses.focused}`]: {
-                  color: 'text.focus',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'border.hover',
-                    borderWidth: '1px',
-                  },
-                },
-                ...((slotProps?.input as any)?.sx || {}),
-              },
-              autoComplete: disabledAutoFill ? 'off' : '',
-            },
-            htmlInput: {
-              ...slotProps?.htmlInput,
-              autoComplete: disabledAutoFill ? 'off' : '',
-              sx: {
-                //medium
-                lineHeight: 1.5,
-                height: 24,
-                color: 'red',
-                '&::placeholder': {
-                  color: 'text.secondary',
-                },
-                py: '8px',
-                fontSize: 14,
-                //small
-                '&.MuiInputBase-inputSizeSmall': {
-                  py: '6px',
-                  height: 20,
-                },
-                ...((slotProps?.htmlInput as any)?.sx || {}),
-              },
-            },
-            formHelperText: {
-              component: 'div',
-            },
-            inputLabel: {
-              ...slotProps?.inputLabel,
-              sx: {
-                //medium
-                transform: 'translate(14px, 9px) scale(1)',
-                fontSize: 14,
-                lineHeight: 1.5,
-                //small
-                '&.MuiInputLabel-sizeSmall': {
-                  transform: 'translate(14px, 5px) scale(1)',
-                  fontSize: 14,
-                },
-                [`&.${inputLabelClasses.shrink}`]: {
-                  transform: 'translate(14px, -8px) scale(0.75)',
-                },
-                ...((slotProps?.inputLabel as any)?.sx || {}),
-              },
-            },
-          }
-        : null,
-    [disabledAutoFill, JSON.stringify(slotProps || {})],
-  );
-  console.log(mergedSlotProps);
   return (
     <TextField
       onChange={onChange}
       size={size}
-      sx={{
-        width: '100%',
-        padding: 0,
-        ...sx,
-      }}
+      sx={[DEFAULT_STYLE, ...(Array.isArray(sx) ? sx : [sx])]}
       variant={variant}
       {...rest}
-      slotProps={mergedSlotProps}
     />
   );
 };
