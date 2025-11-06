@@ -54,3 +54,13 @@ export const _updateTableCellValue = (params: {
     },
   );
 };
+
+export const _createTableRows = (params: {
+  tableId: string;
+  rowCounts: number;
+}) => {
+  return post<string[]>('/sdr/prospect/table/rows/add', {
+    tableId: params.tableId,
+    rowCounts: params.rowCounts,
+  });
+};

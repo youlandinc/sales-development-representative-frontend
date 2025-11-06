@@ -5,10 +5,13 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import {
+  Button,
   Checkbox,
+  CircularProgress,
   ClickAwayListener,
   Divider,
   Icon,
@@ -16,6 +19,8 @@ import {
   Paper,
   Popper,
   Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
 
 import type {
@@ -84,11 +89,13 @@ interface StyledTableProps {
     isHeader?: boolean;
     recordCount?: number;
   }) => Promise<void>;
+  onAddRows?: (count: number) => Promise<void>;
 }
 
 const columnHelper = createColumnHelper<any>();
 
 import ICON_TYPE_ADD from './assets/icon-type-add.svg';
+import { StyledButton } from '@/components/atoms';
 
 export const StyledTable: FC<StyledTableProps> = ({
   columns,
@@ -105,6 +112,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   aiLoading,
   onCellClick,
   onRunAi,
+  onAddRows,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -137,6 +145,9 @@ export const StyledTable: FC<StyledTableProps> = ({
   });
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([]);
+  const [addRowCount, setAddRowCount] = useState<number>(10);
+  const [isAddingRows, setIsAddingRows] = useState<boolean>(false);
+  const addRowInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const pinnedColumns = columns
@@ -583,6 +594,26 @@ export const StyledTable: FC<StyledTableProps> = ({
     [columnSizingInfo.isResizingColumn, headerState],
   );
 
+  const onAddRowsClick = useCallback(async () => {
+    if (!onAddRows || isAddingRows) {
+      return;
+    }
+    // Get the current value from input
+    const inputValue = addRowInputRef.current?.value;
+    const count = inputValue ? parseInt(inputValue, 10) : addRowCount;
+    if (isNaN(count) || count < 1) {
+      return;
+    }
+    setIsAddingRows(true);
+    try {
+      await onAddRows(count);
+    } catch (error) {
+      console.error('Failed to add rows:', error);
+    } finally {
+      setIsAddingRows(false);
+    }
+  }, [onAddRows, addRowCount, isAddingRows]);
+
   const renderContent = useCallback(
     ({
       columnVirtualizer,
@@ -931,6 +962,55 @@ export const StyledTable: FC<StyledTableProps> = ({
           scrollContainer={virtualization?.scrollContainer}
           table={table}
         />
+
+        <Stack
+          alignItems="center"
+          flexDirection="row"
+          gap={1.5}
+          px={2}
+          py={1.5}
+          sx={{
+            bgcolor: 'background.paper',
+          }}
+        >
+          <StyledButton
+            color={'info'}
+            disabled={isAddingRows}
+            loading={isAddingRows}
+            onClick={onAddRowsClick}
+            size={'small'}
+            sx={{
+              width: 64,
+            }}
+            variant={'outlined'}
+          >
+            + Add
+          </StyledButton>
+          <TextField
+            defaultValue={addRowCount}
+            disabled={isAddingRows}
+            inputRef={addRowInputRef}
+            onBlur={(e) => {
+              const value = parseInt(e.target.value, 10);
+              if (!isNaN(value) && value > 0) {
+                setAddRowCount(value);
+              } else {
+                e.target.value = String(addRowCount);
+              }
+            }}
+            size="small"
+            sx={{
+              width: 80,
+              '& .MuiOutlinedInput-root': {
+                height: 32,
+              },
+            }}
+            type="number"
+          />
+          <Typography color="text.secondary" fontSize={14}>
+            more rows at the bottom
+          </Typography>
+        </Stack>
 
         <Popper
           anchorEl={addMenuAnchor}

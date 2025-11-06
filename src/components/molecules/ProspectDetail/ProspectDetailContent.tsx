@@ -24,6 +24,8 @@ import {
   TableColumnMenuEnum,
 } from '@/components/molecules';
 
+import { _createTableRows } from '@/request';
+
 interface ProspectDetailTableProps {
   tableId: string;
 }
@@ -35,6 +37,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     columns,
     fieldGroupMap,
     rowIds,
+    setRowIds,
     updateColumnWidth,
     updateColumnName,
     updateColumnPin,
@@ -70,6 +73,25 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     onRunAi,
   } = useProspectTable({ tableId });
 
+  // Add rows callback
+  const onAddRowsToDo = async (count: number) => {
+    try {
+      const { data } = await _createTableRows({
+        tableId,
+        rowCounts: count,
+      });
+
+      console.log('Created rows:', data);
+
+      if (data && data.length > 0) {
+        // Add new record IDs to the end of the existing rowIds
+        setRowIds([...rowIds, ...data]);
+      }
+    } catch (error) {
+      console.error('Failed to create rows:', error);
+    }
+  };
+
   return (
     <Stack
       ref={scrollContainerRef}
@@ -91,6 +113,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           onAddMenuItemClick={(item) => {
             setWebResearchVisible(true, ActiveTypeEnum.add);
           }}
+          onAddRows={onAddRowsToDo}
           onAiProcess={onAiProcess}
           onCellClick={(columnId, rowId, data) => {
             if (data.original?.[columnId]?.externalContent) {
