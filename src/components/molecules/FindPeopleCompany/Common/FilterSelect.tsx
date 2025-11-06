@@ -7,13 +7,10 @@ import {
 } from '@mui/material';
 import { FC } from 'react';
 
-import { StyledChip } from '@/components/molecules';
 import { FilterContainer, FilterContainerProps } from './FilterContainer';
 
 import { StyledTextField } from '@/components/atoms';
 import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
-import Image from 'next/image';
 import ICON_CLOSE from './assets/icon_close.svg';
 
 export const FilterSelect: FC<
@@ -64,33 +61,31 @@ export const FilterSelect: FC<
         }}
         renderValue={(value, getTagProps) => {
           return value.map((option, index) => (
-            <>
-              <div
-                {...getTagProps({ index })}
-                key={`${option.key}-chip-${index}-key`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  background: '#EFE9FB',
-                  borderRadius: '4px',
-                  padding: '2px 8px',
+            <div
+              {...getTagProps({ index })}
+              key={`${option.key}-chip-${index}-key`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                background: '#EFE9FB',
+                borderRadius: '4px',
+                padding: '2px 8px',
+              }}
+            >
+              <Icon
+                component={ICON_CLOSE}
+                onClick={(e: any) => {
+                  getTagProps({ index }).onDelete(e);
                 }}
-              >
-                <Icon
-                  component={ICON_CLOSE}
-                  onClick={(e: any) => {
-                    getTagProps({ index }).onDelete(e);
-                  }}
-                  sx={{
-                    width: 12,
-                    height: 12,
-                    cursor: 'pointer',
-                  }}
-                />
-                {option.label}
-              </div>
-            </>
+                sx={{
+                  width: 12,
+                  height: 12,
+                  cursor: 'pointer',
+                }}
+              />
+              {option.label}
+            </div>
           ));
         }}
         slotProps={{
