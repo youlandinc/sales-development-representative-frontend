@@ -33,10 +33,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import {
-  isAiColumn,
-  TableColumnMenuEnum,
-} from '@/components/molecules';
+import { isAiColumn, TableColumnMenuEnum } from '@/components/molecules';
 
 import {
   StyledTableAddRowsFooter,
@@ -395,8 +392,8 @@ export const StyledTable: FC<StyledTableProps> = ({
   );
 
   const handleHeaderMenuClick = useCallback(
-    (item: { 
-      label: string; 
+    (item: {
+      label: string;
       value: TableColumnMenuEnum | string;
       parentValue?: TableColumnMenuEnum | string;
     }) => {
@@ -596,7 +593,6 @@ export const StyledTable: FC<StyledTableProps> = ({
     },
     [columnSizingInfo.isResizingColumn, headerState],
   );
-
 
   const renderContent = useCallback(
     ({

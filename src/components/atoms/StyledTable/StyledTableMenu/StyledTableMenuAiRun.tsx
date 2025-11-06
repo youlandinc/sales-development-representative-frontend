@@ -7,7 +7,11 @@ import {
 } from '@mui/material';
 import { FC } from 'react';
 
-import { createMenuItemStyle, createPaperStyle, menuStyles } from './StyledTableMenu.styles';
+import {
+  createMenuItemStyle,
+  createPaperStyle,
+  menuStyles,
+} from './StyledTableMenu.styles';
 
 interface StyledTableMenuAiRunProps {
   anchorEl: HTMLElement | null;

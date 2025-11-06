@@ -106,7 +106,9 @@ export const menuStyles = {
  * Create Paper style with specific width
  * Used by: AddColumn (small), Header (medium), AiRun (large)
  */
-export const createPaperStyle = (variant: PaperWidthVariant): SxProps<Theme> => ({
+export const createPaperStyle = (
+  variant: PaperWidthVariant,
+): SxProps<Theme> => ({
   ...paperBaseStyle,
   minWidth: PAPER_WIDTHS[variant],
 });
@@ -121,5 +123,9 @@ export const createMenuItemStyle = (
 ): SxProps<Theme> => [
   menuItemBaseStyle,
   { py: MENU_ITEM_PADDINGS[variant] },
-  ...(extraStyles ? (Array.isArray(extraStyles) ? extraStyles : [extraStyles]) : []),
+  ...(extraStyles
+    ? Array.isArray(extraStyles)
+      ? extraStyles
+      : [extraStyles]
+    : []),
 ];

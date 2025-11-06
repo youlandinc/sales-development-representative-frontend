@@ -290,11 +290,13 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         // Insert the new column at the correct position
         const columns = get().columns;
         const { beforeFieldId, afterFieldId } = params;
-        
+
         let newColumns: TableColumnProps[];
         if (beforeFieldId) {
           // Insert before specified column
-          const index = columns.findIndex(col => col.fieldId === beforeFieldId);
+          const index = columns.findIndex(
+            (col) => col.fieldId === beforeFieldId,
+          );
           if (index >= 0) {
             newColumns = [
               ...columns.slice(0, index),
@@ -307,7 +309,9 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
           }
         } else if (afterFieldId) {
           // Insert after specified column
-          const index = columns.findIndex(col => col.fieldId === afterFieldId);
+          const index = columns.findIndex(
+            (col) => col.fieldId === afterFieldId,
+          );
           if (index >= 0) {
             newColumns = [
               ...columns.slice(0, index + 1),
@@ -322,7 +326,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
           // Insert at end
           newColumns = [...columns, newColumn];
         }
-        
+
         set({ columns: newColumns });
         return newColumn;
       } catch (err) {

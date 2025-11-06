@@ -14,7 +14,11 @@ import {
   TableColumnMenuEnum,
 } from '@/components/molecules';
 
-import { createMenuItemStyle, createPaperStyle, menuStyles } from './StyledTableMenu.styles';
+import {
+  createMenuItemStyle,
+  createPaperStyle,
+  menuStyles,
+} from './StyledTableMenu.styles';
 
 interface StyledTableMenuAddColumnProps {
   anchorEl: HTMLElement | null;
@@ -30,7 +34,7 @@ export const StyledTableMenuAddColumn: FC<StyledTableMenuAddColumnProps> = ({
   onMenuItemClick,
 }) => {
   const menuItems_ = menuItems ?? getAddColumnMenuActions();
-  
+
   return (
     <Popper
       anchorEl={anchorEl}
@@ -52,7 +56,9 @@ export const StyledTableMenuAddColumn: FC<StyledTableMenuAddColumnProps> = ({
                       gap: 1,
                     })}
                   >
-                    {item.icon && <Icon component={item.icon} sx={menuStyles.icon} />}
+                    {item.icon && (
+                      <Icon component={item.icon} sx={menuStyles.icon} />
+                    )}
                     {item.label}
                   </MenuItem>
                 );
