@@ -15,7 +15,7 @@ export interface StyledTextFieldProps
   variant?: 'outlined' | 'standard' | 'filled';
 }
 
-const DEFAULT_STYLE: SxProps = {
+export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
   width: '100%',
   padding: 0,
   //  border
@@ -27,10 +27,11 @@ const DEFAULT_STYLE: SxProps = {
   [`& .${inputClasses.focused}`]: {
     color: 'text.focus',
   },
-  [`& .${inputClasses.focused} .MuiOutlinedInput-notchedOutline`]: {
-    borderColor: 'border.hover',
-    borderWidth: '1px',
-  },
+  [`&  .MuiOutlinedInput-root.${inputClasses.focused} .MuiOutlinedInput-notchedOutline`]:
+    {
+      borderColor: 'border.hover',
+      borderWidth: '1px',
+    },
   [`& .${inputBaseClasses.input}`]: {
     // medium
     lineHeight: 1.5,
@@ -91,7 +92,7 @@ export const StyledTextField: FC<StyledTextFieldProps> = ({
     <TextField
       onChange={onChange}
       size={size}
-      sx={[DEFAULT_STYLE, ...(Array.isArray(sx) ? sx : [sx])]}
+      sx={[DEFAULT_TEXTFIELD_STYLE, ...(Array.isArray(sx) ? sx : [sx])]}
       variant={variant}
       {...rest}
     />
