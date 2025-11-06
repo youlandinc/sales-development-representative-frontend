@@ -125,6 +125,39 @@ export const useProspectTable = ({
     });
   }, [rowIds, rowsMap, aiColumnIds]);
 
+  // Add new columns to existing rows with default empty values
+  const addColumnsToRows = useCallback(() => {
+    if (columns.length === 0) {
+      return;
+    }
+
+    const columnIds = new Set(columns.map((col) => col.fieldId));
+
+    setRowsMap((prev) => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach((rowId) => {
+        const row = updated[rowId];
+        columnIds.forEach((fieldId) => {
+          if (!(fieldId in row)) {
+            // Add new column with empty default value
+            row[fieldId] = '';
+          }
+        });
+      });
+      return updated;
+    });
+
+    // Update ref as well
+    Object.keys(rowsMapRef.current).forEach((rowId) => {
+      const row = rowsMapRef.current[rowId];
+      columnIds.forEach((fieldId) => {
+        if (!(fieldId in row)) {
+          row[fieldId] = '';
+        }
+      });
+    });
+  }, [columns]);
+
   // Reset on tableId change
   useEffect(() => {
     resetTable();
@@ -134,6 +167,13 @@ export const useProspectTable = ({
     maxLoadedIndexRef.current = -1;
     lastVisibleRangeRef.current = null;
   }, [resetTable, tableId]);
+
+  // Add new columns when columns count changes
+  useEffect(() => {
+    if (columns.length > 0) {
+      addColumnsToRows();
+    }
+  }, [columns.length, addColumnsToRows]);
 
   // WebSocket integration for real-time updates
   useTableWebSocket({

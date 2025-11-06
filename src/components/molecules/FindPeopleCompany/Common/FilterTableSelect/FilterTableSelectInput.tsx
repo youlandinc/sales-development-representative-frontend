@@ -1,5 +1,12 @@
 import { FC, MouseEvent, useState } from 'react';
-import { Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import {
+  CircularProgress,
+  Icon,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from '@mui/material';
 
 import { ProspectTableEnum } from '@/types';
 import {
@@ -36,6 +43,7 @@ interface FilterTableSelectInputProps {
   onClearSelection: () => void;
   selectedTableId?: string;
   selectedTableSource?: ProspectTableEnum;
+  isLoading?: boolean;
 }
 
 export const FilterTableSelectInput: FC<FilterTableSelectInputProps> = ({
@@ -44,6 +52,7 @@ export const FilterTableSelectInput: FC<FilterTableSelectInputProps> = ({
   onClearSelection,
   selectedTableId,
   selectedTableSource,
+  isLoading = false,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -80,16 +89,22 @@ export const FilterTableSelectInput: FC<FilterTableSelectInputProps> = ({
         </Typography>
         {selectedTableName && (
           <Stack flexDirection={'row'} gap={1.5} ml={'auto'}>
-            <Icon
-              component={ICON_FOLDER}
-              onClick={onOpenDialog}
-              sx={hoverableIconSx}
-            />
-            <Icon
-              component={ICON_CLOSE}
-              onClick={onClearSelection}
-              sx={closeIconSx}
-            />
+            {isLoading ? (
+              <CircularProgress size={16} sx={{ color: '#6F6C7D' }} />
+            ) : (
+              <>
+                <Icon
+                  component={ICON_FOLDER}
+                  onClick={onOpenDialog}
+                  sx={hoverableIconSx}
+                />
+                <Icon
+                  component={ICON_CLOSE}
+                  onClick={onClearSelection}
+                  sx={closeIconSx}
+                />
+              </>
+            )}
           </Stack>
         )}
       </Stack>

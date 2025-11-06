@@ -15,6 +15,8 @@ export enum TableColumnMenuEnum {
   delete = 'DELETE',
   cell_detail = 'CELL_DETAIL',
   header_actions = 'HEADER_ACTIONS',
+  insert_column_left = 'INSERT_COLUMN_LEFT',
+  insert_column_right = 'INSERT_COLUMN_RIGHT',
 }
 
 export interface TableColumnOption {
@@ -22,6 +24,7 @@ export interface TableColumnOption {
   value: TableColumnMenuEnum | string; // Allow string for new menu items without enum
   icon: any;
   submenu?: TableColumnOption[];
+  parentValue?: TableColumnMenuEnum | string; // Parent menu value for submenu items
 }
 
 // Add column menu (p1 - highest priority)
@@ -41,26 +44,26 @@ export const getAddColumnMenuActions = (): TableColumnOption[] => [
     icon: '',
     value: TableColumnMenuEnum.divider,
   },
-  {
-    label: 'Message',
-    icon: '',
-    value: '', // No enum yet
-  },
-  {
-    label: 'Waterfall',
-    icon: '',
-    value: '', // No enum yet
-  },
-  {
-    label: 'Formula',
-    icon: '',
-    value: '', // No enum yet
-  },
-  {
-    label: 'Merge columns',
-    icon: '',
-    value: '', // No enum yet
-  },
+  // {
+  //   label: 'Message',
+  //   icon: '',
+  //   value: '', // No enum yet
+  // },
+  // {
+  //   label: 'Waterfall',
+  //   icon: '',
+  //   value: '', // No enum yet
+  // },
+  // {
+  //   label: 'Formula',
+  //   icon: '',
+  //   value: '', // No enum yet
+  // },
+  // {
+  //   label: 'Merge columns',
+  //   icon: '',
+  //   value: '', // No enum yet
+  // },
   {
     label: '2',
     icon: '',
@@ -70,58 +73,58 @@ export const getAddColumnMenuActions = (): TableColumnOption[] => [
   {
     label: 'Text',
     icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.text],
-    value: '', // No enum yet
+    value: TableColumnTypeEnum.text,
   },
-  {
-    label: 'Number',
-    icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.number],
-    value: '', // No enum yet
-  },
-  {
-    label: 'Currency',
-    icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.currency],
-    value: '', // No enum yet
-  },
-  {
-    label: 'Date',
-    icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.date],
-    value: '', // No enum yet
-  },
+  // {
+  //   label: 'Number',
+  //   icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.number],
+  //   value: TableColumnTypeEnum.number,
+  // },
+  // {
+  //   label: 'Currency',
+  //   icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.currency],
+  //   value: TableColumnTypeEnum.currency,
+  // },
+  // {
+  //   label: 'Date',
+  //   icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.date],
+  //   value: TableColumnTypeEnum.date,
+  // },
   {
     label: 'URL',
     icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.url],
-    value: '', // No enum yet
+    value: TableColumnTypeEnum.url,
   },
   {
     label: 'Email',
     icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.email],
-    value: '', // No enum yet
+    value: TableColumnTypeEnum.email,
   },
-  {
-    label: 'Phone',
-    icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.phone],
-    value: '', // No enum yet
-  },
-  {
-    label: 'Image from URL',
-    icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.img_url],
-    value: '', // No enum yet
-  },
-  {
-    label: 'Checkbox',
-    icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.checkbox],
-    value: '', // No enum yet
-  },
-  {
-    label: 'Select',
-    icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.select],
-    value: '', // No enum yet
-  },
-  {
-    label: 'Assigned to',
-    icon: '',
-    value: '', // No enum yet
-  },
+  // {
+  //   label: 'Phone',
+  //   icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.phone],
+  //   value: TableColumnTypeEnum.phone,
+  // },
+  // {
+  //   label: 'Image from URL',
+  //   icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.img_url],
+  //   value: TableColumnTypeEnum.img_url,
+  // },
+  // {
+  //   label: 'Checkbox',
+  //   icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.checkbox],
+  //   value: TableColumnTypeEnum.checkbox,
+  // },
+  // {
+  //   label: 'Select',
+  //   icon: COLUMN_TYPE_ICONS[TableColumnTypeEnum.select],
+  //   value: TableColumnTypeEnum.select,
+  // },
+  // {
+  //   label: 'Assigned to',
+  //   icon: '',
+  //   value: '', // No enum for this type yet
+  // },
 ];
 
 // Normal column menu (p2)
@@ -146,13 +149,13 @@ export const getNormalColumnMenuActions = (
   {
     label: 'Insert 1 column left',
     icon: '',
-    value: '', // No enum yet
+    value: TableColumnMenuEnum.insert_column_left,
     submenu: getAddColumnMenuActions(),
   },
   {
     label: 'Insert 1 column right',
     icon: '',
-    value: '', // No enum yet
+    value: TableColumnMenuEnum.insert_column_right,
     submenu: getAddColumnMenuActions(),
   },
   {
@@ -266,13 +269,13 @@ export const getAiColumnMenuActions = (
   {
     label: 'Insert 1 column left',
     icon: '',
-    value: '', // No enum yet
+    value: TableColumnMenuEnum.insert_column_left,
     submenu: getAddColumnMenuActions(),
   },
   {
     label: 'Insert 1 column right',
     icon: '',
-    value: '', // No enum yet
+    value: TableColumnMenuEnum.insert_column_right,
     submenu: getAddColumnMenuActions(),
   },
   {

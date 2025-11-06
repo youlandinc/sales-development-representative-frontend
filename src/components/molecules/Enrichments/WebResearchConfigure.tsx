@@ -18,14 +18,18 @@ import { createEditor } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { StyledButton, StyledTextField } from '@/components/atoms';
+import {
+  StyledButton,
+  StyledSwitch,
+  StyledTextField,
+} from '@/components/atoms';
 import {
   CollapseCard,
   FormulaEditor,
   OutputsFields,
   PromptEditor,
 } from '@/components/molecules';
-import { useVariableFromStore } from '@/hooks';
+import { useSwitch, useVariableFromStore } from '@/hooks';
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 import { useWebResearchStore } from '@/stores/Prospect';
 
@@ -58,7 +62,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  // const [schemaJsonStr, setSchemaJsonStr] = useState('');
+  const { visible, toggle } = useSwitch(true);
 
   const promptEditorRef = useRef<null | Editor>(null);
   const schemaEditorRef = useRef(null);
@@ -445,7 +449,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                 <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />
               </Tooltip>
             </Stack>
-            <Switch checked={true} />
+            <StyledSwitch checked={visible} onChange={toggle} />
           </Stack>
           {/*<Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>*/}
           {/*  <Typography variant={'subtitle1'}>Only run if</Typography>*/}

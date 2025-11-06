@@ -18,6 +18,7 @@ interface FilterTableSelectProps {
   selectedTableName?: string;
   selectedTableSource?: ProspectTableEnum;
   storeField?: 'tableInclude' | 'tableExclude';
+  isLoading?: boolean;
   onCompanyNamesChange?: (companyNames: string[]) => void;
   onSelectedTableIdChange?: (tableId: string) => void;
   onSelectedTableNameChange?: (tableName: string) => void;
@@ -32,14 +33,14 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
   selectedTableName,
   selectedTableSource,
   storeField = 'tableInclude',
+  isLoading = false,
   onCompanyNamesChange,
   onSelectedTableIdChange,
   onSelectedTableNameChange,
   onSelectedTableSourceChange,
 }) => {
-  const { queryConditions, setQueryConditions } = useFindPeopleCompanyStore(
-    (state) => state,
-  );
+  const { queryConditions, setQueryConditions, gridDataLoading } =
+    useFindPeopleCompanyStore((state) => state);
   const { open, visible, close } = useSwitch(false);
   const {
     fetchingTable,
@@ -117,6 +118,7 @@ export const FilterTableSelect: FC<FilterTableSelectProps> = ({
     <Stack>
       <FilterContainer title={filterTitle}>
         <FilterTableSelectInput
+          isLoading={isLoading || fetchingCondition || gridDataLoading}
           onClearSelection={onClickClearSelection}
           onOpenDialog={onClickOpenDialog}
           selectedTableId={selectedTableId}
