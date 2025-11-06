@@ -1,17 +1,20 @@
-import { FC, useMemo } from 'react';
 import {
   Autocomplete,
   AutocompleteProps,
   Box,
+  Icon,
   Stack,
-  TextField,
 } from '@mui/material';
+import { FC } from 'react';
 
 import { StyledChip } from '@/components/molecules';
 import { FilterContainer, FilterContainerProps } from './FilterContainer';
 
-import ClearIcon from '@mui/icons-material/Clear';
+import { StyledTextField } from '@/components/atoms';
 import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
+import Image from 'next/image';
+import ICON_CLOSE from './assets/icon_close.svg';
 
 export const FilterSelect: FC<
   Omit<AutocompleteProps<any, true, false, false>, 'renderInput'> &
@@ -28,7 +31,7 @@ export const FilterSelect: FC<
         }}
         options={options}
         renderInput={(params) => (
-          <TextField
+          <StyledTextField
             {...params}
             placeholder={
               !!value && Array.isArray(value) && value.length === 0
@@ -61,13 +64,33 @@ export const FilterSelect: FC<
         }}
         renderValue={(value, getTagProps) => {
           return value.map((option, index) => (
-            <StyledChip
-              {...getTagProps({ index })}
-              deleteIcon={<ClearIcon />}
-              key={`${option.key}-chip-${index}-key`}
-              label={`${option.label}`}
-              variant="filled"
-            />
+            <>
+              <div
+                {...getTagProps({ index })}
+                key={`${option.key}-chip-${index}-key`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: '#EFE9FB',
+                  borderRadius: '4px',
+                  padding: '2px 8px',
+                }}
+              >
+                <Icon
+                  component={ICON_CLOSE}
+                  onClick={(e: any) => {
+                    getTagProps({ index }).onDelete(e);
+                  }}
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    cursor: 'pointer',
+                  }}
+                />
+                {option.label}
+              </div>
+            </>
           ));
         }}
         slotProps={{
