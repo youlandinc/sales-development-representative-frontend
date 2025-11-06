@@ -17,6 +17,7 @@ import {
   DialogAllIntegrations,
   DialogCellDetails,
   DialogDeleteColumn,
+  DialogEditColumn,
   DialogEditDescription,
   DialogHeaderActions,
   DialogWebResearch,
@@ -186,6 +187,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
       <DialogHeaderActions />
       <DialogWorkEmail cb={onInitializeAiColumns} />
       <DialogAllIntegrations />
+      <DialogEditColumn />
     </Stack>
   );
 };
