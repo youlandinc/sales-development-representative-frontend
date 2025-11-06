@@ -11,7 +11,7 @@ import { FilterContainer, FilterContainerProps } from './FilterContainer';
 
 import { StyledTextField } from '@/components/atoms';
 import CheckIcon from '@mui/icons-material/Check';
-import ICON_CLOSE from './assets/icon_close.svg';
+import ICON_CLOSE from './assets/icon-close.svg';
 
 export const FilterSelect: FC<
   Omit<AutocompleteProps<any, true, false, false>, 'renderInput'> &
