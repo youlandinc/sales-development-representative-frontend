@@ -16,8 +16,8 @@ import {
   Stack,
 } from '@mui/material';
 import { Cell } from '@tanstack/react-table';
-import { useRowHover } from './StyledTableBodyRow';
-import { StyledTableAiIcon } from './index';
+
+import { StyledTableAiIcon, useRowHover } from './index';
 
 const CELL_CONSTANTS = {
   MIN_WIDTH: 60,

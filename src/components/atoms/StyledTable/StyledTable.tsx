@@ -8,16 +8,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import {
-  Checkbox,
-  ClickAwayListener,
-  Divider,
-  Icon,
-  MenuItem,
-  Paper,
-  Popper,
-  Stack,
-} from '@mui/material';
+import { Checkbox, ClickAwayListener, Icon, Stack } from '@mui/material';
 
 import type {
   ColumnOrderState,
@@ -33,7 +24,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { isAiColumn, TableColumnMenuEnum } from '@/components/molecules';
+import { TableColumnMenuEnum } from '@/components/molecules';
 
 import {
   StyledTableAddRowsFooter,
@@ -178,49 +169,54 @@ export const StyledTable: FC<StyledTableProps> = ({
     [columnSizing, onColumnResize],
   );
 
-  const reducedColumns = useMemo(() => {
-    const selectCol = columnHelper.display({
-      id: '__select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          indeterminate={table.getIsSomePageRowsSelected()}
-          onChange={table.getToggleAllPageRowsSelectedHandler()}
-          onClick={(e) => e.stopPropagation()}
-          size={'small'}
-          sx={{ p: 0 }}
-        />
-      ),
-      cell: (info) => info,
-      size: 100,
-      minSize: 100,
-      enableResizing: false,
-    });
+  const reducedColumns = useMemo(
+    () => {
+      const selectCol = columnHelper.display({
+        id: '__select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected()}
+            onChange={table.getToggleAllPageRowsSelectedHandler()}
+            onClick={(e) => e.stopPropagation()}
+            size={'small'}
+            sx={{ p: 0 }}
+          />
+        ),
+        cell: (info) => info,
+        size: 100,
+        minSize: 100,
+        enableResizing: false,
+      });
 
-    const rest = columns.map((column) =>
-      columnHelper.accessor(
-        (row: any) => {
-          const v = row?.[column.fieldId];
-          if (v && typeof v === 'object' && 'value' in v) {
-            return (v as any).value ?? '';
-          }
-          return v ?? '';
-        },
-        {
-          id: column.fieldId,
-          header: column.fieldName,
-          meta: {
-            actionKey: column.actionKey,
-            fieldType: column.fieldType,
-            column: column,
-            selectedColumnId,
+      const rest = columns.map((column) =>
+        columnHelper.accessor(
+          (row: any) => {
+            const v = row?.[column.fieldId];
+            if (v && typeof v === 'object' && 'value' in v) {
+              return (v as any).value ?? '';
+            }
+            return v ?? '';
           },
-        },
-      ),
-    );
+          {
+            id: column.fieldId,
+            header: column.fieldName,
+            meta: {
+              actionKey: column.actionKey,
+              fieldType: column.fieldType,
+              column: column,
+              selectedColumnId,
+            },
+          },
+        ),
+      );
 
-    return [selectCol, ...rest];
-  }, [columns, selectedColumnId]);
+      return [selectCol, ...rest];
+    },
+    // notice: must have rowSelection
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columns, selectedColumnId, rowSelection],
+  );
 
   const table = useReactTable({
     data: data,
@@ -288,10 +284,16 @@ export const StyledTable: FC<StyledTableProps> = ({
         onAiProcess?.(recordId, columnId);
       },
       hasAiColumnInRow: (recordId: string) => {
-        return columns.some(isAiColumn);
+        return columns.some(
+          (col) =>
+            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
+        );
       },
       triggerBatchAiProcess: () => {
-        const aiColumns = columns.filter(isAiColumn);
+        const aiColumns = columns.filter(
+          (col) =>
+            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
+        );
         rowIds.forEach((recordId) => {
           aiColumns.forEach((col) => {
             onAiProcess?.(recordId, col.fieldId);
@@ -299,7 +301,10 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
       triggerRelatedAiProcess: (recordId: string, columnId: string) => {
-        const aiColumns = columns.filter(isAiColumn);
+        const aiColumns = columns.filter(
+          (col) =>
+            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
+        );
 
         aiColumns.forEach((col) => {
           onAiProcess?.(recordId, col.fieldId);
@@ -310,7 +315,10 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
       getAiColumns: () => {
-        return columns.filter(isAiColumn);
+        return columns.filter(
+          (col) =>
+            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
+        );
       },
       onRunAi: onRunAi,
       openAiRunMenu: (anchorEl: HTMLElement, columnId: string) => {

@@ -77,7 +77,14 @@ export const StyledTableAddRowsFooter: FC<StyledTableAddRowsFooterProps> = ({
         </Typography>
       </Box>
 
-      <Popper anchorEl={anchorEl} open={open} placement="bottom-start">
+      <Popper
+        anchorEl={anchorEl}
+        open={open}
+        placement="bottom-start"
+        sx={{
+          zIndex: 100,
+        }}
+      >
         <ClickAwayListener onClickAway={onClickAwayToClosePopper}>
           <Paper
             elevation={0}
