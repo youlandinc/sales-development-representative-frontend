@@ -10,9 +10,11 @@ import {
 } from 'react';
 import { Box, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
-import { COLUMN_TYPE_ICONS } from './columnTypeIcons';
+
 import { StyledTableAiIcon } from './index';
+
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { COLUMN_TYPE_ICONS } from '@/constant/table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;

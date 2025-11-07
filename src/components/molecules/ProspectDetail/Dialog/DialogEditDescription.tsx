@@ -6,7 +6,8 @@ import {
   StyledDialog,
   StyledTextField,
 } from '@/components/atoms';
-import { TableColumnMenuEnum } from '@/components/molecules';
+
+import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 import { useAsyncFn } from '@/hooks';
 
@@ -111,7 +112,7 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
       }
       onClose={handleClose}
       open={
-        dialogType === TableColumnMenuEnum.edit_description &&
+        dialogType === TableColumnMenuActionEnum.edit_description &&
         dialogVisible &&
         !!column
       }

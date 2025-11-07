@@ -13,7 +13,7 @@ import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
-import { MIN_BATCH_SIZE } from '../data';
+import { MIN_BATCH_SIZE } from '@/constant/table';
 import { isAiColumn } from '../utils';
 
 interface UseProspectTableParams {

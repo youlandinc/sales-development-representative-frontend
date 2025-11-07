@@ -12,7 +12,6 @@ import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 import {
   StyledCellDetailsArray,
   StyledCellItemContainer,
-  TableColumnMenuEnum,
 } from '@/components/molecules';
 
 import { useProspectTableStore } from '@/stores/Prospect';
@@ -24,6 +23,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SearchIcon from '@mui/icons-material/Search';
 import { StyledCellDetailsObj } from './StyledCellDetailsObj';
+
+import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 type CellDetailsProps = {
   data: Record<string, any>;
@@ -49,7 +50,9 @@ export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
     <Drawer
       anchor={'right'}
       hideBackdrop
-      open={dialogVisible && dialogType === TableColumnMenuEnum.cell_detail}
+      open={
+        dialogVisible && dialogType === TableColumnMenuActionEnum.cell_detail
+      }
       sx={{
         left: 'unset',
       }}

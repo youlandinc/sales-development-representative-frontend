@@ -1,5 +1,5 @@
-import { Stack } from '@mui/material';
 import { FC, useState } from 'react';
+import { Stack } from '@mui/material';
 
 import {
   ActiveTypeEnum,
@@ -8,7 +8,7 @@ import {
   useWorkEmailStore,
 } from '@/stores/Prospect';
 
-import { ROW_HEIGHT } from './data';
+import { ROW_HEIGHT } from '@/constant/table';
 import { useProspectTable } from './hooks';
 
 import { StyledTable } from '@/components/atoms';
@@ -22,11 +22,13 @@ import {
   DialogHeaderActions,
   DialogWebResearch,
   DialogWorkEmail,
-  TableColumnMenuEnum,
 } from '@/components/molecules';
 
 import { _createTableRows } from '@/request';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import {
+  TableColumnMenuActionEnum,
+  TableColumnTypeEnum,
+} from '@/types/Prospect/table';
 
 interface ProspectDetailTableProps {
   tableId: string;
@@ -141,7 +143,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
           data={fullData}
           onAddMenuItemClick={(item) => {
             // AI Agent opens configuration dialog
-            if (item.value === TableColumnMenuEnum.ai_agent) {
+            if (item.value === TableColumnMenuActionEnum.ai_agent) {
               setWebResearchVisible(true, ActiveTypeEnum.add);
               return;
             }
@@ -161,11 +163,12 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             if (data.original?.[columnId]?.externalContent) {
               setActiveColumnId(columnId);
               setActiveCell(data.original?.[columnId]?.externalContent || {});
-              !dialogVisible && openDialog(TableColumnMenuEnum.cell_detail);
+              !dialogVisible &&
+                openDialog(TableColumnMenuActionEnum.cell_detail);
               return;
             }
             dialogVisible &&
-              dialogType === TableColumnMenuEnum.cell_detail &&
+              dialogType === TableColumnMenuActionEnum.cell_detail &&
               closeDialog();
           }}
           onCellEdit={onCellEdit}
@@ -182,7 +185,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
             setActiveColumnId(columnId);
 
             switch (type) {
-              case TableColumnMenuEnum.edit_column: {
+              case TableColumnMenuActionEnum.edit_column: {
                 const column = columns.find((col) => col.fieldId === columnId);
                 // Work Email configuration
                 if (column?.groupId && fieldGroupMap) {
@@ -207,42 +210,44 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                   return;
                 }
                 //common edit column
-                openDialog(TableColumnMenuEnum.edit_column);
+                openDialog(TableColumnMenuActionEnum.edit_column);
 
                 break;
               }
-              case TableColumnMenuEnum.edit_description: {
-                openDialog(TableColumnMenuEnum.edit_description);
+              case TableColumnMenuActionEnum.edit_description: {
+                openDialog(TableColumnMenuActionEnum.edit_description);
                 break;
               }
-              case TableColumnMenuEnum.rename_column: {
+              case TableColumnMenuActionEnum.rename_column: {
                 if (value) {
                   await updateColumnName(value);
                 }
                 break;
               }
-              case TableColumnMenuEnum.pin: {
+              case TableColumnMenuActionEnum.pin: {
                 await updateColumnPin(value);
                 break;
               }
-              case TableColumnMenuEnum.visible: {
+              case TableColumnMenuActionEnum.visible: {
                 await updateColumnVisible(columnId, value);
                 break;
               }
-              case TableColumnMenuEnum.delete: {
-                openDialog(TableColumnMenuEnum.delete);
+              case TableColumnMenuActionEnum.delete: {
+                openDialog(TableColumnMenuActionEnum.delete);
                 break;
               }
               default: {
                 // Handle insert column (from submenu)
                 if (
-                  parentValue === TableColumnMenuEnum.insert_column_left ||
-                  parentValue === TableColumnMenuEnum.insert_column_right
+                  parentValue ===
+                    TableColumnMenuActionEnum.insert_column_left ||
+                  parentValue === TableColumnMenuActionEnum.insert_column_right
                 ) {
                   const validTypes = Object.values(TableColumnTypeEnum);
                   if (validTypes.includes(value as TableColumnTypeEnum)) {
                     if (
-                      parentValue === TableColumnMenuEnum.insert_column_left
+                      parentValue ===
+                      TableColumnMenuActionEnum.insert_column_left
                     ) {
                       // Insert left: use beforeFieldId with current column's ID
                       await onClickToAddColumn({

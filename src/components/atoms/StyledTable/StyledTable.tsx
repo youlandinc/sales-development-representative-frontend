@@ -24,8 +24,6 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { TableColumnMenuEnum } from '@/components/molecules';
-
 import {
   StyledTableAddRowsFooter,
   StyledTableBody,
@@ -41,6 +39,13 @@ import {
   StyledTableSpacer,
 } from './index';
 
+import ICON_TYPE_ADD from './assets/icon-type-add.svg';
+
+import {
+  TableColumnMenuActionEnum,
+  TableColumnTypeEnum,
+} from '@/types/Prospect/table';
+
 interface StyledTableProps {
   columns: any[];
   rowIds: string[];
@@ -53,7 +58,7 @@ interface StyledTableProps {
     value,
     parentValue,
   }: {
-    type: TableColumnMenuEnum;
+    type: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
     columnId: string;
     value?: any;
     parentValue?: any;
@@ -81,8 +86,6 @@ interface StyledTableProps {
 }
 
 const columnHelper = createColumnHelper<any>();
-
-import ICON_TYPE_ADD from './assets/icon-type-add.svg';
 
 export const StyledTable: FC<StyledTableProps> = ({
   columns,
@@ -152,7 +155,7 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   const rowHeight = virtualization?.rowHeight ?? 36;
 
-  const handleColumnSizingChange = useCallback(
+  const onColumnSizingChange = useCallback(
     (updater: any) => {
       const newColumnSizing =
         typeof updater === 'function' ? updater(columnSizing) : updater;
@@ -239,7 +242,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       columnOrder,
     },
     onRowSelectionChange: setRowSelection,
-    onColumnSizingChange: handleColumnSizingChange,
+    onColumnSizingChange: onColumnSizingChange,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnOrderChange: setColumnOrder,
     onColumnPinningChange: setColumnPinning,
@@ -337,7 +340,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       },
       updateHeaderName: (headerId: string, newName: string) => {
         onHeaderMenuClick?.({
-          type: TableColumnMenuEnum.rename_column,
+          type: TableColumnMenuActionEnum.rename_column,
           columnId: headerId,
           value: newName,
         });
@@ -391,7 +394,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     }
   }, [columns]);
 
-  const handleAddMenuClick = useCallback(
+  const onAddMenuClick = useCallback(
     (item: { label: string; value: string }) => {
       onAddMenuItemClick?.(item);
       setAddMenuAnchor(null);
@@ -399,35 +402,35 @@ export const StyledTable: FC<StyledTableProps> = ({
     [onAddMenuItemClick],
   );
 
-  const handleHeaderMenuClick = useCallback(
+  const onHeaderMenuItemClick = useCallback(
     (item: {
       label: string;
-      value: TableColumnMenuEnum | string;
-      parentValue?: TableColumnMenuEnum | string;
+      value: TableColumnMenuActionEnum | string;
+      parentValue?: TableColumnMenuActionEnum | string;
     }) => {
       switch (item.value) {
-        case TableColumnMenuEnum.edit_description: {
+        case TableColumnMenuActionEnum.edit_description: {
           onHeaderMenuClick?.({
-            type: TableColumnMenuEnum.edit_description,
+            type: TableColumnMenuActionEnum.edit_description,
             columnId: selectedColumnId,
           });
           break;
         }
-        case TableColumnMenuEnum.edit_column: {
+        case TableColumnMenuActionEnum.edit_column: {
           onHeaderMenuClick?.({
-            type: TableColumnMenuEnum.edit_column,
+            type: TableColumnMenuActionEnum.edit_column,
             columnId: selectedColumnId,
           });
           break;
         }
-        case TableColumnMenuEnum.ai_agent: {
+        case TableColumnMenuActionEnum.ai_agent: {
           onHeaderMenuClick?.({
-            type: TableColumnMenuEnum.ai_agent,
+            type: TableColumnMenuActionEnum.ai_agent,
             columnId: selectedColumnId,
           });
           break;
         }
-        case TableColumnMenuEnum.rename_column: {
+        case TableColumnMenuActionEnum.rename_column: {
           setHeaderState({
             columnId: selectedColumnId,
             isActive: false,
@@ -435,14 +438,14 @@ export const StyledTable: FC<StyledTableProps> = ({
           });
           break;
         }
-        case TableColumnMenuEnum.pin: {
+        case TableColumnMenuActionEnum.pin: {
           const column = table.getColumn(selectedColumnId);
           const isPinned = column?.getIsPinned() === 'left';
 
           column?.pin(isPinned ? false : 'left');
 
           onHeaderMenuClick?.({
-            type: TableColumnMenuEnum.pin,
+            type: TableColumnMenuActionEnum.pin,
             columnId: selectedColumnId,
             value: !isPinned,
           });
@@ -454,22 +457,22 @@ export const StyledTable: FC<StyledTableProps> = ({
           });
           break;
         }
-        case TableColumnMenuEnum.visible: {
+        case TableColumnMenuActionEnum.visible: {
           const column = table.getColumn(selectedColumnId);
           const isVisible = column?.getIsVisible();
 
           column?.toggleVisibility(!isVisible);
 
           onHeaderMenuClick?.({
-            type: TableColumnMenuEnum.visible,
+            type: TableColumnMenuActionEnum.visible,
             columnId: selectedColumnId,
             value: !isVisible,
           });
           break;
         }
-        case TableColumnMenuEnum.delete: {
+        case TableColumnMenuActionEnum.delete: {
           onHeaderMenuClick?.({
-            type: TableColumnMenuEnum.delete,
+            type: TableColumnMenuActionEnum.delete,
             columnId: selectedColumnId,
           });
           break;
@@ -477,7 +480,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         default:
           // Pass through item value and parentValue for custom handlers (like insert column)
           onHeaderMenuClick?.({
-            type: item.value as TableColumnMenuEnum,
+            type: item.value as TableColumnMenuActionEnum,
             columnId: selectedColumnId,
             value: item.value,
             parentValue: item.parentValue,
@@ -490,7 +493,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     [onHeaderMenuClick, selectedColumnId, table],
   );
 
-  const handleHeaderClick = useCallback(
+  const onHeaderClick = useCallback(
     (e: MouseEvent, columnId: string) => {
       const headerElement = e.currentTarget as HTMLElement;
       const rect = headerElement.getBoundingClientRect();
@@ -588,7 +591,7 @@ export const StyledTable: FC<StyledTableProps> = ({
     ],
   );
 
-  const handleHeaderRightClick = useCallback(
+  const onHeaderRightClick = useCallback(
     (e: MouseEvent, columnId: string) => {
       e.preventDefault();
       if (columnSizingInfo.isResizingColumn || headerState?.isEditing) {
@@ -679,13 +682,13 @@ export const StyledTable: FC<StyledTableProps> = ({
                       onClick={
                         col.id !== '__select'
                           ? (e) => {
-                              handleHeaderClick(e, header.id);
+                              onHeaderClick(e, header.id);
                             }
                           : undefined
                       }
                       onContextMenu={
                         col.id !== '__select'
-                          ? (e) => handleHeaderRightClick(e, col.id)
+                          ? (e) => onHeaderRightClick(e, col.id)
                           : undefined
                       }
                       onEditSave={(newName) =>
@@ -735,11 +738,9 @@ export const StyledTable: FC<StyledTableProps> = ({
                         columnVirtualizer.measureElement(node)
                       }
                       onClick={(e) => {
-                        handleHeaderClick(e, header.id);
+                        onHeaderClick(e, header.id);
                       }}
-                      onContextMenu={(e) =>
-                        handleHeaderRightClick(e, header.id)
-                      }
+                      onContextMenu={(e) => onHeaderRightClick(e, header.id)}
                       onEditSave={(newName) =>
                         (table.options.meta as any)?.updateHeaderName?.(
                           header.id,
@@ -915,8 +916,8 @@ export const StyledTable: FC<StyledTableProps> = ({
       headerState?.isActive,
       headerState?.isEditing,
       stickyLeftMap,
-      handleHeaderClick,
-      handleHeaderRightClick,
+      onHeaderClick,
+      onHeaderRightClick,
       centerColumns,
       rowHeight,
       reducedColumns,
@@ -957,7 +958,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           anchorEl={addMenuAnchor}
           menuItems={addMenuItems}
           onClose={() => setAddMenuAnchor(null)}
-          onMenuItemClick={handleAddMenuClick}
+          onMenuItemClick={onAddMenuClick}
         />
 
         <StyledTableMenuHeader
@@ -970,7 +971,7 @@ export const StyledTable: FC<StyledTableProps> = ({
             setHeaderMenuAnchor(null);
             setSelectedColumnId('');
           }}
-          onMenuItemClick={handleHeaderMenuClick}
+          onMenuItemClick={onHeaderMenuItemClick}
           selectedColumnId={selectedColumnId}
         />
 

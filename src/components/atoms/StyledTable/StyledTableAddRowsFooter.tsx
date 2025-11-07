@@ -1,3 +1,4 @@
+import { FC, MouseEvent, useState } from 'react';
 import {
   Box,
   ClickAwayListener,
@@ -6,7 +7,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { FC, MouseEvent, useState } from 'react';
 
 import { StyledButton, StyledTextFieldNumber } from '@/components/atoms';
 

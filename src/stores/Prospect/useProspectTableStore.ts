@@ -2,7 +2,11 @@ import { create } from 'zustand';
 
 import { ColumnFieldGroupMap, HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
-import { TableColumnProps, TableColumnTypeEnum } from '@/types/Prospect/table';
+import {
+  TableColumnMenuActionEnum,
+  TableColumnProps,
+  TableColumnTypeEnum,
+} from '@/types/Prospect/table';
 
 import {
   _createTableColumn,
@@ -14,7 +18,6 @@ import {
   _updateTableColumnConfig,
 } from '@/request';
 import { UNotUndefined } from '@/utils';
-import { TableColumnMenuEnum } from '@/components/molecules';
 
 const handleApiError = <T extends Record<string, any>>(
   err: unknown,
@@ -34,7 +37,7 @@ export type ProspectTableState = {
   activeColumnId: string;
   // dialog
   dialogVisible: boolean;
-  dialogType: TableColumnMenuEnum | null;
+  dialogType: TableColumnMenuActionEnum | null;
 
   rowIds: string[];
   runRecords: {

@@ -4,13 +4,15 @@ import { FC, useEffect, useState } from 'react';
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import { CommonSelectFieldType } from '@/components/molecules/Common';
 
-import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
+import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 import { useAsyncFn } from '@/hooks';
 
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
-import { TableColumnMenuEnum } from '@/components/molecules/ProspectDetail/data';
+import {
+  TableColumnMenuActionEnum,
+  TableColumnTypeEnum,
+} from '@/types/Prospect/table';
 
 import ICON_CLOSE from '@/components/molecules/ProspectDetail/assets/dialog/icon_close.svg';
 
@@ -63,7 +65,7 @@ export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
       hideBackdrop
       onClose={closeDialog}
       open={
-        dialogType === TableColumnMenuEnum.edit_column &&
+        dialogType === TableColumnMenuActionEnum.edit_column &&
         dialogVisible &&
         !!column
       }

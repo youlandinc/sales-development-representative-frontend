@@ -4,7 +4,8 @@ import { Stack, Typography } from '@mui/material';
 import { useProspectTableStore } from '@/stores/Prospect';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
-import { TableColumnMenuEnum } from '@/components/molecules';
+
+import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 export const DialogDeleteColumn: FC = () => {
   const {
@@ -62,7 +63,7 @@ export const DialogDeleteColumn: FC = () => {
       }
       header={'Confirm delete column'}
       onClose={() => closeDialog()}
-      open={dialogVisible && dialogType === TableColumnMenuEnum.delete}
+      open={dialogVisible && dialogType === TableColumnMenuActionEnum.delete}
     />
   );
 };

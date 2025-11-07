@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import {
   ClickAwayListener,
   Divider,
@@ -7,18 +8,20 @@ import {
   Popper,
   Stack,
 } from '@mui/material';
-import { FC } from 'react';
 
-import {
-  getAiColumnMenuActions,
-  getNormalColumnMenuActions,
-  isAiColumn,
-  TableColumnMenuEnum,
-} from '@/components/molecules';
+import { createPaperStyle, menuStyles } from './StyledTableMenu.styles';
 
 import ICON_ARROW from '../assets/icon-arrow.svg';
 
-import { createPaperStyle, menuStyles } from './StyledTableMenu.styles';
+import {
+  TableColumnMenuActionEnum,
+  TableColumnTypeEnum,
+} from '@/types/Prospect/table';
+import {
+  getAiColumnMenuActions,
+  getNormalColumnMenuActions,
+} from '@/constant/table';
+import { isAiColumn } from '@/components/molecules';
 
 interface StyledTableMenuHeaderProps {
   anchorEl: HTMLElement | null;
@@ -34,8 +37,8 @@ interface StyledTableMenuHeaderProps {
   onClose: () => void;
   onMenuItemClick: (item: {
     label: string;
-    value: TableColumnMenuEnum | string;
-    parentValue?: TableColumnMenuEnum | string;
+    value: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
+    parentValue?: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
   }) => void;
 }
 
@@ -79,7 +82,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                 ? getAiColumnMenuActions(isPinned)
                 : getNormalColumnMenuActions(isPinned);
             })().map((item, index) => {
-              if (item.value !== TableColumnMenuEnum.divider) {
+              if (item.value !== TableColumnMenuActionEnum.divider) {
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
 
                 return (
@@ -106,7 +109,8 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                           <Stack gap={0}>
                             {item.submenu!.map((subItem, subIndex) => {
                               if (
-                                subItem.value !== TableColumnMenuEnum.divider
+                                subItem.value !==
+                                TableColumnMenuActionEnum.divider
                               ) {
                                 return (
                                   <MenuItem

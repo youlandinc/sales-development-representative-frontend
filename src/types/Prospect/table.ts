@@ -11,6 +11,32 @@ export enum TableColumnTypeEnum {
   select = 'SELECT',
 }
 
+export enum TableColumnMenuActionEnum {
+  divider = 'DIVIDER',
+  ai_agent = 'AI_AGENT',
+  rename_column = 'RENAME_COLUMN',
+  edit_column = 'EDIT_COLUMN',
+  edit_description = 'EDIT_DESCRIPTION',
+  sort_a_z = 'SORT_A_Z',
+  sort_z_a = 'SORT_Z_A',
+  pin = 'PIN',
+  visible = 'VISIBLE',
+  delete = 'DELETE',
+  cell_detail = 'CELL_DETAIL',
+  header_actions = 'HEADER_ACTIONS',
+  insert_column_left = 'INSERT_COLUMN_LEFT',
+  insert_column_right = 'INSERT_COLUMN_RIGHT',
+}
+
+export interface TableColumnActionOption {
+  label: string;
+  value: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
+  icon: any;
+  key?: string;
+  submenu?: TableColumnActionOption[];
+  parentValue?: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
+}
+
 export interface TableColumnProps {
   fieldId: string;
   description: string | null;

@@ -12,7 +12,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
 import { useProspectTableStore } from '@/stores/Prospect';
-import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
+import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 export type SuggestionListRef = {

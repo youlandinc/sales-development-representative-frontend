@@ -1,5 +1,3 @@
-export * from './data';
-
 export * from './Dialog';
 
 export * from './ProspectDetailHeader';

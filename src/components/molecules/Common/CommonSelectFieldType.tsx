@@ -2,7 +2,7 @@ import { FC } from 'react';
 
 import { StyledSelect, StyledSelectProps } from '@/components/atoms';
 
-import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
+import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
 import { FIELD_TYPE_OPTIONS } from '@/constant';
 
 import { TableColumnTypeEnum } from '@/types/Prospect/table';

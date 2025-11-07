@@ -10,7 +10,7 @@ import { FC, ReactNode } from 'react';
 import { useProspectTableStore } from '@/stores/Prospect';
 
 import { StyledTextField } from '@/components/atoms';
-import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
+import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 export const DialogWorkEmailCustomSelect: FC<
