@@ -10,6 +10,8 @@ export enum FilterElementTypeEnum {
   checkbox = 'CHECKBOX',
   input = 'INPUT',
   switch = 'SWITCH',
+  include_table = 'INCLUDE_TABLE',
+  exclude_table = 'EXCLUDE_TABLE',
 }
 
 export enum FilterElementInputTypeEnum {

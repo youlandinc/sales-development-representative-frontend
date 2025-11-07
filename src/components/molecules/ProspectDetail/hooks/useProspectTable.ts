@@ -14,6 +14,7 @@ import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
 import { MIN_BATCH_SIZE } from '../data';
+import { isAiColumn } from '../utils';
 
 interface UseProspectTableParams {
   tableId: string;
@@ -82,16 +83,9 @@ export const useProspectTable = ({
     },
   );
 
-  // Compute AI column IDs
+  // Compute AI column IDs (包括 dependentFieldId)
   const aiColumnIds = useMemo(() => {
-    return new Set(
-      columns
-        .filter(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        )
-        .map((col) => col.fieldId),
-    );
+    return new Set(columns.filter(isAiColumn).map((col) => col.fieldId));
   }, [columns]);
 
   // Total rows
@@ -131,6 +125,39 @@ export const useProspectTable = ({
     });
   }, [rowIds, rowsMap, aiColumnIds]);
 
+  // Add new columns to existing rows with default empty values
+  const addColumnsToRows = useCallback(() => {
+    if (columns.length === 0) {
+      return;
+    }
+
+    const columnIds = new Set(columns.map((col) => col.fieldId));
+
+    setRowsMap((prev) => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach((rowId) => {
+        const row = updated[rowId];
+        columnIds.forEach((fieldId) => {
+          if (!(fieldId in row)) {
+            // Add new column with empty default value
+            row[fieldId] = '';
+          }
+        });
+      });
+      return updated;
+    });
+
+    // Update ref as well
+    Object.keys(rowsMapRef.current).forEach((rowId) => {
+      const row = rowsMapRef.current[rowId];
+      columnIds.forEach((fieldId) => {
+        if (!(fieldId in row)) {
+          row[fieldId] = '';
+        }
+      });
+    });
+  }, [columns]);
+
   // Reset on tableId change
   useEffect(() => {
     resetTable();
@@ -140,6 +167,13 @@ export const useProspectTable = ({
     maxLoadedIndexRef.current = -1;
     lastVisibleRangeRef.current = null;
   }, [resetTable, tableId]);
+
+  // Add new columns when columns count changes
+  useEffect(() => {
+    if (columns.length > 0) {
+      addColumnsToRows();
+    }
+  }, [columns.length, addColumnsToRows]);
 
   // WebSocket integration for real-time updates
   useTableWebSocket({
@@ -367,15 +401,26 @@ export const useProspectTable = ({
         return;
       }
 
+      // 设置当前列的 loading 状态
+      const loadingUpdates: Record<string, boolean> = {
+        [columnId]: true,
+      };
+
+      // 如果该列有 dependentFieldId，也设置其 loading 状态
+      const column = columns.find((col) => col.fieldId === columnId);
+      if (column?.dependentFieldId) {
+        loadingUpdates[column.dependentFieldId] = true;
+      }
+
       setAiLoadingState((prev) => ({
         ...prev,
         [recordId]: {
           ...prev[recordId],
-          [columnId]: true,
+          ...loadingUpdates,
         },
       }));
     },
-    [aiColumnIds, runRecords, rowIds, rowsMap],
+    [aiColumnIds, runRecords, rowIds, rowsMap, columns],
   );
 
   // Clean up AI loading state based on runRecords
@@ -493,54 +538,112 @@ export const useProspectTable = ({
             : config.recordIds?.includes(recordId);
 
           if (shouldProcess) {
-            onUpdateRowData(recordId, {
+            const column = columns.find((col) => col.fieldId === columnId);
+            const updates: Record<string, any> = {
               [columnId]: { value: '', isFinished: false },
-            });
+            };
+
+            if (column?.dependentFieldId) {
+              updates[column.dependentFieldId] = {
+                value: '',
+                isFinished: false,
+              };
+            }
+
+            onUpdateRowData(recordId, updates);
 
             if (!newLoadingState[recordId]) {
               newLoadingState[recordId] = {};
             }
             newLoadingState[recordId][columnId] = true;
+
+            if (column?.dependentFieldId) {
+              newLoadingState[recordId][column.dependentFieldId] = true;
+            }
           }
         });
     });
 
     setAiLoadingState(newLoadingState);
-  }, [tableId, fetchTable, aiColumnIds, rowIds, onUpdateRowData]);
+  }, [tableId, fetchTable, aiColumnIds, rowIds, columns, onUpdateRowData]);
 
   const onRunAi = useCallback(
     async (params: {
-      fieldId: string;
+      fieldId: string; // '__select' or actual fieldId
       recordId?: string;
       isHeader?: boolean;
+      recordCount?: number;
     }) => {
-      const { fieldId, recordId, isHeader } = params;
+      const { fieldId, recordId, isHeader, recordCount } = params;
 
       try {
         if (isHeader) {
-          const recordCount = Math.min(10, rowIds.length);
-          const targetRecordIds = rowIds.slice(0, recordCount);
-
-          await runAi({
+          const apiParams: any = {
             tableId,
-            recordCount,
             fieldId,
+          };
+
+          if (recordCount !== undefined) {
+            apiParams.recordCount = recordCount;
+            const targetRecordIds = rowIds.slice(0, recordCount);
+
+            await runAi(apiParams);
+
+            targetRecordIds.forEach((rid) => {
+              onUpdateRowData(rid, {
+                [fieldId]: { value: '', isFinished: false },
+              });
+            });
+          } else {
+            // Run all rows
+            await runAi(apiParams);
+
+            rowIds.forEach((rid) => {
+              onUpdateRowData(rid, {
+                [fieldId]: { value: '', isFinished: false },
+              });
+            });
+          }
+        } else if (recordId) {
+          // 如果 fieldId 是 '__select'，说明点击的是选择列的 AI 图标
+          // 需要获取所有符合 AI 条件的列
+          const aiFieldsWithDependents = columns.filter(isAiColumn);
+
+          // 收集所有 fieldIds，包括 dependentFieldId
+          const fieldIds: string[] = [];
+          const loadingUpdates: Record<string, boolean> = {};
+          aiFieldsWithDependents.forEach((col) => {
+            fieldIds.push(col.fieldId);
+            loadingUpdates[col.fieldId] = true;
+            if (col.dependentFieldId) {
+              fieldIds.push(col.dependentFieldId);
+              loadingUpdates[col.dependentFieldId] = true;
+            }
           });
 
-          targetRecordIds.forEach((rid) => {
-            onUpdateRowData(rid, {
-              [fieldId]: { value: '', isFinished: false },
-            });
+          // 立即设置 loading 状态
+          setAiLoadingState((prev) => ({
+            ...prev,
+            [recordId]: {
+              ...prev[recordId],
+              ...loadingUpdates,
+            },
+          }));
+
+          // 设置数据状态
+          const updates: Record<string, any> = {};
+          aiFieldsWithDependents.forEach((col) => {
+            updates[col.fieldId] = { value: '', isFinished: false };
+            if (col.dependentFieldId) {
+              updates[col.dependentFieldId] = { value: '', isFinished: false };
+            }
           });
-        } else if (recordId) {
+          onUpdateRowData(recordId, updates);
+
           await runAi({
             tableId,
             recordIds: [recordId],
-            fieldId,
-          });
-
-          onUpdateRowData(recordId, {
-            [fieldId]: { value: '', isFinished: false },
+            fieldIds,
           });
         }
 
@@ -549,7 +652,7 @@ export const useProspectTable = ({
         console.error('Failed to run AI:', error);
       }
     },
-    [tableId, rowIds, runAi, onUpdateRowData, onInitializeAiColumns],
+    [tableId, rowIds, columns, runAi, onUpdateRowData, onInitializeAiColumns],
   );
 
   return {

@@ -8,7 +8,7 @@ import { FindType, SourceFromOpt } from '@/types';
 
 import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
 
-import ICON_CLOSE from './assets/icon_close.svg';
+import ICON_CLOSE from './assets/icon-close.svg';
 
 type TypeCardProps = {
   title: string;

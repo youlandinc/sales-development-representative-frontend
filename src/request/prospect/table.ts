@@ -3,6 +3,7 @@ import { ColumnFieldGroupMap } from '@/types';
 import {
   TableCellProps,
   TableColumnProps,
+  TableColumnTypeEnum,
   UpdateTableColumnConfigParams,
 } from '@/types/Prospect/table';
 
@@ -53,4 +54,38 @@ export const _updateTableCellValue = (params: {
       value: params.value,
     },
   );
+};
+
+export const _createTableRows = (params: {
+  tableId: string;
+  rowCounts: number;
+}) => {
+  return post<string[]>('/sdr/prospect/table/rows/add', {
+    tableId: params.tableId,
+    rowCounts: params.rowCounts,
+  });
+};
+
+export const _createTableColumn = (params: {
+  tableId: string;
+  fieldType: TableColumnTypeEnum;
+  beforeFieldId?: string; // Insert before this field
+  afterFieldId?: string; // Insert after this field
+  // If neither beforeFieldId nor afterFieldId provided, insert at end
+  //actionKey?: string;
+  //groupId?: string;
+  //isExtractedField?: boolean;
+  //dependentFieldId?: string;
+  //typeSettings?: {
+  //  inputBinding?: Array<{
+  //    name: string;
+  //    optional?: boolean;
+  //    formulaText?: string;
+  //  }>;
+  //  optionalPathsInInputs?: Record<string, any>;
+  //};
+  //actionDefinition?: any;
+}) => {
+  // API v2 returns the created column directly
+  return post<TableColumnProps>('/sdr/prospect/table/field/v2', params);
 };

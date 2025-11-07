@@ -1,22 +1,14 @@
 import {
   FC,
   MouseEvent,
+  ReactNode,
   RefObject,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from 'react';
-import {
-  Checkbox,
-  ClickAwayListener,
-  Divider,
-  Icon,
-  MenuItem,
-  Paper,
-  Popper,
-  Stack,
-} from '@mui/material';
+import { Checkbox, ClickAwayListener, Icon, Stack } from '@mui/material';
 
 import type {
   ColumnOrderState,
@@ -32,14 +24,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import {
-  getAddColumnMenuActions,
-  getAiColumnMenuActions,
-  getNormalColumnMenuActions,
-  TableColumnMenuEnum,
-} from '@/components/molecules';
+import { TableColumnMenuEnum } from '@/components/molecules';
 
 import {
+  StyledTableAddRowsFooter,
   StyledTableBody,
   StyledTableBodyCell,
   StyledTableBodyRow,
@@ -47,6 +35,9 @@ import {
   StyledTableHead,
   StyledTableHeadCell,
   StyledTableHeadRow,
+  StyledTableMenuAddColumn,
+  StyledTableMenuAiRun,
+  StyledTableMenuHeader,
   StyledTableSpacer,
 } from './index';
 
@@ -60,10 +51,12 @@ interface StyledTableProps {
     type,
     columnId,
     value,
+    parentValue,
   }: {
     type: TableColumnMenuEnum;
     columnId: string;
     value?: any;
+    parentValue?: any;
   }) => void;
   scrolled?: boolean;
   virtualization?: {
@@ -81,7 +74,10 @@ interface StyledTableProps {
     fieldId: string;
     recordId?: string;
     isHeader?: boolean;
+    recordCount?: number;
   }) => Promise<void>;
+  onAddRows: (count: number) => Promise<void>;
+  addRowsFooter?: ReactNode;
 }
 
 const columnHelper = createColumnHelper<any>();
@@ -103,6 +99,8 @@ export const StyledTable: FC<StyledTableProps> = ({
   aiLoading,
   onCellClick,
   onRunAi,
+  onAddRows,
+  addRowsFooter,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -125,6 +123,10 @@ export const StyledTable: FC<StyledTableProps> = ({
   const [headerMenuAnchor, setHeaderMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
+  const [aiRunMenuAnchor, setAiRunMenuAnchor] = useState<null | HTMLElement>(
+    null,
+  );
+  const [aiRunColumnId, setAiRunColumnId] = useState<string>('');
   const [selectedColumnId, setSelectedColumnId] = useState<string>('');
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
     left: ['__select'],
@@ -148,11 +150,6 @@ export const StyledTable: FC<StyledTableProps> = ({
     setColumnVisibility(visibilityState);
   }, [columns]);
 
-  const addMenuItems_ = useMemo(
-    () => addMenuItems ?? getAddColumnMenuActions(),
-    [addMenuItems],
-  );
-
   const rowHeight = virtualization?.rowHeight ?? 36;
 
   const handleColumnSizingChange = useCallback(
@@ -172,49 +169,54 @@ export const StyledTable: FC<StyledTableProps> = ({
     [columnSizing, onColumnResize],
   );
 
-  const reducedColumns = useMemo(() => {
-    const selectCol = columnHelper.display({
-      id: '__select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          indeterminate={table.getIsSomePageRowsSelected()}
-          onChange={table.getToggleAllPageRowsSelectedHandler()}
-          onClick={(e) => e.stopPropagation()}
-          size={'small'}
-          sx={{ p: 0 }}
-        />
-      ),
-      cell: (info) => info,
-      size: 100,
-      minSize: 100,
-      enableResizing: false,
-    });
+  const reducedColumns = useMemo(
+    () => {
+      const selectCol = columnHelper.display({
+        id: '__select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected()}
+            onChange={table.getToggleAllPageRowsSelectedHandler()}
+            onClick={(e) => e.stopPropagation()}
+            size={'small'}
+            sx={{ p: 0 }}
+          />
+        ),
+        cell: (info) => info,
+        size: 100,
+        minSize: 100,
+        enableResizing: false,
+      });
 
-    const rest = columns.map((column) =>
-      columnHelper.accessor(
-        (row: any) => {
-          const v = row?.[column.fieldId];
-          if (v && typeof v === 'object' && 'value' in v) {
-            return (v as any).value ?? '';
-          }
-          return v ?? '';
-        },
-        {
-          id: column.fieldId,
-          header: column.fieldName,
-          meta: {
-            actionKey: column.actionKey,
-            fieldType: column.fieldType,
-            column: column,
-            selectedColumnId,
+      const rest = columns.map((column) =>
+        columnHelper.accessor(
+          (row: any) => {
+            const v = row?.[column.fieldId];
+            if (v && typeof v === 'object' && 'value' in v) {
+              return (v as any).value ?? '';
+            }
+            return v ?? '';
           },
-        },
-      ),
-    );
+          {
+            id: column.fieldId,
+            header: column.fieldName,
+            meta: {
+              actionKey: column.actionKey,
+              fieldType: column.fieldType,
+              column: column,
+              selectedColumnId,
+            },
+          },
+        ),
+      );
 
-    return [selectCol, ...rest];
-  }, [columns, selectedColumnId]);
+      return [selectCol, ...rest];
+    },
+    // notice: must have rowSelection
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columns, selectedColumnId, rowSelection],
+  );
 
   const table = useReactTable({
     data: data,
@@ -319,6 +321,12 @@ export const StyledTable: FC<StyledTableProps> = ({
         );
       },
       onRunAi: onRunAi,
+      openAiRunMenu: (anchorEl: HTMLElement, columnId: string) => {
+        setAddMenuAnchor(null);
+        setHeaderMenuAnchor(null);
+        setAiRunMenuAnchor(anchorEl);
+        setAiRunColumnId(columnId);
+      },
       isHeaderEditing: (headerId: string) =>
         headerState?.columnId === headerId && headerState?.isEditing === true,
       startHeaderEdit: (headerId: string) => {
@@ -392,7 +400,11 @@ export const StyledTable: FC<StyledTableProps> = ({
   );
 
   const handleHeaderMenuClick = useCallback(
-    (item: { label: string; value: TableColumnMenuEnum | string }) => {
+    (item: {
+      label: string;
+      value: TableColumnMenuEnum | string;
+      parentValue?: TableColumnMenuEnum | string;
+    }) => {
       switch (item.value) {
         case TableColumnMenuEnum.edit_description: {
           onHeaderMenuClick?.({
@@ -463,6 +475,13 @@ export const StyledTable: FC<StyledTableProps> = ({
           break;
         }
         default:
+          // Pass through item value and parentValue for custom handlers (like insert column)
+          onHeaderMenuClick?.({
+            type: item.value as TableColumnMenuEnum,
+            columnId: selectedColumnId,
+            value: item.value,
+            parentValue: item.parentValue,
+          });
           setHeaderState(null);
           break;
       }
@@ -910,6 +929,8 @@ export const StyledTable: FC<StyledTableProps> = ({
       onClickAway={() => {
         setAddMenuAnchor(null);
         setHeaderMenuAnchor(null);
+        setAiRunMenuAnchor(null);
+        setAiRunColumnId('');
         setSelectedColumnId('');
       }}
     >
@@ -930,224 +951,39 @@ export const StyledTable: FC<StyledTableProps> = ({
           table={table}
         />
 
-        <Popper
+        {addRowsFooter ?? <StyledTableAddRowsFooter onAddRows={onAddRows} />}
+
+        <StyledTableMenuAddColumn
           anchorEl={addMenuAnchor}
-          open={Boolean(addMenuAnchor)}
-          placement="bottom-start"
-          sx={{ zIndex: 1300 }}
-        >
-          <ClickAwayListener onClickAway={() => setAddMenuAnchor(null)}>
-            <Paper
-              sx={{
-                boxShadow: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                minWidth: 200,
-              }}
-            >
-              <Stack gap={0}>
-                {addMenuItems_.map((item, index) => {
-                  if (item.value !== TableColumnMenuEnum.divider) {
-                    return (
-                      <MenuItem
-                        key={item.value || item.label}
-                        onClick={() => handleAddMenuClick(item)}
-                        sx={{
-                          minHeight: 'auto',
-                          py: 1,
-                          px: 2,
-                          fontSize: 14,
-                          alignItems: 'center',
-                          gap: 1,
-                        }}
-                      >
-                        {item.icon && (
-                          <Icon
-                            component={item.icon}
-                            sx={{ width: 16, height: 16 }}
-                          />
-                        )}
-                        {item.label}
-                      </MenuItem>
-                    );
-                  }
-                  return (
-                    <Divider
-                      key={item.label + index}
-                      sx={{ margin: '0 !important' }}
-                    />
-                  );
-                })}
-              </Stack>
-            </Paper>
-          </ClickAwayListener>
-        </Popper>
+          menuItems={addMenuItems}
+          onClose={() => setAddMenuAnchor(null)}
+          onMenuItemClick={handleAddMenuClick}
+        />
 
-        <Popper
+        <StyledTableMenuHeader
           anchorEl={headerMenuAnchor}
-          open={
-            Boolean(headerMenuAnchor) &&
-            !headerState?.isEditing &&
-            !!headerState?.isActive
-          }
-          placement="bottom-start"
-          sx={{ zIndex: 1300 }}
-        >
-          <ClickAwayListener
-            onClickAway={(event) => {
-              const target = event.target as HTMLElement;
-              const isHeaderClick =
-                target.closest('[data-table-header]') !== null;
+          columnPinning={columnPinning}
+          columns={columns}
+          headerState={headerState}
+          onClose={() => {
+            setHeaderState(null);
+            setHeaderMenuAnchor(null);
+            setSelectedColumnId('');
+          }}
+          onMenuItemClick={handleHeaderMenuClick}
+          selectedColumnId={selectedColumnId}
+        />
 
-              if (!isHeaderClick) {
-                setHeaderState(null);
-                setHeaderMenuAnchor(null);
-                setSelectedColumnId('');
-              }
-            }}
-          >
-            <Paper
-              sx={{
-                boxShadow: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                minWidth: 260,
-              }}
-            >
-              <Stack gap={0}>
-                {(() => {
-                  // Determine menu type based on column actionKey
-                  const selectedColumn = columns.find(
-                    (col) => col.fieldId === selectedColumnId,
-                  );
-                  const actionKey = selectedColumn?.actionKey;
-                  const isAiColumn =
-                    actionKey === 'use-ai' || actionKey?.includes('find');
-                  const isPinned =
-                    columnPinning!.left!.includes(selectedColumnId);
-
-                  // Select appropriate menu
-                  const menuActions = isAiColumn
-                    ? getAiColumnMenuActions(isPinned)
-                    : getNormalColumnMenuActions(isPinned);
-
-                  return menuActions;
-                })().map((item, index) => {
-                  if (item.value !== TableColumnMenuEnum.divider) {
-                    const hasSubmenu = item.submenu && item.submenu.length > 0;
-
-                    return (
-                      <MenuItem
-                        component={'div'}
-                        key={item.label}
-                        onClick={() =>
-                          !hasSubmenu && handleHeaderMenuClick(item)
-                        }
-                        sx={{
-                          minHeight: 'auto',
-                          px: 2,
-                          fontSize: 14,
-                          py: 1,
-                          alignItems: 'center',
-                          gap: 1,
-                          position: 'relative',
-                          '&:hover > .submenu-container': {
-                            display: 'block',
-                          },
-                        }}
-                      >
-                        {item.icon && (
-                          <Icon
-                            component={item.icon}
-                            sx={{ width: 16, height: 16 }}
-                          />
-                        )}
-                        {item.label}
-                        {hasSubmenu && (
-                          <>
-                            <Icon
-                              sx={{
-                                marginLeft: 'auto',
-                                fontSize: 16,
-                              }}
-                            >
-                              chevron_right
-                            </Icon>
-                            <Paper
-                              className="submenu-container"
-                              sx={{
-                                display: 'none',
-                                position: 'absolute',
-                                left: '100%',
-                                top: 0,
-                                minWidth: 200,
-                                boxShadow: 2,
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: 1,
-                                zIndex: 1,
-                              }}
-                            >
-                              <Stack gap={0}>
-                                {item.submenu!.map((subItem, subIndex) => {
-                                  if (
-                                    subItem.value !==
-                                    TableColumnMenuEnum.divider
-                                  ) {
-                                    return (
-                                      <MenuItem
-                                        component={'div'}
-                                        key={subItem.label}
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleHeaderMenuClick(subItem);
-                                        }}
-                                        sx={{
-                                          minHeight: 'auto',
-                                          px: 2,
-                                          fontSize: 14,
-                                          py: 1,
-                                          alignItems: 'center',
-                                          gap: 1,
-                                        }}
-                                      >
-                                        {subItem.icon && (
-                                          <Icon
-                                            component={subItem.icon}
-                                            sx={{ width: 16, height: 16 }}
-                                          />
-                                        )}
-                                        {subItem.label}
-                                      </MenuItem>
-                                    );
-                                  }
-                                  return (
-                                    <Divider
-                                      key={subItem.label + subIndex}
-                                      sx={{ margin: '0 !important' }}
-                                    />
-                                  );
-                                })}
-                              </Stack>
-                            </Paper>
-                          </>
-                        )}
-                      </MenuItem>
-                    );
-                  }
-                  return (
-                    <Divider
-                      key={item.label + index}
-                      sx={{ margin: '0 !important' }}
-                    />
-                  );
-                })}
-              </Stack>
-            </Paper>
-          </ClickAwayListener>
-        </Popper>
+        <StyledTableMenuAiRun
+          anchorEl={aiRunMenuAnchor}
+          columnId={aiRunColumnId}
+          onClose={() => {
+            setAiRunMenuAnchor(null);
+            setAiRunColumnId('');
+          }}
+          onRunAi={onRunAi}
+          rowIds={rowIds}
+        />
       </Stack>
     </ClickAwayListener>
   );

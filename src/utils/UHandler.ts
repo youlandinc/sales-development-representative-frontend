@@ -42,6 +42,10 @@ export const computedFilterCount = (
 export const handleParam = (param: Record<string, any>) => {
   return Object.entries(param).reduce(
     (pre, [key, value]) => {
+      // Always include tableInclude if it exists in queryConditions
+      // Don't skip even if both tableId and keywords are empty
+      // This allows clearing the filter properly
+
       if (Array.isArray(value)) {
         pre[key] = value.map((item) =>
           typeof item === 'string' ? item : item.value,
@@ -53,4 +57,13 @@ export const handleParam = (param: Record<string, any>) => {
     },
     {} as Record<string, any>,
   );
+};
+
+export const getParamsFromUrl = (url: string): Record<string, string> => {
+  const params: Record<string, string> = {};
+  const urlObj = new URL(url);
+  urlObj.searchParams.forEach((value, key) => {
+    params[key] = value;
+  });
+  return params;
 };

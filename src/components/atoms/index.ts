@@ -33,3 +33,5 @@ export * from './StyledTextFieldSearch';
 export * from './StyledCost';
 
 export * from './StyledTinyEditor';
+
+export * from './StyledRadioGroup';

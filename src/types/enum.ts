@@ -94,3 +94,12 @@ export enum BizCodeEnum {
   email_domain = 'EMAIL_DOMAIN',
   signature = 'SIGNATURE',
 }
+
+export enum ProspectTableEnum {
+  find_people = 'FIND_PEOPLE',
+  find_companies = 'FIND_COMPANIES',
+  from_csv = 'FROM_CSV',
+  black_table = 'BLANK_TABLE',
+  crm_list = 'CRM_LIST',
+  agent = 'AGENT',
+}

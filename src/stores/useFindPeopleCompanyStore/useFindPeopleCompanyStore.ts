@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 
 import { SDRToast } from '@/components/atoms';
 
@@ -23,6 +23,7 @@ type FindPeopleCompanyStoreState = {
   queryConditions: Record<string, any>;
   fetchSourceLoading: boolean;
   fetchFiltersByTypeLoading: boolean;
+  gridDataLoading: boolean;
 };
 
 type FindPeopleCompanyStoreActions = {
@@ -32,6 +33,7 @@ type FindPeopleCompanyStoreActions = {
   setCheckedSource: (source: SourceFromOpt) => void;
   setQueryConditions: (conditions: Record<string, any>) => void;
   setSourceFromOpts: (opts: SourceFromOpt[]) => void;
+  setGridDataLoading: (loading: boolean) => void;
   fetchSource: () => Promise<void>;
   fetchFiltersByType: () => Promise<void>;
 };
@@ -91,6 +93,34 @@ const extractFormKeys = (obj: Record<string, FilterItem[]>) => {
   }
 
   traverse(obj);
+
+  // Initialize special fields for COMPANIES and EXCLUDE_PEOPLE filter types
+  if (result) {
+    // Check if there's a COMPANIES or EXCLUDE_PEOPLE filter type
+    Object.values(obj).forEach((items) => {
+      if (Array.isArray(items)) {
+        items.forEach((item) => {
+          if (item.formType === FilterElementTypeEnum.include_table) {
+            result.tableInclude = {
+              tableId: '',
+              tableFieldId: '',
+              tableViewId: '',
+              keywords: [],
+            };
+          }
+          if (item.formType === FilterElementTypeEnum.exclude_table) {
+            result.tableExclude = {
+              tableId: '',
+              tableFieldId: '',
+              tableViewId: '',
+              keywords: [],
+            };
+          }
+        });
+      }
+    });
+  }
+
   return result;
 };
 
@@ -102,6 +132,7 @@ export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
         queryConditions: {},
         fetchSourceLoading: false,
         fetchFiltersByTypeLoading: false,
+        gridDataLoading: false,
         findType: FindType.find_people,
         sourceFromOpts: [],
         dialogSourceFromOpen: false,
@@ -140,6 +171,8 @@ export const useFindPeopleCompanyStore = create<FindPeopleCompanyStoreProps>()(
           set({ queryConditions: conditions }),
         setSourceFromOpts: (opts: SourceFromOpt[]) =>
           set({ sourceFromOpts: opts }),
+        setGridDataLoading: (loading: boolean) =>
+          set({ gridDataLoading: loading }),
         fetchFiltersByType: async () => {
           try {
             set({ fetchFiltersByTypeLoading: true });

@@ -10,11 +10,7 @@ import { UFormatDate, UFormatNumber, UFormatPercent } from '@/utils';
 import { useSwitch } from '@/hooks';
 
 import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
-import {
-  CampaignsStatusBadge,
-  CommonPagination,
-  CommonSkeletonLoadingOverlay,
-} from '@/components/molecules';
+import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
 
 import {
   CampaignStatusEnum,
@@ -468,9 +464,14 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         rowCount={totalElements}
         rowHeight={40}
         rows={data?.content || []}
+        slotProps={{
+          loadingOverlay: {
+            variant: 'skeleton',
+            noRowsVariant: 'skeleton',
+          },
+        }}
         slots={{
           pagination: CommonPagination,
-          loadingOverlay: CommonSkeletonLoadingOverlay,
           noRowsOverlay: () => (
             <Stack
               alignItems={'center'}

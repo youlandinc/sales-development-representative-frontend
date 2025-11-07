@@ -14,23 +14,26 @@ const nextConfig = {
   },
   experimental: {
     // missingSuspenseWithCSRBailout: false,
+    reactCompiler: {
+      compilationMode: 'all', // 编译所有组件
+    },
     staleTimes: {
       dynamic: 0,
       static: 0,
     },
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
   logging: {
     fetches: {
       fullUrl: true,
-      hmrRefresh: true,
+      hmrRefreshes: true,
     },
   },
   async redirects() {
