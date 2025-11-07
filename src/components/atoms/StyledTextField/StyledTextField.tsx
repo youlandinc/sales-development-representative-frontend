@@ -62,6 +62,9 @@ export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
     fontSize: 14,
     lineHeight: 1.5,
   },
+  [`& .${inputLabelClasses.root}.Mui-focused`]: {
+    color: 'text.primary',
+  },
   //label - small
   [`& .${inputLabelClasses.sizeSmall}`]: {
     transform: 'translate(14px, 5px) scale(1)',

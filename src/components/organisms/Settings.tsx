@@ -5,17 +5,6 @@ import {
   SettingsIntegrations,
   SettingsPersonalInfo,
 } from '@/components/molecules';
-import dynamic from 'next/dynamic';
-
-const StyledTinyEditor = dynamic(
-  () =>
-    import('@/components/atoms/StyledTinyEditor').then(
-      (mod) => mod.StyledTinyEditor,
-    ),
-  {
-    ssr: false,
-  },
-);
 
 export const Settings = () => {
   return (

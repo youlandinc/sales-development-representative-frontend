@@ -11,8 +11,9 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
-import ICON_TEXT from '../assets/icon_text.svg';
 import { useProspectTableStore } from '@/stores/Prospect';
+import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 export type SuggestionListRef = {
   // For convenience using this SuggestionList from within the
@@ -32,6 +33,7 @@ export type SuggestionListRef = {
 interface MentionNodeAttrs {
   id: string | null;
   label?: string | null;
+  fieldType: TableColumnTypeEnum;
 }
 
 export type SuggestionListProps = SuggestionProps<MentionSuggestion>;
@@ -63,6 +65,7 @@ export const SuggestionList = forwardRef<
     const mentionItem: MentionNodeAttrs = {
       id: suggestion.fieldId,
       label: suggestion.fieldName,
+      fieldType: suggestion.fieldType,
     };
     // type where if you specify the suggestion type (like
     // `SuggestionProps<MentionSuggestion>`), it will incorrectly require that
@@ -126,8 +129,16 @@ export const SuggestionList = forwardRef<
               selected={index === selectedIndex}
               sx={{ px: 1.5, py: 1, gap: 1 }}
             >
-              <Icon component={ICON_TEXT} sx={{ width: 18, height: 18 }} />
-              <Typography variant={'body3'}>{item.fieldName}</Typography>
+              <Icon
+                component={
+                  COLUMN_TYPE_ICONS[item?.fieldType as TableColumnTypeEnum] ||
+                  COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+                }
+                sx={{ width: 18, height: 18 }}
+              />
+              <Typography fontSize={12} lineHeight={1.5}>
+                {item.fieldName}
+              </Typography>
             </ListItemButton>
           </ListItem>
         ))}

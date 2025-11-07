@@ -4,9 +4,10 @@ import {
   Autocomplete,
   AutocompleteProps,
   createFilterOptions,
-  TextField,
 } from '@mui/material';
 import { createUseStyles } from 'react-jss';
+
+import { StyledTextField } from '@/components/atoms';
 
 import { FilterContainer, FilterContainerProps } from './index';
 
@@ -94,7 +95,7 @@ export const FilterTextField: FC<
           onChange?.(value);
         }}
         renderInput={(params) => (
-          <TextField
+          <StyledTextField
             {...params}
             placeholder={
               Array.isArray(controlledValue) && controlledValue.length === 0

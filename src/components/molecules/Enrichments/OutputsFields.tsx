@@ -7,13 +7,16 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import React, { useEffect, useMemo, useState } from 'react';
 import { debounce } from 'lodash-es';
+import { useEffect, useMemo, useState } from 'react';
 
 import { StyledSelect, StyledTextField } from '@/components/atoms';
 
+import { CommonSelectFieldType } from '@/components/molecules/Common';
+
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
+
 import { MoreHoriz } from '@mui/icons-material';
-import ICON_TEXT from './assets/icon_text.svg';
 import ICON_DELETE from './assets/icon_delete.svg';
 
 type OutputsFieldsProps = {
@@ -40,7 +43,7 @@ export const OutputsFields = ({
   selectOptions,
 }: OutputsFieldsProps) => {
   const [name, setName] = useState(fieldName);
-  const [type, setType] = useState(fieldType || 'string');
+  const [type, setType] = useState(fieldType || TableColumnTypeEnum.text);
   const [description, setDescription] = useState(fieldDescription);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -74,7 +77,7 @@ export const OutputsFields = ({
         }}
         value={name}
       />
-      <StyledSelect
+      {/* <StyledSelect
         onChange={(e) => {
           setType(e.target.value as string);
           saveField(
@@ -93,12 +96,10 @@ export const OutputsFields = ({
           },
         ]}
         placeholder={'Text'}
-        startAdornment={
-          <Icon
-            component={ICON_TEXT}
-            sx={{ width: 12, height: 12, mr: '7.5px' }}
-          />
-        }
+        value={type}
+      /> */}
+      <CommonSelectFieldType
+        onChange={(e) => setType(e.target.value as TableColumnTypeEnum)}
         value={type}
       />
       <MoreHoriz

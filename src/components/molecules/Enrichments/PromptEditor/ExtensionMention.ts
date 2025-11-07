@@ -2,6 +2,7 @@ import { Mention } from '@tiptap/extension-mention';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { PlaceholderNode } from './PlaceholderNode';
 import { mentionSuggestionOptions } from './mentionSuggestionOptions';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 export const ExtensionMention = Mention.extend({
   name: 'custom-placeholder',
@@ -15,7 +16,7 @@ export const ExtensionMention = Mention.extend({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const parentAttributes = this?.parent ? this.parent() : {};
-
+    console.log(parentAttributes);
     return {
       // 先继承父类的属性
       ...parentAttributes,

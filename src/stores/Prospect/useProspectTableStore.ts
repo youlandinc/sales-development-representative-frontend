@@ -65,6 +65,10 @@ export type ProspectTableActions = {
   updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
   updateColumnPin: (pin: boolean) => Promise<void>;
   updateColumnDescription: (description: string) => Promise<void>;
+  updateColumnFieldName: (params: {
+    fieldName: string;
+    fieldType: TableColumnTypeEnum;
+  }) => Promise<void>;
   deleteColumn: () => Promise<void>;
   addColumn: (params: {
     tableId: string;
@@ -256,6 +260,36 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         await _updateTableColumnConfig({
           fieldId,
           description: trimmedDescription,
+        });
+      } catch (err) {
+        handleApiError<ProspectTableState>(err, { columns }, set);
+      }
+    },
+    updateColumnFieldName: async (params) => {
+      const fieldId = get().activeColumnId;
+      const columns = get().columns;
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      const trimmedFieldName = params.fieldName.trim();
+      if (!fieldId || !column || !UNotUndefined(trimmedFieldName)) {
+        return;
+      }
+
+      const updatedColumns = columns.map((col) =>
+        col.fieldId === fieldId
+          ? { ...col, fieldName: trimmedFieldName, fieldType: params.fieldType }
+          : col,
+      );
+      set({
+        columns: updatedColumns,
+      });
+
+      try {
+        await _updateTableColumnConfig({
+          fieldId,
+          fieldName: trimmedFieldName,
+          fieldType: params.fieldType,
         });
       } catch (err) {
         handleApiError<ProspectTableState>(err, { columns }, set);

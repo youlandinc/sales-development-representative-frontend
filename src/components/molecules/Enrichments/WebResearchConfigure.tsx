@@ -39,6 +39,7 @@ import ICON_SPARKLE from './assets/icon_sparkle.svg';
 import ICON_WARNING from './assets/icon_warning.svg';
 // import { useCompletion } from '@ai-sdk/react';
 import ICON_DELETE from './assets/icon_delete.svg';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 type WebResearchConfigureProps = {
   handleGenerate?: () => void;
@@ -322,7 +323,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                 <OutputsFields
                   fieldDescription={config?.description || ''}
                   fieldName={item}
-                  fieldType={'string'}
+                  fieldType={config?.type || TableColumnTypeEnum.text}
                   key={config.id || item}
                   removeField={handleDeleteField}
                   saveField={(

@@ -1,10 +1,12 @@
-import { NodeViewWrapper } from '@tiptap/react';
 import { Icon, Stack, Switch, Tooltip, Typography } from '@mui/material';
+import { NodeViewWrapper } from '@tiptap/react';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 
-import CloseIcon from '@mui/icons-material/Close';
-import ICON_TEXT from '../assets/icon_text.svg';
+import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
 import { useWebResearchStore } from '@/stores/Prospect';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
+
+import CloseIcon from '@mui/icons-material/Close';
 
 export const PlaceholderNode: FC = (props: any) => {
   const { excludeFields, setExcludeFields, removeExcludeFields } =
@@ -19,6 +21,7 @@ export const PlaceholderNode: FC = (props: any) => {
     renderTooltip,
     onToggleToken,
     isFallback,
+    fieldType,
   } = node.attrs;
 
   const label = node?.attrs?.label;
@@ -75,7 +78,10 @@ export const PlaceholderNode: FC = (props: any) => {
           width={'fit-content'}
         >
           <Switch checked={checked} onChange={onChange} size={'small'} />
-          <Icon component={ICON_TEXT} sx={{ width: 18, height: 18 }} />
+          <Icon
+            component={COLUMN_TYPE_ICONS[fieldType as TableColumnTypeEnum]}
+            sx={{ width: 18, height: 18 }}
+          />
           <Typography color={'text.primary'} variant={'body3'}>
             {label}
           </Typography>

@@ -6,3 +6,4 @@ export * from './DialogHeaderActions';
 export * from './DialogWorkEmail';
 export * from './Common';
 export * from './DialogAllIntegrations';
+export * from './DialogEditColumn';
