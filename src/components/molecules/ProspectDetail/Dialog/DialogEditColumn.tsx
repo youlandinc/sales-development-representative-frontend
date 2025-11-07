@@ -1,21 +1,72 @@
-import { StyledButton, StyledSelect } from '@/components/atoms';
-import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
-import { useProspectTableStore } from '@/stores/Prospect';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
 import { Drawer, Icon, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
-import { CommonSelectFieldType } from '../../Common';
+import { FC, useEffect, useState } from 'react';
 
-export const DialogEditColumn: FC = () => {
-  const { columns, activeColumnId } = useProspectTableStore((store) => store);
+import { StyledButton, StyledTextField } from '@/components/atoms';
+import { CommonSelectFieldType } from '@/components/molecules/Common';
+
+import { COLUMN_TYPE_ICONS } from '@/components/atoms/StyledTable/columnTypeIcons';
+
+import { useProspectTableStore } from '@/stores/Prospect';
+import { useAsyncFn } from '@/hooks';
+
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnMenuEnum } from '@/components/molecules/ProspectDetail/data';
+
+import ICON_CLOSE from '@/components/molecules/ProspectDetail/assets/dialog/icon_close.svg';
+
+interface DialogEditColumnProps {
+  cb?: () => void;
+}
+
+export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
+  const {
+    columns,
+    activeColumnId,
+    dialogType,
+    closeDialog,
+    updateColumnFieldName,
+    dialogVisible,
+  } = useProspectTableStore((store) => store);
+
   const column = columns.find((col) => col.fieldId === activeColumnId);
 
   const [value, setValue] = useState(TableColumnTypeEnum.text);
+  const [name, setName] = useState('');
+
+  const [state, updateDescription] = useAsyncFn(async () => {
+    await updateColumnFieldName({
+      fieldName: name,
+      fieldType: value,
+    });
+    closeDialog();
+    cb?.();
+  }, [value, name]);
+
+  useEffect(() => {
+    if (column?.fieldName) {
+      setName(column?.fieldName);
+    }
+    if (column?.fieldType) {
+      setValue(column?.fieldType);
+    }
+  }, [closeDialog, column?.fieldName, column?.fieldType]);
+
+  useEffect(() => {
+    return () => {
+      closeDialog();
+    };
+  }, [closeDialog]);
+
   return (
     <Drawer
       anchor={'right'}
       hideBackdrop
-      //   open
+      onClose={closeDialog}
+      open={
+        dialogType === TableColumnMenuEnum.edit_column &&
+        dialogVisible &&
+        !!column
+      }
       slotProps={{
         paper: {
           sx: {
@@ -28,27 +79,57 @@ export const DialogEditColumn: FC = () => {
         left: 'unset',
       }}
     >
-      <Stack height={'100%'}>
+      <Stack gap={4} height={'100%'}>
         {/* header */}
-        <Stack alignItems={'center'} flexDirection={'row'}>
+        <Stack
+          alignItems={'center'}
+          flexDirection={'row'}
+          gap={0.5}
+          pt={3}
+          px={3}
+        >
           {column?.fieldType && (
             <Icon
               component={
                 COLUMN_TYPE_ICONS[column?.fieldType as TableColumnTypeEnum] ||
                 COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
               }
-              sx={{ width: 16, height: 16 }}
+              sx={{ width: 20, height: 20 }}
             />
           )}
-        </Stack>
-        <Stack gap={1} px={3} py={1.5}>
-          <Typography color={'text.secondary'} variant={'body2'}>
-            Data type
+          <Typography fontWeight={600} lineHeight={1.2}>
+            {column?.fieldName}
           </Typography>
-          <CommonSelectFieldType
-            onChange={(e) => setValue(e.target.value as TableColumnTypeEnum)}
-            value={value}
+          <Icon
+            component={ICON_CLOSE}
+            onClick={closeDialog}
+            sx={{ width: 24, height: 24, ml: 'auto', cursor: 'pointer' }}
           />
+        </Stack>
+        <Stack gap={1.5} px={3}>
+          <Stack
+            border={'1px solid #DFDEE6'}
+            borderRadius={2}
+            gap={1.5}
+            p={1.5}
+          >
+            <Stack gap={1}>
+              <Typography variant={'body2'}>Column name</Typography>
+              <StyledTextField
+                onChange={(e) => setName(e.target.value)}
+                value={name}
+              />
+            </Stack>
+            <Stack gap={1}>
+              <Typography variant={'body2'}>Data type</Typography>
+              <CommonSelectFieldType
+                onChange={(e) =>
+                  setValue(e.target.value as TableColumnTypeEnum)
+                }
+                value={value}
+              />
+            </Stack>
+          </Stack>
         </Stack>
         <Stack
           alignItems={'center'}
@@ -62,19 +143,18 @@ export const DialogEditColumn: FC = () => {
         >
           <StyledButton
             color={'info'}
-            //   onClick={handleClose}
+            onClick={closeDialog}
             size={'medium'}
             variant={'outlined'}
           >
             Cancel
           </StyledButton>
           <StyledButton
-            //   loading={state.loading}
-            //   onClick={() => {
-            //     updateDescription(description);
-            //   }}
+            disabled={name.trim() === ''}
+            loading={state.loading}
+            onClick={updateDescription}
             size={'medium'}
-            sx={{ width: 143 }}
+            sx={{ width: 65 }}
             variant={'contained'}
           >
             Save

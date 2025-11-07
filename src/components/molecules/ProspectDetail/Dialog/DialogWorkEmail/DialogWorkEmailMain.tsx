@@ -12,7 +12,7 @@ import {
 } from './index';
 
 import { useWorkEmailStore } from '@/stores/Prospect';
-import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/Prospect';
+import { WaterfallConfigTypeEnum } from '@/types/Prospect';
 
 export const DialogWorkEmailMain = () => {
   const {

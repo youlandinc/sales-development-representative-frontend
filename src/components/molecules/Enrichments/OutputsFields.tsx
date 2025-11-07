@@ -10,7 +10,7 @@ import {
 import { debounce } from 'lodash-es';
 import { useEffect, useMemo, useState } from 'react';
 
-import { StyledTextField } from '@/components/atoms';
+import { StyledSelect, StyledTextField } from '@/components/atoms';
 
 import { CommonSelectFieldType } from '@/components/molecules/Common';
 
@@ -96,12 +96,6 @@ export const OutputsFields = ({
           },
         ]}
         placeholder={'Text'}
-        startAdornment={
-          <Icon
-            component={ICON_TEXT}
-            sx={{ width: 12, height: 12, mr: '7.5px' }}
-          />
-        }
         value={type}
       /> */}
       <CommonSelectFieldType

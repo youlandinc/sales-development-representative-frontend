@@ -82,6 +82,10 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
         ];
       }; */
     const editor = useEditor({
+      onUpdate() {
+        //TODO
+        //onChange
+      },
       extensions: [
         Placeholder.configure({
           placeholder,

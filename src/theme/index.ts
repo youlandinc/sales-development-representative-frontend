@@ -1,8 +1,7 @@
 'use client';
-import { CSSProperties } from 'react';
-import { createTheme, ThemeOptions } from '@mui/material/styles';
-import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 import { inputBaseClasses } from '@mui/material/InputBase';
+import { createTheme, ThemeOptions } from '@mui/material/styles';
+import { CSSProperties } from 'react';
 
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
@@ -542,4 +541,4 @@ const darkTheme = createTheme({
   },
 });
 
-export { lightTheme, darkTheme };
+export { darkTheme, lightTheme };

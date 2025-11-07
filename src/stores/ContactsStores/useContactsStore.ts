@@ -1,4 +1,8 @@
-import { create } from 'zustand';
+import { SDRToast } from '@/components/atoms';
+import {
+  _fetchSegmentDetailsBySegmentId,
+  _fetchSegmentOptions,
+} from '@/request/contacts/segments';
 import {
   ContactsPageMode,
   ContactsTableTypeEnum,
@@ -6,12 +10,7 @@ import {
   HttpError,
   SegmentOption,
 } from '@/types';
-import {
-  _fetchSegmentDetailsBySegmentId,
-  _fetchSegmentOptions,
-  _updateSelectedSegment,
-} from '@/request/contacts/segments';
-import { SDRToast } from '@/components/atoms';
+import { create } from 'zustand';
 
 type DirectoryStoresStates = {
   pageMode: ContactsPageMode;

@@ -28,7 +28,9 @@ export const CommonSelectFieldType: FC<Omit<StyledSelectProps, 'options'>> = ({
             {option?.icon && (
               <Icon component={option.icon} sx={{ width: 16, height: 16 }} />
             )}
-            <Typography>{option?.label || 'Text'}</Typography>
+            <Typography fontSize={14} lineHeight={1.5}>
+              {option?.label || 'Text'}
+            </Typography>
           </Stack>
         );
       }}

@@ -190,26 +190,24 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                   return;
                 }
                 // AI column configuration
-                if (
-                  !column ||
-                  column.actionKey !== 'use-ai' ||
-                  !column.typeSettings
-                ) {
+                if (column && column.actionKey === 'use-ai') {
+                  const schema = column.typeSettings?.inputBinding.find(
+                    (item) => item.name === 'answerSchemaType',
+                  )?.formulaText;
+                  const prompt = column.typeSettings?.inputBinding.find(
+                    (item) => item.name === 'prompt',
+                  )?.formulaText;
+                  const metaprompt = column.typeSettings?.inputBinding.find(
+                    (item) => item.name === 'metaprompt',
+                  )?.formulaText;
+                  prompt && setPrompt(prompt);
+                  schema && setSchemaJson(schema);
+                  metaprompt && setGenerateDescription(metaprompt);
+                  setWebResearchVisible(true, ActiveTypeEnum.edit);
                   return;
                 }
-                const schema = column.typeSettings.inputBinding.find(
-                  (item) => item.name === 'answerSchemaType',
-                )?.formulaText;
-                const prompt = column.typeSettings.inputBinding.find(
-                  (item) => item.name === 'prompt',
-                )?.formulaText;
-                const metaprompt = column.typeSettings.inputBinding.find(
-                  (item) => item.name === 'metaprompt',
-                )?.formulaText;
-                prompt && setPrompt(prompt);
-                schema && setSchemaJson(schema);
-                metaprompt && setGenerateDescription(metaprompt);
-                setWebResearchVisible(true, ActiveTypeEnum.edit);
+                //common edit column
+                openDialog(TableColumnMenuEnum.edit_column);
 
                 break;
               }
