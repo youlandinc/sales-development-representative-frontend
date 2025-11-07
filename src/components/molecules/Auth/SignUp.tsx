@@ -7,23 +7,49 @@ import {
   StyledTextFieldPassword,
 } from '@/components/atoms';
 
-import GOOGLE_ICON from './assets/google-icon.svg';
+import { useSignUp, useSignUpDialog } from './hooks';
+import { SignUpDialog } from './SignUpDialog';
 import { LOGO_HEIGHT, SignLogo } from './SignLogo';
-import { useSignIn } from './hooks';
+import { SignPassWordCheck } from './SignPassWordCheck';
+import GOOGLE_ICON from './assets/google-icon.svg';
 
-export const SignIn = () => {
+export const SignUp = () => {
   const {
     loading,
+    passwordError,
     isDisabled,
+    firstName,
+    lastName,
     email,
     password,
+    setFirstName,
+    setLastName,
     setEmail,
     setPassword,
-    onClickToSignUp,
+    onClickToSignIn,
+    onClickSignUp,
+    userInfo,
+    setUserInfo,
+    visible,
+    close,
     onClickGoogleLogin,
-    onClickToForgetPassword,
-    onClickToLogin,
-  } = useSignIn();
+  } = useSignUp();
+
+  const {
+    onClickResendOtp,
+    seconds,
+    otp,
+    setOtp,
+    handledVerifyOtp,
+    dialogLoading,
+  } = useSignUpDialog({
+    userInfo,
+    setUserInfo,
+    firstName,
+    lastName,
+    email,
+    password,
+  });
 
   return (
     <Box bgcolor={'#FBFCFD'}>
@@ -43,7 +69,7 @@ export const SignIn = () => {
           maxWidth={600}
           onSubmit={async (e) => {
             e.preventDefault();
-            await onClickToLogin();
+            await onClickSignUp();
           }}
           px={5}
           py={7.5}
@@ -56,7 +82,7 @@ export const SignIn = () => {
               textAlign={'center'}
               variant={'h5'}
             >
-              Welcome back to SalesOS
+              Create your SalesOS account
             </Typography>
             <Typography
               color={'#9095A3'}
@@ -64,7 +90,8 @@ export const SignIn = () => {
               textAlign={'center'}
               variant={'body2'}
             >
-              Sign in to access your workspace and start scaling your outreach.
+              Enrich data, launch outreach, and close more deals — all in
+              minutes
             </Typography>
           </Stack>
           <Stack gap={3}>
@@ -98,7 +125,7 @@ export const SignIn = () => {
                   }}
                   variant={'body2'}
                 >
-                  Sign in with Google
+                  Sign up with Google
                 </Typography>
               </Stack>
             </StyledButton>
@@ -111,6 +138,24 @@ export const SignIn = () => {
             >
               OR
             </Divider>
+            <Stack flexDirection={'row'} gap={3}>
+              <StyledTextField
+                disabled={loading}
+                label={'First name'}
+                onChange={(e) => setFirstName(e.target.value.trim())}
+                required
+                size={'large'}
+                value={firstName}
+              />
+              <StyledTextField
+                disabled={loading}
+                label={'Last name'}
+                onChange={(e) => setLastName(e.target.value.trim())}
+                required
+                size={'large'}
+                value={lastName}
+              />
+            </Stack>
             <StyledTextField
               disabled={loading}
               label={'Email'}
@@ -119,47 +164,61 @@ export const SignIn = () => {
               size={'large'}
               value={email}
             />
-            <StyledTextFieldPassword
-              disabled={loading}
-              label={'Password'}
-              onChange={(e) => setPassword(e.target.value.trim())}
-              required
-              size={'large'}
-              value={password}
-            />
+            <Stack gap={1}>
+              <StyledTextFieldPassword
+                disabled={loading}
+                label={'Password'}
+                onChange={(e) => setPassword(e.target.value.trim())}
+                required
+                size={'large'}
+                value={password}
+              />
+              <SignPassWordCheck
+                password={password}
+                passwordError={passwordError}
+              />
+            </Stack>
             <StyledButton
-              disabled={isDisabled}
+              disabled={loading || isDisabled}
               loading={loading}
+              sx={{
+                '&.MuiButton-contained.Mui-disabled': {
+                  color: '#FFFFFF !important',
+                  backgroundColor: '#D0CEDA !important',
+                },
+              }}
               type={'submit'}
             >
-              Sign in
+              Sign up
             </StyledButton>
-            <Stack flexDirection={'row'}>
-              <Typography color={'#202939'} variant={'body2'}>
-                Don&apos;t have an account?
+            <Stack flexDirection={'row'} justifyContent={'center'}>
+              <Typography color={'#041256'} variant={'body2'}>
+                Already have an account?
               </Typography>
               <Typography
                 color={'#6E4EFB'}
                 display={'inline'}
-                onClick={onClickToSignUp}
+                onClick={onClickToSignIn}
                 sx={{ cursor: 'pointer', ml: '4px' }}
                 variant={'body2'}
               >
-                Sign up
-              </Typography>
-              <Typography
-                color={'#9095A3'}
-                ml={'auto'}
-                onClick={onClickToForgetPassword}
-                sx={{ cursor: 'pointer' }}
-                variant={'body2'}
-              >
-                Forgot password?
+                Sign in
               </Typography>
             </Stack>
           </Stack>
         </Stack>
       </Stack>
+      <SignUpDialog
+        close={close}
+        email={email}
+        handledVerifyOtp={handledVerifyOtp}
+        loading={dialogLoading}
+        onClickResendOtp={onClickResendOtp}
+        otp={otp}
+        seconds={seconds}
+        setOtp={setOtp}
+        visible={visible}
+      />
     </Box>
   );
 };
