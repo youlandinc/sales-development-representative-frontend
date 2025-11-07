@@ -20,24 +20,27 @@ export interface IUserLoginParams {
   };
 }
 
-export interface IUserSendCodeParams {
+export interface IUserSignUpParams {
+  appKey: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  appkey: string;
-  bizType: BizTypeEnum;
+  password: string;
 }
 
 export interface IUserVerifyCodeParams {
-  email: string;
-  appkey: string;
-  code: string;
-  bizType: BizTypeEnum;
+  userInfo: string;
+  verifyCode: string;
 }
 
 export interface IUserResetPasswordParams {
-  newPass: string;
-  appkey: string;
-  verifyCode?: string;
   email: string;
+}
+
+export interface IUserSetPasswordParams {
+  email: string;
+  signature: string;
+  newPassword: string;
 }
 
 export enum UserIntegrationEnum {
