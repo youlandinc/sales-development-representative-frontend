@@ -1,10 +1,13 @@
 import {
   FC,
+  memo,
   MouseEvent,
   ReactNode,
   startTransition,
+  useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -70,7 +73,26 @@ interface StyledTableBodyCellProps {
   onCellClick: (columnId: string, rowId: string, data: any) => void;
 }
 
-export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
+const arePropsEqual = (
+  prev: StyledTableBodyCellProps,
+  next: StyledTableBodyCellProps,
+): boolean => {
+  return (
+    prev.width === next.width &&
+    prev.isPinned === next.isPinned &&
+    prev.stickyLeft === next.stickyLeft &&
+    prev.isEditing === next.isEditing &&
+    prev.isActive === next.isActive &&
+    prev.rowSelected === next.rowSelected &&
+    prev.showPinnedRightShadow === next.showPinnedRightShadow &&
+    prev.hasActiveInRow === next.hasActiveInRow &&
+    prev.cell?.id === next.cell?.id &&
+    prev.cell?.getValue() === next.cell?.getValue()
+  );
+};
+
+export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
+  ({
   cell,
   width,
   isPinned = false,
@@ -112,9 +134,14 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   const canEdit = columnId !== '__select' && actionKey !== 'use-ai';
   const canInteract = Boolean(cell && !isSelectColumn && canEdit);
 
-  const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
+  const isAiLoading = useMemo(
+    () => tableMeta?.isAiLoading?.(recordId, columnId) ?? false,
+    [tableMeta, recordId, columnId],
+  );
 
-  const cellValueObj = typeof value === 'object' && value !== null ? value : {};
+  const cellValueObj = useMemo(() => {
+    return typeof value === 'object' && value !== null ? value : {};
+  }, [value]);
   const isFinished =
     'isFinished' in cellValueObj ? cellValueObj.isFinished : false;
   const externalContent =
@@ -123,7 +150,10 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
       : undefined;
 
   const triggerAiProcess = tableMeta?.triggerAiProcess;
-  const hasAiColumnInRow = tableMeta?.hasAiColumnInRow?.(recordId) ?? false;
+  const hasAiColumnInRow = useMemo(
+    () => tableMeta?.hasAiColumnInRow?.(recordId) ?? false,
+    [tableMeta, recordId],
+  );
 
   const [isCellHovered, setIsCellHovered] = useState(false);
 
@@ -163,14 +193,14 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     columnId,
   ]);
 
-  const onStopEdit = () => {
+  const onStopEdit = useCallback(() => {
     startTransition(() => {
       if (localEditValue !== String(displayValue ?? '')) {
         tableMeta?.updateData?.(recordId, columnId, localEditValue);
       }
       tableMeta?.setCellMode?.(recordId, columnId, 'clear');
     });
-  };
+  }, [localEditValue, displayValue, tableMeta, recordId, columnId]);
 
   let content: ReactNode;
   if (isEditing && cell && !isSelectColumn && canEdit) {
@@ -251,31 +281,40 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     content = displayValue;
   }
 
-  const onClickCell = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    onCellClick(columnId, recordId, cell?.row);
-    if (canInteract || isAiColumn) {
-      tableMeta?.setCellMode?.(recordId, columnId, 'active');
-    }
-  };
+  const onClickCell = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      onCellClick(columnId, recordId, cell?.row);
+      if (canInteract || isAiColumn) {
+        tableMeta?.setCellMode?.(recordId, columnId, 'active');
+      }
+    },
+    [onCellClick, columnId, recordId, cell?.row, canInteract, isAiColumn, tableMeta],
+  );
 
-  const onDoubleClickCell = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    if (canInteract) {
-      tableMeta?.setCellMode?.(recordId, columnId, 'edit');
-    }
-  };
+  const onDoubleClickCell = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      if (canInteract) {
+        tableMeta?.setCellMode?.(recordId, columnId, 'edit');
+      }
+    },
+    [canInteract, tableMeta, recordId, columnId],
+  );
 
-  const onClickAiIcon = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const onClickAiIcon = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
 
-    tableMeta?.onRunAi?.({
-      fieldId: columnId,
-      recordId: recordId,
-      isHeader: false,
-    });
-  };
+      tableMeta?.onRunAi?.({
+        fieldId: columnId,
+        recordId: recordId,
+        isHeader: false,
+      });
+    },
+    [tableMeta, columnId, recordId],
+  );
 
   const cellBackgroundColor = getCellBackgroundColor(
     isEditing,
@@ -351,4 +390,6 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         )}
     </Stack>
   );
-};
+  },
+  arePropsEqual,
+);
