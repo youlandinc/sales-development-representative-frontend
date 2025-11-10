@@ -10,3 +10,4 @@ export * from './SettingsEmailVerify';
 export * from './SettingsEmailSignature';
 
 export * from './SettingsEmailDomain';
+export * from './SettingMailboxes';

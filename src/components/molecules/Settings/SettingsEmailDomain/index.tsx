@@ -1,5 +1,4 @@
-import { FC, useMemo } from 'react';
-import { Stack } from '@mui/material';
+import { Dispatch, FC, SetStateAction, useMemo } from 'react';
 
 import { useBreakpoints } from '@/hooks';
 
@@ -7,7 +6,6 @@ import {
   SettingsEmailDomainContent,
   SettingsEmailDomainDialog,
   SettingsEmailDomainDialogRemove,
-  SettingsEmailDomainHeader,
 } from './components';
 import {
   useDialog,
@@ -15,8 +13,19 @@ import {
   useFetchCustomEmailDomain,
   useKeyDown,
 } from './hooks';
+import { EmailDomainDetails } from '@/types';
+import { SettingsBox } from '../SettingsBox';
+import { SettingsButton } from '../SettingsButton';
 
-export const SettingsEmailDomain: FC = () => {
+interface SettingsEmailDomainProps {
+  emailDomainList: EmailDomainDetails[];
+  setEmailDomainList: Dispatch<SetStateAction<EmailDomainDetails[]>>;
+}
+
+export const SettingsEmailDomain: FC<SettingsEmailDomainProps> = ({
+  emailDomainList,
+  setEmailDomainList,
+}) => {
   const breakpoints = useBreakpoints();
   // Integrate duplicate data
   const isSmall = useMemo(
@@ -24,8 +33,9 @@ export const SettingsEmailDomain: FC = () => {
     [breakpoints],
   );
 
-  const { loading, emailDomainList, setEmailDomainList, onRefresh } =
-    useFetchCustomEmailDomain();
+  const { loading, onRefresh } = useFetchCustomEmailDomain({
+    setEmailDomainList,
+  });
 
   const {
     activeStep,
@@ -64,9 +74,17 @@ export const SettingsEmailDomain: FC = () => {
   });
 
   return (
-    <Stack component={'form'} gap={'12px'} maxWidth={'900px'}>
-      <SettingsEmailDomainHeader onAddEmailDomain={onAddEmailDomain} />
-
+    <SettingsBox
+      button={
+        <SettingsButton
+          label="Add domain"
+          onClick={onAddEmailDomain}
+          width="95px"
+        />
+      }
+      subtitle="Verify your domains to start sending emails. You can only add mailboxes under verified domains."
+      title="Domains"
+    >
       <SettingsEmailDomainContent
         data={emailDomainList}
         domain={domain}
@@ -100,6 +118,6 @@ export const SettingsEmailDomain: FC = () => {
         deleteVisible={deleteVisible}
         onClickToDelete={onClickToDelete}
       />
-    </Stack>
+    </SettingsBox>
   );
 };
