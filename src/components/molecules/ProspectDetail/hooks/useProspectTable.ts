@@ -13,8 +13,7 @@ import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
-import { MIN_BATCH_SIZE } from '@/constant/table';
-import { isAiColumn } from '../utils';
+import { checkIsAiColumn, MIN_BATCH_SIZE } from '@/constant/table';
 
 interface UseProspectTableParams {
   tableId: string;
@@ -43,6 +42,10 @@ interface UseProspectTableReturn {
   }) => Promise<void>;
 }
 
+// TODO: Hook优化
+// 1. Hook职责过重，承担了太多功能
+// 2. 考虑拆分为多个更小的hooks: useTableData, useAiProcessing, useVirtualization
+// 3. 状态管理可以优化为更清晰的结构
 export const useProspectTable = ({
   tableId,
 }: UseProspectTableParams): UseProspectTableReturn => {
@@ -58,6 +61,10 @@ export const useProspectTable = ({
   const { runAi } = useRunAi();
   const { fetchIntegrationMenus } = useWorkEmailStore((store) => store);
 
+  // TODO: 状态管理优化
+  // 1. 同时使用ref和state维护rowsMap，容易造成不一致
+  // 2. 过多的useRef可能表明状态设计有问题
+  // 3. 考虑使用zustand或其他状态管理方案
   // State management
   const rowsMapRef = useRef<Record<string, any>>({});
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
@@ -85,7 +92,7 @@ export const useProspectTable = ({
 
   // Compute AI column IDs (包括 dependentFieldId)
   const aiColumnIds = useMemo(() => {
-    return new Set(columns.filter(isAiColumn).map((col) => col.fieldId));
+    return new Set(columns.filter(checkIsAiColumn).map((col) => col.fieldId));
   }, [columns]);
 
   // Total rows
@@ -184,6 +191,10 @@ export const useProspectTable = ({
     maxLoadedIndexRef,
   });
 
+  // TODO: 数据加载优化
+  // 1. 批量加载逻辑可以提取为独立的hook
+  // 2. 考虑添加错误处理和重试机制
+  // 3. 加载状态管理可以更细粒度
   // Fetch batch data
   const fetchBatchData = useCallback(
     async (startIndex: number, endIndex: number) => {
@@ -347,6 +358,10 @@ export const useProspectTable = ({
     [fetchBatchData, total, rowIds],
   );
 
+  // TODO: AI处理逻辑优化
+  // 1. onAiProcess逻辑复杂，包含多个条件判断
+  // 2. 可以拆分为更小的辅助函数
+  // 3. AI loading状态管理可以更清晰
   // Handle AI process
   const onAiProcess = useCallback(
     (recordId: string, columnId: string) => {
@@ -567,6 +582,10 @@ export const useProspectTable = ({
     setAiLoadingState(newLoadingState);
   }, [tableId, fetchTable, aiColumnIds, rowIds, columns, onUpdateRowData]);
 
+  // TODO: AI运行优化
+  // 1. onRunAi函数包含太多if-else分支
+  // 2. 参数类型可以更明确（使用discriminated union）
+  // 3. 错误处理需要增强
   const onRunAi = useCallback(
     async (params: {
       fieldId: string; // '__select' or actual fieldId
@@ -607,7 +626,7 @@ export const useProspectTable = ({
         } else if (recordId) {
           // 如果 fieldId 是 '__select'，说明点击的是选择列的 AI 图标
           // 需要获取所有符合 AI 条件的列
-          const aiFieldsWithDependents = columns.filter(isAiColumn);
+          const aiFieldsWithDependents = columns.filter(checkIsAiColumn);
 
           // 收集所有 fieldIds，包括 dependentFieldId
           const fieldIds: string[] = [];

@@ -59,9 +59,10 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
 
   const isSelectColumn = header?.column?.id === '__select';
 
-  const columnMeta = header?.column?.columnDef?.meta as any;
+  // 使用新的便捷访问方法
+  const columnMeta = tableMeta?.getHeaderColumnMeta?.(header);
   const actionKey = columnMeta?.actionKey;
-  const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
+  const isAiColumn = columnMeta?.isAiColumn ?? false;
 
   const content = header
     ? flexRender(header.column.columnDef.header, header.getContext())
@@ -215,8 +216,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               <Icon
                 component={
                   COLUMN_TYPE_ICONS[
-                    (header.column.columnDef.meta as any)
-                      ?.fieldType as TableColumnTypeEnum
+                    columnMeta?.fieldType as TableColumnTypeEnum
                   ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
                 }
                 sx={{ width: 16, height: 16 }}

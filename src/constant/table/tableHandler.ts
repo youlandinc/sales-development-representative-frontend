@@ -5,7 +5,7 @@ import { TableColumnProps } from '@/types/Prospect/table';
  * 2. actionKey 包含 'find'
  * 3. dependentFieldId
  */
-export const isAiColumn = (col: TableColumnProps): boolean => {
+export const checkIsAiColumn = (col: TableColumnProps) => {
   return (
     col.actionKey === 'use-ai' ||
     col.actionKey?.includes('find') ||

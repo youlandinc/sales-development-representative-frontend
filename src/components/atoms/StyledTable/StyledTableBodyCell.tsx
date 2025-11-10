@@ -110,8 +110,6 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const value = cell?.getValue();
     const displayValue = value != null ? String(value) : '';
     const isSelectColumn = cell?.column?.id === '__select';
-    const isColumnSelected =
-      (cell?.column?.columnDef?.meta as any)?.selectedColumnId === columnId;
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -127,10 +125,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = memo(
     const isEditing = _isEditing !== undefined ? _isEditing : isEditingFromMeta;
     const isActive = _isActive !== undefined ? _isActive : isActiveFromMeta;
 
-    const columnMeta = cell?.column?.columnDef?.meta as any;
+    const columnMeta = tableMeta?.getCellColumnMeta?.(cell);
     const actionKey = columnMeta?.actionKey;
     const fieldType = columnMeta?.fieldType;
-    const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
+    const isAiColumn = columnMeta?.isAiColumn ?? false;
+    const isColumnSelected = columnMeta?.selectedColumnId === columnId;
 
     const canEdit = columnId !== '__select' && actionKey !== 'use-ai';
     const canInteract = Boolean(cell && !isSelectColumn && canEdit);

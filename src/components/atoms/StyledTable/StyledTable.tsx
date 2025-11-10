@@ -45,12 +45,18 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/Prospect/table';
+import { checkIsAiColumn } from '@/constant/table';
 
+// TODO: Props优化
+// 1. 使用TypeScript严格类型定义替代any[]
+// 2. 拆分复杂的Props为更小的配置对象
+// 3. 考虑使用泛型支持不同的数据类型
+// 4. 合并相关回调函数为统一的事件处理器
 interface StyledTableProps {
-  columns: any[];
+  columns: any[]; // TODO: 定义TableColumn类型
   rowIds: string[];
-  data: any[];
-  addMenuItems?: { label: string; value: string; icon: any }[];
+  data: any[]; // TODO: 使用泛型 <TData>
+  addMenuItems?: { label: string; value: string; icon: any }[]; // TODO: 定义MenuItem类型
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
   onHeaderMenuClick?: ({
     type,
@@ -62,25 +68,25 @@ interface StyledTableProps {
     columnId: string;
     value?: any;
     parentValue?: any;
-  }) => void;
+  }) => void; // TODO: 简化事件处理类型
   scrolled?: boolean;
   virtualization?: {
     enabled?: boolean;
     rowHeight?: number;
     scrollContainer?: RefObject<HTMLDivElement | null>;
     onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
-  };
+  }; // TODO: 提取为独立的VirtualizationConfig类型
   onColumnResize?: (fieldId: string, width: number) => void;
   onCellEdit?: (recordId: string, fieldId: string, value: string) => void;
   onAiProcess?: (recordId: string, columnId: string) => void;
   onCellClick: (columnId: string, rowId: string, data: any) => void;
-  aiLoading?: Record<string, Record<string, boolean>>;
+  aiLoading?: Record<string, Record<string, boolean>>; // TODO: 定义LoadingState类型
   onRunAi?: (params: {
     fieldId: string;
     recordId?: string;
     isHeader?: boolean;
     recordCount?: number;
-  }) => Promise<void>;
+  }) => Promise<void>; // TODO: 提取为AiRunParams类型
   onAddRows: (count: number) => Promise<void>;
   addRowsFooter?: ReactNode;
 }
@@ -110,6 +116,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     useState<ColumnSizingInfoState>({} as ColumnSizingInfoState);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  // TODO: 状态管理优化
+  // 1. 考虑使用useReducer替代多个useState
+  // 2. 提取状态类型定义到独立的types文件
+  // 3. 状态更新逻辑过于分散，需要集中管理
   const [cellState, setCellState] = useState<{
     recordId: string;
     columnId: string;
@@ -122,6 +132,9 @@ export const StyledTable: FC<StyledTableProps> = ({
     isEditing?: boolean;
     isShowMenu?: boolean;
   } | null>(null);
+  // TODO: 菜单状态优化
+  // 1. 合并三个menu anchor为统一的menuState对象
+  // 2. 减少state数量，提高可维护性
   const [addMenuAnchor, setAddMenuAnchor] = useState<null | HTMLElement>(null);
   const [headerMenuAnchor, setHeaderMenuAnchor] = useState<null | HTMLElement>(
     null,
@@ -204,10 +217,8 @@ export const StyledTable: FC<StyledTableProps> = ({
           {
             id: column.fieldId,
             header: column.fieldName,
+            // 简化 meta，只保留必要的 selectedColumnId
             meta: {
-              actionKey: column.actionKey,
-              fieldType: column.fieldType,
-              column: column,
               selectedColumnId,
             },
           },
@@ -247,6 +258,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     onColumnOrderChange: setColumnOrder,
     onColumnPinningChange: setColumnPinning,
     onColumnSizingInfoChange: setColumnSizingInfo,
+    // TODO: Table Meta优化
+    // 1. meta对象过于臃肿，包含了太多职责
+    // 2. 考虑拆分为多个context或自定义hooks
+    // 3. 某些方法可以通过更好的状态设计来消除
     meta: {
       updateData: (recordId: string, columnId: string, value: any) => {
         onCellEdit?.(recordId, columnId, String(value));
@@ -287,16 +302,10 @@ export const StyledTable: FC<StyledTableProps> = ({
         onAiProcess?.(recordId, columnId);
       },
       hasAiColumnInRow: (recordId: string) => {
-        return columns.some(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        return columns.some((col) => checkIsAiColumn(col));
       },
       triggerBatchAiProcess: () => {
-        const aiColumns = columns.filter(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        const aiColumns = columns.filter((col) => checkIsAiColumn(col));
         rowIds.forEach((recordId) => {
           aiColumns.forEach((col) => {
             onAiProcess?.(recordId, col.fieldId);
@@ -304,10 +313,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
       triggerRelatedAiProcess: (recordId: string, columnId: string) => {
-        const aiColumns = columns.filter(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        const aiColumns = columns.filter((col) => checkIsAiColumn(col));
 
         aiColumns.forEach((col) => {
           onAiProcess?.(recordId, col.fieldId);
@@ -318,10 +324,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
       getAiColumns: () => {
-        return columns.filter(
-          (col) =>
-            col.actionKey === 'use-ai' || col.actionKey?.includes('find'),
-        );
+        return columns.filter((col) => checkIsAiColumn(col));
       },
       onRunAi: onRunAi,
       openAiRunMenu: (anchorEl: HTMLElement, columnId: string) => {
@@ -345,6 +348,55 @@ export const StyledTable: FC<StyledTableProps> = ({
           value: newName,
         });
         setHeaderState(null);
+      },
+      // 新增：便捷获取列元数据的方法
+      getColumnMeta: (columnId: string) => {
+        const column = columns.find((col) => col.fieldId === columnId);
+        if (!column) {
+          return null;
+        }
+        return {
+          column,
+          actionKey: column.actionKey,
+          fieldType: column.fieldType,
+          isAiColumn: checkIsAiColumn(column),
+          canEdit: column.actionKey !== 'use-ai',
+        };
+      },
+      // 新增：从 cell 获取列元数据
+      getCellColumnMeta: (cell: any) => {
+        if (!cell) {
+          return null;
+        }
+        const columnId = String(cell.column.id);
+        const column = columns.find((col) => col.fieldId === columnId);
+        if (!column) {
+          return null;
+        }
+        return {
+          column,
+          actionKey: column.actionKey,
+          fieldType: column.fieldType,
+          isAiColumn: checkIsAiColumn(column),
+          canEdit: column.actionKey !== 'use-ai' && columnId !== '__select',
+          selectedColumnId,
+        };
+      },
+      getHeaderColumnMeta: (header: any) => {
+        if (!header) {
+          return null;
+        }
+        const columnId = String(header.column.id);
+        const column = columns.find((col) => col.fieldId === columnId);
+        if (!column) {
+          return null;
+        }
+        return {
+          column,
+          actionKey: column.actionKey,
+          fieldType: column.fieldType,
+          isAiColumn: checkIsAiColumn(column),
+        };
       },
     },
   });
@@ -493,6 +545,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     [onHeaderMenuClick, selectedColumnId, table],
   );
 
+  // TODO: 交互逻辑优化
+  // 1. onHeaderClick逻辑过于复杂，多层if-else嵌套
+  // 2. 考虑提取为独立的handler工具函数
+  // 3. 使用状态机模式简化点击状态转换
   const onHeaderClick = useCallback(
     (e: MouseEvent, columnId: string) => {
       const headerElement = e.currentTarget as HTMLElement;
@@ -605,6 +661,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     [columnSizingInfo.isResizingColumn, headerState],
   );
 
+  // TODO: 渲染逻辑优化
+  // 1. renderContent函数过长（约300行），需要拆分
+  // 2. 提取Header和Body的渲染为独立组件
+  // 3. 减少重复代码（pinned cells和virtual cells的渲染逻辑相似）
   const renderContent = useCallback(
     ({
       columnVirtualizer,
@@ -721,6 +781,8 @@ export const StyledTable: FC<StyledTableProps> = ({
                   if (!header) {
                     return null;
                   }
+                  // TODO: 移除调试代码
+                  console.log(header);
                   return (
                     <StyledTableHeadCell
                       dataIndex={virtualColumn.index}

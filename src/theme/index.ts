@@ -1,5 +1,4 @@
 'use client';
-import { inputBaseClasses } from '@mui/material/InputBase';
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 import { CSSProperties } from 'react';
 

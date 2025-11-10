@@ -4,3 +4,5 @@ export * from './optionsAddColumnMenu';
 export * from './optionsNormalColumnMenu';
 export * from './optionsAiColumnMenu';
 export * from './constantsTable';
+
+export * from './tableHandler';

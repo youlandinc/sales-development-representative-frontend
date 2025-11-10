@@ -18,10 +18,10 @@ import {
   TableColumnTypeEnum,
 } from '@/types/Prospect/table';
 import {
+  checkIsAiColumn,
   getAiColumnMenuActions,
   getNormalColumnMenuActions,
 } from '@/constant/table';
-import { isAiColumn } from '@/components/molecules';
 
 interface StyledTableMenuHeaderProps {
   anchorEl: HTMLElement | null;
@@ -78,7 +78,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
               );
               const isPinned = columnPinning!.left!.includes(selectedColumnId);
 
-              return selectedColumn && isAiColumn(selectedColumn)
+              return selectedColumn && checkIsAiColumn(selectedColumn)
                 ? getAiColumnMenuActions(isPinned)
                 : getNormalColumnMenuActions(isPinned);
             })().map((item, index) => {
