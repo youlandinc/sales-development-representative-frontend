@@ -14,11 +14,13 @@ import { TOOLBAR } from './data';
 interface StyledTinyEditorProps {
   onChange?: (dialogApi: any, details: any) => void;
   value?: string;
+  placeholder?: string;
 }
 
 export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   onChange,
   value,
+  placeholder = 'Start typing here...',
 }: StyledTinyEditorProps) => {
   const { signatures, fetchSignatures } = useSettingsStore();
 
@@ -166,7 +168,7 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           //   { value: 'Email', title: 'Email' },
           // ],
           // uploadcare_public_key: 'd198ba221e0237f6d192',
-          placeholder: 'Start typing here...',
+          placeholder: placeholder,
           // 禁用顶部的 "Explore Trial" 提示
           promotion: false,
           // 禁用品牌标志

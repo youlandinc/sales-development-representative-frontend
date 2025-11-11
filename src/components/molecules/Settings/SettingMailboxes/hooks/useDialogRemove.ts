@@ -1,23 +1,20 @@
-import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useSwitch } from '@/hooks';
-import { _deleteCustomEmailDomain } from '@/request';
-import { EmailDomainDetails, HttpError } from '@/types';
+import { HttpError, Mailbox } from '@/types';
 import { SDRToast } from '@/components/atoms';
+
+import { _deleteMailbox } from '../data';
 
 interface UseDialogRemoveProps {
   onRefresh: () => Promise<void>;
-  setActiveStep: Dispatch<SetStateAction<number>>;
 }
 
-export const useDialogRemove = ({
-  onRefresh,
-  setActiveStep,
-}: UseDialogRemoveProps) => {
+export const useDialogRemove = ({ onRefresh }: UseDialogRemoveProps) => {
   const { open, close, visible } = useSwitch(false);
 
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteItem, setDeleteItem] = useState<EmailDomainDetails>();
+  const [deleteItem, setDeleteItem] = useState<Mailbox>();
 
   const onClickToDelete = useCallback(async () => {
     if (!deleteItem) {
@@ -25,7 +22,7 @@ export const useDialogRemove = ({
     }
     setDeleteLoading(true);
     try {
-      await _deleteCustomEmailDomain(deleteItem.id);
+      await _deleteMailbox(deleteItem.id);
       await onRefresh();
     } catch (err) {
       const { message, header, variant } = err as HttpError;
@@ -33,13 +30,12 @@ export const useDialogRemove = ({
     } finally {
       close();
       setDeleteItem(void 0);
-      setActiveStep(0);
       setDeleteLoading(false);
     }
-  }, [close, deleteItem, onRefresh, setActiveStep]);
+  }, [close, deleteItem, onRefresh]);
 
   const onRemove = useCallback(
-    (item: EmailDomainDetails) => {
+    (item: Mailbox) => {
       open();
       setDeleteItem(item);
     },
@@ -47,7 +43,6 @@ export const useDialogRemove = ({
   );
 
   return {
-    deleteItem,
     deleteLoading,
     onClickToDelete,
     close,

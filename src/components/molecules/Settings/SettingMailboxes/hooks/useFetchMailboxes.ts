@@ -1,31 +1,32 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useUserStore } from '@/providers';
+import { HttpError } from '@/types';
+import { SDRToast } from '@/components/atoms';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 
-export const useFetchCustomEmailDomain = () => {
-  const { userProfile } = useUserStore((state) => state);
-  const { fetchEmailDomainList } = useSettingsStore((state) => state);
-  const { tenantId } = userProfile;
-
+export const useFetchMailboxes = () => {
   const [loading, setLoading] = useState(false);
+  const { fetchMailboxes } = useSettingsStore((state) => state);
 
   const onRefresh = useCallback(async () => {
-    if (loading || !tenantId) {
+    if (loading) {
       return;
     }
     setLoading(true);
     try {
-      await fetchEmailDomainList(tenantId);
+      await fetchMailboxes();
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
     } finally {
       setLoading(false);
     }
-  }, [loading, tenantId, fetchEmailDomainList]);
+  }, [loading, fetchMailboxes]);
 
   useEffect(() => {
-    tenantId && onRefresh();
+    onRefresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tenantId]);
+  }, []);
 
   return {
     loading,

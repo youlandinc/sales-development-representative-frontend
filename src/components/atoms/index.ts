@@ -35,3 +35,5 @@ export * from './StyledCost';
 export * from './StyledTinyEditor';
 
 export * from './StyledRadioGroup';
+
+export * from './StyledMultiSelect';

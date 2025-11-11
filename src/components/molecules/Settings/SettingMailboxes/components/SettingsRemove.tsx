@@ -1,29 +1,26 @@
 import { Stack, Typography } from '@mui/material';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
-import { EmailDomainDetails } from '@/types';
 
-interface SettingsEmailDomainDialogRemoveProps {
-  deleteItem?: EmailDomainDetails;
+interface SettingsRemoveProps {
   deleteClose: () => void;
   deleteLoading: boolean;
   onClickToDelete: () => void;
   deleteVisible: boolean;
 }
 
-export const SettingsEmailDomainDialogRemove = ({
-  deleteItem,
+export const SettingsRemove = ({
   deleteClose,
   deleteLoading,
   onClickToDelete,
   deleteVisible,
-}: SettingsEmailDomainDialogRemoveProps) => {
+}: SettingsRemoveProps) => {
   return (
     <StyledDialog
       content={
-        <Typography color={'#636A7C'} my={3} variant={'body2'}>
-          Are you sure you want to delete{' '}
-          {deleteItem?.email || deleteItem?.emailDomain}
+        <Typography color={'#636A7C'} my={'18px'} variant={'body2'}>
+          Once deleted, all mailboxes under this domain will be removed and
+          you’ll need to reverify it before adding it again.
         </Typography>
       }
       footer={
@@ -69,7 +66,7 @@ export const SettingsEmailDomainDialogRemove = ({
           lineHeight={1.2}
           variant={'h6'}
         >
-          Delete domain?
+          Are you sure you want to delete this domain?
         </Typography>
       }
       open={deleteVisible}
