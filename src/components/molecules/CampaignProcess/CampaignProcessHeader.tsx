@@ -193,9 +193,10 @@ export const CampaignProcessHeaderStepSecondary: FC = () => {
       autopilot: lunchInfo.autopilot,
       sendNow: lunchInfo.sendNow,
       scheduleTime: lunchInfo.scheduleTime || null,
-      sender: lunchInfo.sender!,
-      senderName: lunchInfo.senderName!,
-      signatureId: lunchInfo.signatureId,
+      // sender: lunchInfo.sender!,
+      // senderName: lunchInfo.senderName!,
+      // signatureId: lunchInfo.signatureId,
+      emilProfileId: lunchInfo.emilProfileId,
     };
     setLoading(true);
     try {

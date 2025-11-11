@@ -13,6 +13,8 @@ interface CommonSelectWithActionProps {
   containerSx?: SxProps;
   labelSx?: SxProps;
   menuTips?: ReactNode;
+  defaultValue?: string;
+  noOptionTip?: string;
 }
 
 export const CommonSelectWithAction: FC<CommonSelectWithActionProps> = ({
@@ -23,7 +25,8 @@ export const CommonSelectWithAction: FC<CommonSelectWithActionProps> = ({
   loading = false,
   containerSx,
   labelSx,
-  menuTips,
+  defaultValue,
+  noOptionTip,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -45,7 +48,7 @@ export const CommonSelectWithAction: FC<CommonSelectWithActionProps> = ({
         borderRadius={2}
         flexDirection={'row'}
         gap={'2px'}
-        height={32}
+        height={48}
         onClick={(e) => onClickOpenMenu(e)}
         px={1.5}
         sx={{
@@ -68,7 +71,8 @@ export const CommonSelectWithAction: FC<CommonSelectWithActionProps> = ({
             color={loading ? 'text.disabled' : 'text.primary'}
             variant={'body2'}
           >
-            {options.find((item) => item.value === value)?.label || ''}
+            {options.find((item) => item.value === value)?.label ||
+              defaultValue}
           </Typography>
         )}
 
@@ -96,6 +100,7 @@ export const CommonSelectWithAction: FC<CommonSelectWithActionProps> = ({
               '& .MuiList-root': {
                 padding: 0,
               },
+              p: 1.5,
             },
           },
         }}
@@ -104,21 +109,29 @@ export const CommonSelectWithAction: FC<CommonSelectWithActionProps> = ({
           horizontal: 'right',
         }}
       >
-        <Stack bgcolor={'#fff'} minWidth={220} pb={1.5}>
-          <Typography color={'text.secondary'} fontSize={12} px={3} py={1.5}>
-            {menuTips}
-          </Typography>
+        <Stack bgcolor={'#fff'} minWidth={360} pb={1.5}>
+          {options.length === 0 && noOptionTip && (
+            <Typography
+              color={'text.secondary'}
+              px={3}
+              py={1.5}
+              variant={'body2'}
+            >
+              {noOptionTip}
+            </Typography>
+          )}
           {options.map((item, index) => (
             <Stack
-              bgcolor={value === item.value ? '#F0F4FF' : '#fff'}
+              bgcolor={value === item.value ? '#F7F4FD' : '#fff'}
+              borderRadius={2}
               color={value === item.value ? 'primary.main' : 'text.primary'}
-              fontSize={12}
+              fontSize={14}
               key={`${item.label}-${index}`}
               onClick={async () => {
                 onClickToCloseMenu();
                 await onSelect(item.value);
               }}
-              px={3}
+              px={1.5}
               py={1.25}
               sx={{ cursor: 'pointer', '&:hover': { bgcolor: '#F4F4F6' } }}
             >

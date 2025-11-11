@@ -113,9 +113,10 @@ export interface ResponseCampaignLaunchInfo {
   autopilot: boolean;
   sendNow: boolean;
   scheduleTime: string | null;
-  sender: string | null;
-  senderName: string | null;
-  signatureId: string | null;
+  // sender: string | null;
+  // senderName: string | null;
+  // signatureId: string | null;
+  emilProfileId: number | null;
 }
 
 export interface ResponseCampaignEmail {

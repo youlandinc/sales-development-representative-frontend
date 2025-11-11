@@ -179,9 +179,10 @@ export const _saveAndLunchCampaign = (params: {
   autopilot: boolean;
   sendNow: boolean;
   scheduleTime: string | null;
-  sender: string;
-  senderName: string;
-  signatureId: string | null;
+  // sender: string;
+  // senderName: string;
+  // signatureId: string | null;
+  emilProfileId: number | null;
 }) => {
   return put('/sdr/campaign/info', params);
 };
