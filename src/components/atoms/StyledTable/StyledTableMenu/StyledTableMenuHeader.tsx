@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import {
+  Box,
   ClickAwayListener,
   Divider,
   Icon,
@@ -77,13 +78,18 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                 (col) => col.fieldId === selectedColumnId,
               );
               const isPinned = columnPinning!.left!.includes(selectedColumnId);
+              const currentColumnType = selectedColumn?.fieldType;
 
               return selectedColumn && checkIsAiColumn(selectedColumn)
                 ? getAiColumnMenuActions(isPinned)
-                : getNormalColumnMenuActions(isPinned);
+                : getNormalColumnMenuActions(isPinned, currentColumnType);
             })().map((item, index) => {
               if (item.value !== TableColumnMenuActionEnum.divider) {
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
+                const selectedColumn = columns.find(
+                  (col) => col.fieldId === selectedColumnId,
+                );
+                const currentColumnType = selectedColumn?.fieldType;
 
                 return (
                   <MenuItem
@@ -107,24 +113,46 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                           sx={menuStyles.submenuPaper}
                         >
                           <Stack gap={0}>
+                            {/* Show title for change column type submenu */}
+                            {item.value ===
+                              TableColumnMenuActionEnum.change_column_type && (
+                              <Box sx={menuStyles.submenuTitle}>
+                                Change column type
+                              </Box>
+                            )}
                             {item.submenu!.map((subItem, subIndex) => {
                               if (
                                 subItem.value !==
                                 TableColumnMenuActionEnum.divider
                               ) {
+                                // Check if this submenu item matches current column type
+                                const isCurrentType =
+                                  item.value ===
+                                    TableColumnMenuActionEnum.change_column_type &&
+                                  currentColumnType &&
+                                  subItem.value === currentColumnType;
+
                                 return (
                                   <MenuItem
-                                    component={'div'}
+                                    disabled={isCurrentType}
                                     key={subItem.label}
                                     onClick={(e) => {
+                                      if (isCurrentType) {
+                                        return;
+                                      }
                                       e.stopPropagation();
-                                      // Pass both parent menu item and sub item
                                       onMenuItemClick({
                                         ...subItem,
                                         parentValue: item.value,
                                       });
                                     }}
-                                    sx={menuStyles.menuItemWithSubmenu}
+                                    sx={[
+                                      menuStyles.menuItemWithSubmenu,
+                                      isCurrentType && {
+                                        opacity: 0.5,
+                                        pointerEvents: 'auto',
+                                      },
+                                    ]}
                                   >
                                     {subItem.icon && (
                                       <Icon

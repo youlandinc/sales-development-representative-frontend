@@ -1,12 +1,20 @@
-import { COLUMN_MENU_ICONS, getAddColumnMenuActions } from './index';
+import {
+  COLUMN_MENU_ICONS,
+  COLUMN_TYPE_ICONS,
+  COLUMN_TYPE_LABELS,
+  getAddColumnMenuActions,
+  getChangeColumnTypeMenuActions,
+} from './index';
 import {
   TableColumnActionOption,
   TableColumnMenuActionEnum,
+  TableColumnTypeEnum,
 } from '@/types/Prospect/table';
 
 // Normal column menu (p2)
 export const getNormalColumnMenuActions = (
   isPinned: boolean = false,
+  currentColumnType?: TableColumnTypeEnum,
 ): TableColumnActionOption[] => [
   {
     label: 'Rename column',
@@ -57,10 +65,12 @@ export const getNormalColumnMenuActions = (
     submenu: [], // Color options
   },
   {
-    label: 'URL',
-    icon: '',
-    value: '', // No enum yet
-    submenu: [], // Column type options
+    label: currentColumnType
+      ? COLUMN_TYPE_LABELS[currentColumnType]
+      : 'Change type',
+    icon: currentColumnType ? COLUMN_TYPE_ICONS[currentColumnType] : '',
+    value: TableColumnMenuActionEnum.change_column_type,
+    submenu: getChangeColumnTypeMenuActions(),
   },
   {
     label: '4',

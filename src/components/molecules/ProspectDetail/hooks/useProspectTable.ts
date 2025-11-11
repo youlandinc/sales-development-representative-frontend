@@ -1,5 +1,7 @@
 import {
+  Dispatch,
   RefObject,
+  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -27,8 +29,8 @@ interface UseProspectTableReturn {
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   rowsMapRef: RefObject<Record<string, any>>;
   scrolled: boolean;
-  setAiLoadingState: React.Dispatch<
-    React.SetStateAction<Record<string, Record<string, boolean>>>
+  setAiLoadingState: Dispatch<
+    SetStateAction<Record<string, Record<string, boolean>>>
   >;
   onVisibleRangeChange: (startIndex: number, endIndex: number) => void;
   onAiProcess: (recordId: string, columnId: string) => void;
@@ -40,6 +42,7 @@ interface UseProspectTableReturn {
     recordId?: string;
     isHeader?: boolean;
   }) => Promise<void>;
+  refetchCachedRecords: () => Promise<void>;
 }
 
 // TODO: Hook优化
@@ -249,6 +252,41 @@ export const useProspectTable = ({
     },
     [tableId, rowIds],
   );
+
+  // Refetch all cached records (e.g., after column type change)
+  const refetchCachedRecords = useCallback(async () => {
+    if (!tableId || isFetchingRef.current) {
+      return;
+    }
+
+    // Get all cached record IDs
+    const cachedRecordIds = Object.keys(rowsMapRef.current);
+
+    if (cachedRecordIds.length === 0) {
+      return;
+    }
+
+    isFetchingRef.current = true;
+    try {
+      const res = await _fetchTableRowData({
+        tableId,
+        recordIds: cachedRecordIds,
+      });
+      const arr = (res?.data ?? []) as any[];
+      const newRowsMap: Record<string, any> = {};
+      arr.forEach((row) => {
+        if (row && row.id) {
+          newRowsMap[row.id] = row;
+        }
+      });
+
+      // Update both state and ref
+      setRowsMap((prev) => ({ ...prev, ...newRowsMap }));
+      rowsMapRef.current = { ...rowsMapRef.current, ...newRowsMap };
+    } finally {
+      isFetchingRef.current = false;
+    }
+  }, [tableId]);
 
   // Initial data load
   useEffect(() => {
@@ -495,15 +533,63 @@ export const useProspectTable = ({
   const onCellEdit = useCallback(
     async (recordId: string, fieldId: string, value: any) => {
       const currentRowData = rowsMapRef.current[recordId] || { id: recordId };
-      const updatedRowData = { ...currentRowData, [fieldId]: value };
+      const currentFieldValue = currentRowData[fieldId];
 
-      rowsMapRef.current[recordId] = updatedRowData;
+      // Optimistic update
+      let optimisticFieldValue;
+      if (
+        typeof currentFieldValue === 'object' &&
+        currentFieldValue !== null &&
+        'value' in currentFieldValue
+      ) {
+        optimisticFieldValue = { ...currentFieldValue, value };
+      } else {
+        optimisticFieldValue = value;
+      }
+
+      const optimisticRowData = {
+        ...currentRowData,
+        [fieldId]: optimisticFieldValue,
+      };
+
+      rowsMapRef.current[recordId] = optimisticRowData;
       setRowsMap((prev) => ({
         ...prev,
-        [recordId]: updatedRowData,
+        [recordId]: optimisticRowData,
       }));
 
-      await updateCellValue({ tableId, recordId, fieldId, value });
+      try {
+        // Call API and get server response
+        const response = await updateCellValue({
+          tableId,
+          recordId,
+          fieldId,
+          value,
+        });
+
+        // Update with server response (includes metaData.isValidate, etc.)
+        if (response?.data) {
+          const serverFieldValue = response.data;
+          const finalRowData = {
+            ...rowsMapRef.current[recordId],
+            [fieldId]: serverFieldValue,
+          };
+
+          rowsMapRef.current[recordId] = finalRowData;
+          setRowsMap((prev) => ({
+            ...prev,
+            [recordId]: finalRowData,
+          }));
+        }
+      } catch (error) {
+        // Rollback on error
+        rowsMapRef.current[recordId] = currentRowData;
+        setRowsMap((prev) => ({
+          ...prev,
+          [recordId]: currentRowData,
+        }));
+        throw error;
+      }
     },
     [tableId, updateCellValue],
   );
@@ -689,5 +775,6 @@ export const useProspectTable = ({
     onUpdateRowData,
     onInitializeAiColumns,
     onRunAi,
+    refetchCachedRecords,
   };
 };

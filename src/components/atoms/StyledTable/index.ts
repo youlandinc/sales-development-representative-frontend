@@ -8,6 +8,7 @@ export * from './StyledTableHeadCell';
 export * from './StyledTableBody';
 export * from './StyledTableBodyRow';
 export * from './StyledTableBodyCell';
+export * from './StyledTableBodyCellIcons';
 
 export * from './StyledTableSpacer';
 export * from './StyledTableAiIcon';

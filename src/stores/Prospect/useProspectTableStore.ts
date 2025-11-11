@@ -68,6 +68,7 @@ export type ProspectTableActions = {
   updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
   updateColumnPin: (pin: boolean) => Promise<void>;
   updateColumnDescription: (description: string) => Promise<void>;
+  updateColumnType: (fieldType: TableColumnTypeEnum) => Promise<void>;
   updateColumnFieldName: (params: {
     fieldName: string;
     fieldType: TableColumnTypeEnum;
@@ -86,7 +87,7 @@ export type ProspectTableActions = {
     recordId: string;
     fieldId: string;
     value: string;
-  }) => Promise<void>;
+  }) => Promise<any>;
   resetTable: () => void;
 };
 
@@ -268,6 +269,37 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
     },
+    updateColumnType: async (fieldType) => {
+      const fieldId = get().activeColumnId;
+      const columns = get().columns;
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      if (!fieldId || !column || !UNotUndefined(fieldType)) {
+        return;
+      }
+
+      // Don't update if it's the same type
+      if (column.fieldType === fieldType) {
+        return;
+      }
+
+      const updatedColumns = columns.map((col) =>
+        col.fieldId === fieldId ? { ...col, fieldType } : col,
+      );
+      set({
+        columns: updatedColumns,
+      });
+
+      try {
+        await _updateTableColumnConfig({
+          fieldId,
+          fieldType,
+        });
+      } catch (err) {
+        handleApiError<ProspectTableState>(err, { columns }, set);
+      }
+    },
     updateColumnFieldName: async (params) => {
       const fieldId = get().activeColumnId;
       const columns = get().columns;
@@ -374,9 +406,11 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     // table cell
     updateCellValue: async (data) => {
       try {
-        await _updateTableCellValue(data);
+        const response = await _updateTableCellValue(data);
+        return response;
       } catch (err) {
         handleApiError<ProspectTableState>(err);
+        throw err;
       }
     },
     resetTable: () => {

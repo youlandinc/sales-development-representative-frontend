@@ -45,7 +45,11 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/Prospect/table';
-import { checkIsAiColumn } from '@/constant/table';
+import {
+  checkIsAiColumn,
+  checkIsEditableColumn,
+  SYSTEM_COLUMN_SELECT,
+} from '@/constant/table';
 
 // TODO: Props优化
 // 1. 使用TypeScript严格类型定义替代any[]
@@ -145,17 +149,23 @@ export const StyledTable: FC<StyledTableProps> = ({
   const [aiRunColumnId, setAiRunColumnId] = useState<string>('');
   const [selectedColumnId, setSelectedColumnId] = useState<string>('');
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
-    left: ['__select'],
+    left: [SYSTEM_COLUMN_SELECT],
   });
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([]);
+
+  // Calculate if table has AI columns (global check, not per-row)
+  const hasAiColumn = useMemo(
+    () => columns.some((col) => checkIsAiColumn(col)),
+    [columns],
+  );
 
   useEffect(() => {
     const pinnedColumns = columns
       .filter((col) => col.pin)
       .map((col) => col.fieldId);
     setColumnPinning({
-      left: ['__select'].concat(pinnedColumns),
+      left: [SYSTEM_COLUMN_SELECT].concat(pinnedColumns),
     });
 
     const visibilityState: VisibilityState = {};
@@ -188,7 +198,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   const reducedColumns = useMemo(
     () => {
       const selectCol = columnHelper.display({
-        id: '__select',
+        id: SYSTEM_COLUMN_SELECT,
         header: ({ table }) => (
           <Checkbox
             checked={table.getIsAllPageRowsSelected()}
@@ -205,8 +215,8 @@ export const StyledTable: FC<StyledTableProps> = ({
         enableResizing: false,
       });
 
-      const rest = columns.map((column) =>
-        columnHelper.accessor(
+      const rest = columns.map((column) => {
+        return columnHelper.accessor(
           (row: any) => {
             const v = row?.[column.fieldId];
             if (v && typeof v === 'object' && 'value' in v) {
@@ -217,55 +227,34 @@ export const StyledTable: FC<StyledTableProps> = ({
           {
             id: column.fieldId,
             header: column.fieldName,
-            // 简化 meta，只保留必要的 selectedColumnId
             meta: {
-              selectedColumnId,
+              fieldType: column.fieldType,
+              actionKey: column.actionKey,
+              actionDefinition: column.actionDefinition,
+              isAiColumn: checkIsAiColumn(column),
+              canEdit: checkIsEditableColumn(column.fieldId, column.actionKey),
             },
           },
-        ),
-      );
+        );
+      });
 
       return [selectCol, ...rest];
     },
     // notice: must have rowSelection
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columns, selectedColumnId, rowSelection],
+    [columns, rowSelection],
   );
 
-  const table = useReactTable({
-    data: data,
-    columns: reducedColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getRowId: (_row, index) => rowIds[index] ?? String(index),
-    defaultColumn: {
-      size: 200,
-      minSize: 80,
-    },
-    enableRowSelection: true,
-    enableColumnPinning: true,
-    columnResizeMode: 'onEnd',
-    state: {
-      rowSelection,
-      columnSizing,
-      columnSizingInfo,
-      columnPinning,
-      columnVisibility,
-      columnOrder,
-    },
-    onRowSelectionChange: setRowSelection,
-    onColumnSizingChange: onColumnSizingChange,
-    onColumnVisibilityChange: setColumnVisibility,
-    onColumnOrderChange: setColumnOrder,
-    onColumnPinningChange: setColumnPinning,
-    onColumnSizingInfoChange: setColumnSizingInfo,
-    // TODO: Table Meta优化
-    // 1. meta对象过于臃肿，包含了太多职责
-    // 2. 考虑拆分为多个context或自定义hooks
-    // 3. 某些方法可以通过更好的状态设计来消除
-    meta: {
-      updateData: (recordId: string, columnId: string, value: any) => {
-        onCellEdit?.(recordId, columnId, String(value));
-      },
+  const tableMeta = useMemo(() => {
+    const stopHeaderEdit = () => {
+      setHeaderState((prev) => (prev ? { ...prev, isEditing: false } : null));
+    };
+
+    return {
+      // ===== 数据更新 =====
+      onCellEdit,
+
+      // ===== 单元格状态管理 =====
       isEditing: (recordId: string, columnId: string) =>
         cellState?.recordId === recordId &&
         cellState?.columnId === columnId &&
@@ -296,121 +285,81 @@ export const StyledTable: FC<StyledTableProps> = ({
             break;
         }
       },
+
+      // ===== AI 功能 =====
+      hasAiColumn,
       isAiLoading: (recordId: string, columnId: string) =>
         Boolean(aiLoading?.[recordId]?.[columnId]),
-      triggerAiProcess: (recordId: string, columnId: string) => {
-        onAiProcess?.(recordId, columnId);
-      },
-      hasAiColumnInRow: (recordId: string) => {
-        return columns.some((col) => checkIsAiColumn(col));
-      },
-      triggerBatchAiProcess: () => {
-        const aiColumns = columns.filter((col) => checkIsAiColumn(col));
-        rowIds.forEach((recordId) => {
-          aiColumns.forEach((col) => {
-            onAiProcess?.(recordId, col.fieldId);
-          });
-        });
-      },
-      triggerRelatedAiProcess: (recordId: string, columnId: string) => {
-        const aiColumns = columns.filter((col) => checkIsAiColumn(col));
-
-        aiColumns.forEach((col) => {
-          onAiProcess?.(recordId, col.fieldId);
-
-          if (col.dependentFieldId) {
-            onAiProcess?.(recordId, col.dependentFieldId);
-          }
-        });
-      },
-      getAiColumns: () => {
-        return columns.filter((col) => checkIsAiColumn(col));
-      },
-      onRunAi: onRunAi,
+      onAiProcess,
+      onRunAi,
       openAiRunMenu: (anchorEl: HTMLElement, columnId: string) => {
         setAddMenuAnchor(null);
         setHeaderMenuAnchor(null);
         setAiRunMenuAnchor(anchorEl);
         setAiRunColumnId(columnId);
       },
-      isHeaderEditing: (headerId: string) =>
-        headerState?.columnId === headerId && headerState?.isEditing === true,
-      startHeaderEdit: (headerId: string) => {
-        setHeaderState({ columnId: headerId, isActive: true, isEditing: true });
-      },
-      stopHeaderEdit: () => {
-        setHeaderState((prev) => (prev ? { ...prev, isEditing: false } : null));
-      },
-      updateHeaderName: (headerId: string, newName: string) => {
+
+      // ===== 表头编辑 =====
+      stopHeaderEdit,
+      updateHeaderName: (columnId: string, newName: string) => {
+        stopHeaderEdit();
         onHeaderMenuClick?.({
           type: TableColumnMenuActionEnum.rename_column,
-          columnId: headerId,
+          columnId,
           value: newName,
         });
-        setHeaderState(null);
       },
-      // 新增：便捷获取列元数据的方法
-      getColumnMeta: (columnId: string) => {
-        const column = columns.find((col) => col.fieldId === columnId);
-        if (!column) {
-          return null;
-        }
-        return {
-          column,
-          actionKey: column.actionKey,
-          fieldType: column.fieldType,
-          isAiColumn: checkIsAiColumn(column),
-          canEdit: column.actionKey !== 'use-ai',
-        };
-      },
-      // 新增：从 cell 获取列元数据
-      getCellColumnMeta: (cell: any) => {
-        if (!cell) {
-          return null;
-        }
-        const columnId = String(cell.column.id);
-        const column = columns.find((col) => col.fieldId === columnId);
-        if (!column) {
-          return null;
-        }
-        return {
-          column,
-          actionKey: column.actionKey,
-          fieldType: column.fieldType,
-          isAiColumn: checkIsAiColumn(column),
-          canEdit: column.actionKey !== 'use-ai' && columnId !== '__select',
-          selectedColumnId,
-        };
-      },
-      getHeaderColumnMeta: (header: any) => {
-        if (!header) {
-          return null;
-        }
-        const columnId = String(header.column.id);
-        const column = columns.find((col) => col.fieldId === columnId);
-        if (!column) {
-          return null;
-        }
-        return {
-          column,
-          actionKey: column.actionKey,
-          fieldType: column.fieldType,
-          isAiColumn: checkIsAiColumn(column),
-        };
-      },
+
+      // ===== 动态状态 =====
+      selectedColumnId,
+    };
+  }, [
+    onCellEdit,
+    cellState,
+    hasAiColumn,
+    aiLoading,
+    onAiProcess,
+    onRunAi,
+    onHeaderMenuClick,
+    selectedColumnId,
+  ]);
+
+  const table = useReactTable({
+    data: data,
+    columns: reducedColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (_row, index) => rowIds[index] ?? String(index),
+    defaultColumn: {
+      size: 200,
+      minSize: 80,
     },
+    enableRowSelection: true,
+    enableColumnPinning: true,
+    columnResizeMode: 'onEnd',
+    state: {
+      rowSelection,
+      columnSizing,
+      columnSizingInfo,
+      columnPinning,
+      columnVisibility,
+      columnOrder,
+    },
+    onRowSelectionChange: setRowSelection,
+    onColumnSizingChange: onColumnSizingChange,
+    onColumnVisibilityChange: setColumnVisibility,
+    onColumnOrderChange: setColumnOrder,
+    onColumnPinningChange: setColumnPinning,
+    onColumnSizingInfoChange: setColumnSizingInfo,
+    meta: tableMeta,
   });
 
   useEffect(() => {
-    const isResizing = table.getState().columnSizingInfo.isResizingColumn;
+    const isResizing = columnSizingInfo.isResizingColumn;
     if (isResizing && headerState?.isEditing) {
       setHeaderState((prev) => (prev ? { ...prev, isEditing: false } : null));
       setHeaderMenuAnchor(null);
     }
-  }, [
-    table.getState().columnSizingInfo.isResizingColumn,
-    headerState?.isEditing,
-  ]);
+  }, [columnSizingInfo.isResizingColumn, headerState?.isEditing]);
 
   const { leftPinnedColumns, centerColumns, stickyLeftMap } = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();
@@ -530,14 +479,26 @@ export const StyledTable: FC<StyledTableProps> = ({
           break;
         }
         default:
-          // Pass through item value and parentValue for custom handlers (like insert column)
+          // Pass through item value and parentValue for custom handlers (like insert column, change column type)
           onHeaderMenuClick?.({
             type: item.value as TableColumnMenuActionEnum,
             columnId: selectedColumnId,
             value: item.value,
             parentValue: item.parentValue,
           });
-          setHeaderState(null);
+          // Keep header active for change column type operation
+          // Clear state for insert column operations
+          if (
+            item.parentValue === TableColumnMenuActionEnum.change_column_type
+          ) {
+            setHeaderState({
+              columnId: selectedColumnId,
+              isActive: true,
+              isEditing: false,
+            });
+          } else {
+            setHeaderState(null);
+          }
           break;
       }
       setHeaderMenuAnchor(null);
@@ -727,7 +688,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   }
                   return (
                     <StyledTableHeadCell
-                      enableResizing={col.id !== '__select'}
+                      enableResizing={col.id !== SYSTEM_COLUMN_SELECT}
                       header={header}
                       isActive={
                         headerState?.columnId === header.id &&
@@ -740,14 +701,14 @@ export const StyledTable: FC<StyledTableProps> = ({
                       isPinned
                       key={header.id}
                       onClick={
-                        col.id !== '__select'
+                        col.id !== SYSTEM_COLUMN_SELECT
                           ? (e) => {
                               onHeaderClick(e, header.id);
                             }
                           : undefined
                       }
                       onContextMenu={
-                        col.id !== '__select'
+                        col.id !== SYSTEM_COLUMN_SELECT
                           ? (e) => onHeaderRightClick(e, col.id)
                           : undefined
                       }
@@ -781,8 +742,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                   if (!header) {
                     return null;
                   }
-                  // TODO: 移除调试代码
-                  console.log(header);
                   return (
                     <StyledTableHeadCell
                       dataIndex={virtualColumn.index}
@@ -858,35 +817,12 @@ export const StyledTable: FC<StyledTableProps> = ({
                     if (!cell) {
                       return null;
                     }
-                    const isLoading = Boolean(
-                      (cell.row.original as any)?.__loading,
-                    );
-
-                    // 优化: O(1)检查而不是O(M)遍历所有columns
-                    const hasActiveInRow =
-                      cell.column.id === '__select'
-                        ? ((table.options.meta as any)?.hasActiveInRow?.(
-                            String(cell.row.id),
-                          ) ?? false)
-                        : false;
-
                     return (
                       <StyledTableBodyCell
                         cell={cell}
-                        editValue={cell?.getValue()}
-                        hasActiveInRow={hasActiveInRow}
-                        isActive={(table.options.meta as any)?.isActive?.(
-                          String(cell.row.id),
-                          String(cell.column.id),
-                        )}
-                        isEditing={(table.options.meta as any)?.isEditing?.(
-                          String(cell.row.id),
-                          String(cell.column.id),
-                        )}
                         isPinned
                         key={cell.id}
                         onCellClick={onCellClick}
-                        rowSelected={row.getIsSelected?.() ?? false}
                         showPinnedRightShadow={
                           index === leftPinnedColumns.length - 1
                         }
@@ -913,34 +849,11 @@ export const StyledTable: FC<StyledTableProps> = ({
                     if (!cell) {
                       return null;
                     }
-                    const isLoading = Boolean(
-                      (cell.row.original as any)?.__loading,
-                    );
-
-                    // 优化: O(1)检查而不是O(M)遍历所有columns
-                    const hasActiveInRow =
-                      cell.column.id === '__select'
-                        ? ((table.options.meta as any)?.hasActiveInRow?.(
-                            String(cell.row.id),
-                          ) ?? false)
-                        : false;
-
                     return (
                       <StyledTableBodyCell
                         cell={cell}
-                        editValue={cell?.getValue()}
-                        hasActiveInRow={hasActiveInRow}
-                        isActive={(table.options.meta as any)?.isActive?.(
-                          String(cell.row.id),
-                          String(cell.column.id),
-                        )}
-                        isEditing={(table.options.meta as any)?.isEditing?.(
-                          String(cell.row.id),
-                          String(cell.column.id),
-                        )}
                         key={cell.id}
                         onCellClick={onCellClick}
-                        rowSelected={row.getIsSelected?.() ?? false}
                         width={cell.column.getSize()}
                       />
                     );
@@ -982,7 +895,6 @@ export const StyledTable: FC<StyledTableProps> = ({
       onHeaderRightClick,
       centerColumns,
       rowHeight,
-      reducedColumns,
       onCellClick,
     ],
   );

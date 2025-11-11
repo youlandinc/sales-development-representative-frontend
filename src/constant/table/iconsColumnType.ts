@@ -10,6 +10,8 @@ import ICON_TYPE_URL from '@/components/atoms/StyledTable/assets/icon-type-url.s
 import ICON_TYPE_IMG_URL from '@/components/atoms/StyledTable/assets/icon-type-img-url.svg';
 import ICON_TYPE_CHECKBOX from '@/components/atoms/StyledTable/assets/icon-type-checkbox.svg';
 import ICON_TYPE_SELECT from '@/components/atoms/StyledTable/assets/icon-type-select.svg';
+import ICON_TYPE_ASSIGNED_TO from '@/components/atoms/StyledTable/assets/icon-type-assigned-to.svg';
+import ICON_TYPE_PARAGRAPH from '@/components/atoms/StyledTable/assets/icon-type-paragraph.svg';
 
 export const COLUMN_TYPE_ICONS: {
   [key in TableColumnTypeEnum]: any;
@@ -24,6 +26,9 @@ export const COLUMN_TYPE_ICONS: {
   [TableColumnTypeEnum.img_url]: ICON_TYPE_IMG_URL,
   [TableColumnTypeEnum.checkbox]: ICON_TYPE_CHECKBOX,
   [TableColumnTypeEnum.select]: ICON_TYPE_SELECT,
+  [TableColumnTypeEnum.assigned_to]: ICON_TYPE_ASSIGNED_TO,
+  [TableColumnTypeEnum.paragraph]: ICON_TYPE_PARAGRAPH,
 };
 
 export { default as ICON_RUN_AI } from '@/components/atoms/StyledTable/assets/icon-run-ai.svg';
+export { default as ICON_CELL_WARNING } from '@/components/atoms/StyledTable/assets/icon-cell-warning.svg';

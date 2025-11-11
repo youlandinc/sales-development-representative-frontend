@@ -46,6 +46,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     updateColumnName,
     updateColumnPin,
     updateColumnVisible,
+    updateColumnType,
     openDialog,
     closeDialog,
     dialogVisible,
@@ -76,6 +77,7 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
     onCellEdit,
     onInitializeAiColumns,
     onRunAi,
+    refetchCachedRecords,
   } = useProspectTable({ tableId });
 
   // Add rows callback
@@ -237,6 +239,18 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
                 break;
               }
               default: {
+                // Handle change column type (from submenu)
+                if (
+                  parentValue === TableColumnMenuActionEnum.change_column_type
+                ) {
+                  const validTypes = Object.values(TableColumnTypeEnum);
+                  if (validTypes.includes(value as TableColumnTypeEnum)) {
+                    await updateColumnType(value as TableColumnTypeEnum);
+                    // Refetch cached records to get new type-converted values
+                    await refetchCachedRecords();
+                  }
+                  return;
+                }
                 // Handle insert column (from submenu)
                 if (
                   parentValue ===

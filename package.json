@@ -60,6 +60,7 @@
     "sonner": "^1.7.1",
     "styled-components": "6.1.14",
     "swr": "^2.3.0",
+    "tanstack-table-hovering": "^0.1.0",
     "tippy.js": "^6.3.7",
     "uuid": "^11.1.0",
     "zustand": "^5.0.3"

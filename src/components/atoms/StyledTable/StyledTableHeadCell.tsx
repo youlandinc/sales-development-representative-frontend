@@ -13,8 +13,11 @@ import { flexRender, Header } from '@tanstack/react-table';
 
 import { StyledTableAiIcon } from './index';
 
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
-import { COLUMN_TYPE_ICONS } from '@/constant/table';
+import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constant/table';
+import {
+  TableColumnMeta,
+  TableColumnTypeEnum,
+} from '@/types/Prospect/table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -56,13 +59,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
+  const isSelectColumn = header?.column?.id === SYSTEM_COLUMN_SELECT;
 
-  const isSelectColumn = header?.column?.id === '__select';
-
-  // 使用新的便捷访问方法
-  const columnMeta = tableMeta?.getHeaderColumnMeta?.(header);
-  const actionKey = columnMeta?.actionKey;
-  const isAiColumn = columnMeta?.isAiColumn ?? false;
+  // Get column meta from columnDef (contains all column configuration)
+  const columnMeta = header?.column?.columnDef?.meta as
+    | TableColumnMeta
+    | undefined;
+  const { actionKey, isAiColumn = false, actionDefinition } = columnMeta || {};
 
   const content = header
     ? flexRender(header.column.columnDef.header, header.getContext())
@@ -213,14 +216,31 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         ) : (
           <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
             {header && !isSelectColumn && (
-              <Icon
-                component={
-                  COLUMN_TYPE_ICONS[
-                    columnMeta?.fieldType as TableColumnTypeEnum
-                  ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
-                }
-                sx={{ width: 16, height: 16 }}
-              />
+              <>
+                {actionDefinition?.logoUrl ? (
+                  <Box
+                    alt={actionDefinition.integrationName || 'integration logo'}
+                    component="img"
+                    src={actionDefinition.logoUrl}
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      flexShrink: 0,
+                      borderRadius: '2px',
+                      objectFit: 'contain',
+                    }}
+                  />
+                ) : (
+                  <Icon
+                    component={
+                      COLUMN_TYPE_ICONS[
+                        columnMeta?.fieldType as TableColumnTypeEnum
+                      ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+                    }
+                    sx={{ width: 16, height: 16 }}
+                  />
+                )}
+              </>
             )}
             {content}
           </Stack>
