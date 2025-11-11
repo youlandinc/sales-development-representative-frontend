@@ -42,6 +42,7 @@ export const SignUp = () => {
     setOtp,
     handledVerifyOtp,
     dialogLoading,
+    onClickToCloseDialog,
   } = useSignUpDialog({
     userInfo,
     setUserInfo,
@@ -49,6 +50,7 @@ export const SignUp = () => {
     lastName,
     email,
     password,
+    close,
   });
 
   return (
@@ -96,6 +98,7 @@ export const SignUp = () => {
           </Stack>
           <Stack gap={3}>
             <StyledButton
+              onClick={onClickGoogleLogin}
               sx={{
                 borderColor: '#D2D6E1 !important',
               }}
@@ -105,7 +108,6 @@ export const SignUp = () => {
                 alignItems={'center'}
                 flexDirection={'row'}
                 gap={'4px'}
-                onClick={onClickGoogleLogin}
                 width={'100%'}
               >
                 <Icon
@@ -209,7 +211,7 @@ export const SignUp = () => {
         </Stack>
       </Stack>
       <SignUpDialog
-        close={close}
+        close={onClickToCloseDialog}
         email={email}
         handledVerifyOtp={handledVerifyOtp}
         loading={dialogLoading}

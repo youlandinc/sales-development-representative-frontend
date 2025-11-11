@@ -1,4 +1,5 @@
 'use client';
+import { useLayoutEffect, useState } from 'react';
 import { Box, Divider, Icon, Stack, Typography } from '@mui/material';
 
 import {
@@ -6,12 +7,14 @@ import {
   StyledTextField,
   StyledTextFieldPassword,
 } from '@/components/atoms';
+import { getParamsFromUrl } from '@/utils';
 
 import GOOGLE_ICON from './assets/google-icon.svg';
 import { LOGO_HEIGHT, SignLogo } from './SignLogo';
 import { useSignIn } from './hooks';
 
 export const SignIn = () => {
+  const [showEmpty, setShowEmpty] = useState(true);
   const {
     loading,
     isDisabled,
@@ -24,6 +27,17 @@ export const SignIn = () => {
     onClickToForgetPassword,
     onClickToLogin,
   } = useSignIn();
+
+  useLayoutEffect(() => {
+    const { token } = getParamsFromUrl(window.location.href);
+    if (!token) {
+      setShowEmpty(false);
+    }
+  }, []);
+
+  if (showEmpty) {
+    return null;
+  }
 
   return (
     <Box bgcolor={'#FBFCFD'}>
@@ -69,6 +83,7 @@ export const SignIn = () => {
           </Stack>
           <Stack gap={3}>
             <StyledButton
+              onClick={onClickGoogleLogin}
               sx={{
                 borderColor: '#D2D6E1 !important',
               }}
@@ -78,7 +93,6 @@ export const SignIn = () => {
                 alignItems={'center'}
                 flexDirection={'row'}
                 gap={'4px'}
-                onClick={onClickGoogleLogin}
                 width={'100%'}
               >
                 <Icon
