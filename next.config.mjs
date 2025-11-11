@@ -15,7 +15,7 @@ const nextConfig = {
   experimental: {
     // missingSuspenseWithCSRBailout: false,
     reactCompiler: {
-      compilationMode: 'all', // 编译所有组件
+      compilationMode: 'infer', // Compiler 自己推导优化
     },
     staleTimes: {
       dynamic: 0,
