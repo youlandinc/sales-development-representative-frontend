@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import {
   ClickAwayListener,
   MenuItem,
@@ -5,7 +6,6 @@ import {
   Popper,
   Stack,
 } from '@mui/material';
-import { FC } from 'react';
 
 import {
   createMenuItemStyle,

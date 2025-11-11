@@ -4,12 +4,13 @@ import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import { Editor } from '@tiptap/core';
 import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 const defaultSchemaJsonStr = `{
     "type": "object",
     "properties": {
       "response": {
-        "type": "string"
+        "type": "${TableColumnTypeEnum.text}"
       }
     },
     "required": [

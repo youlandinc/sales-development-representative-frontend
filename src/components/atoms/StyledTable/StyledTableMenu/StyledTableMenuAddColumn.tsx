@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import {
   ClickAwayListener,
   Divider,
@@ -7,18 +8,15 @@ import {
   Popper,
   Stack,
 } from '@mui/material';
-import { FC } from 'react';
-
-import {
-  getAddColumnMenuActions,
-  TableColumnMenuEnum,
-} from '@/components/molecules';
 
 import {
   createMenuItemStyle,
   createPaperStyle,
   menuStyles,
 } from './StyledTableMenu.styles';
+
+import { getAddColumnMenuActions } from '@/constant/table';
+import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 interface StyledTableMenuAddColumnProps {
   anchorEl: HTMLElement | null;
@@ -46,7 +44,7 @@ export const StyledTableMenuAddColumn: FC<StyledTableMenuAddColumnProps> = ({
         <Paper sx={createPaperStyle('small')}>
           <Stack gap={0}>
             {menuItems_.map((item, index) => {
-              if (item.value !== TableColumnMenuEnum.divider) {
+              if (item.value !== TableColumnMenuActionEnum.divider) {
                 return (
                   <MenuItem
                     key={item.value || item.label}

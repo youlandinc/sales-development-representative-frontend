@@ -1,7 +1,7 @@
 import { FC, MouseEvent } from 'react';
 import { Box, Icon, Stack } from '@mui/material';
 
-import { ICON_RUN_AI } from './columnTypeIcons';
+import ICON_RUN_AI from './assets/icon-run-ai.svg';
 
 interface StyledTableAiIconProps {
   onClick: (e: MouseEvent<HTMLDivElement>) => void;

@@ -1,172 +1,165 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Stack, Typography } from '@mui/material';
-import { useRouter } from 'nextjs-toploader/app';
-
-import { UDecode, UEncode } from '@/utils';
-import { APP_KEY, DEFAULT_LOGGED_IN_PATH } from '@/constant';
-import { useUserStore } from '@/providers';
+import { Box, Divider, Icon, Stack, Typography } from '@mui/material';
 
 import {
-  SDRToast,
   StyledButton,
-  StyledCheckbox,
   StyledTextField,
   StyledTextFieldPassword,
 } from '@/components/atoms';
 
-import { _userLogin } from '@/request';
-import { HttpError, HttpVariantEnum, LoginTypeEnum } from '@/types';
+import GOOGLE_ICON from './assets/google-icon.svg';
+import { LOGO_HEIGHT, SignLogo } from './SignLogo';
+import { useSignIn } from './hooks';
 
 export const SignIn = () => {
-  const router = useRouter();
-  const { setAccessToken, setUserProfile, isHydration, accessToken } =
-    useUserStore((state) => state);
-
-  const [showToast, setShowToast] = useState(true);
-
-  const [loading, setLoading] = useState(false);
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-
-  const onClickToForgetPassword = () => {
-    router.push('/auth/forget-password');
-  };
-
-  const onClickToLogin = async () => {
-    const postData = {
-      appkey: APP_KEY,
-      loginType: LoginTypeEnum.ylaccount_login,
-      emailParam: {
-        account: email,
-        password: UEncode(password),
-      },
-    };
-
-    if (rememberMe) {
-      localStorage.setItem(UEncode('email'), UEncode(email));
-      localStorage.setItem(UEncode('password'), UEncode(password));
-    }
-
-    setLoading(true);
-    try {
-      const {
-        data: { accessToken, userProfile },
-      } = await _userLogin(postData);
-      setShowToast(false);
-      setAccessToken(accessToken);
-      setUserProfile(userProfile);
-    } catch (err) {
-      const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setEmail(UDecode(localStorage.getItem(UEncode('email')) || ''));
-    setPassword(UDecode(localStorage.getItem(UEncode('password')) || ''));
-    setRememberMe(!!localStorage.getItem(UEncode('email')));
-  }, []);
-
-  useEffect(() => {
-    if (!isHydration) {
-      return;
-    }
-    if (accessToken) {
-      showToast &&
-        SDRToast({
-          header: '',
-          message: 'You are already logged in!',
-          variant: HttpVariantEnum.success,
-        });
-      return router.push(DEFAULT_LOGGED_IN_PATH);
-    }
-  }, [isHydration, accessToken, router, showToast]);
+  const {
+    loading,
+    isDisabled,
+    email,
+    password,
+    setEmail,
+    setPassword,
+    onClickToSignUp,
+    onClickGoogleLogin,
+    onClickToForgetPassword,
+    onClickToLogin,
+  } = useSignIn();
 
   return (
-    <Stack
-      alignItems={'center'}
-      bgcolor={'#FBFCFD'}
-      height={'100vh'}
-      justifyContent={'center'}
-      width={'100%'}
-    >
+    <Box bgcolor={'#FBFCFD'}>
+      <SignLogo />
       <Stack
-        bgcolor={'#ffffff'}
-        border={'1px solid #DFDEE6'}
-        borderRadius={4}
-        component={'form'}
-        gap={6}
-        maxWidth={600}
-        onSubmit={async (e) => {
-          e.preventDefault();
-          await onClickToLogin();
-        }}
-        px={5}
-        py={7.5}
+        alignItems={'center'}
+        height={`calc(100vh - ${LOGO_HEIGHT}px)`}
+        justifyContent={'center'}
         width={'100%'}
       >
-        <Stack>
-          <Typography textAlign={'center'} variant={'h5'}>
-            Welcome back
-          </Typography>
-          <Typography
-            color={'text.secondary'}
-            textAlign={'center'}
-            variant={'body2'}
-          >
-            Log in by entering your email below
-          </Typography>
-        </Stack>
-
-        <Stack gap={3}>
-          <StyledTextField
-            disabled={loading}
-            label={'Email'}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            size={'large'}
-            value={email}
-          />
-          <StyledTextFieldPassword
-            disabled={loading}
-            label={'Password'}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            size={'large'}
-            value={password}
-          />
-
-          <Stack flexDirection={'row'}>
-            <StyledCheckbox
-              checked={rememberMe}
-              label={
-                <Typography color={'text.secondary'} ml={1} variant={'body2'}>
-                  Remember me
-                </Typography>
-              }
-              onChange={(e, checked) => setRememberMe(checked)}
-            />
+        <Stack
+          bgcolor={'#ffffff'}
+          border={'1px solid #E5E5E5'}
+          borderRadius={4}
+          component={'form'}
+          gap={6}
+          maxWidth={600}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            await onClickToLogin();
+          }}
+          px={5}
+          py={7.5}
+          width={'100%'}
+        >
+          <Stack>
             <Typography
-              color={'text.secondary'}
-              ml={'auto'}
-              onClick={onClickToForgetPassword}
-              sx={{ cursor: 'pointer' }}
+              fontSize={'24px'}
+              lineHeight={1.2}
+              textAlign={'center'}
+              variant={'h5'}
+            >
+              Welcome back to SalesOS
+            </Typography>
+            <Typography
+              color={'#9095A3'}
+              mt={1}
+              textAlign={'center'}
               variant={'body2'}
             >
-              Forgot password?
+              Sign in to access your workspace and start scaling your outreach.
             </Typography>
           </Stack>
-
-          <StyledButton disabled={loading} loading={loading} type={'submit'}>
-            Log in
-          </StyledButton>
+          <Stack gap={3}>
+            <StyledButton
+              sx={{
+                borderColor: '#D2D6E1 !important',
+              }}
+              variant="outlined"
+            >
+              <Stack
+                alignItems={'center'}
+                flexDirection={'row'}
+                gap={'4px'}
+                onClick={onClickGoogleLogin}
+                width={'100%'}
+              >
+                <Icon
+                  component={GOOGLE_ICON}
+                  sx={{
+                    width: '24px',
+                    height: '24px',
+                  }}
+                />
+                <Typography
+                  sx={{
+                    flexGrow: 1,
+                    color: '#202939',
+                    fontSize: '16px',
+                    lineHeight: 1.5,
+                    fontWeight: 400,
+                  }}
+                  variant={'body2'}
+                >
+                  Sign in with Google
+                </Typography>
+              </Stack>
+            </StyledButton>
+            <Divider
+              sx={{
+                color: '#B0ADBD',
+                fontSize: '14px',
+                lineHeight: 1.5,
+              }}
+            >
+              OR
+            </Divider>
+            <StyledTextField
+              disabled={loading}
+              label={'Email'}
+              onChange={(e) => setEmail(e.target.value.trim())}
+              required
+              size={'large'}
+              value={email}
+            />
+            <StyledTextFieldPassword
+              disabled={loading}
+              label={'Password'}
+              onChange={(e) => setPassword(e.target.value.trim())}
+              required
+              size={'large'}
+              value={password}
+            />
+            <StyledButton
+              disabled={isDisabled}
+              loading={loading}
+              type={'submit'}
+            >
+              Sign in
+            </StyledButton>
+            <Stack flexDirection={'row'}>
+              <Typography color={'#202939'} variant={'body2'}>
+                Don&apos;t have an account?
+              </Typography>
+              <Typography
+                color={'#6E4EFB'}
+                display={'inline'}
+                onClick={onClickToSignUp}
+                sx={{ cursor: 'pointer', ml: '4px' }}
+                variant={'body2'}
+              >
+                Sign up
+              </Typography>
+              <Typography
+                color={'#9095A3'}
+                ml={'auto'}
+                onClick={onClickToForgetPassword}
+                sx={{ cursor: 'pointer' }}
+                variant={'body2'}
+              >
+                Forgot password?
+              </Typography>
+            </Stack>
+          </Stack>
         </Stack>
       </Stack>
-    </Stack>
+    </Box>
   );
 };

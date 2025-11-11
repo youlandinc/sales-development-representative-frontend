@@ -3,8 +3,10 @@ import {
   MouseEvent,
   ReactNode,
   startTransition,
+  useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -16,8 +18,15 @@ import {
   Stack,
 } from '@mui/material';
 import { Cell } from '@tanstack/react-table';
-import { useRowHover } from './StyledTableBodyRow';
-import { StyledTableAiIcon } from './index';
+
+import { SYSTEM_COLUMN_SELECT } from '@/constant/table';
+import { TableCellFieldData, TableColumnMeta } from '@/types/Prospect/table';
+
+import {
+  StyledTableAiIcon,
+  StyledTableBodyCellIcons,
+  useRowHover,
+} from './index';
 
 const CELL_CONSTANTS = {
   MIN_WIDTH: 60,
@@ -57,16 +66,10 @@ const getCellBackgroundColor = (
 
 interface StyledTableBodyCellProps {
   cell?: Cell<any, unknown>;
-  children?: ReactNode;
   width: number;
   isPinned?: boolean;
   stickyLeft?: number;
-  isEditing?: boolean;
-  editValue?: any;
-  isActive?: boolean;
-  rowSelected?: boolean;
   showPinnedRightShadow?: boolean;
-  hasActiveInRow?: boolean;
   onCellClick: (columnId: string, rowId: string, data: any) => void;
 }
 
@@ -75,55 +78,56 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   width,
   isPinned = false,
   stickyLeft = 0,
-  isEditing: _isEditing,
-  editValue: _editValue,
-  isActive: _isActive,
-  rowSelected = false,
   showPinnedRightShadow,
-  hasActiveInRow = false,
   onCellClick,
 }) => {
-  const recordId = cell ? String(cell.row.id) : '';
-  const columnId = cell ? String(cell.column.id) : '';
-  const value = cell?.getValue();
-  const displayValue = value != null ? String(value) : '';
-  const isSelectColumn = cell?.column?.id === '__select';
-  const isColumnSelected =
-    (cell?.column?.columnDef?.meta as any)?.selectedColumnId === columnId;
-
   const inputRef = useRef<HTMLInputElement>(null);
-
   const [localEditValue, setLocalEditValue] = useState<string>('');
 
-  const tableMeta = cell?.getContext?.()?.table?.options?.meta as any;
+  const context = cell?.getContext?.();
+  const { table, row, column } = context || {};
+  const tableMeta = table?.options?.meta as any;
+
+  const recordId = row?.id ? String(row.id) : '';
+  const columnId = column?.id ? String(column.id) : '';
+  const isSelectColumn = column?.id === SYSTEM_COLUMN_SELECT;
+
+  const displayValue = cell?.getValue() != null ? String(cell.getValue()) : '';
+
+  const originalCellData = cell?.row?.original?.[columnId] as
+    | TableCellFieldData
+    | undefined;
 
   const { isRowHovered } = useRowHover();
 
-  const isEditingFromMeta = tableMeta?.isEditing?.(recordId, columnId) ?? false;
-  const isActiveFromMeta = tableMeta?.isActive?.(recordId, columnId) ?? false;
-  const isEditing = _isEditing !== undefined ? _isEditing : isEditingFromMeta;
-  const isActive = _isActive !== undefined ? _isActive : isActiveFromMeta;
+  const isEditing = tableMeta?.isEditing?.(recordId, columnId) ?? false;
+  const isActive = tableMeta?.isActive?.(recordId, columnId) ?? false;
+  const hasActiveInRow = isSelectColumn
+    ? (tableMeta?.hasActiveInRow?.(recordId) ?? false)
+    : false;
 
-  const columnMeta = cell?.column?.columnDef?.meta as any;
-  const actionKey = columnMeta?.actionKey;
-  const fieldType = columnMeta?.fieldType;
-  const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
+  const rowSelected = row?.getIsSelected?.() ?? false;
 
-  const canEdit = columnId !== '__select' && actionKey !== 'use-ai';
-  const canInteract = Boolean(cell && !isSelectColumn && canEdit);
+  const columnMeta = column?.columnDef?.meta as TableColumnMeta | undefined;
+  const { fieldType, canEdit = false, isAiColumn = false } = columnMeta || {};
+
+  const selectedColumnId = tableMeta?.selectedColumnId;
+  const isColumnSelected = selectedColumnId === columnId;
 
   const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
 
-  const cellValueObj = typeof value === 'object' && value !== null ? value : {};
-  const isFinished =
-    'isFinished' in cellValueObj ? cellValueObj.isFinished : false;
-  const externalContent =
-    'externalContent' in cellValueObj
-      ? cellValueObj.externalContent
-      : undefined;
+  const isFinished = originalCellData?.isFinished ?? false;
 
-  const triggerAiProcess = tableMeta?.triggerAiProcess;
-  const hasAiColumnInRow = tableMeta?.hasAiColumnInRow?.(recordId) ?? false;
+  const metaData = originalCellData?.metaData;
+  const isValidate = metaData?.isValidate ?? true;
+  const imagePreview = metaData?.imagePreview;
+  const confidence = metaData?.confidence;
+
+  const isEditableCell = canEdit && !imagePreview && !confidence;
+
+  const canInteract = Boolean(cell && !isSelectColumn && isEditableCell);
+
+  const hasAiColumn = tableMeta?.hasAiColumn ?? false;
 
   const [isCellHovered, setIsCellHovered] = useState(false);
 
@@ -132,10 +136,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
 
   useEffect(() => {
     if (isEditing) {
-      const initValue = _editValue !== undefined ? _editValue : displayValue;
-      setLocalEditValue(String(initValue ?? ''));
+      setLocalEditValue(String(displayValue ?? ''));
     }
-  }, [isEditing, _editValue, displayValue]);
+  }, [displayValue, isEditing]);
 
   useLayoutEffect(() => {
     if (isEditing && inputRef.current) {
@@ -149,133 +152,153 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
       !isAiLoading &&
       !displayValue &&
       !isFinished &&
-      triggerAiProcess
+      tableMeta?.onAiProcess
     ) {
-      triggerAiProcess(recordId, columnId);
+      tableMeta.onAiProcess(recordId, columnId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAiColumn, isAiLoading, displayValue, isFinished, recordId, columnId]);
+
+  const onStopEdit = useCallback(() => {
+    startTransition(() => {
+      if (localEditValue !== String(displayValue ?? '')) {
+        tableMeta?.onCellEdit?.(recordId, columnId, String(localEditValue));
+      }
+      tableMeta?.setCellMode?.(recordId, columnId, 'clear');
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localEditValue, displayValue, recordId, columnId]);
+
+  const content = useMemo<ReactNode>(() => {
+    if (isEditing && cell && !isSelectColumn && isEditableCell) {
+      return (
+        <InputBase
+          autoFocus
+          inputRef={inputRef}
+          onBlur={onStopEdit}
+          onChange={(e) => setLocalEditValue(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === 'Escape') {
+              e.preventDefault();
+              onStopEdit();
+            }
+          }}
+          size={'small'}
+          sx={{
+            height: '100%',
+            width: '100%',
+            fontSize: CELL_CONSTANTS.FONT_SIZE,
+            display: 'flex',
+            alignItems: 'center',
+            lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
+            '& input': {
+              p: 0,
+              m: 0,
+              height: '100%',
+              boxSizing: 'border-box',
+              fontSize: CELL_CONSTANTS.FONT_SIZE,
+              lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
+            },
+          }}
+          value={localEditValue}
+        />
+      );
+    } else if (cell && isSelectColumn) {
+      const label = `${cell.row.index + 1}`;
+
+      return (
+        <Stack
+          flexDirection={'row'}
+          sx={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <Box display={rowSelected || isRowHovered ? 'none' : 'block'}>
+            {label}
+          </Box>
+          <Box display={rowSelected || isRowHovered ? 'block' : 'none'}>
+            <Checkbox
+              checked={rowSelected}
+              onChange={(e, next) => cell.row.toggleSelected?.(next)}
+              onClick={(e) => e.stopPropagation()}
+              size={'small'}
+              sx={{ p: 0 }}
+            />
+          </Box>
+        </Stack>
+      );
+    } else if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
+      return (
+        <Stack alignItems="center" direction="row" spacing={1}>
+          <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
+          <Box
+            component="span"
+            sx={{
+              fontSize: CELL_CONSTANTS.FONT_SIZE,
+              color: 'text.secondary',
+            }}
+          >
+            Processing...
+          </Box>
+        </Stack>
+      );
+    }
+    return displayValue;
   }, [
+    isEditing,
+    cell,
+    isSelectColumn,
+    isEditableCell,
     isAiColumn,
     isAiLoading,
     displayValue,
     isFinished,
-    triggerAiProcess,
-    recordId,
-    columnId,
+    onStopEdit,
+    localEditValue,
+    rowSelected,
+    isRowHovered,
   ]);
 
-  const onStopEdit = () => {
-    startTransition(() => {
-      if (localEditValue !== String(displayValue ?? '')) {
-        tableMeta?.updateData?.(recordId, columnId, localEditValue);
+  const onClickCell = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      onCellClick(columnId, recordId, cell?.row);
+      if (canInteract || isAiColumn) {
+        tableMeta?.setCellMode?.(recordId, columnId, 'active');
       }
-      tableMeta?.setCellMode?.(recordId, columnId, 'clear');
-    });
-  };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onCellClick, columnId, recordId, cell?.row, canInteract, isAiColumn],
+  );
 
-  let content: ReactNode;
-  if (isEditing && cell && !isSelectColumn && canEdit) {
-    content = (
-      <InputBase
-        autoFocus
-        inputRef={inputRef}
-        onBlur={onStopEdit}
-        onChange={(e) => setLocalEditValue(e.target.value)}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === 'Escape') {
-            e.preventDefault();
-            onStopEdit();
-          }
-        }}
-        size={'small'}
-        sx={{
-          height: '100%',
-          width: '100%',
-          fontSize: CELL_CONSTANTS.FONT_SIZE,
-          display: 'flex',
-          alignItems: 'center',
-          lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
-          '& input': {
-            p: 0,
-            m: 0,
-            height: '100%',
-            boxSizing: 'border-box',
-            fontSize: CELL_CONSTANTS.FONT_SIZE,
-            lineHeight: CELL_CONSTANTS.LINE_HEIGHT,
-          },
-        }}
-        value={localEditValue}
-      />
-    );
-  } else if (cell && isSelectColumn) {
-    const label = `${cell.row.index + 1}`;
-    const checked = cell.row.getIsSelected?.() ?? false;
+  const onDoubleClickCell = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      if (canInteract) {
+        tableMeta?.setCellMode?.(recordId, columnId, 'edit');
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [canInteract, recordId, columnId],
+  );
 
-    content = (
-      <Stack
-        flexDirection={'row'}
-        sx={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        <Box display={checked || isRowHovered ? 'none' : 'block'}>{label}</Box>
-        <Box display={checked || isRowHovered ? 'block' : 'none'}>
-          <Checkbox
-            checked={checked}
-            onChange={(e, next) => cell.row.toggleSelected?.(next)}
-            onClick={(e) => e.stopPropagation()}
-            size={'small'}
-            sx={{ p: 0 }}
-          />
-        </Box>
-      </Stack>
-    );
-  } else if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
-    content = (
-      <Stack alignItems="center" direction="row" spacing={1}>
-        <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
-        <Box
-          component="span"
-          sx={{
-            fontSize: CELL_CONSTANTS.FONT_SIZE,
-            color: 'text.secondary',
-          }}
-        >
-          Processing...
-        </Box>
-      </Stack>
-    );
-  } else {
-    content = displayValue;
-  }
+  const onClickAiIcon = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
 
-  const onClickCell = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    onCellClick(columnId, recordId, cell?.row);
-    if (canInteract || isAiColumn) {
-      tableMeta?.setCellMode?.(recordId, columnId, 'active');
-    }
-  };
-
-  const onDoubleClickCell = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    if (canInteract) {
-      tableMeta?.setCellMode?.(recordId, columnId, 'edit');
-    }
-  };
-
-  const onClickAiIcon = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    tableMeta?.onRunAi?.({
-      fieldId: columnId,
-      recordId: recordId,
-      isHeader: false,
-    });
-  };
+      tableMeta?.onRunAi?.({
+        fieldId: isSelectColumn ? SYSTEM_COLUMN_SELECT : columnId,
+        recordId: recordId,
+        isHeader: false,
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columnId, recordId, isSelectColumn],
+  );
 
   const cellBackgroundColor = getCellBackgroundColor(
     isEditing,
@@ -286,12 +309,15 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     isColumnSelected,
   );
 
+  const onMouseEnter = useCallback(() => setIsCellHovered(true), []);
+  const onMouseLeave = useCallback(() => setIsCellHovered(false), []);
+
   return (
     <Stack
       onClick={onClickCell}
       onDoubleClick={onDoubleClickCell}
-      onMouseEnter={() => setIsCellHovered(true)}
-      onMouseLeave={() => setIsCellHovered(false)}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       sx={{
         width,
         minWidth: resolvedMinWidth,
@@ -326,23 +352,50 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
             : 'none',
         height: '100%',
         justifyContent: 'center',
-        cursor: canInteract || isAiColumn ? 'pointer' : 'default',
+        cursor:
+          canInteract || isAiColumn
+            ? 'pointer'
+            : imagePreview || confidence
+              ? 'not-allowed'
+              : 'default',
       }}
     >
-      <Box
-        sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          minWidth: 0,
-          width: '100%',
-          fontSize: CELL_CONSTANTS.FONT_SIZE,
-          px: CELL_CONSTANTS.PADDING_X,
-        }}
+      <Stack
+        alignItems={'center'}
+        flexDirection={'row'}
+        fontSize={CELL_CONSTANTS.FONT_SIZE}
+        gap={0.5}
+        px={CELL_CONSTANTS.PADDING_X}
       >
-        {content}
-      </Box>
-      {hasAiColumnInRow &&
+        {/* Prefix icons: Image Preview & Confidence Indicator */}
+        {!isEditing && (imagePreview || confidence) && (
+          <StyledTableBodyCellIcons
+            confidence={confidence}
+            imagePreview={imagePreview}
+          />
+        )}
+
+        <Box
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            minWidth: 0,
+            flex: 1,
+          }}
+        >
+          {content}
+        </Box>
+
+        {/* Suffix icon: Validation Warning */}
+        {!isEditing && !isValidate && fieldType && (
+          <StyledTableBodyCellIcons
+            fieldType={fieldType}
+            isValidate={isValidate}
+          />
+        )}
+      </Stack>
+      {hasAiColumn &&
         ((isSelectColumn && isRowHovered) || (isAiColumn && isCellHovered)) && (
           <StyledTableAiIcon
             backgroundColor={cellBackgroundColor}

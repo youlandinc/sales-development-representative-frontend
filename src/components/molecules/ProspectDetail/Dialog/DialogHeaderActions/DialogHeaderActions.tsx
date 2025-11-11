@@ -10,12 +10,12 @@ import {
 import { SyntheticEvent, useState } from 'react';
 
 import { StyledCost, StyledDialog } from '@/components/atoms';
-import { TableColumnMenuEnum } from '@/components/molecules';
 import {
   StyledCollapseMenuContainer,
   StyledIntegrationCost,
   StyledMenu,
 } from './base';
+import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 import { useSwitch } from '@/hooks';
 import { useProspectTableStore } from '@/stores/Prospect';
@@ -234,7 +234,9 @@ export const DialogHeaderActions = () => {
         </Stack>
       }
       onClose={handleClose}
-      open={dialogType === TableColumnMenuEnum.header_actions && dialogVisible}
+      open={
+        dialogType === TableColumnMenuActionEnum.header_actions && dialogVisible
+      }
     />
   );
 };

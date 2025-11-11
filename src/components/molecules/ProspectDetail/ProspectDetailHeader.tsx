@@ -2,12 +2,7 @@ import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
 import { debounce, Icon, Stack } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import {
-  CampaignProcess,
-  CommonRenameTextField,
-  LayoutUserInfo,
-  TableColumnMenuEnum,
-} from '@/components/molecules';
+import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
@@ -23,6 +18,7 @@ import {
 import { StyledButton } from '@/components/atoms';
 import { useDialogStore } from '@/stores/useDialogStore';
 import { ProcessCreateTypeEnum } from '@/types';
+import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 interface ProspectDetailHeaderProps {
   tableId: string;
@@ -140,7 +136,7 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
               setSelectedEnrichmentTableId(tableId);
               // setEnrichmentTableDisabled(true);
               // setLeadsVisible(true);
-              openDialog(TableColumnMenuEnum.header_actions);
+              openDialog(TableColumnMenuActionEnum.header_actions);
             }}
             size={'medium'}
             variant={'contained'}

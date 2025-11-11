@@ -1,5 +1,7 @@
 import {
+  Dispatch,
   RefObject,
+  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -13,8 +15,11 @@ import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
-import { MIN_BATCH_SIZE } from '../data';
-import { isAiColumn } from '../utils';
+import {
+  checkIsAiColumn,
+  MIN_BATCH_SIZE,
+  SYSTEM_COLUMN_SELECT,
+} from '@/constant/table';
 
 interface UseProspectTableParams {
   tableId: string;
@@ -28,8 +33,8 @@ interface UseProspectTableReturn {
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   rowsMapRef: RefObject<Record<string, any>>;
   scrolled: boolean;
-  setAiLoadingState: React.Dispatch<
-    React.SetStateAction<Record<string, Record<string, boolean>>>
+  setAiLoadingState: Dispatch<
+    SetStateAction<Record<string, Record<string, boolean>>>
   >;
   onVisibleRangeChange: (startIndex: number, endIndex: number) => void;
   onAiProcess: (recordId: string, columnId: string) => void;
@@ -41,8 +46,13 @@ interface UseProspectTableReturn {
     recordId?: string;
     isHeader?: boolean;
   }) => Promise<void>;
+  refetchCachedRecords: () => Promise<void>;
 }
 
+// TODO: Hook优化
+// 1. Hook职责过重，承担了太多功能
+// 2. 考虑拆分为多个更小的hooks: useTableData, useAiProcessing, useVirtualization
+// 3. 状态管理可以优化为更清晰的结构
 export const useProspectTable = ({
   tableId,
 }: UseProspectTableParams): UseProspectTableReturn => {
@@ -58,6 +68,10 @@ export const useProspectTable = ({
   const { runAi } = useRunAi();
   const { fetchIntegrationMenus } = useWorkEmailStore((store) => store);
 
+  // TODO: 状态管理优化
+  // 1. 同时使用ref和state维护rowsMap，容易造成不一致
+  // 2. 过多的useRef可能表明状态设计有问题
+  // 3. 考虑使用zustand或其他状态管理方案
   // State management
   const rowsMapRef = useRef<Record<string, any>>({});
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
@@ -85,7 +99,7 @@ export const useProspectTable = ({
 
   // Compute AI column IDs (包括 dependentFieldId)
   const aiColumnIds = useMemo(() => {
-    return new Set(columns.filter(isAiColumn).map((col) => col.fieldId));
+    return new Set(columns.filter(checkIsAiColumn).map((col) => col.fieldId));
   }, [columns]);
 
   // Total rows
@@ -184,6 +198,10 @@ export const useProspectTable = ({
     maxLoadedIndexRef,
   });
 
+  // TODO: 数据加载优化
+  // 1. 批量加载逻辑可以提取为独立的hook
+  // 2. 考虑添加错误处理和重试机制
+  // 3. 加载状态管理可以更细粒度
   // Fetch batch data
   const fetchBatchData = useCallback(
     async (startIndex: number, endIndex: number) => {
@@ -238,6 +256,41 @@ export const useProspectTable = ({
     },
     [tableId, rowIds],
   );
+
+  // Refetch all cached records (e.g., after column type change)
+  const refetchCachedRecords = useCallback(async () => {
+    if (!tableId || isFetchingRef.current) {
+      return;
+    }
+
+    // Get all cached record IDs
+    const cachedRecordIds = Object.keys(rowsMapRef.current);
+
+    if (cachedRecordIds.length === 0) {
+      return;
+    }
+
+    isFetchingRef.current = true;
+    try {
+      const res = await _fetchTableRowData({
+        tableId,
+        recordIds: cachedRecordIds,
+      });
+      const arr = (res?.data ?? []) as any[];
+      const newRowsMap: Record<string, any> = {};
+      arr.forEach((row) => {
+        if (row && row.id) {
+          newRowsMap[row.id] = row;
+        }
+      });
+
+      // Update both state and ref
+      setRowsMap((prev) => ({ ...prev, ...newRowsMap }));
+      rowsMapRef.current = { ...rowsMapRef.current, ...newRowsMap };
+    } finally {
+      isFetchingRef.current = false;
+    }
+  }, [tableId]);
 
   // Initial data load
   useEffect(() => {
@@ -347,6 +400,10 @@ export const useProspectTable = ({
     [fetchBatchData, total, rowIds],
   );
 
+  // TODO: AI处理逻辑优化
+  // 1. onAiProcess逻辑复杂，包含多个条件判断
+  // 2. 可以拆分为更小的辅助函数
+  // 3. AI loading状态管理可以更清晰
   // Handle AI process
   const onAiProcess = useCallback(
     (recordId: string, columnId: string) => {
@@ -480,15 +537,63 @@ export const useProspectTable = ({
   const onCellEdit = useCallback(
     async (recordId: string, fieldId: string, value: any) => {
       const currentRowData = rowsMapRef.current[recordId] || { id: recordId };
-      const updatedRowData = { ...currentRowData, [fieldId]: value };
+      const currentFieldValue = currentRowData[fieldId];
 
-      rowsMapRef.current[recordId] = updatedRowData;
+      // Optimistic update
+      let optimisticFieldValue;
+      if (
+        typeof currentFieldValue === 'object' &&
+        currentFieldValue !== null &&
+        'value' in currentFieldValue
+      ) {
+        optimisticFieldValue = { ...currentFieldValue, value };
+      } else {
+        optimisticFieldValue = value;
+      }
+
+      const optimisticRowData = {
+        ...currentRowData,
+        [fieldId]: optimisticFieldValue,
+      };
+
+      rowsMapRef.current[recordId] = optimisticRowData;
       setRowsMap((prev) => ({
         ...prev,
-        [recordId]: updatedRowData,
+        [recordId]: optimisticRowData,
       }));
 
-      await updateCellValue({ tableId, recordId, fieldId, value });
+      try {
+        // Call API and get server response
+        const response = await updateCellValue({
+          tableId,
+          recordId,
+          fieldId,
+          value,
+        });
+
+        // Update with server response (includes metaData.isValidate, etc.)
+        if (response?.data) {
+          const serverFieldValue = response.data;
+          const finalRowData = {
+            ...rowsMapRef.current[recordId],
+            [fieldId]: serverFieldValue,
+          };
+
+          rowsMapRef.current[recordId] = finalRowData;
+          setRowsMap((prev) => ({
+            ...prev,
+            [recordId]: finalRowData,
+          }));
+        }
+      } catch (error) {
+        // Rollback on error
+        rowsMapRef.current[recordId] = currentRowData;
+        setRowsMap((prev) => ({
+          ...prev,
+          [recordId]: currentRowData,
+        }));
+        throw error;
+      }
     },
     [tableId, updateCellValue],
   );
@@ -567,9 +672,13 @@ export const useProspectTable = ({
     setAiLoadingState(newLoadingState);
   }, [tableId, fetchTable, aiColumnIds, rowIds, columns, onUpdateRowData]);
 
+  // TODO: AI运行优化
+  // 1. onRunAi函数包含太多if-else分支
+  // 2. 参数类型可以更明确（使用discriminated union）
+  // 3. 错误处理需要增强
   const onRunAi = useCallback(
     async (params: {
-      fieldId: string; // '__select' or actual fieldId
+      fieldId: string;
       recordId?: string;
       isHeader?: boolean;
       recordCount?: number;
@@ -578,26 +687,19 @@ export const useProspectTable = ({
 
       try {
         if (isHeader) {
-          const apiParams: any = {
-            tableId,
-            fieldId,
-          };
+          const apiParams: any = { tableId, fieldId };
 
           if (recordCount !== undefined) {
             apiParams.recordCount = recordCount;
             const targetRecordIds = rowIds.slice(0, recordCount);
-
             await runAi(apiParams);
-
             targetRecordIds.forEach((rid) => {
               onUpdateRowData(rid, {
                 [fieldId]: { value: '', isFinished: false },
               });
             });
           } else {
-            // Run all rows
             await runAi(apiParams);
-
             rowIds.forEach((rid) => {
               onUpdateRowData(rid, {
                 [fieldId]: { value: '', isFinished: false },
@@ -605,46 +707,44 @@ export const useProspectTable = ({
             });
           }
         } else if (recordId) {
-          // 如果 fieldId 是 '__select'，说明点击的是选择列的 AI 图标
-          // 需要获取所有符合 AI 条件的列
-          const aiFieldsWithDependents = columns.filter(isAiColumn);
+          // Check if clicking select column (run all AI columns) or specific column
+          const isSelectColumn = fieldId === SYSTEM_COLUMN_SELECT;
+          const targetColumns = isSelectColumn
+            ? columns.filter(checkIsAiColumn)
+            : columns.filter((col) => col.fieldId === fieldId);
 
-          // 收集所有 fieldIds，包括 dependentFieldId
+          if (targetColumns.length === 0) {
+            return;
+          }
+
+          // Collect fieldIds and prepare loading states
           const fieldIds: string[] = [];
           const loadingUpdates: Record<string, boolean> = {};
-          aiFieldsWithDependents.forEach((col) => {
+          const updates: Record<string, any> = {};
+
+          targetColumns.forEach((col) => {
             fieldIds.push(col.fieldId);
             loadingUpdates[col.fieldId] = true;
+            updates[col.fieldId] = { value: '', isFinished: false };
+
             if (col.dependentFieldId) {
               fieldIds.push(col.dependentFieldId);
               loadingUpdates[col.dependentFieldId] = true;
-            }
-          });
-
-          // 立即设置 loading 状态
-          setAiLoadingState((prev) => ({
-            ...prev,
-            [recordId]: {
-              ...prev[recordId],
-              ...loadingUpdates,
-            },
-          }));
-
-          // 设置数据状态
-          const updates: Record<string, any> = {};
-          aiFieldsWithDependents.forEach((col) => {
-            updates[col.fieldId] = { value: '', isFinished: false };
-            if (col.dependentFieldId) {
               updates[col.dependentFieldId] = { value: '', isFinished: false };
             }
           });
+
+          // Set loading state
+          setAiLoadingState((prev) => ({
+            ...prev,
+            [recordId]: { ...prev[recordId], ...loadingUpdates },
+          }));
+
+          // Update row data
           onUpdateRowData(recordId, updates);
 
-          await runAi({
-            tableId,
-            recordIds: [recordId],
-            fieldIds,
-          });
+          // Run AI
+          await runAi({ tableId, recordIds: [recordId], fieldIds });
         }
 
         await onInitializeAiColumns();
@@ -670,5 +770,6 @@ export const useProspectTable = ({
     onUpdateRowData,
     onInitializeAiColumns,
     onRunAi,
+    refetchCachedRecords,
   };
 };

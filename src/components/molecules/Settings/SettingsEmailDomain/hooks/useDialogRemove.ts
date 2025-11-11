@@ -33,11 +33,8 @@ export const useDialogRemove = ({
     } finally {
       close();
       setDeleteItem(void 0);
+      setActiveStep(0);
       setDeleteLoading(false);
-      setTimeout(() => {
-        setActiveStep(0);
-        setDeleteItem(void 0);
-      }, 200);
     }
   }, [close, deleteItem, onRefresh, setActiveStep]);
 

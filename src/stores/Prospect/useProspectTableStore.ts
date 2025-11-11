@@ -2,7 +2,11 @@ import { create } from 'zustand';
 
 import { ColumnFieldGroupMap, HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
-import { TableColumnProps, TableColumnTypeEnum } from '@/types/Prospect/table';
+import {
+  TableColumnMenuActionEnum,
+  TableColumnProps,
+  TableColumnTypeEnum,
+} from '@/types/Prospect/table';
 
 import {
   _createTableColumn,
@@ -14,7 +18,6 @@ import {
   _updateTableColumnConfig,
 } from '@/request';
 import { UNotUndefined } from '@/utils';
-import { TableColumnMenuEnum } from '@/components/molecules';
 
 const handleApiError = <T extends Record<string, any>>(
   err: unknown,
@@ -34,7 +37,7 @@ export type ProspectTableState = {
   activeColumnId: string;
   // dialog
   dialogVisible: boolean;
-  dialogType: TableColumnMenuEnum | null;
+  dialogType: TableColumnMenuActionEnum | null;
 
   rowIds: string[];
   runRecords: {
@@ -65,6 +68,11 @@ export type ProspectTableActions = {
   updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
   updateColumnPin: (pin: boolean) => Promise<void>;
   updateColumnDescription: (description: string) => Promise<void>;
+  updateColumnType: (fieldType: TableColumnTypeEnum) => Promise<void>;
+  updateColumnFieldName: (params: {
+    fieldName: string;
+    fieldType: TableColumnTypeEnum;
+  }) => Promise<void>;
   deleteColumn: () => Promise<void>;
   addColumn: (params: {
     tableId: string;
@@ -79,7 +87,7 @@ export type ProspectTableActions = {
     recordId: string;
     fieldId: string;
     value: string;
-  }) => Promise<void>;
+  }) => Promise<any>;
   resetTable: () => void;
 };
 
@@ -261,6 +269,67 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
     },
+    updateColumnType: async (fieldType) => {
+      const fieldId = get().activeColumnId;
+      const columns = get().columns;
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      if (!fieldId || !column || !UNotUndefined(fieldType)) {
+        return;
+      }
+
+      // Don't update if it's the same type
+      if (column.fieldType === fieldType) {
+        return;
+      }
+
+      const updatedColumns = columns.map((col) =>
+        col.fieldId === fieldId ? { ...col, fieldType } : col,
+      );
+      set({
+        columns: updatedColumns,
+      });
+
+      try {
+        await _updateTableColumnConfig({
+          fieldId,
+          fieldType,
+        });
+      } catch (err) {
+        handleApiError<ProspectTableState>(err, { columns }, set);
+      }
+    },
+    updateColumnFieldName: async (params) => {
+      const fieldId = get().activeColumnId;
+      const columns = get().columns;
+
+      const column = get().columns.find((col) => col.fieldId === fieldId);
+
+      const trimmedFieldName = params.fieldName.trim();
+      if (!fieldId || !column || !UNotUndefined(trimmedFieldName)) {
+        return;
+      }
+
+      const updatedColumns = columns.map((col) =>
+        col.fieldId === fieldId
+          ? { ...col, fieldName: trimmedFieldName, fieldType: params.fieldType }
+          : col,
+      );
+      set({
+        columns: updatedColumns,
+      });
+
+      try {
+        await _updateTableColumnConfig({
+          fieldId,
+          fieldName: trimmedFieldName,
+          fieldType: params.fieldType,
+        });
+      } catch (err) {
+        handleApiError<ProspectTableState>(err, { columns }, set);
+      }
+    },
     deleteColumn: async () => {
       const fieldId = get().activeColumnId;
       const columns = get().columns;
@@ -337,9 +406,11 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     // table cell
     updateCellValue: async (data) => {
       try {
-        await _updateTableCellValue(data);
+        const response = await _updateTableCellValue(data);
+        return response;
       } catch (err) {
         handleApiError<ProspectTableState>(err);
+        throw err;
       }
     },
     resetTable: () => {

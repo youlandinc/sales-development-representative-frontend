@@ -1,5 +1,4 @@
 import { FC, useMemo } from 'react';
-import { Stack } from '@mui/material';
 
 import { useBreakpoints } from '@/hooks';
 
@@ -7,14 +6,17 @@ import {
   SettingsEmailDomainContent,
   SettingsEmailDomainDialog,
   SettingsEmailDomainDialogRemove,
-  SettingsEmailDomainHeader,
+  SettingsEmailDomainDialogVerified,
 } from './components';
 import {
   useDialog,
   useDialogRemove,
+  useDialogVerified,
   useFetchCustomEmailDomain,
   useKeyDown,
 } from './hooks';
+import { SettingsBox } from '../SettingsBox';
+import { SettingsButton } from '../SettingsButton';
 
 export const SettingsEmailDomain: FC = () => {
   const breakpoints = useBreakpoints();
@@ -24,8 +26,14 @@ export const SettingsEmailDomain: FC = () => {
     [breakpoints],
   );
 
-  const { loading, emailDomainList, setEmailDomainList, onRefresh } =
-    useFetchCustomEmailDomain();
+  const { loading, onRefresh } = useFetchCustomEmailDomain();
+
+  const {
+    close: verifiedClose,
+    visible: verifiedVisible,
+    onOpenVerified,
+    onClickSetupMailbox,
+  } = useDialogVerified();
 
   const {
     activeStep,
@@ -46,8 +54,7 @@ export const SettingsEmailDomain: FC = () => {
     onClickSave,
     onClickCopy,
   } = useDialog({
-    emailDomainList,
-    setEmailDomainList,
+    onOpenVerified,
   });
 
   const {
@@ -64,11 +71,18 @@ export const SettingsEmailDomain: FC = () => {
   });
 
   return (
-    <Stack component={'form'} gap={'12px'} maxWidth={'900px'}>
-      <SettingsEmailDomainHeader onAddEmailDomain={onAddEmailDomain} />
-
+    <SettingsBox
+      button={
+        <SettingsButton
+          label="Add domain"
+          onClick={onAddEmailDomain}
+          width="95px"
+        />
+      }
+      subtitle="Verify your domains to start sending emails. You can only add mailboxes under verified domains."
+      title="Domains"
+    >
       <SettingsEmailDomainContent
-        data={emailDomainList}
         domain={domain}
         loading={loading}
         onClickView={onClickView}
@@ -100,6 +114,12 @@ export const SettingsEmailDomain: FC = () => {
         deleteVisible={deleteVisible}
         onClickToDelete={onClickToDelete}
       />
-    </Stack>
+
+      <SettingsEmailDomainDialogVerified
+        onClickSetupMailbox={onClickSetupMailbox}
+        verifiedClose={verifiedClose}
+        verifiedVisible={verifiedVisible}
+      />
+    </SettingsBox>
   );
 };

@@ -2,6 +2,7 @@ import { mergeAttributes, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
 import { PlaceholderNode } from './PlaceholderNode';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 export const ExtensionNode = Node.create({
   name: 'custom-placeholder',
@@ -21,10 +22,14 @@ export const ExtensionNode = Node.create({
         parseHTML: (t) => t.getAttribute('data-label'),
         renderHTML: (t) => (t.label ? { 'data-label': t.label } : {}),
       },
-      path: {
-        default: null,
-        parseHTML: (t) => t.getAttribute('data-path'),
-        renderHTML: (t) => (t.path ? { 'data-path': t.path } : {}),
+
+      fieldType: {
+        default: TableColumnTypeEnum.text,
+        parseHTML: (t) => t.getAttribute('data-field-type'),
+        renderHTML: (t) => {
+          console.log(t);
+          return t.fieldType ? { 'data-field-type': t.fieldType } : {};
+        },
       },
     };
   },

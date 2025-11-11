@@ -87,6 +87,17 @@ const submenuIconStyle: SxProps<Theme> = {
   fontSize: 16,
 };
 
+// For submenu title
+const submenuTitleStyle: SxProps<Theme> = {
+  px: 2,
+  py: 1,
+  fontSize: 12,
+  fontWeight: 600,
+  color: 'text.secondary',
+  letterSpacing: '0.5px',
+  cursor: 'default',
+};
+
 // ============================================================================
 // Exports
 // ============================================================================
@@ -100,6 +111,7 @@ export const menuStyles = {
   divider: dividerStyle,
   submenuPaper: submenuPaperStyle,
   submenuIcon: submenuIconStyle,
+  submenuTitle: submenuTitleStyle,
 } as const;
 
 /**

@@ -6,7 +6,7 @@ import { StyledRadioProps } from './index';
 import RADIO_CHECKED from './checked.svg';
 import RADIO_STATIC from './static.svg';
 
-export const StyledRadio: FC<RadioProps> = ({ sx, ...rest }) => {
+export const StyledRadio: FC<RadioProps> = ({ ...rest }) => {
   return (
     <Radio
       checkedIcon={
@@ -34,7 +34,6 @@ export const StyledRadioWithLabel: FC<StyledRadioProps> = ({
     <FormControlLabel
       control={<StyledRadio {...rest} />}
       disabled={disabled}
-      //label={`${label}-${label}-${label}`}
       label={label}
       sx={{
         m: 0,

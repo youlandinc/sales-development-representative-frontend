@@ -27,6 +27,7 @@ export interface StyledSelectProps extends BaseSelectProps {
   onClear?: () => void;
   loading?: boolean;
   loadOptions?: () => Promise<void>;
+  renderOption?: (option: TOption) => React.ReactNode;
 }
 
 export const StyledSelect: FC<StyledSelectProps> = ({
@@ -48,6 +49,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   onClear,
   loading,
   loadOptions,
+  renderOption,
   ...rest
   //sxHelperText,
 }) => {
@@ -214,34 +216,24 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         {...rest}
         // size={['xs', 'sm', 'md'].includes(breakpoints) ? 'small' : 'medium'}
       >
-        {/*{placeholder && (*/}
-        {/*  <MenuItem disabled value="">*/}
-        {/*    {loading ? (*/}
-        {/*      <StyledLoading*/}
-        {/*        size={24}*/}
-        {/*        sx={{*/}
-        {/*          color: 'text.primary',*/}
-        {/*        }}*/}
-        {/*      />*/}
-        {/*    ) : (*/}
-        {/*      <Typography variant={'body2'}>{placeholder}</Typography>*/}
-        {/*    )}*/}
-        {/*  </MenuItem>*/}
-        {/*)}*/}
         {!loading &&
-          options.map((opt) => (
-            <MenuItem
-              disabled={opt.disabled}
-              key={opt.key}
-              sx={{ gap: 1 }}
-              value={opt.value}
-            >
-              {opt.icon && (
-                <Icon component={opt.icon} sx={{ width: 16, height: 16 }} />
-              )}
-              {opt.label}
-            </MenuItem>
-          ))}
+          options.map((opt) =>
+            renderOption ? (
+              renderOption(opt)
+            ) : (
+              <MenuItem
+                disabled={opt.disabled}
+                key={opt.key}
+                sx={{ gap: 1 }}
+                value={opt.value}
+              >
+                {opt.icon && (
+                  <Icon component={opt.icon} sx={{ width: 16, height: 16 }} />
+                )}
+                {opt.label}
+              </MenuItem>
+            ),
+          )}
       </Select>
     </FormControl>
   );

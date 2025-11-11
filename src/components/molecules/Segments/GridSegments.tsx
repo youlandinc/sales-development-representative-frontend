@@ -24,7 +24,6 @@ import {
   _fetchSegmentsList,
   _updateExistSegment,
 } from '@/request';
-import { UFormatNumber } from '@/utils';
 
 export const GridSegments = () => {
   // const router = useRouter();

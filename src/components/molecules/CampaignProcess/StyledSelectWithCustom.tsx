@@ -15,7 +15,7 @@ interface StyledSelectWithCustomProps {
 export const StyledSelectWithCustom: FC<StyledSelectWithCustomProps> = ({
   options,
   selectValue,
-  inputValue,
+  //inputValue,
   placeholder,
   onSelectChange,
   onClear,

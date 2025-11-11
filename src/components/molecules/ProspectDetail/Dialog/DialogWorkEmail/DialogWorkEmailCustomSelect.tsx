@@ -3,14 +3,15 @@ import {
   AutocompleteProps,
   Icon,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import { FC, ReactNode } from 'react';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 
-import ICON_TEXT from '@/components/molecules/ProspectDetail/assets/dialog/icon_text.svg';
+import { StyledTextField } from '@/components/atoms';
+import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 export const DialogWorkEmailCustomSelect: FC<
   { title?: string | ReactNode; required?: boolean } & Pick<
@@ -20,11 +21,11 @@ export const DialogWorkEmailCustomSelect: FC<
 > = ({ title, onChange, value, required }) => {
   const { columns } = useProspectTableStore((store) => store);
 
-  const options = columns.map((item) => ({
+  const options: TOption[] = columns.map((item) => ({
     label: item.fieldName,
     value: item.fieldId,
     key: item.fieldId,
-  })) as TOption[];
+  }));
 
   return (
     <Stack gap={0.5}>
@@ -53,7 +54,7 @@ export const DialogWorkEmailCustomSelect: FC<
         options={options}
         renderInput={(params) => {
           return (
-            <TextField
+            <StyledTextField
               {...params}
               fullWidth
               placeholder={'Start typing or select a column'}
@@ -62,7 +63,12 @@ export const DialogWorkEmailCustomSelect: FC<
                   ...params.InputProps,
                   startAdornment: !value ? null : (
                     <Icon
-                      component={ICON_TEXT}
+                      component={
+                        COLUMN_TYPE_ICONS[
+                          columns.find((col) => col.fieldId === value.value)
+                            ?.fieldType as TableColumnTypeEnum
+                        ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+                      }
                       sx={{ width: 16, height: 16 }}
                     />
                   ),
@@ -82,7 +88,15 @@ export const DialogWorkEmailCustomSelect: FC<
               key={key}
               {...optionProps}
             >
-              <Icon component={ICON_TEXT} sx={{ width: 16, height: 16 }} />
+              <Icon
+                component={
+                  COLUMN_TYPE_ICONS[
+                    columns.find((col) => col.fieldId === option.value)
+                      ?.fieldType as TableColumnTypeEnum
+                  ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+                }
+                sx={{ width: 16, height: 16 }}
+              />
               {option.label}
             </Stack>
           );

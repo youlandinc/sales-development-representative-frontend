@@ -15,7 +15,6 @@ export const ExtensionMention = Mention.extend({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const parentAttributes = this?.parent ? this.parent() : {};
-
     return {
       // 先继承父类的属性
       ...parentAttributes,

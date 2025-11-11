@@ -1,11 +1,11 @@
 import { FC } from 'react';
-import { Avatar, Icon, Stack, SxProps, Typography } from '@mui/material';
+import { Avatar, Stack, SxProps, Typography } from '@mui/material';
 
 import { CampaignLeadItem } from '@/types';
 
 import { StyledTooltip } from '@/components/atoms';
 
-import ICON_LINKEDIN from './assets/icon_linkedin.svg';
+//import ICON_LINKEDIN from './assets/icon_linkedin.svg';
 
 interface CampaignLeadItemProps extends CampaignLeadItem {
   sx?: SxProps;
@@ -18,7 +18,7 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
   firstName,
   lastName,
   role,
-  company,
+  //company,
   backgroundColor,
   sx,
   avatar,

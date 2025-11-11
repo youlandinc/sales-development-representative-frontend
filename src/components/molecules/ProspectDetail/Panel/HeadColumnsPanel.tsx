@@ -10,36 +10,11 @@ import {
 } from '@mui/material';
 
 import { useProspectTableStore } from '@/stores/Prospect';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { COLUMN_TYPE_ICONS } from '@/constant/table';
 
 import ICON_COLUMN from '../assets/head/icon-column.svg';
-
 import ICON_COLUMN_HIDE from '../assets/table/icon-column-hide.svg';
 import ICON_COLUMN_VISIBLE from '../assets/table/icon-column-visible.svg';
-
-import ICON_TYPE_TEXT from '../assets/head/icon-type-text.svg';
-import ICON_TYPE_NUMBER from '../assets/head/icon-type-number.svg';
-import ICON_TYPE_EMAIL from '../assets/head/icon-type-email.svg';
-import ICON_TYPE_PHONE from '../assets/head/icon-type-phone.svg';
-import ICON_TYPE_CURRENCY from '../assets/head/icon-type-currency.svg';
-import ICON_TYPE_DATE from '../assets/head/icon-type-date.svg';
-import ICON_TYPE_URL from '../assets/head/icon-type-url.svg';
-import ICON_TYPE_IMG_URL from '../assets/head/icon-type-img-url.svg';
-import ICON_TYPE_CHECKBOX from '../assets/head/icon-type-checkbox.svg';
-import ICON_TYPE_SELECT from '../assets/head/icon-type-select.svg';
-
-const ICON_HASH = {
-  [TableColumnTypeEnum.text]: ICON_TYPE_TEXT,
-  [TableColumnTypeEnum.number]: ICON_TYPE_NUMBER,
-  [TableColumnTypeEnum.email]: ICON_TYPE_EMAIL,
-  [TableColumnTypeEnum.phone]: ICON_TYPE_PHONE,
-  [TableColumnTypeEnum.currency]: ICON_TYPE_CURRENCY,
-  [TableColumnTypeEnum.date]: ICON_TYPE_DATE,
-  [TableColumnTypeEnum.url]: ICON_TYPE_URL,
-  [TableColumnTypeEnum.img_url]: ICON_TYPE_IMG_URL,
-  [TableColumnTypeEnum.checkbox]: ICON_TYPE_CHECKBOX,
-  [TableColumnTypeEnum.select]: ICON_TYPE_SELECT,
-};
 
 export const HeadColumnsPanel = () => {
   const { columns, updateColumnVisible } = useProspectTableStore(
@@ -113,7 +88,7 @@ export const HeadColumnsPanel = () => {
                       }}
                     >
                       <Icon
-                        component={ICON_HASH[col.fieldType]}
+                        component={COLUMN_TYPE_ICONS[col.fieldType]}
                         sx={{
                           width: 16,
                           height: 16,
