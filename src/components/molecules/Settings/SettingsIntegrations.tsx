@@ -1,9 +1,9 @@
 import { FC, useState } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { CircularProgress, Icon, Stack, Typography } from '@mui/material';
 import useSWR from 'swr';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { SDRToast, StyledButton } from '@/components/atoms';
+import { SDRToast } from '@/components/atoms';
 
 import { _fetchHubspotIntegrations } from '@/request';
 import { HttpError, UserIntegrationEnum, UserIntegrationItem } from '@/types';
@@ -11,6 +11,8 @@ import { HttpError, UserIntegrationEnum, UserIntegrationItem } from '@/types';
 import ICON_HUBSPOT from './assets/icon_hubspot.svg';
 import ICON_SALESFORCE from './assets/icon_salesforce.svg';
 import ICON_PIPEDRIVE from './assets/icon_pipedrive.svg';
+import ICON_LINK from './assets/icon_link.svg';
+import ICON_ADD from './assets/icon_add.svg';
 
 const INTEGRATIONS_NAME_MAP: {
   [key in UserIntegrationEnum]: { name: string; icon: any };
@@ -111,8 +113,12 @@ export const SettingsIntegrations: FC = () => {
             border={'1px solid #DFDEE6'}
             borderRadius={1}
             flexDirection={'row'}
+            justifyContent={'space-between'}
             key={`${integration.provider}-${index}`}
             p={1.5}
+            sx={{
+              backgroundColor: integration.connected ? '#fff' : '#F8F8FA',
+            }}
             width={438}
           >
             <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
@@ -130,40 +136,45 @@ export const SettingsIntegrations: FC = () => {
                 {INTEGRATIONS_NAME_MAP[integration.provider]?.name}
               </Typography>
             </Stack>
-            <StyledButton
-              color={'info'}
-              disabled={isLoading}
-              loading={isLoading}
-              onClick={() => {
-                if (isLoading) {
-                  return;
-                }
-                router.push(
-                  integration.connected
-                    ? integration.websiteUrl
-                    : integration.oauthUrl,
-                );
-              }}
-              size={'medium'}
-              sx={{
-                ml: 'auto',
-                minWidth: 64,
-                maxWidth: 220,
-              }}
-              variant={'outlined'}
-            >
-              <Typography
-                sx={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+            {isLoading ? (
+              <CircularProgress
+                size={20}
+                sx={{ width: '100%', color: '#E3E3EE' }}
+              />
+            ) : (
+              <Stack
+                onClick={() => {
+                  router.push(
+                    integration.connected
+                      ? integration.websiteUrl
+                      : integration.oauthUrl,
+                  );
                 }}
-                variant={'body2'}
-                width={'fit-content'}
+                sx={{
+                  cursor: 'pointer',
+                }}
               >
-                {integration.connected ? integration.account : 'Add'}
-              </Typography>
-            </StyledButton>
+                {integration.connected ? (
+                  <Stack flexDirection={'row'} gap={'4px'}>
+                    <Typography
+                      color="#363440"
+                      fontSize={14}
+                      fontWeight={400}
+                      lineHeight={1.5}
+                      variant={'body2'}
+                    >
+                      {integration.account}
+                    </Typography>
+                    <Icon
+                      component={ICON_LINK}
+                      sx={{ width: 20, height: 20 }}
+                    />
+                  </Stack>
+                ) : (
+                  <Icon component={ICON_ADD} sx={{ width: 20, height: 20 }} />
+                )}
+              </Stack>
+            )}
           </Stack>
         ))}
       </Stack>

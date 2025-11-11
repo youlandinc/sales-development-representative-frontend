@@ -111,3 +111,10 @@ export const _updateEmailProfile = (data: EmailProfileRequest) => {
 export const _deleteEmailProfile = (id: number) => {
   return del(`/sdr/email/profile/info/${id}`);
 };
+
+export const _modifyUserInfo = (param: {
+  firstName: string;
+  lastName: string;
+}) => {
+  return post('/usercenter/api/user/modifyUserInfo', param);
+};
