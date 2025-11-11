@@ -15,7 +15,11 @@ import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
-import { checkIsAiColumn, MIN_BATCH_SIZE } from '@/constant/table';
+import {
+  checkIsAiColumn,
+  MIN_BATCH_SIZE,
+  SYSTEM_COLUMN_SELECT,
+} from '@/constant/table';
 
 interface UseProspectTableParams {
   tableId: string;
@@ -674,7 +678,7 @@ export const useProspectTable = ({
   // 3. 错误处理需要增强
   const onRunAi = useCallback(
     async (params: {
-      fieldId: string; // '__select' or actual fieldId
+      fieldId: string;
       recordId?: string;
       isHeader?: boolean;
       recordCount?: number;
@@ -683,26 +687,19 @@ export const useProspectTable = ({
 
       try {
         if (isHeader) {
-          const apiParams: any = {
-            tableId,
-            fieldId,
-          };
+          const apiParams: any = { tableId, fieldId };
 
           if (recordCount !== undefined) {
             apiParams.recordCount = recordCount;
             const targetRecordIds = rowIds.slice(0, recordCount);
-
             await runAi(apiParams);
-
             targetRecordIds.forEach((rid) => {
               onUpdateRowData(rid, {
                 [fieldId]: { value: '', isFinished: false },
               });
             });
           } else {
-            // Run all rows
             await runAi(apiParams);
-
             rowIds.forEach((rid) => {
               onUpdateRowData(rid, {
                 [fieldId]: { value: '', isFinished: false },
@@ -710,46 +707,44 @@ export const useProspectTable = ({
             });
           }
         } else if (recordId) {
-          // 如果 fieldId 是 '__select'，说明点击的是选择列的 AI 图标
-          // 需要获取所有符合 AI 条件的列
-          const aiFieldsWithDependents = columns.filter(checkIsAiColumn);
+          // Check if clicking select column (run all AI columns) or specific column
+          const isSelectColumn = fieldId === SYSTEM_COLUMN_SELECT;
+          const targetColumns = isSelectColumn
+            ? columns.filter(checkIsAiColumn)
+            : columns.filter((col) => col.fieldId === fieldId);
 
-          // 收集所有 fieldIds，包括 dependentFieldId
+          if (targetColumns.length === 0) {
+            return;
+          }
+
+          // Collect fieldIds and prepare loading states
           const fieldIds: string[] = [];
           const loadingUpdates: Record<string, boolean> = {};
-          aiFieldsWithDependents.forEach((col) => {
+          const updates: Record<string, any> = {};
+
+          targetColumns.forEach((col) => {
             fieldIds.push(col.fieldId);
             loadingUpdates[col.fieldId] = true;
+            updates[col.fieldId] = { value: '', isFinished: false };
+
             if (col.dependentFieldId) {
               fieldIds.push(col.dependentFieldId);
               loadingUpdates[col.dependentFieldId] = true;
-            }
-          });
-
-          // 立即设置 loading 状态
-          setAiLoadingState((prev) => ({
-            ...prev,
-            [recordId]: {
-              ...prev[recordId],
-              ...loadingUpdates,
-            },
-          }));
-
-          // 设置数据状态
-          const updates: Record<string, any> = {};
-          aiFieldsWithDependents.forEach((col) => {
-            updates[col.fieldId] = { value: '', isFinished: false };
-            if (col.dependentFieldId) {
               updates[col.dependentFieldId] = { value: '', isFinished: false };
             }
           });
+
+          // Set loading state
+          setAiLoadingState((prev) => ({
+            ...prev,
+            [recordId]: { ...prev[recordId], ...loadingUpdates },
+          }));
+
+          // Update row data
           onUpdateRowData(recordId, updates);
 
-          await runAi({
-            tableId,
-            recordIds: [recordId],
-            fieldIds,
-          });
+          // Run AI
+          await runAi({ tableId, recordIds: [recordId], fieldIds });
         }
 
         await onInitializeAiColumns();

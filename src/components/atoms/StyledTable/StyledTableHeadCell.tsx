@@ -14,10 +14,7 @@ import { flexRender, Header } from '@tanstack/react-table';
 import { StyledTableAiIcon } from './index';
 
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constant/table';
-import {
-  TableColumnMeta,
-  TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+import { TableColumnMeta, TableColumnTypeEnum } from '@/types/Prospect/table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -152,7 +149,6 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
         '&:hover': {
-          //bgcolor: !isEditing ? '#BBDEFB' : '#F6F6F6',
           bgcolor: !isEditing ? '#F7F4FD' : '#F6F6F6',
         },
         height: '36px',

@@ -291,13 +291,13 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
       e.preventDefault();
 
       tableMeta?.onRunAi?.({
-        fieldId: columnId,
+        fieldId: isSelectColumn ? SYSTEM_COLUMN_SELECT : columnId,
         recordId: recordId,
         isHeader: false,
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columnId, recordId],
+    [columnId, recordId, isSelectColumn],
   );
 
   const cellBackgroundColor = getCellBackgroundColor(
