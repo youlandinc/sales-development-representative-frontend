@@ -76,9 +76,27 @@ export const SettingsIntegrations: FC = () => {
 
   return (
     <Stack border={'1px solid #DFDEE6'} borderRadius={4} gap={3} p={3}>
-      <Typography component={'div'} lineHeight={1.2} variant={'h6'}>
-        Integrations
-      </Typography>
+      <Stack gap={'4px'}>
+        <Typography
+          component={'div'}
+          fontSize={18}
+          lineHeight={1.2}
+          variant={'h6'}
+        >
+          Integrations
+        </Typography>
+        <Typography
+          color={'#6F6C7D'}
+          component={'div'}
+          fontSize={14}
+          fontWeight={400}
+          lineHeight={1.2}
+          variant={'h6'}
+        >
+          Import your contacts and segments from connected CRMs into your
+          workspace for faster campaign setup.
+        </Typography>
+      </Stack>
 
       <Stack
         flexDirection={'row'}
@@ -91,14 +109,14 @@ export const SettingsIntegrations: FC = () => {
           <Stack
             alignItems={'center'}
             border={'1px solid #DFDEE6'}
-            borderRadius={2}
+            borderRadius={1}
             flexDirection={'row'}
             key={`${integration.provider}-${index}`}
             p={1.5}
             width={438}
           >
-            <Stack alignItems={'center'} flexDirection={'row'} gap={2}>
-              <Stack border={'1px solid #DFDEE6'} borderRadius={'50%'} p={0.75}>
+            <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
+              <Stack border={'1px solid #DFDEE6'} borderRadius={'50%'} p={0.5}>
                 <Icon
                   component={INTEGRATIONS_NAME_MAP[integration.provider]?.icon}
                   sx={{

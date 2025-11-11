@@ -1,20 +1,20 @@
 import { CircularProgress, Divider, Stack, Typography } from '@mui/material';
 
-import { Mailbox } from '../data';
+import { Mailbox } from '@/types';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 
 interface SettingsContentProps {
   loading: boolean;
-  data: Mailbox[];
   onRemove: (item: Mailbox) => void;
   onClickEdit: (item: Mailbox) => void;
 }
 
 export const SettingsContent = ({
   loading,
-  data,
   onRemove,
   onClickEdit,
 }: SettingsContentProps) => {
+  const { mailboxes: data } = useSettingsStore((state) => state);
   if (loading) {
     return (
       <Stack alignItems={'center'} flex={1} justifyContent={'center'}>

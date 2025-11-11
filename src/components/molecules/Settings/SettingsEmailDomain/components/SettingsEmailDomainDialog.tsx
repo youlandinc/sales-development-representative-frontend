@@ -246,7 +246,7 @@ export const SettingsEmailDomainDialog = ({
             </Typography>
             <StyledTextField
               label={'Email domain'}
-              onChange={(e) => setDomain(e.target.value)}
+              onChange={(e) => setDomain(e.target.value.trim())}
               placeholder={'Email domain (ex: corepass.com)'}
               sx={{
                 mt: 1.5,

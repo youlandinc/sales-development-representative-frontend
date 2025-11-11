@@ -1,9 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { useSettingsStore } from '@/stores/useSettingsStore';
+
 import { useSwitch } from '@/hooks';
 import { SDRToast } from '@/components/atoms';
-import { EmailDomainDetails } from '@/types';
-import { _saveMailbox, _updateMailbox, Mailbox } from '../data';
+import { Mailbox } from '@/types';
+
+import { _saveMailbox, _updateMailbox } from '../data';
 
 enum ActiveTypeEnum {
   add = 'add',
@@ -12,10 +15,10 @@ enum ActiveTypeEnum {
 
 interface UseDialogProps {
   onRefresh: () => void;
-  emailDomainList: EmailDomainDetails[];
 }
 
-export const useDialog = ({ onRefresh, emailDomainList }: UseDialogProps) => {
+export const useDialog = ({ onRefresh }: UseDialogProps) => {
+  const { emailDomainList } = useSettingsStore((state) => state);
   const { open, close, visible } = useSwitch(false);
 
   const [saveLoading, setSaveLoading] = useState(false);

@@ -1,10 +1,4 @@
-import { del, get, post, put } from '@/request/request';
-
-import { Mailbox } from './types';
-
-export const _fetchMailboxes = () => {
-  return get<Mailbox[]>('/sdr/mailbox/list');
-};
+import { del, post, put } from '@/request/request';
 
 export const _saveMailbox = (params: {
   prefixName: string;

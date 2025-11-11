@@ -1,20 +1,13 @@
 import { FC } from 'react';
-
-import { EmailDomainDetails } from '@/types';
+import { Box } from '@mui/material';
 
 import { SettingsContent, SettingsDialog, SettingsRemove } from './components';
 import { SettingsBox } from '../SettingsBox';
 import { SettingsButton } from '../SettingsButton';
 import { useDialog, useDialogRemove, useFetchMailboxes } from './hooks';
 
-interface SettingMailboxesProps {
-  emailDomainList: EmailDomainDetails[];
-}
-
-export const SettingMailboxes: FC<SettingMailboxesProps> = ({
-  emailDomainList,
-}) => {
-  const { loading, mailboxes, onRefresh } = useFetchMailboxes();
+export const SettingMailboxes: FC = () => {
+  const { loading, onRefresh } = useFetchMailboxes();
   const {
     onAddMailbox,
     onClickEdit,
@@ -27,7 +20,7 @@ export const SettingMailboxes: FC<SettingMailboxesProps> = ({
     setMailboxPrefix,
     domain,
     setDomain,
-  } = useDialog({ onRefresh, emailDomainList });
+  } = useDialog({ onRefresh });
   const {
     deleteLoading,
     onClickToDelete,
@@ -39,24 +32,24 @@ export const SettingMailboxes: FC<SettingMailboxesProps> = ({
   return (
     <SettingsBox
       button={
-        <SettingsButton
-          label="Add mailbox"
-          onClick={onAddMailbox}
-          width="95px"
-        />
+        <Box id="add-mailbox-button">
+          <SettingsButton
+            label="Add mailbox"
+            onClick={onAddMailbox}
+            width="95px"
+          />
+        </Box>
       }
       subtitle="Add your sending accounts under a verified domain. Each mailbox represents a real email account used to send messages."
       title="Mailboxes"
     >
       <SettingsContent
-        data={mailboxes}
         loading={loading}
         onClickEdit={onClickEdit}
         onRemove={onRemove}
       />
       <SettingsDialog
         domain={domain}
-        emailDomainList={emailDomainList}
         mailboxPrefix={mailboxPrefix}
         onCancelDialog={onCancelDialog}
         onClickSave={onClickSave}

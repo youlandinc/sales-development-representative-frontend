@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 
 import { useBreakpoints } from '@/hooks';
 
@@ -6,26 +6,19 @@ import {
   SettingsEmailDomainContent,
   SettingsEmailDomainDialog,
   SettingsEmailDomainDialogRemove,
+  SettingsEmailDomainDialogVerified,
 } from './components';
 import {
   useDialog,
   useDialogRemove,
+  useDialogVerified,
   useFetchCustomEmailDomain,
   useKeyDown,
 } from './hooks';
-import { EmailDomainDetails } from '@/types';
 import { SettingsBox } from '../SettingsBox';
 import { SettingsButton } from '../SettingsButton';
 
-interface SettingsEmailDomainProps {
-  emailDomainList: EmailDomainDetails[];
-  setEmailDomainList: Dispatch<SetStateAction<EmailDomainDetails[]>>;
-}
-
-export const SettingsEmailDomain: FC<SettingsEmailDomainProps> = ({
-  emailDomainList,
-  setEmailDomainList,
-}) => {
+export const SettingsEmailDomain: FC = () => {
   const breakpoints = useBreakpoints();
   // Integrate duplicate data
   const isSmall = useMemo(
@@ -33,9 +26,14 @@ export const SettingsEmailDomain: FC<SettingsEmailDomainProps> = ({
     [breakpoints],
   );
 
-  const { loading, onRefresh } = useFetchCustomEmailDomain({
-    setEmailDomainList,
-  });
+  const { loading, onRefresh } = useFetchCustomEmailDomain();
+
+  const {
+    close: verifiedClose,
+    visible: verifiedVisible,
+    onOpenVerified,
+    onClickSetupMailbox,
+  } = useDialogVerified();
 
   const {
     activeStep,
@@ -56,8 +54,7 @@ export const SettingsEmailDomain: FC<SettingsEmailDomainProps> = ({
     onClickSave,
     onClickCopy,
   } = useDialog({
-    emailDomainList,
-    setEmailDomainList,
+    onOpenVerified,
   });
 
   const {
@@ -86,7 +83,6 @@ export const SettingsEmailDomain: FC<SettingsEmailDomainProps> = ({
       title="Domains"
     >
       <SettingsEmailDomainContent
-        data={emailDomainList}
         domain={domain}
         loading={loading}
         onClickView={onClickView}
@@ -117,6 +113,12 @@ export const SettingsEmailDomain: FC<SettingsEmailDomainProps> = ({
         deleteLoading={deleteLoading}
         deleteVisible={deleteVisible}
         onClickToDelete={onClickToDelete}
+      />
+
+      <SettingsEmailDomainDialogVerified
+        onClickSetupMailbox={onClickSetupMailbox}
+        verifiedClose={verifiedClose}
+        verifiedVisible={verifiedVisible}
       />
     </SettingsBox>
   );

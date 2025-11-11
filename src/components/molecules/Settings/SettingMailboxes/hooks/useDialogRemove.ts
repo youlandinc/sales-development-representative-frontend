@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 
 import { useSwitch } from '@/hooks';
-import { HttpError } from '@/types';
+import { HttpError, Mailbox } from '@/types';
 import { SDRToast } from '@/components/atoms';
 
-import { _deleteMailbox, Mailbox } from '../data';
+import { _deleteMailbox } from '../data';
 
 interface UseDialogRemoveProps {
   onRefresh: () => Promise<void>;

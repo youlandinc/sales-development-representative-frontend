@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 
-import { HttpError } from '@/types';
+import { EmailDomainDetails, HttpError, Mailbox } from '@/types';
 
 import { SDRToast } from '@/components/atoms';
 
-import { _fetchEmailSignatures } from '@/request';
+import {
+  _fetchCustomEmailDomains,
+  _fetchEmailSignatures,
+  _fetchMailboxes,
+} from '@/request';
 
 interface SignatureInfo {
   name: string;
@@ -14,10 +18,14 @@ interface SignatureInfo {
 export interface SettingsStoreState {
   signatures: SignatureInfo[];
   fetchSignatureLoading: boolean;
+  emailDomainList: EmailDomainDetails[];
+  mailboxes: Mailbox[];
 }
 
 export type SettingsStoreStateActions = {
   fetchSignatures: () => Promise<void>;
+  fetchEmailDomainList: (tenantId: string) => Promise<void>;
+  fetchMailboxes: () => Promise<void>;
 };
 
 export type SettingsStoreProps = SettingsStoreState & SettingsStoreStateActions;
@@ -37,6 +45,26 @@ export const useSettingsStore = create<SettingsStoreProps>()((set) => ({
       SDRToast({ message, header, variant });
     } finally {
       set({ fetchSignatureLoading: false });
+    }
+  },
+  emailDomainList: [],
+  fetchEmailDomainList: async (tenantId: string) => {
+    try {
+      const { data } = await _fetchCustomEmailDomains(tenantId);
+      set({ emailDomainList: data });
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  },
+  mailboxes: [],
+  fetchMailboxes: async () => {
+    try {
+      const { data } = await _fetchMailboxes();
+      set({ mailboxes: data });
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
     }
   },
 }));

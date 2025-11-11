@@ -1,24 +1,11 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { EmailDomainDetails, HttpError } from '@/types';
-import { _fetchCustomEmailDomains } from '@/request';
 import { useUserStore } from '@/providers';
-import { SDRToast } from '@/components/atoms';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 
-interface UseFetchCustomEmailDomainProps {
-  setEmailDomainList: Dispatch<SetStateAction<EmailDomainDetails[]>>;
-}
-
-export const useFetchCustomEmailDomain = ({
-  setEmailDomainList,
-}: UseFetchCustomEmailDomainProps) => {
+export const useFetchCustomEmailDomain = () => {
   const { userProfile } = useUserStore((state) => state);
+  const { fetchEmailDomainList } = useSettingsStore((state) => state);
   const { tenantId } = userProfile;
 
   const [loading, setLoading] = useState(false);
@@ -29,15 +16,11 @@ export const useFetchCustomEmailDomain = ({
     }
     setLoading(true);
     try {
-      const { data } = await _fetchCustomEmailDomains(tenantId);
-      setEmailDomainList(data);
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
+      await fetchEmailDomainList(tenantId);
     } finally {
       setLoading(false);
     }
-  }, [loading, tenantId, setEmailDomainList]);
+  }, [loading, tenantId, fetchEmailDomainList]);
 
   useEffect(() => {
     tenantId && onRefresh();

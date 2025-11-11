@@ -83,3 +83,7 @@ export const _verifyCustomEmailDomain = (params: { domain: string }) => {
 export const _deleteCustomEmailDomain = (id: number | string) => {
   return del(`/usercenter/api/customEmail/${id}`);
 };
+
+export const _fetchMailboxes = () => {
+  return get('/sdr/mailbox/list');
+};

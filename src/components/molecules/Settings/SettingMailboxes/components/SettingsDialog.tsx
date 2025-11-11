@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
+import { useSettingsStore } from '@/stores/useSettingsStore';
 import {
   StyledButton,
   StyledDialog,
@@ -8,7 +9,7 @@ import {
   StyledTextField,
   StyledTooltip,
 } from '@/components/atoms';
-import { EmailDomainDetails, EmailDomainState } from '@/types';
+import { EmailDomainState } from '@/types';
 
 import ICON_INFO from '../assets/icon_info.svg';
 
@@ -20,7 +21,6 @@ interface SettingsDialogProps {
   onClickSave: () => void;
   mailboxPrefix: string;
   setMailboxPrefix: Dispatch<SetStateAction<string>>;
-  emailDomainList: EmailDomainDetails[];
   domain: string;
   setDomain: Dispatch<SetStateAction<string>>;
 }
@@ -33,10 +33,11 @@ export const SettingsDialog = ({
   onClickSave,
   mailboxPrefix,
   setMailboxPrefix,
-  emailDomainList,
   domain,
   setDomain,
 }: SettingsDialogProps) => {
+  const { emailDomainList } = useSettingsStore((state) => state);
+
   const domainOptions = useMemo(() => {
     return emailDomainList
       .filter((item) =>

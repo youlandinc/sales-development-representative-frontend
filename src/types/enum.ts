@@ -84,6 +84,13 @@ export interface EmailDomainDetails {
   userName: string;
 }
 
+export interface Mailbox {
+  id: string;
+  prefixName: string;
+  domain: string;
+  mailboxName: string;
+}
+
 export interface EmailDomainData {
   domainType: string;
   recordName: string;

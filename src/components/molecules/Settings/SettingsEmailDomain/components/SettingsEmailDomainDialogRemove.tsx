@@ -55,7 +55,7 @@ export const SettingsEmailDomainDialogRemove = ({
               width: 70,
               height: '40px !important',
               color: '#fff',
-              backgroundColor: '#6E4EFB',
+              backgroundColor: '#E26E6E !important',
             }}
           >
             Delete

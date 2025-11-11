@@ -2,12 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
-
-import { _fetchMailboxes, Mailbox } from '../data';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 
 export const useFetchMailboxes = () => {
   const [loading, setLoading] = useState(false);
-  const [mailboxes, setMailboxes] = useState<Mailbox[]>([]);
+  const { fetchMailboxes } = useSettingsStore((state) => state);
 
   const onRefresh = useCallback(async () => {
     if (loading) {
@@ -15,15 +14,14 @@ export const useFetchMailboxes = () => {
     }
     setLoading(true);
     try {
-      const { data } = await _fetchMailboxes();
-      setMailboxes(data);
+      await fetchMailboxes();
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, [loading, fetchMailboxes]);
 
   useEffect(() => {
     onRefresh();
@@ -32,8 +30,6 @@ export const useFetchMailboxes = () => {
 
   return {
     loading,
-    mailboxes,
-    setMailboxes,
     onRefresh,
   };
 };

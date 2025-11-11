@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 
+import { useSettingsStore } from '@/stores/useSettingsStore';
 import { DomainSource, EmailDomainDetails, EmailDomainState } from '@/types';
 
 import ICON_PENDING from '../../assets/icon_email_pending.svg';
@@ -13,29 +14,28 @@ import ICON_SUCCESS from '../../assets/icon_email_success.svg';
 
 const DomainStateHash = {
   [EmailDomainState.ACTIVE]: 'Verified',
-  [EmailDomainState.SUCCESS]: 'Waiting for sender setup',
+  [EmailDomainState.SUCCESS]: 'Verified',
   [EmailDomainState.PENDING]: 'Waiting for verification',
   [EmailDomainState.FAILED]: 'Waiting for verification',
 };
 
 const DomainStateActionHash = {
   [EmailDomainState.ACTIVE]: '',
-  [EmailDomainState.SUCCESS]: 'View',
+  [EmailDomainState.SUCCESS]: '',
   [EmailDomainState.PENDING]: 'View',
   [EmailDomainState.FAILED]: 'View',
 };
 
 const DomainStateIconHash = {
-  [EmailDomainState.SUCCESS]: ICON_PENDING,
-  [EmailDomainState.PENDING]: ICON_PENDING,
   [EmailDomainState.ACTIVE]: ICON_SUCCESS,
+  [EmailDomainState.SUCCESS]: ICON_SUCCESS,
+  [EmailDomainState.PENDING]: ICON_PENDING,
   [EmailDomainState.FAILED]: ICON_PENDING,
 };
 
 interface SettingsEmailDomainContentProps {
   loading: boolean;
   viewLoading: boolean;
-  data: EmailDomainDetails[];
   domain: string;
   onRemove: (item: EmailDomainDetails) => void;
   onClickView: (domain: string) => void;
@@ -44,11 +44,11 @@ interface SettingsEmailDomainContentProps {
 export const SettingsEmailDomainContent = ({
   loading,
   viewLoading,
-  data,
   domain,
   onRemove,
   onClickView,
 }: SettingsEmailDomainContentProps) => {
+  const { emailDomainList: data } = useSettingsStore((state) => state);
   if (loading) {
     return (
       <Stack alignItems={'center'} flex={1} justifyContent={'center'}>
