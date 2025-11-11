@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { getParamsFromUrl, UEncode } from '@/utils';
-import { APP_KEY } from '@/constant';
+import { APP_KEY, DEFAULT_LOGGED_IN_PATH } from '@/constant';
 import { useUserStore } from '@/providers';
 
 import { SDRToast } from '@/components/atoms';
@@ -10,15 +11,14 @@ import { LoginTypeEnum } from '@/types';
 import { _userLogin, _userSetPassword } from '@/request';
 
 import { useCheckPassword } from './useCheckPassword';
-import { useLogged } from './useLogged';
 
 export const useSetPassword = () => {
+  const router = useRouter();
   const { setAccessToken, setUserProfile } = useUserStore((state) => state);
 
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { passwordError } = useCheckPassword({ password });
-  const { setShowToast } = useLogged();
 
   const isDisabled = useMemo(() => {
     return !password || !Object.values(passwordError).every(Boolean);
@@ -55,9 +55,9 @@ export const useSetPassword = () => {
         const {
           data: { accessToken, userProfile },
         } = await _userLogin(loginData);
-        setShowToast(false);
         setAccessToken(accessToken);
         setUserProfile(userProfile);
+        router.push(DEFAULT_LOGGED_IN_PATH);
       }
     } catch (err) {
       const { message, header, variant } = err as HttpError;

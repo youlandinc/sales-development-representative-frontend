@@ -26,10 +26,6 @@ import { _fetchEmails, _fetchEmailsDetails } from '@/request';
 import { HttpError, SSE_EVENT_TYPE } from '@/types';
 import { useUserStore } from '@/providers';
 
-const computedContainerHeight = (height = 0) => {
-  return Math.floor(height / 65) + 5;
-};
-
 export const InboxSide: FC = () => {
   const {
     receiptType,
@@ -195,7 +191,7 @@ export const InboxSide: FC = () => {
         ReceiptTypeEnum.engaged,
         '',
         0,
-        computedContainerHeight(scrollRef.current.clientHeight),
+        Math.floor(scrollRef.current.clientHeight / 65) + 5,
       );
       // }
     }
@@ -233,7 +229,6 @@ export const InboxSide: FC = () => {
 
     // clear
     return () => {
-      console.log('clear');
       eventSource?.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -12,12 +12,12 @@ import { UNotUndefined } from '@/utils';
 import {
   SDRToast,
   StyledDatePicker,
-  StyledSelect,
+  StyledRadioGroup,
   StyledSwitch,
 } from '@/components/atoms';
 import { CommonSelectWithAction } from '@/components/molecules';
 
-import { _commonFetchSettings } from '@/request';
+import { _commonFetchSettings, _fetchEmailProfiles } from '@/request';
 import {
   BizCodeEnum,
   HttpError,
@@ -29,14 +29,16 @@ const tomorrow = addDays(new Date(), 1);
 
 const INITIAL_STATE: Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
   scheduleTime: Date | null;
+  emilProfileId: number | null;
 } = {
   dailyLimit: 100,
   autopilot: false,
   sendNow: false,
   scheduleTime: null,
-  sender: 'example@site.com',
-  senderName: 'example',
-  signatureId: null,
+  // sender: 'example@site.com',
+  // senderName: 'example',
+  // signatureId: null,
+  emilProfileId: null,
 };
 
 const INITIAL_OPTION = [
@@ -51,6 +53,12 @@ const INITIAL_OPTION = [
     value: 'schedule',
   },
 ];
+
+const DEFAULT_CARD_STYLE = {
+  border: '1px solid #E5E5E5',
+  borderRadius: 4,
+  p: 3,
+};
 
 export const CampaignProcessContentLunch = () => {
   const {
@@ -67,6 +75,7 @@ export const CampaignProcessContentLunch = () => {
   const [formData, setFormData] = useState<
     Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
       scheduleTime: Date | null;
+      emilProfileId: number | null;
     }
   >(INITIAL_STATE);
 
@@ -81,9 +90,10 @@ export const CampaignProcessContentLunch = () => {
         scheduleTime: lunchInfo.scheduleTime
           ? new Date(lunchInfo.scheduleTime)
           : INITIAL_STATE.scheduleTime,
-        sender: lunchInfo.sender || INITIAL_STATE.sender,
-        senderName: lunchInfo.senderName || INITIAL_STATE.senderName,
-        signatureId: lunchInfo.signatureId || INITIAL_STATE.signatureId,
+        // sender: lunchInfo.sender || INITIAL_STATE.sender,
+        // senderName: lunchInfo.senderName || INITIAL_STATE.senderName,
+        // signatureId: lunchInfo.signatureId || INITIAL_STATE.signatureId,
+        emilProfileId: lunchInfo.emilProfileId || INITIAL_STATE.emilProfileId,
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -96,7 +106,9 @@ export const CampaignProcessContentLunch = () => {
         setLunchInfo({
           ...formData,
           scheduleTime:
-            isValid(formData.scheduleTime) && isDate(formData.scheduleTime)
+            formData.scheduleTime &&
+            isDate(formData.scheduleTime) &&
+            isValid(formData.scheduleTime)
               ? formData.scheduleTime.toISOString()
               : null,
         });
@@ -156,15 +168,15 @@ export const CampaignProcessContentLunch = () => {
           (item) => item.selected,
         );
 
-        if (defaultSignature) {
-          setFormData((prev) => ({
-            ...prev,
-            signatureId:
-              prev.signatureId === null
-                ? defaultSignature.value
-                : prev.signatureId,
-          }));
-        }
+        // if (defaultSignature) {
+        //   setFormData((prev) => ({
+        //     ...prev,
+        //     signatureId:
+        //       prev.signatureId === null
+        //         ? defaultSignature.value
+        //         : prev.signatureId,
+        //   }));
+        // }
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -175,17 +187,39 @@ export const CampaignProcessContentLunch = () => {
     },
   );
 
+  const { data, isValidating: emailProfilesLoading } = useSWR(
+    'emailProfiles',
+    async () => {
+      try {
+        const data = await _fetchEmailProfiles();
+        if (data?.data?.length > 0) {
+          setFormData({
+            ...formData,
+            emilProfileId: data.data[0].id,
+          });
+        }
+        return data;
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateOnMount: true,
+    },
+  );
+
   const onClickToChangeSignature = (value: any) => {
-    if (value === formData.signatureId) {
+    if (value === formData.emilProfileId) {
       return;
     }
     setFormData({
       ...formData,
-      signatureId: value,
+      emilProfileId: value,
     });
   };
-
-  console.log(formData);
 
   return (
     <Stack
@@ -196,17 +230,86 @@ export const CampaignProcessContentLunch = () => {
       }
       flex={1}
       gap={6}
-      p={3}
+      maxWidth={1200}
+      mr={'auto'}
       sx={{
         transition: 'all .3s',
       }}
     >
-      <Stack gap={1}>
-        <Typography variant={'h7'}>Daily leads quota</Typography>
-        <Typography color={'text.secondary'} variant={'body2'}>
-          When the daily limit is reached, the remaining emails will be sent
-          each following day until the total is completed.
+      <Stack gap={1.5} sx={DEFAULT_CARD_STYLE}>
+        <Typography fontSize={18} variant={'h6'}>
+          Select sender profile
         </Typography>
+        <Stack>
+          <Typography color={'text.secondary'} variant={'body2'}>
+            Choose which sender profile to use for this campaign. Each profile
+            includes your sender name, email signature, and connected mailboxes.
+          </Typography>
+          <Typography color={'text.secondary'} variant={'body2'}>
+            If mailbox rotation is enabled, emails will send evenly across them.
+          </Typography>
+        </Stack>
+        <CommonSelectWithAction
+          actionsNode={
+            <>
+              <Stack bgcolor={'#EAE9EF'} height={'1px'} my={1.5} />
+              <Typography
+                color={'#6E4EFB'}
+                fontSize={14}
+                lineHeight={1}
+                ml={'auto'}
+                onClick={async () => {
+                  await resetDialogState();
+                  router.push('/settings');
+                }}
+                sx={{
+                  cursor: 'pointer',
+                }}
+              >
+                Manage profiles
+              </Typography>
+            </>
+          }
+          containerSx={{ width: '600px' }}
+          defaultValue={'No sender profile selected'}
+          labelSx={{
+            justifyContent: 'space-between',
+          }}
+          loading={emailProfilesLoading}
+          noOptionTip={'No profiles available — create one in Settings'}
+          onSelect={(value) => {
+            onClickToChangeSignature(value);
+          }}
+          options={
+            data?.data?.map((item) => ({
+              label: `${item.senderName} (${item.mailboxList.length} mailbox${
+                item.mailboxList.length > 1 ? 'es' : ''
+              })`,
+              value: item.id,
+              key: item.id,
+            })) || []
+          }
+          value={formData.emilProfileId}
+        />
+      </Stack>
+      <Stack gap={1.5} sx={DEFAULT_CARD_STYLE}>
+        <Typography fontSize={18} variant={'h6'}>
+          Daily send limit
+        </Typography>
+        <Stack>
+          <Typography color={'text.secondary'} variant={'body2'}>
+            Set how many emails you want to send per day for this campaign. Once
+            the daily limit is reached, remaining emails will continue sending
+            the next day.
+          </Typography>
+          <Typography color={'text.secondary'} variant={'body2'}>
+            <Typography component={'span'} fontSize={14} fontWeight={600}>
+              Tip:
+            </Typography>
+            Start low (20–50/day) if your mailbox is new. Increase gradually for
+            better deliverability.
+          </Typography>
+        </Stack>
         <Slider
           marks={WORD_COUNT_OPTIONS}
           max={400}
@@ -251,9 +354,11 @@ export const CampaignProcessContentLunch = () => {
         />
       </Stack>
 
-      <Stack>
+      <Stack gap={1.5} sx={DEFAULT_CARD_STYLE}>
         <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
-          <Typography variant={'h7'}>Autopilot</Typography>
+          <Typography fontSize={18} variant={'h6'}>
+            Autopilot
+          </Typography>
           <StyledSwitch
             checked={formData.autopilot}
             onChange={(_, checked) => {
@@ -265,13 +370,75 @@ export const CampaignProcessContentLunch = () => {
           Save manual effort by eliminating the need to review or confirm emails
           one by one.
         </Typography>
-        <Typography color={'text.secondary'} variant={'body2'}>
-          Ensure marketing campaigns or notifications can quickly respond to
-          customer needs.
-        </Typography>
       </Stack>
-
-      <Stack gap={2}>
+      <Stack gap={1.5} sx={DEFAULT_CARD_STYLE}>
+        <Typography fontSize={18} variant={'h6'}>
+          Send schedule
+        </Typography>
+        <Stack gap={1}>
+          <StyledRadioGroup
+            onChange={(_, value) => {
+              setOptionValue(value);
+              setFormData({
+                ...formData,
+                sendNow: value === 'send',
+              });
+            }}
+            options={INITIAL_OPTION}
+            sx={{
+              '& .MuiFormControlLabel-label': {
+                fontSize: 14,
+              },
+              '& .MuiFormControlLabel-root': {
+                alignItems: 'center',
+              },
+              gap: 1,
+            }}
+            value={optionValue}
+          />
+          <Fade
+            in={formData.sendNow}
+            style={{ display: formData.sendNow ? 'block' : 'none' }}
+          >
+            <Typography color={'text.secondary'} variant={'body2'}>
+              Send your campaign now.
+            </Typography>
+          </Fade>
+          <Fade
+            in={!formData.sendNow}
+            style={{ display: !formData.sendNow ? 'flex' : 'none' }}
+          >
+            <Stack gap={1}>
+              <Typography color={'text.secondary'} variant={'body2'}>
+                Schedule your campaign to send at a time of your choosing. The
+                date and time below are in Pacific Standard Time (PST).
+              </Typography>
+              <Stack maxWidth={600}>
+                <StyledDatePicker
+                  disablePast
+                  error={UNotUndefined(isValidate) ? !isValidate : false}
+                  minDate={tomorrow}
+                  onChange={(date) => {
+                    setFormData({
+                      ...formData,
+                      scheduleTime: date,
+                    });
+                  }}
+                  onError={(error) => {
+                    setIsValidate(!error);
+                  }}
+                  value={
+                    formData.scheduleTime
+                      ? new Date(formData.scheduleTime)
+                      : null
+                  }
+                />
+              </Stack>
+            </Stack>
+          </Fade>
+        </Stack>
+      </Stack>
+      {/* <Stack gap={2}>
         <Stack flexDirection={'row'} gap={3}>
           {INITIAL_OPTION.map((item) => (
             <Typography
@@ -344,8 +511,9 @@ export const CampaignProcessContentLunch = () => {
             </Stack>
           </Stack>
         </Fade>
-      </Stack>
-      <Stack gap={3} maxWidth={600}>
+      </Stack> */}
+
+      {/* <Stack gap={3} maxWidth={600}>
         <Stack alignItems={'center'} flexDirection={'row'}>
           <Typography flexShrink={0} variant={'subtitle2'}>
             Email address
@@ -418,7 +586,7 @@ export const CampaignProcessContentLunch = () => {
             value={formData.signatureId}
           />
         </Stack>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 };

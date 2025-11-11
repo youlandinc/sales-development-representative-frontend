@@ -1,13 +1,12 @@
 import { Dispatch, SetStateAction, useState } from 'react';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { SDRToast } from '@/components/atoms';
 import { _userLogin, _userSignUp, _userVerifyCode } from '@/request';
-import { APP_KEY } from '@/constant';
+import { APP_KEY, DEFAULT_LOGGED_IN_PATH } from '@/constant';
 import { UEncode } from '@/utils';
 import { LoginTypeEnum } from '@/types';
 import { useUserStore } from '@/providers';
-
-import { useLogged } from './useLogged';
 
 interface UseSignUpDialogProps {
   userInfo: string;
@@ -16,6 +15,7 @@ interface UseSignUpDialogProps {
   lastName: string;
   email: string;
   password: string;
+  close: () => void;
 }
 
 export const useSignUpDialog = ({
@@ -25,14 +25,14 @@ export const useSignUpDialog = ({
   lastName,
   email,
   password,
+  close,
 }: UseSignUpDialogProps) => {
+  const router = useRouter();
   const { setAccessToken, setUserProfile } = useUserStore((state) => state);
 
   const [dialogLoading, setDialogLoading] = useState(false);
   const [otp, setOtp] = useState('');
   const [seconds, setSeconds] = useState(60);
-
-  const { setShowToast } = useLogged();
 
   const onClickResendOtp = async () => {
     const postData = {
@@ -92,9 +92,9 @@ export const useSignUpDialog = ({
         const {
           data: { accessToken, userProfile },
         } = await _userLogin(postData);
-        setShowToast(false);
         setAccessToken(accessToken);
         setUserProfile(userProfile);
+        router.push(DEFAULT_LOGGED_IN_PATH);
       }
     } catch (err) {
       const { message, header, variant } = err as HttpError;
@@ -111,5 +111,6 @@ export const useSignUpDialog = ({
     handledVerifyOtp,
     onClickResendOtp,
     seconds,
+    onClickToCloseDialog,
   };
 };

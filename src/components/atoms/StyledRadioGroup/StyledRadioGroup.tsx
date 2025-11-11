@@ -15,11 +15,13 @@ export const StyledRadioGroup: FC<StyledStyledRadioProps> = ({
     <FormControl>
       {label && <FormLabel>{label}</FormLabel>}
       <RadioGroup
-        sx={{
-          ...sx,
-          display: 'flex',
-          gap: 1.5,
-        }}
+        sx={[
+          {
+            display: 'flex',
+            gap: 1.5,
+          },
+          ...(Array.isArray(sx) ? sx : [sx]),
+        ]}
         value={value}
         {...rest}
       >
