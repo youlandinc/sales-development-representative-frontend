@@ -11,3 +11,5 @@ export * from './SettingsEmailSignature';
 
 export * from './SettingsEmailDomain';
 export * from './SettingMailboxes';
+
+export * from './SettingsEmailProfiles';
