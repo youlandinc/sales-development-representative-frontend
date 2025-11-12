@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
@@ -6,22 +6,25 @@ import { useSettingsStore } from '@/stores/useSettingsStore';
 
 export const useFetchMailboxes = () => {
   const [loading, setLoading] = useState(false);
+  const isFirstRefresh = useRef(true);
   const { fetchMailboxes } = useSettingsStore((state) => state);
 
   const onRefresh = useCallback(async () => {
-    if (loading) {
-      return;
+    if (isFirstRefresh.current) {
+      setLoading(true);
     }
-    setLoading(true);
     try {
       await fetchMailboxes();
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
-      setLoading(false);
+      if (isFirstRefresh.current) {
+        setLoading(false);
+        isFirstRefresh.current = false;
+      }
     }
-  }, [loading, fetchMailboxes]);
+  }, [fetchMailboxes]);
 
   useEffect(() => {
     onRefresh();

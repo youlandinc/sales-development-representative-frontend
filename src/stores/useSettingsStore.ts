@@ -30,9 +30,15 @@ export type SettingsStoreStateActions = {
 
 export type SettingsStoreProps = SettingsStoreState & SettingsStoreStateActions;
 
-export const useSettingsStore = create<SettingsStoreProps>()((set) => ({
+const initialState: SettingsStoreState = {
   signatures: [],
   fetchSignatureLoading: false,
+  emailDomainList: [],
+  mailboxes: [],
+};
+
+export const useSettingsStore = create<SettingsStoreProps>()((set) => ({
+  ...initialState,
   fetchSignatures: async () => {
     try {
       set({ fetchSignatureLoading: true });
@@ -47,7 +53,6 @@ export const useSettingsStore = create<SettingsStoreProps>()((set) => ({
       set({ fetchSignatureLoading: false });
     }
   },
-  emailDomainList: [],
   fetchEmailDomainList: async (tenantId: string) => {
     try {
       const { data } = await _fetchCustomEmailDomains(tenantId);
@@ -57,7 +62,6 @@ export const useSettingsStore = create<SettingsStoreProps>()((set) => ({
       SDRToast({ message, header, variant });
     }
   },
-  mailboxes: [],
   fetchMailboxes: async () => {
     try {
       const { data } = await _fetchMailboxes();

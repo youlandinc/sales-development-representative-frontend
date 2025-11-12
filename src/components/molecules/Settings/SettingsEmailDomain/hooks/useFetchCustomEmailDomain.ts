@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useUserStore } from '@/providers';
 import { useSettingsStore } from '@/stores/useSettingsStore';
@@ -9,18 +9,24 @@ export const useFetchCustomEmailDomain = () => {
   const { tenantId } = userProfile;
 
   const [loading, setLoading] = useState(false);
+  const isFirstRefresh = useRef(true);
 
   const onRefresh = useCallback(async () => {
-    if (loading || !tenantId) {
+    if (!tenantId) {
       return;
     }
-    setLoading(true);
+    if (isFirstRefresh.current) {
+      setLoading(true);
+    }
     try {
       await fetchEmailDomainList(tenantId);
     } finally {
-      setLoading(false);
+      if (isFirstRefresh.current) {
+        setLoading(false);
+        isFirstRefresh.current = false;
+      }
     }
-  }, [loading, tenantId, fetchEmailDomainList]);
+  }, [tenantId, fetchEmailDomainList]);
 
   useEffect(() => {
     tenantId && onRefresh();
