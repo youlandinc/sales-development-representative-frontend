@@ -60,7 +60,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
       }}
     >
       <Editor
-        apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
         init={{
           content_style:
             'p { margin: 0;font-size:12px } body::before { font-size:12px }',
@@ -210,7 +209,9 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           paste_data_images: true,
           menubar: false,
         }}
+        licenseKey="gpl"
         onEditorChange={onChange}
+        tinymceScriptSrc="/tinymce/tinymce.min.js"
         value={value}
       />
     </Box>
