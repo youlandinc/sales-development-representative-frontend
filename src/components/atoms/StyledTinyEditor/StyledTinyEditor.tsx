@@ -44,10 +44,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
     };
   }, []);
 
-  if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY) {
-    return null;
-  }
-
   return (
     <Box
       minHeight={400}
