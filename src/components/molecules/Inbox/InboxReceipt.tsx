@@ -1,11 +1,14 @@
 import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { format } from 'date-fns';
+import Icon from '@mui/material/Icon';
 
 import {
   CommonReceiptCardHeader,
   InboxReceiptCard,
 } from '@/components/molecules';
 import { useInboxStore } from '@/stores/useInboxStore';
+
+import ICON_NO_RESULT from './assets/icon_table_no_result.svg';
 
 export const InboxReceipt = () => {
   const {
@@ -14,6 +17,23 @@ export const InboxReceipt = () => {
     fetchEmailLoading,
     fetchEmailDetailsLoading,
   } = useInboxStore((state) => state);
+
+  if (!fetchEmailLoading && inboxContentList.length === 0) {
+    return (
+      <Stack alignItems={'center'} height={'100%'} justifyContent={'center'}>
+        <Icon
+          component={ICON_NO_RESULT}
+          sx={{
+            width: 120,
+            height: 93,
+          }}
+        />
+        <Typography color={'text.secondary'} mt={1.5} variant={'body2'}>
+          No data found.
+        </Typography>
+      </Stack>
+    );
+  }
 
   return (
     <Stack flex={1} height={'100%'}>

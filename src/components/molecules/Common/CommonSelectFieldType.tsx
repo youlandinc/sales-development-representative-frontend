@@ -2,8 +2,8 @@ import { FC } from 'react';
 
 import { StyledSelect, StyledSelectProps } from '@/components/atoms';
 
+import { getAddColumnMenuActions } from '@/constant';
 import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
-import { FIELD_TYPE_OPTIONS } from '@/constant';
 
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 import { Icon, Stack, Typography } from '@mui/material';
@@ -12,10 +12,16 @@ export const CommonSelectFieldType: FC<Omit<StyledSelectProps, 'options'>> = ({
   value = TableColumnTypeEnum.text,
   ...rest
 }) => {
-  const options = FIELD_TYPE_OPTIONS.map((opt) => ({
-    ...opt,
-    icon: COLUMN_TYPE_ICONS[opt.value as TableColumnTypeEnum],
-  }));
+  const options = getAddColumnMenuActions()
+    .filter((opt) =>
+      Object.values(TableColumnTypeEnum).includes(opt.value as any),
+    )
+    .map((opt) => ({
+      icon: COLUMN_TYPE_ICONS[opt.value as TableColumnTypeEnum],
+      key: opt.value,
+      value: opt.value,
+      label: opt.label,
+    }));
 
   return (
     <StyledSelect
