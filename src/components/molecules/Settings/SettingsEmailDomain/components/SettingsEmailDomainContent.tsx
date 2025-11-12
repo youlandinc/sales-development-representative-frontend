@@ -2,6 +2,7 @@ import {
   CircularProgress,
   Divider,
   Icon,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
@@ -51,10 +52,18 @@ export const SettingsEmailDomainContent = ({
   const { emailDomainList: data } = useSettingsStore((state) => state);
   if (loading) {
     return (
-      <Stack alignItems={'center'} flex={1} justifyContent={'center'}>
-        <CircularProgress size={24} sx={{ width: '100%', color: '#E3E3EE' }} />
+      <Stack gap={1.5}>
+        <Stack flex={1} flexDirection={'row'} gap={1.5}>
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} sx={{ flex: 1 }} variant="rounded" />
+          ))}
+        </Stack>
       </Stack>
     );
+  }
+
+  if (data.length === 0) {
+    return null;
   }
 
   return (
