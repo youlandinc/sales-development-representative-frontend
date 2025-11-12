@@ -311,19 +311,39 @@ export const CampaignProcessContentLunch = () => {
           </Typography>
         </Stack>
         <Slider
-          marks={WORD_COUNT_OPTIONS}
-          max={400}
-          min={100}
+          marks={[
+            { label: '10', value: 10 },
+            ...Array.from({ length: 50 }, (_, i) => {
+              const value = (i + 1) * 50;
+              return {
+                value,
+                label: value === 500 ? value.toString() : '',
+              };
+            }),
+          ]}
+          max={500}
+          min={10}
           onChange={(_, v) => {
             setFormData({
               ...formData,
               dailyLimit: v as number,
             });
           }}
-          step={1}
+          step={10}
           sx={{
+            mt: 3,
             maxWidth: 1200,
             height: 4,
+            '& .MuiSlider-markLabel': {
+              top: -24,
+              color: 'text.primary',
+              '&[data-index="0"]': {
+                left: '8px',
+              },
+              '&[data-index="10"]': {
+                left: 'calc(100% - 10px) !important',
+              },
+            },
             '& .MuiSlider-thumb': {
               height: 20,
               width: 20,

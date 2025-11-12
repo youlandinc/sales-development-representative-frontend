@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Skeleton, Stack, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { FC } from 'react';
 
@@ -49,6 +49,7 @@ export const SettingsEmailProfiles: FC = () => {
     deleteEmailProfile,
     submitMethod,
     deleteState,
+    isLoading,
   } = useEmailProfilesRequest();
 
   return (
@@ -58,11 +59,6 @@ export const SettingsEmailProfiles: FC = () => {
           color="info"
           onClick={onClickCreateProfile}
           size={'small'}
-          sx={{
-            py: '6px !important',
-            fontWeight: 400,
-            borderColor: '#DFDEE6 !important',
-          }}
           variant={'outlined'}
         >
           Create profile
@@ -75,66 +71,80 @@ export const SettingsEmailProfiles: FC = () => {
     >
       {/* Table */}
       <Stack gap={1.5}>
-        <Stack flex={1} flexDirection={'row'} gap={1.5}>
-          <Typography color={'text.secondary'} flex={1} variant={'body3'}>
-            Name
-          </Typography>
-          <Typography color={'text.secondary'} flex={1} variant={'body3'}>
-            Mailboxes
-          </Typography>
-          <Typography color={'text.secondary'} flex={1} variant={'body3'}>
-            Default mailbox
-          </Typography>
-          <Typography color={'text.secondary'} flex={1} variant={'body3'}>
-            Mailbox rotation
-          </Typography>
-          <Typography
-            color={'text.secondary'}
-            flex={1}
-            variant={'body3'}
-          ></Typography>
-        </Stack>
-
-        {(data || []).map((profile) => (
-          <Stack flexDirection={'row'} gap={1.5} key={profile.id}>
-            <Typography flex={1} fontWeight={600} variant={'body3'}>
-              {profile.senderName}
-            </Typography>
-            <Typography flex={1} variant={'body3'}>
-              {profile.mailboxList.length} mailbox
-              {profile.mailboxList.length > 1 ? 'es' : ''}
-            </Typography>
-            <Typography flex={1} variant={'body3'}>
-              {profile.defaultMailbox?.mailboxName}
-            </Typography>
-            <Typography flex={1} variant={'body3'}>
-              {profile.rotationEnabled ? 'On' : 'Off'}
-            </Typography>
-            <Stack
-              flex={1}
-              flexDirection={'row'}
-              gap={1.5}
-              justifyContent={'flex-end'}
-            >
-              <Typography
-                color="primary"
-                onClick={() => onClickEdit(profile)}
-                sx={{ cursor: 'pointer' }}
-                variant={'body3'}
-              >
-                Edit
-              </Typography>
-              <Typography
-                color="text.secondary"
-                onClick={() => onClickDelete(profile.id)}
-                sx={{ cursor: 'pointer' }}
-                variant={'body3'}
-              >
-                Delete
-              </Typography>
+        {isLoading ? (
+          // Skeleton loader
+          <Stack gap={1.5}>
+            <Stack flex={1} flexDirection={'row'} gap={1.5}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} sx={{ flex: 1 }} variant="rounded" />
+              ))}
             </Stack>
           </Stack>
-        ))}
+        ) : (data || []).length > 0 ? (
+          // Actual data table
+          <>
+            <Stack flex={1} flexDirection={'row'} gap={1.5}>
+              <Typography color={'text.secondary'} flex={1} variant={'body3'}>
+                Name
+              </Typography>
+              <Typography color={'text.secondary'} flex={1} variant={'body3'}>
+                Mailboxes
+              </Typography>
+              <Typography color={'text.secondary'} flex={1} variant={'body3'}>
+                Default mailbox
+              </Typography>
+              <Typography color={'text.secondary'} flex={1} variant={'body3'}>
+                Mailbox rotation
+              </Typography>
+              <Typography
+                color={'text.secondary'}
+                flex={1}
+                variant={'body3'}
+              ></Typography>
+            </Stack>
+
+            {(data || []).map((profile) => (
+              <Stack flexDirection={'row'} gap={1.5} key={profile.id}>
+                <Typography flex={1} fontWeight={600} variant={'body3'}>
+                  {profile.senderName}
+                </Typography>
+                <Typography flex={1} variant={'body3'}>
+                  {profile.mailboxList.length} mailbox
+                  {profile.mailboxList.length > 1 ? 'es' : ''}
+                </Typography>
+                <Typography flex={1} variant={'body3'}>
+                  {profile.defaultMailbox?.mailboxName}
+                </Typography>
+                <Typography flex={1} variant={'body3'}>
+                  {profile.rotationEnabled ? 'On' : 'Off'}
+                </Typography>
+                <Stack
+                  flex={1}
+                  flexDirection={'row'}
+                  gap={1.5}
+                  justifyContent={'flex-end'}
+                >
+                  <Typography
+                    color="primary"
+                    onClick={() => onClickEdit(profile)}
+                    sx={{ cursor: 'pointer' }}
+                    variant={'body3'}
+                  >
+                    Edit
+                  </Typography>
+                  <Typography
+                    color="text.secondary"
+                    onClick={() => onClickDelete(profile.id)}
+                    sx={{ cursor: 'pointer' }}
+                    variant={'body3'}
+                  >
+                    Delete
+                  </Typography>
+                </Stack>
+              </Stack>
+            ))}
+          </>
+        ) : null}
       </Stack>
       <StyledDialog
         content={
