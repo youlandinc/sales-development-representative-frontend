@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import { combine } from 'zustand/middleware';
 
 import { EmailDomainDetails, HttpError, Mailbox } from '@/types';
 
@@ -37,38 +39,51 @@ const initialState: SettingsStoreState = {
   mailboxes: [],
 };
 
-export const useSettingsStore = create<SettingsStoreProps>()((set) => ({
-  ...initialState,
-  fetchSignatures: async () => {
-    try {
-      set({ fetchSignatureLoading: true });
-      const res = await _fetchEmailSignatures();
-      if (Array.isArray(res.data)) {
-        set({ signatures: res.data });
-      }
-    } catch (e) {
-      const { message, header, variant } = e as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      set({ fetchSignatureLoading: false });
-    }
-  },
-  fetchEmailDomainList: async (tenantId: string) => {
-    try {
-      const { data } = await _fetchCustomEmailDomains(tenantId);
-      set({ emailDomainList: data });
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    }
-  },
-  fetchMailboxes: async () => {
-    try {
-      const { data } = await _fetchMailboxes();
-      set({ mailboxes: data });
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    }
-  },
-}));
+export const useSettingsStore = create<SettingsStoreProps>()(
+  immer(
+    combine(initialState, (set) => ({
+      fetchSignatures: async () => {
+        try {
+          set((state) => {
+            state.fetchSignatureLoading = true;
+          });
+          const res = await _fetchEmailSignatures();
+          if (Array.isArray(res.data)) {
+            set((state) => {
+              state.signatures = res.data;
+            });
+          }
+        } catch (e) {
+          const { message, header, variant } = e as HttpError;
+          SDRToast({ message, header, variant });
+        } finally {
+          set((state) => {
+            state.fetchSignatureLoading = false;
+          });
+        }
+      },
+      fetchEmailDomainList: async (tenantId: string) => {
+        try {
+          const { data } = await _fetchCustomEmailDomains(tenantId);
+          set((state) => {
+            state.emailDomainList = data;
+          });
+        } catch (err) {
+          const { header, message, variant } = err as HttpError;
+          SDRToast({ message, header, variant });
+        }
+      },
+      fetchMailboxes: async () => {
+        try {
+          const { data } = await _fetchMailboxes();
+          set((state) => {
+            state.mailboxes = data;
+          });
+        } catch (err) {
+          const { header, message, variant } = err as HttpError;
+          SDRToast({ message, header, variant });
+        }
+      },
+    })),
+  ),
+);

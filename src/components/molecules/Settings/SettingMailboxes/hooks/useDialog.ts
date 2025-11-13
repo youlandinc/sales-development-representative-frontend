@@ -18,7 +18,7 @@ interface UseDialogProps {
 }
 
 export const useDialog = ({ onRefresh }: UseDialogProps) => {
-  const { emailDomainList } = useSettingsStore((state) => state);
+  const emailDomainList = useSettingsStore((state) => state.emailDomainList);
   const { open, close, visible } = useSwitch(false);
 
   const [saveLoading, setSaveLoading] = useState(false);

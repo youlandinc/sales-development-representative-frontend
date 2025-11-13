@@ -1,4 +1,5 @@
 'use client';
+import { useShallow } from 'zustand/react/shallow';
 
 import { Box } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
@@ -22,7 +23,12 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   value,
   placeholder = 'Start typing here...',
 }: StyledTinyEditorProps) => {
-  const { signatures, fetchSignatures } = useSettingsStore();
+  const { signatures, fetchSignatures } = useSettingsStore(
+    useShallow((state) => ({
+      signatures: state.signatures,
+      fetchSignatures: state.fetchSignatures,
+    })),
+  );
 
   useEffect(() => {
     // close();

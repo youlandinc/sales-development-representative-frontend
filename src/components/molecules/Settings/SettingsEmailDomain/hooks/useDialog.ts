@@ -22,9 +22,10 @@ interface UseDialogProps {
 }
 
 export const useDialog = ({ onOpenVerified }: UseDialogProps) => {
-  const { userProfile } = useUserStore((state) => state);
-  const { emailDomainList, fetchEmailDomainList } = useSettingsStore(
-    (state) => state,
+  const userProfile = useUserStore((state) => state.userProfile);
+  const emailDomainList = useSettingsStore((state) => state.emailDomainList);
+  const fetchEmailDomainList = useSettingsStore(
+    (state) => state.fetchEmailDomainList,
   );
   const { tenantId } = userProfile;
 
