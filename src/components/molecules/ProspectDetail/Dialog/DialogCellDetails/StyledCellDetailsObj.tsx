@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Stack, Typography } from '@mui/material';
 
-import { StyledCellItemContainer } from './index';
+import { StyledCellDetailsArray, StyledCellItemContainer } from './index';
 
 import { useSwitch } from '@/hooks/useSwitch';
 
@@ -52,16 +52,30 @@ export const StyledCellDetailsObj: FC<StyledCellDetailsObjProps> = ({
       </Stack>
       {visible && (
         <Stack gap={1.5} ml={2}>
-          {Object.entries(value).map(([key, value], index) => (
-            <StyledCellItemContainer copyContent={value} key={index}>
-              <Stack gap={1} key={key} width={'fit-content'}>
-                <Typography variant={'body2'}>{key}</Typography>
-                <Typography color={'text.secondary'} variant={'body3'}>
-                  {typeof value === 'object' ? JSON.stringify(value) : value}
-                </Typography>
-              </Stack>
-            </StyledCellItemContainer>
-          ))}
+          {Object.entries(value).map(([key, v], index) => {
+            if (Array.isArray(v)) {
+              return (
+                <StyledCellDetailsArray key={index} title={key} value={v} />
+              );
+            }
+            if (Object.prototype.toString.call(v) === '[object Object]') {
+              return <StyledCellDetailsObj key={index} title={key} value={v} />;
+            }
+            return (
+              <StyledCellItemContainer copyContent={v} key={index}>
+                <Stack gap={1} key={key} width={'fit-content'}>
+                  <Typography variant={'body2'}>{key}</Typography>
+                  <Typography
+                    color={'text.secondary'}
+                    component="p"
+                    variant={'body3'}
+                  >
+                    {v}
+                  </Typography>
+                </Stack>
+              </StyledCellItemContainer>
+            );
+          })}
         </Stack>
       )}
     </Stack>
