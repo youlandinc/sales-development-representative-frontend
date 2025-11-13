@@ -14,7 +14,7 @@ export const SettingsContent = ({
   onRemove,
   onClickEdit,
 }: SettingsContentProps) => {
-  const { mailboxes: data } = useSettingsStore((state) => state);
+  const data = useSettingsStore((state) => state.mailboxes);
   if (loading) {
     return (
       <Stack gap={1.5}>

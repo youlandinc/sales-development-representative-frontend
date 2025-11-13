@@ -7,7 +7,7 @@ import { useSettingsStore } from '@/stores/useSettingsStore';
 export const useFetchMailboxes = () => {
   const [loading, setLoading] = useState(false);
   const isFirstRefresh = useRef(true);
-  const { fetchMailboxes } = useSettingsStore((state) => state);
+  const fetchMailboxes = useSettingsStore((state) => state.fetchMailboxes);
 
   const onRefresh = useCallback(async () => {
     if (isFirstRefresh.current) {
