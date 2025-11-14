@@ -6,7 +6,6 @@ import useSWR from 'swr';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { WORD_COUNT_OPTIONS } from '@/constant';
 import { UNotUndefined } from '@/utils';
 
 import {
@@ -17,9 +16,8 @@ import {
 } from '@/components/atoms';
 import { CommonSelectWithAction } from '@/components/molecules';
 
-import { _commonFetchSettings, _fetchEmailProfiles } from '@/request';
+import { _fetchEmailProfiles } from '@/request';
 import {
-  BizCodeEnum,
   HttpError,
   ProcessCreateTypeEnum,
   ResponseCampaignLaunchInfo,
@@ -35,9 +33,6 @@ const INITIAL_STATE: Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
   autopilot: false,
   sendNow: false,
   scheduleTime: null,
-  // sender: 'example@site.com',
-  // senderName: 'example',
-  // signatureId: null,
   emilProfileId: null,
 };
 
@@ -61,25 +56,23 @@ const DEFAULT_CARD_STYLE = {
 };
 
 export const ContentLaunch = () => {
-  const {
-    launchInfo,
-    setLaunchInfo,
-    setIsValidate,
-    isValidate,
-    campaignType,
-    resetDialogState,
-  } = useDialogStore();
-
   const router = useRouter();
 
+  const launchInfo = useDialogStore((state) => state.launchInfo);
+  const isValidate = useDialogStore((state) => state.isValidate);
+  const campaignType = useDialogStore((state) => state.campaignType);
+
+  const setLaunchInfo = useDialogStore((state) => state.setLaunchInfo);
+  const setIsValidate = useDialogStore((state) => state.setIsValidate);
+  const resetDialogState = useDialogStore((state) => state.resetDialogState);
+
+  const [optionValue, setOptionValue] = useState('schedule');
   const [formData, setFormData] = useState<
     Omit<ResponseCampaignLaunchInfo, 'scheduleTime'> & {
       scheduleTime: Date | null;
       emilProfileId: number | null;
     }
   >(INITIAL_STATE);
-
-  const [optionValue, setOptionValue] = useState('schedule');
 
   useEffect(
     () => {
@@ -90,9 +83,6 @@ export const ContentLaunch = () => {
         scheduleTime: launchInfo.scheduleTime
           ? new Date(launchInfo.scheduleTime)
           : INITIAL_STATE.scheduleTime,
-        // sender: launchInfo.sender || INITIAL_STATE.sender,
-        // senderName: launchInfo.senderName || INITIAL_STATE.senderName,
-        // signatureId: launchInfo.signatureId || INITIAL_STATE.signatureId,
         emilProfileId: launchInfo.emilProfileId || INITIAL_STATE.emilProfileId,
       });
     },
@@ -119,73 +109,6 @@ export const ContentLaunch = () => {
   useEffect(() => {
     updateLaunchInfo();
   }, [formData, updateLaunchInfo]);
-
-  const [signatureList, setSignatureList] = useState<TOption[]>([
-    {
-      label: 'No signature',
-      value: null,
-      key: 'noSignature',
-      default: false,
-    },
-  ]);
-
-  const { isLoading } = useSWR(
-    'fetchSignature',
-    async () => {
-      try {
-        const {
-          data: {
-            [BizCodeEnum.signature]: signatureList,
-            [BizCodeEnum.email_domain]: emailDomainList,
-          },
-        } = await _commonFetchSettings({
-          bizCode: [BizCodeEnum.email_domain, BizCodeEnum.signature],
-        });
-
-        const reducedSignatureList = signatureList.map((item) => ({
-          label: item.label,
-          key: String(item.key),
-          value: String(item.value),
-          selected: item.selected,
-        }));
-
-        const reducedEmailDomainList = emailDomainList.map((item) => ({
-          label: item.label,
-          key: String(item.key),
-          value: String(item.value),
-          selected: item.selected,
-        }));
-
-        setSignatureList((prev) => [
-          ...reducedSignatureList,
-          ...prev.filter((item) => item.key === 'noSignature'),
-        ]);
-
-        const defaultSignature = reducedSignatureList.find(
-          (item) => item.selected,
-        );
-        const defaultEmailDomain = reducedEmailDomainList.find(
-          (item) => item.selected,
-        );
-
-        // if (defaultSignature) {
-        //   setFormData((prev) => ({
-        //     ...prev,
-        //     signatureId:
-        //       prev.signatureId === null
-        //         ? defaultSignature.value
-        //         : prev.signatureId,
-        //   }));
-        // }
-      } catch (err) {
-        const { message, header, variant } = err as HttpError;
-        SDRToast({ message, header, variant });
-      }
-    },
-    {
-      revalidateOnFocus: false,
-    },
-  );
 
   const { data, isValidating: emailProfilesLoading } = useSWR(
     'emailProfiles',
@@ -458,155 +381,6 @@ export const ContentLaunch = () => {
           </Fade>
         </Stack>
       </Stack>
-      {/* <Stack gap={2}>
-        <Stack flexDirection={'row'} gap={3}>
-          {INITIAL_OPTION.map((item) => (
-            <Typography
-              key={item.key}
-              onClick={() => {
-                setOptionValue(item.value);
-                setFormData({
-                  ...formData,
-                  sendNow: item.value === 'send',
-                });
-              }}
-              sx={{
-                px: 1.5,
-                py: 1,
-                border:
-                  optionValue === item.value
-                    ? '1px solid #6E4EFB'
-                    : '1px solid #DFDEE6',
-                borderRadius: 2,
-                color: optionValue === item.value ? '#6E4EFB' : '#6F6C7D',
-                cursor: 'pointer',
-                transition: 'all .3s',
-                userSelect: 'none',
-                outline:
-                  optionValue === item.value
-                    ? '1px solid #6E4EFB'
-                    : '1px solid transparent',
-              }}
-              variant={'body2'}
-            >
-              {item.label}
-            </Typography>
-          ))}
-        </Stack>
-        <Fade
-          in={formData.sendNow}
-          style={{ display: formData.sendNow ? 'block' : 'none' }}
-        >
-          <Typography color={'text.secondary'} variant={'body2'}>
-            Send your campaign now.
-          </Typography>
-        </Fade>
-        <Fade
-          in={!formData.sendNow}
-          style={{ display: !formData.sendNow ? 'block' : 'none' }}
-        >
-          <Stack>
-            <Typography color={'text.secondary'} variant={'body2'}>
-              Schedule your campaign to send at a time of your choosing. The
-              date and time below are in Pacific Standard Time (PST).
-            </Typography>
-            <Stack maxWidth={600} mt={3}>
-              <StyledDatePicker
-                disablePast
-                error={UNotUndefined(isValidate) ? !isValidate : false}
-                minDate={tomorrow}
-                onChange={(date) => {
-                  setFormData({
-                    ...formData,
-                    scheduleTime: date,
-                  });
-                }}
-                onError={(error) => {
-                  setIsValidate(!error);
-                }}
-                value={
-                  formData.scheduleTime ? new Date(formData.scheduleTime) : null
-                }
-              />
-            </Stack>
-          </Stack>
-        </Fade>
-      </Stack> */}
-
-      {/* <Stack gap={3} maxWidth={600}>
-        <Stack alignItems={'center'} flexDirection={'row'}>
-          <Typography flexShrink={0} variant={'subtitle2'}>
-            Email address
-          </Typography>
-          <StyledSelect
-            options={[
-              {
-                label: formData.sender!,
-                value: formData.sender!,
-                key: formData.sender!,
-              },
-            ]}
-            size={'small'}
-            sx={{ width: 'fit-content', ml: 'auto' }}
-            value={formData.sender}
-          />
-        </Stack>
-
-        <Stack alignItems={'center'} flexDirection={'row'}>
-          <Typography flexShrink={0} variant={'subtitle2'}>
-            Name
-          </Typography>
-          <StyledSelect
-            options={[
-              {
-                label: formData.senderName!,
-                value: formData.senderName!,
-                key: formData.senderName!,
-              },
-            ]}
-            size={'small'}
-            sx={{ width: 'fit-content', ml: 'auto' }}
-            value={formData.senderName}
-          />
-        </Stack>
-        <Stack alignItems={'center'} flexDirection={'row'}>
-          <Typography flexShrink={0} variant={'subtitle2'}>
-            Signature
-          </Typography>
-          <CommonSelectWithAction
-            actionsNode={
-              <>
-                <Stack bgcolor={'#EAE9EF'} height={'1px'} mt={1.5} mx={3} />
-                <Typography
-                  color={'#6E4EFB'}
-                  fontSize={14}
-                  lineHeight={1}
-                  ml={'auto'}
-                  mr={3}
-                  mt={1}
-                  onClick={async () => {
-                    await resetDialogState();
-                    router.push('/settings');
-                  }}
-                  sx={{
-                    cursor: 'pointer',
-                  }}
-                >
-                  Manage signatures
-                </Typography>
-              </>
-            }
-            containerSx={{ width: 'fit-content', ml: 'auto' }}
-            loading={isLoading}
-            menuTips={'Signatures saved by you'}
-            onSelect={(value) => {
-              onClickToChangeSignature(value);
-            }}
-            options={signatureList}
-            value={formData.signatureId}
-          />
-        </Stack>
-      </Stack> */}
     </Stack>
   );
 };

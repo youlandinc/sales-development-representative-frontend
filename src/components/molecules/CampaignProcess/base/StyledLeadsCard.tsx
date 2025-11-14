@@ -5,15 +5,13 @@ import { CampaignLeadItem } from '@/types';
 
 import { StyledTooltip } from '@/components/atoms';
 
-//import ICON_LINKEDIN from './assets/icon_linkedin.svg';
-
 interface CampaignLeadItemProps extends CampaignLeadItem {
   sx?: SxProps;
   onClick?: () => void;
   disabled?: boolean;
 }
 
-export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
+export const StyledLeadsCard: FC<CampaignLeadItemProps> = ({
   name,
   firstName,
   lastName,
@@ -70,7 +68,6 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
               {name}
             </Typography>
           </StyledTooltip>
-          {/* <Icon component={ICON_LINKEDIN} sx={{ width: 18, height: 18 }} /> */}
         </Stack>
 
         <StyledTooltip mode={'hover'} title={role}>
@@ -89,23 +86,6 @@ export const CampaignLeadsCard: FC<CampaignLeadItemProps> = ({
           </Typography>
         </StyledTooltip>
       </Stack>
-
-      {/*   <StyledTooltip mode={'hover'} title={company}>
-        <Typography
-          alignSelf={'center'}
-          color={disabled ? 'text.disabled' : 'text.primary'}
-          maxWidth={'20%'}
-          ml={'auto'}
-          sx={{
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-          variant={'body3'}
-        >
-          {company}
-        </Typography>
-      </StyledTooltip> */}
     </Stack>
   );
 };

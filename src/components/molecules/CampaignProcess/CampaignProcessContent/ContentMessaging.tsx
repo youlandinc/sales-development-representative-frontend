@@ -24,7 +24,6 @@ import {
   StyledShadowContent,
   StyledTextFieldNumber,
 } from '@/components/atoms';
-import { CampaignLeadsCard, StyledSwitchModel } from '@/components/molecules';
 
 import {
   AIModelEnum,
@@ -49,6 +48,8 @@ import {
 import {
   CampaignProcessDrawerBody,
   CampaignProcessDrawerSubject,
+  StyledLeadsCard,
+  StyledSwitchModel,
 } from '../index';
 
 import ICON_NEXT from '../assets/icon_next.svg';
@@ -607,7 +608,7 @@ export const ContentMessaging = () => {
                   <Tab
                     key={index}
                     label={
-                      <CampaignLeadsCard
+                      <StyledLeadsCard
                         disabled={
                           activeValue !== index
                             ? leadsFetching || fetchTemplateLoading

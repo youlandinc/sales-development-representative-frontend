@@ -17,8 +17,8 @@ import {
   _updateStepEmailBodyInstructions,
 } from '@/request';
 
-import ICON_CLOSE from './assets/icon_close.svg';
-import ICON_TRASH from './assets/icon_trash.svg';
+import ICON_CLOSE from '../assets/icon_close.svg';
+import ICON_TRASH from '../assets/icon_trash.svg';
 
 interface CampaignProcessDrawerBodyProps {
   onClose: () => void;
