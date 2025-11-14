@@ -406,8 +406,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     // table cell
     updateCellValue: async (data) => {
       try {
-        const response = await _updateTableCellValue(data);
-        return response;
+        return await _updateTableCellValue(data);
       } catch (err) {
         handleApiError<ProspectTableState>(err);
         throw err;

@@ -1,9 +1,9 @@
 import { FC, MouseEvent, useState } from 'react';
 import { Icon, Popover, Stack, SxProps, Typography } from '@mui/material';
 
-import ICON_OPENAI from './assets/icon_openai.svg';
-import ICON_DEEPSEEK from './assets/icon_deepseek.svg';
-import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
+import ICON_OPENAI from '../assets/icon_openai.svg';
+import ICON_DEEPSEEK from '../assets/icon_deepseek.svg';
+import ICON_ARROW_DOWN from '../assets/icon_arrow_down.svg';
 
 import { AIModelEnum } from '@/types';
 

@@ -4,14 +4,14 @@ import { Icon, Stack, Typography } from '@mui/material';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { SDRToast, StyledTextField } from '@/components/atoms';
-import { CampaignProcessContentChatServerCard } from '@/components/molecules';
+import { ChatServerCard } from './ChatServerCard';
 
-import { HttpError, SourceEnum } from '@/types';
+import { CampaignStepEnum, HttpError, SourceEnum } from '@/types';
 import { _sendChatMessage } from '@/request';
 
-import ICON_SEND from './assets/icon_send.svg';
+import ICON_SEND from '../assets/icon_send.svg';
 
-export const CampaignProcessContentChat: FC = () => {
+export const Chat: FC = () => {
   const {
     chatId,
     activeStep,
@@ -102,23 +102,23 @@ export const CampaignProcessContentChat: FC = () => {
     <Stack
       alignItems={'center'}
       border={'1px solid'}
-      borderColor={activeStep === 1 ? 'transparent' : '#DFDEE6'}
+      borderColor={activeStep === CampaignStepEnum.audience ? 'transparent' : '#DFDEE6'}
       gap={4}
       justifyContent={messageList.length > 0 ? 'unset' : 'center'}
-      maxWidth={activeStep === 1 ? '100%' : 460}
+      maxWidth={activeStep === CampaignStepEnum.audience ? '100%' : 460}
       minWidth={460}
       mt={3}
-      pb={activeStep === 1 ? 0 : 6}
-      pt={activeStep === 1 ? 0 : 3}
+      pb={activeStep === CampaignStepEnum.audience ? 0 : 6}
+      pt={activeStep === CampaignStepEnum.audience ? 0 : 3}
       sx={{
         transition: 'all .3s',
         overflow: 'hidden',
-        borderTopLeftRadius: activeStep === 1 ? '8px' : '16px',
-        borderTopRightRadius: activeStep === 1 ? '8px' : '16px',
+        borderTopLeftRadius: activeStep === CampaignStepEnum.audience ? '8px' : '16px',
+        borderTopRightRadius: activeStep === CampaignStepEnum.audience ? '8px' : '16px',
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px',
       }}
-      width={activeStep === 1 ? '100%' : 460}
+      width={activeStep === CampaignStepEnum.audience ? '100%' : 460}
     >
       <Stack
         alignItems={'center'}
@@ -140,7 +140,7 @@ export const CampaignProcessContentChat: FC = () => {
           <Stack
             gap={3}
             height={'100%'}
-            px={activeStep === 1 ? 0 : 3}
+            px={activeStep === CampaignStepEnum.audience ? 0 : 3}
             ref={messageBoxRef}
             sx={{ overflow: 'auto' }}
             width={'100%'}
@@ -148,7 +148,7 @@ export const CampaignProcessContentChat: FC = () => {
             {messageList.map((item, index) => (
               <Stack
                 key={`${index}`}
-                maxWidth={activeStep === 1 ? '60%' : '80%'}
+                maxWidth={activeStep === CampaignStepEnum.audience ? '60%' : '80%'}
                 ml={item.source === SourceEnum.user ? 'auto' : 'unset'}
                 width={'fit-content'}
               >
@@ -163,7 +163,7 @@ export const CampaignProcessContentChat: FC = () => {
                     {item.message}
                   </Typography>
                 ) : (
-                  <CampaignProcessContentChatServerCard
+                  <ChatServerCard
                     data={item.data!}
                     id={item.id!}
                     isFake={item.isFake}
@@ -187,7 +187,7 @@ export const CampaignProcessContentChat: FC = () => {
         pb={1.5}
         px={1.5}
         sx={{ transition: 'all .3s' }}
-        width={activeStep === 1 ? '100%' : 'calc(100% - 48px)'}
+        width={activeStep === CampaignStepEnum.audience ? '100%' : 'calc(100% - 48px)'}
       >
         <StyledTextField
           disabled={sending || returning}

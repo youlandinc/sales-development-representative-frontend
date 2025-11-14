@@ -38,21 +38,21 @@ export const ProspectDetailContent: FC<ProspectDetailTableProps> = ({
   tableId,
 }) => {
   const {
+    addColumn,
+    closeDialog,
     columns,
+    dialogType,
+    dialogVisible,
     fieldGroupMap,
+    openDialog,
     rowIds,
+    setActiveColumnId,
     setRowIds,
-    updateColumnWidth,
     updateColumnName,
     updateColumnPin,
-    updateColumnVisible,
     updateColumnType,
-    openDialog,
-    closeDialog,
-    dialogVisible,
-    dialogType,
-    setActiveColumnId,
-    addColumn,
+    updateColumnVisible,
+    updateColumnWidth,
   } = useProspectTableStore((store) => store);
 
   const {

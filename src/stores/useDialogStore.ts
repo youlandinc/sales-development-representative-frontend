@@ -1,13 +1,16 @@
 import { create } from 'zustand';
 import {
   AIModelEnum,
+  AITableInfo,
   CampaignLeadItem,
   CampaignStatusEnum,
+  CampaignStepEnum,
   CRMInfo,
-  FileInfo,
+  CSVInfo,
   HttpError,
   ProcessCreateChatEnum,
   ProcessCreateTypeEnum,
+  ProspectDelimiterEnum,
   ResponseCampaignChatRecord,
   ResponseCampaignFilterFormData,
   ResponseCampaignLaunchInfo,
@@ -23,6 +26,7 @@ import {
   _closeSSE,
   _createCampaign,
   _fetchCrmProviderList,
+  _fetchEmailProfiles,
   _fetchEnrichmentTableData,
   _fetchSegmentOptions,
   _renameCampaign,
@@ -34,7 +38,8 @@ export type DialogStoreState = {
   campaignType: ProcessCreateTypeEnum | undefined;
   reloadTable: boolean;
   visibleProcess: boolean;
-  activeStep: number;
+  openProcessLoading: boolean;
+  activeStep: CampaignStepEnum;
   chatId: string | number;
   chatSSE: EventSource | undefined;
   isFirst: boolean;
@@ -43,25 +48,34 @@ export type DialogStoreState = {
   messageList: ResponseCampaignChatRecord[];
   aiModel: AIModelEnum;
 
+  /** @deprecated */
   filterFormData: ResponseCampaignFilterFormData;
-  csvFormData: FileInfo;
+
+  csvFormData: CSVInfo;
+
+  // ai table
+  fetchEnrichmentTableLoading: boolean;
+  enrichmentTableOptions: TOption[];
+  aiTableFormData: AITableInfo;
+
+  // crm
   crmFormData: CRMInfo;
   fetchProviderOptionsLoading: boolean;
   providerOptions: TOption[];
-  savedListFormData: SavedListInfo;
-  fetchSavedListLoading: boolean;
-  savedListOptions: TOption[];
 
-  selectedEnrichmentTableId: string;
-  fetchEnrichmentTableLoading: boolean;
-  enrichmentTableOptions: TOption[];
-  enrichmentTableDisabled: boolean;
+  /** @deprecated */
+  savedListFormData: SavedListInfo;
+  /** @deprecated */
+  fetchSavedListLoading: boolean;
+  /** @deprecated */
+  savedListOptions: TOption[];
 
   createCampaignErrorMessage: string;
 
   leadsFetchLoading: boolean;
   leadsList: CampaignLeadItem[];
   leadsCount: number;
+  /** @deprecated */
   leadsVisible: boolean;
 
   campaignId: number | string | null;
@@ -69,11 +83,12 @@ export type DialogStoreState = {
   campaignStatus: CampaignStatusEnum;
   setupPhase: SetupPhaseEnum;
 
+  /** @deprecated */
   offerOptions: ResponseOfferOption[];
 
   messagingSteps: ResponseCampaignMessagingStep[];
 
-  lunchInfo: ResponseCampaignLaunchInfo;
+  launchInfo: ResponseCampaignLaunchInfo;
   isValidate: boolean | undefined;
 };
 
@@ -81,9 +96,11 @@ export type DialogStoreActions = {
   setDetailsFetchLoading: (detailsFetchLoading: boolean) => void;
   setAiModel: (aiModel: AIModelEnum) => void;
   setCampaignType: (campaignType: ProcessCreateTypeEnum) => void;
-  openProcess: () => void;
+  setOpenProcessLoading: (loading: boolean) => void;
+  openProcess: (id?: string | number) => Promise<void>;
   closeProcess: () => void;
-  setActiveStep: (activeStep: number) => void;
+  closeProcessAndReset: () => void;
+  setActiveStep: (activeStep: CampaignStepEnum) => void;
   setChatId: (chatId: number | string) => void;
   setReturning: (returning: boolean) => void;
   createChatSSE: (chatId: number | string) => Promise<void>;
@@ -92,23 +109,28 @@ export type DialogStoreActions = {
 
   setIsFirst: (isFirst: boolean) => void;
 
-  setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
-  setCSVFormData: (formData: FileInfo) => void;
+  fetchEnrichmentTableData: () => Promise<void>;
 
   setCRMFormData: (formData: CRMInfo) => void;
   fetchProviderOptions: () => Promise<void>;
 
-  setSavedListFormData: (formData: SavedListInfo) => void;
-  fetchSavedListOptions: () => Promise<void>;
+  setCSVFormData: (formData: CSVInfo) => void;
 
-  fetchEnrichmentTableData: () => Promise<void>;
-  setSelectedEnrichmentTableId: (id: string) => void;
-  setEnrichmentTableDisabled: (disabled: boolean) => void;
+  setAiTableInfo: (formData: AITableInfo) => void;
+
+  /** @deprecated See {@link DialogStoreState.filterFormData} */
+  setFilterFormData: (formData: ResponseCampaignFilterFormData) => void;
+  /** @deprecated */
+  setSavedListFormData: (formData: SavedListInfo) => void;
+  /** @deprecated */
+  fetchSavedListOptions: () => Promise<void>;
 
   setCreateCampaignErrorMessage: (errorMessage: string) => void;
 
   setLeadsList: (leadsList: CampaignLeadItem[]) => void;
   setLeadsCount: (leadsCount: number) => void;
+
+  /** @deprecated See {@link DialogStoreState.leadsVisible} */
   setLeadsVisible: (leadsVisible: boolean) => void;
   setLeadsFetchLoading: (leadsFetchLoading: boolean) => void;
 
@@ -123,7 +145,7 @@ export type DialogStoreActions = {
   setReloadTable: (reloadTable: boolean) => void;
   setMessagingSteps: (messagingSteps: ResponseCampaignMessagingStep[]) => void;
 
-  setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => void;
+  setLaunchInfo: (launchInfo: ResponseCampaignLaunchInfo) => void;
   setIsValidate: (isValidate: boolean | undefined) => void;
 
   setOfferOptions: (offerOptions: ResponseOfferOption[]) => void;
@@ -139,9 +161,10 @@ const InitialState: DialogStoreState = {
   campaignName: 'name',
   campaignStatus: CampaignStatusEnum.draft,
   setupPhase: SetupPhaseEnum.audience,
-  activeStep: 0,
+  activeStep: CampaignStepEnum.choose,
 
   visibleProcess: false,
+  openProcessLoading: false,
 
   chatId: '',
   chatSSE: void 0,
@@ -151,6 +174,43 @@ const InitialState: DialogStoreState = {
   returning: false,
 
   creating: false,
+
+  csvFormData: {
+    fileInfo: {
+      url: '',
+      originalFileName: '',
+      fileName: '',
+    },
+    delimiter: ProspectDelimiterEnum.comma,
+    hasHeader: true,
+    counts: 0,
+    invalidCounts: 0,
+    validCounts: 0,
+    data: [],
+  },
+
+  crmFormData: {
+    listId: '',
+    provider: '',
+    counts: 0,
+    invalidCounts: 0,
+    validCounts: 0,
+    data: [],
+  },
+  providerOptions: [],
+  fetchProviderOptionsLoading: false,
+
+  aiTableFormData: {
+    tableId: '',
+    mappings: [],
+  },
+
+  savedListFormData: {
+    listId: '',
+    name: '',
+  },
+  fetchSavedListLoading: false,
+  savedListOptions: [],
 
   filterFormData: {
     jobTitle: [],
@@ -170,30 +230,8 @@ const InitialState: DialogStoreState = {
     excludeSkill: [],
   },
 
-  csvFormData: {
-    url: '',
-    originalFileName: '',
-    fileName: '',
-  },
-
-  crmFormData: {
-    listId: '',
-    provider: '',
-  },
-  providerOptions: [],
-  fetchProviderOptionsLoading: false,
-
-  savedListFormData: {
-    listId: '',
-    name: '',
-  },
-  fetchSavedListLoading: false,
-  savedListOptions: [],
-
   fetchEnrichmentTableLoading: false,
   enrichmentTableOptions: [],
-  selectedEnrichmentTableId: '',
-  enrichmentTableDisabled: false,
 
   createCampaignErrorMessage: '',
 
@@ -206,7 +244,7 @@ const InitialState: DialogStoreState = {
 
   offerOptions: [],
 
-  lunchInfo: {
+  launchInfo: {
     dailyLimit: 100,
     autopilot: false,
     sendNow: false,
@@ -230,24 +268,51 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   },
   setAiModel: (aiModel: AIModelEnum) => set({ aiModel }),
   setDetailsFetchLoading: (detailsFetchLoading) => set({ detailsFetchLoading }),
+  setOpenProcessLoading: (openProcessLoading) => set({ openProcessLoading }),
   setCRMFormData: (formData: CRMInfo) => set({ crmFormData: formData }),
-  setCSVFormData: (formData: FileInfo) => set({ csvFormData: formData }),
+  setCSVFormData: (formData: CSVInfo) => set({ csvFormData: formData }),
+  setAiTableInfo: (formData: AITableInfo) => set({ aiTableFormData: formData }),
   setFilterFormData: (formData) => set({ filterFormData: formData }),
   setIsFirst: (isFirst) => set({ isFirst }),
   setLeadsFetchLoading: (leadsFetchLoading) => set({ leadsFetchLoading }),
   setCampaignType: (campaignType: ProcessCreateTypeEnum) =>
-    set({ campaignType, activeStep: 1 }),
+    set({ campaignType, activeStep: CampaignStepEnum.audience }),
   setIsValidate: (isValidate: undefined | boolean) => set({ isValidate }),
   setOfferOptions: (offerOptions) => set({ offerOptions }),
-  setLunchInfo: (lunchInfo: ResponseCampaignLaunchInfo) => set({ lunchInfo }),
-  openProcess: () => set({ visibleProcess: true }),
+  setLaunchInfo: (launchInfo: ResponseCampaignLaunchInfo) =>
+    set({ launchInfo }),
+
+  openProcess: async (id) => {
+    if (id) {
+      set({ visibleProcess: true });
+      return;
+    }
+    set({ openProcessLoading: true });
+    try {
+      const { data } = await _fetchEmailProfiles();
+      if (data.length > 0) {
+        set({ visibleProcess: true, activeStep: CampaignStepEnum.choose });
+      } else {
+        set({ visibleProcess: true, activeStep: CampaignStepEnum.prepare });
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      set({ openProcessLoading: false });
+    }
+  },
+
   closeProcess: () =>
     set({
       visibleProcess: false,
-      selectedEnrichmentTableId: '',
-      enrichmentTableDisabled: false,
       createCampaignErrorMessage: '',
     }),
+  closeProcessAndReset: () => {
+    get().closeProcess();
+    setTimeout(async () => {
+      await get().resetDialogState();
+    }, 300);
+  },
   setCampaignName: (name) => set({ campaignName: name }),
   setCampaignStatus: (status) => set({ campaignStatus: status }),
   renameCampaign: async (campaignName) => {
@@ -284,12 +349,12 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           campaignId: campaignId,
           setupPhase,
         });
-        set({ setupPhase, reloadTable: true });
+        set({ reloadTable: true });
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
         set({
-          activeStep: 1,
+          activeStep: CampaignStepEnum.audience,
           setupPhase: SetupPhaseEnum.audience,
         });
       }
@@ -400,6 +465,40 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
     const { campaignType } = get();
     let postData;
     switch (campaignType) {
+      case ProcessCreateTypeEnum.ai_table: {
+        const { aiTableFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.ai_table,
+          data: {
+            tableId: aiTableFormData.tableId,
+          },
+        };
+        break;
+      }
+      case ProcessCreateTypeEnum.csv: {
+        const { csvFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.csv,
+          data: {
+            csvInfo: {
+              fileInfo: csvFormData.fileInfo,
+              delimiter: csvFormData.delimiter,
+              hasHeader: csvFormData.hasHeader,
+            },
+          },
+        };
+        break;
+      }
+      case ProcessCreateTypeEnum.crm: {
+        const { crmFormData } = get();
+        postData = {
+          startingPoint: ProcessCreateTypeEnum.crm,
+          data: crmFormData,
+        };
+        break;
+      }
+
+      /** @deprecated
       case ProcessCreateTypeEnum.agent: {
         const { chatId } = get();
         if (!chatId) {
@@ -423,26 +522,6 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         };
         break;
       }
-      case ProcessCreateTypeEnum.csv: {
-        const { csvFormData } = get();
-        postData = {
-          startingPoint: ProcessCreateTypeEnum.csv,
-          data: {
-            fileInfo: csvFormData,
-          },
-        };
-        break;
-      }
-      case ProcessCreateTypeEnum.crm: {
-        const { crmFormData } = get();
-        postData = {
-          startingPoint: ProcessCreateTypeEnum.crm,
-          data: {
-            ...crmFormData,
-          },
-        };
-        break;
-      }
       case ProcessCreateTypeEnum.saved_list: {
         const { savedListFormData } = get();
         postData = {
@@ -453,15 +532,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         };
         break;
       }
-      case ProcessCreateTypeEnum.ai_table: {
-        postData = {
-          startingPoint: ProcessCreateTypeEnum.ai_table,
-          data: {
-            tableId: get().selectedEnrichmentTableId,
-          },
-        };
-        break;
-      }
+       */
     }
     if (!postData) {
       return;
@@ -479,21 +550,15 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         campaignStatus: data.campaignStatus,
         setupPhase: SetupPhaseEnum.messaging,
         messagingSteps: data.data.steps,
-        lunchInfo: data.data.launchInfo,
+        launchInfo: data.data.launchInfo,
         offerOptions: data.data.offerOptions,
         chatId: data.chatId,
-        activeStep: 2,
+        activeStep: CampaignStepEnum.messaging,
       });
       switch (campaignType) {
-        case ProcessCreateTypeEnum.filter: {
-          set({
-            filterFormData: data.data.conditions,
-          });
-          break;
-        }
         case ProcessCreateTypeEnum.csv: {
           set({
-            csvFormData: data.data.fileInfo,
+            csvFormData: data.data.csvInfo,
           });
           break;
         }
@@ -501,6 +566,13 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
           set({
             crmFormData: data.data.crmInfo,
           });
+          break;
+        }
+        case ProcessCreateTypeEnum.ai_table: {
+          set({
+            aiTableFormData: data.data.aiTableInfo,
+          });
+          break;
         }
       }
     } catch (err) {
@@ -571,10 +643,6 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
       set({ fetchEnrichmentTableLoading: false });
     }
   },
-  setSelectedEnrichmentTableId: (id: string) =>
-    set({ selectedEnrichmentTableId: id }),
-  setEnrichmentTableDisabled: (disabled: boolean) =>
-    set({ enrichmentTableDisabled: disabled }),
   setCreateCampaignErrorMessage: (errorMessage: string) =>
     set({ createCampaignErrorMessage: errorMessage }),
   setMessagingSteps: (messagingSteps) => set({ messagingSteps }),
@@ -590,7 +658,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         savedListOptions: [],
         providerOptions: [],
         messageList: [],
-        lunchInfo: {
+        launchInfo: {
           dailyLimit: 100,
           autopilot: false,
           sendNow: false,

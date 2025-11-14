@@ -22,7 +22,6 @@ import {
   SDRToast,
   StyledButton,
   StyledShadowContent,
-  StyledSwitch,
   StyledTextFieldNumber,
 } from '@/components/atoms';
 import { CampaignLeadsCard, StyledSwitchModel } from '@/components/molecules';
@@ -32,11 +31,9 @@ import {
   CampaignLeadItem,
   HttpError,
   ProcessCreateTypeEnum,
-  //ModuleEnum,
   ResponseCampaignEmail,
   ResponseCampaignMessagingStepFormBody,
   ResponseCampaignMessagingStepFormSubject,
-  ResponseOfferOption,
 } from '@/types';
 import {
   _addStepEmail,
@@ -46,42 +43,37 @@ import {
   _fetchLeadPersonalResearch,
   _fetchStepEmail,
   _switchAIModel,
-  _updateSelectedLibraryOffer,
   _updateStepEmailSendDays,
 } from '@/request';
 
 import {
   CampaignProcessDrawerBody,
   CampaignProcessDrawerSubject,
-} from './index';
+} from '../index';
 
-import ICON_NEXT from './assets/icon_next.svg';
-import ICON_PREV from './assets/icon_prev.svg';
+import ICON_NEXT from '../assets/icon_next.svg';
+import ICON_PREV from '../assets/icon_prev.svg';
 
-import ICON_MESSAGING_COMPANY from './assets/icon_messaging_company.svg';
-import ICON_MESSAGING_PERSON from './assets/icon_messaging_person.svg';
+import ICON_MESSAGING_COMPANY from '../assets/icon_messaging_company.svg';
+import ICON_MESSAGING_PERSON from '../assets/icon_messaging_person.svg';
 
-import ICON_MESSAGING_EMAIL from './assets/icon_messaging_email.svg';
+import ICON_MESSAGING_EMAIL from '../assets/icon_messaging_email.svg';
 
-import ICON_ADD from './assets/icon_add.svg';
-import ICON_DASHED from './assets/icon_dashed.svg';
-import ICON_TRASH from './assets/icon_trash.svg';
+import ICON_ADD from '../assets/icon_add.svg';
+import ICON_DASHED from '../assets/icon_dashed.svg';
+import ICON_TRASH from '../assets/icon_trash.svg';
 
-export const CampaignProcessContentMessaging = () => {
+export const ContentMessaging = () => {
   const {
     campaignId,
     leadsCount,
     leadsList,
-    leadsVisible,
     setLeadsList,
     setLeadsCount,
     chatId,
     returning,
-    setLeadsVisible,
     messagingSteps,
     setMessagingSteps,
-    offerOptions,
-    setOfferOptions,
     campaignType,
     aiModel,
     setAiModel,
@@ -209,7 +201,6 @@ export const CampaignProcessContentMessaging = () => {
   const [emailTemplate, setEmailTemplate] = useState<ResponseCampaignEmail[]>();
 
   const fetchLeads = async () => {
-    !leadsVisible && setLeadsVisible(true);
     setLeadsFetching(true);
     setExpend(false);
     setActiveInfo('company');
@@ -364,46 +355,6 @@ export const CampaignProcessContentMessaging = () => {
     [campaignId, fetchTemplateLoading],
   );
 
-  const onClickToChangeOffer = useCallback(
-    async (checked: boolean, index: number) => {
-      if (!campaignId || !leadsList[activeValue]?.previewLeadId) {
-        return;
-      }
-      const temp = JSON.parse(JSON.stringify(offerOptions));
-      temp[index].selected = checked;
-      setOfferOptions(temp);
-
-      const postData = {
-        campaignId,
-        offerIds: temp.reduce(
-          (cur: Array<number | string>, pre: ResponseOfferOption) => {
-            if (pre.selected) {
-              cur.push(pre.id);
-            }
-            return cur;
-          },
-          [],
-        ),
-      };
-      const previewData = {
-        campaignId,
-        previewLeadId: leadsList[activeValue].previewLeadId,
-      };
-      setFetchTemplateLoading(true);
-      try {
-        await _updateSelectedLibraryOffer(postData);
-        const { data } = await _fetchEmailByLead(previewData);
-        setEmailTemplate(data);
-      } catch (err) {
-        const { message, header, variant } = err as HttpError;
-        SDRToast({ message, header, variant });
-      } finally {
-        setFetchTemplateLoading(false);
-      }
-    },
-    [activeValue, campaignId, leadsList, offerOptions, setOfferOptions],
-  );
-
   const [buttons, setButtons] = useState<HTMLElement[] | null>(null);
   const [preDisabled, setPreDisabled] = useState(true);
   const [nextDisabled, setNextDisabled] = useState(false);
@@ -424,12 +375,13 @@ export const CampaignProcessContentMessaging = () => {
 
   useEffect(
     () => {
-      if (!returning) {
+      // 只有在 chatId 存在且不在 returning 状态时才获取数据
+      if (!returning && chatId) {
         fetchLeads();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [returning],
+    [returning, chatId],
   );
 
   useEffect(() => {
@@ -556,29 +508,6 @@ export const CampaignProcessContentMessaging = () => {
       width={'calc(100% - 510px)'}
     >
       <Stack gap={1.5} width={'100%'}>
-        <Typography variant={'subtitle2'}>Offers</Typography>
-        <Stack flexDirection={'row'} gap={1.5}>
-          {offerOptions.map((item, index) => (
-            <Stack
-              border={'1px solid'}
-              borderColor={item.selected ? '#6E4EFB' : '#DFDEE6'}
-              borderRadius={2}
-              flexDirection={'row'}
-              gap={1.5}
-              key={`${item.name}-${index}`}
-              p={1.5}
-            >
-              <StyledSwitch
-                checked={item.selected}
-                onChange={async (_, checked) =>
-                  await onClickToChangeOffer(checked, index)
-                }
-              />
-              <Typography variant={'subtitle2'}>{item.name}</Typography>
-            </Stack>
-          ))}
-        </Stack>
-
         <Stack alignItems={'center'} flexDirection={'row'} mt={1.5}>
           <Typography variant={'subtitle2'}>
             Estimated <b>{UFormatNumber(leadsCount)}</b> leads

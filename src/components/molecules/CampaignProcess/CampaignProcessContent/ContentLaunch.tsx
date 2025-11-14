@@ -60,10 +60,10 @@ const DEFAULT_CARD_STYLE = {
   p: 3,
 };
 
-export const CampaignProcessContentLunch = () => {
+export const ContentLaunch = () => {
   const {
-    lunchInfo,
-    setLunchInfo,
+    launchInfo,
+    setLaunchInfo,
     setIsValidate,
     isValidate,
     campaignType,
@@ -84,26 +84,26 @@ export const CampaignProcessContentLunch = () => {
   useEffect(
     () => {
       setFormData({
-        dailyLimit: lunchInfo.dailyLimit || INITIAL_STATE.dailyLimit,
-        autopilot: lunchInfo.autopilot || INITIAL_STATE.autopilot,
-        sendNow: lunchInfo.sendNow || INITIAL_STATE.sendNow,
-        scheduleTime: lunchInfo.scheduleTime
-          ? new Date(lunchInfo.scheduleTime)
+        dailyLimit: launchInfo.dailyLimit || INITIAL_STATE.dailyLimit,
+        autopilot: launchInfo.autopilot || INITIAL_STATE.autopilot,
+        sendNow: launchInfo.sendNow || INITIAL_STATE.sendNow,
+        scheduleTime: launchInfo.scheduleTime
+          ? new Date(launchInfo.scheduleTime)
           : INITIAL_STATE.scheduleTime,
-        // sender: lunchInfo.sender || INITIAL_STATE.sender,
-        // senderName: lunchInfo.senderName || INITIAL_STATE.senderName,
-        // signatureId: lunchInfo.signatureId || INITIAL_STATE.signatureId,
-        emilProfileId: lunchInfo.emilProfileId || INITIAL_STATE.emilProfileId,
+        // sender: launchInfo.sender || INITIAL_STATE.sender,
+        // senderName: launchInfo.senderName || INITIAL_STATE.senderName,
+        // signatureId: launchInfo.signatureId || INITIAL_STATE.signatureId,
+        emilProfileId: launchInfo.emilProfileId || INITIAL_STATE.emilProfileId,
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
-  const updateLunchInfo = useMemo(
+  const updateLaunchInfo = useMemo(
     () =>
       debounce(() => {
-        setLunchInfo({
+        setLaunchInfo({
           ...formData,
           scheduleTime:
             formData.scheduleTime &&
@@ -113,12 +113,12 @@ export const CampaignProcessContentLunch = () => {
               : null,
         });
       }, 500),
-    [formData, setLunchInfo],
+    [formData, setLaunchInfo],
   );
 
   useEffect(() => {
-    updateLunchInfo();
-  }, [formData, updateLunchInfo]);
+    updateLaunchInfo();
+  }, [formData, updateLaunchInfo]);
 
   const [signatureList, setSignatureList] = useState<TOption[]>([
     {

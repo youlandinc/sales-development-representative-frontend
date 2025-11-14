@@ -4,14 +4,14 @@ import useSWR from 'swr';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { COMPANY_HEADCOUNT_OPTIONS, COMPANY_REVENUE_OPTIONS } from './data';
+import { COMPANY_HEADCOUNT_OPTIONS, COMPANY_REVENUE_OPTIONS } from '../data';
 import { SDRToast } from '@/components/atoms';
-import { StyledSearchSelect, StyledSelectWithCustom } from './index';
+import { StyledSearchSelect, StyledSelectWithCustom } from '../base';
 
 import { HttpError, SearchWithFlagData, SelectWithCustomProps } from '@/types';
 import { _fetchFilterOptions } from '@/request';
 
-import ICON_ARROW_DOWN from './assets/icon_arrow_down.svg';
+import ICON_ARROW_DOWN from '../assets/icon_arrow_down.svg';
 
 export enum TreeNodeRenderTypeEnum {
   search_with_flag = 'SEARCH_WITH_FLAG',
@@ -32,7 +32,7 @@ interface TreeNode {
   }[];
 }
 
-export const CampaignProcessContentFilter: FC = () => {
+export const DataSourceFilter: FC = () => {
   const { filterFormData, setFilterFormData } = useDialogStore();
   const [renderData, setRenderData] = useState<TreeNode[]>(RENDER_DATA);
 

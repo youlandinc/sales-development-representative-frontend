@@ -37,13 +37,13 @@ export const StyledButton: FC<StyledButtonProps> = ({
       sx={{
         flexShrink: 0,
         fontSize: 16,
-        fontWeight: 600,
+        fontWeight: 400,
         lineHeight: 1.5,
         textTransform: 'none',
         borderRadius: 2,
         minWidth: 'auto',
         maxWidth: 'auto',
-        boxShadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
+        //boxShadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
@@ -62,10 +62,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
         },
         '&.MuiButton-outlined': {
           border: '1px solid',
-          borderColor:
-            color !== 'primary'
-              ? `${color}.main`
-              : `${color}.contrastBackground`,
+          borderColor: `${color}.borderColor`,
           color:
             color !== 'primary'
               ? `${color}.main`

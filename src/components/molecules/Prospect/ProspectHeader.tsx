@@ -183,7 +183,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
             aria-haspopup="true"
             id="basic-button"
             onClick={onMenuOpen}
-            size={'medium'}
+            size={'small'}
           >
             <Icon
               component={ICON_NEW_TABLE}

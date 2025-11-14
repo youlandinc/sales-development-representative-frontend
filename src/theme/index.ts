@@ -32,6 +32,8 @@ declare module '@mui/material/styles' {
     background?: string;
     contrastHover?: string;
     contrastBackground?: string;
+    borderColor?: string;
+    contrastBorderColor?: string;
   }
 
   interface SimplePaletteColorOptions {
@@ -40,9 +42,11 @@ declare module '@mui/material/styles' {
     lighter?: string;
     lightest?: string;
     hover?: string;
-    background?: string;
     contrastHover?: string;
+    background?: string;
     contrastBackground?: string;
+    borderColor?: string;
+    contrastBorderColor?: string;
   }
 
   interface TypeText {
@@ -167,6 +171,7 @@ const defaultOptions: ThemeOptions = {
       hover: '#81889B',
       background: '#F4F4F6',
       contrastText: '#FFFFFF',
+      borderColor: '#E5E5E5',
     },
     success: {
       main: '#69C0A5',

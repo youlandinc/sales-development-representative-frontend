@@ -86,7 +86,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
 
   return (
     <Dialog
-      closeAfterTransition={false}
+      closeAfterTransition={true}
       fullWidth={true}
       open={open}
       sx={[
@@ -104,14 +104,15 @@ export const StyledDialog: FC<StyledDialogProps> = ({
               //mx: 3,
             },
             '& .MuiPaper-root': {
-              transition: 'all .3s',
+              transition: 'all 0.3s ease-in-out',
               borderRadius: rest.fullScreen ? 0 : 2,
-              maxWidth: rest.fullScreen
+              width: rest.fullScreen
                 ? '100%'
                 : {
                     lg: paperWidth,
                     xs: '100%',
                   },
+              maxWidth: rest.fullScreen ? '100%' : paperWidth,
               boxShadow:
                 '0px 0px 2px rgba(17, 52, 227, 0.1), 0px 10px 10px rgba(17, 52, 227, 0.1)',
             },

@@ -72,7 +72,7 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
 };
 
 export const LayoutSide: FC = () => {
-  const { openProcess } = useDialogStore();
+  const { openProcess, openProcessLoading } = useDialogStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -193,6 +193,8 @@ export const LayoutSide: FC = () => {
         <Stack mt={3}>
           <StyledButton
             color={'info'}
+            disabled={openProcessLoading}
+            loading={openProcessLoading}
             onClick={() => openProcess()}
             size={'medium'}
             variant={'outlined'}

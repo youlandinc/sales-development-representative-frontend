@@ -1,27 +1,65 @@
+import { useMemo } from 'react';
 import { useDialogStore } from '@/stores/useDialogStore';
+import { CampaignStepEnum } from '@/types';
 
 import { StyledDialog } from '@/components/atoms';
 
 import { CampaignProcessContent, CampaignProcessHeader } from './index';
 
 export const CampaignProcess = () => {
-  const { visibleProcess, closeProcess, activeStep, resetDialogState } =
-    useDialogStore();
+  const { visibleProcess, closeProcessAndReset, activeStep } = useDialogStore();
+
+  const fullScreen = useMemo(
+    () =>
+      ![
+        CampaignStepEnum.prepare,
+        CampaignStepEnum.choose,
+        CampaignStepEnum.audience,
+      ].includes(activeStep),
+    [activeStep],
+  );
+
+  const isNonFullScreenStep = !fullScreen;
+
+  const paperWidth = useMemo(() => {
+    if (activeStep === CampaignStepEnum.audience) {
+      return 900;
+    }
+    if (
+      [CampaignStepEnum.choose, CampaignStepEnum.prepare].includes(activeStep)
+    ) {
+      return 1152;
+    }
+    return 1200;
+  }, [activeStep]);
 
   return (
     <StyledDialog
       content={<CampaignProcessContent />}
-      fullScreen={![0, 1].includes(activeStep)}
+      fullScreen={fullScreen}
       header={<CampaignProcessHeader />}
       headerSx={{ p: 0 }}
-      onClose={async (_, reason) => {
+      onClose={(_, reason) => {
         if (reason === 'escapeKeyDown') {
-          await resetDialogState();
-          closeProcess();
+          closeProcessAndReset();
         }
       }}
       open={visibleProcess}
-      paperWidth={1200}
+      paperWidth={paperWidth}
+      slotProps={{
+        transition: {
+          timeout: 300,
+          easing: 'ease-in-out',
+        },
+      }}
+      sx={{
+        '&.MuiDialog-root': {
+          '& .MuiPaper-root': {
+            borderRadius: isNonFullScreenStep ? 4 : 0,
+            transition: 'all 0.3s ease-in-out !important',
+          },
+        },
+      }}
     />
   );
 };

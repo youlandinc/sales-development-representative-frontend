@@ -9,12 +9,12 @@ import { HttpError } from '@/types';
 
 import { SDRToast, StyledSelect } from '@/components/atoms';
 
-import ICON_CHAT_THINKING from './assets/icon_chat_thinking.svg';
-import ICON_CHAT_SEARCH from './assets/icon_chat_search.svg';
-import ICON_LINKEDIN from './assets/icon_linkedin.svg';
-import ICON_EARTH from './assets/icon_earth.svg';
-import ICON_CHAT_COMPLETED from './assets/icon_chat_completed.svg';
-import ICON_CHAT_LOGO from './assets/icon_chat_logo.svg';
+import ICON_CHAT_THINKING from '../assets/icon_chat_thinking.svg';
+import ICON_CHAT_SEARCH from '../assets/icon_chat_search.svg';
+import ICON_LINKEDIN from '../assets/icon_linkedin.svg';
+import ICON_EARTH from '../assets/icon_earth.svg';
+import ICON_CHAT_COMPLETED from '../assets/icon_chat_completed.svg';
+import ICON_CHAT_LOGO from '../assets/icon_chat_logo.svg';
 
 const FAKE_ANIMATE = [
   <Stack flexDirection={'row'} gap={1}>
@@ -62,11 +62,9 @@ const FAKE_ANIMATE = [
   </Stack>,
 ];
 
-export const CampaignProcessContentSavedList: FC = () => {
+export const DataSourceSavedList: FC = () => {
   const {
-    leadsVisible,
     setLeadsList,
-    setLeadsVisible,
     setLeadsCount,
     leadsCount,
     setLeadsFetchLoading,
@@ -151,9 +149,6 @@ export const CampaignProcessContentSavedList: FC = () => {
     async () => {
       if (!savedListFormData?.listId || !savedListFormData?.name) {
         return;
-      }
-      if (!leadsVisible) {
-        setLeadsVisible(true);
       }
       setIsFirst(false);
       setLeadsFetchLoading(true);

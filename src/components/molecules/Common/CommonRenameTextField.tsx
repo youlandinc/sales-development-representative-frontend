@@ -50,6 +50,13 @@ export const CommonRenameTextField: FC<StyledTextFieldProps> = ({
               height: 'auto',
               lineHeight: 1,
             },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'text.primary',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'text.primary',
+              borderWidth: '1px',
+            },
           },
           position: 'absolute',
           left: 0,

@@ -6,20 +6,20 @@ import {
   ResponseCampaignProcessChatServer,
 } from '@/types';
 
-import ICON_LOADING from './assets/icon_loading.svg';
+import ICON_LOADING from '../assets/icon_loading.svg';
 
-import ICON_EARTH from './assets/icon_earth.svg';
-import ICON_LINKEDIN from './assets/icon_linkedin.svg';
+import ICON_EARTH from '../assets/icon_earth.svg';
+import ICON_LINKEDIN from '../assets/icon_linkedin.svg';
 
-import ICON_CHAT_LOGO from './assets/icon_chat_logo.svg';
+import ICON_CHAT_LOGO from '../assets/icon_chat_logo.svg';
 
-import ICON_CHAT_THINKING from './assets/icon_chat_thinking.svg';
-import ICON_CHAT_PLAN from './assets/icon_chat_plan.svg';
-import ICON_CHAT_AFTER_PLAN from './assets/icon_chat_after_plan.svg';
-import ICON_CHAT_SEARCH from './assets/icon_chat_search.svg';
-import ICON_CHAT_COMPLETED from './assets/icon_chat_completed.svg';
+import ICON_CHAT_THINKING from '../assets/icon_chat_thinking.svg';
+import ICON_CHAT_PLAN from '../assets/icon_chat_plan.svg';
+import ICON_CHAT_AFTER_PLAN from '../assets/icon_chat_after_plan.svg';
+import ICON_CHAT_SEARCH from '../assets/icon_chat_search.svg';
+import ICON_CHAT_COMPLETED from '../assets/icon_chat_completed.svg';
 
-export interface CampaignProcessContentChatServerCardProps {
+export interface ChatServerCardProps {
   source: string;
   id: string | number;
   data: ResponseCampaignProcessChatServer[];
@@ -42,9 +42,7 @@ const STEP_HASH = (step: ProcessCreateChatEnum) => {
   }
 };
 
-export const CampaignProcessContentChatServerCard: FC<
-  CampaignProcessContentChatServerCardProps
-> = ({ data, isFake }) => {
+export const ChatServerCard: FC<ChatServerCardProps> = ({ data, isFake }) => {
   const sortedData = data.sort((a, b) => a.sort - b.sort);
 
   return (
