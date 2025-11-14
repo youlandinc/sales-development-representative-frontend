@@ -102,7 +102,9 @@ export const Chat: FC = () => {
     <Stack
       alignItems={'center'}
       border={'1px solid'}
-      borderColor={activeStep === CampaignStepEnum.audience ? 'transparent' : '#DFDEE6'}
+      borderColor={
+        activeStep === CampaignStepEnum.audience ? 'transparent' : '#DFDEE6'
+      }
       gap={4}
       justifyContent={messageList.length > 0 ? 'unset' : 'center'}
       maxWidth={activeStep === CampaignStepEnum.audience ? '100%' : 460}
@@ -113,8 +115,10 @@ export const Chat: FC = () => {
       sx={{
         transition: 'all .3s',
         overflow: 'hidden',
-        borderTopLeftRadius: activeStep === CampaignStepEnum.audience ? '8px' : '16px',
-        borderTopRightRadius: activeStep === CampaignStepEnum.audience ? '8px' : '16px',
+        borderTopLeftRadius:
+          activeStep === CampaignStepEnum.audience ? '8px' : '16px',
+        borderTopRightRadius:
+          activeStep === CampaignStepEnum.audience ? '8px' : '16px',
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px',
       }}
@@ -148,7 +152,9 @@ export const Chat: FC = () => {
             {messageList.map((item, index) => (
               <Stack
                 key={`${index}`}
-                maxWidth={activeStep === CampaignStepEnum.audience ? '60%' : '80%'}
+                maxWidth={
+                  activeStep === CampaignStepEnum.audience ? '60%' : '80%'
+                }
                 ml={item.source === SourceEnum.user ? 'auto' : 'unset'}
                 width={'fit-content'}
               >
@@ -187,7 +193,11 @@ export const Chat: FC = () => {
         pb={1.5}
         px={1.5}
         sx={{ transition: 'all .3s' }}
-        width={activeStep === CampaignStepEnum.audience ? '100%' : 'calc(100% - 48px)'}
+        width={
+          activeStep === CampaignStepEnum.audience
+            ? '100%'
+            : 'calc(100% - 48px)'
+        }
       >
         <StyledTextField
           disabled={sending || returning}

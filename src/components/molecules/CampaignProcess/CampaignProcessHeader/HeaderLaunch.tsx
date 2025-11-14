@@ -3,7 +3,10 @@ import { debounce, Icon, Stack } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 import { StyledButton } from '@/components/atoms';
-import { CampaignsStatusBadge, CommonRenameTextField } from '@/components/molecules';
+import {
+  CampaignsStatusBadge,
+  CommonRenameTextField,
+} from '@/components/molecules';
 
 import { HeaderButtonGroup } from './HeaderButtonGroup';
 import { useCampaignLaunch } from './hooks/useCampaignLaunch';
@@ -11,12 +14,8 @@ import { useCampaignLaunch } from './hooks/useCampaignLaunch';
 import ICON_BACK from '../assets/icon_back.svg';
 
 export const HeaderLaunch: FC = () => {
-  const {
-    campaignName,
-    campaignStatus,
-    closeProcessAndReset,
-    renameCampaign,
-  } = useDialogStore();
+  const { campaignName, campaignStatus, closeProcessAndReset, renameCampaign } =
+    useDialogStore();
 
   const [value, setValue] = useState(campaignName);
   const { loading, onClickToNext } = useCampaignLaunch();
