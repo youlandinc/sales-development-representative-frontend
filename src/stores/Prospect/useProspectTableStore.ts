@@ -33,10 +33,10 @@ const handleApiError = <T extends Record<string, any>>(
 
 /**
  * Helper function to get active column info from store
- * 
+ *
  * Note: This is only used by methods that operate on the currently active column
  * (e.g., updateColumnName, updateColumnPin, deleteColumn).
- * 
+ *
  * Methods like updateColumnWidth and updateColumnVisible receive fieldId as a parameter
  * because they may need to update any column, not just the active one.
  */
@@ -46,7 +46,9 @@ type GetActiveColumnResult = {
   column: TableColumnProps | undefined;
 };
 
-const getActiveColumn = (get: () => ProspectTableStoreProps): GetActiveColumnResult => {
+const getActiveColumn = (
+  get: () => ProspectTableStoreProps,
+): GetActiveColumnResult => {
   const { activeColumnId, columns } = get();
   return {
     fieldId: activeColumnId,
