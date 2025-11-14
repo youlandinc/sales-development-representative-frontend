@@ -36,7 +36,7 @@ export const SettingsDialog = ({
   domain,
   setDomain,
 }: SettingsDialogProps) => {
-  const { emailDomainList } = useSettingsStore((state) => state);
+  const emailDomainList = useSettingsStore((state) => state.emailDomainList);
 
   const domainOptions = useMemo(() => {
     return emailDomainList

@@ -29,15 +29,12 @@ import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
 import ICON_SPARK from '../../assets/dialog/icon_sparkle_blue.svg';
 
 export const DialogHeaderActions = () => {
-  const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
-    (store) => store,
-  );
-  const {
-    openProcess,
-    setCampaignType,
-    setEnrichmentTableDisabled,
-    setLeadsVisible,
-  } = useDialogStore();
+  const dialogType = useProspectTableStore((state) => state.dialogType);
+  const dialogVisible = useProspectTableStore((state) => state.dialogVisible);
+  const closeDialog = useProspectTableStore((state) => state.closeDialog);
+
+  const openProcess = useDialogStore((state) => state.openProcess);
+  const setCampaignType = useDialogStore((state) => state.setCampaignType);
 
   const { ENRICHMENTS_SUGGESTION_MENUS, ENRICHMENTS_AI_MENUS } =
     useDialogHeaderActionsHook();
@@ -57,12 +54,10 @@ export const DialogHeaderActions = () => {
     setValue('Enrichments');
   };
 
-  const handleCampaignClick = () => {
+  const handleCampaignClick = async () => {
     handleClose();
     setCampaignType(ProcessCreateTypeEnum.ai_table);
-    openProcess();
-    setEnrichmentTableDisabled(true);
-    setLeadsVisible(true);
+    await openProcess('FROM_TABLE');
   };
 
   return (

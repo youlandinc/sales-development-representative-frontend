@@ -1,4 +1,5 @@
 'use client';
+import { useShallow } from 'zustand/react/shallow';
 
 import { Box } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
@@ -22,7 +23,12 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   value,
   placeholder = 'Start typing here...',
 }: StyledTinyEditorProps) => {
-  const { signatures, fetchSignatures } = useSettingsStore();
+  const { signatures, fetchSignatures } = useSettingsStore(
+    useShallow((state) => ({
+      signatures: state.signatures,
+      fetchSignatures: state.fetchSignatures,
+    })),
+  );
 
   useEffect(() => {
     // close();
@@ -44,10 +50,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
     };
   }, []);
 
-  if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY) {
-    return null;
-  }
-
   return (
     <Box
       minHeight={400}
@@ -60,7 +62,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
       }}
     >
       <Editor
-        apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
         init={{
           content_style:
             'p { margin: 0;font-size:12px } body::before { font-size:12px }',
@@ -210,7 +211,9 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           paste_data_images: true,
           menubar: false,
         }}
+        licenseKey="gpl"
         onEditorChange={onChange}
+        tinymceScriptSrc="/tinymce/tinymce.min.js"
         value={value}
       />
     </Box>

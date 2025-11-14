@@ -17,7 +17,6 @@ import {
 } from './Panel';
 import { StyledButton } from '@/components/atoms';
 import { useDialogStore } from '@/stores/useDialogStore';
-import { ProcessCreateTypeEnum } from '@/types';
 import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 interface ProspectDetailHeaderProps {
@@ -30,15 +29,8 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
   const { resetTable, tableName, renameTable } = useProspectTableStore(
     (store) => store,
   );
-  const { openDialog } = useProspectTableStore((store) => store);
-
-  const {
-    openProcess,
-    setCampaignType,
-    setSelectedEnrichmentTableId,
-    setEnrichmentTableDisabled,
-    setLeadsVisible,
-  } = useDialogStore();
+  const openDialog = useProspectTableStore((state) => state.openDialog);
+  const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
   const router = useRouter();
 
@@ -131,11 +123,7 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
         <Stack flexDirection={'row'}>
           <StyledButton
             onClick={() => {
-              // setCampaignType(ProcessCreateTypeEnum.ai_table);
-              // openProcess();
-              setSelectedEnrichmentTableId(tableId);
-              // setEnrichmentTableDisabled(true);
-              // setLeadsVisible(true);
+              setAiTableInfo({ tableId, mappings: [] });
               openDialog(TableColumnMenuActionEnum.header_actions);
             }}
             size={'medium'}

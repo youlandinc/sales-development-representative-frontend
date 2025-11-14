@@ -115,7 +115,9 @@ export const InboxReceiptCard: FC<InboxReceiptCardProps> = ({
         </Fade>
         <Fade in={visible}>
           <Stack display={visible ? 'flex' : 'none'} gap={1.5}>
-            <StyledTinyEditor onChange={setContent} value={content} />
+            {visible && (
+              <StyledTinyEditor onChange={setContent} value={content} />
+            )}
             <Stack flexDirection={'row'} gap={1.5} justifyContent={'flex-end'}>
               <StyledButton
                 color={'info'}

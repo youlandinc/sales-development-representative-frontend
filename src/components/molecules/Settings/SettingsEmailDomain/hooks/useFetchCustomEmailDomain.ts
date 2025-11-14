@@ -4,8 +4,10 @@ import { useUserStore } from '@/providers';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 
 export const useFetchCustomEmailDomain = () => {
-  const { userProfile } = useUserStore((state) => state);
-  const { fetchEmailDomainList } = useSettingsStore((state) => state);
+  const userProfile = useUserStore((state) => state.userProfile);
+  const fetchEmailDomainList = useSettingsStore(
+    (state) => state.fetchEmailDomainList,
+  );
   const { tenantId } = userProfile;
 
   const [loading, setLoading] = useState(false);

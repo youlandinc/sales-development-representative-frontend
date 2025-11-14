@@ -31,6 +31,32 @@ const handleApiError = <T extends Record<string, any>>(
   SDRToast({ message, header, variant });
 };
 
+/**
+ * Helper function to get active column info from store
+ *
+ * Note: This is only used by methods that operate on the currently active column
+ * (e.g., updateColumnName, updateColumnPin, deleteColumn).
+ *
+ * Methods like updateColumnWidth and updateColumnVisible receive fieldId as a parameter
+ * because they may need to update any column, not just the active one.
+ */
+type GetActiveColumnResult = {
+  fieldId: string;
+  columns: TableColumnProps[];
+  column: TableColumnProps | undefined;
+};
+
+const getActiveColumn = (
+  get: () => ProspectTableStoreProps,
+): GetActiveColumnResult => {
+  const { activeColumnId, columns } = get();
+  return {
+    fieldId: activeColumnId,
+    columns,
+    column: columns.find((col) => col.fieldId === activeColumnId),
+  };
+};
+
 export type ProspectTableState = {
   tableName: string;
   columns: TableColumnProps[];
@@ -179,10 +205,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
     },
     updateColumnName: async (newName) => {
-      const fieldId = get().activeColumnId;
-      const columns = get().columns;
-
-      const column = get().columns.find((col) => col.fieldId === fieldId);
+      const { fieldId, columns, column } = getActiveColumn(get);
 
       const trimmedName = newName.trim();
       if (!fieldId || !column || !trimmedName) {
@@ -218,10 +241,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
     },
     updateColumnPin: async (pin) => {
-      const fieldId = get().activeColumnId;
-      const columns = get().columns;
-
-      const column = get().columns.find((col) => col.fieldId === fieldId);
+      const { fieldId, columns, column } = getActiveColumn(get);
 
       if (!fieldId || !column || !UNotUndefined(pin)) {
         return;
@@ -241,10 +261,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
     },
     updateColumnDescription: async (description) => {
-      const fieldId = get().activeColumnId;
-      const columns = get().columns;
-
-      const column = get().columns.find((col) => col.fieldId === fieldId);
+      const { fieldId, columns, column } = getActiveColumn(get);
 
       const trimmedDescription = description.trim();
       if (!fieldId || !column || !UNotUndefined(trimmedDescription)) {
@@ -270,10 +287,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
     },
     updateColumnType: async (fieldType) => {
-      const fieldId = get().activeColumnId;
-      const columns = get().columns;
-
-      const column = get().columns.find((col) => col.fieldId === fieldId);
+      const { fieldId, columns, column } = getActiveColumn(get);
 
       if (!fieldId || !column || !UNotUndefined(fieldType)) {
         return;
@@ -301,13 +315,10 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
     },
     updateColumnFieldName: async (params) => {
-      const fieldId = get().activeColumnId;
-      const columns = get().columns;
-
-      const column = get().columns.find((col) => col.fieldId === fieldId);
+      const { fieldId, columns, column } = getActiveColumn(get);
 
       const trimmedFieldName = params.fieldName.trim();
-      if (!fieldId || !column || !UNotUndefined(trimmedFieldName)) {
+      if (!fieldId || !column || !trimmedFieldName || !params.fieldType) {
         return;
       }
 
@@ -331,20 +342,19 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       }
     },
     deleteColumn: async () => {
-      const fieldId = get().activeColumnId;
-      const columns = get().columns;
-
-      const column = get().columns.find((col) => col.fieldId === fieldId);
+      const { fieldId, columns, column } = getActiveColumn(get);
 
       if (!fieldId || !column) {
         return;
       }
 
+      // Optimistic update
+      const updatedColumns = columns.filter((col) => col.fieldId !== fieldId);
+      set({ columns: updatedColumns });
+      get().closeDialog();
+
       try {
         await _deleteTableColumn(fieldId);
-        const updatedColumns = columns.filter((col) => col.fieldId !== fieldId);
-        get().closeDialog();
-        set({ columns: updatedColumns });
       } catch (err) {
         handleApiError<ProspectTableState>(err, { columns }, set);
       }
@@ -406,15 +416,23 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     // table cell
     updateCellValue: async (data) => {
       try {
-        const response = await _updateTableCellValue(data);
-        return response;
+        return await _updateTableCellValue(data);
       } catch (err) {
         handleApiError<ProspectTableState>(err);
         throw err;
       }
     },
     resetTable: () => {
-      set({ columns: [], rowIds: [], runRecords: null });
+      set({
+        tableName: '',
+        columns: [],
+        activeColumnId: '',
+        dialogVisible: false,
+        dialogType: null,
+        rowIds: [],
+        runRecords: null,
+        fieldGroupMap: null,
+      });
     },
   }),
 );

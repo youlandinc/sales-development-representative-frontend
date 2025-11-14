@@ -16,7 +16,7 @@ import { useAsyncFn, useSwitch } from '@/hooks';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 
 export const useEmailProfilesRequest = () => {
-  const { mailboxes } = useSettingsStore((state) => state);
+  const mailboxes = useSettingsStore((state) => state.mailboxes);
 
   const { data, mutate, isLoading } = useSWR(
     'emailProfiles',

@@ -49,7 +49,7 @@ export const SettingsEmailDomainContent = ({
   onRemove,
   onClickView,
 }: SettingsEmailDomainContentProps) => {
-  const { emailDomainList: data } = useSettingsStore((state) => state);
+  const data = useSettingsStore((state) => state.emailDomainList);
   if (loading) {
     return (
       <Stack gap={1.5}>

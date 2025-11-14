@@ -3,6 +3,7 @@
 **/.hg
 **/node_modules
 **/.next
+public
 *.yaml
 *.json
 *.md
