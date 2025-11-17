@@ -1,11 +1,9 @@
-import { FC, Fragment, useEffect, useState } from 'react';
 import { Icon, Stack, SxProps, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
+import { FC, Fragment, useEffect, useState } from 'react';
 
 import { useDialogStore } from '@/stores/useDialogStore';
-
-import { StyledButton } from '@/components/atoms';
 
 import { LAYOUT_SIDE_MENU } from './Layout.data';
 
@@ -82,8 +80,6 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
 };
 
 export const LayoutSide: FC = () => {
-  const { openProcess, openProcessLoading } = useDialogStore();
-
   const router = useRouter();
   const pathname = usePathname();
 
