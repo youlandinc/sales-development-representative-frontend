@@ -4,6 +4,9 @@ export * from './Layout';
 
 export * from './Auth';
 
+export * from './Directories';
+export * from './DirectoriesIndustry';
+
 export * from './Prospect';
 export * from './ProspectDetail';
 
