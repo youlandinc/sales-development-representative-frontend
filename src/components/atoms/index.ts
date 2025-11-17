@@ -37,3 +37,7 @@ export * from './StyledTinyEditor';
 export * from './StyledRadioGroup';
 
 export * from './StyledMultiSelect';
+
+export * from './StyledButtonGroup';
+
+export * from './StyledTab';
