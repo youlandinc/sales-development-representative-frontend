@@ -181,16 +181,6 @@ export const LayoutSide: FC = () => {
             />
           </Fragment>
         ))}
-        <Stack mt={3}>
-          <StyledButton
-            color={'info'}
-            onClick={() => openProcess()}
-            size={'medium'}
-            variant={'outlined'}
-          >
-            {expend ? 'Create new campaign' : '+'}
-          </StyledButton>
-        </Stack>
       </Stack>
     </Stack>
   );
