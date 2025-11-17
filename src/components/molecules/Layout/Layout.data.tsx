@@ -16,6 +16,8 @@ import ICON_SIDE_SETTINGS_ACTIVE from './assets/icon_side_settings_active.svg';
 import ICON_SIDE_DIRECTORIES_DEFAULT from './assets/icon_directories_default.svg';
 import ICON_SIDE_DIRECTORIES_ACTIVE from './assets/icon_directories_active.svg';
 
+import ICON_SIDE_PRICING_DEFAULT from './assets/icon_side_pricing_default.svg';
+
 /* import ICON_SIDE_CONTACTS_DEFAULT from './assets/icon_side_contacts_default.svg';
 import ICON_SIDE_CONTACTS_ACTIVE from './assets/icon_side_contacts_active.svg';
 
@@ -38,7 +40,7 @@ export const LAYOUT_SIDE_MENU = [
     type: 'link',
   },
   {
-    label: 'Prospect & Enrich',
+    label: 'Enrichment',
     url: '/prospect-enrich',
     key: 'prospect-enrich',
     defaultIcon: ICON_SIDE_ENRICH_DEFAULT,
@@ -100,6 +102,17 @@ export const LAYOUT_SIDE_MENU = [
     key: 'library',
     defaultIcon: ICON_SIDE_LIBRARY_DEFAULT,
     activeIcon: ICON_SIDE_LIBRARY_ACTIVE,
+    type: 'link',
+  },
+];
+
+export const LAYOUT_SIDE_MENU_BOTTOM = [
+  {
+    label: 'Pricing',
+    url: '/pricing-plan',
+    key: 'pricing-plan',
+    defaultIcon: ICON_SIDE_PRICING_DEFAULT,
+    activeIcon: ICON_SIDE_PRICING_DEFAULT,
     type: 'link',
   },
   {

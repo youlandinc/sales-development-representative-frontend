@@ -30,3 +30,5 @@ export * from './Enrichments';
 
 export * from './FindPeopleCompany/FindPeople';
 export * from './FindPeopleCompany/FindCompanies';
+
+export * from './Payment';

@@ -13,21 +13,21 @@ export const StyledButtonGroupStyles = {
     justifyContent: 'center',
     p: 0,
     '&.MuiToggleButtonGroup-middleButton, &.MuiToggleButtonGroup-lastButton': {
-      borderTopLeftRadius: '0px !important',
-      borderBottomLeftRadius: '0px !important',
+      borderTopLeftRadius: '0px',
+      borderBottomLeftRadius: '0px',
     },
     '&.MuiToggleButtonGroup-middleButton, &.MuiToggleButtonGroup-firstButton': {
-      borderTopRightRadius: '0px !important',
-      borderBottomRightRadius: '0px !important',
+      borderTopRightRadius: '0px',
+      borderBottomRightRadius: '0px',
     },
     '&.MuiToggleButtonGroup-grouped:not(:first-of-type)': {
       ml: '-2px',
       borderLeft: '2px solid transparent',
     },
     '&.MuiToggleButtonGroup-grouped.Mui-selected': {
-      bgcolor: 'primary.lighter',
+      bgcolor: 'primary.main',
       borderColor: 'primary.main',
-      color: 'primary.darker',
+      color: 'text.white',
     },
     '&:disabled': {
       color: 'text.disabled',

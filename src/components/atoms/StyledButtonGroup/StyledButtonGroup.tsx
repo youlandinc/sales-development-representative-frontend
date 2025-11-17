@@ -14,12 +14,7 @@ export const StyledButtonGroup: FC<StyledButtonGroupProps> = ({
     <ToggleButtonGroup
       color={color}
       exclusive
-      sx={[
-        {
-          ...StyledButtonGroupStyles,
-        },
-        ...(Array.isArray(sx) ? sx : [sx]),
-      ]}
+      sx={[StyledButtonGroupStyles, ...(Array.isArray(sx) ? sx : [sx])]}
       value={value}
       {...rest}
     >

@@ -3,9 +3,7 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 import { FC, Fragment, useEffect, useState } from 'react';
 
-import { useDialogStore } from '@/stores/useDialogStore';
-
-import { LAYOUT_SIDE_MENU } from './Layout.data';
+import { LAYOUT_SIDE_MENU, LAYOUT_SIDE_MENU_BOTTOM } from './Layout.data';
 
 import ICON_EXPEND from './assets/icon_expend.svg';
 
@@ -146,7 +144,8 @@ export const LayoutSide: FC = () => {
         bgcolor: '#FFFFFF',
         position: 'relative',
         px: expend ? 3 : 1.5,
-        py: 4,
+        pt: 4,
+        pb: 2,
         transition: 'all .3s',
         flexShrink: 0,
       }}
@@ -177,6 +176,26 @@ export const LayoutSide: FC = () => {
             />
           </Fragment>
         ))}
+        <Stack mt={'auto'}>
+          {LAYOUT_SIDE_MENU_BOTTOM.map((item, index) => (
+            <Fragment key={index}>
+              <StyledMenuItem
+                active={isSelected(item.key)}
+                activeIcon={item.activeIcon}
+                defaultIcon={item.defaultIcon}
+                expend={expend}
+                key={`${item.key}-${index}`}
+                label={item.label}
+                onClick={() => {
+                  if (item.url) {
+                    onClickToRedirect(item.url);
+                    return;
+                  }
+                }}
+              />
+            </Fragment>
+          ))}
+        </Stack>
       </Stack>
     </Stack>
   );

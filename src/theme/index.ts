@@ -57,6 +57,7 @@ declare module '@mui/material/styles' {
     active: string;
     primary: string;
     secondary: string;
+    white: string;
   }
 
   interface TypeBorder {
@@ -193,13 +194,14 @@ const defaultOptions: ThemeOptions = {
     },
 
     text: {
-      default: '#2A292E',
+      default: '#363440',
       disabled: '#BABCBE',
       hover: '#4C4957',
       focus: '#363440',
       active: '#6E4EFB',
-      primary: '#2A292E',
+      primary: '#363440',
       secondary: '#6F6C7D',
+      white: '#FFFFFF',
     },
     background: {
       default: '#FFFFFF',
