@@ -152,8 +152,8 @@ const defaultOptions: ThemeOptions = {
   ...customBreakpoints,
   palette: {
     primary: {
-      main: '#6E4EFB',
-      hover: '#5133D7',
+      main: '#363440',
+      hover: '#4C4957',
       light: '#AC99FB',
       lighter: '#D5CBFB',
       dark: '#3D25A8',
@@ -191,6 +191,7 @@ const defaultOptions: ThemeOptions = {
       background: '#FFEEEA',
       contrastText: '#FFFFFF',
     },
+
     text: {
       default: '#2A292E',
       disabled: '#BABCBE',
@@ -205,7 +206,7 @@ const defaultOptions: ThemeOptions = {
       disabled: '#BABCBE',
       hover: '#4C4957',
       focus: '#5B76BC',
-      active: '#F7F4FD',
+      active: '#F8F8FA',
       primary: '#2A292E',
       secondary: '#6F6C7D',
       avatar_defaultBg: '#DFE2E7',
@@ -471,7 +472,7 @@ const defaultOptions: ThemeOptions = {
             },
           '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-endAdornment':
             {
-              top: 0,
+              top: 2,
             },
           '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-tag':
             {

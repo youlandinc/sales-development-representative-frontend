@@ -80,7 +80,7 @@ export const HeadColumnsPanel = () => {
                         cursor: 'pointer',
                         px: 1,
                         '&:hover': {
-                          bgcolor: '#F7F4FD',
+                          bgcolor: '#F8F8FA',
                           '& .action': {
                             display: 'block',
                           },

@@ -135,7 +135,7 @@ export const DataSourceAiTable: FC = () => {
               </Typography>
               <Stack>
                 <Stack
-                  bgcolor={'#F7F4FD'}
+                  bgcolor={'#F8F8FA'}
                   border={'1px solid #D2D6E1'}
                   flexDirection={'row'}
                   px={4}

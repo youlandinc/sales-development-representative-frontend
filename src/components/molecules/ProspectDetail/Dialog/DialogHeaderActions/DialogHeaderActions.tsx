@@ -26,7 +26,7 @@ import { ProcessCreateTypeEnum } from '@/types';
 
 import CloseIcon from '@mui/icons-material/Close';
 import ICON_ARROW from '../../assets/dialog/icon_arrow_down.svg';
-import ICON_SPARK from '../../assets/dialog/icon_sparkle_blue.svg';
+import ICON_SPARK from '../../assets/dialog/icon_sparkle.svg';
 
 export const DialogHeaderActions = () => {
   const dialogType = useProspectTableStore((state) => state.dialogType);
@@ -191,7 +191,7 @@ export const DialogHeaderActions = () => {
                     py={0.5}
                     sx={{
                       '&:hover': {
-                        bgcolor: '#F7F4FD',
+                        bgcolor: '#F8F8FA',
                       },
                       cursor: 'pointer',
                     }}

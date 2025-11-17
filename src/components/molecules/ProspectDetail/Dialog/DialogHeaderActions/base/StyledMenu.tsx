@@ -28,7 +28,7 @@ export const StyledMenu: FC<StyledMenuProps> = ({
       sx={{
         cursor: 'pointer',
         '&:hover': {
-          bgcolor: '#F7F4FD',
+          bgcolor: '#F8F8FA',
         },
         ...sx,
       }}

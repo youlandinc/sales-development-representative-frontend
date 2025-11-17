@@ -23,7 +23,7 @@ export const HeaderButtonGroup: FC = () => {
           alignItems={'center'}
           border={
             activeStep === item.id
-              ? '2px solid #6E4EFB'
+              ? '2px solid #363440'
               : '2px solid transparent'
           }
           borderRadius={2}
@@ -50,17 +50,16 @@ export const HeaderButtonGroup: FC = () => {
               transition: 'all .2s',
               color:
                 activeStep === item.id || disabled()
-                  ? 'primary.main'
+                  ? '#FFFFFF'
                   : 'text.disabled',
-              bgcolor:
-                activeStep === item.id ? 'primary.lighter' : 'transparent',
+              bgcolor: activeStep === item.id ? '#363440' : 'transparent',
               border:
                 activeStep === item.id || disabled()
                   ? '1px solid transparent'
                   : '1px solid #D5CBFB',
             },
             '&:hover': {
-              border: !campaignId || returning ? '' : '2px solid #6E4EFB',
+              border: !campaignId || returning ? '' : '2px solid #363440',
             },
           }}
         >

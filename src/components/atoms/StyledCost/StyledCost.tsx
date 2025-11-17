@@ -24,7 +24,7 @@ export const StyledCost: FC<StyledCostProps> = ({
       {...rest}
     >
       <Icon component={ICON_COINS} sx={{ width: 16, height: 16 }} />
-      <Typography color={textColor || '#866BFB'} variant={'body3'}>
+      <Typography color={textColor || 'primary.main'} variant={'body3'}>
         {count} / row
       </Typography>
     </Stack>

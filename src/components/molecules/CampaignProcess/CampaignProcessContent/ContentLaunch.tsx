@@ -177,7 +177,7 @@ export const ContentLaunch = () => {
             <>
               <Stack bgcolor={'#EAE9EF'} height={'1px'} my={1.5} />
               <Typography
-                color={'#6E4EFB'}
+                color={'#363440'}
                 fontSize={14}
                 lineHeight={1}
                 ml={'auto'}
@@ -270,7 +270,7 @@ export const ContentLaunch = () => {
             '& .MuiSlider-thumb': {
               height: 20,
               width: 20,
-              bgcolor: '#6E4EFB',
+              bgcolor: '#363440',
               '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
                 boxShadow: 'inherit',
               },
@@ -279,11 +279,11 @@ export const ContentLaunch = () => {
               },
             },
             '& .MuiSlider-rail': {
-              bgcolor: '#6E4EFB',
+              bgcolor: '#363440',
               opacity: 0.32,
             },
             '& .MuiSlider-track': {
-              bgcolor: '#6E4EFB',
+              bgcolor: '#363440',
             },
             '.MuiSlider-mark': {
               width: 4,

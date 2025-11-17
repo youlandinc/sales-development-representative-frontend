@@ -1,5 +1,5 @@
-import { SyntheticEvent, useState } from 'react';
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { SyntheticEvent, useState } from 'react';
 
 import {
   SettingsEmails,
@@ -35,11 +35,9 @@ export const Settings = () => {
             '& .MuiTab-root': {
               padding: '12px',
               fontSize: '16px',
-              color: '#6F6C7D',
               textTransform: 'none',
             },
             '& .MuiTab-root.Mui-selected': {
-              color: '#6E4EFB',
               fontWeight: '600',
             },
           }}

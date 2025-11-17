@@ -49,7 +49,7 @@ export const CollapsePanel: FC<PropsWithChildren<CollapsePanelProps>> = ({
         <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
           {!!filterCount && (
             <Box
-              bgcolor={'#EFE9FB'}
+              bgcolor={'#EAE9EF'}
               borderRadius={1}
               fontSize={12}
               px={1}

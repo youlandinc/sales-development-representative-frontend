@@ -37,33 +37,43 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
       gap={0.5}
       justifyContent={expend ? 'unset' : 'center'}
       onClick={() => onClick?.()}
+      px={expend ? 1.5 : 0}
       py={1.5}
-      sx={{
-        cursor: 'pointer',
-        transitions: 'all .3s',
-        '& .layout_label': {
-          color: active ? 'primary.main' : 'text.primary',
-        },
-        '&:hover': {
-          '& .layout_icon': {
-            '& path': {
-              fill: active ? '' : '#6F6C7D',
+      sx={[
+        {
+          cursor: 'pointer',
+          transition: 'all .3s',
+          '& .layout_label': {
+            color: active ? '#363440' : 'text.primary',
+          },
+          '&:hover': {
+            '& .layout_icon': {
+              '& path': {
+                fill: active ? '' : '#6F6C7D',
+              },
+            },
+            '& .layout_label': {
+              color: active ? 'primary.main' : 'text.secondary',
             },
           },
-          '& .layout_label': {
-            color: active ? 'primary.main' : 'text.secondary',
-          },
+          bgcolor: active && expend ? '#EAE9EF' : 'transparent',
+          borderRadius: 2,
         },
-        ...sx,
-      }}
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
     >
       <Icon
         className={'layout_icon'}
         component={active ? activeIcon : defaultIcon}
+        sx={{ width: 20, height: 20 }}
       />
 
       {expend && (
-        <Typography className={'layout_label'} mb={0.5} variant={'body2'}>
+        <Typography
+          className={'layout_label'}
+          variant={'body2'}
+          whiteSpace={'nowrap'}
+        >
           {label}
         </Typography>
       )}
@@ -150,51 +160,30 @@ export const LayoutSide: FC = () => {
         sx={{
           width: '100%',
           overflowX: 'hidden',
+          flex: 1,
         }}
       >
         {LAYOUT_SIDE_MENU.map((item, index) => (
           <Fragment key={index}>
-            {item.subMenus && !expend ? null : (
-              <StyledMenuItem
-                active={isSelected(item.key)}
-                activeIcon={item.activeIcon}
-                defaultIcon={item.defaultIcon}
-                expend={expend}
-                key={`${item.key}-${index}`}
-                label={item.label}
-                onClick={() => {
-                  if (item.url) {
-                    onClickToRedirect(item.url);
-                    return;
-                  }
-                  if (item?.subMenus?.length) {
-                    onClickToRedirect(item.subMenus[0].url);
-                  }
-                }}
-              />
-            )}
-            {item.subMenus && (
-              <Stack pl={expend ? '28px' : 0}>
-                {item.subMenus.map((subItem, i) => (
-                  <StyledMenuItem
-                    active={isSelected(subItem.key)}
-                    activeIcon={subItem.activeIcon}
-                    defaultIcon={subItem.defaultIcon}
-                    expend={expend}
-                    key={`${subItem.key}-${i}`}
-                    label={subItem.label}
-                    onClick={() => onClickToRedirect(subItem.url)}
-                  />
-                ))}
-              </Stack>
-            )}
+            <StyledMenuItem
+              active={isSelected(item.key)}
+              activeIcon={item.activeIcon}
+              defaultIcon={item.defaultIcon}
+              expend={expend}
+              key={`${item.key}-${index}`}
+              label={item.label}
+              onClick={() => {
+                if (item.url) {
+                  onClickToRedirect(item.url);
+                  return;
+                }
+              }}
+            />
           </Fragment>
         ))}
         <Stack mt={3}>
           <StyledButton
             color={'info'}
-            disabled={openProcessLoading}
-            loading={openProcessLoading}
             onClick={() => openProcess()}
             size={'medium'}
             variant={'outlined'}

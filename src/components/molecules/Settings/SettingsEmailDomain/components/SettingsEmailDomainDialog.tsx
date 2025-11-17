@@ -266,7 +266,7 @@ export const SettingsEmailDomainDialog = ({
               color={'#6E4EFB'}
               gap={'10px'}
               sx={{
-                bgcolor: '#F7F4FD',
+                bgcolor: '#F8F8FA',
                 p: 1.5,
                 borderRadius: 1,
               }}

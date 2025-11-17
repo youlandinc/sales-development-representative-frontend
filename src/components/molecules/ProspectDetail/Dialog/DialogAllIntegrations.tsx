@@ -44,7 +44,7 @@ export const DialogAllIntegrations: FC = () => {
                 px={1.5}
                 py={0.5}
                 sx={{
-                  '&:hover': { backgroundColor: '#F7F4FD' },
+                  '&:hover': { backgroundColor: '#F8F8FA' },
                   cursor: 'pointer',
                 }}
               >

@@ -116,7 +116,7 @@ export const ChatServerCard: FC<ChatServerCardProps> = ({ data, isFake }) => {
                           >
                             {item.labels.map((label, labelIndex) => (
                               <Typography
-                                bgcolor={'#F7F4FD'}
+                                bgcolor={'#F8F8FA'}
                                 borderRadius={1}
                                 color={'#6F6C7D'}
                                 key={`${label}-${item.id}-${index}-${labelIndex}`}

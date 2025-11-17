@@ -28,7 +28,7 @@ const TypeCard: FC<TypeCardProps> = ({
 }) => {
   return (
     <Stack
-      bgcolor={'#F7F4FD'}
+      bgcolor={'#F8F8FA'}
       borderRadius={4}
       flex={1}
       gap={1.5}

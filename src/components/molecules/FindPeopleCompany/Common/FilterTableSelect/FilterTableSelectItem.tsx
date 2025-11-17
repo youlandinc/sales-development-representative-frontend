@@ -46,7 +46,7 @@ export const FilterTableSelectItem: FC<FilterTableSelectItemProps> = ({
           borderRadius: 2,
           cursor: 'pointer',
           '&:hover': {
-            bgcolor: '#F7F4FD',
+            bgcolor: '#F8F8FA',
           },
         }}
       >
@@ -115,7 +115,7 @@ export const FilterTableSelectItem: FC<FilterTableSelectItemProps> = ({
                     borderRadius: 2,
                     cursor: 'pointer',
                     '&:hover': {
-                      bgcolor: '#F7F4FD',
+                      bgcolor: '#F8F8FA',
                     },
                   }}
                 >

@@ -25,7 +25,7 @@ export const StyledCellItemContainer: FC<
         userSelect: 'none',
         '&:hover': {
           borderColor: '#6E4EFB',
-          bgcolor: '#F7F4FD',
+          bgcolor: '#F8F8FA',
           '& .icon_copy': {
             display: 'block',
           },

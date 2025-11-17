@@ -6,7 +6,7 @@ import {
 import { SyntheticEvent, useState } from 'react';
 
 import ICON_SUGGESTIONS from '@/components/molecules/ProspectDetail/assets/dialog/headerActions/icon_suggestions.svg';
-import ICON_AI from '@/components/molecules/ProspectDetail/assets/dialog/icon_sparkle_blue.svg';
+import ICON_AI from '@/components/molecules/ProspectDetail/assets/dialog/icon_sparkle.svg';
 
 import { ActiveTypeEnum } from '@/types';
 

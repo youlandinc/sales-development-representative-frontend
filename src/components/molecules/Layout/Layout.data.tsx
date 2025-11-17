@@ -13,7 +13,10 @@ import ICON_SIDE_LIBRARY_ACTIVE from './assets/icon_side_library_active.svg';
 import ICON_SIDE_SETTINGS_DEFAULT from './assets/icon_side_settings_default.svg';
 import ICON_SIDE_SETTINGS_ACTIVE from './assets/icon_side_settings_active.svg';
 
-import ICON_SIDE_CONTACTS_DEFAULT from './assets/icon_side_contacts_default.svg';
+import ICON_SIDE_DIRECTORIES_DEFAULT from './assets/icon_directories_default.svg';
+import ICON_SIDE_DIRECTORIES_ACTIVE from './assets/icon_directories_active.svg';
+
+/* import ICON_SIDE_CONTACTS_DEFAULT from './assets/icon_side_contacts_default.svg';
 import ICON_SIDE_CONTACTS_ACTIVE from './assets/icon_side_contacts_active.svg';
 
 import ICON_SIDE_CONTACTS_PEOPLE_DEFAULT from './assets/icon_side_contacts_people_default.svg';
@@ -23,9 +26,17 @@ import ICON_SIDE_CONTACTS_COMPANIES_DEFAULT from './assets/icon_side_contacts_co
 import ICON_SIDE_CONTACTS_COMPANIES_ACTIVE from './assets/icon_side_contacts_companies_active.svg';
 
 import ICON_SIDE_CONTACTS_LISTS_DEFAULT from './assets/icon_side_contacts_lists_default.svg';
-import ICON_SIDE_CONTACTS_LISTS_ACTIVE from './assets/icon_side_contacts_lists_active.svg';
+import ICON_SIDE_CONTACTS_LISTS_ACTIVE from './assets/icon_side_contacts_lists_active.svg'; */
 
 export const LAYOUT_SIDE_MENU = [
+  {
+    label: 'Directories',
+    url: '/directories',
+    key: 'directories',
+    defaultIcon: ICON_SIDE_DIRECTORIES_DEFAULT,
+    activeIcon: ICON_SIDE_DIRECTORIES_ACTIVE,
+    type: 'link',
+  },
   {
     label: 'Prospect & Enrich',
     url: '/prospect-enrich',
@@ -42,7 +53,7 @@ export const LAYOUT_SIDE_MENU = [
     activeIcon: ICON_SIDE_CAMPAIGNS_ACTIVE,
     type: 'link',
   },
-  {
+  /* {
     label: 'Contacts',
     key: 'Contacts',
     defaultIcon: ICON_SIDE_CONTACTS_DEFAULT,
@@ -74,7 +85,7 @@ export const LAYOUT_SIDE_MENU = [
         type: 'link',
       },
     ],
-  },
+  }, */
   {
     label: 'Inbox',
     url: '/inbox',

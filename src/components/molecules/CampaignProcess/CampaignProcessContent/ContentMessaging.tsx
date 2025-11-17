@@ -624,10 +624,10 @@ export const ContentMessaging = () => {
                         sx={{
                           border:
                             activeValue === index
-                              ? '1px solid #6E4EFB'
+                              ? '1px solid #363440'
                               : '1px solid #DFDEE6',
                           bgcolor:
-                            activeValue === index ? '#F7F4FD' : '#ffffff',
+                            activeValue === index ? '#F8F8FA' : '#ffffff',
                           borderRadius: 2,
                           width: 320,
                           flexShrink: 0,

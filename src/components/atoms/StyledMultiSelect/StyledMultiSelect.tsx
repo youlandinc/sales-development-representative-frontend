@@ -84,7 +84,7 @@ export const StyledMultiSelect: FC<
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              background: '#EFE9FB',
+              background: '#EAE9EF',
               borderRadius: '4px',
               padding: '2px 8px',
             }}

@@ -21,7 +21,7 @@ const useChipStyle = createUseStyles({
     flexDirection: 'row',
     alignItems: 'center',
     gap: '4px',
-    backgroundColor: '#F7F4FD',
+    backgroundColor: '#EAE9EF',
   },
   buttonWrap: {
     width: '16px',

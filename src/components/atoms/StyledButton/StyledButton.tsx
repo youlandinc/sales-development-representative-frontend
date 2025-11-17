@@ -34,86 +34,76 @@ export const StyledButton: FC<StyledButtonProps> = ({
       disabled={disabled || loading}
       onClick={onClick}
       size={size}
-      sx={{
-        flexShrink: 0,
-        fontSize: 16,
-        fontWeight: 400,
-        lineHeight: 1.5,
-        textTransform: 'none',
-        borderRadius: 2,
-        minWidth: 'auto',
-        maxWidth: 'auto',
-        //boxShadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        '&.MuiButton-contained': {
-          bgcolor: `${color}.main`,
-          //color !== 'primary'
-          //  ? `${color}.main`
-          //  : `${color}.contrastBackground`,
-          '&:hover': {
-            bgcolor: `${color}.hover`,
-            //color !== 'primary' ? `${color}.hover` : `${color}.contrastHover`,
-          },
-          '&.Mui-disabled': {
-            bgcolor: 'action.disabled_background',
-          },
-        },
-        '&.MuiButton-outlined': {
-          border: '1px solid',
-          borderColor: `${color}.borderColor`,
-          color:
-            color !== 'primary'
-              ? `${color}.main`
-              : `${color}.contrastBackground`,
-          '&:hover': {
-            bgcolor: `${color}.background`,
-            borderColor: `${color}.main`,
-            //color !== 'primary' ? `${color}.main` : `${color}.contrastHover`,
-          },
-          '&.Mui-disabled': {
-            borderColor: 'action.disabled',
-            color: '#BABCBE !important',
-          },
-        },
-        '&.MuiButton-text': {
-          bgcolor: 'transparent',
-          boxShadow: 'none',
-          border: '1px solid transparent',
-          color: `${color}.main`,
-          //color !== 'primary'
-          //  ? `${color}.main`
-          //  : `${color}.contrastBackground`,
-          '&:hover': {
-            bgcolor: 'transparent',
-            color: `${color}.hover`,
-            //color !== 'primary' ? `${color}.hover` : `${color}.contrastHover`,
-          },
-          '&.Mui-disabled': {
-            color: '#BABCBE !important',
-          },
-        },
-        '&.MuiButton-outlined.MuiButton-colorInfo, &.MuiButton-textInfo': {
-          color: 'text.primary',
-        },
-        '&.MuiButton-sizeLarge': {
-          px: 2.5,
-          height: 48,
+      sx={[
+        {
+          flexShrink: 0,
           fontSize: 16,
+          fontWeight: 400,
+          lineHeight: 1.5,
+          textTransform: 'none',
+          borderRadius: 2,
+          minWidth: 'auto',
+          maxWidth: 'auto',
+          boxShadow: '0px 1px 2px 0px rgba(52, 50, 62, 0.15)',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          '&.MuiButton-contained': {
+            bgcolor: `${color}.main`,
+            '&:hover': {
+              bgcolor: `${color}.hover`,
+            },
+            '&.Mui-disabled': {
+              bgcolor: 'action.disabled_background',
+            },
+          },
+          '&.MuiButton-outlined': {
+            border: '1px solid',
+            borderColor: '#DFDEE6',
+            color: 'primary.main',
+            '&:hover': {
+              bgcolor: '#FFFFFF',
+              borderColor: '#6F6C7D',
+            },
+            '&.Mui-disabled': {
+              borderColor: 'action.disabled',
+              color: '#BABCBE !important',
+            },
+          },
+          '&.MuiButton-text': {
+            bgcolor: 'transparent',
+            boxShadow: 'none',
+            border: '1px solid transparent',
+            color: `${color}.main`,
+            '&:hover': {
+              bgcolor: 'transparent',
+              color: `${color}.hover`,
+            },
+            '&.Mui-disabled': {
+              color: '#BABCBE !important',
+            },
+          },
+          '&.MuiButton-outlined.MuiButton-colorInfo, &.MuiButton-textInfo': {
+            color: 'text.primary',
+          },
+          '&.MuiButton-sizeLarge': {
+            px: 2.5,
+            height: 48,
+            fontSize: 16,
+          },
+          '&.MuiButton-sizeMedium': {
+            px: 2,
+            height: 40,
+            fontSize: 14,
+          },
+          '&.MuiButton-sizeSmall': {
+            px: 1.5,
+            height: 32,
+            fontSize: 12,
+          },
         },
-        '&.MuiButton-sizeMedium': {
-          px: 2,
-          height: 40,
-          fontSize: 14,
-        },
-        '&.MuiButton-sizeSmall': {
-          px: 1.5,
-          height: 32,
-          fontSize: 12,
-        },
-        ...sx,
-      }}
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
       variant={variant}
       {...rest}
     >

@@ -184,6 +184,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
             id="basic-button"
             onClick={onMenuOpen}
             size={'small'}
+            variant={'outlined'}
           >
             <Icon
               component={ICON_NEW_TABLE}
