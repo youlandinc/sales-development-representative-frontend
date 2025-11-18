@@ -38,19 +38,16 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
   const colors = isDark ? DIRECTORIES_COLORS.dark : DIRECTORIES_COLORS.light;
 
   return (
-    <Box
+    <Stack
       sx={{
+        position: 'relative',
         backgroundColor: colors.card.background,
         border: `1px solid ${colors.card.border}`,
-        borderRadius: '16px',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '48px',
-        position: 'relative',
-        overflow: 'hidden',
-        minHeight: '308px',
-        width: '515px',
+        borderRadius: 4,
+        padding: 3,
+        gap: 6,
+        minHeight: 308,
+        width: 515,
         flexShrink: 0,
       }}
     >
@@ -59,10 +56,12 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
       <Stack gap="12px" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack gap="8px">
           <Stack
-            alignItems="flex-start"
-            bgcolor={'linear-gradient(90deg, #FEF1D7 0%, #D5BB9B 100%)'}
-            direction="row"
-            justifyContent="space-between"
+            sx={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              bgcolor: 'linear-gradient(90deg, #FEF1D7 0%, #D5BB9B 100%)',
+            }}
           >
             <Box
               alt={title}
@@ -132,6 +131,6 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
           statPeriod={statPeriod}
         />
       </Stack>
-    </Box>
+    </Stack>
   );
 };

@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import { Box, Icon, Typography } from '@mui/material';
 
-import ICON_CROWN from './assets/icon-crown.svg';
 import { BADGE_COLORS } from './constants';
+
+import ICON_CROWN from './assets/icon-crown.svg';
 
 interface DirectoriesBadgeProps {
   variant: 'intelligence' | 'active';
@@ -20,7 +21,6 @@ export const DirectoriesBadge: FC<DirectoriesBadgeProps> = ({ variant }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '4px',
-          cursor: 'pointer',
         }}
       >
         <Icon
