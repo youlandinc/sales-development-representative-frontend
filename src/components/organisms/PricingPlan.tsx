@@ -1,10 +1,13 @@
 'use client';
 
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
+import useSWR from 'swr';
 
-import { StyledButton, StyledButtonGroup } from '@/components/atoms';
+import { SDRToast, StyledButtonGroup } from '@/components/atoms';
+import { PricingPlanCard } from '@/components/molecules';
+
+import { _fetchAllPlan } from '@/request/pricingPlan';
 
 type PlanType = 'directories' | 'enrichment';
 
@@ -25,6 +28,18 @@ interface PricingCard {
   buttonVariant: 'contained' | 'outlined';
   features: FeatureItem[];
   isHighlighted?: boolean;
+  // Additional fields from mockData
+  paymentDetails?: Array<{
+    type: string | null;
+    planDateTypeName: string;
+    price: number | null;
+    priceAdditionalInfo: string;
+    credit: number | null;
+    creditType: string;
+  }>;
+  credit?: number | null;
+  creditType?: string;
+  price?: number | null;
 }
 
 const PRICING_DATA: Record<
@@ -96,37 +111,68 @@ const PRICING_DATA: Record<
   },
 };
 
+// 定义 mockData 的类型
+interface MockPlanData {
+  categoryName: string;
+  category: string;
+  planName: string;
+  paymentDetail: Array<{
+    type: string | null;
+    planDateTypeName: string;
+    price: number | null;
+    priceAdditionalInfo: string;
+    credit: number | null;
+    creditType: string;
+  }>;
+  packages: string[];
+  isDefault: boolean;
+}
+
 export const PricingPlan = () => {
-  const [planType, setPlanType] = useState<PlanType>('directories');
-  const [category, setCategory] = useState<CategoryType>('capital-markets');
+  const [planType, setPlanType] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
+
+  const { data } = useSWR(
+    'pricing-plan',
+    async () => {
+      try {
+        const res = await _fetchAllPlan();
+        if (res.data) {
+          const defaultKey = Object.keys(res.data)[0];
+          const defaultCategory = res.data[defaultKey][0].category;
+          setPlanType(Object.keys(res.data)[0]);
+          setCategory(defaultCategory);
+        }
+        return res;
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      }
+    },
+    { revalidateOnFocus: false },
+  );
 
   const handlePlanTypeChange = (
     _: React.MouseEvent<HTMLElement>,
-    newValue: PlanType | null,
+    newValue: string,
   ) => {
-    if (newValue !== null) {
-      setPlanType(newValue);
-    }
+    setPlanType(newValue);
+    setCategory(data?.data?.[newValue]?.[0]?.category || '');
   };
 
-  const handleCategoryChange = (_: SyntheticEvent, newValue: number) => {
-    const categories: CategoryType[] = [
-      'capital-markets',
-      'real-estate-lending',
-      'business-corporate',
-      'enrichment-credits',
-    ];
-    setCategory(categories[newValue]);
+  const handleCategoryChange = (_: SyntheticEvent, newValue: string) => {
+    setCategory(newValue);
   };
 
-  const currentCards = PRICING_DATA[planType][category].cards;
+  // 直接获取和过滤 mockData，不转换
+  const getCurrentPlans = () => {
+    return (
+      data?.data?.[planType]?.find((item) => item.category === category)
+        ?.plans || []
+    );
+  };
 
-  const categories = [
-    'Capital Markets',
-    'Real Estate & Lending',
-    'Business & Corporate',
-    'Enrichment credits',
-  ];
+  const currentPlans = getCurrentPlans();
 
   return (
     <Stack
@@ -147,7 +193,6 @@ export const PricingPlan = () => {
         {/* Plan Type Toggle */}
         <Box
           sx={{
-            // bgcolor: '#EAE9EF',
             borderRadius: 2,
             p: 0.25,
             display: 'inline-flex',
@@ -156,10 +201,10 @@ export const PricingPlan = () => {
         >
           <StyledButtonGroup
             onChange={handlePlanTypeChange}
-            options={[
-              { label: 'Directories', value: 'directories' },
-              { label: 'Enrichment', value: 'enrichment' },
-            ]}
+            options={Object.keys(data?.data || {}).map((item) => ({
+              label: item,
+              value: item,
+            }))}
             sx={{
               bgcolor: 'transparent',
               '& .MuiToggleButton-root': {
@@ -199,7 +244,8 @@ export const PricingPlan = () => {
       </Stack>
 
       {/* Category Tabs */}
-      <Box
+      <Stack
+        flexDirection={'row'}
         sx={{
           borderBottom: '1px solid #EFE9FB',
           width: '100%',
@@ -214,9 +260,9 @@ export const PricingPlan = () => {
               textTransform: 'none',
               fontSize: 14,
               fontWeight: 400,
-              color: '#6F6C7D',
-              minHeight: 32,
-              height: 32,
+              color: 'text.secondary',
+              minHeight: 'auto',
+              height: 'auto',
               px: 1.5,
               py: 1.5,
               lineHeight: 1.2,
@@ -225,45 +271,39 @@ export const PricingPlan = () => {
                 fontWeight: 600,
               },
             },
-            '& .MuiTabs-indicator': {
-              display: 'none',
-            },
-            '& .MuiTabs-flexContainer': {
-              gap: 0,
-              '& .MuiButtonBase-root': {
-                position: 'relative',
-                '&.Mui-selected::after': {
-                  content: '""',
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  bgcolor: '#363440',
-                },
-              },
-            },
+            // '& .MuiTabs-indicator': {
+            //   display: 'none',
+            // },
+            // '& .MuiTabs-flexContainer': {
+            //   gap: 0,
+            //   '& .MuiButtonBase-root': {
+            //     position: 'relative',
+            //     '&.Mui-selected::after': {
+            //       content: '""',
+            //       position: 'absolute',
+            //       bottom: 0,
+            //       left: 0,
+            //       right: 0,
+            //       height: '2px',
+            //       bgcolor: '#363440',
+            //     },
+            //   },
+            // },
           }}
-          value={
-            categories.findIndex((_, idx) => {
-              const categoriesList: CategoryType[] = [
-                'capital-markets',
-                'real-estate-lending',
-                'business-corporate',
-                'enrichment-credits',
-              ];
-              return categoriesList[idx] === category;
-            }) || 0
-          }
+          value={category}
         >
-          {categories.map((cat) => (
-            <Tab key={cat} label={cat} />
+          {(data?.data?.[planType] || []).map((cat) => (
+            <Tab
+              key={cat.category}
+              label={cat.categoryName}
+              value={cat.category}
+            />
           ))}
         </Tabs>
-      </Box>
+      </Stack>
 
-      {/* Pricing Cards */}
-      {currentCards.length > 0 && (
+      {/* Pricing Cards - 直接传递 mockData */}
+      {currentPlans.length > 0 && (
         <Stack
           direction="row"
           gap={3}
@@ -273,8 +313,8 @@ export const PricingPlan = () => {
             alignItems: 'flex-start',
           }}
         >
-          {currentCards.map((card, index) => (
-            <PricingCardComponent card={card} key={index} />
+          {currentPlans.map((plan, index) => (
+            <PricingPlanCard key={index} plan={plan} />
           ))}
         </Stack>
       )}
@@ -282,136 +322,68 @@ export const PricingPlan = () => {
   );
 };
 
-interface PricingCardComponentProps {
-  card: PricingCard;
-}
-
-const PricingCardComponent = ({ card }: PricingCardComponentProps) => {
-  const isHighlighted = card.isHighlighted;
-
-  return (
-    <Stack
-      sx={{
-        width: 384,
-        flexShrink: 0,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Card Header */}
-      <Box
-        sx={{
-          bgcolor: isHighlighted ? '#363440' : '#EAE9EF',
-          p: 3,
-          borderRadius: '24px 24px 0 0',
-        }}
-      >
-        <Typography
-          sx={{
-            color: isHighlighted ? 'white' : 'text.primary',
-            lineHeight: 1.2,
-          }}
-          variant="h4"
-        >
-          {card.title}
-        </Typography>
-      </Box>
-
-      {/* Card Body */}
-      <Box
-        sx={{
-          bgcolor: isHighlighted ? '#363440' : '#EAE9EF',
-          borderRadius: '0 0 24px 24px',
-          // p: 1.25,
-        }}
-      >
-        <Stack
-          sx={{
-            bgcolor: 'background.default',
-            border: `1px solid ${isHighlighted ? '#363440' : '#DFDEE6'}`,
-            borderRadius: 6,
-            p: 3,
-            gap: 3,
-            minHeight: 496,
-          }}
-        >
-          {/* Subtitle */}
-          <Stack gap={1} sx={{ height: 36, justifyContent: 'flex-end' }}>
-            <Typography
-              sx={{
-                fontSize: 24,
-                fontWeight: 400,
-                color: 'text.secondary',
-                lineHeight: 'none',
-              }}
-            >
-              {card.subtitle}
-            </Typography>
-          </Stack>
-
-          {/* Button */}
-          <StyledButton
-            fullWidth
-            size="medium"
-            sx={{
-              bgcolor:
-                card.buttonVariant === 'contained' ? '#363440' : 'transparent',
-              color:
-                card.buttonVariant === 'contained' ? 'white' : 'text.primary',
-              borderColor:
-                card.buttonVariant === 'outlined' ? '#DFDEE6' : 'transparent',
-              '&:hover': {
-                bgcolor:
-                  card.buttonVariant === 'contained'
-                    ? '#363440'
-                    : 'transparent',
-              },
-            }}
-            variant={card.buttonVariant}
-          >
-            {card.buttonText}
-          </StyledButton>
-
-          {/* Divider */}
-          <Box
-            sx={{
-              height: 1,
-              bgcolor: '#EFE9FB',
-              width: '100%',
-            }}
-          />
-
-          {/* Features List */}
-          <Stack gap={1.5}>
-            {card.features.map((feature, idx) => (
-              <Stack alignItems="flex-start" direction="row" gap={1} key={idx}>
-                {idx > 0 ? (
-                  <CheckCircleIcon
-                    sx={{
-                      width: 24,
-                      height: 24,
-                      color: '#363440',
-                      flexShrink: 0,
-                      mt: 0.25,
-                    }}
-                  />
-                ) : (
-                  <Box sx={{ width: 24, flexShrink: 0 }} />
-                )}
-                <Typography
-                  sx={{
-                    color: 'text.primary',
-                    lineHeight: 1.71,
-                    fontSize: 14,
-                  }}
-                  variant="body2"
-                >
-                  {feature.text}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Stack>
-      </Box>
-    </Stack>
-  );
+const temp = {
+  categoryName: 'Real Estate & Lending',
+  category: 'REAL_ESTATE_LENDING',
+  paymentDetail: [
+    {
+      type: 'MONTH',
+      planDateTypeName: 'pay monthly',
+      price: '999',
+      priceAdditionalInfo: null,
+      credit: 400,
+      creditType: 'RECORD',
+    },
+    {
+      type: 'YEAR',
+      planDateTypeName: 'pay yearly(17% off)',
+      price: '10008',
+      priceAdditionalInfo: null,
+      credit: 4800,
+      creditType: 'RECORD',
+    },
+  ],
+  plans: [
+    {
+      perMonth: 299,
+      perMonthDiscount: 200,
+      costDesc: '100 verified records per month',
+      descTitle: 'Includes everything in Research, plus:',
+      planName: 'Essential',
+      packages: [
+        'Access to core fields: Contact type, Contact location',
+        'Up to 100 records per search',
+        'Designed for independent brokers, smaller lenders, and analysts evaluating data quality before scaling.',
+      ],
+      isDefault: false,
+    },
+    {
+      perMonth: 299,
+      perMonthDiscount: 200,
+      costDesc: '100 verified records per month',
+      descTitle: 'Includes everything in Research, plus:',
+      planName: 'Professional',
+      packages: [
+        'Access to search by project types',
+        'Advanced fields, including past projects/lenders, upcoming maturities, and additional contact methods',
+        'Up to 400 records per search',
+        'Built for active originators and small to mid-size lenders',
+      ],
+      isDefault: false,
+    },
+    {
+      perMonth: 299,
+      perMonthDiscount: 200,
+      costDesc: '100 verified records per month',
+      descTitle: 'Includes everything in Research, plus:',
+      planName: 'Institutional',
+      packages: [
+        'Full data coverage',
+        'Exports and bulk access enabled',
+        'Up to 1,000 records per search',
+        'For high-volume lenders and large real-estate organizations with complex portfolios',
+      ],
+      isDefault: true,
+    },
+  ],
 };
