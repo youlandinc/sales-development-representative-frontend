@@ -7,21 +7,29 @@ import { useSwitch } from '@/hooks';
 import { PlanInfo } from '@/types/pricingPlan';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useMemo } from 'react';
 
 interface PricingCardComponentProps {
   plan: PlanInfo; // 改为接受 mockData 结构
+  paymentType?: 'MONTH' | 'YEAR';
 }
 
-export const PricingPlanCard = ({ plan }: PricingCardComponentProps) => {
+export const PricingPlanCard = ({
+  plan,
+  paymentType,
+}: PricingCardComponentProps) => {
   const { visible, toggle } = useSwitch();
 
-  const firstPaymentDetail = plan.paymentDetail[0];
   //type 为null时，无限制，高亮。
   const isHighlighted = plan.isDefault;
 
   // 确定按钮文本
-  const buttonText =
-    firstPaymentDetail.price === null ? 'Request access' : 'Subscribe';
+  const buttonText = useMemo(() => {
+    if (paymentType) {
+      return 'Choose plan';
+    }
+    return 'Request access';
+  }, [paymentType]);
 
   // 确定按钮样式;
   const buttonVariant = isHighlighted ? 'contained' : 'outlined';
@@ -71,17 +79,51 @@ export const PricingPlanCard = ({ plan }: PricingCardComponentProps) => {
           }}
         >
           {/* Subtitle - 从 paymentDetail[0].priceAdditionalInfo 获取 */}
-          <Stack gap={1} sx={{ height: 36, justifyContent: 'flex-end' }}>
-            <Typography
-              sx={{
-                fontSize: 24,
-                fontWeight: 400,
-                color: 'text.secondary',
-                lineHeight: 'none',
-              }}
-            >
-              {firstPaymentDetail.priceAdditionalInfo}
-            </Typography>
+          <Stack
+            gap={1}
+            sx={{ flexDirection: 'row', alignItems: 'flex-end', minHeight: 36 }}
+          >
+            {paymentType === 'MONTH' && plan.monthlyPrice && (
+              <Typography
+                sx={{
+                  fontSize: 36,
+                  fontWeight: 400,
+                  lineHeight: 1,
+                }}
+              >
+                ${plan.monthlyPrice}
+              </Typography>
+            )}
+            {paymentType === 'YEAR' && plan.yearlyPrice && (
+              <Typography
+                sx={{
+                  fontSize: 36,
+                  fontWeight: 400,
+                  lineHeight: 1,
+                }}
+              >
+                ${plan.yearlyPrice}
+              </Typography>
+            )}
+
+            {plan.monthlyPrice || plan.yearlyPrice ? (
+              <Typography fontSize={15} lineHeight={1.5}>
+                per month
+              </Typography>
+            ) : null}
+            {plan.priceAdditionalInfo && (
+              <Typography
+                sx={{
+                  fontSize: 24,
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  color: 'text.secondary',
+                  ml: 1,
+                }}
+              >
+                {plan.priceAdditionalInfo}
+              </Typography>
+            )}
           </Stack>
 
           {/* Button */}
@@ -105,32 +147,42 @@ export const PricingPlanCard = ({ plan }: PricingCardComponentProps) => {
             {buttonText}
           </StyledButton>
 
+          {plan.priceDesc && <Typography>{plan.priceDesc}</Typography>}
+
           {/* Divider */}
           <Box
             sx={{
-              height: 1,
-              bgcolor: '#EFE9FB',
+              height: '1px',
+              bgcolor: '#DFDEE6',
               width: '100%',
             }}
           />
 
           {/* Features List - 从 packages 数组获取 */}
           <Stack gap={1.5}>
+            {plan.packageTitle && (
+              <Typography
+                sx={{
+                  color: 'text.primary',
+                  lineHeight: 1.71,
+                  fontSize: 14,
+                }}
+                variant="body2"
+              >
+                {plan.packageTitle}
+              </Typography>
+            )}
             {plan.packages.map((pkg, idx) => (
               <Stack alignItems="flex-start" direction="row" gap={1} key={idx}>
-                {idx > 0 ? (
-                  <CheckCircleIcon
-                    sx={{
-                      width: 24,
-                      height: 24,
-                      color: '#363440',
-                      flexShrink: 0,
-                      mt: 0.25,
-                    }}
-                  />
-                ) : (
-                  <Box sx={{ width: 24, flexShrink: 0 }} />
-                )}
+                <CheckCircleIcon
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    color: '#363440',
+                    flexShrink: 0,
+                    mt: 0.25,
+                  }}
+                />
                 <Typography
                   sx={{
                     color: 'text.primary',
