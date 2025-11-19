@@ -103,3 +103,22 @@ export enum ProspectTableEnum {
   crm_list = 'CRM_LIST',
   agent = 'AGENT',
 }
+
+export enum PlanTypeEnum {
+  // capital
+  research = 'RESEARCH',
+  intelligence = 'INTELLIGENCE',
+  // real estate
+  essential = 'ESSENTIAL',
+  professional = 'PROFESSIONAL',
+  institutional = 'INSTITUTIONAL',
+  // corporate
+  starter = 'STARTER',
+  business = 'BUSINESS',
+  enterprise = 'ENTERPRISE',
+  // enrichment
+  free = 'FREE',
+  basic = 'BASIC',
+  plus = 'PLUS',
+  pro = 'PRO',
+}

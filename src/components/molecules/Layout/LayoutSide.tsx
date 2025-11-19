@@ -1,7 +1,7 @@
+import { FC, Fragment, useState } from 'react';
 import { Icon, Stack, SxProps, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
-import { FC, Fragment, useEffect, useState } from 'react';
 
 import { LAYOUT_SIDE_MENU, LAYOUT_SIDE_MENU_BOTTOM } from './Layout.data';
 
@@ -81,7 +81,17 @@ export const LayoutSide: FC = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [expend, setExpend] = useState(true);
+  const [expend, setExpend] = useState(() => {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+    const stored = localStorage.getItem('expend');
+    if (stored === null) {
+      localStorage.setItem('expend', '1');
+      return true;
+    }
+    return stored === '1';
+  });
 
   // 0 false, 1 true
 
@@ -119,21 +129,12 @@ export const LayoutSide: FC = () => {
 
   const isSelected = (key?: string) => pathname.includes(key || '');
 
-  const onClickToRedirect = (key: string) => {
-    if (isSelected(key)) {
+  const onClickToRedirect = (url: string) => {
+    if (isSelected(url) && url !== '/directories') {
       return;
     }
-    router.push(key);
+    router.push(url);
   };
-
-  useEffect(() => {
-    if (localStorage.getItem('expend') === null) {
-      localStorage.setItem('expend', '1');
-    }
-    if (localStorage.getItem('expend') === '1') {
-      setExpend(true);
-    }
-  }, []);
 
   return (
     <Stack
@@ -144,8 +145,7 @@ export const LayoutSide: FC = () => {
         bgcolor: '#FFFFFF',
         position: 'relative',
         px: expend ? 3 : 1.5,
-        pt: 4,
-        pb: 2,
+        py: 4,
         transition: 'all .3s',
         flexShrink: 0,
       }}
