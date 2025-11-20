@@ -56,7 +56,7 @@ export const Directories: FC = () => {
               if (isAuth) {
                 // 预加载配置
                 const success = await fetchDefaultViaBiz(bizId);
-                
+
                 if (success) {
                   // 成功后跳转
                   router.push(`/directories/${SLUG_MAP[bizId]}`);

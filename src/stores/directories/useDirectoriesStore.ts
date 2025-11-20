@@ -106,7 +106,11 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
     },
 
     updateInstitutionType: (value: string) => {
-      const { institutionType: currentInstitutionType, configMap, formValues } = get();
+      const {
+        institutionType: currentInstitutionType,
+        configMap,
+        formValues,
+      } = get();
 
       if (currentInstitutionType === value || !value) {
         return;
