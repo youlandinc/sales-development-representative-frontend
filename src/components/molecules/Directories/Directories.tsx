@@ -8,13 +8,7 @@ import useSWR from 'swr';
 import { _fetchDirectoriesInfo } from '@/request/directories';
 
 import { DirectoriesCard } from './index';
-import { DirectoriesBizIdEnum } from '@/types/Directories';
-
-const DirectoriesBizIdHash = {
-  [DirectoriesBizIdEnum.capital_markets]: 'capital_markets',
-  [DirectoriesBizIdEnum.real_estate_lending]: 'real_estate_lending',
-  [DirectoriesBizIdEnum.business_corporate]: 'business_corporate',
-};
+import { SLUG_MAP } from '@/constants/directories';
 
 export const Directories: FC = () => {
   const router = useRouter();
@@ -58,8 +52,7 @@ export const Directories: FC = () => {
             key={directory.bizId}
             onButtonClick={({ bizId, isAuth }) => {
               if (isAuth) {
-                console.log(123);
-                router.push(`/directories/${DirectoriesBizIdHash[bizId]}`);
+                router.push(`/directories/${SLUG_MAP[bizId]}`);
               }
             }}
           />

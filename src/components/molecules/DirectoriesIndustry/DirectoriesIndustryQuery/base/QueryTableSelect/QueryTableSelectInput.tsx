@@ -17,7 +17,7 @@ import {
   inputContainerSx,
   moreButtonSx,
   placeholderTextSx,
-} from './StyledTableSelect.styles';
+} from './QueryTableSelect.styles';
 
 import ICON_FOLDER from './assets/icon-folder.svg';
 import ICON_CLOSE from './assets/icon-close.svg';
@@ -46,7 +46,7 @@ interface FilterTableSelectInputProps {
   isLoading?: boolean;
 }
 
-export const StyledTableSelectInput: FC<FilterTableSelectInputProps> = ({
+export const QueryTableSelectInput: FC<FilterTableSelectInputProps> = ({
   selectedTableName,
   onOpenDialog,
   onClearSelection,

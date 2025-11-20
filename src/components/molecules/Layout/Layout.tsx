@@ -4,18 +4,15 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/providers';
 
-import {
-  CampaignProcess,
-  LayoutHeader,
-  LayoutSide,
-} from '@/components/molecules';
+import { LayoutHeader, LayoutSide } from '@/components/molecules';
 
 export interface StyledLayoutProps {
   sx?: SxProps;
   children?: ReactNode;
+  contentSx?: SxProps;
 }
 
-export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
+export const Layout: FC<StyledLayoutProps> = ({ sx, children, contentSx }) => {
   const router = useRouter();
   const { isHydration, accessToken } = useUserStore((state) => state);
 
@@ -55,12 +52,12 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
             p: 3,
             overflow: 'auto',
             minWidth: 720,
+            ...contentSx,
           }}
         >
           {children}
         </Stack>
       </Stack>
-      <CampaignProcess />
     </Box>
   );
 };

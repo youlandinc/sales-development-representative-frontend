@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react';
+
+import { SDRToast } from '@/components/atoms';
+import { DirectoriesQueryGroupTypeEnum } from '@/types/Directories/query';
 import { _fetchAllProspectTable, _fetchCompanyNameViaTableId } from '@/request';
 import {
-  FilterElementTypeEnum,
   HttpError,
   ProspectTableEnum,
   ResponseProspectTableViaSearch,
 } from '@/types';
-import { SDRToast } from '@/components/atoms';
 
 interface UseTableSelectParams {
   outerTableId?: string;
   outerTableName?: string;
   outerTableSource?: ProspectTableEnum;
-  type?: FilterElementTypeEnum;
+  type?: DirectoriesQueryGroupTypeEnum;
 }
 
 interface UseTableSelectReturn {
   // State
   fetchingTable: boolean;
-  fetchingCondition: boolean;
+  fetchingKeywords: boolean;
+
   innerTableId: string;
   outerTableId: string;
   outerTableName: string;
@@ -31,11 +33,7 @@ interface UseTableSelectReturn {
   setInnerTableId: (id: string) => void;
   fetchTableList: () => Promise<void>;
   confirmTableSelection: (
-    onConfirm: (
-      data: string[],
-      tableName: string,
-      tableSource?: ProspectTableEnum,
-    ) => void,
+    onConfirm: (keywords: string[]) => void,
     onClose: () => void,
   ) => Promise<void>;
   resetSelection: () => void;
@@ -50,20 +48,26 @@ export const useTableSelect = (
     outerTableSource: externalOuterTableSource,
     type,
   } = params || {};
+
   const [fetchingTable, setFetchingTable] = useState(false);
-  const [fetchingCondition, setFetchingCondition] = useState(false);
+  const [fetchingKeywords, setFetchingKeywords] = useState(false);
+
   const [innerTableId, setInnerTableId] = useState('');
-  const [outerTableId, setOuterTableId] = useState('');
-  const [outerTableName, setOuterTableName] = useState('');
+  const [outerTableId, setOuterTableId] = useState(externalOuterTableId || '');
+  const [outerTableName, setOuterTableName] = useState(
+    externalOuterTableName || '',
+  );
   const [outerTableSource, setOuterTableSource] = useState<
     ProspectTableEnum | undefined
-  >(undefined);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  >(externalOuterTableSource);
+
   const [tableList, setTableList] = useState<ResponseProspectTableViaSearch>(
     [],
   );
 
-  // Sync external outer table id and name with internal state
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  // Sync external values with internal state
   useEffect(() => {
     if (externalOuterTableId !== undefined) {
       setOuterTableId(externalOuterTableId);
@@ -72,13 +76,19 @@ export const useTableSelect = (
         setInnerTableId(externalOuterTableId);
       }
     }
+  }, [externalOuterTableId]);
+
+  useEffect(() => {
     if (externalOuterTableName !== undefined) {
       setOuterTableName(externalOuterTableName);
     }
+  }, [externalOuterTableName]);
+
+  useEffect(() => {
     if (externalOuterTableSource !== undefined) {
       setOuterTableSource(externalOuterTableSource);
     }
-  }, [externalOuterTableId, externalOuterTableName, externalOuterTableSource]);
+  }, [externalOuterTableSource]);
 
   // If tableList is loaded and we have outerTableId but no outerTableName or outerTableSource, derive them
   useEffect(() => {
@@ -123,11 +133,7 @@ export const useTableSelect = (
   };
 
   const confirmTableSelection = async (
-    onConfirm: (
-      data: string[],
-      tableName: string,
-      tableSource?: ProspectTableEnum,
-    ) => void,
+    onConfirm: (keywords: string[]) => void,
     onClose: () => void,
   ) => {
     if (!innerTableId) {
@@ -140,31 +146,29 @@ export const useTableSelect = (
     const tableName = tableItem?.tableName || '';
     const tableSource = tableItem?.source;
 
-    // For exclude_people type, skip fetching company names
-    if (type === FilterElementTypeEnum.exclude_table) {
-      setOuterTableId(innerTableId);
-      setOuterTableName(tableName);
-      setOuterTableSource(tableSource);
-      onConfirm([], tableName, tableSource);
+    // Update outer state for display
+    setOuterTableId(innerTableId);
+    setOuterTableName(tableName);
+    setOuterTableSource(tableSource);
+
+    // For exclude_individuals type, keywords is always empty
+    if (type === DirectoriesQueryGroupTypeEnum.exclude_individuals) {
+      onConfirm([]);
       onClose();
       return;
     }
 
-    // For companies type, fetch company names from the table
-    setFetchingCondition(true);
+    // For exclude_firms type, fetch company names from the table
+    setFetchingKeywords(true);
     try {
       const { data } = await _fetchCompanyNameViaTableId(innerTableId);
-
-      setOuterTableId(innerTableId);
-      setOuterTableName(tableName);
-      setOuterTableSource(tableSource);
-      onConfirm(data, tableName, tableSource);
+      onConfirm(data);
       onClose();
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
-      setFetchingCondition(false);
+      setFetchingKeywords(false);
     }
   };
 
@@ -177,13 +181,16 @@ export const useTableSelect = (
 
   return {
     fetchingTable,
-    fetchingCondition,
+    fetchingKeywords,
+
     innerTableId,
     outerTableId,
     outerTableName,
     outerTableSource,
-    expandedIds,
+
     tableList,
+    expandedIds,
+
     toggleExpand,
     setInnerTableId,
     fetchTableList,

@@ -27,7 +27,7 @@ import {
   _createCampaign,
   _fetchCrmProviderList,
   _fetchEmailProfiles,
-  _fetchEnrichmentTableData,
+  _fetchProspectTableData,
   _fetchSegmentOptions,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
@@ -629,7 +629,10 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   fetchEnrichmentTableData: async () => {
     set({ fetchEnrichmentTableLoading: true });
     try {
-      const { data } = await _fetchEnrichmentTableData();
+      const { data } = await _fetchProspectTableData({
+        size: 1000,
+        page: 0,
+      });
       const reducedData = data.content.map((item) => ({
         label: item.tableName,
         value: item.tableId,

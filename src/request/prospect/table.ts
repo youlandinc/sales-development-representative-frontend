@@ -15,18 +15,18 @@ export const _fetchTable = (tableId: string) => {
       [key: string]: { recordIds: string[]; isAll: boolean };
     };
     fieldGroupMap: ColumnFieldGroupMap;
-  }>(`/sdr/prospect/table/${tableId}`);
+  }>(`/sdr/table/${tableId}`);
 };
 
 export const _fetchTableRowIds = (tableId: string) => {
-  return get(`/sdr/prospect/table/${tableId}/data/ids`);
+  return get(`/sdr/table/data/${tableId}/ids`);
 };
 
 export const _fetchTableRowData = (params: {
   tableId: string;
   recordIds: string[];
 }) => {
-  return post<TableCellProps[]>(`/sdr/prospect/table/${params.tableId}/data`, {
+  return post<TableCellProps[]>(`/sdr/table/data/${params.tableId}`, {
     recordIds: params.recordIds,
   });
 };
@@ -34,11 +34,11 @@ export const _fetchTableRowData = (params: {
 export const _updateTableColumnConfig = (
   params: Partial<UpdateTableColumnConfigParams>,
 ) => {
-  return patch('/sdr/prospect/table/field', params);
+  return patch('/sdr/table/field', params);
 };
 
 export const _deleteTableColumn = (fieldId: string) => {
-  return del(`/sdr/prospect/table/field/${fieldId}`);
+  return del(`/sdr/table/field/${fieldId}`);
 };
 
 export const _updateTableCellValue = (params: {
@@ -47,20 +47,17 @@ export const _updateTableCellValue = (params: {
   fieldId: string;
   value: any;
 }) => {
-  return patch(
-    `/sdr/prospect/table/${params.tableId}/records/${params.recordId}`,
-    {
-      fieldId: params.fieldId,
-      value: params.value,
-    },
-  );
+  return patch(`/sdr/table/data/${params.tableId}/records/${params.recordId}`, {
+    fieldId: params.fieldId,
+    value: params.value,
+  });
 };
 
 export const _createTableRows = (params: {
   tableId: string;
   rowCounts: number;
 }) => {
-  return post<string[]>('/sdr/prospect/table/rows/add', {
+  return post<string[]>('/sdr/table/rows/add', {
     tableId: params.tableId,
     rowCounts: params.rowCounts,
   });
@@ -87,5 +84,5 @@ export const _createTableColumn = (params: {
   //actionDefinition?: any;
 }) => {
   // API v2 returns the created column directly
-  return post<TableColumnProps>('/sdr/prospect/table/field/v2', params);
+  return post<TableColumnProps>('/sdr/table/field/v2', params);
 };

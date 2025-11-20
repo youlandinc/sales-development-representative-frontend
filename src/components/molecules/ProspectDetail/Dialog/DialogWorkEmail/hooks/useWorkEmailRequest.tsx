@@ -9,7 +9,7 @@ import { useComputedInWorkEmailStore } from './useComputedInWorkEmailStore';
 import {
   _createIntegrationConfig,
   _editIntegrationConfig,
-} from '@/request/enrichments/integrations';
+} from '@/request/prospect/integrations';
 
 import { ActiveTypeEnum, HttpError } from '@/types';
 import { CreateWaterfallConfigRequestParam } from '@/types/Prospect';
