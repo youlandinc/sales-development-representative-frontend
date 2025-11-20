@@ -49,6 +49,7 @@ export class WSClient {
     try {
       this.ws = new WebSocket(wsUrl);
     } catch (error) {
+      console.log(error);
       return;
     }
 

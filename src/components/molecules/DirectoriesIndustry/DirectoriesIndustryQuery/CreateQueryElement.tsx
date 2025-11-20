@@ -59,7 +59,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
             }
           }}
           options={config.optionValues || []}
-          value={formData[config.key!] || ''}
+          value={formData[config.key!] ?? ''}
         />
         {config.children && config.children.length > 0 && (
           <Stack gap={2} sx={{ mt: 1.5 }}>
@@ -143,7 +143,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           key={`${groupPath}-${config.key}`}
           onFormChange={(key, value) => onFormChange(key, value, groupPath)}
           type={DirectoriesQueryGroupTypeEnum.exclude_firms}
-          value={formData[config.key!]}
+          value={
+            formData[config.key!] ?? {
+              tableId: '',
+              tableFieldId: '',
+              tableViewId: '',
+              keywords: [],
+            }
+          }
         />
       </QueryCollapse>
     );
@@ -161,7 +168,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           key={`${groupPath}-${config.key}`}
           onFormChange={(key, value) => onFormChange(key, value, groupPath)}
           type={DirectoriesQueryGroupTypeEnum.exclude_individuals}
-          value={formData[config.key!]}
+          value={
+            formData[config.key!] ?? {
+              tableId: '',
+              tableFieldId: '',
+              tableViewId: '',
+              keywords: [],
+            }
+          }
         />
       </QueryCollapse>
     );
@@ -240,7 +254,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
               onFormChange?.(config.key, value, groupPath)
             }
             placeholder={config.placeholder || ''}
-            value={formData[config.key!] || ''}
+            value={formData[config.key!] ?? ''}
           />
         </QueryContainer>
       );

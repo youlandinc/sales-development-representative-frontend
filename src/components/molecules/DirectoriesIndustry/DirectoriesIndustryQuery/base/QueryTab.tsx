@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import BusinessIcon from '@mui/icons-material/Business';
 import PeopleIcon from '@mui/icons-material/People';
@@ -32,6 +32,17 @@ export const QueryTab: FC<QueryTabProps> = ({
 
   const tabOptions = config.optionValues || config.children;
 
+  useEffect(() => {
+    if (value && tabOptions) {
+      const index = tabOptions.findIndex(
+        (option: any) => option.value === value,
+      );
+      if (index !== -1) {
+        setActiveTab(index);
+      }
+    }
+  }, [value, tabOptions]);
+
   if (!tabOptions || tabOptions.length === 0) {
     return null;
   }
@@ -52,7 +63,10 @@ export const QueryTab: FC<QueryTabProps> = ({
           return (
             <Box
               key={option.key || option.value || index}
-              onClick={() => setActiveTab(index)}
+              onClick={() => {
+                setActiveTab(index);
+                onFormChange(option.value);
+              }}
               sx={{
                 flex: 1,
                 height: '32px',

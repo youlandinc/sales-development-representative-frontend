@@ -62,6 +62,10 @@ export const DirectoriesIndustryQuery: FC = () => {
     }
 
     updateFormValues(key, value, groupPath);
+
+    if (key === 'entityType') {
+      debouncedFetchResults();
+    }
   };
 
   if (!buttonGroupConfig && !loadingConfig) {

@@ -17,6 +17,7 @@ interface DirectoriesStoreState {
   configMap: Record<string, DirectoriesQueryItem[]>;
   buttonGroupConfig: DirectoriesQueryItem | null;
   queryConfig: DirectoriesQueryItem[];
+  formValuesByInstitutionType: Record<string, Record<string, any>>;
   formValues: Record<string, any>;
   results: any[];
   resultCount: number;
@@ -40,6 +41,7 @@ const INITIAL_STATE: DirectoriesStoreState = {
   configMap: {},
   buttonGroupConfig: null,
   queryConfig: [],
+  formValuesByInstitutionType: {},
   formValues: {},
   results: [],
   resultCount: 0,
@@ -70,15 +72,27 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         const { configMap, buttonGroupConfig, firstInstitutionType } =
           convertToConfigMap(apiData);
 
+        const formValuesByInstitutionType: Record<
+          string,
+          Record<string, any>
+        > = {};
+        Object.keys(configMap).forEach((institutionType) => {
+          formValuesByInstitutionType[institutionType] = initializeFormValues(
+            configMap[institutionType],
+          );
+        });
+
         const queryConfig = configMap[firstInstitutionType] || [];
-        const initialFormValues = initializeFormValues(queryConfig);
+        const currentFormValues =
+          formValuesByInstitutionType[firstInstitutionType];
 
         set({
           configMap,
           buttonGroupConfig,
           queryConfig,
           institutionType: firstInstitutionType,
-          formValues: initialFormValues,
+          formValuesByInstitutionType,
+          formValues: currentFormValues,
           loadingConfig: false,
         });
 
@@ -116,24 +130,29 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
     },
 
     updateInstitutionType: (value: string) => {
-      const { institutionType: currentInstitutionType, configMap } = get();
+      const {
+        institutionType: currentInstitutionType,
+        configMap,
+        formValuesByInstitutionType,
+      } = get();
 
       if (currentInstitutionType === value || !value) {
         return;
       }
 
       const queryConfig = configMap[value] || [];
-      const newFormValues = initializeFormValues(queryConfig);
+      const formValues = formValuesByInstitutionType[value];
 
       set({
         institutionType: value,
         queryConfig,
-        formValues: newFormValues,
+        formValues,
       });
     },
 
     updateFormValues: (key: string, value: any, groupPath?: string) => {
-      const { formValues } = get();
+      const { formValues, institutionType, formValuesByInstitutionType } =
+        get();
 
       let updatedFormValues: Record<string, any>;
 
@@ -157,7 +176,13 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         };
       }
 
-      set({ formValues: updatedFormValues });
+      set({
+        formValues: updatedFormValues,
+        formValuesByInstitutionType: {
+          ...formValuesByInstitutionType,
+          [institutionType]: updatedFormValues,
+        },
+      });
     },
 
     reset: () => {
