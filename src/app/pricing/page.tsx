@@ -5,7 +5,7 @@ export const fetchCache = 'force-no-store';
 import { Layout } from '@/components/molecules';
 import { PricingPlan } from '@/components/organisms';
 
-const PricingPlanPage = () => {
+const PricingPage = () => {
   return (
     <Layout>
       <PricingPlan />
@@ -13,4 +13,4 @@ const PricingPlanPage = () => {
   );
 };
 
-export default PricingPlanPage;
+export default PricingPage;

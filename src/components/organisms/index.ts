@@ -19,4 +19,3 @@ export * from './ContactsPeoplePage';
 export * from './FindPeoplePage';
 export * from './FindCompaniesPage';
 export * from './PricingPlan';
-export * from './Payment';

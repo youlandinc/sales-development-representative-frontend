@@ -1,14 +1,11 @@
-'use client';
-
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { SyntheticEvent, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
-import { SDRToast, StyledButtonGroup } from '@/components/atoms';
+import { SDRToast } from '@/components/atoms';
 import { PricingPlanCard } from '@/components/molecules';
 
 import { _fetchAllPlan } from '@/request/pricingPlan';
-import { mockData } from '@/data/mockPricingData';
 
 export const PricingPlan = () => {
   const [planType, setPlanType] = useState<string>('');
@@ -28,7 +25,7 @@ export const PricingPlan = () => {
           setCategory(defaultCategory);
         }
 
-        return { ...res, data: mockData };
+        return res;
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -37,10 +34,7 @@ export const PricingPlan = () => {
     { revalidateOnFocus: false },
   );
 
-  const handlePlanTypeChange = (
-    _: React.MouseEvent<HTMLElement>,
-    newValue: string,
-  ) => {
+  const handlePlanTypeChange = (newValue: string) => {
     setPlanType(newValue);
     setCategory(data?.data?.[newValue]?.[0]?.category || '');
   };
@@ -61,9 +55,8 @@ export const PricingPlan = () => {
 
   const getPaymentType = useMemo(() => {
     const paymentDetail =
-      data?.data?.[planType as keyof typeof mockData]?.find(
-        (item) => item.category === category,
-      )?.paymentDetail || [];
+      data?.data?.[planType]?.find((item) => item.category === category)
+        ?.pricingOptions || [];
     if (paymentDetail && paymentDetail.length > 0) {
       setPaymentType('MONTH');
     } else {
@@ -88,56 +81,48 @@ export const PricingPlan = () => {
         </Typography>
 
         {/* Plan Type Toggle */}
-        <Box
+        <Stack
+          direction="row"
+          gap={1.25}
           sx={{
+            bgcolor: '#F8F8FA',
             borderRadius: 2,
-            p: 0.25,
-            display: 'inline-flex',
-            width: 'auto',
+            p: 0.5,
+            boxShadow: '0px 1px 1px 0px rgba(46, 46, 46, 0.25)',
           }}
         >
-          <StyledButtonGroup
-            onChange={handlePlanTypeChange}
-            options={Object.keys(data?.data || {}).map((item) => ({
-              label: item,
-              value: item,
-            }))}
-            sx={{
-              bgcolor: 'transparent',
-              '& .MuiToggleButton-root': {
-                width: 144,
-                height: 40,
-                fontSize: 16,
-                fontWeight: 600,
-                textTransform: 'none',
-                borderRadius: 2,
-                border: 'none',
-                bgcolor: 'transparent',
-                color: '#363440',
+          {Object.keys(data?.data || {}).map((item) => (
+            <Box
+              key={item}
+              onClick={() => handlePlanTypeChange(item)}
+              sx={{
+                width: 128,
                 px: 1,
-                py: 1,
-                '&.Mui-selected': {
-                  bgcolor: '#363440',
-                  color: 'white',
-                  '&:hover': {
-                    bgcolor: '#363440',
-                  },
-                },
-                '&:hover': {
-                  bgcolor: 'transparent',
-                },
-              },
-              '& .MuiToggleButtonGroup-grouped:not(:first-of-type)': {
-                marginLeft: 0,
-                borderLeft: 'none',
-              },
-              '& .MuiToggleButtonGroup-grouped.Mui-selected': {
+                py: 0.5,
                 borderRadius: 2,
-              },
-            }}
-            value={planType}
-          />
-        </Box>
+                bgcolor: planType === item ? '#363440' : 'transparent',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                '&:hover': {
+                  bgcolor:
+                    planType === item ? '#363440' : 'rgba(54, 52, 64, 0.05)',
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  color: planType === item ? 'white' : '#6F6C7D',
+                  lineHeight: 1.5,
+                }}
+              >
+                {item}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
       </Stack>
       <Stack sx={{ gap: 3, width: 'fit-content', mx: 'auto', minWidth: 1200 }}>
         {/* Category Tabs */}
@@ -212,7 +197,7 @@ export const PricingPlan = () => {
               {getPaymentType.map((item) => (
                 <Typography
                   key={item.type}
-                  onClick={() => setPaymentType(item.type)}
+                  onClick={() => setPaymentType(item.type as string)}
                   sx={{
                     fontWeight: 600,
                     color:
@@ -246,6 +231,7 @@ export const PricingPlan = () => {
           >
             {currentPlans.map((plan, index) => (
               <PricingPlanCard
+                category={category}
                 key={index}
                 paymentType={paymentType}
                 plan={plan}

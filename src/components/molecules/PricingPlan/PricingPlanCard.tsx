@@ -1,23 +1,36 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Icon, Stack, Typography } from '@mui/material';
+import { useRouter } from 'nextjs-toploader/app';
+import { FC, useMemo } from 'react';
 
-import { StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton } from '@/components/atoms';
 import { TalkToTeamDialog } from './TalkToTeamDialog';
 
-import { useSwitch } from '@/hooks';
-import { PlanInfo } from '@/types/pricingPlan';
+import { useAsyncFn, useSwitch } from '@/hooks';
+import { PlanTypeEnum } from '@/types';
+import { DirectoriesBizIdEnum } from '@/types/Directories';
+import { PaymentType, PlanInfo } from '@/types/pricingPlan';
 
+import { _createPaymentLink } from '@/request/pricingPlan';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useMemo } from 'react';
+import { StyledCapitalDesc } from './base';
+import { packageTitle, PERIOD_INFO, PRICE_INFO } from './data';
+import { CANCEL_URL, SUCCESS_URL } from './data';
 
-interface PricingCardComponentProps {
-  plan: PlanInfo; // 改为接受 mockData 结构
-  paymentType?: 'MONTH' | 'YEAR';
+import ICON_NORMAL from './assets/icon_normal.svg';
+import ICON_PRO from './assets/icon_pro.svg';
+
+interface PricingCardProps {
+  plan: PlanInfo;
+  paymentType?: PaymentType | string;
+  category: string;
 }
 
-export const PricingPlanCard = ({
+export const PricingPlanCard: FC<PricingCardProps> = ({
   plan,
   paymentType,
-}: PricingCardComponentProps) => {
+  category,
+}) => {
+  const router = useRouter();
   const { visible, toggle } = useSwitch();
 
   //type 为null时，无限制，高亮。
@@ -25,14 +38,91 @@ export const PricingPlanCard = ({
 
   // 确定按钮文本
   const buttonText = useMemo(() => {
-    if (paymentType) {
+    if (category === DirectoriesBizIdEnum.capital_markets) {
+      return 'Request access';
+    }
+    if (plan.monthlyPrice && plan.yearlyPrice) {
       return 'Choose plan';
     }
+    if (plan.isDefault) {
+      return 'Talk to our team';
+    }
+    if (plan.planType === PlanTypeEnum.free) {
+      return 'Current plan';
+    }
     return 'Request access';
-  }, [paymentType]);
+  }, [
+    plan.monthlyPrice,
+    plan.yearlyPrice,
+    category,
+    plan.isDefault,
+    plan.planType,
+  ]);
 
   // 确定按钮样式;
   const buttonVariant = isHighlighted ? 'contained' : 'outlined';
+
+  const [state, createPaymentLink] = useAsyncFn(async () => {
+    try {
+      const { data } = await _createPaymentLink({
+        successUrl: SUCCESS_URL,
+        cancelUrl: CANCEL_URL,
+        planType: plan.planType,
+        pricingType: paymentType as PaymentType,
+      });
+      // 这里可以处理重定向逻辑
+      if (data) {
+        // window.location.href = data.url;
+        router.push(data);
+      }
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  }, [paymentType, plan.planType]);
+
+  const handleClick = () => {
+    if (!plan.monthlyPrice && !plan.yearlyPrice) {
+      toggle();
+      return;
+    }
+    createPaymentLink();
+  };
+
+  const priceDesc = useMemo(() => {
+    if (category === DirectoriesBizIdEnum.capital_markets) {
+      return null;
+    }
+    if (plan.planType === PlanTypeEnum.free && plan.creditType && plan.credit) {
+      return (
+        <Typography>
+          {paymentType === PaymentType.YEARLY ? plan.credit * 12 : plan.credit}{' '}
+          {PRICE_INFO[plan.creditType as string] || ''}{' '}
+          {paymentType === PaymentType.YEARLY ? 'per year' : 'per month'}
+        </Typography>
+      );
+    }
+    if (
+      [PlanTypeEnum.institutional, PlanTypeEnum.enterprise].includes(
+        plan.planType,
+      )
+    ) {
+      return <Typography>Unlimited verified records</Typography>;
+    }
+
+    if (plan.creditType) {
+      return (
+        <Typography>
+          {paymentType === PaymentType.YEARLY && plan.credit
+            ? (plan.credit * 12).toLocaleString()
+            : plan.credit?.toLocaleString()}{' '}
+          {PRICE_INFO[plan.creditType as string] || ''}{' '}
+          {PERIOD_INFO[paymentType as PaymentType] || ''}
+        </Typography>
+      );
+    }
+    return null;
+  }, [category, plan.planType, plan.creditType, plan.credit, paymentType]);
 
   return (
     <Stack
@@ -40,8 +130,14 @@ export const PricingPlanCard = ({
         width: 384,
         flexShrink: 0,
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
+      {/* Decorative dot pattern overlay */}
+      <Icon
+        component={plan.isDefault ? ICON_PRO : ICON_NORMAL}
+        sx={{ position: 'absolute', top: 0, right: 0, width: 258, height: 310 }}
+      />
       {/* Card Header */}
       <Box
         sx={{
@@ -76,60 +172,75 @@ export const PricingPlanCard = ({
             p: 3,
             gap: 3,
             minHeight: 496,
+            position: 'relative',
+            zIndex: 1,
           }}
         >
-          {/* Subtitle - 从 paymentDetail[0].priceAdditionalInfo 获取 */}
-          <Stack
-            gap={1}
-            sx={{ flexDirection: 'row', alignItems: 'flex-end', minHeight: 36 }}
-          >
-            {paymentType === 'MONTH' && plan.monthlyPrice && (
-              <Typography
-                sx={{
-                  fontSize: 36,
-                  fontWeight: 400,
-                  lineHeight: 1,
-                }}
-              >
-                ${plan.monthlyPrice}
-              </Typography>
-            )}
-            {paymentType === 'YEAR' && plan.yearlyPrice && (
-              <Typography
-                sx={{
-                  fontSize: 36,
-                  fontWeight: 400,
-                  lineHeight: 1,
-                }}
-              >
-                ${plan.yearlyPrice}
-              </Typography>
-            )}
+          {/* <StyledEmailReceived /> */}
+          {category === DirectoriesBizIdEnum.capital_markets ? (
+            <StyledCapitalDesc
+              planType={plan.planType}
+              priceAdditionalInfo={plan.priceAdditionalInfo || ''}
+            />
+          ) : (
+            <Stack
+              gap={1}
+              sx={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                minHeight: 36,
+              }}
+            >
+              {paymentType === 'MONTH' && plan.monthlyPrice && (
+                <Typography
+                  sx={{
+                    fontSize: 36,
+                    fontWeight: 400,
+                    lineHeight: 1,
+                  }}
+                >
+                  ${plan.monthlyPrice.toLocaleString()}
+                </Typography>
+              )}
+              {paymentType === 'YEAR' && plan.yearlyPrice && (
+                <Typography
+                  sx={{
+                    fontSize: 36,
+                    fontWeight: 400,
+                    lineHeight: 1,
+                  }}
+                >
+                  ${plan.yearlyPrice.toLocaleString()}
+                </Typography>
+              )}
 
-            {plan.monthlyPrice || plan.yearlyPrice ? (
-              <Typography fontSize={15} lineHeight={1.5}>
-                per month
-              </Typography>
-            ) : null}
-            {plan.priceAdditionalInfo && (
-              <Typography
-                sx={{
-                  fontSize: 24,
-                  fontWeight: 400,
-                  lineHeight: 1,
-                  color: 'text.secondary',
-                  ml: 1,
-                }}
-              >
-                {plan.priceAdditionalInfo}
-              </Typography>
-            )}
-          </Stack>
+              {plan.monthlyPrice || plan.yearlyPrice ? (
+                <Typography fontSize={15} lineHeight={1.5}>
+                  per month
+                </Typography>
+              ) : null}
+              {plan.priceAdditionalInfo && (
+                <Typography
+                  sx={{
+                    fontSize: 24,
+                    fontWeight: 400,
+                    lineHeight: 1,
+                    color: 'text.secondary',
+                    ml: 1,
+                  }}
+                >
+                  {plan.priceAdditionalInfo}
+                </Typography>
+              )}
+            </Stack>
+          )}
 
           {/* Button */}
           <StyledButton
+            disabled={plan.planType === PlanTypeEnum.free}
             fullWidth
-            onClick={toggle}
+            loading={state.loading}
+            onClick={handleClick}
             size="medium"
             sx={{
               bgcolor:
@@ -147,7 +258,7 @@ export const PricingPlanCard = ({
             {buttonText}
           </StyledButton>
 
-          {plan.priceDesc && <Typography>{plan.priceDesc}</Typography>}
+          {priceDesc}
 
           {/* Divider */}
           <Box
@@ -160,7 +271,7 @@ export const PricingPlanCard = ({
 
           {/* Features List - 从 packages 数组获取 */}
           <Stack gap={1.5}>
-            {plan.packageTitle && (
+            {packageTitle[plan.planType] && (
               <Typography
                 sx={{
                   color: 'text.primary',
@@ -169,7 +280,7 @@ export const PricingPlanCard = ({
                 }}
                 variant="body2"
               >
-                {plan.packageTitle}
+                {packageTitle[plan.planType]}
               </Typography>
             )}
             {plan.packages.map((pkg, idx) => (
@@ -203,7 +314,6 @@ export const PricingPlanCard = ({
         onGoToDirectories={() => {
           // Navigate to directories page
           // You can implement navigation logic here
-          console.log('Navigate to directories');
         }}
         open={visible}
       />

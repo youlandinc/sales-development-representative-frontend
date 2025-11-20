@@ -1,4 +1,4 @@
-import { Box, Link, Stack, Typography } from '@mui/material';
+import { Box, Icon, Link, Stack, Typography } from '@mui/material';
 import { FC, useState } from 'react';
 
 import {
@@ -9,7 +9,7 @@ import {
 } from '@/components/atoms';
 
 import CloseIcon from '@mui/icons-material/Close';
-import ConfettiIcon from './assets/icon_confetti.svg';
+import ICON_CONFETTI from './assets/icon_confetti.svg';
 
 export interface TalkToTeamDialogProps {
   open: boolean;
@@ -92,10 +92,8 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
     >
       <Stack alignItems="center" spacing={1.5}>
         {/* Confetti Icon */}
-        <Box
-          alt="Success"
-          component="img"
-          src={ConfettiIcon}
+        <Icon
+          component={ICON_CONFETTI}
           sx={{
             width: 64,
             height: 64,
@@ -414,10 +412,10 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
           fontWeight: 400,
           color: '#B0ADBD',
           lineHeight: 1.5,
-          textAlign: 'center',
         }}
       >
-        By clicking &quot;Submit&quot; or signing up, you agree to Corepass's{' '}
+        By clicking &quot;Submit&quot; or signing up, you agree to
+        Corepass&apos;s{' '}
         <Link
           href="#"
           sx={{

@@ -110,8 +110,8 @@ export const LAYOUT_SIDE_MENU = [
 export const LAYOUT_SIDE_MENU_BOTTOM = [
   {
     label: 'Manage plan',
-    url: '/pricing-plan',
-    key: 'pricing-plan',
+    url: '/pricing',
+    key: 'pricing',
     defaultIcon: ICON_SIDE_PRICING_DEFAULT,
     activeIcon: ICON_SIDE_PRICING_ACTIVE,
     type: 'link',
