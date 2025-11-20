@@ -6,12 +6,14 @@ import { useRouter } from 'nextjs-toploader/app';
 import useSWR from 'swr';
 
 import { _fetchDirectoriesInfo } from '@/request/directories';
+import { useDirectoriesStore } from '@/stores/directories';
 
 import { DirectoriesCard } from './index';
 import { SLUG_MAP } from '@/constants/directories';
 
 export const Directories: FC = () => {
   const router = useRouter();
+  const { fetchDefaultViaBiz, loadingConfig } = useDirectoriesStore();
 
   const { data: directoriesData, isLoading } = useSWR(
     'fetchDirectoriesInfo',
@@ -50,9 +52,15 @@ export const Directories: FC = () => {
           <DirectoriesCard
             {...directory}
             key={directory.bizId}
-            onButtonClick={({ bizId, isAuth }) => {
+            onButtonClick={async ({ bizId, isAuth }) => {
               if (isAuth) {
-                router.push(`/directories/${SLUG_MAP[bizId]}`);
+                // 预加载配置
+                const success = await fetchDefaultViaBiz(bizId);
+                
+                if (success) {
+                  // 成功后跳转
+                  router.push(`/directories/${SLUG_MAP[bizId]}`);
+                }
               }
             }}
           />
