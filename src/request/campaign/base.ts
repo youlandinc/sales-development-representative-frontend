@@ -24,21 +24,9 @@ export const _renameCampaign = (params: {
   return put('/sdr/campaign/name', params);
 };
 
-export const _fetchEnrichmentTableData = () => {
-  return post<{
-    content: {
-      tableId: string;
-      tableName: string;
-    }[];
-  }>('/sdr/prospect/list', {
-    size: 1000,
-    page: 0,
-  });
-};
-
 export const _fetchEnrichmentTableOptions = (tableId: string) => {
   return get<{ fieldName: string; fieldId: string }[]>(
-    `/sdr/prospect/table/${tableId}/fields`,
+    `/sdr/table/${tableId}/fields`,
   );
 };
 
@@ -49,12 +37,12 @@ export const _fetchEnrichmentTableMapping = (tableId: string) => {
       fieldName: string;
       campaignRequiredColumnEnum: string;
     }[];
-  }>(`/sdr/prospect/table/field/mapping/${tableId}`);
+  }>(`/sdr/table/field/mapping/${tableId}`);
 };
 
 export const _updateMappingField = (param: {
   fieldId: string;
   requiredColumn: string;
 }) => {
-  return post('/sdr/prospect/table/field/mapping', param);
+  return post('/sdr/table/field/mapping', param);
 };

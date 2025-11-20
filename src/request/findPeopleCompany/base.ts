@@ -39,7 +39,7 @@ export const _fetchGridDate = (param: Record<string, any>) => {
 };
 
 export const _createTableByFindPeopleCompany = (param: Record<string, any>) => {
-  return post<string>('/sdr/prospect/table/import', param);
+  return post<string>('/sdr/table/import', param);
 };
 
 export const _fetchAllProspectTable = () => {

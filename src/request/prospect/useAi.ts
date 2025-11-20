@@ -30,7 +30,7 @@ export const columnRun = (param: {
   fieldId?: string;
   fieldIds?: string[];
 }) => {
-  return post(`/sdr/prospect/table/${param.tableId}/field/run`, {
+  return post(`/sdr/table/field/${param.tableId}/run`, {
     fieldId: param.fieldId,
     fieldIds: param.fieldIds,
     recordCount: param.recordCount,
@@ -45,7 +45,7 @@ export const _saveWebResearchConfig = (
   excludeFields: string[][],
   generatePrompt: string,
 ) => {
-  return post<string>('/sdr/prospect/table/field', {
+  return post<string>('/sdr/table/field', {
     tableId,
     actionKey: 'use-ai',
     fieldType: 'TEXT',
@@ -82,7 +82,7 @@ export const updateWebResearchConfig = (param: {
   schema: string;
   generatePrompt: string;
 }) => {
-  return patch('/sdr/prospect/table/aiField', {
+  return patch('/sdr/table/aiField', {
     tableId: param.tableId,
     fieldId: param.fieldId,
     typeSettings: {

@@ -15,7 +15,7 @@ interface FilterTableSelectItemProps {
   onSelectTable: (tableId: string) => void;
 }
 
-export const StyledTableSelectItem: FC<FilterTableSelectItemProps> = ({
+export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
   item,
   isExpanded,
   selectedTableId,

@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
 import { StyledButton, StyledDialog, StyledLoading } from '@/components/atoms';
-import { StyledTableSelectItem } from './StyledTableSelectItem';
 import { ResponseProspectTableViaSearch } from '@/types';
+import { QueryTableSelectItem } from './index';
 
 import ICON_CLOSE from './assets/icon-close.svg';
 
@@ -13,12 +13,12 @@ import {
   dialogStyles,
   dialogTitleSx,
   selectButtonSx,
-} from './StyledTableSelect.styles';
+} from './QueryTableSelect.styles';
 
 interface FilterTableSelectDialogProps {
   visible: boolean;
   fetchingTable: boolean;
-  fetchingCondition: boolean;
+  fetchingKeywords: boolean;
   selectedTableId: string;
   expandedIds: Set<string>;
   tableList: ResponseProspectTableViaSearch;
@@ -28,10 +28,10 @@ interface FilterTableSelectDialogProps {
   onConfirm: () => void;
 }
 
-export const StyledTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
+export const QueryTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
   visible,
   fetchingTable,
-  fetchingCondition,
+  fetchingKeywords,
   selectedTableId,
   expandedIds,
   tableList,
@@ -58,7 +58,7 @@ export const StyledTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
         ) : (
           <Stack gap={0.5}>
             {tableList.map((item) => (
-              <StyledTableSelectItem
+              <QueryTableSelectItem
                 isExpanded={expandedIds.has(item.tableId)}
                 item={item}
                 key={item.tableId}
@@ -73,8 +73,7 @@ export const StyledTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
       contentSx={contentSx}
       footer={
         <StyledButton
-          disabled={!selectedTableId || fetchingCondition}
-          loading={fetchingCondition}
+          disabled={!selectedTableId || fetchingKeywords}
           onClick={onConfirm}
           size={'medium'}
           sx={selectButtonSx}

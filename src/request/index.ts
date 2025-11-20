@@ -14,8 +14,6 @@ export * from './inbox';
 
 export * from './contacts';
 
-export * from './enrichments';
-
 export * from './findPeople';
 
 export * from './findCompany';
