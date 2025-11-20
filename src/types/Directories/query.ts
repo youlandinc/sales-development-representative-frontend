@@ -60,7 +60,7 @@ export interface DirectoriesQueryItem {
 
   // ========== Options & Values ==========
   optionMultiple: boolean;
-  defaultValues: any;
+  defaultValue: any;
   // For tab/button group/exclude components OR select/input options
   optionValues: { key: string; label: string; value: string }[];
 
@@ -68,7 +68,7 @@ export interface DirectoriesQueryItem {
   url: string | null; // if url exists, fetch options from API
 
   // ========== Nested Structure ==========
-  children: DirectoriesQueryItem[]; // sub components
+  children: DirectoriesQueryItem[] | null; // sub components
 }
 
 export interface DirectoriesQueryDefaultApiResponse {

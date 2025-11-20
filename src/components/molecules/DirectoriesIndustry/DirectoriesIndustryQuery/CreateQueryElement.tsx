@@ -28,6 +28,8 @@ interface CreateQueryElementProps {
     groupPath?: string,
   ) => void;
   groupPath?: string; // 当前分组路径（如 'FIRM', 'EXECUTIVE'）
+  disabledLoading?: boolean; // Loading 状态导致的禁用
+  disabledPermission?: boolean; // 权限导致的禁用（planType, isAuth）
 }
 
 export const CreateQueryElement: FC<CreateQueryElementProps> = ({
@@ -35,7 +37,11 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   formData,
   onFormChange,
   groupPath,
+  disabledLoading = false,
+  disabledPermission = false,
 }) => {
+  // 组合最终的 disabled 状态
+  const isDisabled = disabledLoading || disabledPermission;
   // ========================================
   // 优先级1: 处理 groupType（容器/布局）
   // ========================================
@@ -45,6 +51,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     return (
       <QueryContainer label={config.label || undefined}>
         <StyledButtonGroup
+          disabled={isDisabled}
           onChange={(event, newValue) => {
             // BUTTON_GROUP 必须有值，忽略空值
             if (newValue) {
@@ -59,6 +66,8 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
             {config.children.map((child: DirectoriesQueryItem) => (
               <CreateQueryElement
                 config={child}
+                disabledLoading={disabledLoading}
+                disabledPermission={disabledPermission}
                 formData={formData}
                 groupPath={groupPath}
                 key={child.key || child.label || ''}
@@ -213,7 +222,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           options={config.optionValues || []}
           placeholder={config.placeholder || ''}
           url={config.url}
-          value={formData[config.key!] || (config.optionMultiple ? [] : '')}
+          value={formData[config.key!] ?? (config.optionMultiple ? [] : '')}
         />
       </QueryContainer>
     );
@@ -254,7 +263,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           options={config.optionValues || []}
           placeholder={config.placeholder || ''}
           url={config.url}
-          value={formData[config.key!] || (config.optionMultiple ? [] : '')}
+          value={formData[config.key!] ?? (config.optionMultiple ? [] : '')}
         />
       </QueryContainer>
     );

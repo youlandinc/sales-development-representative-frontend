@@ -3,59 +3,6 @@ import { CompanyTypeEnum, HttpError } from '@/types';
 import { _fetchFundType, _fetchIndustries } from '@/request';
 import { SDRToast } from '@/components/atoms';
 
-// export const DEFAULT_FILTER = {
-//   companyDescriptionKeywordsExclude: [],
-//   companyDescriptionKeywords: [],
-//   companyIdentifier: [],
-//   companyIndustriesExclude: [],
-//   companyIndustriesInclude: [],
-//   companySizes: [],
-//   locationCitiesExclude: [],
-//   locationCitiesInclude: [],
-//   locationCountriesExclude: [],
-//   locationCountriesInclude: [],
-//   locationRegionsExclude: [],
-//   locationRegionsInclude: [],
-//   locationStatesExclude: [],
-//   locationStatesInclude: [],
-//   locationsExclude: [],
-//   locations: [],
-//   name: '',
-//   names: [],
-//   resultCount: true,
-//   limit: void 0,
-//   limitPerCompany: void 0,
-//   companyType: CompanyTypeEnum.customer,
-//   fundingAmount: [],
-//   fundType: [],
-//   aum: [],
-// };
-// export type CompanyFilterKeysType =
-//   | 'companyDescriptionKeywordsExclude'
-//   | 'companyDescriptionKeywords'
-//   | 'companyIndustriesExclude'
-//   | 'companyIndustriesInclude'
-//   | 'companySizes'
-//   | 'locationCitiesExclude'
-//   | 'locationCitiesInclude'
-//   | 'locationCountriesExclude'
-//   | 'locationCountriesInclude'
-//   | 'locationRegionsExclude'
-//   | 'locationRegionsInclude'
-//   | 'locationStatesExclude'
-//   | 'locationStatesInclude'
-//   | 'locationsExclude'
-//   | 'locations'
-//   | 'name'
-//   | 'names'
-//   | 'resultCount'
-//   | 'limit'
-//   | 'limitPerCompany'
-//   | 'companyType'
-//   | 'fundingAmount'
-//   | 'aum'
-//   | 'fundType';
-
 type FindCompaniesStoreState = {
   filters: Record<
     string,
