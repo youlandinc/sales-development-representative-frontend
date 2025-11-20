@@ -6,7 +6,10 @@ import {
 import { _fetchDirectoriesConfig } from '@/request/directories';
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
-import { convertToConfigMap } from '@/components/molecules/DirectoriesIndustry/DirectoriesIndustryQuery/data';
+import {
+  convertToConfigMap,
+  initializeFormValues,
+} from '@/components/molecules/DirectoriesIndustry/DirectoriesIndustryQuery/data';
 
 interface DirectoriesStoreState {
   bizId: DirectoriesBizIdEnum | '';
@@ -68,13 +71,14 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           convertToConfigMap(apiData);
 
         const queryConfig = configMap[firstInstitutionType] || [];
+        const initialFormValues = initializeFormValues(queryConfig);
 
         set({
           configMap,
           buttonGroupConfig,
           queryConfig,
           institutionType: firstInstitutionType,
-          formValues: { entityType: 'FIRM' },
+          formValues: initialFormValues,
           loadingConfig: false,
         });
 
@@ -94,6 +98,12 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         return;
       }
 
+      console.log('🔍 Debounced fetchResults triggered:', {
+        bizId,
+        institutionType,
+        formValues: JSON.parse(JSON.stringify(formValues)),
+      });
+
       set({ loadingResults: true });
 
       try {
@@ -106,22 +116,19 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
     },
 
     updateInstitutionType: (value: string) => {
-      const {
-        institutionType: currentInstitutionType,
-        configMap,
-        formValues,
-      } = get();
+      const { institutionType: currentInstitutionType, configMap } = get();
 
       if (currentInstitutionType === value || !value) {
         return;
       }
 
       const queryConfig = configMap[value] || [];
+      const newFormValues = initializeFormValues(queryConfig);
 
       set({
         institutionType: value,
         queryConfig,
-        formValues: { ...formValues, entityType: 'FIRM' },
+        formValues: newFormValues,
       });
     },
 
@@ -135,11 +142,11 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           ...formValues,
           [key]: value,
         };
-      } else if (groupPath && formValues[groupPath]) {
+      } else if (groupPath) {
         updatedFormValues = {
           ...formValues,
           [groupPath]: {
-            ...formValues[groupPath],
+            ...(formValues[groupPath] || {}),
             [key]: value,
           },
         };

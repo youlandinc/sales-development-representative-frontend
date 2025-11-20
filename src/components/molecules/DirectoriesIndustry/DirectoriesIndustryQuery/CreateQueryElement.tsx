@@ -86,9 +86,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       <QueryContainer title={config.label || undefined}>
         <QueryTab
           config={config}
-          onFormChange={(newValue) =>
-            onFormChange?.(config.key, newValue, groupPath)
-          }
+          onFormChange={(newValue) => onFormChange?.(config.key, newValue)}
           renderChild={(child, childIndex) => {
             const optionValue = config.optionValues?.[childIndex];
             const tabGroupPath = optionValue?.value || groupPath || '';
