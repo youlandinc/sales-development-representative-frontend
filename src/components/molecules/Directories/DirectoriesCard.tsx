@@ -1,25 +1,26 @@
 import { FC } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 
+import { DIRECTORIES_COLORS } from './constants';
+
 import {
   DirectoriesBizIdEnum,
   DirectoryApiResponse,
 } from '@/types/Directories';
 
 import { StyledButton } from '@/components/atoms';
-
 import {
   DirectoriesBadge,
   DirectoriesPattern,
   DirectoriesStats,
 } from './index';
-import { DIRECTORIES_COLORS } from './constants';
 
 type DirectoriesCardProps = DirectoryApiResponse & {
   onButtonClick?: (data: {
     bizId: DirectoriesBizIdEnum;
     isAuth: boolean;
   }) => void;
+  buttonLoading: boolean;
 };
 
 export const DirectoriesCard: FC<DirectoriesCardProps> = ({
@@ -33,6 +34,7 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
   buttonDescription,
   planType,
   onButtonClick,
+  buttonLoading,
 }) => {
   const isDark = bizId === DirectoriesBizIdEnum.capital_markets;
   const colors = isDark ? DIRECTORIES_COLORS.dark : DIRECTORIES_COLORS.light;
@@ -111,6 +113,8 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
         }}
       >
         <StyledButton
+          disabled={buttonLoading}
+          loading={buttonLoading}
           onClick={() => onButtonClick?.({ bizId, isAuth })}
           size={'medium'}
           sx={{

@@ -53,7 +53,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         <StyledButtonGroup
           disabled={isDisabled}
           onChange={(event, newValue) => {
-            // BUTTON_GROUP 必须有值，忽略空值
             if (newValue) {
               onFormChange?.(config.key, newValue, groupPath);
             }

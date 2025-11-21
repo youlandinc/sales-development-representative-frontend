@@ -1,19 +1,22 @@
 'use client';
-
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 import useSWR from 'swr';
 
-import { _fetchDirectoriesInfo } from '@/request/directories';
+import { SLUG_MAP } from '@/constants/directories';
 import { useDirectoriesStore } from '@/stores/directories';
+import { _fetchDirectoriesInfo } from '@/request/directories';
+import { DirectoriesBizIdEnum } from '@/types/Directories';
 
 import { DirectoriesCard } from './index';
-import { SLUG_MAP } from '@/constants/directories';
 
 export const Directories: FC = () => {
   const router = useRouter();
   const { fetchDefaultViaBiz, loadingConfig } = useDirectoriesStore();
+  const [clickedBizId, setClickedBizId] = useState<DirectoriesBizIdEnum | null>(
+    null,
+  );
 
   const { data: directoriesData, isLoading } = useSWR(
     'fetchDirectoriesInfo',
@@ -22,7 +25,7 @@ export const Directories: FC = () => {
 
   if (isLoading) {
     return (
-      <Stack gap="48px" sx={{ padding: '48px' }}>
+      <Stack>
         <Typography>Loading directories...</Typography>
       </Stack>
     );
@@ -51,16 +54,17 @@ export const Directories: FC = () => {
         {directoriesData?.data.map((directory) => (
           <DirectoriesCard
             {...directory}
+            buttonLoading={loadingConfig && clickedBizId === directory.bizId}
             key={directory.bizId}
             onButtonClick={async ({ bizId, isAuth }) => {
               if (isAuth) {
-                // 预加载配置
+                setClickedBizId(bizId);
                 const success = await fetchDefaultViaBiz(bizId);
 
                 if (success) {
-                  // 成功后跳转
                   router.push(`/directories/${SLUG_MAP[bizId]}`);
                 }
+                setClickedBizId(null);
               }
             }}
           />

@@ -1,11 +1,13 @@
 import { FC } from 'react';
 import { Stack, Typography } from '@mui/material';
+import { useRouter } from 'nextjs-toploader/app';
 
 interface QueryBreadcrumbsProps {
   current: string;
 }
 
 export const QueryBreadcrumbs: FC<QueryBreadcrumbsProps> = ({ current }) => {
+  const router = useRouter();
   return (
     <>
       <Stack
@@ -16,9 +18,11 @@ export const QueryBreadcrumbs: FC<QueryBreadcrumbsProps> = ({ current }) => {
         }}
       >
         <Typography
+          onClick={() => router.push('/directories')}
           sx={{
             fontSize: 12,
             color: 'text.focus',
+            cursor: 'pointer',
             '&:hover': {
               textDecorationLine: 'underline',
               textDecorationStyle: 'solid',
