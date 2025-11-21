@@ -17,7 +17,7 @@ import { PaymentType, SendPricingEmailParam } from '@/types/pricingPlan';
 import { useAsyncFn } from '@/hooks';
 import { _sendPricingEmail } from '@/request/pricingPlan';
 
-import CloseIcon from '@mui/icons-material/Close';
+import { Close } from '@mui/icons-material';
 import ICON_CONFETTI from './assets/icon_confetti.svg';
 export interface TalkToTeamDialogProps {
   open: boolean;
@@ -315,13 +315,12 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
             sx={{
               fontSize: 18,
               fontWeight: 600,
-              color: 'text.primary',
               lineHeight: 1.2,
             }}
           >
             Talk to our team
           </Typography>
-          <CloseIcon
+          <Close
             onClick={handleClose}
             sx={{ fontSize: 24, cursor: 'pointer' }}
           />
