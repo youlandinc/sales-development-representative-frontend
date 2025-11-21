@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { WSClient } from '@/service';
+import { FC, ReactNode, useEffect, useRef } from 'react';
+import { WSClient } from '@/services';
 import { useUserStore } from './index';
 
 interface WSProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const WSProvider: React.FC<WSProviderProps> = ({ children }) => {
+export const WSProvider: FC<WSProviderProps> = ({ children }) => {
   const { accessToken } = useUserStore((store) => store);
   const wsClientRef = useRef<WSClient | null>(null);
 

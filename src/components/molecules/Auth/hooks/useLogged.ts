@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { useUserStore } from '@/providers';
-import { DEFAULT_LOGGED_IN_PATH } from '@/constant';
+import { DEFAULT_LOGGED_IN_PATH } from '@/constants';
 
 import { SDRToast } from '@/components/atoms';
 

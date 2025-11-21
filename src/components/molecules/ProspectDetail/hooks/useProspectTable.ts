@@ -19,7 +19,7 @@ import {
   checkIsAiColumn,
   MIN_BATCH_SIZE,
   SYSTEM_COLUMN_SELECT,
-} from '@/constant/table';
+} from '@/constants/table';
 
 interface UseProspectTableParams {
   tableId: string;

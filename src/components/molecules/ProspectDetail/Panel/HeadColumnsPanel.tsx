@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 
 import { useProspectTableStore } from '@/stores/Prospect';
-import { COLUMN_TYPE_ICONS } from '@/constant/table';
+import { COLUMN_TYPE_ICONS } from '@/constants/table';
 
 import ICON_COLUMN from '../assets/head/icon-column.svg';
 import ICON_COLUMN_HIDE from '../assets/table/icon-column-hide.svg';

@@ -3,7 +3,7 @@ import { Drawer, Fade, Icon, Slider, Stack, Typography } from '@mui/material';
 
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { WORD_COUNT_OPTIONS } from '@/constant';
+import { WORD_COUNT_OPTIONS } from '@/constants';
 
 import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 

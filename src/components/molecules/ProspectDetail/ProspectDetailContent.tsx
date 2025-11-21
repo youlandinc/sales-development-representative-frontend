@@ -8,7 +8,7 @@ import {
   useWorkEmailStore,
 } from '@/stores/Prospect';
 
-import { ROW_HEIGHT } from '@/constant/table';
+import { ROW_HEIGHT } from '@/constants/table';
 import { useProspectTable } from './hooks';
 
 import { StyledTable } from '@/components/atoms';

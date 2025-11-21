@@ -22,7 +22,7 @@ import {
   checkIsAiColumn,
   getAiColumnMenuActions,
   getNormalColumnMenuActions,
-} from '@/constant/table';
+} from '@/constants/table';
 
 interface StyledTableMenuHeaderProps {
   anchorEl: HTMLElement | null;

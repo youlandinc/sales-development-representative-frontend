@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { REQUEST_TIMEOUT } from '@/constant';
+import { REQUEST_TIMEOUT } from '@/constants';
 import { HttpError, HttpErrorEnum, HttpVariantEnum } from '@/types';
 import { USystemLogout } from '@/utils';
 
@@ -15,7 +15,7 @@ const service = axios.create({
 
 // todo request interceptors & response interceptors
 
-// service.interceptors.request.use((config) => {
+// services.interceptors.request.use((config) => {
 //   if (rootStore.session) {
 //     config.headers.Authorization = `Bearer ${rootStore.session.idToken.jwtToken}`;
 //   }

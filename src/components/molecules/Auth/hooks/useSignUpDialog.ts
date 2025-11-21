@@ -3,7 +3,7 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { SDRToast } from '@/components/atoms';
 import { _userLogin, _userSignUp, _userVerifyCode } from '@/request';
-import { APP_KEY, DEFAULT_LOGGED_IN_PATH } from '@/constant';
+import { APP_KEY, DEFAULT_LOGGED_IN_PATH } from '@/constants';
 import { UEncode } from '@/utils';
 import { LoginTypeEnum } from '@/types';
 import { useUserStore } from '@/providers';

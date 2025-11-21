@@ -11,7 +11,7 @@ import {
   ITag,
   useLibraryStore,
 } from '@/stores/useLibraryStore';
-import { PREVIEW_IMAGE_URL } from '@/constant';
+import { PREVIEW_IMAGE_URL } from '@/constants';
 
 export enum modeEnum {
   add = 'add',

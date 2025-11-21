@@ -2,7 +2,7 @@ import { Icon, Stack, Switch, Tooltip, Typography } from '@mui/material';
 import { NodeViewWrapper } from '@tiptap/react';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 
-import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
+import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
 import { useWebResearchStore } from '@/stores/Prospect';
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
