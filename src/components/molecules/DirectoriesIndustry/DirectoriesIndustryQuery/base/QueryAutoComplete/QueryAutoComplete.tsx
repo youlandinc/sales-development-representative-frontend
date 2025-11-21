@@ -80,7 +80,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
 
   return (
     <Autocomplete
-      disableCloseOnSelect
+      disableCloseOnSelect={multiple}
       filterOptions={(options, params) => {
         const filtered = createFilterOptions<AutoCompleteOption>()(
           options as AutoCompleteOption[],

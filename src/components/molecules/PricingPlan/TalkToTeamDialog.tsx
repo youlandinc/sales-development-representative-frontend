@@ -11,7 +11,7 @@ import {
 } from '@/components/atoms';
 import { StyledFormElementContainer } from './base';
 
-import { PrivacyPolicy, TermsOfUse } from '@/constant';
+import { PrivacyPolicy, TermsOfUse } from '@/constants';
 import { PlanTypeEnum } from '@/types';
 import { PaymentType, SendPricingEmailParam } from '@/types/pricingPlan';
 import { useAsyncFn } from '@/hooks';
