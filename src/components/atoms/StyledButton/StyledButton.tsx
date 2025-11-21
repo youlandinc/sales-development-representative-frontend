@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Button, ButtonProps } from '@mui/material';
+import { Box, Button, ButtonProps } from '@mui/material';
 
 import { StyledLoading } from '@/components/atoms';
 
@@ -36,6 +36,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
       size={size}
       sx={[
         {
+          position: 'relative',
           flexShrink: 0,
           fontSize: 16,
           fontWeight: 400,
@@ -107,14 +108,29 @@ export const StyledButton: FC<StyledButtonProps> = ({
       variant={variant}
       {...rest}
     >
-      {loading ? (
-        loadingText ? (
-          loadingText
-        ) : (
-          <StyledLoading size={size} />
-        )
-      ) : (
-        children
+      <Box
+        component="span"
+        sx={{
+          visibility: loading ? 'hidden' : 'visible',
+        }}
+      >
+        {children}
+      </Box>
+
+      {loading && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {loadingText ? loadingText : <StyledLoading size={size} />}
+        </Box>
       )}
     </Button>
   );

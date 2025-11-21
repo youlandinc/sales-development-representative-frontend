@@ -90,7 +90,7 @@ export const DirectoriesIndustryQuery: FC = () => {
     <Stack
       sx={{
         width: 420,
-        gap: 3,
+        gap: 1.5,
         p: 3,
         height: 'auto',
         overflowY: 'auto',

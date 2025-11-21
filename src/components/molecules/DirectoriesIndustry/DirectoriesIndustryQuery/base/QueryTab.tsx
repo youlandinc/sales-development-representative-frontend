@@ -1,8 +1,12 @@
-import { FC, ReactNode, useEffect, useState } from 'react';
-import { Box, Stack } from '@mui/material';
-import BusinessIcon from '@mui/icons-material/Business';
-import PeopleIcon from '@mui/icons-material/People';
+import { FC, ReactNode } from 'react';
+import { Box, Icon, Tab, Tabs } from '@mui/material';
 import { DirectoriesQueryItem } from '@/types/Directories/query';
+
+import ICON_FIRM_DEFAULT from './assets/icon-firm-default.svg';
+import ICON_FIRM_ACTIVE from './assets/icon-firm-active.svg';
+
+import ICON_EXECUTIVE_DEFAULT from './assets/icon-executive-default.svg';
+import ICON_EXECUTIVE_ACTIVE from './assets/icon-executive-active.svg';
 
 interface QueryTabProps {
   config: DirectoriesQueryItem;
@@ -11,13 +15,22 @@ interface QueryTabProps {
   renderChild: (child: DirectoriesQueryItem, childIndex: number) => ReactNode;
 }
 
-const getIconByLabel = (label: string) => {
-  const lowerLabel = label?.toLowerCase() || '';
-  if (lowerLabel.includes('firm')) {
-    return <BusinessIcon sx={{ fontSize: 20 }} />;
+const getIconByValue = (value: string, isActive: boolean) => {
+  if (value === 'FIRM') {
+    return (
+      <Icon
+        component={isActive ? ICON_FIRM_ACTIVE : ICON_FIRM_DEFAULT}
+        sx={{ width: 20, height: 20 }}
+      />
+    );
   }
-  if (lowerLabel.includes('executive')) {
-    return <PeopleIcon sx={{ fontSize: 20 }} />;
+  if (value === 'EXECUTIVE') {
+    return (
+      <Icon
+        component={isActive ? ICON_EXECUTIVE_ACTIVE : ICON_EXECUTIVE_DEFAULT}
+        sx={{ width: 20, height: 20 }}
+      />
+    );
   }
   return null;
 };
@@ -28,77 +41,77 @@ export const QueryTab: FC<QueryTabProps> = ({
   onFormChange,
   renderChild,
 }) => {
-  const [activeTab, setActiveTab] = useState(0);
-
   const tabOptions = config.optionValues || config.children;
-
-  useEffect(() => {
-    if (value && tabOptions) {
-      const index = tabOptions.findIndex(
-        (option: any) => option.value === value,
-      );
-      if (index !== -1) {
-        setActiveTab(index);
-      }
-    }
-  }, [value, tabOptions]);
 
   if (!tabOptions || tabOptions.length === 0) {
     return null;
   }
 
+  const currentIndex =
+    tabOptions.findIndex((option: any) => option.value === value) ?? 0;
+
   return (
     <Box>
-      <Stack
-        direction="row"
-        sx={{
-          borderBottom: '1px solid #efe9fb',
+      <Tabs
+        onChange={(_, newIndex) => {
+          const newValue = tabOptions[newIndex]?.value;
+          if (newValue) {
+            onFormChange(newValue);
+          }
         }}
+        sx={{
+          height: '36px',
+          minHeight: '36px',
+          '& .MuiTabs-flexContainer': {
+            height: '36px',
+          },
+          '& .MuiTabs-indicator': {
+            height: '2px',
+            backgroundColor: '#363440',
+          },
+          '& .MuiTab-root': {
+            height: '36px',
+            minHeight: '36px',
+            fontSize: 14,
+            fontWeight: 400,
+            textTransform: 'none',
+            color: 'text.focus',
+            px: 1.5,
+            transition: 'border 0.2s',
+            flex: 1,
+            '&.Mui-selected': {
+              fontWeight: 600,
+              color: 'text.focus',
+            },
+            '&:hover': {
+              opacity: 0.8,
+            },
+          },
+        }}
+        value={currentIndex}
       >
         {tabOptions.map((option: any, index: number) => {
-          const label = option.label || '';
-          const isActive = activeTab === index;
-          const icon = getIconByLabel(label);
+          const isActive = currentIndex === index;
+          const icon = getIconByValue(option.value, isActive);
 
           return (
-            <Box
+            <Tab
               key={option.key || option.value || index}
-              onClick={() => {
-                setActiveTab(index);
-                onFormChange(option.value);
-              }}
-              sx={{
-                flex: 1,
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 0.5,
-                px: 1.5,
-                cursor: 'pointer',
-                fontSize: 14,
-                fontWeight: isActive ? 600 : 400,
-                color: 'text.focus',
-                borderBottom: isActive
-                  ? '2px solid #363440'
-                  : '2px solid transparent',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  opacity: 0.8,
-                },
-              }}
-            >
-              {icon}
-              <span>{label}</span>
-            </Box>
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {icon}
+                  <span>{option.label || ''}</span>
+                </Box>
+              }
+            />
           );
         })}
-      </Stack>
+      </Tabs>
 
       <Box sx={{ mt: 1.5 }}>
         {config.children &&
-          config.children[activeTab] &&
-          renderChild(config.children[activeTab], activeTab)}
+          config.children[currentIndex] &&
+          renderChild(config.children[currentIndex], currentIndex)}
       </Box>
     </Box>
   );
