@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { UEncode } from '@/utils';
-import { APP_KEY } from '@/constant';
+import { APP_KEY } from '@/constants';
 
 import { SDRToast } from '@/components/atoms';
 

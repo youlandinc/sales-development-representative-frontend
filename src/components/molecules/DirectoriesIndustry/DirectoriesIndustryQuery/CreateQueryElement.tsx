@@ -3,6 +3,7 @@ import { Stack } from '@mui/material';
 
 import { StyledButtonGroup, StyledTextFieldNumber } from '@/components/atoms';
 import {
+  QueryAdditionalDetails,
   QueryAutoComplete,
   QueryCheckbox,
   QueryCollapse,
@@ -42,14 +43,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
 }) => {
   // 组合最终的 disabled 状态
   const isDisabled = disabledLoading || disabledPermission;
-  // ========================================
-  // 优先级1: 处理 groupType（容器/布局）
-  // ========================================
 
-  // BUTTON_GROUP - 按钮组切换
   if (config.groupType === DirectoriesQueryGroupTypeEnum.button_group) {
     return (
-      <QueryContainer label={config.label || undefined}>
+      <QueryContainer
+        label={config.label}
+        labelSx={{ fontWeight: 600, fontSize: 14 }}
+      >
         <StyledButtonGroup
           disabled={isDisabled}
           onChange={(event, newValue) => {
@@ -82,29 +82,27 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   // TAB - Tab 切换布局
   if (config.groupType === DirectoriesQueryGroupTypeEnum.tab) {
     return (
-      <QueryContainer title={config.label || undefined}>
-        <QueryTab
-          config={config}
-          onFormChange={(newValue) => onFormChange?.(config.key, newValue)}
-          renderChild={(child, childIndex) => {
-            const optionValue = config.optionValues?.[childIndex];
-            const tabGroupPath = optionValue?.value || groupPath || '';
+      <QueryTab
+        config={config}
+        onFormChange={(newValue) => onFormChange?.(config.key, newValue)}
+        renderChild={(child, childIndex) => {
+          const optionValue = config.optionValues?.[childIndex];
+          const tabGroupPath = optionValue?.value || groupPath || '';
 
-            return (
-              <CreateQueryElement
-                config={child}
-                formData={
-                  tabGroupPath ? formData[tabGroupPath] || {} : formData
-                }
-                groupPath={tabGroupPath}
-                key={child.key || child.label || ''}
-                onFormChange={onFormChange}
-              />
-            );
-          }}
-          value={config.key ? formData[config.key] : null}
-        />
-      </QueryContainer>
+          return (
+            <CreateQueryElement
+              config={child}
+              disabledLoading={disabledLoading}
+              disabledPermission={disabledPermission}
+              formData={tabGroupPath ? formData[tabGroupPath] || {} : formData}
+              groupPath={tabGroupPath}
+              key={child.key || child.label || ''}
+              onFormChange={onFormChange}
+            />
+          );
+        }}
+        value={config.key ? formData[config.key] : null}
+      />
     );
   }
 
@@ -112,7 +110,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   if (config.groupType === DirectoriesQueryGroupTypeEnum.general) {
     return (
       <QueryCollapse
-        defaultOpen={config.isDefaultOpen ?? true}
+        defaultOpen={config.isDefaultOpen ?? false}
         title={config.label}
       >
         {config.children && config.children.length > 0
@@ -180,24 +178,18 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // ADDITIONAL_DETAILS - 附加详情（内部自己处理子项）
+  // ADDITIONAL_DETAILS - 附加详情（组件内部从 store 获取数据）
   if (config.groupType === DirectoriesQueryGroupTypeEnum.additional_details) {
     return (
       <QueryCollapse
-        defaultOpen={config.isDefaultOpen ?? true}
+        defaultOpen={config.isDefaultOpen ?? false}
         title={config.label}
       >
-        {/* TBD: QueryAdditionalDetails 组件，接收 children、formData、onFormChange */}
-        <div>Additional Details - TBD</div>
+        <QueryAdditionalDetails />
       </QueryCollapse>
     );
   }
 
-  // ========================================
-  // 优先级2: 处理 actionType（表单控件）
-  // ========================================
-
-  // CLICK - 仅作为容器渲染 children
   if (config.actionType === DirectoriesQueryActionTypeEnum.click) {
     if (!config.children || config.children.length === 0) {
       return null;
@@ -207,6 +199,8 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         {config.children.map((child: DirectoriesQueryItem) => (
           <CreateQueryElement
             config={child}
+            disabledLoading={disabledLoading}
+            disabledPermission={disabledPermission}
             formData={formData}
             groupPath={groupPath}
             key={child.key || child.label || ''}
@@ -220,10 +214,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   // SELECT - 下拉选择（QueryAutoComplete freeSolo=false）
   if (config.actionType === DirectoriesQueryActionTypeEnum.select) {
     return (
-      <QueryContainer
-        description={config.description || undefined}
-        label={config.label || undefined}
-      >
+      <QueryContainer description={config.description} label={config.label}>
         <QueryAutoComplete
           freeSolo={false}
           multiple={config.optionMultiple}
@@ -244,10 +235,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     // 数字类型输入框 - 使用 StyledTextFieldNumber
     if (config.inputType === DirectoriesQueryInputTypeEnum.number) {
       return (
-        <QueryContainer
-          description={config.description || undefined}
-          label={config.label || undefined}
-        >
+        <QueryContainer description={config.description} label={config.label}>
           <StyledTextFieldNumber
             onValueChange={({ value }) =>
               onFormChange?.(config.key, value, groupPath)
@@ -261,10 +249,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
 
     // 文本类型输入框 - 使用 QueryAutoComplete (freeSolo=true)
     return (
-      <QueryContainer
-        description={config.description || undefined}
-        label={config.label || undefined}
-      >
+      <QueryContainer description={config.description} label={config.label}>
         <QueryAutoComplete
           freeSolo={true}
           multiple={config.optionMultiple}
@@ -285,7 +270,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     const isChecked = formData[config.key!] || false;
 
     return (
-      <QueryContainer description={config.description || undefined}>
+      <QueryContainer description={config.description}>
         <QueryCheckbox
           onFormChange={(checked) =>
             onFormChange?.(config.key, checked, groupPath)
@@ -300,7 +285,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   // SWITCH - 开关
   if (config.actionType === DirectoriesQueryActionTypeEnum.switch) {
     return (
-      <QueryContainer description={config.description || undefined}>
+      <QueryContainer description={config.description}>
         <QuerySwitch
           checked={formData[config.key!] || false}
           label={config.label || ''}

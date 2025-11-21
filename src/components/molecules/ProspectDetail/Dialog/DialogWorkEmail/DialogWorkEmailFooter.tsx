@@ -11,7 +11,7 @@ import { FC, useState } from 'react';
 
 import { StyledButton, StyledCost } from '@/components/atoms';
 
-import { COINS_PER_ROW } from '@/constant';
+import { COINS_PER_ROW } from '@/constants';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 import { useWorkEmailStore } from '@/stores/Prospect/useWorkEmailStore';

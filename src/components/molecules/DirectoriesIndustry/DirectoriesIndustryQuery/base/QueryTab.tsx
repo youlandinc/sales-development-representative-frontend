@@ -51,7 +51,7 @@ export const QueryTab: FC<QueryTabProps> = ({
     tabOptions.findIndex((option: any) => option.value === value) ?? 0;
 
   return (
-    <Box>
+    <>
       <Tabs
         onChange={(_, newIndex) => {
           const newValue = tabOptions[newIndex]?.value;
@@ -62,6 +62,7 @@ export const QueryTab: FC<QueryTabProps> = ({
         sx={{
           height: '36px',
           minHeight: '36px',
+          borderBottom: '1px solid #EAE9EF',
           '& .MuiTabs-flexContainer': {
             height: '36px',
           },
@@ -113,6 +114,6 @@ export const QueryTab: FC<QueryTabProps> = ({
           config.children[currentIndex] &&
           renderChild(config.children[currentIndex], currentIndex)}
       </Box>
-    </Box>
+    </>
   );
 };

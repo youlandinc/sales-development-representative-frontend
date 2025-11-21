@@ -14,7 +14,7 @@ export const DirectoriesIndustryTable: FC = () => {
         Preview leads
       </Typography>
 
-      <Stack bgcolor={'blue'} flexShrink={0} height={4000}></Stack>
+      <Stack flexShrink={0} height={4000}></Stack>
     </Stack>
   );
 };

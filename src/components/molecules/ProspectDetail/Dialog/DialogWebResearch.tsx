@@ -28,7 +28,7 @@ import {
   useWebResearchStore,
 } from '@/stores/Prospect';
 
-import { COINS_PER_ROW } from '@/constant';
+import { COINS_PER_ROW } from '@/constants';
 import { useAsyncFn, useVariableFromStore } from '@/hooks';
 import { columnRun, updateWebResearchConfig } from '@/request';
 import { HttpError } from '@/types';

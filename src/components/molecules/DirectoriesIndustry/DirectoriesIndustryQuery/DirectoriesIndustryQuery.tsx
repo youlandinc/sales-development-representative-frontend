@@ -1,13 +1,13 @@
-import { FC, useEffect, useMemo } from 'react';
+import { FC } from 'react';
 import { CircularProgress, Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
-import { debounce } from 'lodash-es';
 
 import { QueryBreadcrumbs } from './base';
 import { getBizIdFromSlug } from './data';
 import { CreateQueryElement } from './index';
 import { TITLE_MAP } from '@/constants/directories';
 import { DirectoriesQueryItem } from '@/types/Directories';
+import { useDirectoriesDataFlow } from '@/hooks';
 import { useDirectoriesStore } from '@/stores/directories';
 
 export const DirectoriesIndustryQuery: FC = () => {
@@ -16,36 +16,22 @@ export const DirectoriesIndustryQuery: FC = () => {
 
   const bizId = getBizIdFromSlug(industrySlug);
 
+  // ✅ 使用新的 RxJS 数据流 Hook（自动处理 debounce + 请求）
   const {
-    institutionType,
-    buttonGroupConfig,
-    queryConfig,
     formValues,
+    queryConfig,
+    institutionType,
     loadingConfig,
-    updateInstitutionType,
+    loadingAdditional,
     updateFormValues,
-    fetchResults,
-    fetchDefaultViaBiz,
-  } = useDirectoriesStore();
+    additionalDetails, // B: Additional details（预留）
+    finalData, // C: 最终数据（预留）
+  } = useDirectoriesDataFlow(bizId);
 
-  useEffect(() => {
-    if (queryConfig.length === 0 && !loadingConfig && bizId) {
-      fetchDefaultViaBiz(bizId);
-    }
-  }, [bizId]);
+  console.log(finalData);
 
-  const debouncedFetchResults = useMemo(
-    () => debounce(() => fetchResults(), 500),
-    [fetchResults],
-  );
-
-  useEffect(() => {
-    if (Object.keys(formValues).length > 0) {
-      debouncedFetchResults();
-    }
-
-    return () => debouncedFetchResults.cancel();
-  }, [formValues, debouncedFetchResults]);
+  // 保留 institutionType 更新逻辑（不走 RxJS）
+  const { buttonGroupConfig, updateInstitutionType } = useDirectoriesStore();
 
   const onFormChange = (
     key: string | undefined | null,
@@ -61,11 +47,8 @@ export const DirectoriesIndustryQuery: FC = () => {
       return;
     }
 
+    // ✅ 自动触发 RxJS 流程（debounce + 请求 additionalDetails）
     updateFormValues(key, value, groupPath);
-
-    if (key === 'entityType') {
-      debouncedFetchResults();
-    }
   };
 
   if (!buttonGroupConfig && !loadingConfig) {

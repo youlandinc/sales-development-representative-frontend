@@ -29,12 +29,10 @@ export const useQueryAutoComplete = ({
   multiple,
   onFormChange,
 }: UseQueryAutoCompleteParams) => {
-  // ==================== 状态管理 ====================
   const [options, setOptions] = useState<AutoCompleteOption[]>([]);
   const [loading, setLoading] = useState(false);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ==================== 初始化静态选项 ====================
   useEffect(() => {
     if (!url && staticOptions.length > 0) {
       const formattedOptions = staticOptions.map((item) => ({
@@ -45,7 +43,6 @@ export const useQueryAutoComplete = ({
     }
   }, [url, staticOptions]);
 
-  // ==================== 动态搜索 ====================
   const onSearch = useCallback(
     async (inputValue: string) => {
       if (!url) {
@@ -90,7 +87,6 @@ export const useQueryAutoComplete = ({
     [url],
   );
 
-  // ==================== 清理定时器 ====================
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
@@ -99,7 +95,6 @@ export const useQueryAutoComplete = ({
     };
   }, []);
 
-  // ==================== 值转换 ====================
   const autocompleteValue = useMemo(() => {
     if (multiple) {
       const valueArray = (value as string[]) ?? [];
@@ -131,7 +126,6 @@ export const useQueryAutoComplete = ({
     };
   }, [value, multiple, options]);
 
-  // ==================== 事件回调 ====================
   const onGetOptionLabel = useCallback(
     (option: string | AutoCompleteOption): string => {
       if (typeof option === 'string') {

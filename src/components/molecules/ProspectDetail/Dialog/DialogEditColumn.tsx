@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from 'react';
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import { CommonSelectFieldType } from '@/components/molecules/Common';
 
-import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
+import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
 
 import { useProspectTableStore } from '@/stores/Prospect';
 import { useAsyncFn } from '@/hooks';

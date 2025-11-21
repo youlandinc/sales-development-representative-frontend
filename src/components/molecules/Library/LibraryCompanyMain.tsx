@@ -17,7 +17,7 @@ import { HttpError } from '@/types';
 import ICON_BUILDINGS from './assets/icon_buildings.svg';
 
 import { ITag, useLibraryStore } from '@/stores/useLibraryStore';
-import { PREVIEW_IMAGE_URL } from '@/constant';
+import { PREVIEW_IMAGE_URL } from '@/constants';
 
 const LibraryCompanyCard: FC<PropsWithChildren<LibraryCardProps>> = ({
   children,

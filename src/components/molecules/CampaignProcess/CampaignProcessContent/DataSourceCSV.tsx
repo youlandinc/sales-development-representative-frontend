@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { debounce, Fade, Icon, Stack, Typography } from '@mui/material';
 
-import { PROSPECT_CSV_TYPE_OPTIONS } from '@/constant';
+import { PROSPECT_CSV_TYPE_OPTIONS } from '@/constants';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import {
