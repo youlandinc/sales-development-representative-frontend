@@ -82,7 +82,7 @@ export const updateWebResearchConfig = (param: {
   schema: string;
   generatePrompt: string;
 }) => {
-  return patch('/sdr/table/aiField', {
+  return patch('/sdr/table/field/aiField', {
     tableId: param.tableId,
     fieldId: param.fieldId,
     typeSettings: {
