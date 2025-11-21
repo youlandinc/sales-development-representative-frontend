@@ -1,49 +1,67 @@
 import { Box, Icon, Link, Stack, Typography } from '@mui/material';
 import { FC, useState } from 'react';
+import { useRouter } from 'nextjs-toploader/app';
 
 import {
+  SDRToast,
   StyledButton,
   StyledDialog,
   StyledNumberFormat,
   StyledTextField,
 } from '@/components/atoms';
+import { StyledFormElementContainer } from './base';
+
+import { PrivacyPolicy, TermsOfUse } from '@/constant';
+import { PlanTypeEnum } from '@/types';
+import { PaymentType, SendPricingEmailParam } from '@/types/pricingPlan';
+import { useAsyncFn } from '@/hooks';
+import { _sendPricingEmail } from '@/request/pricingPlan';
 
 import CloseIcon from '@mui/icons-material/Close';
 import ICON_CONFETTI from './assets/icon_confetti.svg';
-
 export interface TalkToTeamDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: (data: TalkToTeamFormData) => void;
-  onGoToDirectories?: () => void;
+  planType: PlanTypeEnum;
+  pricingType: PaymentType;
 }
 
-export interface TalkToTeamFormData {
-  firstName: string;
-  lastName: string;
-  workEmail: string;
-  phone?: string;
-  company: string;
-  position: string;
-  useCase: string;
-}
+export type TalkToTeamFormData = Omit<
+  SendPricingEmailParam,
+  'planType' | 'pricingType'
+>;
 
 export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
   open,
   onClose,
-  onSubmit,
-  onGoToDirectories,
+  planType,
+  pricingType,
 }) => {
+  const router = useRouter();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState<TalkToTeamFormData>({
     firstName: '',
     lastName: '',
     workEmail: '',
     phone: '',
-    company: '',
+    companyName: '',
     position: '',
     useCase: '',
   });
+
+  const [state, sendEmail] = useAsyncFn(async () => {
+    try {
+      await _sendPricingEmail({
+        ...formData,
+        planType,
+        pricingType,
+      });
+      setIsSubmitted(true);
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    }
+  }, [formData, planType, pricingType]);
 
   const handleChange =
     (field: keyof TalkToTeamFormData) =>
@@ -54,28 +72,27 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
       }));
     };
 
-  const handleSubmit = () => {
-    onSubmit?.(formData);
-    setIsSubmitted(true);
+  const handleSubmit = async () => {
+    await sendEmail();
   };
 
   const handleClose = () => {
+    onClose();
     setFormData({
       firstName: '',
       lastName: '',
       workEmail: '',
       phone: '',
-      company: '',
+      companyName: '',
       position: '',
       useCase: '',
     });
     setIsSubmitted(false);
-    onClose();
   };
 
   const handleGoToDirectories = () => {
+    router.push('/directories');
     handleClose();
-    onGoToDirectories?.();
   };
 
   // Success state content
@@ -103,11 +120,9 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
         {/* Thank you message */}
         <Typography
           sx={{
-            fontSize: 14,
-            fontWeight: 400,
-            color: 'text.primary',
             lineHeight: 1.4,
           }}
+          variant={'body2'}
         >
           Thank you! We&apos;ll reach out soon.
         </Typography>
@@ -117,7 +132,6 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
           sx={{
             fontSize: 24,
             fontWeight: 600,
-            color: 'text.primary',
             lineHeight: 1.2,
             textAlign: 'center',
             maxWidth: 450,
@@ -133,16 +147,6 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
         size="medium"
         sx={{
           width: 336,
-          height: 40,
-          bgcolor: '#363440',
-          color: 'white',
-          fontSize: 14,
-          fontWeight: 400,
-          textTransform: 'none',
-          borderRadius: 2,
-          '&:hover': {
-            bgcolor: '#4C4957',
-          },
         }}
       >
         Go to Directories
@@ -155,104 +159,36 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
     <Stack spacing={3} sx={{ pt: 3 }}>
       {/* First name and Last name row */}
       <Stack direction="row" spacing={3}>
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: '#202939',
-              lineHeight: 1.4,
-              mb: 0.5,
-            }}
-          >
-            First name
-          </Typography>
+        <StyledFormElementContainer label="First name">
           <StyledTextField
             onChange={handleChange('firstName')}
             placeholder="Your first name"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                height: 48,
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#B0ADBD',
-                opacity: 1,
-              },
-            }}
+            size={'large'}
             value={formData.firstName}
           />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: '#202939',
-              lineHeight: 1.4,
-              mb: 0.5,
-            }}
-          >
-            Last name
-          </Typography>
+        </StyledFormElementContainer>
+        <StyledFormElementContainer label="Last name">
           <StyledTextField
             onChange={handleChange('lastName')}
             placeholder="Your last name"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                height: 48,
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#B0ADBD',
-                opacity: 1,
-              },
-            }}
+            size={'large'}
             value={formData.lastName}
           />
-        </Box>
+        </StyledFormElementContainer>
       </Stack>
 
       {/* Work email and Phone row */}
       <Stack direction="row" spacing={3}>
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: '#202939',
-              lineHeight: 1.4,
-              mb: 0.5,
-            }}
-          >
-            Work email
-          </Typography>
+        <StyledFormElementContainer label="Work email">
           <StyledTextField
             onChange={handleChange('workEmail')}
             placeholder="name@company.com"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                height: 48,
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#B0ADBD',
-                opacity: 1,
-              },
-            }}
+            size={'large'}
             type="email"
             value={formData.workEmail}
           />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: '#202939',
-              lineHeight: 1.4,
-              mb: 0.5,
-            }}
-          >
-            Phone (optional)
-          </Typography>
+        </StyledFormElementContainer>
+        <StyledFormElementContainer label="Phone (optional)">
           <StyledNumberFormat
             format="(###) ###-####"
             onValueChange={({ floatValue }) => {
@@ -262,92 +198,35 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
               }));
             }}
             placeholder="Your phone number"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                height: 48,
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#B0ADBD',
-                opacity: 1,
-              },
-            }}
+            size={'large'}
             type="tel"
             value={formData.phone}
           />
-        </Box>
+        </StyledFormElementContainer>
       </Stack>
 
       {/* Company and Position row */}
       <Stack direction="row" spacing={3}>
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: '#202939',
-              lineHeight: 1.4,
-              mb: 0.5,
-            }}
-          >
-            Company
-          </Typography>
+        <StyledFormElementContainer label="Company">
           <StyledTextField
-            onChange={handleChange('company')}
+            onChange={handleChange('companyName')}
             placeholder="Your company name"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                height: 48,
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#B0ADBD',
-                opacity: 1,
-              },
-            }}
-            value={formData.company}
+            size={'large'}
+            value={formData.companyName}
           />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: '#202939',
-              lineHeight: 1.4,
-              mb: 0.5,
-            }}
-          >
-            Position
-          </Typography>
+        </StyledFormElementContainer>
+        <StyledFormElementContainer label="Position">
           <StyledTextField
             onChange={handleChange('position')}
             placeholder="Your job title"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                height: 48,
-              },
-              '& .MuiInputBase-input::placeholder': {
-                color: '#B0ADBD',
-                opacity: 1,
-              },
-            }}
+            size={'large'}
             value={formData.position}
           />
-        </Box>
+        </StyledFormElementContainer>
       </Stack>
 
       {/* Use case textarea */}
-      <Box>
-        <Typography
-          sx={{
-            fontSize: 14,
-            fontWeight: 400,
-            color: '#202939',
-            lineHeight: 1.4,
-            mb: 0.5,
-          }}
-        >
-          What are you looking to do?
-        </Typography>
+      <StyledFormElementContainer label="What are you looking to do?">
         <StyledTextField
           multiline
           onChange={handleChange('useCase')}
@@ -355,16 +234,8 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
           rows={3}
           sx={{
             '& .MuiOutlinedInput-root': {
-              // height: 86,
               alignItems: 'flex-start',
               p: 2,
-            },
-            '& .MuiInputBase-input': {
-              height: '100% !important',
-            },
-            '& .MuiInputBase-input::placeholder': {
-              color: '#B0ADBD',
-              opacity: 1,
             },
             '& .MuiInputBase-inputMultiline': {
               py: 0,
@@ -372,33 +243,24 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
           }}
           value={formData.useCase}
         />
-      </Box>
+      </StyledFormElementContainer>
 
       {/* Submit button */}
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <StyledButton
-          disabled={
-            !formData.firstName ||
-            !formData.lastName ||
-            !formData.workEmail ||
-            !formData.company ||
-            !formData.position ||
-            !formData.useCase
-          }
+          disabled={[
+            formData.firstName,
+            formData.lastName,
+            formData.workEmail,
+            formData.companyName,
+            formData.position,
+            formData.useCase,
+          ].some((item) => item.trim() === '')}
+          loading={state.loading}
           onClick={handleSubmit}
           size="medium"
           sx={{
             width: 336,
-            height: 40,
-            bgcolor: '#363440',
-            color: 'white',
-            fontSize: 14,
-            fontWeight: 400,
-            textTransform: 'none',
-            borderRadius: 2,
-            '&:hover': {
-              bgcolor: '#4C4957',
-            },
           }}
         >
           Submit
@@ -406,18 +268,11 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
       </Box>
 
       {/* Terms text */}
-      <Typography
-        sx={{
-          fontSize: 12,
-          fontWeight: 400,
-          color: '#B0ADBD',
-          lineHeight: 1.5,
-        }}
-      >
+      <Typography color={'#B0ADBD'} variant={'body3'}>
         By clicking &quot;Submit&quot; or signing up, you agree to
         Corepass&apos;s{' '}
         <Link
-          href="#"
+          href={TermsOfUse}
           sx={{
             color: '#363440',
             textDecoration: 'none',
@@ -430,7 +285,7 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
         </Link>{' '}
         and{' '}
         <Link
-          href="#"
+          href={PrivacyPolicy}
           sx={{
             color: '#363440',
             textDecoration: 'none',

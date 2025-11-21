@@ -11,11 +11,11 @@ import { DirectoriesBizIdEnum } from '@/types/Directories';
 import { PaymentType, PlanInfo } from '@/types/pricingPlan';
 
 import { _createPaymentLink } from '@/request/pricingPlan';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { StyledCapitalDesc } from './base';
 import { packageTitle, PERIOD_INFO, PRICE_INFO } from './data';
 import { CANCEL_URL, SUCCESS_URL } from './data';
 
+import { CheckCircleOutline } from '@mui/icons-material';
 import ICON_NORMAL from './assets/icon_normal.svg';
 import ICON_PRO from './assets/icon_pro.svg';
 
@@ -278,29 +278,25 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
                   lineHeight: 1.71,
                   fontSize: 14,
                 }}
-                variant="body2"
+                variant={'body2'}
               >
                 {packageTitle[plan.planType]}
               </Typography>
             )}
             {plan.packages.map((pkg, idx) => (
               <Stack alignItems="flex-start" direction="row" gap={1} key={idx}>
-                <CheckCircleIcon
+                <CheckCircleOutline
                   sx={{
                     width: 24,
                     height: 24,
-                    color: '#363440',
                     flexShrink: 0,
-                    mt: 0.25,
                   }}
                 />
                 <Typography
                   sx={{
-                    color: 'text.primary',
                     lineHeight: 1.71,
-                    fontSize: 14,
                   }}
-                  variant="body2"
+                  variant={'body2'}
                 >
                   {pkg}
                 </Typography>
@@ -311,11 +307,9 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
       </Box>
       <TalkToTeamDialog
         onClose={toggle}
-        onGoToDirectories={() => {
-          // Navigate to directories page
-          // You can implement navigation logic here
-        }}
         open={visible}
+        planType={plan.planType}
+        pricingType={paymentType as PaymentType}
       />
     </Stack>
   );

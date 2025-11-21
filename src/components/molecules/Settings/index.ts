@@ -8,3 +8,6 @@ export * from './SettingsEmailDomain';
 export * from './SettingMailboxes';
 
 export * from './SettingsEmailProfiles';
+
+export * from './SettingsCreditUsage';
+export * from './SettingsCurrentPlan';

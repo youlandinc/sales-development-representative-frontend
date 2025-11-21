@@ -111,8 +111,8 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             lineHeight: 1.5,
           },
           '& .MuiInputBase-sizeSmall .MuiSelect-outlined': {
-            py: '5.5px',
-            fontSize: 14,
+            py: '7px',
+            fontSize: 12,
             lineHeight: 1.5,
           },
           '& .MuiInputBase-sizeLarge .MuiSelect-outlined': {

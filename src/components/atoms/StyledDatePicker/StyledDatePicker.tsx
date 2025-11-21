@@ -19,6 +19,8 @@ export const StyledDatePicker: FC<StyledDatePickerProps> = ({
   size = 'medium',
   ...rest
 }) => {
+  const { textField, ...restSlotProps } = slotProps || {};
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <DateTimePicker
@@ -27,6 +29,7 @@ export const StyledDatePicker: FC<StyledDatePickerProps> = ({
           textField: {
             error,
             size,
+            ...textField,
             sx: [
               DEFAULT_TEXTFIELD_STYLE,
               ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
@@ -39,7 +42,7 @@ export const StyledDatePicker: FC<StyledDatePickerProps> = ({
               height: 20,
             },
           },
-          ...slotProps,
+          ...restSlotProps,
         }}
         {...rest}
       />

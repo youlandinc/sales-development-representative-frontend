@@ -45,3 +45,15 @@ export interface CreatePaymentLinkParam {
   successUrl: string;
   cancelUrl: string;
 }
+
+export interface SendPricingEmailParam {
+  firstName: string;
+  lastName: string;
+  workEmail: string;
+  phone: string;
+  companyName: string;
+  position: string;
+  useCase: string;
+  planType: PlanTypeEnum;
+  pricingType: PaymentType;
+}
