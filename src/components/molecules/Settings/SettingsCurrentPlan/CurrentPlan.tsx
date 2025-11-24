@@ -1,7 +1,9 @@
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import ArrowsClockwiseIcon from '@mui/icons-material/Autorenew';
 import CalendarBlankIcon from '@mui/icons-material/CalendarToday';
+import { StyledButton } from '@/components/atoms';
+import { CancelSubscriptionDialog } from './CancelSubscriptionDialog';
 
 interface PlanCardProps {
   planName: string;
@@ -167,6 +169,12 @@ const PlanCard: FC<PlanCardProps> = ({
 };
 
 export const CurrentPlan: FC = () => {
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{
+    planName: string;
+    renewalDate: string;
+  } | null>(null);
+
   // Mock data - replace with actual data from API
   const plans = [
     {
@@ -198,6 +206,18 @@ export const CurrentPlan: FC = () => {
     },
   ];
 
+  const handleCancelClick = (planName: string, renewalDate: string) => {
+    setSelectedPlan({ planName, renewalDate });
+    setCancelDialogOpen(true);
+  };
+
+  const handleConfirmCancellation = () => {
+    // Handle actual cancellation logic here
+    console.log('Subscription cancelled for:', selectedPlan?.planName);
+    setCancelDialogOpen(false);
+    setSelectedPlan(null);
+  };
+
   return (
     <Stack gap={3} sx={{ width: 900 }}>
       {/* Title */}
@@ -218,13 +238,82 @@ export const CurrentPlan: FC = () => {
           <PlanCard
             key={index}
             {...plan}
-            onCancel={() => {
-              // Handle cancel subscription
-              console.log('Cancel subscription for', plan.planName);
-            }}
+            onCancel={() => handleCancelClick(plan.planName, plan.renewalDate)}
           />
         ))}
       </Stack>
+
+      {/* Payment settings */}
+      <Box
+        sx={{
+          bgcolor: 'white',
+          border: '1px solid #E5E5E5',
+          borderRadius: 2,
+          p: 3,
+          width: '100%',
+        }}
+      >
+        <Stack
+          alignItems="flex-start"
+          direction="row"
+          justifyContent="space-between"
+          sx={{ pr: 2 }}
+        >
+          <Stack gap={0.5}>
+            <Typography
+              sx={{
+                fontSize: 18,
+                fontWeight: 600,
+                color: '#363440',
+                lineHeight: 1.2,
+              }}
+            >
+              Payment settings
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: 12,
+                fontWeight: 400,
+                color: '#6F6C7D',
+                lineHeight: 1.5,
+              }}
+            >
+              You&apos;ll be redirected to Stripe to update cards, billing info,
+              and invoices.
+            </Typography>
+          </Stack>
+          <StyledButton
+            onClick={() => {
+              // Handle manage payment - redirect to Stripe
+              console.log('Redirect to Stripe payment management');
+            }}
+            size="small"
+            sx={{
+              height: 32,
+              px: 1.5,
+              py: 0.75,
+              fontSize: 12,
+            }}
+            variant="outlined"
+          >
+            Manage payment
+          </StyledButton>
+        </Stack>
+      </Box>
+
+      {/* Cancel Subscription Dialog */}
+      {selectedPlan && (
+        <CancelSubscriptionDialog
+          endDate={selectedPlan.renewalDate}
+          onClose={() => {
+            setCancelDialogOpen(false);
+            setSelectedPlan(null);
+          }}
+          onConfirm={handleConfirmCancellation}
+          open={cancelDialogOpen}
+          planName={selectedPlan.planName}
+        />
+      )}
     </Stack>
   );
 };
