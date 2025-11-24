@@ -9,6 +9,8 @@ export enum DirectoriesBizIdEnum {
 export interface DirectoryApiResponse {
   isAuth: boolean;
   planType: PlanTypeEnum;
+  planLogo: string | null;
+  planName: string | null;
   bizId: DirectoriesBizIdEnum;
   description: string;
   buttonDescription: string;

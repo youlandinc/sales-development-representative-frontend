@@ -141,7 +141,7 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
         </Typography>
       </Stack>
 
-      {/* Go to Directories button */}
+      {/* Go to directories button */}
       <StyledButton
         onClick={handleGoToDirectories}
         size="medium"

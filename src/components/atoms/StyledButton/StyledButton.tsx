@@ -109,9 +109,11 @@ export const StyledButton: FC<StyledButtonProps> = ({
       {...rest}
     >
       <Box
-        component="span"
         sx={{
           visibility: loading ? 'hidden' : 'visible',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {children}

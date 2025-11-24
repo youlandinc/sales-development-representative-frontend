@@ -6,7 +6,7 @@ import { DIRECTORIES_COLORS } from './constants';
 import {
   DirectoriesBizIdEnum,
   DirectoryApiResponse,
-} from '@/types/Directories';
+} from '@/types/directories';
 
 import { StyledButton } from '@/components/atoms';
 import {
@@ -32,7 +32,8 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
   statPeriod,
   isAuth,
   buttonDescription,
-  planType,
+  planLogo,
+  planName,
   onButtonClick,
   buttonLoading,
 }) => {
@@ -69,14 +70,18 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
               alt={title}
               component={'img'}
               src={logo}
-              style={{
-                width: '48px',
-                height: '48px',
+              sx={{
+                width: 48,
+                height: 48,
                 objectFit: 'contain',
               }}
             />
             {isAuth && (
-              <DirectoriesBadge variant={isDark ? 'intelligence' : 'active'} />
+              <DirectoriesBadge
+                planLogo={planLogo || ''}
+                planName={planName || ''}
+                variant={isDark ? 'capital' : 'other'}
+              />
             )}
           </Stack>
 

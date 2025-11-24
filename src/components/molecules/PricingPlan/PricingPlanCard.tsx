@@ -7,7 +7,7 @@ import { TalkToTeamDialog } from './TalkToTeamDialog';
 
 import { useAsyncFn, useSwitch } from '@/hooks';
 import { PlanTypeEnum } from '@/types';
-import { DirectoriesBizIdEnum } from '@/types/Directories';
+import { DirectoriesBizIdEnum } from '@/types/directories';
 import { PaymentType, PlanInfo } from '@/types/pricingPlan';
 
 import { _createPaymentLink } from '@/request/pricingPlan';

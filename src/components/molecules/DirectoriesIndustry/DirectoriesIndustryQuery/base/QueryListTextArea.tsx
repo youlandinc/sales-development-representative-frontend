@@ -12,7 +12,7 @@ export const QueryListTextArea: FC<QueryListTextAreaProps> = ({
   onInsideFormChange,
 }) => {
   return (
-    <QueryContainer title={'Table'}>
+    <QueryContainer>
       <QueryAutoComplete
         freeSolo={true}
         multiple

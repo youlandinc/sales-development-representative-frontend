@@ -1,4 +1,5 @@
 import { DirectoriesBizIdEnum } from './base';
+import { TableColumnTypeEnum } from '@/types/Prospect/table';
 
 export enum DirectoriesQueryActionTypeEnum {
   click = 'CLICK',
@@ -25,6 +26,11 @@ export enum DirectoriesQueryGroupTypeEnum {
   exclude_firms = 'EXCLUDE_FIRMS',
   exclude_individuals = 'EXCLUDE_INDIVIDUALS',
   additional_details = 'ADDITIONAL_DETAILS',
+}
+
+export enum DirectoriesEntityTypeEnum {
+  firm = 'FIRM',
+  executive = 'EXECUTIVE',
 }
 
 export interface DirectoriesQueryItem {
@@ -71,6 +77,24 @@ export interface DirectoriesQueryItem {
   children: DirectoriesQueryItem[] | null; // sub components
 }
 
-export interface DirectoriesQueryDefaultApiResponse {
-  data: DirectoriesQueryItem[];
+export type DirectoriesQueryDefaultApiResponse = DirectoriesQueryItem[];
+export type DirectoriesQueryAdditionalApiResponse = DirectoriesQueryItem[];
+
+export interface DirectoriesQueryTableHeaderItem {
+  columnKey: string | null;
+  columnName: string | null;
+  columnType: TableColumnTypeEnum;
+  groupLabel: string | null;
+  groupOrder: number | null;
+  width?: number;
+}
+
+export type DirectoriesQueryTableHeaderApiResponse =
+  DirectoriesQueryTableHeaderItem[];
+
+export type DirectoriesQueryTableBodyItem = Record<string, any>;
+
+export interface DirectoriesQueryTableBodyApiResponse {
+  findCount: number;
+  findList: DirectoriesQueryTableBodyItem[];
 }

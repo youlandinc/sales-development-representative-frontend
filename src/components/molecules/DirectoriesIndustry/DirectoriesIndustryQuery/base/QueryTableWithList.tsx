@@ -3,26 +3,14 @@ import { Stack } from '@mui/material';
 
 import { StyledRadioGroup } from '@/components/atoms';
 import { QueryListTextArea, QueryTableSelect } from './index';
-import { DirectoriesQueryGroupTypeEnum } from '@/types/Directories/query';
+
 import { ProspectTableEnum } from '@/types';
+import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
 
 enum CompaniesRadioEnum {
   list = 'LIST',
   table = 'TABLE',
 }
-
-const COMPANIES_OPTIONS = [
-  {
-    label: 'SalesOS table of companies',
-    key: CompaniesRadioEnum.table,
-    value: CompaniesRadioEnum.table,
-  },
-  {
-    label: 'List of company identifiers',
-    key: CompaniesRadioEnum.list,
-    value: CompaniesRadioEnum.list,
-  },
-];
 
 export interface QueryTableWithListValue {
   tableId: string;
@@ -35,6 +23,12 @@ interface QueryTableWithListProps {
   type: DirectoriesQueryGroupTypeEnum;
   fieldKey: string;
   value?: QueryTableWithListValue;
+  optionValues: Array<{
+    label: string;
+    key: CompaniesRadioEnum | string;
+    value: CompaniesRadioEnum | string;
+    selected?: boolean | null;
+  }>;
   onFormChange: (key: string, value: QueryTableWithListValue) => void;
 }
 
@@ -42,6 +36,7 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
   type,
   fieldKey,
   value,
+  optionValues,
   onFormChange,
 }) => {
   const [mode, setMode] = useState<CompaniesRadioEnum>(CompaniesRadioEnum.list);
@@ -109,7 +104,7 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
       <Stack mt={0.5}>
         <StyledRadioGroup
           onChange={(_, val) => setMode(val as string as CompaniesRadioEnum)}
-          options={COMPANIES_OPTIONS}
+          options={optionValues}
           value={mode}
         />
       </Stack>

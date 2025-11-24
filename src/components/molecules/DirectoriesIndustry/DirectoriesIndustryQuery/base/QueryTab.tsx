@@ -1,6 +1,10 @@
 import { FC, ReactNode } from 'react';
 import { Box, Icon, Tab, Tabs } from '@mui/material';
-import { DirectoriesQueryItem } from '@/types/Directories/query';
+
+import {
+  DirectoriesEntityTypeEnum,
+  DirectoriesQueryItem,
+} from '@/types/directories';
 
 import ICON_FIRM_DEFAULT from './assets/icon-firm-default.svg';
 import ICON_FIRM_ACTIVE from './assets/icon-firm-active.svg';
@@ -16,7 +20,7 @@ interface QueryTabProps {
 }
 
 const getIconByValue = (value: string, isActive: boolean) => {
-  if (value === 'FIRM') {
+  if (value === DirectoriesEntityTypeEnum.firm) {
     return (
       <Icon
         component={isActive ? ICON_FIRM_ACTIVE : ICON_FIRM_DEFAULT}
@@ -24,7 +28,7 @@ const getIconByValue = (value: string, isActive: boolean) => {
       />
     );
   }
-  if (value === 'EXECUTIVE') {
+  if (value === DirectoriesEntityTypeEnum.executive) {
     return (
       <Icon
         component={isActive ? ICON_EXECUTIVE_ACTIVE : ICON_EXECUTIVE_DEFAULT}
@@ -60,19 +64,19 @@ export const QueryTab: FC<QueryTabProps> = ({
           }
         }}
         sx={{
-          height: '36px',
-          minHeight: '36px',
+          height: 36,
+          minHeight: 36,
           borderBottom: '1px solid #EAE9EF',
           '& .MuiTabs-flexContainer': {
-            height: '36px',
+            height: 36,
           },
           '& .MuiTabs-indicator': {
             height: '2px',
             backgroundColor: '#363440',
           },
           '& .MuiTab-root': {
-            height: '36px',
-            minHeight: '36px',
+            height: 36,
+            minHeight: 36,
             fontSize: 14,
             fontWeight: 400,
             textTransform: 'none',

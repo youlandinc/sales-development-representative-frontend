@@ -18,19 +18,20 @@ import {
   DirectoriesQueryGroupTypeEnum,
   DirectoriesQueryInputTypeEnum,
   DirectoriesQueryItem,
-} from '@/types/Directories/query';
+} from '@/types/directories';
+import { countFilledFieldsInGroup } from '@/utils/directories';
 
 interface CreateQueryElementProps {
   config: DirectoriesQueryItem;
-  formData: any; // 整个表单数据对象
+  formData: any;
   onFormChange: (
     key: string | undefined | null,
     newValue: any,
     groupPath?: string,
   ) => void;
-  groupPath?: string; // 当前分组路径（如 'FIRM', 'EXECUTIVE'）
-  disabledLoading?: boolean; // Loading 状态导致的禁用
-  disabledPermission?: boolean; // 权限导致的禁用（planType, isAuth）
+  groupPath?: string;
+  disabledLoading?: boolean;
+  disabledPermission?: boolean;
 }
 
 export const CreateQueryElement: FC<CreateQueryElementProps> = ({
@@ -106,11 +107,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // GENERAL - 可折叠分组
+  // GENERAL
   if (config.groupType === DirectoriesQueryGroupTypeEnum.general) {
+    const filterCount = countFilledFieldsInGroup(config, formData);
+
     return (
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
+        filterCount={filterCount}
         title={config.label}
       >
         {config.children && config.children.length > 0
@@ -128,17 +132,21 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // EXCLUDE_FIRMS - 排除公司（带列表选项）
+  // EXCLUDE_FIRMS
   if (config.groupType === DirectoriesQueryGroupTypeEnum.exclude_firms) {
+    const filterCount = countFilledFieldsInGroup(config, formData);
+
     return (
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
+        filterCount={filterCount}
         title={config.label}
       >
         <QueryTableWithList
           fieldKey={config.key!}
           key={`${groupPath}-${config.key}`}
           onFormChange={(key, value) => onFormChange(key, value, groupPath)}
+          optionValues={config.optionValues}
           type={DirectoriesQueryGroupTypeEnum.exclude_firms}
           value={
             formData[config.key!] ?? {
@@ -153,11 +161,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // EXCLUDE_INDIVIDUALS - 排除个人（仅表格选择）
+  // EXCLUDE_INDIVIDUALS
   if (config.groupType === DirectoriesQueryGroupTypeEnum.exclude_individuals) {
+    const filterCount = countFilledFieldsInGroup(config, formData);
+
     return (
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
+        filterCount={filterCount}
         title={config.label}
       >
         <QueryTable
@@ -178,11 +189,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // ADDITIONAL_DETAILS - 附加详情（组件内部从 store 获取数据）
+  // ADDITIONAL_DETAILS
   if (config.groupType === DirectoriesQueryGroupTypeEnum.additional_details) {
+    const filterCount = countFilledFieldsInGroup(config, formData);
+
     return (
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
+        filterCount={filterCount}
         title={config.label}
       >
         <QueryAdditionalDetails />
@@ -211,7 +225,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // SELECT - 下拉选择（QueryAutoComplete freeSolo=false）
+  // SELECT - （QueryAutoComplete freeSolo=false）
   if (config.actionType === DirectoriesQueryActionTypeEnum.select) {
     return (
       <QueryContainer description={config.description} label={config.label}>
@@ -297,7 +311,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // 未知类型警告
+  //eslint-disable-next-line
   console.warn('Unknown config:', config);
   return null;
 };

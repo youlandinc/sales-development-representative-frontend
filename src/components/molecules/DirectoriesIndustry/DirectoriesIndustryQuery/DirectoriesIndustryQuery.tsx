@@ -3,35 +3,29 @@ import { CircularProgress, Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
 
 import { QueryBreadcrumbs } from './base';
-import { getBizIdFromSlug } from './data';
 import { CreateQueryElement } from './index';
 import { TITLE_MAP } from '@/constants/directories';
-import { DirectoriesQueryItem } from '@/types/Directories';
-import { useDirectoriesDataFlow } from '@/hooks';
+import { DirectoriesQueryItem } from '@/types/directories';
 import { useDirectoriesStore } from '@/stores/directories';
 
 export const DirectoriesIndustryQuery: FC = () => {
   const params = useParams();
   const industrySlug = params.industry as string;
 
-  const bizId = getBizIdFromSlug(industrySlug);
-
-  // ✅ 使用新的 RxJS 数据流 Hook（自动处理 debounce + 请求）
-  const {
-    formValues,
-    queryConfig,
-    institutionType,
-    loadingConfig,
-    loadingAdditional,
-    updateFormValues,
-    additionalDetails, // B: Additional details（预留）
-    finalData, // C: 最终数据（预留）
-  } = useDirectoriesDataFlow(bizId);
-
-  console.log(finalData);
-
-  // 保留 institutionType 更新逻辑（不走 RxJS）
-  const { buttonGroupConfig, updateInstitutionType } = useDirectoriesStore();
+  // 直接从 store 读取状态
+  const formValues = useDirectoriesStore((state) => state.formValues);
+  const queryConfig = useDirectoriesStore((state) => state.queryConfig);
+  const institutionType = useDirectoriesStore((state) => state.institutionType);
+  const isLoadingConfig = useDirectoriesStore((state) => state.isLoadingConfig);
+  const buttonGroupConfig = useDirectoriesStore(
+    (state) => state.buttonGroupConfig,
+  );
+  const updateFormValues = useDirectoriesStore(
+    (state) => state.updateFormValues,
+  );
+  const updateInstitutionType = useDirectoriesStore(
+    (state) => state.updateInstitutionType,
+  );
 
   const onFormChange = (
     key: string | undefined | null,
@@ -51,7 +45,7 @@ export const DirectoriesIndustryQuery: FC = () => {
     updateFormValues(key, value, groupPath);
   };
 
-  if (!buttonGroupConfig && !loadingConfig) {
+  if (!buttonGroupConfig && !isLoadingConfig) {
     return (
       <Stack
         sx={{
@@ -84,7 +78,7 @@ export const DirectoriesIndustryQuery: FC = () => {
       {buttonGroupConfig && (
         <CreateQueryElement
           config={buttonGroupConfig}
-          disabledLoading={loadingConfig}
+          disabledLoading={isLoadingConfig}
           disabledPermission={false}
           formData={{ institutionType }}
           key="institutionType-button-group"
@@ -95,7 +89,7 @@ export const DirectoriesIndustryQuery: FC = () => {
       {queryConfig.map((config: DirectoriesQueryItem) => (
         <CreateQueryElement
           config={config}
-          disabledLoading={loadingConfig}
+          disabledLoading={isLoadingConfig}
           disabledPermission={false}
           formData={{ institutionType, ...formValues }}
           key={config.key || config.label || ''}

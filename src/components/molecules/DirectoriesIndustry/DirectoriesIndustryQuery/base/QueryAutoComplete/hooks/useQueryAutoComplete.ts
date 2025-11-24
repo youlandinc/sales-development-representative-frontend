@@ -33,6 +33,7 @@ export const useQueryAutoComplete = ({
   const [loading, setLoading] = useState(false);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Initialize static options when no URL provided
   useEffect(() => {
     if (!url && staticOptions.length > 0) {
       const formattedOptions = staticOptions.map((item) => ({
@@ -43,18 +44,22 @@ export const useQueryAutoComplete = ({
     }
   }, [url, staticOptions]);
 
+  /**
+   * Search options via API with debouncing (300ms)
+   * Only triggers when input length >= 2
+   */
   const onSearch = useCallback(
     async (inputValue: string) => {
       if (!url) {
         return;
       }
 
-      // 清除之前的定时器
+      // Clear previous debounce timer
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
 
-      // 输入太短时清空选项
+      // Clear options if input is too short
       if (!inputValue || inputValue.length < 2) {
         setOptions([]);
         setLoading(false);
@@ -63,7 +68,7 @@ export const useQueryAutoComplete = ({
 
       setLoading(true);
 
-      // 防抖：300ms 后执行搜索
+      // Debounce: Execute search after 300ms
       debounceTimerRef.current = setTimeout(async () => {
         try {
           const searchUrl = `${url}?q=${encodeURIComponent(inputValue)}`;
@@ -87,6 +92,7 @@ export const useQueryAutoComplete = ({
     [url],
   );
 
+  // Cleanup: Clear debounce timer on unmount
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
@@ -95,16 +101,20 @@ export const useQueryAutoComplete = ({
     };
   }, []);
 
+  /**
+   * Convert value to autocomplete option format
+   * Supports freeSolo mode: creates temporary objects for values not in options
+   */
   const autocompleteValue = useMemo(() => {
     if (multiple) {
       const valueArray = (value as string[]) ?? [];
-      // 对于 freeSolo 模式，需要将不在 options 中的值也转换为对象
+      // For freeSolo mode, convert values not in options to objects
       return valueArray.map((val) => {
         const existingOption = options.find((opt) => opt.inputValue === val);
         if (existingOption) {
           return existingOption;
         }
-        // freeSolo 模式：创建临时选项对象
+        // FreeSolo mode: Create temporary option object
         return {
           label: val,
           inputValue: val,
@@ -114,18 +124,22 @@ export const useQueryAutoComplete = ({
     if (!value) {
       return null;
     }
-    // 单选模式：优先从 options 查找，找不到则创建临时对象（freeSolo）
+    // Single mode: Find in options first, create temporary object if not found (freeSolo)
     const existingOption = options.find((opt) => opt.inputValue === value);
     if (existingOption) {
       return existingOption;
     }
-    // freeSolo 模式：返回临时对象
+    // FreeSolo mode: Return temporary object
     return {
       label: value as string,
       inputValue: value as string,
     };
   }, [value, multiple, options]);
 
+  /**
+   * Get display label for option
+   * Handles both string and object formats
+   */
   const onGetOptionLabel = useCallback(
     (option: string | AutoCompleteOption): string => {
       if (typeof option === 'string') {
@@ -136,6 +150,10 @@ export const useQueryAutoComplete = ({
     [],
   );
 
+  /**
+   * Check if two options are equal
+   * Compares by inputValue for objects, direct comparison for strings
+   */
   const onIsOptionEqualToValue = useCallback(
     (
       option: string | AutoCompleteOption,
@@ -155,6 +173,11 @@ export const useQueryAutoComplete = ({
     [],
   );
 
+  /**
+   * Handle value change
+   * Multiple mode: Supports toggle behavior (clicking selected item removes it)
+   * Single mode: Updates with new value or null
+   */
   const onValueChange = useCallback(
     (_: any, newValue: any) => {
       if (multiple) {
@@ -163,23 +186,23 @@ export const useQueryAutoComplete = ({
           .map((item) => (typeof item === 'string' ? item : item.inputValue))
           .filter((v): v is string => !!v);
 
-        // 统计每个值出现的次数
+        // Count occurrences of each value
         const valueCounts = new Map<string, number>();
         values.forEach((v) => {
           valueCounts.set(v, (valueCounts.get(v) || 0) + 1);
         });
 
-        // 找出重复出现的值（count > 1），说明用户想 toggle 移除
+        // Find duplicates (count > 1), indicating user wants to toggle/remove
         const duplicates = Array.from(valueCounts.entries())
           .filter(([_, count]) => count > 1)
           .map(([val]) => val);
 
         if (duplicates.length > 0) {
-          // 有重复值，移除所有重复的值（toggle 行为）
+          // Has duplicates, remove all duplicate values (toggle behavior)
           const uniqueValues = values.filter((v) => !duplicates.includes(v));
           (onFormChange as (newValue: string[]) => void)?.(uniqueValues);
         } else {
-          // 无重复，正常去重
+          // No duplicates, normal deduplication
           const uniqueValues = Array.from(new Set(values));
           (onFormChange as (newValue: string[]) => void)?.(uniqueValues);
         }
@@ -196,6 +219,10 @@ export const useQueryAutoComplete = ({
     [multiple, onFormChange],
   );
 
+  /**
+   * Handle input value change
+   * Triggers search only when reason is 'input' and URL is provided
+   */
   const onInputValueChange = useCallback(
     (_: any, inputValue: string, reason: string) => {
       if (reason === 'input' && url) {

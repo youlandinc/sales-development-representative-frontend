@@ -1,4 +1,4 @@
 export * from './DirectoriesIndustryQuery';
-export * from './DirectoriesIndustryTable';
+export * from './DirectoriesIndustryPreview/DirectoriesIndustryPreview';
 
 export * from './DirectoriesIndustry';

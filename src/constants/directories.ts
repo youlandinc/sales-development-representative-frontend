@@ -1,4 +1,4 @@
-import { DirectoriesBizIdEnum } from '@/types/Directories';
+import { DirectoriesBizIdEnum } from '@/types/directories';
 
 export const DIRECTORIES = {
   [DirectoriesBizIdEnum.capital_markets]: {
