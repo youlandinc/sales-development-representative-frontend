@@ -72,8 +72,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
       });
       // 这里可以处理重定向逻辑
       if (data) {
-        // window.location.href = data.url;
-        router.push(data);
+        window.location.href = data;
       }
     } catch (err) {
       const { header, message, variant } = err as HttpError;

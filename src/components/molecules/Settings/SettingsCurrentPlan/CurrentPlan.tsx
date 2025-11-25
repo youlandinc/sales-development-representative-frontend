@@ -1,9 +1,8 @@
-import { Stack } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { FC } from 'react';
 
-import { CancelSubscriptionDialog, PaymentSetting } from './base';
-import { PlanList, SectionTitle } from './components';
-import { LAYOUT } from './data';
+import { CancelSubscriptionDialog, PaymentSetting, PlanList } from './base';
+import { COLORS, LAYOUT } from './data';
 
 import { useCurrentPlan } from './hooks';
 
@@ -13,8 +12,16 @@ export const CurrentPlan: FC = () => {
 
   return (
     <Stack gap={3} sx={{ width: LAYOUT.maxWidth }}>
-      <SectionTitle>Current plan</SectionTitle>
-
+      <Typography
+        sx={{
+          fontSize: 18,
+          fontWeight: 600,
+          color: COLORS.text.primary,
+          lineHeight: 1.2,
+        }}
+      >
+        Current plan
+      </Typography>
       <PlanList
         isLoading={isLoading}
         onCancelClick={handleCancelClick}

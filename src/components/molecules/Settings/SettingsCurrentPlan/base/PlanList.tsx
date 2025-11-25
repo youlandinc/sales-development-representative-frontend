@@ -1,7 +1,7 @@
 import { Stack } from '@mui/material';
 import { FC, useCallback } from 'react';
 
-import { PlanCard, PlanCardProps } from '../base';
+import { PlanCard, PlanCardProps } from '.';
 import { PlanListState } from './PlanListState';
 import { PlanTypeEnum } from '@/types';
 

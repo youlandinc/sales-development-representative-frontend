@@ -1,5 +1,6 @@
 import { ListSubheader, MenuItem, Stack, Typography } from '@mui/material';
 import { FC, useState } from 'react';
+import { format } from 'date-fns';
 
 import { StyledSelect } from '@/components/atoms';
 import { DateRangeDialog } from './DateRangeDialog';
@@ -25,6 +26,9 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
   usageTypeList,
 }) => {
   const [dateDialogOpen, setDateDialogOpen] = useState(false);
+  const [customRangeLabel, setCustomRangeLabel] = useState<string>('');
+  const [tempStartDate, setTempStartDate] = useState<Date | null>(null);
+  const [tempEndDate, setTempEndDate] = useState<Date | null>(null);
 
   return (
     <Stack
@@ -97,15 +101,54 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
           const v = e.target.value;
           if (v === DateRangeEnum.range) {
             setDateDialogOpen(true);
+            // 不更新 dateType，保持当前值
           } else {
+            // 清空自定义范围标签
+            setCustomRangeLabel('');
             onChange?.({
               ...value,
               dateType: v as string,
+              startTime: undefined,
+              endTime: undefined,
             });
           }
         }}
         options={DATE_RANGE_OPTIONS}
+        renderOption={(option) => {
+          return (
+            <MenuItem
+              key={option.key}
+              onClick={() => {
+                // 如果是 range 选项，直接打开对话框
+                if (option.value === DateRangeEnum.range) {
+                  setDateDialogOpen(true);
+                } else {
+                  // 其他选项正常处理
+                  setCustomRangeLabel('');
+                  onChange?.({
+                    ...value,
+                    dateType: option.value as string,
+                    startTime: undefined,
+                    endTime: undefined,
+                  });
+                }
+              }}
+              sx={{
+                px: 1.5,
+                py: '8px !important',
+                borderRadius: 2,
+              }}
+              value={option.value}
+            >
+              {option.label}
+            </MenuItem>
+          );
+        }}
         renderValue={(value) => {
+          // 如果是自定义范围且有自定义标签，显示自定义标签
+          if (value === DateRangeEnum.range && customRangeLabel) {
+            return customRangeLabel;
+          }
           return formatDateRange(value as DateRangeEnum);
         }}
         sx={{ width: 320 }}
@@ -127,15 +170,39 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
       />
 
       <DateRangeDialog
-        onClose={() => setDateDialogOpen(false)}
-        onConfirm={(startDate, endDate) => {
-          onChange?.({
-            ...value,
-            startTime: startDate?.toISOString(),
-            endTime: endDate?.toISOString(),
-          });
+        endDate={tempEndDate}
+        onClose={() => {
+          setDateDialogOpen(false);
+          // 关闭时清空临时状态
+          setTempStartDate(null);
+          setTempEndDate(null);
         }}
+        onConfirm={() => {
+          if (tempStartDate) {
+            const dateFormat = 'MMM d, yyyy';
+            const formattedStart = format(tempStartDate, dateFormat);
+
+            let label: string;
+            if (tempEndDate) {
+              const formattedEnd = format(tempEndDate, dateFormat);
+              label = `${formattedStart} - ${formattedEnd}`;
+            } else {
+              label = `From ${formattedStart}`;
+            }
+
+            setCustomRangeLabel(label);
+            onChange?.({
+              ...value,
+              dateType: DateRangeEnum.range,
+              startTime: tempStartDate.toISOString(),
+              endTime: tempEndDate?.toISOString(),
+            });
+          }
+        }}
+        onEndDateChange={setTempEndDate}
+        onStartDateChange={setTempStartDate}
         open={dateDialogOpen}
+        startDate={tempStartDate}
       />
     </Stack>
   );

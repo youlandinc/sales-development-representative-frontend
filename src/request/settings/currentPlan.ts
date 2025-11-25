@@ -9,3 +9,7 @@ export const _fetchCurrentPlan = () => {
 export const _cancelPlan = (category: PlanTypeEnum) => {
   return put('/sdr/pricing/plan/cancel', { category });
 };
+
+export const _fetchPaymentPortal = (returnUrl: string) => {
+  return get(`/sdr/pricing/plan/billing/portal?returnUrl=${returnUrl}`);
+};

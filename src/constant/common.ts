@@ -12,3 +12,5 @@ export const COINS_PER_ROW = 0.5;
 export const TermsOfUse = 'https://www.corepass.com/legal/privacy-policy';
 export const PrivacyPolicy =
   'https://www.corepass.com/legal/terms-and-conditions';
+
+export const BASE_URL = `https://${process.env.NEXT_PUBLIC_BASE_DOMAIN_PREFIX}sales.corepass.com`;

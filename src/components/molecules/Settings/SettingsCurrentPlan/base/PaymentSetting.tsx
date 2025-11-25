@@ -1,9 +1,28 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { FC } from 'react';
 
-import { StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton } from '@/components/atoms';
+import { useAsyncFn } from '@/hooks';
+import { _fetchPaymentPortal } from '@/request/settings/currentPlan';
+
+import { BASE_URL } from '@/constant';
+
+const RETURN_URL = `${BASE_URL}/settings`;
 
 export const PaymentSetting: FC = () => {
+  const [state, fetchPaymentPortal] = useAsyncFn(async () => {
+    try {
+      const { data } = await _fetchPaymentPortal(RETURN_URL);
+      window.location.href = data;
+    } catch (error) {
+      const { message, header, variant } = error as HttpError;
+      SDRToast({
+        message,
+        header,
+        variant,
+      });
+    }
+  }, []);
   return (
     <Box
       sx={{
@@ -44,8 +63,9 @@ export const PaymentSetting: FC = () => {
           </Typography>
         </Stack>
         <StyledButton
+          loading={state.loading}
           onClick={() => {
-            // Handle manage payment - redirect to Stripe
+            fetchPaymentPortal();
           }}
           size="small"
           sx={{
@@ -53,6 +73,7 @@ export const PaymentSetting: FC = () => {
             px: 1.5,
             py: 0.75,
             fontSize: 12,
+            width: 125,
           }}
           variant="outlined"
         >
