@@ -79,7 +79,6 @@ export const DirectoriesIndustryQuery: FC = () => {
         <CreateQueryElement
           config={buttonGroupConfig}
           disabledLoading={isLoadingConfig}
-          disabledPermission={false}
           formData={{ institutionType }}
           key="institutionType-button-group"
           onFormChange={onFormChange}
@@ -90,7 +89,6 @@ export const DirectoriesIndustryQuery: FC = () => {
         <CreateQueryElement
           config={config}
           disabledLoading={isLoadingConfig}
-          disabledPermission={false}
           formData={{ institutionType, ...formValues }}
           key={config.key || config.label || ''}
           onFormChange={onFormChange}

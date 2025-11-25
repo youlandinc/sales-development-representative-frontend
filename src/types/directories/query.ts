@@ -41,6 +41,7 @@ export interface DirectoriesQueryItem {
   sort: number | null; // for sorting items (not implemented yet)
 
   // ========== Meta Information ==========
+  isAuth: boolean;
   bizId: DirectoriesBizIdEnum; // product category
 
   // ========== Form Field ==========
@@ -96,5 +97,7 @@ export type DirectoriesQueryTableBodyItem = Record<string, any>;
 
 export interface DirectoriesQueryTableBodyApiResponse {
   findCount: number;
+  defaultPreviewCount: number;
+  maxImportCount: number;
   findList: DirectoriesQueryTableBodyItem[];
 }

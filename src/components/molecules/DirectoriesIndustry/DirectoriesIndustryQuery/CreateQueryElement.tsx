@@ -31,7 +31,6 @@ interface CreateQueryElementProps {
   ) => void;
   groupPath?: string;
   disabledLoading?: boolean;
-  disabledPermission?: boolean;
 }
 
 export const CreateQueryElement: FC<CreateQueryElementProps> = ({
@@ -40,14 +39,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   onFormChange,
   groupPath,
   disabledLoading = false,
-  disabledPermission = false,
 }) => {
-  // 组合最终的 disabled 状态
-  const isDisabled = disabledLoading || disabledPermission;
+  const isDisabled = disabledLoading;
 
   if (config.groupType === DirectoriesQueryGroupTypeEnum.button_group) {
     return (
       <QueryContainer
+        isAuth={config.isAuth}
         label={config.label}
         labelSx={{ fontWeight: 600, fontSize: 14 }}
       >
@@ -67,7 +65,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
               <CreateQueryElement
                 config={child}
                 disabledLoading={disabledLoading}
-                disabledPermission={disabledPermission}
                 formData={formData}
                 groupPath={groupPath}
                 key={child.key || child.label || ''}
@@ -94,7 +91,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
             <CreateQueryElement
               config={child}
               disabledLoading={disabledLoading}
-              disabledPermission={disabledPermission}
               formData={tabGroupPath ? formData[tabGroupPath] || {} : formData}
               groupPath={tabGroupPath}
               key={child.key || child.label || ''}
@@ -107,7 +103,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // GENERAL
+  // GENERAL - 不受权限影响
   if (config.groupType === DirectoriesQueryGroupTypeEnum.general) {
     const filterCount = countFilledFieldsInGroup(config, formData);
 
@@ -115,6 +111,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
+        isAuth={config.isAuth}
         title={config.label}
       >
         {config.children && config.children.length > 0
@@ -140,6 +137,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
+        isAuth={config.isAuth}
         title={config.label}
       >
         <QueryTableWithList
@@ -161,7 +159,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // EXCLUDE_INDIVIDUALS
+  // EXCLUDE_INDIVIDUALS - 不受权限影响
   if (config.groupType === DirectoriesQueryGroupTypeEnum.exclude_individuals) {
     const filterCount = countFilledFieldsInGroup(config, formData);
 
@@ -169,6 +167,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
+        isAuth={config.isAuth}
         title={config.label}
       >
         <QueryTable
@@ -197,6 +196,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       <QueryCollapse
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
+        isAuth={config.isAuth}
         title={config.label}
       >
         <QueryAdditionalDetails />
@@ -214,7 +214,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           <CreateQueryElement
             config={child}
             disabledLoading={disabledLoading}
-            disabledPermission={disabledPermission}
             formData={formData}
             groupPath={groupPath}
             key={child.key || child.label || ''}
@@ -228,8 +227,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   // SELECT - （QueryAutoComplete freeSolo=false）
   if (config.actionType === DirectoriesQueryActionTypeEnum.select) {
     return (
-      <QueryContainer description={config.description} label={config.label}>
+      <QueryContainer
+        description={config.description}
+        isAuth={config.isAuth}
+        label={config.label}
+      >
         <QueryAutoComplete
+          disabled={isDisabled}
           freeSolo={false}
           multiple={config.optionMultiple}
           onFormChange={(newValue: string[] | string | null) =>
@@ -249,8 +253,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     // 数字类型输入框 - 使用 StyledTextFieldNumber
     if (config.inputType === DirectoriesQueryInputTypeEnum.number) {
       return (
-        <QueryContainer description={config.description} label={config.label}>
+        <QueryContainer
+          description={config.description}
+          isAuth={config.isAuth}
+          label={config.label}
+        >
           <StyledTextFieldNumber
+            disabled={isDisabled}
             onValueChange={({ value }) =>
               onFormChange?.(config.key, value, groupPath)
             }
@@ -263,8 +272,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
 
     // 文本类型输入框 - 使用 QueryAutoComplete (freeSolo=true)
     return (
-      <QueryContainer description={config.description} label={config.label}>
+      <QueryContainer
+        description={config.description}
+        isAuth={config.isAuth}
+        label={config.label}
+      >
         <QueryAutoComplete
+          disabled={isDisabled}
           freeSolo={true}
           multiple={config.optionMultiple}
           onFormChange={(newValue: string[] | string | null) =>
@@ -284,8 +298,9 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     const isChecked = formData[config.key!] || false;
 
     return (
-      <QueryContainer description={config.description}>
+      <QueryContainer description={config.description} isAuth={config.isAuth}>
         <QueryCheckbox
+          disabled={isDisabled}
           onFormChange={(checked) =>
             onFormChange?.(config.key, checked, groupPath)
           }
@@ -296,12 +311,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // SWITCH - 开关
+  // SWITCH
   if (config.actionType === DirectoriesQueryActionTypeEnum.switch) {
     return (
-      <QueryContainer description={config.description}>
+      <QueryContainer description={config.description} isAuth={config.isAuth}>
         <QuerySwitch
           checked={formData[config.key!] || false}
+          disabled={isDisabled}
           label={config.label || ''}
           onFormChange={(e, checked) =>
             onFormChange?.(config.key, checked, groupPath)

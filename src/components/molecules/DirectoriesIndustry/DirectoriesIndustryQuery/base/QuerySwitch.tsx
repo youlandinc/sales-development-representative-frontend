@@ -5,6 +5,7 @@ interface QuerySwitchProps {
   label?: string;
   description?: string;
   checked?: boolean;
+  disabled?: boolean;
   onFormChange?: (
     event: ChangeEvent<HTMLInputElement>,
     checked: boolean,
@@ -15,12 +16,13 @@ export const QuerySwitch: FC<QuerySwitchProps> = ({
   label,
   description,
   checked,
+  disabled = false,
   onFormChange,
 }) => {
   return (
     <Stack gap={1}>
       <FormControlLabel
-        control={<Switch checked={checked} onChange={onFormChange} />}
+        control={<Switch checked={checked} disabled={disabled} onChange={onFormChange} />}
         label={label}
         labelPlacement={'start'}
         slotProps={{

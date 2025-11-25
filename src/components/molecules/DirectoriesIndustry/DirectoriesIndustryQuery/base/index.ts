@@ -6,6 +6,7 @@ export * from './QueryTable';
 export * from './QueryTableWithList';
 export * from './QueryListTextArea';
 
+export * from './QueryBadgeAuth';
 export * from './QueryCollapse';
 export * from './QueryContainer';
 

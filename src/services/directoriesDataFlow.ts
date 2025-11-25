@@ -30,7 +30,8 @@ import { DirectoriesBizIdEnum } from '@/types/directories';
  * Directories Data Flow Service
  *
  * Data flow pipeline:
- * A (formValues) → debounce 500ms → B (additionalDetails) → debounce 500ms → C (finalData) → debounce 300ms → D (preview)
+ * A (formValues) → debounce 500ms → B (additionalDetails) → C (finalData) → debounce 300ms → D (preview)
+ * Note: B layer does NOT have debounce (DEBOUNCE_TIME.ADDITIONAL is reserved but unused)
  *
  * A: Form values (from Zustand store)
  * B: Additional details configuration (fetched based on A, can be manually edited)
@@ -88,7 +89,7 @@ class DirectoriesDataFlow {
     distinctUntilChanged(
       (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr),
     ),
-    shareReplay(1),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   // ========================================
@@ -135,7 +136,7 @@ class DirectoriesDataFlow {
         }),
       );
     }),
-    shareReplay(1),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   /**
@@ -173,21 +174,17 @@ class DirectoriesDataFlow {
       }
     >(
       (acc, curr) => {
-        // Case 1: A changed (new formValuesKey) - reset manual edits
-        if (
-          curr.source === 'api' &&
-          curr.formValuesKey &&
-          curr.formValuesKey !== acc.formValuesKey
-        ) {
+        // Case 1: API response - always apply, reset manual edit flag
+        if (curr.source === 'api') {
           return {
             source: curr.source,
             data: curr.data,
             hasManualEdit: false,
-            formValuesKey: curr.formValuesKey,
+            formValuesKey: curr.formValuesKey || acc.formValuesKey,
           };
         }
 
-        // Case 2: User manual edit - set flag and keep current A's key
+        // Case 2: User manual edit - only possible when loading = false
         if (curr.source === 'manual') {
           return {
             source: curr.source,
@@ -197,17 +194,7 @@ class DirectoriesDataFlow {
           };
         }
 
-        // Case 3: API update while manual edits exist - ignore API update
-        if (acc.hasManualEdit) {
-          return acc;
-        }
-        // Case 4: Normal API update without manual edits
-        return {
-          source: curr.source,
-          data: curr.data,
-          hasManualEdit: false,
-          formValuesKey: curr.formValuesKey || acc.formValuesKey,
-        };
+        return acc;
       },
       {
         source: 'api' as const,
@@ -216,7 +203,7 @@ class DirectoriesDataFlow {
         formValuesKey: null,
       },
     ),
-    shareReplay(1),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   /**
@@ -287,7 +274,7 @@ class DirectoriesDataFlow {
     distinctUntilChanged(
       (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr),
     ),
-    shareReplay(1),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   // ========================================
@@ -315,8 +302,23 @@ class DirectoriesDataFlow {
           catchError(this._handleError([])),
         ),
         body: from(_fetchPreviewBody(requestData)).pipe(
-          map(({ data }) => data || { findCount: 0, findList: [] }),
-          catchError(this._handleError({ findCount: 0, findList: [] })),
+          map(
+            ({ data }) =>
+              data || {
+                findCount: 0,
+                defaultPreviewCount: 0,
+                maxImportCount: 0,
+                findList: [],
+              },
+          ),
+          catchError(
+            this._handleError({
+              findCount: 0,
+              defaultPreviewCount: 0,
+              maxImportCount: 0,
+              findList: [],
+            }),
+          ),
         ),
       }).pipe(
         tap(() => {
@@ -327,12 +329,17 @@ class DirectoriesDataFlow {
           this.loadingPreviewSubject.next(false);
           return this._handleError({
             header: [],
-            body: { findCount: 0, findList: [] },
+            body: {
+              findCount: 0,
+              defaultPreviewCount: 0,
+              maxImportCount: 0,
+              findList: [],
+            },
           })(error);
         }),
       );
     }),
-    shareReplay(1),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   // ========================================
@@ -376,6 +383,14 @@ class DirectoriesDataFlow {
    */
   updateAdditionalManually(data: any) {
     this.additionalManualEdit$.next(data);
+  }
+
+  /**
+   * Get flattened request params from finalData
+   * Used by import API which needs the same format as preview request
+   */
+  getFlattenedParams(finalData: any): Record<string, any> {
+    return this._assemblePreviewRequest(finalData);
   }
 
   /**
@@ -449,7 +464,7 @@ class DirectoriesDataFlow {
    * Flattens nested structure into flat key-value pairs:
    * Input: { query: { bizId, entityType, FIRM: {...} }, additionalDetails: {...} }
    * Output: { bizId, entityType, ...FIRM fields, ...additionalDetails }
-   * Excludes 'additionalFields' key and empty values
+   * Excludes empty values only
    */
   private _assemblePreviewRequest(finalData: any): any {
     if (!finalData || !finalData.query) {
@@ -469,11 +484,9 @@ class DirectoriesDataFlow {
     const entityData = query[entityType] || {};
     this._mergeNonEmptyFields(requestData, entityData);
 
-    // Flatten additional details fields (exclude 'additionalFields' key)
+    // Flatten additional details fields (include additionalFields array)
     if (additionalDetails && typeof additionalDetails === 'object') {
-      this._mergeNonEmptyFields(requestData, additionalDetails, [
-        'additionalFields',
-      ]);
+      this._mergeNonEmptyFields(requestData, additionalDetails);
     }
 
     return requestData;

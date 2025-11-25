@@ -57,16 +57,13 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
         return (
           <QueryTableSelect
             onDisplayDataChange={(data) => {
-              // 只更新内部 UI 显示状态
               setSelectedTableName(data.tableName);
               setSelectedTableSource(data.tableSource);
             }}
             onFormDataChange={(data) => {
-              // 更新内部状态
               setSelectedTableId(data.tableId);
               setKeywords(data.keywords);
 
-              // 同步到外层 formValues（触发 onFormChange）
               onFormChange(fieldKey, {
                 tableFieldId: '',
                 tableViewId: '',

@@ -23,8 +23,8 @@ const getRandomWidth = () => `${Math.floor(Math.random() * 50 + 40)}%`;
 
 // 固定骨架屏配置
 const SKELETON_CONFIG = {
-  COLUMNS: 6,  // 默认显示 6 列
-  ROWS: 5,     // 默认显示 5 行
+  COLUMNS: 6, // 默认显示 6 列
+  ROWS: 5, // 默认显示 5 行
 };
 
 export interface PreviewTableProps {
@@ -136,39 +136,43 @@ export const PreviewTable: FC<PreviewTableProps> = ({
       </TableHead>
       <TableBody>
         {(loading && body.length === 0
-          ? (Array.from({ length: SKELETON_CONFIG.ROWS }) as DirectoriesQueryTableBodyItem[])
+          ? (Array.from({
+              length: SKELETON_CONFIG.ROWS,
+            }) as DirectoriesQueryTableBodyItem[])
           : body
         ).map((row, rowIndex) => (
           <TableRow key={rowIndex}>
-            {(loading ? skeletonColumns : reducedHeader).map((head, colIndex) => (
-              <TableCell
-                key={`${rowIndex}-${colIndex}`}
-                sx={{
-                  py: 0,
-                  px: 1.5,
-                  borderRight: '1px solid #D0CEDA',
-                  borderBottom: '1px solid #D0CEDA',
-                  fontSize: 14,
-                  color: 'text.primary',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: 300,
-                  textAlign: colIndex === 0 ? 'center' : 'left',
-                }}
-              >
-                {loading ? (
-                  <Skeleton
-                    animation="wave"
-                    width={bodySkeletonWidths[rowIndex]?.[colIndex]}
-                  />
-                ) : colIndex === 0 ? (
-                  rowIndex + 1
-                ) : (
-                  row[head.columnKey as keyof typeof row] || '-'
-                )}
-              </TableCell>
-            ))}
+            {(loading ? skeletonColumns : reducedHeader).map(
+              (head, colIndex) => (
+                <TableCell
+                  key={`${rowIndex}-${colIndex}`}
+                  sx={{
+                    py: 0,
+                    px: 1.5,
+                    borderRight: '1px solid #D0CEDA',
+                    borderBottom: '1px solid #D0CEDA',
+                    fontSize: 14,
+                    color: 'text.primary',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: 300,
+                    textAlign: colIndex === 0 ? 'center' : 'left',
+                  }}
+                >
+                  {loading ? (
+                    <Skeleton
+                      animation="wave"
+                      width={bodySkeletonWidths[rowIndex]?.[colIndex]}
+                    />
+                  ) : colIndex === 0 ? (
+                    rowIndex + 1
+                  ) : (
+                    row[head.columnKey as keyof typeof row] || '-'
+                  )}
+                </TableCell>
+              ),
+            )}
           </TableRow>
         ))}
       </TableBody>

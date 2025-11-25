@@ -62,13 +62,11 @@ export const QueryTableSelect: FC<FilterTableSelectProps> = ({
 
   const onClickConfirm = async () => {
     await confirmTableSelection((keywords) => {
-      // 同步到 formValues
       onFormDataChange?.({
         tableId: innerTableId,
         keywords: keywords,
       });
 
-      // 更新 UI 显示数据
       onDisplayDataChange?.({
         tableName: outerTableName,
         tableSource: outerTableSource,
@@ -79,13 +77,11 @@ export const QueryTableSelect: FC<FilterTableSelectProps> = ({
   const onClickClearSelection = () => {
     resetSelection();
 
-    // 清空 formValues
     onFormDataChange?.({
       tableId: '',
       keywords: [],
     });
 
-    // 清空 UI 显示数据
     onDisplayDataChange?.({
       tableName: '',
       tableSource: undefined,
@@ -94,7 +90,7 @@ export const QueryTableSelect: FC<FilterTableSelectProps> = ({
 
   return (
     <Stack>
-      <QueryContainer label={'Table'}>
+      <QueryContainer isAuth={true} label={'Table'}>
         <QueryTableSelectInput
           isLoading={isLoading || fetchingTable || fetchingKeywords}
           onClearSelection={onClickClearSelection}

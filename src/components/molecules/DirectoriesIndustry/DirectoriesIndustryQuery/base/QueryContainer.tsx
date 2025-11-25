@@ -8,6 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import { QueryBadgeAuth } from './index';
+
 import ICON_INFO from './assets/icon-info.svg';
 
 interface QueryContainerProps extends StackProps {
@@ -16,6 +18,7 @@ interface QueryContainerProps extends StackProps {
   description?: string | null;
   tooltip?: string | null;
   children: ReactNode;
+  isAuth: boolean;
 }
 
 export const QueryContainer: FC<QueryContainerProps> = ({
@@ -25,6 +28,7 @@ export const QueryContainer: FC<QueryContainerProps> = ({
   children,
   sx,
   labelSx,
+  isAuth,
   ...props
 }) => {
   return (
@@ -36,29 +40,42 @@ export const QueryContainer: FC<QueryContainerProps> = ({
       {...props}
     >
       <Stack>
-        {label && (
-          <Stack
-            sx={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 0.5,
-            }}
-          >
-            <Typography sx={{ fontSize: 12, color: 'text.focus', ...labelSx }}>
-              {label}
-            </Typography>
-            {tooltip && (
-              <Tooltip arrow title={tooltip}>
-                <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
-              </Tooltip>
-            )}
-          </Stack>
-        )}
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          {label && (
+            <Stack
+              sx={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
+            >
+              <Typography
+                sx={{ fontSize: 12, color: 'text.focus', ...labelSx }}
+              >
+                {label}
+              </Typography>
+              {tooltip && (
+                <Tooltip arrow title={tooltip}>
+                  <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
+                </Tooltip>
+              )}
+            </Stack>
+          )}
+          {!isAuth && <QueryBadgeAuth />}
+        </Stack>
+
         {description && (
           <Typography
             sx={{
               fontSize: 12,
               color: '#B0ADBD',
+              mt: 0.5,
             }}
           >
             {description}

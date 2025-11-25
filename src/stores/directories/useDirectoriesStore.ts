@@ -39,6 +39,7 @@ interface DirectoriesStoreState {
   previewBody: DirectoriesQueryTableBodyApiResponse;
   isLoadingPreview: boolean;
   hasSubmittedSearch: boolean;
+  lastSearchParams: Record<string, any> | null;
 }
 
 interface DirectoriesStoreActions {
@@ -75,9 +76,10 @@ const INITIAL_STATE: DirectoriesStoreState = {
   additionalValues: {},
   // Preview
   previewHeader: [],
-  previewBody: { findCount: 0, findList: [] },
+  previewBody: { findCount: 0, defaultPreviewCount: 0, maxImportCount: 0, findList: [] },
   isLoadingPreview: false,
   hasSubmittedSearch: false,
+  lastSearchParams: null,
 };
 
 export const useDirectoriesStore = create<DirectoriesStoreProps>()(
@@ -237,6 +239,12 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         },
       );
 
+      const finalDataSub = directoriesDataFlow.finalData$.subscribe(
+        (finalData) => {
+          set({ lastSearchParams: finalData });
+        },
+      );
+
       const previewSub = directoriesDataFlow.preview$.subscribe((preview) => {
         set({
           previewHeader: preview.header,
@@ -252,7 +260,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           if (loading) {
             set({
               previewHeader: [],
-              previewBody: { findCount: 0, findList: [] },
+              previewBody: { findCount: 0, defaultPreviewCount: 0, maxImportCount: 0, findList: [] },
             });
           }
         },
@@ -261,6 +269,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
       return () => {
         additionalSub.unsubscribe();
         loadingSub.unsubscribe();
+        finalDataSub.unsubscribe();
         previewSub.unsubscribe();
         previewLoadingSub.unsubscribe();
       };
@@ -335,7 +344,25 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
 
     reset: () => {
       directoriesDataFlow.reset();
-      set(INITIAL_STATE);
+      set({
+        bizId: '',
+        institutionType: '',
+        configMap: {},
+        buttonGroupConfig: null,
+        queryConfig: [],
+        formValuesByInstitutionType: {},
+        formValues: {},
+        isLoadingConfig: false,
+        isLoadingAdditional: false,
+        additionalConfig: [],
+        additionalCheckbox: {},
+        additionalValues: {},
+        previewHeader: [],
+        previewBody: { findCount: 0, defaultPreviewCount: 0, maxImportCount: 0, findList: [] },
+        isLoadingPreview: false,
+        hasSubmittedSearch: false,
+        lastSearchParams: null,
+      });
     },
   }),
 );

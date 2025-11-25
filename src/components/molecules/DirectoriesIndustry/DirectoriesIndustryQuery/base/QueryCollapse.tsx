@@ -1,6 +1,8 @@
 import { FC, ReactNode, useState } from 'react';
 import { Box, Collapse, Icon, Stack } from '@mui/material';
 
+import { QueryBadgeAuth } from './index';
+
 import ICON_ARROW from './assets/icon-arrow.svg';
 
 interface QueryCollapseProps {
@@ -8,6 +10,7 @@ interface QueryCollapseProps {
   children: ReactNode;
   defaultOpen?: boolean;
   filterCount?: number;
+  isAuth: boolean;
 }
 
 export const QueryCollapse: FC<QueryCollapseProps> = ({
@@ -15,6 +18,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
   children,
   defaultOpen = true,
   filterCount = 0,
+  isAuth,
 }) => {
   const [expanded, setExpanded] = useState(defaultOpen);
 
@@ -63,6 +67,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                 {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}
               </Box>
             )}
+            {!isAuth && <QueryBadgeAuth />}
             <Icon
               component={ICON_ARROW}
               sx={{
