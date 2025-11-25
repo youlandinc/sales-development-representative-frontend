@@ -41,7 +41,7 @@ export const PlanList: FC<PlanListProps> = ({
     <Stack gap={1.5}>
       {plans.map((plan) => (
         <PlanCard
-          key={`${plan.planName}-${plan.renewalDate}`}
+          key={plan.planBadge.label}
           {...plan}
           onCancel={plan.renewalDate ? handleCancel(plan) : undefined}
         />

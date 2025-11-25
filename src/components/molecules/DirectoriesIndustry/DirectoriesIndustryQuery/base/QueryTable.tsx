@@ -1,8 +1,8 @@
 import { FC, useState } from 'react';
 import { ProspectTableEnum } from '@/types';
 
+import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
 import { QueryTableSelect, QueryTableWithListValue } from './index';
-import { DirectoriesQueryGroupTypeEnum } from '@/types/Directories/query';
 
 interface QueryTableProps {
   type: DirectoriesQueryGroupTypeEnum;

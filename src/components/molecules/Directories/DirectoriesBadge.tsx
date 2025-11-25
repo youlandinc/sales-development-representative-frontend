@@ -1,52 +1,55 @@
 import { FC } from 'react';
-import { Box, Icon, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import { BADGE_COLORS } from './constants';
 
-import ICON_CROWN from './assets/icon-crown.svg';
-
 interface DirectoriesBadgeProps {
-  variant: 'intelligence' | 'active';
+  variant: 'capital' | 'other';
+  planName: string;
+  planLogo: string;
 }
 
-export const DirectoriesBadge: FC<DirectoriesBadgeProps> = ({ variant }) => {
-  if (variant === 'intelligence') {
-    const config = BADGE_COLORS.intelligence;
+export const DirectoriesBadge: FC<DirectoriesBadgeProps> = ({
+  variant,
+  planName,
+  planLogo,
+}) => {
+  if (variant === 'capital') {
+    const config = BADGE_COLORS.capital;
     return (
       <Box
         sx={{
           background: config.background,
-          borderRadius: '4px',
+          borderRadius: 1,
           padding: '2px 8px',
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
+          gap: 0.5,
         }}
       >
-        <Icon
-          component={ICON_CROWN}
-          sx={{ width: 16, height: 16, color: config.iconColor }}
+        <Box
+          component={'img'}
+          src={planLogo}
+          sx={{ width: 16, height: 16, objectFit: 'contain' }}
         />
         <Typography
           sx={{
             color: config.color,
-            fontSize: '12px',
-            fontWeight: 400,
-            lineHeight: 1.5,
+            fontSize: 12,
           }}
         >
-          Intelligence
+          {planName}
         </Typography>
       </Box>
     );
   }
 
-  const config = BADGE_COLORS.active;
+  const config = BADGE_COLORS.other;
   return (
     <Box
       sx={{
         background: config.background,
-        borderRadius: '4px',
+        borderRadius: 1,
         padding: '2px 8px',
         display: 'flex',
         alignItems: 'center',
@@ -55,12 +58,10 @@ export const DirectoriesBadge: FC<DirectoriesBadgeProps> = ({ variant }) => {
       <Typography
         sx={{
           color: config.color,
-          fontSize: '12px',
-          fontWeight: 400,
-          lineHeight: 1.5,
+          fontSize: 12,
         }}
       >
-        Active access
+        {planName}
       </Typography>
     </Box>
   );

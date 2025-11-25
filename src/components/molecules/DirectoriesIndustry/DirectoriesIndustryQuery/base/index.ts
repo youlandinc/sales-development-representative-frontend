@@ -12,3 +12,4 @@ export * from './QueryContainer';
 export * from './QueryAutoComplete';
 export * from './QueryCheckbox';
 export * from './QuerySwitch';
+export * from './QueryAdditionalDetails';

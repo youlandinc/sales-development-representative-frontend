@@ -1,7 +1,3 @@
-/**
- * Directories components color constants
- */
-
 export const DIRECTORIES_COLORS = {
   light: {
     card: {
@@ -34,12 +30,12 @@ export const DIRECTORIES_COLORS = {
 } as const;
 
 export const BADGE_COLORS = {
-  intelligence: {
+  capital: {
     background: 'linear-gradient(to right, #fef1d7, #d5bb9b)',
     color: '#363440',
     iconColor: '#363440',
   },
-  active: {
+  other: {
     background: 'linear-gradient(to right, #369B7C, #266C57)',
     color: '#FFFFFF',
   },

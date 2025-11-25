@@ -1,8 +1,8 @@
-import { Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { FC } from 'react';
 
 import { CancelSubscriptionDialog, PaymentSetting, PlanList } from './base';
-import { COLORS, LAYOUT } from './data';
+import { COLORS } from './data';
 
 import { useCurrentPlan } from './hooks';
 
@@ -11,35 +11,48 @@ export const CurrentPlan: FC = () => {
     useCurrentPlan();
 
   return (
-    <Stack gap={3} sx={{ width: LAYOUT.maxWidth }}>
-      <Typography
+    <Box
+      sx={{
+        border: '1px solid #E5E5E5',
+        borderRadius: 4,
+        p: 3,
+      }}
+    >
+      <Stack
+        gap={3}
         sx={{
-          fontSize: 18,
-          fontWeight: 600,
-          color: COLORS.text.primary,
-          lineHeight: 1.2,
+          width: 900,
         }}
       >
-        Current plan
-      </Typography>
-      <PlanList
-        isLoading={isLoading}
-        onCancelClick={handleCancelClick}
-        plans={plans}
-      />
-
-      <PaymentSetting />
-
-      {cancelDialog.selectedPlan && (
-        <CancelSubscriptionDialog
-          endDate={cancelDialog.selectedPlan.renewalDate}
-          loading={cancelDialog.loading}
-          onClose={cancelDialog.onClose}
-          onConfirm={cancelDialog.onConfirm}
-          open={cancelDialog.open}
-          planName={cancelDialog.selectedPlan.planName}
+        <Typography
+          sx={{
+            fontSize: 18,
+            fontWeight: 600,
+            color: COLORS.text.primary,
+            lineHeight: 1.2,
+          }}
+        >
+          Current plan
+        </Typography>
+        <PlanList
+          isLoading={isLoading}
+          onCancelClick={handleCancelClick}
+          plans={plans}
         />
-      )}
-    </Stack>
+
+        <PaymentSetting />
+
+        {cancelDialog.selectedPlan && (
+          <CancelSubscriptionDialog
+            endDate={cancelDialog.selectedPlan.renewalDate}
+            loading={cancelDialog.loading}
+            onClose={cancelDialog.onClose}
+            onConfirm={cancelDialog.onConfirm}
+            open={cancelDialog.open}
+            planName={cancelDialog.selectedPlan.planName}
+          />
+        )}
+      </Stack>
+    </Box>
   );
 };

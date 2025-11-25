@@ -17,7 +17,7 @@ export const PlanBadge: FC<PlanBadgeProps> = ({
   <Box
     sx={{
       bgcolor: bgColor,
-      borderRadius: 0.5,
+      borderRadius: 1,
       px: 1,
       py: 0.5,
     }}

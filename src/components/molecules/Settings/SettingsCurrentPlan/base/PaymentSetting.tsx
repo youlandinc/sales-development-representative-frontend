@@ -5,7 +5,7 @@ import { SDRToast, StyledButton } from '@/components/atoms';
 import { useAsyncFn } from '@/hooks';
 import { _fetchPaymentPortal } from '@/request/settings/currentPlan';
 
-import { BASE_URL } from '@/constant';
+import { BASE_URL } from '@/constants';
 
 const RETURN_URL = `${BASE_URL}/settings`;
 

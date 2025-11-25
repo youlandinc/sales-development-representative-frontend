@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Divider, Stack } from '@mui/material';
 
-import { DirectoriesIndustryQuery, DirectoriesIndustryTable } from './index';
+import { DirectoriesIndustryPreview, DirectoriesIndustryQuery } from './index';
 
 export const DirectoriesIndustry: FC = () => {
   return (
@@ -13,7 +13,7 @@ export const DirectoriesIndustry: FC = () => {
     >
       <DirectoriesIndustryQuery />
       <Divider orientation={'vertical'} />
-      <DirectoriesIndustryTable />
+      <DirectoriesIndustryPreview />
     </Stack>
   );
 };

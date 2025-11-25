@@ -48,3 +48,8 @@ export enum DateRangeEnum {
 
   range = 'RANGE',
 }
+
+export interface UsageTypeOptions extends TOption {
+  planName?: string;
+  planType?: PlanTypeEnum;
+}

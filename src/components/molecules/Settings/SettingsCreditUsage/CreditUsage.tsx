@@ -171,7 +171,7 @@ export const CreditUsage: FC = () => {
     {
       field: 'remainingCredits',
       headerName: 'Remaining Credits',
-      width: 200,
+      width: 160,
     },
     {
       field: 'tableName',

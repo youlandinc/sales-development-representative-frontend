@@ -11,6 +11,7 @@ import {
 import {
   DateRangeEnum,
   FetchCreditUsageListRequest,
+  UsageTypeOptions,
 } from '@/types/Settings/creditUsage';
 
 export const useCreditUsage = () => {
@@ -87,7 +88,7 @@ export const useCreditUsage = () => {
               integrationName: 'string',
             },
             {
-              id: 0,
+              id: 1,
               creditsUsed: 0,
               remainingCredits: 0,
               tableName: 'string',
@@ -141,13 +142,15 @@ export const useCreditUsage = () => {
         });
         item.children.forEach((child) => {
           acc.push({
-            label: child.category,
+            label: child.categoryName,
             value: child.category,
             key: child.category,
+            planType: child.planType,
+            planName: child.choosePlanName,
           });
         });
       }
       return acc;
-    }, [] as TOption[]),
+    }, [] as UsageTypeOptions[]),
   };
 };

@@ -4,10 +4,11 @@ import { Stack } from '@mui/material';
 import { useSwitch } from '@/hooks';
 import { useTableSelect } from './hooks';
 
-import { QueryTableSelectDialog, QueryTableSelectInput } from './index';
-
-import { DirectoriesQueryGroupTypeEnum } from '@/types/Directories/query';
+import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
 import { ProspectTableEnum } from '@/types';
+
+import { QueryTableSelectDialog, QueryTableSelectInput } from './index';
+import { QueryContainer } from '../QueryContainer';
 
 interface FilterTableSelectProps {
   type: DirectoriesQueryGroupTypeEnum;
@@ -93,16 +94,16 @@ export const QueryTableSelect: FC<FilterTableSelectProps> = ({
 
   return (
     <Stack>
-      {/*<FilterContainer title={filterTitle}>*/}
-      <QueryTableSelectInput
-        isLoading={isLoading || fetchingTable || fetchingKeywords}
-        onClearSelection={onClickClearSelection}
-        onOpenDialog={onClickOpenDialog}
-        selectedTableId={selectedTableId}
-        selectedTableName={outerTableName}
-        selectedTableSource={outerTableSource}
-      />
-      {/*</FilterContainer>*/}
+      <QueryContainer label={'Table'}>
+        <QueryTableSelectInput
+          isLoading={isLoading || fetchingTable || fetchingKeywords}
+          onClearSelection={onClickClearSelection}
+          onOpenDialog={onClickOpenDialog}
+          selectedTableId={selectedTableId}
+          selectedTableName={outerTableName}
+          selectedTableSource={outerTableSource}
+        />
+      </QueryContainer>
       <QueryTableSelectDialog
         expandedIds={expandedIds}
         fetchingKeywords={fetchingKeywords}

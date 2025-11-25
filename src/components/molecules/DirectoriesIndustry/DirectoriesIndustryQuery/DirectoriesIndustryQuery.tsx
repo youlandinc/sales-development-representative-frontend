@@ -1,51 +1,31 @@
-import { FC, useEffect, useMemo } from 'react';
+import { FC } from 'react';
 import { CircularProgress, Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
-import { debounce } from 'lodash-es';
 
 import { QueryBreadcrumbs } from './base';
-import { getBizIdFromSlug } from './data';
 import { CreateQueryElement } from './index';
 import { TITLE_MAP } from '@/constants/directories';
-import { DirectoriesQueryItem } from '@/types/Directories';
+import { DirectoriesQueryItem } from '@/types/directories';
 import { useDirectoriesStore } from '@/stores/directories';
 
 export const DirectoriesIndustryQuery: FC = () => {
   const params = useParams();
   const industrySlug = params.industry as string;
 
-  const bizId = getBizIdFromSlug(industrySlug);
-
-  const {
-    institutionType,
-    buttonGroupConfig,
-    queryConfig,
-    formValues,
-    loadingConfig,
-    updateInstitutionType,
-    updateFormValues,
-    fetchResults,
-    fetchDefaultViaBiz,
-  } = useDirectoriesStore();
-
-  useEffect(() => {
-    if (queryConfig.length === 0 && !loadingConfig && bizId) {
-      fetchDefaultViaBiz(bizId);
-    }
-  }, [bizId]);
-
-  const debouncedFetchResults = useMemo(
-    () => debounce(() => fetchResults(), 500),
-    [fetchResults],
+  // 直接从 store 读取状态
+  const formValues = useDirectoriesStore((state) => state.formValues);
+  const queryConfig = useDirectoriesStore((state) => state.queryConfig);
+  const institutionType = useDirectoriesStore((state) => state.institutionType);
+  const isLoadingConfig = useDirectoriesStore((state) => state.isLoadingConfig);
+  const buttonGroupConfig = useDirectoriesStore(
+    (state) => state.buttonGroupConfig,
   );
-
-  useEffect(() => {
-    if (Object.keys(formValues).length > 0) {
-      debouncedFetchResults();
-    }
-
-    return () => debouncedFetchResults.cancel();
-  }, [formValues, debouncedFetchResults]);
+  const updateFormValues = useDirectoriesStore(
+    (state) => state.updateFormValues,
+  );
+  const updateInstitutionType = useDirectoriesStore(
+    (state) => state.updateInstitutionType,
+  );
 
   const onFormChange = (
     key: string | undefined | null,
@@ -61,14 +41,11 @@ export const DirectoriesIndustryQuery: FC = () => {
       return;
     }
 
+    // ✅ 自动触发 RxJS 流程（debounce + 请求 additionalDetails）
     updateFormValues(key, value, groupPath);
-
-    if (key === 'entityType') {
-      debouncedFetchResults();
-    }
   };
 
-  if (!buttonGroupConfig && !loadingConfig) {
+  if (!buttonGroupConfig && !isLoadingConfig) {
     return (
       <Stack
         sx={{
@@ -90,7 +67,7 @@ export const DirectoriesIndustryQuery: FC = () => {
     <Stack
       sx={{
         width: 420,
-        gap: 3,
+        gap: 1.5,
         p: 3,
         height: 'auto',
         overflowY: 'auto',
@@ -101,7 +78,7 @@ export const DirectoriesIndustryQuery: FC = () => {
       {buttonGroupConfig && (
         <CreateQueryElement
           config={buttonGroupConfig}
-          disabledLoading={loadingConfig}
+          disabledLoading={isLoadingConfig}
           disabledPermission={false}
           formData={{ institutionType }}
           key="institutionType-button-group"
@@ -112,7 +89,7 @@ export const DirectoriesIndustryQuery: FC = () => {
       {queryConfig.map((config: DirectoriesQueryItem) => (
         <CreateQueryElement
           config={config}
-          disabledLoading={loadingConfig}
+          disabledLoading={isLoadingConfig}
           disabledPermission={false}
           formData={{ institutionType, ...formValues }}
           key={config.key || config.label || ''}

@@ -1,5 +1,4 @@
 import { Box, Icon, Stack, Typography } from '@mui/material';
-import { useRouter } from 'nextjs-toploader/app';
 import { FC, useMemo } from 'react';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
@@ -7,13 +6,18 @@ import { TalkToTeamDialog } from './TalkToTeamDialog';
 
 import { useAsyncFn, useSwitch } from '@/hooks';
 import { PlanTypeEnum } from '@/types';
-import { DirectoriesBizIdEnum } from '@/types/Directories';
+import { DirectoriesBizIdEnum } from '@/types/directories';
 import { PaymentTypeEnum, PlanInfo } from '@/types/pricingPlan';
 
 import { _createPaymentLink } from '@/request/pricingPlan';
 import { StyledCapitalDesc } from './base';
-import { packageTitle, PERIOD_INFO, PRICE_INFO } from './data';
-import { CANCEL_URL, SUCCESS_URL } from './data';
+import {
+  CANCEL_URL,
+  packageTitle,
+  PERIOD_INFO,
+  PRICE_INFO,
+  SUCCESS_URL,
+} from './data';
 
 import { CheckCircleOutline } from '@mui/icons-material';
 import ICON_NORMAL from './assets/icon_normal.svg';
@@ -30,7 +34,6 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
   paymentType,
   category,
 }) => {
-  const router = useRouter();
   const { visible, toggle } = useSwitch();
 
   //type 为null时，无限制，高亮。

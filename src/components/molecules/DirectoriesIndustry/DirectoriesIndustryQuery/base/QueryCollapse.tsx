@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState } from 'react';
-import { Collapse, Icon, Stack } from '@mui/material';
+import { Box, Collapse, Icon, Stack } from '@mui/material';
 
 import ICON_ARROW from './assets/icon-arrow.svg';
 
@@ -7,12 +7,14 @@ interface QueryCollapseProps {
   title?: ReactNode;
   children: ReactNode;
   defaultOpen?: boolean;
+  filterCount?: number;
 }
 
 export const QueryCollapse: FC<QueryCollapseProps> = ({
   title,
   children,
   defaultOpen = true,
+  filterCount = 0,
 }) => {
   const [expanded, setExpanded] = useState(defaultOpen);
 
@@ -33,46 +35,45 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
             fontSize: 14,
-            lineHeight: 1.2,
+            height: 20,
             fontWeight: 600,
+            gap: 1.5,
           }}
         >
           {title}
-          {/*todo : filter count*/}
-          {/*<Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>*/}
-          {/*  {!!filterCount && (*/}
-          {/*    <Box*/}
-          {/*      bgcolor={'#EAE9EF'}*/}
-          {/*      borderRadius={1}*/}
-          {/*      fontSize={12}*/}
-          {/*      px={1}*/}
-          {/*      py={'2px'}*/}
-          {/*      sx={{*/}
-          {/*        userSelect: 'none',*/}
-          {/*      }}*/}
-          {/*    >*/}
-          {/*      {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}*/}
-          {/*    </Box>*/}
-          {/*  )}*/}
-          {/*  <Icon*/}
-          {/*    component={ICON_ARROW}*/}
-          {/*    sx={{*/}
-          {/*      width: 16,*/}
-          {/*      height: 16,*/}
-          {/*      transform: !visible ? 'rotate(-90deg)' : 'rotate(0deg)',*/}
-          {/*    }}*/}
-          {/*  />*/}
-          {/*</Stack>*/}
-          <Icon
-            component={ICON_ARROW}
+          <Stack
             sx={{
               ml: 'auto',
-              width: 12,
-              height: 12,
-              transform: `rotate(${expanded ? '.25' : '0'}turn)`,
-              transition: 'transform .3s',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 1,
             }}
-          />
+          >
+            {filterCount > 0 && (
+              <Box
+                sx={{
+                  bgcolor: '#EAE9EF',
+                  borderRadius: 1,
+                  fontSize: 12,
+                  px: 1,
+                  py: '2px',
+                  userSelect: 'none',
+                }}
+              >
+                {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}
+              </Box>
+            )}
+            <Icon
+              component={ICON_ARROW}
+              sx={{
+                ml: 'auto',
+                width: 12,
+                height: 12,
+                transform: `rotate(${expanded ? '.25' : '0'}turn)`,
+                transition: 'transform .3s',
+              }}
+            />
+          </Stack>
         </Stack>
       )}
       <Collapse in={expanded}>

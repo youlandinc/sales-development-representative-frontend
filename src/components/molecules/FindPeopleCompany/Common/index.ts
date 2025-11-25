@@ -5,7 +5,7 @@ export * from './CreateFilterElement';
 export * from './CollapsePanel';
 export * from './FilterContainer';
 
-// base
+// PreviewTable
 export * from './FilterSelect';
 export * from './FilterSwitch';
 export * from './FilterTextField';

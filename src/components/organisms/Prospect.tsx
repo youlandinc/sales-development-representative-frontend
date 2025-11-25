@@ -10,7 +10,7 @@ import { Icon, Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { useSwitch } from '@/hooks';
-import { PROSPECT_CSV_TYPE_OPTIONS } from '@/constant';
+import { PROSPECT_CSV_TYPE_OPTIONS } from '@/constants';
 
 import {
   SDRToast,

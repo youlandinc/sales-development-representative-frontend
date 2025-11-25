@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { Cell } from '@tanstack/react-table';
 
-import { SYSTEM_COLUMN_SELECT } from '@/constant/table';
+import { SYSTEM_COLUMN_SELECT } from '@/constants/table';
 import { TableCellFieldData, TableColumnMeta } from '@/types/Prospect/table';
 
 import {

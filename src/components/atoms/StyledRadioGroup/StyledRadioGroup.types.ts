@@ -1,11 +1,16 @@
 import { RadioGroupProps, RadioProps } from '@mui/material';
-type option = {
+
+export type Option<T = string | number | boolean> = {
   label: string;
-  value: string | number | boolean;
+  value: T;
   disabled?: boolean;
+  selected?: boolean | null;
+  [key: string]: any;
 };
-export interface StyledStyledRadioProps extends RadioGroupProps {
-  options: option[];
+
+export interface StyledStyledRadioProps<T = string | number | boolean>
+  extends RadioGroupProps {
+  options: Option<T>[];
   label?: string;
 }
 export interface StyledRadioProps extends RadioProps {

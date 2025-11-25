@@ -49,7 +49,7 @@ import {
   checkIsAiColumn,
   checkIsEditableColumn,
   SYSTEM_COLUMN_SELECT,
-} from '@/constant/table';
+} from '@/constants/table';
 
 // TODO: Props优化
 // 1. 使用TypeScript严格类型定义替代any[]

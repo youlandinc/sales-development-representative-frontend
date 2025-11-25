@@ -9,16 +9,22 @@ import { PlanTypeEnum } from '@/types';
 import {
   DateRangeEnum,
   FetchCreditUsageListRequest,
+  UsageTypeOptions,
 } from '@/types/Settings/creditUsage';
 
 import { DATE_RANGE_OPTIONS, formatDateRange } from './data';
+import {
+  computedPlanBadgeStyle,
+  PlanBadge,
+  PREMIUM_PLAN_TYPES,
+} from '@/components/molecules/Settings/SettingsCurrentPlan';
 
 interface CreditUsageToolbarProps {
   onChange: (
     conditions: Omit<FetchCreditUsageListRequest, 'page' | 'size'>,
   ) => void;
   value: Omit<FetchCreditUsageListRequest, 'page' | 'size'>;
-  usageTypeList: TOption[];
+  usageTypeList: UsageTypeOptions[];
 }
 export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
   onChange,
@@ -52,7 +58,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
             });
           }}
           options={usageTypeList || []}
-          renderOption={(option, index) => {
+          renderOption={(option: any, index) => {
             if (option.disabled) {
               return (
                 <ListSubheader
@@ -75,11 +81,38 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
                   px: 1.5,
                   py: '8px !important',
                   borderRadius: 2,
+                  gap: 1.25,
                 }}
                 value={option.value}
               >
-                {option.label}
+                {option.label}{' '}
+                {option.planType ? (
+                  <PlanBadge
+                    {...computedPlanBadgeStyle(option.planType)}
+                    gradient={PREMIUM_PLAN_TYPES.includes(
+                      option.planType as (typeof PREMIUM_PLAN_TYPES)[number],
+                    )}
+                    label={option.planName}
+                  />
+                ) : null}
               </MenuItem>
+            );
+          }}
+          renderValue={(value: any) => {
+            const option = usageTypeList?.find((item) => item.value === value);
+            return (
+              <Stack alignItems={'center'} direction={'row'} gap={0.5}>
+                {option?.label}
+                {option?.planType ? (
+                  <PlanBadge
+                    {...computedPlanBadgeStyle(option.planType)}
+                    gradient={PREMIUM_PLAN_TYPES.includes(
+                      option.planType as (typeof PREMIUM_PLAN_TYPES)[number],
+                    )}
+                    label={option.planName || ''}
+                  />
+                ) : null}
+              </Stack>
             );
           }}
           sxList={{

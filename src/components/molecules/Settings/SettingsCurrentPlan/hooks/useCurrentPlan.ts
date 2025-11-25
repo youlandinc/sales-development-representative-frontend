@@ -1,18 +1,17 @@
+import { format } from 'date-fns';
 import { useCallback, useState } from 'react';
 import useSwr from 'swr';
-import { format } from 'date-fns';
 
 import { SDRToast } from '@/components/atoms';
 
 import {
-  computedStyle,
+  computedPlanBadgeStyle,
   FULL_ACCESS_PLAN_TYPES,
   PREMIUM_PLAN_TYPES,
 } from '../data';
 
+import { HttpError, PlanTypeEnum } from '@/types';
 import { PlanCardProps } from '../base';
-import { PlanTypeEnum } from '@/types';
-import { HttpError } from '@/types';
 
 import { _cancelPlan, _fetchCurrentPlan } from '@/request/settings';
 
@@ -38,7 +37,7 @@ export const useCurrentPlan = () => {
 
   const plans: PlanCardProps[] = (data?.data?.currentPlans || []).map(
     (plan) => {
-      const style = computedStyle(plan.planType);
+      const style = computedPlanBadgeStyle(plan.planType);
       const isPremium = PREMIUM_PLAN_TYPES.includes(
         plan.planType as (typeof PREMIUM_PLAN_TYPES)[number],
       );
@@ -51,8 +50,8 @@ export const useCurrentPlan = () => {
         category: plan.category,
         planBadge: {
           label: plan.planName,
-          bgColor: style.bgcolor,
-          textColor: style.color,
+          bgColor: style.bgColor,
+          textColor: style.textColor,
           gradient: isPremium,
         },
         fullAccess: isFullAccess,

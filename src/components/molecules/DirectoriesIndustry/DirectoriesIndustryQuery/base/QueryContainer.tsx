@@ -1,19 +1,30 @@
 import { FC, ReactNode } from 'react';
-import { Icon, Stack, StackProps, Typography } from '@mui/material';
+import {
+  Icon,
+  Stack,
+  StackProps,
+  SxProps,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 
 import ICON_INFO from './assets/icon-info.svg';
 
 interface QueryContainerProps extends StackProps {
-  label?: string;
-  description?: string;
+  label?: string | null;
+  labelSx?: SxProps;
+  description?: string | null;
+  tooltip?: string | null;
   children: ReactNode;
 }
 
 export const QueryContainer: FC<QueryContainerProps> = ({
   label,
   description,
+  tooltip,
   children,
   sx,
+  labelSx,
   ...props
 }) => {
   return (
@@ -33,10 +44,14 @@ export const QueryContainer: FC<QueryContainerProps> = ({
               gap: 0.5,
             }}
           >
-            <Typography sx={{ fontSize: 12, color: 'text.focus' }}>
+            <Typography sx={{ fontSize: 12, color: 'text.focus', ...labelSx }}>
               {label}
             </Typography>
-            <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
+            {tooltip && (
+              <Tooltip arrow title={tooltip}>
+                <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
+              </Tooltip>
+            )}
           </Stack>
         )}
         {description && (

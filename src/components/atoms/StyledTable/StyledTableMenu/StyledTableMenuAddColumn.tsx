@@ -15,7 +15,7 @@ import {
   menuStyles,
 } from './StyledTableMenu.styles';
 
-import { getAddColumnMenuActions } from '@/constant/table';
+import { getAddColumnMenuActions } from '@/constants/table';
 import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
 
 interface StyledTableMenuAddColumnProps {

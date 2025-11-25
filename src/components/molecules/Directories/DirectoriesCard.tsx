@@ -1,25 +1,26 @@
 import { FC } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 
+import { DIRECTORIES_COLORS } from './constants';
+
 import {
   DirectoriesBizIdEnum,
   DirectoryApiResponse,
-} from '@/types/Directories';
+} from '@/types/directories';
 
 import { StyledButton } from '@/components/atoms';
-
 import {
   DirectoriesBadge,
   DirectoriesPattern,
   DirectoriesStats,
 } from './index';
-import { DIRECTORIES_COLORS } from './constants';
 
 type DirectoriesCardProps = DirectoryApiResponse & {
   onButtonClick?: (data: {
     bizId: DirectoriesBizIdEnum;
     isAuth: boolean;
   }) => void;
+  buttonLoading: boolean;
 };
 
 export const DirectoriesCard: FC<DirectoriesCardProps> = ({
@@ -31,8 +32,10 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
   statPeriod,
   isAuth,
   buttonDescription,
-  planType,
+  planLogo,
+  planName,
   onButtonClick,
+  buttonLoading,
 }) => {
   const isDark = bizId === DirectoriesBizIdEnum.capital_markets;
   const colors = isDark ? DIRECTORIES_COLORS.dark : DIRECTORIES_COLORS.light;
@@ -67,14 +70,18 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
               alt={title}
               component={'img'}
               src={logo}
-              style={{
-                width: '48px',
-                height: '48px',
+              sx={{
+                width: 48,
+                height: 48,
                 objectFit: 'contain',
               }}
             />
             {isAuth && (
-              <DirectoriesBadge variant={isDark ? 'intelligence' : 'active'} />
+              <DirectoriesBadge
+                planLogo={planLogo || ''}
+                planName={planName || ''}
+                variant={isDark ? 'capital' : 'other'}
+              />
             )}
           </Stack>
 
@@ -111,6 +118,8 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
         }}
       >
         <StyledButton
+          disabled={buttonLoading}
+          loading={buttonLoading}
           onClick={() => onButtonClick?.({ bizId, isAuth })}
           size={'medium'}
           sx={{

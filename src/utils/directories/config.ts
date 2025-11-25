@@ -1,9 +1,11 @@
 import {
   DirectoriesBizIdEnum,
+  DirectoriesEntityTypeEnum,
+  DirectoriesQueryGroupTypeEnum,
   DirectoriesQueryItem,
-} from '@/types/Directories';
+} from '@/types/directories';
 
-export const getBizIdFromSlug = (slug: string): DirectoriesBizIdEnum => {
+export const getDirectoriesBizId = (slug: string): DirectoriesBizIdEnum => {
   const slugMap: Record<string, DirectoriesBizIdEnum> = {
     'capital-markets': DirectoriesBizIdEnum.capital_markets,
     'real-estate-lending': DirectoriesBizIdEnum.real_estate_lending,
@@ -12,7 +14,7 @@ export const getBizIdFromSlug = (slug: string): DirectoriesBizIdEnum => {
   return slugMap[slug] || DirectoriesBizIdEnum.capital_markets;
 };
 
-export const convertToConfigMap = (
+export const configParse = (
   apiData: DirectoriesQueryItem[],
 ): {
   configMap: Record<string, DirectoriesQueryItem[]>;
@@ -25,7 +27,8 @@ export const convertToConfigMap = (
 
   const buttonGroup = apiData.find(
     (item) =>
-      item.key === 'institutionType' && item.groupType === 'BUTTON_GROUP',
+      item.key === 'institutionType' &&
+      item.groupType === DirectoriesQueryGroupTypeEnum.button_group,
   );
 
   if (!buttonGroup || !buttonGroup.children) {
@@ -51,7 +54,7 @@ export const convertToConfigMap = (
   return { configMap, buttonGroupConfig, firstInstitutionType };
 };
 
-export const initializeFormValues = (
+export const configInitFormValues = (
   configs: DirectoriesQueryItem[],
 ): Record<string, any> => {
   const result: Record<string, any> = {};
@@ -61,7 +64,8 @@ export const initializeFormValues = (
   }
 
   const entityTypeConfig = configs.find(
-    (c) => c.groupType === 'TAB' && c.isGroup && c.key,
+    (c) =>
+      c.groupType === DirectoriesQueryGroupTypeEnum.tab && c.isGroup && c.key,
   );
 
   if (!entityTypeConfig || !entityTypeConfig.children) {
@@ -72,7 +76,8 @@ export const initializeFormValues = (
     entityTypeConfig.defaultValue ?? entityTypeConfig.optionValues?.[0]?.value;
 
   if (entityTypeConfig.key) {
-    result[entityTypeConfig.key] = defaultEntityType ?? 'FIRM';
+    result[entityTypeConfig.key] =
+      defaultEntityType ?? DirectoriesEntityTypeEnum.firm;
   }
 
   entityTypeConfig.children.forEach((tabChild, index) => {
@@ -87,8 +92,8 @@ export const initializeFormValues = (
 
   configs.forEach((child) => {
     if (
-      child.groupType === 'EXCLUDE_FIRMS' ||
-      child.groupType === 'EXCLUDE_INDIVIDUALS'
+      child.groupType === DirectoriesQueryGroupTypeEnum.exclude_individuals ||
+      child.groupType === DirectoriesQueryGroupTypeEnum.exclude_firms
     ) {
       entityTypeConfig.children?.forEach((tabChild, index) => {
         const optionValue = entityTypeConfig.optionValues?.[index];
@@ -109,7 +114,7 @@ const collectFormKeys = (
 ): void => {
   const { groupType, key, children } = config;
 
-  if (groupType === 'GENERAL') {
+  if (groupType === DirectoriesQueryGroupTypeEnum.general) {
     if (children && children.length > 0) {
       children.forEach((child) => {
         collectFormKeys(child, result);
@@ -118,7 +123,10 @@ const collectFormKeys = (
     return;
   }
 
-  if (groupType === 'EXCLUDE_FIRMS' || groupType === 'EXCLUDE_INDIVIDUALS') {
+  if (
+    groupType === DirectoriesQueryGroupTypeEnum.exclude_firms ||
+    groupType === DirectoriesQueryGroupTypeEnum.exclude_individuals
+  ) {
     if (key) {
       result[key] = {
         tableId: '',
@@ -130,7 +138,7 @@ const collectFormKeys = (
     return;
   }
 
-  if (groupType === 'ADDITIONAL_DETAILS') {
+  if (groupType === DirectoriesQueryGroupTypeEnum.additional_details) {
     return;
   }
 

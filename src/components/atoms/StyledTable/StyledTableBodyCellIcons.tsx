@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Box, Tooltip } from '@mui/material';
 
-import { COLUMN_TYPE_LABELS } from '@/constant/table';
+import { COLUMN_TYPE_LABELS } from '@/constants/table';
 import {
   TableCellConfidenceEnum,
   TableColumnTypeEnum,

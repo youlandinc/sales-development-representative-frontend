@@ -3,7 +3,7 @@ import { CreditTypeEnum, PaymentTypeEnum } from '@/types/pricingPlan';
 
 import ICON_USER from '../assets/icon_users.svg';
 import ICON_BUILD from '../assets/icon_build.svg';
-import { BASE_URL } from '@/constant';
+import { BASE_URL } from '@/constants';
 
 export const PRICE_INFO: Record<string, string> = {
   [CreditTypeEnum.credit]: 'credits',

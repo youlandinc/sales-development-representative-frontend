@@ -13,7 +13,7 @@ import { flexRender, Header } from '@tanstack/react-table';
 
 import { StyledTableAiIcon } from './index';
 
-import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constant/table';
+import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
 import { TableColumnMeta, TableColumnTypeEnum } from '@/types/Prospect/table';
 
 interface StyledTableHeadCellProps {

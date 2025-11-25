@@ -31,11 +31,6 @@ export const COLORS = {
   },
 } as const;
 
-// Layout constants
-export const LAYOUT = {
-  maxWidth: 900,
-} as const;
-
 // Credit type display mapping
 export const CREDIT_TYPE_LABELS: Record<CreditTypeEnum, string> = {
   [CreditTypeEnum.credit]: 'Credits',
@@ -43,26 +38,26 @@ export const CREDIT_TYPE_LABELS: Record<CreditTypeEnum, string> = {
   [CreditTypeEnum.full_access]: 'Full Access',
 } as const;
 
-export const computedStyle = (type: PlanTypeEnum) => {
+export const computedPlanBadgeStyle = (type: PlanTypeEnum) => {
   switch (type) {
     case PlanTypeEnum.free:
       return {
-        color: '#6F6C7D',
-        bgcolor: '#DFDEE6',
+        textColor: '#6F6C7D',
+        bgColor: '#DFDEE6',
       };
     case PlanTypeEnum.basic:
     case PlanTypeEnum.starter:
     case PlanTypeEnum.essential:
       return {
-        color: '#3F67C6',
-        bgcolor: '#DFEDFF',
+        textColor: '#3F67C6',
+        bgColor: '#DFEDFF',
       };
     case PlanTypeEnum.professional:
     case PlanTypeEnum.business:
     case PlanTypeEnum.plus:
       return {
-        color: '#823FC6',
-        bgcolor: '#EADFFF',
+        textColor: '#823FC6',
+        bgColor: '#EADFFF',
       };
     case PlanTypeEnum.research:
     case PlanTypeEnum.intelligence:
@@ -70,13 +65,13 @@ export const computedStyle = (type: PlanTypeEnum) => {
     case PlanTypeEnum.enterprise:
     case PlanTypeEnum.pro:
       return {
-        color: '#FFFFFF',
-        bgcolor: '#363440',
+        textColor: '#FFFFFF',
+        bgColor: '#363440',
       };
     default:
       return {
-        color: '#6F6C7D',
-        bgcolor: '#DFDEE6',
+        textColor: '#6F6C7D',
+        bgColor: '#DFDEE6',
       };
   }
 };

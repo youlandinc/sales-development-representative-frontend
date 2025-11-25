@@ -44,7 +44,7 @@ export const StyledTextFieldNumber: FC<StyledTextFieldNumberProps> = ({
   percentage = false,
   max,
   isAllowed,
-  type,
+  //type,
   ...rest
 }) => {
   const [text, setText] = useState(value ?? 0);

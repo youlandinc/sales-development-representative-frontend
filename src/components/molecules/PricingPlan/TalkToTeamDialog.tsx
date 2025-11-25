@@ -11,7 +11,7 @@ import {
 } from '@/components/atoms';
 import { StyledFormElementContainer } from './base';
 
-import { PrivacyPolicy, TermsOfUse } from '@/constant';
+import { PrivacyPolicy, TermsOfUse } from '@/constants';
 import { PlanTypeEnum } from '@/types';
 import { PaymentTypeEnum, SendPricingEmailParam } from '@/types/pricingPlan';
 import { useAsyncFn } from '@/hooks';
@@ -141,7 +141,7 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
         </Typography>
       </Stack>
 
-      {/* Go to Directories button */}
+      {/* Go to directories button */}
       <StyledButton
         onClick={handleGoToDirectories}
         size="medium"

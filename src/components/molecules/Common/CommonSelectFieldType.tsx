@@ -2,8 +2,8 @@ import { FC } from 'react';
 
 import { StyledSelect, StyledSelectProps } from '@/components/atoms';
 
-import { getAddColumnMenuActions } from '@/constant';
-import { COLUMN_TYPE_ICONS } from '@/constant/table/iconsColumnType';
+import { getAddColumnMenuActions } from '@/constants';
+import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
 
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 import { Icon, Stack, Typography } from '@mui/material';
