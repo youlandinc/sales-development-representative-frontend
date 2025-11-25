@@ -125,7 +125,6 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
       </Stack>
 
       <StyledSelect
-        label={'Date range'}
         menuPaperSx={{
           px: 3,
           py: 2,
