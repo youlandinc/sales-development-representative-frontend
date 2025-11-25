@@ -60,8 +60,10 @@ export const Settings = () => {
   ];
 
   return (
-    <Stack gap={3} sx={{ '& .tox-promotion': { display: 'none' } }}>
-      <Typography variant={'h5'}>Settings</Typography>
+    <Stack sx={{ '& .tox-promotion': { display: 'none' }, height: '100%' }}>
+      <Typography pb={3} variant={'h5'}>
+        Settings
+      </Typography>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           onChange={handleChange}
@@ -83,7 +85,11 @@ export const Settings = () => {
         </Tabs>
       </Box>
       {tabsData.map((item) => (
-        <Box hidden={value !== item.value} key={item.value} sx={{ flex: 1 }}>
+        <Box
+          hidden={value !== item.value}
+          key={item.value}
+          sx={{ flex: 1, minHeight: 0, overflow: 'auto', pt: 3 }}
+        >
           {item.content}
         </Box>
       ))}

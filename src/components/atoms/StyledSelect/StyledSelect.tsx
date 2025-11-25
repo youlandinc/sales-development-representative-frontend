@@ -19,6 +19,7 @@ export interface StyledSelectProps extends BaseSelectProps {
   options: TOption[];
   sxHelperText?: SxProps;
   sxList?: SxProps;
+  menuPaperSx?: SxProps;
   tooltipTitle?: string;
   tooltipSx?: SxProps;
   isTooltip?: boolean;
@@ -27,7 +28,7 @@ export interface StyledSelectProps extends BaseSelectProps {
   onClear?: () => void;
   loading?: boolean;
   loadOptions?: () => Promise<void>;
-  renderOption?: (option: TOption) => React.ReactNode;
+  renderOption?: (option: TOption, index: number) => React.ReactNode;
 }
 
 export const StyledSelect: FC<StyledSelectProps> = ({
@@ -38,6 +39,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   label,
   disabled,
   sxList,
+  menuPaperSx,
   sx,
   size,
   required,
@@ -163,28 +165,31 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         inputProps={{
           MenuProps: {
             MenuListProps: {
-              sx: {
-                p: 0,
-                m: 0,
-                '& .MuiMenuItem-root:hover': {
-                  bgcolor: 'rgba(144, 149, 163, 0.1) !important',
+              sx: [
+                {
+                  p: 0,
+                  m: 0,
+                  '& .MuiMenuItem-root:hover': {
+                    bgcolor: 'rgba(144, 149, 163, 0.1) !important',
+                  },
+                  '& .Mui-selected': {
+                    bgcolor: '#EFE9FB !important',
+                  },
+                  '& .Mui-selected:hover': {
+                    bgcolor: '#EFE9FB !important',
+                  },
+                  '& .MuiMenuItem-root': {
+                    fontSize: 14,
+                    color: 'text.primary',
+                    p: 1.5,
+                  },
                 },
-                '& .Mui-selected': {
-                  bgcolor: '#EFE9FB !important',
-                },
-                '& .Mui-selected:hover': {
-                  bgcolor: '#EFE9FB !important',
-                },
-                '& .MuiMenuItem-root': {
-                  fontSize: 14,
-                  color: 'text.primary',
-                  p: 1.5,
-                },
-                ...sxList,
-              },
+                ...(Array.isArray(sxList) ? sxList : [sxList]),
+              ],
             },
             PaperProps: {
               style: { marginTop: 12, borderRadius: 8 },
+              sx: menuPaperSx,
             },
           },
         }}
@@ -217,9 +222,9 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         // size={['xs', 'sm', 'md'].includes(breakpoints) ? 'small' : 'medium'}
       >
         {!loading &&
-          options.map((opt) =>
+          options.map((opt, i) =>
             renderOption ? (
-              renderOption(opt)
+              renderOption(opt, i)
             ) : (
               <MenuItem
                 disabled={opt.disabled}

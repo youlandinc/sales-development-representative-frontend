@@ -1,3 +1,4 @@
+import { FetchCurrentPlanResponse } from '@/types/Settings/currentPlan';
 import { get, post } from '../request';
 import {
   CreatePaymentLinkParam,

@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 
-import { _fetchCreditUsageList } from '@/request/settings/creditUsage';
+import {
+  _fetchCreditUsageList,
+  _fetchUsageType,
+} from '@/request/settings/creditUsage';
 
 import { FetchCreditUsageListRequest } from '@/types/Settings/creditUsage';
 import { PlanTypeEnum } from '@/types';
@@ -85,7 +88,15 @@ export const useCreditUsage = () => {
         },
       };
     },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
   );
+
+  const { data: usageType } = useSWR('usage-type', _fetchUsageType, {
+    revalidateOnFocus: false,
+  });
 
   return {
     data,
@@ -95,5 +106,6 @@ export const useCreditUsage = () => {
     setPage,
     page,
     totalPages: data?.data?.page?.totalPages || 0,
+    usageType: usageType?.data || [],
   };
 };

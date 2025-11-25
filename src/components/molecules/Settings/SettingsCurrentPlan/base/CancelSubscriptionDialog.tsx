@@ -11,6 +11,7 @@ interface CancelSubscriptionDialogProps {
   onConfirm: () => void;
   planName: string;
   endDate: string;
+  loading?: boolean;
 }
 
 export const CancelSubscriptionDialog: FC<CancelSubscriptionDialogProps> = ({
@@ -19,6 +20,7 @@ export const CancelSubscriptionDialog: FC<CancelSubscriptionDialogProps> = ({
   onConfirm,
   planName,
   endDate,
+  loading,
 }) => {
   return (
     <StyledDialog
@@ -51,7 +53,12 @@ export const CancelSubscriptionDialog: FC<CancelSubscriptionDialogProps> = ({
           <StyledButton onClick={onClose} size={'medium'} variant={'outlined'}>
             Keep subscription
           </StyledButton>
-          <StyledButton onClick={onConfirm} size={'medium'}>
+          <StyledButton
+            loading={loading}
+            onClick={onConfirm}
+            size={'medium'}
+            sx={{ width: 168 }}
+          >
             Confirm cancellation
           </StyledButton>
         </Stack>

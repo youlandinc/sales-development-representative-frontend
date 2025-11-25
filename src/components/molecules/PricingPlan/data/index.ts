@@ -1,17 +1,17 @@
 import { PlanTypeEnum } from '@/types';
-import { CreditType, PaymentType } from '@/types/pricingPlan';
+import { CreditTypeEnum, PaymentTypeEnum } from '@/types/pricingPlan';
 
 import ICON_USER from '../assets/icon_users.svg';
 import ICON_BUILD from '../assets/icon_build.svg';
 
 export const PRICE_INFO: Record<string, string> = {
-  [CreditType.credit]: 'credits',
-  [CreditType.record]: 'records',
+  [CreditTypeEnum.credit]: 'credits',
+  [CreditTypeEnum.record]: 'records',
 };
 
 export const PERIOD_INFO: Record<string, string> = {
-  [PaymentType.MONTHLY]: 'per month',
-  [PaymentType.YEARLY]: 'per year, billed yearly',
+  [PaymentTypeEnum.MONTHLY]: 'per month',
+  [PaymentTypeEnum.YEARLY]: 'per year, billed yearly',
 };
 
 export const packageTitle: Record<string, string> = {

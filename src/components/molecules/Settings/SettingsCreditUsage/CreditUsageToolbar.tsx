@@ -1,21 +1,26 @@
-import { Stack, Typography } from '@mui/material';
+import { ListSubheader, MenuItem, Stack, Typography } from '@mui/material';
 import { FC, useState } from 'react';
 
-import { DateRangeDialog } from './DateRangeDialog';
 import { StyledSelect } from '@/components/atoms';
+import { DateRangeDialog } from './DateRangeDialog';
 
 import { PlanTypeEnum } from '@/types';
-import { FetchCreditUsageListRequest } from '@/types/Settings/creditUsage';
+import {
+  FetchCreditUsageListRequest,
+  FetchUsageTypeItem,
+} from '@/types/Settings/creditUsage';
 
 interface CreditUsageToolbarProps {
   onChange: (
     conditions: Omit<FetchCreditUsageListRequest, 'page' | 'size'>,
   ) => void;
   value: Omit<FetchCreditUsageListRequest, 'page' | 'size'>;
+  usageTypeList: FetchUsageTypeItem[];
 }
 export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
   onChange,
   value,
+  usageTypeList,
 }) => {
   const [dateDialogOpen, setDateDialogOpen] = useState(false);
 
@@ -30,23 +35,63 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
           Usage type
         </Typography>
         <StyledSelect
+          menuPaperSx={{
+            px: 3,
+            py: 2,
+          }}
           onChange={(e) => {
             onChange?.({
               ...value,
               category: e.target.value as PlanTypeEnum,
             });
           }}
-          options={[
-            { value: 'Enrichment', label: 'Enrichment', key: 'Enrichment' },
-            { value: 'Research', label: 'Research', key: 'Research' },
-          ]}
+          options={usageTypeList as any}
+          renderOption={(options: any, index) => {
+            return (
+              <>
+                <ListSubheader
+                  sx={{
+                    pt: index === 0 ? '0 !important' : '8px !important',
+                    pb: '8px !important',
+                    px: '0 !important',
+                    lineHeight: 1.5,
+                    color: 'text.secondary',
+                  }}
+                >
+                  {options.parentCategory}
+                </ListSubheader>
+                {options.children.map((child: any, i: number) => (
+                  <MenuItem
+                    key={i}
+                    sx={{
+                      px: 1.5,
+                      py: '8px !important',
+                      borderRadius: 2,
+                    }}
+                    value={child.category}
+                  >
+                    {child.categoryName}
+                  </MenuItem>
+                ))}
+              </>
+            );
+          }}
           size={'small'}
+          sxList={{
+            '& .MuiMenuItem-root:hover': {
+              bgcolor: '#EAE9EF !important',
+            },
+          }}
           value={value.category}
         />
       </Stack>
 
       <StyledSelect
-        label="Date range"
+        label={'Date range'}
+        menuPaperSx={{
+          px: 3,
+          py: 2,
+        }}
         onChange={(e) => {
           const v = e.target.value;
           if (v === 'range') {
@@ -83,6 +128,20 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
         ]}
         size={'small'}
         sx={{ width: 280 }}
+        sxList={{
+          '& .MuiMenuItem-root:hover': {
+            bgcolor: '#EAE9EF !important',
+          },
+          '& .MuiMenuItem-root': {
+            py: '8px',
+            px: 1.5,
+            lineHeight: 1.5,
+            borderRadius: 2,
+          },
+          '& .Mui-selected': {
+            bgcolor: '#EAE9EF !important',
+          },
+        }}
         value={value.dateType}
       />
 

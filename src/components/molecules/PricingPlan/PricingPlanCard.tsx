@@ -8,7 +8,7 @@ import { TalkToTeamDialog } from './TalkToTeamDialog';
 import { useAsyncFn, useSwitch } from '@/hooks';
 import { PlanTypeEnum } from '@/types';
 import { DirectoriesBizIdEnum } from '@/types/Directories';
-import { PaymentType, PlanInfo } from '@/types/pricingPlan';
+import { PaymentTypeEnum, PlanInfo } from '@/types/pricingPlan';
 
 import { _createPaymentLink } from '@/request/pricingPlan';
 import { StyledCapitalDesc } from './base';
@@ -21,7 +21,7 @@ import ICON_PRO from './assets/icon_pro.svg';
 
 interface PricingCardProps {
   plan: PlanInfo;
-  paymentType?: PaymentType | string;
+  paymentType?: PaymentTypeEnum | string;
   category: string;
 }
 
@@ -68,7 +68,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
         successUrl: SUCCESS_URL,
         cancelUrl: CANCEL_URL,
         planType: plan.planType,
-        pricingType: paymentType as PaymentType,
+        pricingType: paymentType as PaymentTypeEnum,
       });
       // 这里可以处理重定向逻辑
       if (data) {
@@ -96,9 +96,11 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
     if (plan.planType === PlanTypeEnum.free && plan.creditType && plan.credit) {
       return (
         <Typography>
-          {paymentType === PaymentType.YEARLY ? plan.credit * 12 : plan.credit}{' '}
+          {paymentType === PaymentTypeEnum.YEARLY
+            ? plan.credit * 12
+            : plan.credit}{' '}
           {PRICE_INFO[plan.creditType as string] || ''}{' '}
-          {paymentType === PaymentType.YEARLY ? 'per year' : 'per month'}
+          {paymentType === PaymentTypeEnum.YEARLY ? 'per year' : 'per month'}
         </Typography>
       );
     }
@@ -113,11 +115,11 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
     if (plan.creditType) {
       return (
         <Typography>
-          {paymentType === PaymentType.YEARLY && plan.credit
+          {paymentType === PaymentTypeEnum.YEARLY && plan.credit
             ? (plan.credit * 12).toLocaleString()
             : plan.credit?.toLocaleString()}{' '}
           {PRICE_INFO[plan.creditType as string] || ''}{' '}
-          {PERIOD_INFO[paymentType as PaymentType] || ''}
+          {PERIOD_INFO[paymentType as PaymentTypeEnum] || ''}
         </Typography>
       );
     }
@@ -309,7 +311,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
         onClose={toggle}
         open={visible}
         planType={plan.planType}
-        pricingType={paymentType as PaymentType}
+        pricingType={paymentType as PaymentTypeEnum}
       />
     </Stack>
   );

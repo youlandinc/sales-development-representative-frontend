@@ -24,3 +24,15 @@ export interface CreditUsageItemInfo {
   date: string;
   integrationName: string;
 }
+
+export interface UsageTypeChild {
+  category: PlanTypeEnum;
+  categoryName: string;
+  planType: PlanTypeEnum;
+  choosePlanName: string;
+}
+
+export interface FetchUsageTypeItem {
+  parentCategory: string;
+  children: UsageTypeChild[];
+}
