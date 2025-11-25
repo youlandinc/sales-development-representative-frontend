@@ -45,7 +45,7 @@ export const _saveWebResearchConfig = (
   excludeFields: string[][],
   generatePrompt: string,
 ) => {
-  return post<string>('/sdr/table/field', {
+  return post<string>('/sdr/table/field/add', {
     tableId,
     actionKey: 'use-ai',
     fieldType: 'TEXT',
