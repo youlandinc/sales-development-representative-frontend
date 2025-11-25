@@ -45,7 +45,9 @@ export const useComputedInWorkEmailStore = () => {
   const isMissingConfig = useMemo(
     () =>
       integrationsInWaterfall.some((integration) =>
-        integration.inputParams.some((param) => !param.selectedOption),
+        integration.inputParams
+          .filter((p) => p.isRequired)
+          .some((param) => !param.selectedOption),
       ),
     [integrationsInWaterfall],
   );
@@ -53,7 +55,9 @@ export const useComputedInWorkEmailStore = () => {
   const hasConfigCount = useMemo(
     () =>
       integrationsInWaterfall.filter((item) =>
-        item.inputParams.every((p) => !!p.selectedOption),
+        item.inputParams
+          .filter((p) => p.isRequired)
+          .every((p) => !!p.selectedOption),
       ).length,
     [integrationsInWaterfall],
   );

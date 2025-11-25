@@ -1,6 +1,4 @@
-import { format } from 'date-fns';
 import { useCallback, useState } from 'react';
-import useSwr from 'swr';
 
 import { SDRToast } from '@/components/atoms';
 
@@ -10,33 +8,32 @@ import {
   PREMIUM_PLAN_TYPES,
 } from '../data';
 
-import { HttpError, PlanTypeEnum } from '@/types';
+import { HttpError, PlanStatusEnum, PlanTypeEnum } from '@/types';
 import { PlanCardProps } from '../base';
 
-import { _cancelPlan, _fetchCurrentPlan } from '@/request/settings';
+import { _cancelPlan } from '@/request/settings';
 
 import { useAsyncFn } from '@/hooks';
+import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
 
 export interface SelectedPlan {
   planName: string;
   renewalDate: string;
-  category: PlanTypeEnum;
+  planType: PlanTypeEnum;
 }
 
 export const useCurrentPlan = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SelectedPlan | null>(null);
-
-  const { data, isLoading, mutate } = useSwr(
-    'current-plan',
-    _fetchCurrentPlan,
-    {
-      revalidateOnFocus: false,
-    },
+  const planList = useCurrentPlanStore((state) => state.planList);
+  const fetchCurrentPlan = useCurrentPlanStore(
+    (state) => state.fetchCurrentPlan,
   );
+  const isLoading = useCurrentPlanStore((state) => state.isLoading);
 
-  const plans: PlanCardProps[] = (data?.data?.currentPlans || []).map(
-    (plan) => {
+  const plans: PlanCardProps[] = planList
+    .filter((plan) => plan.status !== PlanStatusEnum.created)
+    .map((plan) => {
       const style = computedPlanBadgeStyle(plan.planType);
       const isPremium = PREMIUM_PLAN_TYPES.includes(
         plan.planType as (typeof PREMIUM_PLAN_TYPES)[number],
@@ -47,7 +44,7 @@ export const useCurrentPlan = () => {
 
       return {
         planName: plan.categoryName,
-        category: plan.category,
+        // category: plan.category,
         planBadge: {
           label: plan.planName,
           bgColor: style.bgColor,
@@ -56,25 +53,25 @@ export const useCurrentPlan = () => {
         },
         fullAccess: isFullAccess,
         unit: plan.creditType,
-        renewalDate: format(new Date(plan.planEndTime), 'MMM dd, yyyy'),
+        renewalDate: plan.planEndTime,
         refreshDays: plan.remainingDays,
         totalValue: plan.totalCredits,
         // currentValue: plan.totalCredits - plan.usedCredits, // 剩余额度
         currentValue: plan.remainingCredits, // 剩余额度
         status: plan.status,
+        planType: plan.planType,
       };
-    },
-  );
+    });
 
   const [cancelState, handleConfirmCancellation] = useAsyncFn(async () => {
     if (!selectedPlan) {
       return;
     }
     try {
-      await _cancelPlan(selectedPlan.category);
+      await _cancelPlan(selectedPlan.planType);
       setCancelDialogOpen(false);
       setSelectedPlan(null);
-      mutate();
+      fetchCurrentPlan();
     } catch (e) {
       const { message, header, variant } = e as HttpError;
       SDRToast({ message, header, variant });
@@ -82,8 +79,8 @@ export const useCurrentPlan = () => {
   }, [selectedPlan]);
 
   const handleCancelClick = useCallback(
-    (planName: string, category: PlanTypeEnum, renewalDate?: string) => {
-      setSelectedPlan({ planName, renewalDate: renewalDate ?? '', category });
+    (planName: string, planType: PlanTypeEnum, renewalDate?: string) => {
+      setSelectedPlan({ planName, renewalDate: renewalDate ?? '', planType });
       setCancelDialogOpen(true);
     },
     [],

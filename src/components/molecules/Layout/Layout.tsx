@@ -5,6 +5,7 @@ import { useRouter } from 'nextjs-toploader/app';
 import { useUserStore } from '@/providers';
 
 import { LayoutHeader, LayoutSide } from '@/components/molecules';
+import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
 
 export interface StyledLayoutProps {
   sx?: SxProps;
@@ -15,6 +16,9 @@ export interface StyledLayoutProps {
 export const Layout: FC<StyledLayoutProps> = ({ sx, children, contentSx }) => {
   const router = useRouter();
   const { isHydration, accessToken } = useUserStore((state) => state);
+  const fetchCurrentPlan = useCurrentPlanStore(
+    (state) => state.fetchCurrentPlan,
+  );
 
   useEffect(
     () => {
@@ -22,6 +26,7 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children, contentSx }) => {
         if (!accessToken) {
           return router.push('/auth/sign-in');
         }
+        fetchCurrentPlan();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

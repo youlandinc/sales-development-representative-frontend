@@ -65,7 +65,7 @@ const shouldShowRefreshInfo = (
 
 export interface PlanCardProps {
   planName: string;
-  category: PlanTypeEnum;
+  // category: PlanTypeEnum;
   planBadge: {
     label: string;
     bgColor: string;
@@ -80,6 +80,7 @@ export interface PlanCardProps {
   fullAccess?: boolean; // For plans with full access (no limits)
   onCancel?: () => void;
   status: PlanStatusEnum;
+  planType: PlanTypeEnum;
 }
 
 export const PlanCard: FC<PlanCardProps> = ({

@@ -10,7 +10,7 @@ interface PlanListProps {
   isLoading: boolean;
   onCancelClick: (
     planName: string,
-    category: PlanTypeEnum,
+    planType: PlanTypeEnum,
     renewalDate?: string,
   ) => void;
 }
@@ -23,7 +23,7 @@ export const PlanList: FC<PlanListProps> = ({
   const handleCancel = useCallback(
     (plan: PlanCardProps) => () => {
       if (plan.renewalDate) {
-        onCancelClick(plan.planName, plan.category, plan.renewalDate);
+        onCancelClick(plan.planName, plan.planType, plan.renewalDate);
       }
     },
     [onCancelClick],
@@ -39,9 +39,9 @@ export const PlanList: FC<PlanListProps> = ({
 
   return (
     <Stack gap={1.5}>
-      {plans.map((plan) => (
+      {plans.map((plan, index) => (
         <PlanCard
-          key={plan.planBadge.label}
+          key={plan.planBadge.label + index}
           {...plan}
           onCancel={plan.renewalDate ? handleCancel(plan) : undefined}
         />
