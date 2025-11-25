@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useSwr from 'swr';
 import { format } from 'date-fns';
 
@@ -18,13 +18,15 @@ import { _cancelPlan, _fetchCurrentPlan } from '@/request/settings';
 
 import { useAsyncFn } from '@/hooks';
 
+export interface SelectedPlan {
+  planName: string;
+  renewalDate: string;
+  category: PlanTypeEnum;
+}
+
 export const useCurrentPlan = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<{
-    planName: string;
-    renewalDate: string;
-    category: PlanTypeEnum;
-  } | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<SelectedPlan | null>(null);
 
   const { data, isLoading, mutate } = useSwr(
     'current-plan',
@@ -80,24 +82,29 @@ export const useCurrentPlan = () => {
     }
   }, [selectedPlan]);
 
-  const handleCancelClick = (
-    planName: string,
-    category: PlanTypeEnum,
-    renewalDate?: string,
-  ) => {
-    setSelectedPlan({ planName, renewalDate: renewalDate ?? '', category });
-    setCancelDialogOpen(true);
-  };
+  const handleCancelClick = useCallback(
+    (planName: string, category: PlanTypeEnum, renewalDate?: string) => {
+      setSelectedPlan({ planName, renewalDate: renewalDate ?? '', category });
+      setCancelDialogOpen(true);
+    },
+    [],
+  );
+
+  const handleCloseDialog = useCallback(() => {
+    setCancelDialogOpen(false);
+    setSelectedPlan(null);
+  }, []);
 
   return {
-    cancelDialogOpen,
-    selectedPlan,
     plans,
     isLoading,
     handleCancelClick,
-    handleConfirmCancellation,
-    setCancelDialogOpen,
-    setSelectedPlan,
-    cancelState,
+    cancelDialog: {
+      open: cancelDialogOpen,
+      selectedPlan,
+      loading: cancelState.loading,
+      onClose: handleCloseDialog,
+      onConfirm: handleConfirmCancellation,
+    },
   };
 };

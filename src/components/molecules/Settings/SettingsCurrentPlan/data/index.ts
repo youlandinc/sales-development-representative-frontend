@@ -31,6 +31,11 @@ export const COLORS = {
   },
 } as const;
 
+// Layout constants
+export const LAYOUT = {
+  maxWidth: 900,
+} as const;
+
 // Credit type display mapping
 export const CREDIT_TYPE_LABELS: Record<CreditTypeEnum, string> = {
   [CreditTypeEnum.credit]: 'Credits',

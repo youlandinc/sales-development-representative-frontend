@@ -6,16 +6,18 @@ import { DateRangeDialog } from './DateRangeDialog';
 
 import { PlanTypeEnum } from '@/types';
 import {
+  DateRangeEnum,
   FetchCreditUsageListRequest,
-  FetchUsageTypeItem,
 } from '@/types/Settings/creditUsage';
+
+import { DATE_RANGE_OPTIONS, formatDateRange } from './data';
 
 interface CreditUsageToolbarProps {
   onChange: (
     conditions: Omit<FetchCreditUsageListRequest, 'page' | 'size'>,
   ) => void;
   value: Omit<FetchCreditUsageListRequest, 'page' | 'size'>;
-  usageTypeList: FetchUsageTypeItem[];
+  usageTypeList: TOption[];
 }
 export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
   onChange,
@@ -45,10 +47,10 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
               category: e.target.value as PlanTypeEnum,
             });
           }}
-          options={usageTypeList as any}
-          renderOption={(options: any, index) => {
-            return (
-              <>
+          options={usageTypeList || []}
+          renderOption={(option, index) => {
+            if (option.disabled) {
+              return (
                 <ListSubheader
                   sx={{
                     pt: index === 0 ? '0 !important' : '8px !important',
@@ -58,25 +60,24 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
                     color: 'text.secondary',
                   }}
                 >
-                  {options.parentCategory}
+                  {option.label}
                 </ListSubheader>
-                {options.children.map((child: any, i: number) => (
-                  <MenuItem
-                    key={i}
-                    sx={{
-                      px: 1.5,
-                      py: '8px !important',
-                      borderRadius: 2,
-                    }}
-                    value={child.category}
-                  >
-                    {child.categoryName}
-                  </MenuItem>
-                ))}
-              </>
+              );
+            }
+            return (
+              <MenuItem
+                key={option.key}
+                sx={{
+                  px: 1.5,
+                  py: '8px !important',
+                  borderRadius: 2,
+                }}
+                value={option.value}
+              >
+                {option.label}
+              </MenuItem>
             );
           }}
-          size={'small'}
           sxList={{
             '& .MuiMenuItem-root:hover': {
               bgcolor: '#EAE9EF !important',
@@ -94,7 +95,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
         }}
         onChange={(e) => {
           const v = e.target.value;
-          if (v === 'range') {
+          if (v === DateRangeEnum.range) {
             setDateDialogOpen(true);
           } else {
             onChange?.({
@@ -103,31 +104,11 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
             });
           }
         }}
-        options={[
-          {
-            value: 'This month (Nov 1, 2025 - Nov 30, 2025)',
-            label: 'This month (Nov 1, 2025 - Nov 30, 2025)',
-            key: 'This month (Nov 1, 2025 - Nov 30, 2025)',
-          },
-          { value: 'Last month', label: 'Last month', key: 'Last month' },
-          {
-            value: 'Last 3 months',
-            label: 'Last 3 months',
-            key: 'Last 3 months',
-          },
-          {
-            value: 'Last 6 months',
-            label: 'Last 6 months',
-            key: 'Last 6 months',
-          },
-          {
-            value: 'range',
-            label: 'Select custom range',
-            key: 'range',
-          },
-        ]}
-        size={'small'}
-        sx={{ width: 280 }}
+        options={DATE_RANGE_OPTIONS}
+        renderValue={(value) => {
+          return formatDateRange(value as DateRangeEnum);
+        }}
+        sx={{ width: 320 }}
         sxList={{
           '& .MuiMenuItem-root:hover': {
             bgcolor: '#EAE9EF !important',
@@ -138,9 +119,9 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
             lineHeight: 1.5,
             borderRadius: 2,
           },
-          '& .Mui-selected': {
-            bgcolor: '#EAE9EF !important',
-          },
+          // '& .Mui-selected': {
+          //   bgcolor: '#EAE9EF !important',
+          // },
         }}
         value={value.dateType}
       />

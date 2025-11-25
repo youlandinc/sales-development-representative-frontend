@@ -1,82 +1,36 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import { FC } from 'react';
 
-import { CancelSubscriptionDialog, PaymentSetting, PlanCard } from './base';
+import { CancelSubscriptionDialog, PaymentSetting } from './base';
+import { PlanList, SectionTitle } from './components';
+import { LAYOUT } from './data';
 
 import { useCurrentPlan } from './hooks';
 
 export const CurrentPlan: FC = () => {
-  const {
-    cancelDialogOpen,
-    selectedPlan,
-    plans,
-    isLoading,
-    handleCancelClick,
-    handleConfirmCancellation,
-    setCancelDialogOpen,
-    setSelectedPlan,
-    cancelState,
-  } = useCurrentPlan();
+  const { plans, isLoading, handleCancelClick, cancelDialog } =
+    useCurrentPlan();
 
   return (
-    <Stack gap={3} sx={{ width: 900 }}>
-      {/* Title */}
-      <Typography
-        sx={{
-          fontSize: 18,
-          fontWeight: 600,
-          color: '#363440',
-          lineHeight: 1.2,
-        }}
-      >
-        Current plan
-      </Typography>
+    <Stack gap={3} sx={{ width: LAYOUT.maxWidth }}>
+      <SectionTitle>Current plan</SectionTitle>
 
-      {/* Plan cards */}
-      <Stack gap={1.5}>
-        {isLoading ? (
-          <Typography sx={{ color: '#6F6C7D', fontSize: 14 }}>
-            Loading plans...
-          </Typography>
-        ) : plans.length === 0 ? (
-          <Typography sx={{ color: '#6F6C7D', fontSize: 14 }}>
-            No active plans found.
-          </Typography>
-        ) : (
-          plans.map((plan) => (
-            <PlanCard
-              key={`${plan.planName}-${plan.renewalDate}`}
-              {...plan}
-              onCancel={
-                plan.renewalDate
-                  ? () =>
-                      handleCancelClick(
-                        plan.planName,
-                        plan.category,
-                        plan.renewalDate,
-                      )
-                  : undefined
-              }
-            />
-          ))
-        )}
-      </Stack>
+      <PlanList
+        isLoading={isLoading}
+        onCancelClick={handleCancelClick}
+        plans={plans}
+      />
 
-      {/* Payment settings */}
       <PaymentSetting />
 
-      {/* Cancel Subscription Dialog */}
-      {selectedPlan && (
+      {cancelDialog.selectedPlan && (
         <CancelSubscriptionDialog
-          endDate={selectedPlan.renewalDate}
-          loading={cancelState.loading}
-          onClose={() => {
-            setCancelDialogOpen(false);
-            setSelectedPlan(null);
-          }}
-          onConfirm={handleConfirmCancellation}
-          open={cancelDialogOpen}
-          planName={selectedPlan.planName}
+          endDate={cancelDialog.selectedPlan.renewalDate}
+          loading={cancelDialog.loading}
+          onClose={cancelDialog.onClose}
+          onConfirm={cancelDialog.onConfirm}
+          open={cancelDialog.open}
+          planName={cancelDialog.selectedPlan.planName}
         />
       )}
     </Stack>
