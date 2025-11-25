@@ -21,18 +21,24 @@ import ICON_NO_RESULT from './assets/icon-no-result.svg';
 
 const getRandomWidth = () => `${Math.floor(Math.random() * 50 + 40)}%`;
 
+// 固定骨架屏配置
+const SKELETON_CONFIG = {
+  COLUMNS: 6,  // 默认显示 6 列
+  ROWS: 5,     // 默认显示 5 行
+};
+
 export interface PreviewTableProps {
   header: DirectoriesQueryTableHeaderItem[];
   body: DirectoriesQueryTableBodyItem[];
   loading: boolean;
-  hasSearched: boolean;
+  isShowResult: boolean;
 }
 
 export const PreviewTable: FC<PreviewTableProps> = ({
   header,
   body,
   loading,
-  hasSearched,
+  isShowResult,
 }) => {
   const reducedHeader = useMemo(() => {
     return [
@@ -48,23 +54,43 @@ export const PreviewTable: FC<PreviewTableProps> = ({
     ];
   }, [header]);
 
-  // 为 Header 生成随机宽度
-  const headerSkeletonWidths = useMemo(() => {
-    return reducedHeader.map(() => getRandomWidth());
-  }, [reducedHeader]);
+  // 骨架屏渲染用的列数组：有 header 用 reducedHeader，否则用固定数量
+  const skeletonColumns = useMemo(() => {
+    if (header.length > 0) {
+      return reducedHeader;
+    }
+    // 固定骨架屏列：序号列 + N 个占位列
+    return [
+      {
+        columnKey: 'inside_sort_number',
+        columnName: '',
+        columnType: TableColumnTypeEnum.number,
+        width: 60,
+      },
+      ...Array.from({ length: SKELETON_CONFIG.COLUMNS }, (_, i) => ({
+        columnKey: `skeleton_${i}`,
+        columnName: '',
+        columnType: null,
+        width: null,
+      })),
+    ];
+  }, [header.length, reducedHeader]);
 
-  // 为 Body 每个单元格预生成随机宽度
+  const headerSkeletonWidths = useMemo(() => {
+    return skeletonColumns.map(() => getRandomWidth());
+  }, [skeletonColumns]);
+
   const bodySkeletonWidths = useMemo(() => {
     if (!loading) {
       return [];
     }
-    const rows = body.length === 0 ? 5 : body.length;
+    const rows = body.length === 0 ? SKELETON_CONFIG.ROWS : body.length;
     return Array.from({ length: rows }, () =>
-      reducedHeader.map(() => getRandomWidth()),
+      skeletonColumns.map(() => getRandomWidth()),
     );
-  }, [loading, body.length, reducedHeader]);
+  }, [loading, body.length, skeletonColumns]);
 
-  return hasSearched ? (
+  return isShowResult ? (
     <Table
       sx={{
         '& .MuiTableCell-root': {
@@ -79,7 +105,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
     >
       <TableHead>
         <TableRow>
-          {reducedHeader.map((head, index) => (
+          {(loading ? skeletonColumns : reducedHeader).map((head, index) => (
             <TableCell
               key={`header-${index}`}
               sx={{
@@ -110,11 +136,11 @@ export const PreviewTable: FC<PreviewTableProps> = ({
       </TableHead>
       <TableBody>
         {(loading && body.length === 0
-          ? (Array.from({ length: 5 }) as DirectoriesQueryTableBodyItem[])
+          ? (Array.from({ length: SKELETON_CONFIG.ROWS }) as DirectoriesQueryTableBodyItem[])
           : body
         ).map((row, rowIndex) => (
           <TableRow key={rowIndex}>
-            {reducedHeader.map((head, colIndex) => (
+            {(loading ? skeletonColumns : reducedHeader).map((head, colIndex) => (
               <TableCell
                 key={`${rowIndex}-${colIndex}`}
                 sx={{

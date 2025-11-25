@@ -17,19 +17,22 @@ export const DirectoriesIndustryPreview: FC = () => {
 
   const { findCount, findList } = previewBody;
 
+  const isShowResult =
+    isLoadingPreview || (hasSubmittedSearch && findCount > 0);
+
   return (
     <Stack sx={{ flex: 1, p: 3, gap: 3, overflow: 'hidden' }}>
       <PreviewSummary
-        hasSearched={hasSubmittedSearch}
         importCount={Math.min(findCount, 1000)}
+        isShowResult={isShowResult}
         loading={isLoadingPreview}
         totalCount={findCount}
       />
       <Stack sx={{ flex: 1, overflowX: 'auto', overflowY: 'auto' }}>
         <PreviewTable
           body={findList}
-          hasSearched={hasSubmittedSearch}
           header={previewHeader}
+          isShowResult={isShowResult}
           loading={isLoadingPreview}
         />
       </Stack>

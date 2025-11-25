@@ -5,14 +5,14 @@ interface PreviewSummaryProps {
   totalCount: number;
   importCount: number;
   loading: boolean;
-  hasSearched: boolean;
+  isShowResult: boolean;
 }
 
 export const PreviewSummary: FC<PreviewSummaryProps> = ({
   totalCount,
   importCount,
   loading,
-  hasSearched,
+  isShowResult,
 }) => {
   return (
     <Stack sx={{ flexDirection: 'row', alignItems: 'flex-end' }}>
@@ -26,7 +26,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
         Preview leads
       </Typography>
 
-      {hasSearched && (
+      {isShowResult && (
         <Typography
           sx={{
             ml: 'auto',
