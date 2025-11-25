@@ -24,3 +24,32 @@ export interface CreditUsageItemInfo {
   date: string;
   integrationName: string;
 }
+
+export interface UsageTypeChild {
+  category: PlanTypeEnum;
+  categoryName: string;
+  planType: PlanTypeEnum;
+  choosePlanName: string;
+}
+
+export interface FetchUsageTypeItem {
+  parentCategory: string;
+  children: UsageTypeChild[];
+}
+
+export enum DateRangeEnum {
+  this_month = 'THIS_MONTH',
+
+  last_month = 'LAST_MONTH',
+
+  last_3_months = 'LAST_3_MONTHS',
+
+  last_6_months = 'LAST_6_MONTHS',
+
+  range = 'RANGE',
+}
+
+export interface UsageTypeOptions extends TOption {
+  planName?: string;
+  planType?: PlanTypeEnum;
+}

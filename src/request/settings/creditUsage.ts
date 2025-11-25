@@ -1,4 +1,5 @@
-import { post } from '../request';
+import { FetchUsageTypeItem } from '@/types';
+import { get, post } from '../request';
 
 import {
   CreditUsageItemInfo,
@@ -10,4 +11,8 @@ export const _fetchCreditUsageList = (param: FetchCreditUsageListRequest) => {
     '/sdr/pricing/credit/usage',
     param,
   );
+};
+
+export const _fetchUsageType = () => {
+  return get<FetchUsageTypeItem[]>('/sdr/pricing/plan/purchased');
 };

@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 
 import {
   StyledButton,
@@ -10,25 +10,28 @@ import {
 interface DateRangeDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm?: (startDate: Date | null, endDate: Date | null) => void;
+  startDate: Date | null;
+  endDate: Date | null;
+  onStartDateChange: (date: Date | null) => void;
+  onEndDateChange: (date: Date | null) => void;
+  onConfirm?: () => void;
 }
 
 export const DateRangeDialog: FC<DateRangeDialogProps> = ({
   open,
   onClose,
+  startDate,
+  endDate,
+  onStartDateChange,
+  onEndDateChange,
   onConfirm,
 }) => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-
   const handleConfirm = () => {
-    onConfirm?.(startDate, endDate);
+    onConfirm?.();
     onClose();
   };
 
   const handleCancel = () => {
-    setStartDate(null);
-    setEndDate(null);
     onClose();
   };
 
@@ -49,7 +52,7 @@ export const DateRangeDialog: FC<DateRangeDialogProps> = ({
               Start date
             </Typography>
             <StyledDatePicker
-              onChange={(newValue) => setStartDate(newValue)}
+              onChange={onStartDateChange}
               slotProps={{
                 textField: {
                   placeholder: 'Select date',
@@ -74,7 +77,7 @@ export const DateRangeDialog: FC<DateRangeDialogProps> = ({
             </Typography>
             <StyledDatePicker
               minDate={startDate || undefined}
-              onChange={(newValue) => setEndDate(newValue)}
+              onChange={onEndDateChange}
               slotProps={{
                 textField: {
                   placeholder: 'Select date',
@@ -96,7 +99,7 @@ export const DateRangeDialog: FC<DateRangeDialogProps> = ({
               Cancel
             </StyledButton>
             <StyledButton
-              disabled={!startDate && !endDate}
+              disabled={!startDate}
               onClick={handleConfirm}
               size={'medium'}
             >

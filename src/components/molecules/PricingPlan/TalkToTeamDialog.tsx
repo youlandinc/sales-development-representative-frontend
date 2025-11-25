@@ -13,7 +13,7 @@ import { StyledFormElementContainer } from './base';
 
 import { PrivacyPolicy, TermsOfUse } from '@/constants';
 import { PlanTypeEnum } from '@/types';
-import { PaymentType, SendPricingEmailParam } from '@/types/pricingPlan';
+import { PaymentTypeEnum, SendPricingEmailParam } from '@/types/pricingPlan';
 import { useAsyncFn } from '@/hooks';
 import { _sendPricingEmail } from '@/request/pricingPlan';
 
@@ -23,7 +23,7 @@ export interface TalkToTeamDialogProps {
   open: boolean;
   onClose: () => void;
   planType: PlanTypeEnum;
-  pricingType: PaymentType;
+  pricingType: PaymentTypeEnum;
 }
 
 export type TalkToTeamFormData = Omit<

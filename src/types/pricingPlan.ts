@@ -28,12 +28,12 @@ export interface PricingPlanResponse {
   [key: string]: PlanCategoryConfig[];
 }
 
-export enum PaymentType {
+export enum PaymentTypeEnum {
   MONTHLY = 'MONTH',
   YEARLY = 'YEAR',
 }
 
-export enum CreditType {
+export enum CreditTypeEnum {
   credit = 'CREDIT',
   record = 'RECORD',
   full_access = 'FULL_ACCESS',
@@ -41,7 +41,7 @@ export enum CreditType {
 
 export interface CreatePaymentLinkParam {
   planType: PlanTypeEnum;
-  pricingType?: PaymentType;
+  pricingType?: PaymentTypeEnum;
   successUrl: string;
   cancelUrl: string;
 }
@@ -55,5 +55,5 @@ export interface SendPricingEmailParam {
   position: string;
   useCase: string;
   planType: PlanTypeEnum;
-  pricingType: PaymentType;
+  pricingType: PaymentTypeEnum;
 }

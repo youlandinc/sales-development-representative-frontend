@@ -1,17 +1,18 @@
 import { PlanTypeEnum } from '@/types';
-import { CreditType, PaymentType } from '@/types/pricingPlan';
+import { CreditTypeEnum, PaymentTypeEnum } from '@/types/pricingPlan';
 
 import ICON_USER from '../assets/icon_users.svg';
 import ICON_BUILD from '../assets/icon_build.svg';
+import { BASE_URL } from '@/constants';
 
 export const PRICE_INFO: Record<string, string> = {
-  [CreditType.credit]: 'credits',
-  [CreditType.record]: 'records',
+  [CreditTypeEnum.credit]: 'credits',
+  [CreditTypeEnum.record]: 'records',
 };
 
 export const PERIOD_INFO: Record<string, string> = {
-  [PaymentType.MONTHLY]: 'per month',
-  [PaymentType.YEARLY]: 'per year, billed yearly',
+  [PaymentTypeEnum.MONTHLY]: 'per month',
+  [PaymentTypeEnum.YEARLY]: 'per year, billed yearly',
 };
 
 export const packageTitle: Record<string, string> = {
@@ -26,8 +27,6 @@ export const CAPITAL_PLAN_DESC_ICON: Record<string, string> = {
   [PlanTypeEnum.research]: ICON_USER,
   [PlanTypeEnum.intelligence]: ICON_BUILD,
 };
-
-const BASE_URL = 'https://dev-sales.corepass.com';
 
 export const SUCCESS_URL = `${BASE_URL}/directories`;
 export const CANCEL_URL = `${BASE_URL}/pricing`;

@@ -25,6 +25,7 @@ export const CreditUsage: FC = () => {
     page,
     setPage,
     totalPages,
+    usageType,
   } = useCreditUsage();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
@@ -170,7 +171,7 @@ export const CreditUsage: FC = () => {
     {
       field: 'remainingCredits',
       headerName: 'Remaining Credits',
-      width: 200,
+      width: 160,
     },
     {
       field: 'tableName',
@@ -244,6 +245,7 @@ export const CreditUsage: FC = () => {
     >
       <CreditUsageToolbar
         onChange={setQueryConditions}
+        usageTypeList={usageType}
         value={queryConditions}
       />
       <Stack gap={1.5}>
