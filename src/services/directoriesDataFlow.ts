@@ -20,6 +20,11 @@ import {
 } from 'rxjs/operators';
 
 import {
+  buildAdditionalRequestParams,
+  buildFinalData,
+  buildSearchRequestParams,
+} from '@/utils/directories';
+import {
   _fetchDirectoriesAdditionalConfig,
   _fetchPreviewBody,
   _fetchPreviewHeader,
@@ -115,7 +120,7 @@ class DirectoriesDataFlow {
     switchMap((data) => {
       // Capture A's snapshot to ensure correct A-B pairing
       const formValuesKey = JSON.stringify(data);
-      const requestData = this._assembleAdditionalRequest(data);
+      const requestData = buildAdditionalRequestParams(data);
 
       return from(_fetchDirectoriesAdditionalConfig(requestData)).pipe(
         map(({ data }) => ({
@@ -259,7 +264,7 @@ class DirectoriesDataFlow {
         map(([result]) => {
           // Combine A + B into final request payload
           const additional = result.data;
-          return this._assembleFinalData(formData, additional);
+          return buildFinalData(formData, additional);
         }),
       );
     }),
@@ -293,7 +298,7 @@ class DirectoriesDataFlow {
     }),
     switchMap((finalData) => {
       // Flatten finalData into flat request payload
-      const requestData = this._assemblePreviewRequest(finalData);
+      const requestData = buildSearchRequestParams(finalData);
 
       // Parallel requests for header and body
       return forkJoin({
@@ -386,14 +391,6 @@ class DirectoriesDataFlow {
   }
 
   /**
-   * Get flattened request params from finalData
-   * Used by import API which needs the same format as preview request
-   */
-  getFlattenedParams(finalData: any): Record<string, any> {
-    return this._assemblePreviewRequest(finalData);
-  }
-
-  /**
    * Reset all data flows to initial state
    * Called when user navigates away or explicitly resets the form
    */
@@ -412,44 +409,10 @@ class DirectoriesDataFlow {
   // ========================================
   // Private Helper Methods
   // ========================================
-  /**
-   * Check if a value is considered empty
-   * Empty values: null, undefined, empty string, empty array
-   */
-  private _isEmptyValue(value: any): boolean {
-    return (
-      value === null ||
-      value === undefined ||
-      value === '' ||
-      (Array.isArray(value) && value.length === 0)
-    );
-  }
-
-  /**
-   * Merge non-empty fields from source into target object
-   * Excludes specified keys (e.g., 'additionalFields')
-   * Only copies fields that are not empty
-   */
-  private _mergeNonEmptyFields(
-    target: Record<string, any>,
-    source: Record<string, any>,
-    excludeKeys: string[] = [],
-  ): void {
-    Object.keys(source).forEach((key) => {
-      if (excludeKeys.includes(key)) {
-        return;
-      }
-      const value = source[key];
-      if (!this._isEmptyValue(value)) {
-        target[key] = value;
-      }
-    });
-  }
 
   /**
    * Generic error handler for API requests
    * Returns a fallback value when request fails
-   * Logs error to console (commented out for production)
    */
   private _handleError<T>(fallbackValue: T) {
     return (error: any) => {
@@ -457,136 +420,6 @@ class DirectoriesDataFlow {
       console.error('❌ API request failed:', error);
       return of(fallbackValue);
     };
-  }
-
-  /**
-   * Assemble preview request payload from finalData (C)
-   * Flattens nested structure into flat key-value pairs:
-   * Input: { query: { bizId, entityType, FIRM: {...} }, additionalDetails: {...} }
-   * Output: { bizId, entityType, ...FIRM fields, ...additionalDetails }
-   * Excludes empty values only
-   */
-  private _assemblePreviewRequest(finalData: any): any {
-    if (!finalData || !finalData.query) {
-      return {};
-    }
-
-    const { query, additionalDetails } = finalData;
-    const { bizId, institutionType, entityType } = query;
-
-    const requestData: any = {
-      bizId,
-      institutionType,
-      entityType,
-    };
-
-    // Flatten current entityType's fields
-    const entityData = query[entityType] || {};
-    this._mergeNonEmptyFields(requestData, entityData);
-
-    // Flatten additional details fields (include additionalFields array)
-    if (additionalDetails && typeof additionalDetails === 'object') {
-      this._mergeNonEmptyFields(requestData, additionalDetails);
-    }
-
-    return requestData;
-  }
-
-  /**
-   * Assemble additional details request payload from form values (A)
-   * Extracts only the current entityType's fields from nested formValues
-   * Input: { bizId, entityType: 'FIRM', formValues: { FIRM: {...}, EXECUTIVE: {...} } }
-   * Output: { bizId, entityType: 'FIRM', ...FIRM fields }
-   */
-  private _assembleAdditionalRequest(data: {
-    bizId: DirectoriesBizIdEnum | '';
-    institutionType: string;
-    entityType: string;
-    formValues: Record<string, any>;
-  }) {
-    const { bizId, institutionType, entityType, formValues } = data;
-
-    const entityData = formValues[entityType] || {};
-
-    const requestData: any = {
-      bizId,
-      institutionType,
-      entityType,
-    };
-
-    this._mergeNonEmptyFields(requestData, entityData);
-
-    return requestData;
-  }
-
-  /**
-   * Assemble final combined data (C) from A + B
-   * Output structure:
-   * {
-   *   query: { bizId, institutionType, entityType, ...all formValues },
-   *   additionalDetails: { additionalFields: ['key1'], ...values },
-   *   timestamp: number
-   * }
-   */
-  private _assembleFinalData(
-    formData: {
-      bizId: DirectoriesBizIdEnum | '';
-      institutionType: string;
-      entityType: string;
-      formValues: Record<string, any>;
-    },
-    additional: any,
-  ) {
-    const processedAdditional = this._processAdditionalDetails(additional);
-
-    return {
-      query: {
-        bizId: formData.bizId,
-        institutionType: formData.institutionType,
-        entityType: formData.entityType,
-        ...formData.formValues,
-      },
-      additionalDetails: processedAdditional,
-      timestamp: Date.now(),
-    };
-  }
-
-  /**
-   * Process additional details data into standardized format
-   * Supports two input formats:
-   * 1. Dual-state format (from manual edits): { checkbox: {key: true/false}, values: {key: value} }
-   * 2. Array format (from API): [...config items]
-   *
-   * Output format: { additionalFields: ['checkedKey1', 'checkedKey2'], ...otherValues }
-   * - additionalFields: Array of checked checkbox keys
-   * - Other fields: Values from SELECT inputs
-   */
-  private _processAdditionalDetails(additional: any): any {
-    if (!additional || typeof additional !== 'object') {
-      return { additionalFields: [] };
-    }
-
-    // Handle dual-state format (manual edits)
-    if ('checkbox' in additional && 'values' in additional) {
-      const { checkbox, values } = additional;
-
-      const additionalFieldsKeys = Object.entries(checkbox)
-        .filter(([, value]) => value === true)
-        .map(([key]) => key);
-
-      return {
-        additionalFields: additionalFieldsKeys,
-        ...values,
-      };
-    }
-
-    // Handle array format (initial API data)
-    if (Array.isArray(additional)) {
-      return { additionalFields: [] };
-    }
-
-    // Unknown format - return empty
-    return { additionalFields: [] };
   }
 }
 

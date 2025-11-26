@@ -1,14 +1,18 @@
 import { FC, useState } from 'react';
 import { CircularProgress, Stack } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
+import { useShallow } from 'zustand/react/shallow';
+
+import { TITLE_MAP } from '@/constants/directories';
+import { useDirectoriesStore } from '@/stores/directories';
+import { buildSearchRequestParams } from '@/utils/directories';
+import { _importDirectoriesDataToTable } from '@/request/directories';
+import { DirectoriesQueryItem } from '@/types/directories';
 
 import { QueryBreadcrumbs } from './base';
 import { CreateQueryElement } from './index';
-import { TITLE_MAP } from '@/constants/directories';
-import { DirectoriesQueryItem } from '@/types/directories';
-import { useDirectoriesStore } from '@/stores/directories';
-import { useShallow } from 'zustand/react/shallow';
-import { StyledButton } from '@/components/atoms';
+import { SDRToast, StyledButton } from '@/components/atoms';
+import { HttpError } from '@/types';
 
 export const DirectoriesIndustryQuery: FC = () => {
   const router = useRouter();
@@ -28,6 +32,7 @@ export const DirectoriesIndustryQuery: FC = () => {
     isLoadingPreview,
     hasSubmittedSearch,
     previewBody,
+    lastSearchParams,
   } = useDirectoriesStore(
     useShallow((state) => ({
       formValues: state.formValues,
@@ -40,6 +45,7 @@ export const DirectoriesIndustryQuery: FC = () => {
       isLoadingPreview: state.isLoadingPreview,
       hasSubmittedSearch: state.hasSubmittedSearch,
       previewBody: state.previewBody,
+      lastSearchParams: state.lastSearchParams,
     })),
   );
 
@@ -61,17 +67,24 @@ export const DirectoriesIndustryQuery: FC = () => {
   };
 
   const onContinueToImport = async () => {
-    if (isImporting) {
+    if (isImporting || !lastSearchParams) {
       return;
     }
 
     try {
       setIsImporting(true);
-      // TODO: 调用导入 API
-      // await importAPI(lastSearchParams);
-      // router.push('/leads'); // 跳转到 table 页面
-    } catch (error) {
-      console.error('Import failed:', error);
+
+      const requestParams = buildSearchRequestParams(lastSearchParams);
+      const { data } = await _importDirectoriesDataToTable(requestParams);
+
+      if (data.tableId) {
+        router.push(`/prospect-enrich/${data.tableId}`);
+      }
+
+      // TODO: access not enough show dialog
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
     } finally {
       setIsImporting(false);
     }

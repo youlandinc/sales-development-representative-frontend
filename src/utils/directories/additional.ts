@@ -3,10 +3,12 @@ import {
   DirectoriesQueryItem,
 } from '@/types/directories';
 
-export function additionalInit(config: DirectoriesQueryItem): {
+export const additionalInit = (
+  config: DirectoriesQueryItem,
+): {
   checkbox: Record<string, boolean>;
   values: Record<string, any>;
-} {
+} => {
   const checkbox: Record<string, boolean> = {};
   const values: Record<string, any> = {};
 
@@ -34,11 +36,11 @@ export function additionalInit(config: DirectoriesQueryItem): {
   config.children.forEach((child) => processItem(child));
 
   return { checkbox, values };
-}
+};
 
-export function additionalCollectKeys(
+export const additionalCollectKeys = (
   children: DirectoriesQueryItem[],
-): string[] {
+): string[] => {
   const keys: string[] = [];
 
   children.forEach((child) => {
@@ -54,4 +56,4 @@ export function additionalCollectKeys(
   });
 
   return keys;
-}
+};
