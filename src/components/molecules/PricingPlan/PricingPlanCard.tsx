@@ -200,6 +200,8 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
         flexShrink: 0,
         overflow: 'hidden',
         position: 'relative',
+        bgcolor: isHighlighted ? COLORS.PRIMARY : COLORS.BACKGROUND,
+        borderRadius: '24px',
       }}
     >
       {/* Decorative dot pattern overlay */}
@@ -215,15 +217,15 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
       {/* Card Header */}
       <Box
         sx={{
-          bgcolor: isHighlighted ? COLORS.PRIMARY : COLORS.BACKGROUND,
           p: 3,
-          borderRadius: '24px 24px 0 0',
         }}
       >
         <Typography
           sx={{
             color: isHighlighted ? 'white' : 'text.primary',
             lineHeight: 1.2,
+            zIndex: 1,
+            position: 'relative',
           }}
           variant="h4"
         >
