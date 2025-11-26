@@ -2,20 +2,22 @@ import { FC } from 'react';
 import { Stack } from '@mui/material';
 
 import { useDirectoriesStore } from '@/stores/directories';
+import { useShallow } from 'zustand/react/shallow';
 
 import { PreviewSummary, PreviewTable } from './index';
 
 export const DirectoriesIndustryPreview: FC = () => {
-  const previewHeader = useDirectoriesStore((state) => state.previewHeader);
-  const previewBody = useDirectoriesStore((state) => state.previewBody);
-  const isLoadingPreview = useDirectoriesStore(
-    (state) => state.isLoadingPreview,
-  );
-  const hasSubmittedSearch = useDirectoriesStore(
-    (state) => state.hasSubmittedSearch,
-  );
+  const { previewHeader, previewBody, isLoadingPreview, hasSubmittedSearch } =
+    useDirectoriesStore(
+      useShallow((state) => ({
+        previewHeader: state.previewHeader,
+        previewBody: state.previewBody,
+        isLoadingPreview: state.isLoadingPreview,
+        hasSubmittedSearch: state.hasSubmittedSearch,
+      })),
+    );
 
-  const { findCount, findList } = previewBody;
+  const { findCount, findList, maxImportCount } = previewBody;
 
   const isShowResult =
     isLoadingPreview || (hasSubmittedSearch && findCount > 0);
@@ -23,7 +25,7 @@ export const DirectoriesIndustryPreview: FC = () => {
   return (
     <Stack sx={{ flex: 1, p: 3, gap: 3, overflow: 'hidden' }}>
       <PreviewSummary
-        importCount={Math.min(findCount, 1000)}
+        importCount={maxImportCount}
         isShowResult={isShowResult}
         loading={isLoadingPreview}
         totalCount={findCount}

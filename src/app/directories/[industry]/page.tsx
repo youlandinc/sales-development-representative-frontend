@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useShallow } from 'zustand/react/shallow';
 
 import { getDirectoriesBizId } from '@/utils/directories';
 import { TITLE_MAP } from '@/constants/directories';
@@ -15,28 +16,33 @@ export default function DirectoriesIndustryPage() {
   const industrySlug = params.industry as string;
   const bizId = getDirectoriesBizId(industrySlug);
 
-  const initializeDataFlow = useDirectoriesStore(
-    (state) => state.initializeDataFlow,
+  const { initializeDataFlow, syncFromRxJS, reset } = useDirectoriesStore(
+    useShallow((state) => ({
+      initializeDataFlow: state.initializeDataFlow,
+      syncFromRxJS: state.syncFromRxJS,
+      reset: state.reset,
+    })),
   );
-  const syncFromRxJS = useDirectoriesStore((state) => state.syncFromRxJS);
-  const reset = useDirectoriesStore((state) => state.reset);
 
   useEffect(() => {
     if (bizId) {
       initializeDataFlow(bizId);
     }
-  }, [bizId, initializeDataFlow]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bizId]);
 
   useEffect(() => {
     const cleanup = syncFromRxJS();
     return cleanup;
-  }, [syncFromRxJS]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     return () => {
       reset();
     };
-  }, [reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!TITLE_MAP[industrySlug]) {

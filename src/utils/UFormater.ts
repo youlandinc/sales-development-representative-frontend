@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { FormatDateOptions } from 'date-fns/format';
-import { UNotNull, UNotUndefined, UTypeOf } from '@/utils/UCommon';
+import { UNotNull, UNotUndefined, UTypeOf } from '@/utils/UTypeOf';
 
 export const UFormatDollar = (
   amount: string | number | null | undefined,

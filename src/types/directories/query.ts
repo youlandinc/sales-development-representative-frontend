@@ -68,6 +68,7 @@ export interface DirectoriesQueryItem {
   // ========== Options & Values ==========
   optionMultiple: boolean;
   defaultValue: any;
+  optionDictCode: string | null;
   // For tab/button group/exclude components OR select/input options
   optionValues: { key: string; label: string; value: string }[];
 

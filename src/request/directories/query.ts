@@ -8,6 +8,13 @@ import {
   DirectoriesQueryTableHeaderApiResponse,
 } from '@/types/directories';
 
+export const _fetchOptionsViaDirectoriesKey = (params: {
+  dataType: string;
+  keyword?: string;
+}) => {
+  return post('/sdr/search/dict/options', params);
+};
+
 export const _fetchDirectoriesConfig = (params: {
   bizId: DirectoriesBizIdEnum;
 }) => {

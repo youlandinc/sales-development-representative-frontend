@@ -19,3 +19,10 @@ export interface DirectoryApiResponse {
   periodCount: number;
   statPeriod: string;
 }
+
+export interface DirectoriesImportApiResponse {
+  tableId: string | null;
+  remainingCredit: number | null;
+  currentImportNumber: number | null;
+  actualNeedCredit: number | null;
+}

@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-type AutoCompleteOption = {
-  inputValue?: string;
+import { useDebounce } from '@/hooks';
+import { get } from '@/request/request';
+import { UTypeOf } from '@/utils/UTypeOf';
+
+export type AutoCompleteOption = {
+  inputValue: string;
   label: string;
 };
 
@@ -9,237 +13,220 @@ type RawOption = {
   key?: string;
   label: string;
   value?: string;
-  inputValue?: string;
 };
 
 interface UseQueryAutoCompleteParams {
   url?: string | null;
-  staticOptions?: Array<RawOption | AutoCompleteOption>;
+  staticOptions?: RawOption[];
   value?: string | string[] | null;
   multiple?: boolean;
+  freeSolo?: boolean;
+  isAuth?: boolean;
   onFormChange:
     | ((newValue: string[]) => void)
     | ((newValue: string | null) => void);
 }
 
+const normalizeOption = (item: RawOption): AutoCompleteOption => ({
+  label: item.label,
+  inputValue: item.value || item.label,
+});
+
+const valueToOption = (val: string): AutoCompleteOption => ({
+  label: val,
+  inputValue: val,
+});
+
+const optionToValue = (opt: string | AutoCompleteOption): string =>
+  UTypeOf.isString(opt) ? opt : opt.inputValue;
+
 export const useQueryAutoComplete = ({
   url,
   staticOptions = [],
   value,
-  multiple,
+  multiple = false,
+  freeSolo = false,
+  isAuth = true,
   onFormChange,
 }: UseQueryAutoCompleteParams) => {
+  const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<AutoCompleteOption[]>([]);
   const [loading, setLoading] = useState(false);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Initialize static options when no URL provided
-  useEffect(() => {
-    if (!url && staticOptions.length > 0) {
-      const formattedOptions = staticOptions.map((item) => ({
-        label: item.label,
-        inputValue: ('value' in item ? item.value : item.label) || item.label,
-      }));
-      setOptions(formattedOptions);
+  const [inputValue, setInputValue] = useState(() => {
+    if (!multiple && value) {
+      return UTypeOf.isString(value) ? value : '';
     }
-  }, [url, staticOptions]);
+    return '';
+  });
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const debouncedInputValue = useDebounce(inputValue, 300);
+  const hasStatic = staticOptions.length > 0;
+  const hasDynamic = !!url;
 
-  /**
-   * Search options via API with debouncing (300ms)
-   * Only triggers when input length >= 2
-   */
-  const onSearch = useCallback(
-    async (inputValue: string) => {
-      if (!url) {
-        return;
-      }
+  useEffect(() => {
+    if (hasStatic && !hasDynamic) {
+      setOptions(staticOptions.map(normalizeOption));
+    }
+  }, [hasStatic, hasDynamic, staticOptions]);
 
-      // Clear previous debounce timer
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
+  useEffect(() => {
+    if (open) {
+      return;
+    }
+    if (!multiple && value) {
+      const option = options.find((opt) => opt.inputValue === value);
+      setInputValue(option?.label || (value as string));
+    } else if (!multiple && !value) {
+      setInputValue('');
+    }
+  }, [value, multiple, open, options]);
 
-      // Clear options if input is too short
-      if (!inputValue || inputValue.length < 2) {
-        setOptions([]);
-        setLoading(false);
-        return;
-      }
+  useEffect(() => {
+    if (hasStatic && hasDynamic && !inputValue && open) {
+      setOptions(staticOptions.map(normalizeOption));
+    }
+  }, [hasStatic, hasDynamic, inputValue, open, staticOptions]);
 
-      setLoading(true);
+  useEffect(() => {
+    const shouldSearch =
+      hasDynamic &&
+      open &&
+      (!hasStatic || (hasStatic && debouncedInputValue !== ''));
 
-      // Debounce: Execute search after 300ms
-      debounceTimerRef.current = setTimeout(async () => {
-        try {
-          const searchUrl = `${url}?q=${encodeURIComponent(inputValue)}`;
-          const res = await fetch(searchUrl);
-          const data = await res.json();
+    if (!shouldSearch) {
+      setLoading(false);
+      return;
+    }
 
-          const items = Array.isArray(data) ? data : data.data || [];
-          const formattedOptions = items.map((item: any) => ({
-            label: item.label || item.name || item.value || String(item),
-            inputValue: item.value || item.label || item.name || String(item),
-          }));
-          setOptions(formattedOptions);
-        } catch (error) {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setLoading(true);
+    const requestUrl = `${url}?keyword=${encodeURIComponent(debouncedInputValue)}`;
+
+    get(requestUrl, { signal: controller.signal })
+      .then((res) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        const responseData = res.data;
+        const items = Array.isArray(responseData)
+          ? responseData
+          : responseData?.data || [];
+
+        const mappedOptions = items.map((item: any) => ({
+          label: item.label || item.name || item.value || String(item),
+          inputValue: item.value || item.label || item.name || String(item),
+        }));
+        setOptions(mappedOptions);
+      })
+      .catch((error: any) => {
+        if (error?.code !== 'ERR_CANCELED') {
           console.error('Failed to search options:', error);
-          setOptions([]);
-        } finally {
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
-      }, 300);
-    },
-    [url],
-  );
+      });
 
-  // Cleanup: Clear debounce timer on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, []);
+    return () => controller.abort();
+  }, [debouncedInputValue, url, open, hasStatic, hasDynamic]);
 
-  /**
-   * Convert value to autocomplete option format
-   * Supports freeSolo mode: creates temporary objects for values not in options
-   */
   const autocompleteValue = useMemo(() => {
     if (multiple) {
-      const valueArray = (value as string[]) ?? [];
-      // For freeSolo mode, convert values not in options to objects
-      return valueArray.map((val) => {
-        const existingOption = options.find((opt) => opt.inputValue === val);
-        if (existingOption) {
-          return existingOption;
-        }
-        // FreeSolo mode: Create temporary option object
-        return {
-          label: val,
-          inputValue: val,
-        };
-      });
+      return ((value as string[]) ?? []).map(
+        (val) =>
+          options.find((opt) => opt.inputValue === val) || valueToOption(val),
+      );
     }
     if (!value) {
       return null;
     }
-    // Single mode: Find in options first, create temporary object if not found (freeSolo)
-    const existingOption = options.find((opt) => opt.inputValue === value);
-    if (existingOption) {
-      return existingOption;
-    }
-    // FreeSolo mode: Return temporary object
-    return {
-      label: value as string,
-      inputValue: value as string,
-    };
+    return (
+      options.find((opt) => opt.inputValue === value) ||
+      valueToOption(value as string)
+    );
   }, [value, multiple, options]);
 
-  /**
-   * Get display label for option
-   * Handles both string and object formats
-   */
-  const onGetOptionLabel = useCallback(
-    (option: string | AutoCompleteOption): string => {
-      if (typeof option === 'string') {
-        return option;
-      }
-      return option.label || '';
-    },
-    [],
-  );
+  const onOpenToTrigger = useCallback(() => {
+    setOpen(true);
+  }, []);
 
-  /**
-   * Check if two options are equal
-   * Compares by inputValue for objects, direct comparison for strings
-   */
-  const onIsOptionEqualToValue = useCallback(
+  const onCloseToReset = useCallback(() => {
+    setOpen(false);
+    if (!multiple && value) {
+      const selectedOption = options.find((opt) => opt.inputValue === value);
+      setInputValue(selectedOption?.label || (value as string));
+    } else if (!multiple) {
+      setInputValue('');
+    }
+    if (multiple) {
+      setInputValue('');
+    }
+  }, [multiple, value, options]);
+
+  const onChangeToUpdateValue = useCallback(
     (
-      option: string | AutoCompleteOption,
-      value: string | AutoCompleteOption,
-    ): boolean => {
-      if (!option || !value) {
-        return false;
+      _: unknown,
+      newValue: AutoCompleteOption | AutoCompleteOption[] | null,
+    ) => {
+      if (!isAuth) {
+        return;
       }
-      if (typeof option === 'string' && typeof value === 'string') {
-        return option === value;
+
+      if (multiple) {
+        const values = (newValue as AutoCompleteOption[])
+          .map(optionToValue)
+          .filter((v): v is string => !!v);
+        (onFormChange as (v: string[]) => void)(Array.from(new Set(values)));
+        setInputValue('');
+      } else {
+        const val = newValue
+          ? optionToValue(newValue as AutoCompleteOption)
+          : null;
+        (onFormChange as (v: string | null) => void)(val || null);
+        setInputValue((newValue as AutoCompleteOption)?.label || '');
       }
-      return (
-        (option as AutoCompleteOption).inputValue ===
-        (value as AutoCompleteOption).inputValue
-      );
+    },
+    [multiple, isAuth, onFormChange],
+  );
+
+  const onInputChangeToSearch = useCallback(
+    (_: unknown, newInputValue: string, reason: string) => {
+      if (reason === 'input') {
+        setInputValue(newInputValue);
+      } else if (reason === 'clear') {
+        setInputValue('');
+      }
     },
     [],
   );
 
-  /**
-   * Handle value change
-   * Multiple mode: Supports toggle behavior (clicking selected item removes it)
-   * Single mode: Updates with new value or null
-   */
-  const onValueChange = useCallback(
-    (_: any, newValue: any) => {
-      if (multiple) {
-        const items = newValue as Array<string | AutoCompleteOption>;
-        const values = items
-          .map((item) => (typeof item === 'string' ? item : item.inputValue))
-          .filter((v): v is string => !!v);
-
-        // Count occurrences of each value
-        const valueCounts = new Map<string, number>();
-        values.forEach((v) => {
-          valueCounts.set(v, (valueCounts.get(v) || 0) + 1);
-        });
-
-        // Find duplicates (count > 1), indicating user wants to toggle/remove
-        const duplicates = Array.from(valueCounts.entries())
-          .filter(([_, count]) => count > 1)
-          .map(([val]) => val);
-
-        if (duplicates.length > 0) {
-          // Has duplicates, remove all duplicate values (toggle behavior)
-          const uniqueValues = values.filter((v) => !duplicates.includes(v));
-          (onFormChange as (newValue: string[]) => void)?.(uniqueValues);
-        } else {
-          // No duplicates, normal deduplication
-          const uniqueValues = Array.from(new Set(values));
-          (onFormChange as (newValue: string[]) => void)?.(uniqueValues);
-        }
-      } else if (newValue) {
-        const value =
-          typeof newValue === 'string'
-            ? newValue
-            : (newValue as AutoCompleteOption).inputValue;
-        (onFormChange as (newValue: string | null) => void)?.(value || null);
-      } else {
-        (onFormChange as (newValue: string | null) => void)?.(null);
-      }
-    },
-    [multiple, onFormChange],
+  const onGetOptionLabel = useCallback(
+    (option: string | AutoCompleteOption): string =>
+      UTypeOf.isString(option) ? option : option.label || '',
+    [],
   );
 
-  /**
-   * Handle input value change
-   * Triggers search only when reason is 'input' and URL is provided
-   */
-  const onInputValueChange = useCallback(
-    (_: any, inputValue: string, reason: string) => {
-      if (reason === 'input' && url) {
-        onSearch(inputValue);
-      }
-    },
-    [url, onSearch],
+  const onIsOptionEqualToValue = useCallback(
+    (option: AutoCompleteOption, val: AutoCompleteOption): boolean =>
+      option.inputValue === val.inputValue,
+    [],
   );
 
   return {
+    open,
     options,
     loading,
-
+    inputValue,
     autocompleteValue,
-
-    onValueChange,
-    onInputValueChange,
+    onOpenToTrigger,
+    onCloseToReset,
+    onChangeToUpdateValue,
+    onInputChangeToSearch,
     onGetOptionLabel,
     onIsOptionEqualToValue,
   };

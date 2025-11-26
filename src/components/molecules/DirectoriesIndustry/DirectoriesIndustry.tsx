@@ -8,7 +8,8 @@ export const DirectoriesIndustry: FC = () => {
     <Stack
       sx={{
         flexDirection: 'row',
-        minHeight: '100%',
+        height: '100vh',
+        overflow: 'hidden',
       }}
     >
       <DirectoriesIndustryQuery />

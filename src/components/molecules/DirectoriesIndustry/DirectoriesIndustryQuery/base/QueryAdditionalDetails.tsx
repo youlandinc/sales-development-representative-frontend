@@ -2,6 +2,8 @@ import { FC } from 'react';
 import { Divider, Skeleton, Stack, Typography } from '@mui/material';
 
 import { useDirectoriesStore } from '@/stores/directories';
+import { useShallow } from 'zustand/react/shallow';
+import { UTypeOf } from '@/utils/UTypeOf';
 import {
   DirectoriesQueryActionTypeEnum,
   DirectoriesQueryItem,
@@ -10,15 +12,27 @@ import {
 import { StyledCheckbox } from '@/components/atoms';
 import { QueryAutoComplete } from './index';
 
-export const QueryAdditionalDetails: FC = () => {
-  const config = useDirectoriesStore((state) => state.additionalConfig);
-  const checkbox = useDirectoriesStore((state) => state.additionalCheckbox);
-  const values = useDirectoriesStore((state) => state.additionalValues);
-  const isLoadingAdditional = useDirectoriesStore(
-    (state) => state.isLoadingAdditional,
-  );
-  const updateAdditionalSelection = useDirectoriesStore(
-    (state) => state.updateAdditionalSelection,
+interface QueryAdditionalDetailsProps {
+  isAuth?: boolean;
+}
+
+export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
+  isAuth = true,
+}) => {
+  const {
+    config,
+    checkbox,
+    values,
+    isLoadingAdditional,
+    updateAdditionalSelection,
+  } = useDirectoriesStore(
+    useShallow((state) => ({
+      config: state.additionalConfig,
+      checkbox: state.additionalCheckbox,
+      values: state.additionalValues,
+      isLoadingAdditional: state.isLoadingAdditional,
+      updateAdditionalSelection: state.updateAdditionalSelection,
+    })),
   );
 
   const collectChildKeys = (children: DirectoriesQueryItem[]): string[] => {
@@ -69,6 +83,7 @@ export const QueryAdditionalDetails: FC = () => {
           <Stack key={itemKey || item.label} sx={{ gap: 1 }}>
             <StyledCheckbox
               checked={isChecked}
+              disabled={!isAuth}
               indeterminate={indeterminate}
               label={item.subLabel || item.label || ''}
               onChange={(_, checked) => {
@@ -94,6 +109,7 @@ export const QueryAdditionalDetails: FC = () => {
         <Stack key={itemKey}>
           <StyledCheckbox
             checked={isChecked}
+            disabled={!isAuth}
             label={item.subLabel || item.label || ''}
             onChange={(_, checked) => {
               updateAdditionalSelection(itemKey, checked, item);
@@ -117,6 +133,7 @@ export const QueryAdditionalDetails: FC = () => {
         return (
           <Stack key={itemKey} mb={1}>
             <QueryAutoComplete
+              isAuth={isAuth}
               multiple={true}
               onFormChange={(newValue: string[]) => {
                 updateAdditionalSelection(itemKey, newValue, item);
@@ -129,10 +146,11 @@ export const QueryAdditionalDetails: FC = () => {
         );
       }
 
-      const safeValue = typeof rawValue === 'string' ? rawValue : null;
+      const safeValue = UTypeOf.isString(rawValue) ? rawValue : null;
       return (
         <Stack key={itemKey} mb={1}>
           <QueryAutoComplete
+            isAuth={isAuth}
             multiple={false}
             onFormChange={(newValue: string | null) => {
               updateAdditionalSelection(itemKey, newValue, item);

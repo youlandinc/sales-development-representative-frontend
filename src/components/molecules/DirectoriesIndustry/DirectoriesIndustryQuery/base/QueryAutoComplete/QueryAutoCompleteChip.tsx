@@ -42,7 +42,7 @@ const useStyles = createUseStyles({
 
 interface QueryAutoCompleteChipProps {
   label: string;
-  onDelete: (e: MouseEvent) => void;
+  onDelete?: (e: MouseEvent) => void;
 }
 
 export const QueryAutoCompleteChip: FC<QueryAutoCompleteChipProps> = ({
@@ -53,11 +53,13 @@ export const QueryAutoCompleteChip: FC<QueryAutoCompleteChipProps> = ({
 
   return (
     <div className={classes.container}>
-      <div className={classes.buttonWrap} onClick={onDelete}>
-        <div className={classes.button}>
-          <Image alt="" fill sizes="100%" src="/images/icon-close.svg" />
+      {onDelete && (
+        <div className={classes.buttonWrap} onClick={onDelete}>
+          <div className={classes.button}>
+            <Image alt="" fill sizes="100%" src="/images/icon-close.svg" />
+          </div>
         </div>
-      </div>
+      )}
       <div className={classes.content}>{label}</div>
     </div>
   );

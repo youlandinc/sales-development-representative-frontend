@@ -76,7 +76,12 @@ const INITIAL_STATE: DirectoriesStoreState = {
   additionalValues: {},
   // Preview
   previewHeader: [],
-  previewBody: { findCount: 0, defaultPreviewCount: 0, maxImportCount: 0, findList: [] },
+  previewBody: {
+    findCount: 0,
+    defaultPreviewCount: 0,
+    maxImportCount: 0,
+    findList: [],
+  },
   isLoadingPreview: false,
   hasSubmittedSearch: false,
   lastSearchParams: null,
@@ -260,7 +265,12 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           if (loading) {
             set({
               previewHeader: [],
-              previewBody: { findCount: 0, defaultPreviewCount: 0, maxImportCount: 0, findList: [] },
+              previewBody: {
+                findCount: 0,
+                defaultPreviewCount: 0,
+                maxImportCount: 0,
+                findList: [],
+              },
             });
           }
         },
@@ -358,7 +368,12 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         additionalCheckbox: {},
         additionalValues: {},
         previewHeader: [],
-        previewBody: { findCount: 0, defaultPreviewCount: 0, maxImportCount: 0, findList: [] },
+        previewBody: {
+          findCount: 0,
+          defaultPreviewCount: 0,
+          maxImportCount: 0,
+          findList: [],
+        },
         isLoadingPreview: false,
         hasSubmittedSearch: false,
         lastSearchParams: null,

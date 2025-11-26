@@ -1,4 +1,4 @@
-export * from './UCommon';
+export * from './UTypeOf';
 
 export * from './UStystem';
 

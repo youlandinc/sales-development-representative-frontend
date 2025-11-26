@@ -22,7 +22,13 @@ export const QuerySwitch: FC<QuerySwitchProps> = ({
   return (
     <Stack gap={1}>
       <FormControlLabel
-        control={<Switch checked={checked} disabled={disabled} onChange={onFormChange} />}
+        control={
+          <Switch
+            checked={checked}
+            disabled={disabled}
+            onChange={onFormChange}
+          />
+        }
         label={label}
         labelPlacement={'start'}
         slotProps={{

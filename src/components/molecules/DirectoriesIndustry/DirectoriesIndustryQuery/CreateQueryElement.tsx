@@ -40,8 +40,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   groupPath,
   disabledLoading = false,
 }) => {
-  const isDisabled = disabledLoading;
-
   if (config.groupType === DirectoriesQueryGroupTypeEnum.button_group) {
     return (
       <QueryContainer
@@ -50,7 +48,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         labelSx={{ fontWeight: 600, fontSize: 14 }}
       >
         <StyledButtonGroup
-          disabled={isDisabled}
           onChange={(event, newValue) => {
             if (newValue) {
               onFormChange?.(config.key, newValue, groupPath);
@@ -199,7 +196,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         isAuth={config.isAuth}
         title={config.label}
       >
-        <QueryAdditionalDetails />
+        <QueryAdditionalDetails isAuth={config.isAuth} />
       </QueryCollapse>
     );
   }
@@ -224,7 +221,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // SELECT - （QueryAutoComplete freeSolo=false）
+  //（QueryAutoComplete freeSolo=false）
   if (config.actionType === DirectoriesQueryActionTypeEnum.select) {
     return (
       <QueryContainer
@@ -233,8 +230,8 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         label={config.label}
       >
         <QueryAutoComplete
-          disabled={isDisabled}
           freeSolo={false}
+          isAuth={config.isAuth}
           multiple={config.optionMultiple}
           onFormChange={(newValue: string[] | string | null) =>
             onFormChange?.(config.key, newValue, groupPath)
@@ -248,9 +245,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // INPUT - 输入框
   if (config.actionType === DirectoriesQueryActionTypeEnum.input) {
-    // 数字类型输入框 - 使用 StyledTextFieldNumber
     if (config.inputType === DirectoriesQueryInputTypeEnum.number) {
       return (
         <QueryContainer
@@ -259,7 +254,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           label={config.label}
         >
           <StyledTextFieldNumber
-            disabled={isDisabled}
             onValueChange={({ value }) =>
               onFormChange?.(config.key, value, groupPath)
             }
@@ -270,7 +264,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       );
     }
 
-    // 文本类型输入框 - 使用 QueryAutoComplete (freeSolo=true)
+    // QueryAutoComplete (freeSolo=true)
     return (
       <QueryContainer
         description={config.description}
@@ -278,8 +272,8 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         label={config.label}
       >
         <QueryAutoComplete
-          disabled={isDisabled}
           freeSolo={true}
+          isAuth={config.isAuth}
           multiple={config.optionMultiple}
           onFormChange={(newValue: string[] | string | null) =>
             onFormChange?.(config.key, newValue, groupPath)
@@ -293,14 +287,12 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // CHECKBOX - 简单复选框（无子项，子项由 groupType 处理）
   if (config.actionType === DirectoriesQueryActionTypeEnum.checkbox) {
     const isChecked = formData[config.key!] || false;
 
     return (
       <QueryContainer description={config.description} isAuth={config.isAuth}>
         <QueryCheckbox
-          disabled={isDisabled}
           onFormChange={(checked) =>
             onFormChange?.(config.key, checked, groupPath)
           }
@@ -317,7 +309,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       <QueryContainer description={config.description} isAuth={config.isAuth}>
         <QuerySwitch
           checked={formData[config.key!] || false}
-          disabled={isDisabled}
           label={config.label || ''}
           onFormChange={(e, checked) =>
             onFormChange?.(config.key, checked, groupPath)

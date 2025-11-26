@@ -6,6 +6,7 @@ import useSWR from 'swr';
 
 import { SLUG_MAP } from '@/constants/directories';
 import { useDirectoriesStore } from '@/stores/directories';
+import { useShallow } from 'zustand/react/shallow';
 import { _fetchDirectoriesInfo } from '@/request/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
 
@@ -13,10 +14,12 @@ import { DirectoriesCard } from './index';
 
 export const Directories: FC = () => {
   const router = useRouter();
-  const initializeDataFlow = useDirectoriesStore(
-    (state) => state.initializeDataFlow,
+  const { initializeDataFlow, isLoadingConfig } = useDirectoriesStore(
+    useShallow((state) => ({
+      initializeDataFlow: state.initializeDataFlow,
+      isLoadingConfig: state.isLoadingConfig,
+    })),
   );
-  const isLoadingConfig = useDirectoriesStore((state) => state.isLoadingConfig);
   const [clickedBizId, setClickedBizId] = useState<DirectoriesBizIdEnum | null>(
     null,
   );
