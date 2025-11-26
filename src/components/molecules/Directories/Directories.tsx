@@ -10,7 +10,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { _fetchDirectoriesInfo } from '@/request/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
 
-import { DirectoriesCard } from './index';
+import { DirectoriesCard, DirectoriesCardSkeleton } from './index';
 
 export const Directories: FC = () => {
   const router = useRouter();
@@ -34,14 +34,34 @@ export const Directories: FC = () => {
 
   if (isLoading) {
     return (
-      <Stack>
-        <Typography>Loading directories...</Typography>
+      <Stack gap={6}>
+        <Stack gap={1}>
+          <Typography lineHeight={1.2} variant={'h5'}>
+            Directories
+          </Typography>
+          <Typography fontSize={14}>
+            Your gateway to verified intelligence across capital markets, real
+            estate, and global industries
+          </Typography>
+        </Stack>
+
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            gap: 6,
+            maxWidth: 1100,
+            flexWrap: 'wrap',
+          }}
+        >
+          <DirectoriesCardSkeleton isDark />
+          <DirectoriesCardSkeleton />
+        </Stack>
       </Stack>
     );
   }
 
   return (
-    <Fade in={!isLoading}>
+    <Fade in>
       <Stack gap={6}>
         <Stack gap={1}>
           <Typography lineHeight={1.2} variant={'h5'}>

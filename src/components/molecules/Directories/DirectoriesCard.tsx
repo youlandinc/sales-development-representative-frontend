@@ -56,8 +56,8 @@ export const DirectoriesCard: FC<DirectoriesCardProps> = ({
     >
       {isDark && <DirectoriesPattern />}
 
-      <Stack gap="12px" sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack gap="8px">
+      <Stack sx={{ position: 'relative', zIndex: 1, gap: 1.5 }}>
+        <Stack sx={{ gap: 1 }}>
           <Stack
             sx={{
               flexDirection: 'row',
