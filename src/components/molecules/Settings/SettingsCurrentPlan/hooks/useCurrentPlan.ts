@@ -1,6 +1,4 @@
-import { format } from 'date-fns';
 import { useCallback, useState } from 'react';
-import useSwr from 'swr';
 
 import { SDRToast } from '@/components/atoms';
 
@@ -13,7 +11,7 @@ import {
 import { HttpError, PlanStatusEnum, PlanTypeEnum } from '@/types';
 import { PlanCardProps } from '../base';
 
-import { _cancelPlan, _fetchCurrentPlan } from '@/request/settings';
+import { _cancelPlan } from '@/request/settings';
 
 import { useAsyncFn } from '@/hooks';
 import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
@@ -21,7 +19,7 @@ import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
 export interface SelectedPlan {
   planName: string;
   renewalDate: string;
-  category: PlanTypeEnum;
+  planType: PlanTypeEnum;
 }
 
 export const useCurrentPlan = () => {
@@ -46,7 +44,7 @@ export const useCurrentPlan = () => {
 
       return {
         planName: plan.categoryName,
-        category: plan.category,
+        // category: plan.category,
         planBadge: {
           label: plan.planName,
           bgColor: style.bgColor,
@@ -61,6 +59,7 @@ export const useCurrentPlan = () => {
         // currentValue: plan.totalCredits - plan.usedCredits, // 剩余额度
         currentValue: plan.remainingCredits, // 剩余额度
         status: plan.status,
+        planType: plan.planType,
       };
     });
 
@@ -69,7 +68,7 @@ export const useCurrentPlan = () => {
       return;
     }
     try {
-      await _cancelPlan(selectedPlan.category);
+      await _cancelPlan(selectedPlan.planType);
       setCancelDialogOpen(false);
       setSelectedPlan(null);
       fetchCurrentPlan();
@@ -80,8 +79,8 @@ export const useCurrentPlan = () => {
   }, [selectedPlan]);
 
   const handleCancelClick = useCallback(
-    (planName: string, category: PlanTypeEnum, renewalDate?: string) => {
-      setSelectedPlan({ planName, renewalDate: renewalDate ?? '', category });
+    (planName: string, planType: PlanTypeEnum, renewalDate?: string) => {
+      setSelectedPlan({ planName, renewalDate: renewalDate ?? '', planType });
       setCancelDialogOpen(true);
     },
     [],
