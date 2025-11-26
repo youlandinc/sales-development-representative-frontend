@@ -54,7 +54,7 @@ export const TalkToTeamDialog: FC<TalkToTeamDialogProps> = ({
       await _sendPricingEmail({
         ...formData,
         planType,
-        pricingType,
+        pricingType: pricingType || null,
       });
       setIsSubmitted(true);
     } catch (err) {

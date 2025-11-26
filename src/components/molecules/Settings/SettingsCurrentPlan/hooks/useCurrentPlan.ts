@@ -10,12 +10,13 @@ import {
   PREMIUM_PLAN_TYPES,
 } from '../data';
 
-import { HttpError, PlanTypeEnum } from '@/types';
+import { HttpError, PlanStatusEnum, PlanTypeEnum } from '@/types';
 import { PlanCardProps } from '../base';
 
 import { _cancelPlan, _fetchCurrentPlan } from '@/request/settings';
 
 import { useAsyncFn } from '@/hooks';
+import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
 
 export interface SelectedPlan {
   planName: string;
@@ -26,17 +27,15 @@ export interface SelectedPlan {
 export const useCurrentPlan = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SelectedPlan | null>(null);
-
-  const { data, isLoading, mutate } = useSwr(
-    'current-plan',
-    _fetchCurrentPlan,
-    {
-      revalidateOnFocus: false,
-    },
+  const planList = useCurrentPlanStore((state) => state.planList);
+  const fetchCurrentPlan = useCurrentPlanStore(
+    (state) => state.fetchCurrentPlan,
   );
+  const isLoading = useCurrentPlanStore((state) => state.isLoading);
 
-  const plans: PlanCardProps[] = (data?.data?.currentPlans || []).map(
-    (plan) => {
+  const plans: PlanCardProps[] = planList
+    .filter((plan) => plan.status !== PlanStatusEnum.created)
+    .map((plan) => {
       const style = computedPlanBadgeStyle(plan.planType);
       const isPremium = PREMIUM_PLAN_TYPES.includes(
         plan.planType as (typeof PREMIUM_PLAN_TYPES)[number],
@@ -56,15 +55,14 @@ export const useCurrentPlan = () => {
         },
         fullAccess: isFullAccess,
         unit: plan.creditType,
-        renewalDate: format(new Date(plan.planEndTime), 'MMM dd, yyyy'),
+        renewalDate: plan.planEndTime,
         refreshDays: plan.remainingDays,
         totalValue: plan.totalCredits,
         // currentValue: plan.totalCredits - plan.usedCredits, // 剩余额度
         currentValue: plan.remainingCredits, // 剩余额度
         status: plan.status,
       };
-    },
-  );
+    });
 
   const [cancelState, handleConfirmCancellation] = useAsyncFn(async () => {
     if (!selectedPlan) {
@@ -74,7 +72,7 @@ export const useCurrentPlan = () => {
       await _cancelPlan(selectedPlan.category);
       setCancelDialogOpen(false);
       setSelectedPlan(null);
-      mutate();
+      fetchCurrentPlan();
     } catch (e) {
       const { message, header, variant } = e as HttpError;
       SDRToast({ message, header, variant });

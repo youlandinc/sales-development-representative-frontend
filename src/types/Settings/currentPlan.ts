@@ -22,4 +22,5 @@ export interface FetchCurrentPlanResponse {
 export enum PlanStatusEnum {
   cancelled = 'CANCELED',
   succeeded = 'SUCCEEDED',
+  created = 'CREATED',
 }

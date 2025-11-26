@@ -1,16 +1,16 @@
 import { Box, Icon, Stack, Typography } from '@mui/material';
+import { CheckCircleOutline } from '@mui/icons-material';
 import { FC, useMemo } from 'react';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
-import { TalkToTeamDialog } from './TalkToTeamDialog';
-
 import { useAsyncFn, useSwitch } from '@/hooks';
+import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
+
 import { PlanTypeEnum } from '@/types';
 import { DirectoriesBizIdEnum } from '@/types/directories';
 import { PaymentTypeEnum, PlanInfo } from '@/types/pricingPlan';
 
 import { _createPaymentLink } from '@/request/pricingPlan';
-import { StyledCapitalDesc } from './base';
 import {
   CANCEL_URL,
   packageTitle,
@@ -18,10 +18,44 @@ import {
   PRICE_INFO,
   SUCCESS_URL,
 } from './data';
+import { StyledCapitalDesc } from './base';
+import { TalkToTeamDialog } from './TalkToTeamDialog';
 
-import { CheckCircleOutline } from '@mui/icons-material';
 import ICON_NORMAL from './assets/icon_normal.svg';
 import ICON_PRO from './assets/icon_pro.svg';
+import ICON_CHECKED from './assets/icon_checked.svg';
+import ICON_CONFETTI from './assets/icon_confetti_bold.svg';
+
+// Constants
+const COLORS = {
+  PRIMARY: '#363440',
+  BORDER: '#DFDEE6',
+  BACKGROUND: '#EAE9EF',
+} as const;
+
+const DIMENSIONS = {
+  CARD_WIDTH: 384,
+  MIN_HEIGHT: 496,
+  ICON_SIZE: { width: 258, height: 310 },
+} as const;
+
+const UNLIMITED_PLAN_TYPES = [
+  PlanTypeEnum.institutional,
+  PlanTypeEnum.enterprise,
+] as const;
+
+// Helper functions
+const isPaidPlan = (planType: PlanTypeEnum, paidPlans: PlanTypeEnum[]) => {
+  return planType === PlanTypeEnum.free || paidPlans.includes(planType);
+};
+
+const hasPrice = (plan: PlanInfo) => {
+  return Boolean(plan.monthlyPrice && plan.yearlyPrice);
+};
+
+const isUnlimitedPlan = (planType: PlanTypeEnum) => {
+  return UNLIMITED_PLAN_TYPES.includes(planType as any);
+};
 
 interface PricingCardProps {
   plan: PlanInfo;
@@ -29,41 +63,112 @@ interface PricingCardProps {
   category: string;
 }
 
+// Price Display Component
+const PriceDisplay: FC<{
+  plan: PlanInfo;
+  paymentType?: PaymentTypeEnum | string;
+}> = ({ plan, paymentType }) => {
+  if (!plan.monthlyPrice && !plan.yearlyPrice) {
+    return null;
+  }
+
+  const price =
+    paymentType === PaymentTypeEnum.YEARLY
+      ? plan.yearlyPrice
+      : plan.monthlyPrice;
+
+  if (!price) {
+    return null;
+  }
+
+  return (
+    <Stack
+      gap={1}
+      sx={{
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        minHeight: 36,
+      }}
+    >
+      <Typography
+        sx={{
+          fontSize: 36,
+          fontWeight: 400,
+          lineHeight: 1,
+        }}
+      >
+        ${price.toLocaleString()}
+      </Typography>
+      <Typography fontSize={15} lineHeight={1.5}>
+        per month
+      </Typography>
+      {plan.priceAdditionalInfo && (
+        <Typography
+          sx={{
+            fontSize: 24,
+            fontWeight: 400,
+            lineHeight: 1,
+            color: 'text.secondary',
+            ml: 1,
+          }}
+        >
+          {plan.priceAdditionalInfo}
+        </Typography>
+      )}
+    </Stack>
+  );
+};
+
+// Email Sent Status Component
+const EmailSentStatus: FC = () => (
+  <Stack gap={3}>
+    <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
+      <Icon component={ICON_CONFETTI} sx={{ width: 21, height: 21 }} />
+      <Typography fontWeight={400} lineHeight={1} variant={'h4'}>
+        Request received
+      </Typography>
+    </Stack>
+    <Typography lineHeight={1.4} variant={'body2'}>
+      Our team will contact you as soon as possible to discuss next steps.
+    </Typography>
+  </Stack>
+);
+
 export const PricingPlanCard: FC<PricingCardProps> = ({
   plan,
   paymentType,
   category,
 }) => {
   const { visible, toggle } = useSwitch();
+  const paidPlan = useCurrentPlanStore((state) => state.paidPlan);
+  const sendEmailPlan = useCurrentPlanStore((state) => state.sendEmailPlan);
 
-  //type 为null时，无限制，高亮。
+  // Computed states
   const isHighlighted = plan.isDefault;
+  const isPaid = isPaidPlan(plan.planType, paidPlan);
+  const isEmailSent = sendEmailPlan.includes(plan.planType);
+  const isCapitalMarkets = category === DirectoriesBizIdEnum.capital_markets;
 
-  // 确定按钮文本
-  const buttonText = useMemo(() => {
-    if (category === DirectoriesBizIdEnum.capital_markets) {
-      return 'Request access';
+  // Button configuration
+  const buttonConfig = useMemo(() => {
+    if (isPaid) {
+      return {
+        text: 'Current plan',
+        variant: 'contained' as const,
+        showIcon: true,
+      };
     }
-    if (plan.monthlyPrice && plan.yearlyPrice) {
-      return 'Choose plan';
+    if (isCapitalMarkets) {
+      return { text: 'Request access', variant: 'outlined' as const };
+    }
+    if (hasPrice(plan)) {
+      return { text: 'Choose plan', variant: 'contained' as const };
     }
     if (plan.isDefault) {
-      return 'Talk to our team';
+      return { text: 'Talk to our team', variant: 'outlined' as const };
     }
-    if (plan.planType === PlanTypeEnum.free) {
-      return 'Current plan';
-    }
-    return 'Request access';
-  }, [
-    plan.monthlyPrice,
-    plan.yearlyPrice,
-    category,
-    plan.isDefault,
-    plan.planType,
-  ]);
-
-  // 确定按钮样式;
-  const buttonVariant = isHighlighted ? 'contained' : 'outlined';
+    return { text: 'Request access', variant: 'outlined' as const };
+  }, [isCapitalMarkets, plan, isPaid]);
 
   const [state, createPaymentLink] = useAsyncFn(async () => {
     try {
@@ -91,47 +196,41 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
     createPaymentLink();
   };
 
+  // Price description
   const priceDesc = useMemo(() => {
-    if (category === DirectoriesBizIdEnum.capital_markets) {
+    if (isCapitalMarkets || !plan.creditType) {
       return null;
     }
-    if (plan.planType === PlanTypeEnum.free && plan.creditType && plan.credit) {
-      return (
-        <Typography>
-          {paymentType === PaymentTypeEnum.YEARLY
-            ? plan.credit * 12
-            : plan.credit}{' '}
-          {PRICE_INFO[plan.creditType as string] || ''}{' '}
-          {paymentType === PaymentTypeEnum.YEARLY ? 'per year' : 'per month'}
-        </Typography>
-      );
-    }
-    if (
-      [PlanTypeEnum.institutional, PlanTypeEnum.enterprise].includes(
-        plan.planType,
-      )
-    ) {
+
+    if (isUnlimitedPlan(plan.planType)) {
       return <Typography>Unlimited verified records</Typography>;
     }
 
-    if (plan.creditType) {
-      return (
-        <Typography>
-          {paymentType === PaymentTypeEnum.YEARLY && plan.credit
-            ? (plan.credit * 12).toLocaleString()
-            : plan.credit?.toLocaleString()}{' '}
-          {PRICE_INFO[plan.creditType as string] || ''}{' '}
-          {PERIOD_INFO[paymentType as PaymentTypeEnum] || ''}
-        </Typography>
-      );
+    if (!plan.credit) {
+      return null;
     }
-    return null;
-  }, [category, plan.planType, plan.creditType, plan.credit, paymentType]);
+
+    const isYearly = paymentType === PaymentTypeEnum.YEARLY;
+    const creditAmount = isYearly ? plan.credit * 12 : plan.credit;
+    const creditLabel = PRICE_INFO[plan.creditType] || '';
+    const periodLabel =
+      plan.planType === PlanTypeEnum.free
+        ? isYearly
+          ? 'per year'
+          : 'per month'
+        : PERIOD_INFO[paymentType as PaymentTypeEnum] || '';
+
+    return (
+      <Typography>
+        {creditAmount.toLocaleString()} {creditLabel} {periodLabel}
+      </Typography>
+    );
+  }, [isCapitalMarkets, plan, paymentType]);
 
   return (
     <Stack
       sx={{
-        width: 384,
+        width: DIMENSIONS.CARD_WIDTH,
         flexShrink: 0,
         overflow: 'hidden',
         position: 'relative',
@@ -140,12 +239,17 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
       {/* Decorative dot pattern overlay */}
       <Icon
         component={plan.isDefault ? ICON_PRO : ICON_NORMAL}
-        sx={{ position: 'absolute', top: 0, right: 0, width: 258, height: 310 }}
+        sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          ...DIMENSIONS.ICON_SIZE,
+        }}
       />
       {/* Card Header */}
       <Box
         sx={{
-          bgcolor: isHighlighted ? '#363440' : '#EAE9EF',
+          bgcolor: isHighlighted ? COLORS.PRIMARY : COLORS.BACKGROUND,
           p: 3,
           borderRadius: '24px 24px 0 0',
         }}
@@ -164,111 +268,86 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
       {/* Card Body */}
       <Box
         sx={{
-          bgcolor: isHighlighted ? '#363440' : '#EAE9EF',
+          bgcolor: isHighlighted ? COLORS.PRIMARY : COLORS.BACKGROUND,
           borderRadius: '0 0 24px 24px',
         }}
       >
         <Stack
           sx={{
             bgcolor: 'background.default',
-            border: `1px solid ${isHighlighted ? '#363440' : '#DFDEE6'}`,
+            border: `1px solid ${isHighlighted ? COLORS.PRIMARY : COLORS.BORDER}`,
             borderRadius: 6,
             p: 3,
             gap: 3,
-            minHeight: 496,
+            minHeight: DIMENSIONS.MIN_HEIGHT,
             position: 'relative',
             zIndex: 1,
           }}
         >
-          {/* <StyledEmailReceived /> */}
-          {category === DirectoriesBizIdEnum.capital_markets ? (
-            <StyledCapitalDesc
-              planType={plan.planType}
-              priceAdditionalInfo={plan.priceAdditionalInfo || ''}
-            />
+          {isEmailSent ? (
+            <EmailSentStatus />
           ) : (
-            <Stack
-              gap={1}
-              sx={{
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                minHeight: 36,
-              }}
-            >
-              {paymentType === 'MONTH' && plan.monthlyPrice && (
-                <Typography
-                  sx={{
-                    fontSize: 36,
-                    fontWeight: 400,
-                    lineHeight: 1,
-                  }}
-                >
-                  ${plan.monthlyPrice.toLocaleString()}
-                </Typography>
-              )}
-              {paymentType === 'YEAR' && plan.yearlyPrice && (
-                <Typography
-                  sx={{
-                    fontSize: 36,
-                    fontWeight: 400,
-                    lineHeight: 1,
-                  }}
-                >
-                  ${plan.yearlyPrice.toLocaleString()}
-                </Typography>
+            <>
+              {isCapitalMarkets ? (
+                <StyledCapitalDesc
+                  planType={plan.planType}
+                  priceAdditionalInfo={plan.priceAdditionalInfo || ''}
+                />
+              ) : (
+                <PriceDisplay paymentType={paymentType} plan={plan} />
               )}
 
-              {plan.monthlyPrice || plan.yearlyPrice ? (
-                <Typography fontSize={15} lineHeight={1.5}>
-                  per month
-                </Typography>
-              ) : null}
-              {plan.priceAdditionalInfo && (
-                <Typography
-                  sx={{
-                    fontSize: 24,
-                    fontWeight: 400,
-                    lineHeight: 1,
-                    color: 'text.secondary',
-                    ml: 1,
-                  }}
-                >
-                  {plan.priceAdditionalInfo}
-                </Typography>
-              )}
-            </Stack>
+              {/* Button */}
+              <StyledButton
+                disabled={isPaid}
+                fullWidth
+                loading={state.loading}
+                onClick={handleClick}
+                size="medium"
+                sx={{
+                  bgcolor:
+                    buttonConfig.variant === 'contained'
+                      ? COLORS.PRIMARY
+                      : 'transparent',
+                  color:
+                    buttonConfig.variant === 'contained'
+                      ? 'white'
+                      : 'text.primary',
+                  borderColor:
+                    buttonConfig.variant === 'outlined'
+                      ? COLORS.BORDER
+                      : 'transparent',
+                  '&:hover': {
+                    bgcolor:
+                      buttonConfig.variant === 'contained'
+                        ? COLORS.PRIMARY
+                        : 'transparent',
+                  },
+                }}
+                variant={buttonConfig.variant}
+              >
+                {buttonConfig.showIcon ? (
+                  <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+                    {buttonConfig.text}
+                    <Icon
+                      component={ICON_CHECKED}
+                      sx={{ width: 16, height: 16 }}
+                    />
+                  </Stack>
+                ) : (
+                  buttonConfig.text
+                )}
+              </StyledButton>
+
+              {priceDesc}
+            </>
           )}
-
-          {/* Button */}
-          <StyledButton
-            disabled={plan.planType === PlanTypeEnum.free}
-            fullWidth
-            loading={state.loading}
-            onClick={handleClick}
-            size="medium"
-            sx={{
-              bgcolor:
-                buttonVariant === 'contained' ? '#363440' : 'transparent',
-              color: buttonVariant === 'contained' ? 'white' : 'text.primary',
-              borderColor:
-                buttonVariant === 'outlined' ? '#DFDEE6' : 'transparent',
-              '&:hover': {
-                bgcolor:
-                  buttonVariant === 'contained' ? '#363440' : 'transparent',
-              },
-            }}
-            variant={buttonVariant}
-          >
-            {buttonText}
-          </StyledButton>
-
-          {priceDesc}
 
           {/* Divider */}
           <Box
             sx={{
               height: '1px',
-              bgcolor: '#DFDEE6',
+              bgcolor: COLORS.BORDER,
               width: '100%',
             }}
           />
@@ -279,7 +358,6 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
               <Typography
                 sx={{
                   color: 'text.primary',
-                  lineHeight: 1.71,
                   fontSize: 14,
                 }}
                 variant={'body2'}
@@ -296,14 +374,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
                     flexShrink: 0,
                   }}
                 />
-                <Typography
-                  sx={{
-                    lineHeight: 1.71,
-                  }}
-                  variant={'body2'}
-                >
-                  {pkg}
-                </Typography>
+                <Typography variant={'body2'}>{pkg}</Typography>
               </Stack>
             ))}
           </Stack>

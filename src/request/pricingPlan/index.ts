@@ -1,10 +1,9 @@
-import { FetchCurrentPlanResponse } from '@/types/Settings/currentPlan';
-import { get, post } from '../request';
 import {
   CreatePaymentLinkParam,
   PricingPlanResponse,
   SendPricingEmailParam,
 } from '@/types/pricingPlan';
+import { get, post } from '../request';
 
 export const _fetchAllPlan = () => {
   return get<PricingPlanResponse>('/sdr/pricing/info');
