@@ -1,4 +1,4 @@
-import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { SyntheticEvent, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -12,7 +12,7 @@ export const PricingPlan = () => {
   const [category, setCategory] = useState<string>('');
   const [paymentType, setPaymentType] = useState<string>('MONTH');
 
-  const { data } = useSWR(
+  const { data, isLoading } = useSWR(
     'pricing-plan',
     async () => {
       try {
@@ -91,9 +91,12 @@ export const PricingPlan = () => {
             boxShadow: '0px 1px 1px 0px rgba(46, 46, 46, 0.25)',
           }}
         >
-          {Object.keys(data?.data || {}).map((item) => (
+          {(isLoading
+            ? Array.from(new Array(2))
+            : Object.keys(data?.data || {})
+          ).map((item, index) => (
             <Box
-              key={item}
+              key={item || index}
               onClick={() => handlePlanTypeChange(item)}
               sx={{
                 width: 128,
@@ -109,17 +112,21 @@ export const PricingPlan = () => {
                 },
               }}
             >
-              <Typography
-                sx={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  color: planType === item ? 'white' : '#6F6C7D',
-                  lineHeight: 1.5,
-                }}
-              >
-                {item}
-              </Typography>
+              {item ? (
+                <Typography
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    color: planType === item ? 'white' : '#6F6C7D',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {item}
+                </Typography>
+              ) : (
+                <Skeleton />
+              )}
             </Box>
           ))}
         </Stack>
@@ -154,24 +161,6 @@ export const PricingPlan = () => {
                   fontWeight: 600,
                 },
               },
-              // '& .MuiTabs-indicator': {
-              //   display: 'none',
-              // },
-              // '& .MuiTabs-flexContainer': {
-              //   gap: 0,
-              //   '& .MuiButtonBase-root': {
-              //     position: 'relative',
-              //     '&.Mui-selected::after': {
-              //       content: '""',
-              //       position: 'absolute',
-              //       bottom: 0,
-              //       left: 0,
-              //       right: 0,
-              //       height: '2px',
-              //       bgcolor: '#363440',
-              //     },
-              //   },
-              // },
             }}
             value={category}
           >

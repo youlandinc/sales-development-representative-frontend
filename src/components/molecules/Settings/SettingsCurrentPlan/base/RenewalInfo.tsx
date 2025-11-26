@@ -4,6 +4,7 @@ import { FC } from 'react';
 import { COLORS } from '../data';
 import { PlanStatusEnum } from '@/types';
 import ICON_CALENDAR from '../assets/icon_calendar.svg';
+import { format } from 'date-fns';
 
 export interface RenewalInfoProps {
   renewalDate: string;
@@ -26,7 +27,7 @@ export const RenewalInfo: FC<RenewalInfoProps> = ({ renewalDate, status }) => {
           lineHeight: 1.5,
         }}
       >
-        {actionText} on {renewalDate}
+        {actionText} on {format(new Date(renewalDate), 'MMM dd, yyyy')}
       </Typography>
     </Stack>
   );
