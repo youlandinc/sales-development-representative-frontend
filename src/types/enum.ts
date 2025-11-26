@@ -122,3 +122,10 @@ export enum PlanTypeEnum {
   plus = 'PLUS',
   pro = 'PRO',
 }
+
+export enum PlanCategoryEnum {
+  business = 'BUSINESS_CORPORATE',
+  real_estate = 'REAL_ESTATE_LENDING',
+  capital = 'CAPITAL_MARKETS',
+  enrichment = 'ENRICHMENT_CREDITS',
+}

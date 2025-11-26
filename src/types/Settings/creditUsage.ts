@@ -1,4 +1,4 @@
-import { PlanTypeEnum } from '../enum';
+import { PlanCategoryEnum, PlanTypeEnum } from '../enum';
 
 export interface FetchCreditUsageListRequest {
   size: number;
@@ -6,7 +6,7 @@ export interface FetchCreditUsageListRequest {
   startTime?: string;
   endTime?: string;
   dateType?: string;
-  category?: PlanTypeEnum;
+  category?: PlanCategoryEnum;
 }
 
 export interface CreditUsageItemInfo {
@@ -26,7 +26,7 @@ export interface CreditUsageItemInfo {
 }
 
 export interface UsageTypeChild {
-  category: PlanTypeEnum;
+  category: PlanCategoryEnum;
   categoryName: string;
   planType: PlanTypeEnum;
   choosePlanName: string;

@@ -26,6 +26,13 @@ export const useCreditUsage = () => {
 
   const [page, setPage] = useState(0);
 
+  const handleSetQueryConditions = (
+    newConditions: Omit<FetchCreditUsageListRequest, 'page' | 'size'>,
+  ) => {
+    setQueryConditions(newConditions);
+    setPage(0);
+  };
+
   const { data: usageType } = useSWR(
     'usage-type',
     async () => {
@@ -52,71 +59,10 @@ export const useCreditUsage = () => {
   );
 
   const { data, isLoading } = useSWR(
-    queryConditions.category ? { ...queryConditions, page, size: 10 } : null,
+    queryConditions.category ? { ...queryConditions, page, size: 2 } : null,
     async (param) => {
       const res = await _fetchCreditUsageList(param);
-      return {
-        ...res,
-        data: {
-          ...res.data,
-          content: [
-            {
-              id: 0,
-              creditsUsed: 0,
-              remainingCredits: 0,
-              tableName: 'string',
-              directory: 'string',
-              searchTime: '2025-11-20T07:58:22.187Z',
-              providers: [
-                {
-                  companyName: 'Wiza',
-                  companyUrl: 'https://via.placeholder.com/18',
-                  creditsUsed: 0,
-                },
-                {
-                  companyName: 'Forager',
-                  companyUrl: 'https://via.placeholder.com/18',
-                  creditsUsed: 0,
-                },
-                {
-                  companyName: 'Forager',
-                  companyUrl: 'https://via.placeholder.com/18',
-                  creditsUsed: 0,
-                },
-              ],
-              date: '2025-11-20T07:58:22.187Z',
-              integrationName: 'string',
-            },
-            {
-              id: 1,
-              creditsUsed: 0,
-              remainingCredits: 0,
-              tableName: 'string',
-              directory: 'string',
-              searchTime: '2025-11-20T07:58:22.187Z',
-              providers: [
-                {
-                  companyName: 'Wiza',
-                  companyUrl: 'https://via.placeholder.com/18',
-                  creditsUsed: 0,
-                },
-                {
-                  companyName: 'Forager',
-                  companyUrl: 'https://via.placeholder.com/18',
-                  creditsUsed: 0,
-                },
-                {
-                  companyName: 'Forager',
-                  companyUrl: 'https://via.placeholder.com/18',
-                  creditsUsed: 0,
-                },
-              ],
-              date: '2025-11-20T07:58:22.187Z',
-              integrationName: 'string',
-            },
-          ],
-        },
-      };
+      return res;
     },
     {
       revalidateOnFocus: false,
@@ -127,7 +73,7 @@ export const useCreditUsage = () => {
   return {
     data,
     isLoading,
-    setQueryConditions,
+    setQueryConditions: handleSetQueryConditions,
     queryConditions,
     setPage,
     page,
