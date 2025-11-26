@@ -1,23 +1,23 @@
 import { ListSubheader, MenuItem, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
 import { format } from 'date-fns';
+import { FC, useState } from 'react';
 
 import { StyledSelect } from '@/components/atoms';
 import { DateRangeDialog } from './DateRangeDialog';
 
-import { PlanTypeEnum } from '@/types';
+import { PlanCategoryEnum } from '@/types';
 import {
   DateRangeEnum,
   FetchCreditUsageListRequest,
   UsageTypeOptions,
 } from '@/types/Settings/creditUsage';
 
-import { DATE_RANGE_OPTIONS, formatDateRange } from './data';
 import {
   computedPlanBadgeStyle,
   PlanBadge,
   PREMIUM_PLAN_TYPES,
 } from '@/components/molecules/Settings/SettingsCurrentPlan';
+import { DATE_RANGE_OPTIONS, formatDateRange } from './data';
 
 interface CreditUsageToolbarProps {
   onChange: (
@@ -54,7 +54,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
           onChange={(e) => {
             onChange?.({
               ...value,
-              category: e.target.value as PlanTypeEnum,
+              category: e.target.value as PlanCategoryEnum,
             });
           }}
           options={usageTypeList || []}
