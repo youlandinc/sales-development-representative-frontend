@@ -133,7 +133,7 @@ export const useCreditUsage = () => {
     page,
     totalPages: data?.data?.page?.totalPages || 0,
     usageType: (usageType?.data || []).reduce((acc, item) => {
-      if (item.children) {
+      if (Array.isArray(item?.children)) {
         acc.push({
           label: item.parentCategory,
           value: item.parentCategory,

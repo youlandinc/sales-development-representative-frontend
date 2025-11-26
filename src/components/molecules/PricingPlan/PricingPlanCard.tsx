@@ -1,5 +1,4 @@
 import { Box, Icon, Stack, Typography } from '@mui/material';
-import { CheckCircleOutline } from '@mui/icons-material';
 import { FC, useMemo } from 'react';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
@@ -13,126 +12,37 @@ import { PaymentTypeEnum, PlanInfo } from '@/types/pricingPlan';
 import { _createPaymentLink } from '@/request/pricingPlan';
 import {
   CANCEL_URL,
+  COLORS,
+  DIMENSIONS,
+  hasPrice,
+  ICON_STYLES,
+  isPaidPlan,
+  isUnlimitedPlan,
   packageTitle,
   PERIOD_INFO,
   PRICE_INFO,
   SUCCESS_URL,
+  TYPOGRAPHY_STYLES,
 } from './data';
-import { StyledCapitalDesc } from './base';
+
+import {
+  CustomPricing,
+  EmailSentStatus,
+  PriceDisplay,
+  SimpleTextHeader,
+  StyledCapitalDesc,
+} from './base';
 import { TalkToTeamDialog } from './TalkToTeamDialog';
 
 import ICON_NORMAL from './assets/icon_normal.svg';
 import ICON_PRO from './assets/icon_pro.svg';
 import ICON_CHECKED from './assets/icon_checked.svg';
-import ICON_CONFETTI from './assets/icon_confetti_bold.svg';
-
-// Constants
-const COLORS = {
-  PRIMARY: '#363440',
-  BORDER: '#DFDEE6',
-  BACKGROUND: '#EAE9EF',
-} as const;
-
-const DIMENSIONS = {
-  CARD_WIDTH: 384,
-  MIN_HEIGHT: 496,
-  ICON_SIZE: { width: 258, height: 310 },
-} as const;
-
-const UNLIMITED_PLAN_TYPES = [
-  PlanTypeEnum.institutional,
-  PlanTypeEnum.enterprise,
-] as const;
-
-// Helper functions
-const isPaidPlan = (planType: PlanTypeEnum, paidPlans: PlanTypeEnum[]) => {
-  return planType === PlanTypeEnum.free || paidPlans.includes(planType);
-};
-
-const hasPrice = (plan: PlanInfo) => {
-  return Boolean(plan.monthlyPrice && plan.yearlyPrice);
-};
-
-const isUnlimitedPlan = (planType: PlanTypeEnum) => {
-  return UNLIMITED_PLAN_TYPES.includes(planType as any);
-};
 
 interface PricingCardProps {
   plan: PlanInfo;
   paymentType?: PaymentTypeEnum | string;
   category: string;
 }
-
-// Price Display Component
-const PriceDisplay: FC<{
-  plan: PlanInfo;
-  paymentType?: PaymentTypeEnum | string;
-}> = ({ plan, paymentType }) => {
-  if (!plan.monthlyPrice && !plan.yearlyPrice) {
-    return null;
-  }
-
-  const price =
-    paymentType === PaymentTypeEnum.YEARLY
-      ? plan.yearlyPrice
-      : plan.monthlyPrice;
-
-  if (!price) {
-    return null;
-  }
-
-  return (
-    <Stack
-      gap={1}
-      sx={{
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        minHeight: 36,
-      }}
-    >
-      <Typography
-        sx={{
-          fontSize: 36,
-          fontWeight: 400,
-          lineHeight: 1,
-        }}
-      >
-        ${price.toLocaleString()}
-      </Typography>
-      <Typography fontSize={15} lineHeight={1.5}>
-        per month
-      </Typography>
-      {plan.priceAdditionalInfo && (
-        <Typography
-          sx={{
-            fontSize: 24,
-            fontWeight: 400,
-            lineHeight: 1,
-            color: 'text.secondary',
-            ml: 1,
-          }}
-        >
-          {plan.priceAdditionalInfo}
-        </Typography>
-      )}
-    </Stack>
-  );
-};
-
-// Email Sent Status Component
-const EmailSentStatus: FC = () => (
-  <Stack gap={3}>
-    <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
-      <Icon component={ICON_CONFETTI} sx={{ width: 21, height: 21 }} />
-      <Typography fontWeight={400} lineHeight={1} variant={'h4'}>
-        Request received
-      </Typography>
-    </Stack>
-    <Typography lineHeight={1.4} variant={'body2'}>
-      Our team will contact you as soon as possible to discuss next steps.
-    </Typography>
-  </Stack>
-);
 
 export const PricingPlanCard: FC<PricingCardProps> = ({
   plan,
@@ -162,13 +72,32 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
       return { text: 'Request access', variant: 'outlined' as const };
     }
     if (hasPrice(plan)) {
-      return { text: 'Choose plan', variant: 'contained' as const };
+      if (plan.isDefault) {
+        return { text: 'Choose plan', variant: 'contained' as const };
+      }
+      return { text: 'Choose plan', variant: 'outlined' as const };
     }
     if (plan.isDefault) {
-      return { text: 'Talk to our team', variant: 'outlined' as const };
+      return { text: 'Talk to our team', variant: 'contained' as const };
     }
     return { text: 'Request access', variant: 'outlined' as const };
   }, [isCapitalMarkets, plan, isPaid]);
+
+  // Button styles
+  const buttonStyles = useMemo(
+    () => ({
+      bgcolor:
+        buttonConfig.variant === 'contained' ? COLORS.PRIMARY : 'transparent',
+      color: buttonConfig.variant === 'contained' ? 'white' : 'text.primary',
+      borderColor:
+        buttonConfig.variant === 'outlined' ? COLORS.BORDER : 'transparent',
+      '&:hover': {
+        bgcolor:
+          buttonConfig.variant === 'contained' ? COLORS.PRIMARY : 'transparent',
+      },
+    }),
+    [buttonConfig.variant],
+  );
 
   const [state, createPaymentLink] = useAsyncFn(async () => {
     try {
@@ -178,7 +107,6 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
         planType: plan.planType,
         pricingType: paymentType as PaymentTypeEnum,
       });
-      // 这里可以处理重定向逻辑
       if (data) {
         window.location.href = data;
       }
@@ -226,6 +154,44 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
       </Typography>
     );
   }, [isCapitalMarkets, plan, paymentType]);
+
+  // Content header logic
+  const contentHeader = useMemo(() => {
+    // Email sent state
+    if (isEmailSent) {
+      return <EmailSentStatus />;
+    }
+
+    const isUnlimited = isUnlimitedPlan(plan.planType);
+
+    // Paid plan with custom pricing
+    if (isPaid && (isCapitalMarkets || isUnlimited)) {
+      return <CustomPricing />;
+    }
+
+    // Unpaid unlimited plans
+    if (isUnlimited) {
+      return <SimpleTextHeader text="Request pricing" />;
+    }
+
+    // Capital markets
+    if (isCapitalMarkets) {
+      return (
+        <StyledCapitalDesc
+          planType={plan.planType}
+          priceAdditionalInfo={plan.priceAdditionalInfo || ''}
+        />
+      );
+    }
+
+    // Free plan
+    if (plan.planType === PlanTypeEnum.free) {
+      return <SimpleTextHeader text="Try enrichment for free" />;
+    }
+
+    // Default: show price
+    return <PriceDisplay paymentType={paymentType} plan={plan} />;
+  }, [isCapitalMarkets, isEmailSent, isPaid, paymentType, plan]);
 
   return (
     <Stack
@@ -284,19 +250,9 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
             zIndex: 1,
           }}
         >
-          {isEmailSent ? (
-            <EmailSentStatus />
-          ) : (
+          {contentHeader}
+          {!isEmailSent && (
             <>
-              {isCapitalMarkets ? (
-                <StyledCapitalDesc
-                  planType={plan.planType}
-                  priceAdditionalInfo={plan.priceAdditionalInfo || ''}
-                />
-              ) : (
-                <PriceDisplay paymentType={paymentType} plan={plan} />
-              )}
-
               {/* Button */}
               <StyledButton
                 disabled={isPaid}
@@ -304,35 +260,13 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
                 loading={state.loading}
                 onClick={handleClick}
                 size="medium"
-                sx={{
-                  bgcolor:
-                    buttonConfig.variant === 'contained'
-                      ? COLORS.PRIMARY
-                      : 'transparent',
-                  color:
-                    buttonConfig.variant === 'contained'
-                      ? 'white'
-                      : 'text.primary',
-                  borderColor:
-                    buttonConfig.variant === 'outlined'
-                      ? COLORS.BORDER
-                      : 'transparent',
-                  '&:hover': {
-                    bgcolor:
-                      buttonConfig.variant === 'contained'
-                        ? COLORS.PRIMARY
-                        : 'transparent',
-                  },
-                }}
+                sx={buttonStyles}
                 variant={buttonConfig.variant}
               >
                 {buttonConfig.showIcon ? (
                   <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
                     {buttonConfig.text}
-                    <Icon
-                      component={ICON_CHECKED}
-                      sx={{ width: 16, height: 16 }}
-                    />
+                    <Icon component={ICON_CHECKED} sx={ICON_STYLES.CHECKED} />
                   </Stack>
                 ) : (
                   buttonConfig.text
@@ -352,14 +286,19 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
             }}
           />
 
-          {/* Features List - 从 packages 数组获取 */}
+          {/* Features List */}
           <Stack gap={1.5}>
+            {isEmailSent && (
+              <Typography
+                sx={TYPOGRAPHY_STYLES.PACKAGE_TITLE}
+                variant={'body2'}
+              >
+                Unlimited verified records
+              </Typography>
+            )}
             {packageTitle[plan.planType] && (
               <Typography
-                sx={{
-                  color: 'text.primary',
-                  fontSize: 14,
-                }}
+                sx={TYPOGRAPHY_STYLES.PACKAGE_TITLE}
                 variant={'body2'}
               >
                 {packageTitle[plan.planType]}
@@ -367,13 +306,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
             )}
             {plan.packages.map((pkg, idx) => (
               <Stack alignItems="flex-start" direction="row" gap={1} key={idx}>
-                <CheckCircleOutline
-                  sx={{
-                    width: 24,
-                    height: 24,
-                    flexShrink: 0,
-                  }}
-                />
+                <Icon component={ICON_CHECKED} sx={ICON_STYLES.PACKAGE} />
                 <Typography variant={'body2'}>{pkg}</Typography>
               </Stack>
             ))}

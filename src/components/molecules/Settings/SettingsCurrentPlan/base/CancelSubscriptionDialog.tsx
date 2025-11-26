@@ -1,5 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { FC } from 'react';
+import { format } from 'date-fns';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
 
@@ -43,7 +44,9 @@ export const CancelSubscriptionDialog: FC<CancelSubscriptionDialogProps> = ({
 
             <Stack alignItems="flex-start" direction="row" gap={1}>
               <Typography variant={'subtitle2'}>End on:</Typography>
-              <Typography variant={'body2'}>{endDate}</Typography>
+              <Typography variant={'body2'}>
+                {format(new Date(endDate), 'MMM dd, yyyy')}
+              </Typography>
             </Stack>
           </Stack>
         </Stack>
