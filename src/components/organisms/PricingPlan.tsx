@@ -1,5 +1,5 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
-import { SyntheticEvent, useMemo, useState } from 'react';
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import { SDRToast } from '@/components/atoms';
@@ -11,20 +11,11 @@ export const PricingPlan = () => {
   const [planType, setPlanType] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [paymentType, setPaymentType] = useState<string>('MONTH');
-
   const { data, isLoading } = useSWR(
     'pricing-plan',
     async () => {
       try {
         const res = await _fetchAllPlan();
-        if (res.data) {
-          // 调试：查看后端返回的键顺序
-          const defaultKey = Object.keys(res.data)[0];
-          const defaultCategory = res.data[defaultKey][0].category;
-          setPlanType(Object.keys(res.data)[0]);
-          setCategory(defaultCategory);
-        }
-
         return res;
       } catch (err) {
         const { message, header, variant } = err as HttpError;
@@ -34,36 +25,45 @@ export const PricingPlan = () => {
     { revalidateOnFocus: false },
   );
 
-  const handlePlanTypeChange = (newValue: string) => {
+  useEffect(() => {
+    const firstPlanTypeKey = Object.keys(data?.data || {})[0];
+    const firstCategory = data?.data?.[firstPlanTypeKey]?.[0]?.category;
+    if (firstPlanTypeKey && firstCategory) {
+      setPlanType(firstPlanTypeKey);
+      setCategory(firstCategory);
+    }
+  }, [data]);
+
+  const onPlanTypeChange = (newValue: string) => {
     setPlanType(newValue);
     setCategory(data?.data?.[newValue]?.[0]?.category || '');
   };
 
-  const handleCategoryChange = (_: SyntheticEvent, newValue: string) => {
+  const onCategoryChange = (_: SyntheticEvent, newValue: string) => {
     setCategory(newValue);
   };
 
-  // 直接获取和过滤 mockData，不转换
-  const getCurrentPlans = () => {
-    return (
-      data?.data?.[planType]?.find((item) => item.category === category)
-        ?.plans || []
-    );
+  const onPaymentTypeSelect = (type: string) => {
+    setPaymentType(type);
   };
 
-  const currentPlans = getCurrentPlans();
+  // Current category data
+  const currentCategoryData = useMemo(
+    () => data?.data?.[planType]?.find((item) => item.category === category),
+    [data, planType, category],
+  );
 
-  const getPaymentType = useMemo(() => {
-    const paymentDetail =
-      data?.data?.[planType]?.find((item) => item.category === category)
-        ?.pricingOptions || [];
-    if (paymentDetail && paymentDetail.length > 0) {
+  const currentPlans = currentCategoryData?.plans || [];
+  const pricingOptions = currentCategoryData?.pricingOptions || [];
+
+  // Reset paymentType when pricingOptions change
+  useEffect(() => {
+    if (pricingOptions.length > 0) {
       setPaymentType('MONTH');
     } else {
       setPaymentType('');
     }
-    return paymentDetail;
-  }, [category, planType, data]);
+  }, [pricingOptions.length]);
 
   return (
     <Stack
@@ -97,7 +97,7 @@ export const PricingPlan = () => {
           ).map((item, index) => (
             <Box
               key={item || index}
-              onClick={() => handlePlanTypeChange(item)}
+              onClick={() => onPlanTypeChange(item)}
               sx={{
                 width: 128,
                 px: 1,
@@ -143,7 +143,7 @@ export const PricingPlan = () => {
           }}
         >
           <Tabs
-            onChange={handleCategoryChange}
+            onChange={onCategoryChange}
             sx={{
               minHeight: 32,
               '& .MuiTab-root': {
@@ -172,7 +172,7 @@ export const PricingPlan = () => {
               />
             ))}
           </Tabs>
-          {getPaymentType.length > 0 && (
+          {pricingOptions.length > 0 && (
             <Stack
               sx={{
                 flexDirection: 'row',
@@ -183,10 +183,10 @@ export const PricingPlan = () => {
                 borderRadius: '50px',
               }}
             >
-              {getPaymentType.map((item) => (
+              {pricingOptions.map((item) => (
                 <Typography
                   key={item.type}
-                  onClick={() => setPaymentType(item.type as string)}
+                  onClick={() => onPaymentTypeSelect(item.type as string)}
                   sx={{
                     fontWeight: 600,
                     color:
@@ -218,10 +218,10 @@ export const PricingPlan = () => {
               flexWrap: 'wrap',
             }}
           >
-            {currentPlans.map((plan, index) => (
+            {currentPlans.map((plan) => (
               <PricingPlanCard
                 category={category}
-                key={index}
+                key={plan.planType}
                 paymentType={paymentType}
                 plan={plan}
               />
