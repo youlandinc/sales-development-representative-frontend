@@ -10,6 +10,7 @@ interface CurrentPlanStoreState {
   isLoading: boolean;
   paidPlan: PlanTypeEnum[];
   sendEmailPlan: PlanTypeEnum[];
+  cancelledPlan: PlanTypeEnum[];
 }
 
 interface CurrentPlanStoreActions {
@@ -23,6 +24,7 @@ export const useCurrentPlanStore = create<CurrentPlanStoreProps>()((set) => ({
   isLoading: false,
   paidPlan: [],
   sendEmailPlan: [],
+  cancelledPlan: [],
   fetchCurrentPlan: async () => {
     try {
       set({ isLoading: true });
@@ -44,7 +46,16 @@ export const useCurrentPlanStore = create<CurrentPlanStoreProps>()((set) => ({
         )
         .map((plan) => plan.planType);
 
-      set({ planList: response.data.currentPlans, paidPlan, sendEmailPlan });
+      const cancelledPlan = response.data.currentPlans
+        .filter((plan) => plan.status === PlanStatusEnum.cancelled)
+        .map((plan) => plan.planType);
+
+      set({
+        planList: response.data.currentPlans,
+        paidPlan,
+        sendEmailPlan,
+        cancelledPlan,
+      });
       set({ isLoading: false });
     } catch (err) {
       set({ isLoading: false });
