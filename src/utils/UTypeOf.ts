@@ -64,6 +64,10 @@ UTypeOf.isObject = <T = Record<string, unknown>>(
   return UTypeOf(value) === 'Object';
 };
 
+UTypeOf.isEmptyObject = (value: unknown): boolean => {
+  return UTypeOf.isObject(value) && Object.keys(value).length === 0;
+};
+
 UTypeOf.isFunction = (
   value: unknown,
 ): value is (...args: unknown[]) => unknown => {
@@ -123,10 +127,16 @@ UTypeOf.isPrimitive = (
   ].includes(type);
 };
 
+/**
+ * @deprecated Use `value !== undefined` or `!UTypeOf.isUndefined(value)` instead
+ */
 export const UNotUndefined = (value: unknown): boolean => {
   return !UTypeOf.isUndefined(value);
 };
 
+/**
+ * @deprecated Use `value !== null` or `!UTypeOf.isNull(value)` instead
+ */
 export const UNotNull = (value: unknown): boolean => {
   return !UTypeOf.isNull(value);
 };

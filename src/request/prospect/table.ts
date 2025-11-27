@@ -1,5 +1,5 @@
 import { del, get, patch, post } from '@/request/request';
-import { ColumnFieldGroupMap } from '@/types';
+import { ColumnFieldGroupMap, ResponseProspectTableViaSearch } from '@/types';
 import {
   TableCellProps,
   TableColumnProps,

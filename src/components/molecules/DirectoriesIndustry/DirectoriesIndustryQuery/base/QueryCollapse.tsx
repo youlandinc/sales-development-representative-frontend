@@ -11,6 +11,7 @@ interface QueryCollapseProps {
   defaultOpen?: boolean;
   filterCount?: number;
   isAuth: boolean;
+  planName: string;
 }
 
 export const QueryCollapse: FC<QueryCollapseProps> = ({
@@ -19,6 +20,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
   defaultOpen = true,
   filterCount = 0,
   isAuth,
+  planName,
 }) => {
   const [expanded, setExpanded] = useState(defaultOpen);
 
@@ -67,7 +69,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                 {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}
               </Box>
             )}
-            {!isAuth && <QueryBadgeAuth />}
+            {!isAuth && <QueryBadgeAuth planName={planName} />}
             <Icon
               component={ICON_ARROW}
               sx={{

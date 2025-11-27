@@ -152,8 +152,12 @@ export const useQueryAutoComplete = ({
   }, [value, multiple, options]);
 
   const onOpenToTrigger = useCallback(() => {
+    // Do not open menu when no options source (pure input mode)
+    if (!hasStatic && !hasDynamic) {
+      return;
+    }
     setOpen(true);
-  }, []);
+  }, [hasStatic, hasDynamic]);
 
   const onCloseToReset = useCallback(() => {
     setOpen(false);

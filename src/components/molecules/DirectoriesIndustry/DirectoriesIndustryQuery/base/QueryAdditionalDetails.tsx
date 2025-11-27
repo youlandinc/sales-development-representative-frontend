@@ -13,7 +13,7 @@ import { StyledCheckbox } from '@/components/atoms';
 import { QueryAutoComplete } from './index';
 
 interface QueryAdditionalDetailsProps {
-  isAuth?: boolean;
+  isAuth: boolean;
 }
 
 export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({

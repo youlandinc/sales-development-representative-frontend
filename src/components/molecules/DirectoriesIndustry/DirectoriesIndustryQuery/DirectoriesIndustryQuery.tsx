@@ -1,13 +1,22 @@
 import { FC, useState } from 'react';
-import { CircularProgress, Stack } from '@mui/material';
+import { CircularProgress, Stack, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
 
-import { TITLE_MAP } from '@/constants/directories';
+import {
+  HIERARCHICAL_CONFIG_BIZ_IDS,
+  TITLE_MAP,
+} from '@/constants/directories';
 import { useDirectoriesStore } from '@/stores/directories';
-import { buildSearchRequestParams } from '@/utils/directories';
+import {
+  buildSearchRequestParams,
+  getDirectoriesBizId,
+} from '@/utils/directories';
 import { _importDirectoriesDataToTable } from '@/request/directories';
-import { DirectoriesQueryItem } from '@/types/directories';
+import {
+  DirectoriesBizIdEnum,
+  DirectoriesQueryItem,
+} from '@/types/directories';
 
 import { QueryBreadcrumbs } from './base';
 import { CreateQueryElement } from './index';
@@ -90,7 +99,7 @@ export const DirectoriesIndustryQuery: FC = () => {
     }
   };
 
-  if (!buttonGroupConfig && !isLoadingConfig) {
+  if (isLoadingConfig) {
     return (
       <Stack
         sx={{
@@ -104,6 +113,27 @@ export const DirectoriesIndustryQuery: FC = () => {
         }}
       >
         <CircularProgress />
+      </Stack>
+    );
+  }
+
+  // Hierarchical config must have buttonGroupConfig
+  const bizId = getDirectoriesBizId(industrySlug);
+  if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId) && !buttonGroupConfig) {
+    return (
+      <Stack
+        sx={{
+          width: 420,
+          gap: 3,
+          p: 3,
+          height: 'auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: 400,
+          color: 'text.secondary',
+        }}
+      >
+        <Typography>Configuration not available</Typography>
       </Stack>
     );
   }

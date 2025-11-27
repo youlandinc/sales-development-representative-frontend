@@ -46,17 +46,17 @@ export const UFormatPercent = (
   if (!UNotUndefined(percentageValue) || !UNotNull(percentageValue)) {
     return '-';
   }
-  if (radix <= 0) {
-    return '0%';
-  }
-  const insideRadix = UGetRadix(radix);
   let target = percentageValue;
   if (UTypeOf(target) === 'String') {
     target = parseFloat(target as string);
   }
+  if (isNaN(target as number)) {
+    return '-';
+  }
+  const finalRadix = radix <= 0 ? 0 : Math.min(UGetRadix(radix), 3);
   return (
     ((Math.floor((target as number) * 10000000) / 10000000) * 100).toFixed(
-      insideRadix >= 3 ? 3 : insideRadix,
+      finalRadix,
     ) + '%'
   );
 };
@@ -75,11 +75,19 @@ export const UFormatDate = (
   date: string | Date | null,
   timeFormat = 'MM/dd/yyyy',
   options?: FormatDateOptions,
-) => {
+): string => {
   if (!date) {
     return '-';
   }
-  return format(new Date(date), timeFormat, options);
+  try {
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return '-';
+    }
+    return format(dateObj, timeFormat, options);
+  } catch {
+    return '-';
+  }
 };
 
 /**

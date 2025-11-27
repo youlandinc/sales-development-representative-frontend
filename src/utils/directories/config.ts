@@ -4,27 +4,49 @@ import {
   DirectoriesQueryGroupTypeEnum,
   DirectoriesQueryItem,
 } from '@/types/directories';
+import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
 
 export const getDirectoriesBizId = (slug: string): DirectoriesBizIdEnum => {
   const slugMap: Record<string, DirectoriesBizIdEnum> = {
     'capital-markets': DirectoriesBizIdEnum.capital_markets,
-    'real-estate-lending': DirectoriesBizIdEnum.real_estate_lending,
+    'real-estate': DirectoriesBizIdEnum.real_estate_lending,
   };
 
   return slugMap[slug] || DirectoriesBizIdEnum.capital_markets;
 };
 
-export const configParse = (
+// ========================================
+// Config Parse: Flat Config
+// ========================================
+export type FlatConfigResult = {
+  configMap: Record<string, DirectoriesQueryItem[]>;
+  buttonGroupConfig: null;
+  firstKey: string;
+};
+
+const parseFlatConfig = (
   apiData: DirectoriesQueryItem[],
-): {
+  bizId: DirectoriesBizIdEnum,
+): FlatConfigResult => {
+  return {
+    configMap: { [bizId]: apiData },
+    buttonGroupConfig: null,
+    firstKey: bizId,
+  };
+};
+
+// ========================================
+// Config Parse: Hierarchical Config (BUTTON_GROUP)
+// ========================================
+export type HierarchicalConfigResult = {
   configMap: Record<string, DirectoriesQueryItem[]>;
   buttonGroupConfig: DirectoriesQueryItem | null;
-  firstInstitutionType: string;
-} => {
-  if (!apiData || apiData.length === 0) {
-    return { configMap: {}, buttonGroupConfig: null, firstInstitutionType: '' };
-  }
+  firstKey: string;
+};
 
+const parseHierarchicalConfig = (
+  apiData: DirectoriesQueryItem[],
+): HierarchicalConfigResult => {
   const buttonGroup = apiData.find(
     (item) =>
       item.key === 'institutionType' &&
@@ -32,7 +54,7 @@ export const configParse = (
   );
 
   if (!buttonGroup || !buttonGroup.children) {
-    return { configMap: {}, buttonGroupConfig: null, firstInstitutionType: '' };
+    return { configMap: {}, buttonGroupConfig: null, firstKey: '' };
   }
 
   const configMap: Record<string, DirectoriesQueryItem[]> = {};
@@ -44,14 +66,34 @@ export const configParse = (
     }
   });
 
-  const firstInstitutionType = buttonGroup.children[0]?.defaultValue || '';
+  const firstKey = buttonGroup.children[0]?.defaultValue || '';
 
   const buttonGroupConfig: DirectoriesQueryItem = {
     ...buttonGroup,
     children: null,
   };
 
-  return { configMap, buttonGroupConfig, firstInstitutionType };
+  return { configMap, buttonGroupConfig, firstKey };
+};
+
+// ========================================
+// Config Parse: Entry Function
+// ========================================
+export type ConfigParseResult = FlatConfigResult | HierarchicalConfigResult;
+
+export const configParse = (
+  apiData: DirectoriesQueryItem[],
+  bizId: DirectoriesBizIdEnum,
+): ConfigParseResult => {
+  if (!apiData || apiData.length === 0) {
+    return { configMap: {}, buttonGroupConfig: null, firstKey: '' };
+  }
+
+  if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId)) {
+    return parseHierarchicalConfig(apiData);
+  }
+
+  return parseFlatConfig(apiData, bizId);
 };
 
 export const configInitFormValues = (
@@ -69,6 +111,9 @@ export const configInitFormValues = (
   );
 
   if (!entityTypeConfig || !entityTypeConfig.children) {
+    configs.forEach((config) => {
+      collectFormKeys(config, result);
+    });
     return result;
   }
 

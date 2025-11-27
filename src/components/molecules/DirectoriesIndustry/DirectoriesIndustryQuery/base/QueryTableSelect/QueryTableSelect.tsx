@@ -16,9 +16,9 @@ interface FilterTableSelectProps {
   selectedTableName?: string;
   selectedTableSource?: ProspectTableEnum;
   isLoading?: boolean;
-  // 同步到 formValues 的数据（tableId 和 keywords）
+  // Data synced to formValues (tableId and keywords)
   onFormDataChange?: (data: { tableId: string; keywords: string[] }) => void;
-  // 只用于 UI 显示的数据（tableName 和 tableSource）
+  // Data used for UI display only (tableName and tableSource)
   onDisplayDataChange?: (data: {
     tableName: string;
     tableSource?: ProspectTableEnum;
@@ -90,7 +90,7 @@ export const QueryTableSelect: FC<FilterTableSelectProps> = ({
 
   return (
     <Stack>
-      <QueryContainer isAuth={true} label={'Table'}>
+      <QueryContainer isAuth={true} label={'Table'} planName={'123'}>
         <QueryTableSelectInput
           isLoading={isLoading || fetchingTable || fetchingKeywords}
           onClearSelection={onClickClearSelection}

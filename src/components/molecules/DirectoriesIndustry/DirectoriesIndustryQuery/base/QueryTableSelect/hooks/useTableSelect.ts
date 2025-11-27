@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { SDRToast } from '@/components/atoms';
 import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
-import { _fetchAllProspectTable, _fetchCompanyNameViaTableId } from '@/request';
+import {
+  _fetchAllProspectTable,
+  _fetchCompanyNameViaTableId,
+} from '@/request/directories';
 import {
   HttpError,
   ProspectTableEnum,

@@ -15,11 +15,13 @@ export const QueryListTextArea: FC<QueryListTextAreaProps> = ({
     <QueryContainer isAuth={true}>
       <QueryAutoComplete
         freeSolo={true}
-        multiple
+        multiple={true}
         onFormChange={(newValue: string[]) => {
           onInsideFormChange(newValue);
         }}
+        options={[]}
         placeholder={'e.g. Amazon'}
+        url={''}
         value={value}
       />
     </QueryContainer>

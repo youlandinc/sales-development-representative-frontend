@@ -42,6 +42,7 @@ export interface DirectoriesQueryItem {
 
   // ========== Meta Information ==========
   isAuth: boolean;
+  planName: string;
   bizId: DirectoriesBizIdEnum; // product category
 
   // ========== Form Field ==========
@@ -64,6 +65,7 @@ export interface DirectoriesQueryItem {
   placeholder: string | null; // for input components
   subLabel: string | null; // for checkbox/switch inside tooltip
   subTooltip: string | null;
+  subDescription: string | null;
 
   // ========== Options & Values ==========
   optionMultiple: boolean;

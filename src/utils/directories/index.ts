@@ -12,3 +12,5 @@ export {
   buildFinalData,
   processAdditionalDetails,
 } from './request';
+
+export type { DirectoriesFormValues } from './request';

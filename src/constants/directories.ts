@@ -1,5 +1,9 @@
 import { DirectoriesBizIdEnum } from '@/types/directories';
 
+export const HIERARCHICAL_CONFIG_BIZ_IDS = [
+  DirectoriesBizIdEnum.capital_markets,
+];
+
 export const DIRECTORIES = {
   [DirectoriesBizIdEnum.capital_markets]: {
     slug: 'capital-markets',

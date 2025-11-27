@@ -14,6 +14,7 @@ import {
   DirectoriesQueryItem,
   DirectoriesQueryTableBodyApiResponse,
 } from '@/types/directories';
+import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
 
 import { SDRToast } from '@/components/atoms';
 
@@ -99,6 +100,13 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         bizId,
       } = get();
 
+      // Only hierarchical config supports institutionType switching
+      if (
+        !HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId as DirectoriesBizIdEnum)
+      ) {
+        return;
+      }
+
       if (currentInstitutionType === value || !value) {
         return;
       }
@@ -112,6 +120,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         formValues,
       });
 
+      // Hierarchical config: pass institutionType and entityType
       directoriesDataFlow.updateFormValues({
         bizId,
         institutionType: value,
@@ -134,7 +143,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         const currentEntityType = formValues.entityType;
         const targetEntityType = value;
 
-        // 切换 tab 时，将共同字段的值从当前 tab 带到目标 tab
+        // When switching tab, copy shared field values from current tab to target tab
         if (
           currentEntityType &&
           targetEntityType &&
@@ -143,7 +152,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           const currentTabValues = formValues[currentEntityType] || {};
           const targetTabValues = formValues[targetEntityType] || {};
 
-          // 找出共同的 keys，并将当前 tab 的值复制到目标 tab
+          // Find shared keys and copy values from current tab to target tab
           const mergedTargetValues = { ...targetTabValues };
           Object.keys(currentTabValues).forEach((fieldKey) => {
             if (fieldKey in targetTabValues) {
@@ -177,20 +186,35 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         };
       }
 
-      set({
-        formValues: updatedFormValues,
-        formValuesByInstitutionType: {
-          ...formValuesByInstitutionType,
-          [institutionType]: updatedFormValues,
-        },
-      });
+      const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
+        bizId as DirectoriesBizIdEnum,
+      );
 
-      directoriesDataFlow.updateFormValues({
-        bizId,
-        institutionType,
-        entityType: updatedFormValues.entityType || '',
-        formValues: updatedFormValues,
-      });
+      // Hierarchical config: store by institutionType
+      if (isHierarchical) {
+        set({
+          formValues: updatedFormValues,
+          formValuesByInstitutionType: {
+            ...formValuesByInstitutionType,
+            [institutionType]: updatedFormValues,
+          },
+        });
+
+        directoriesDataFlow.updateFormValues({
+          bizId,
+          institutionType,
+          entityType: updatedFormValues.entityType || '',
+          formValues: updatedFormValues,
+        });
+      } else {
+        // Flat config: store directly
+        set({ formValues: updatedFormValues });
+
+        directoriesDataFlow.updateFormValues({
+          bizId,
+          formValues: updatedFormValues,
+        });
+      }
     },
 
     // ========================================
@@ -205,40 +229,64 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
 
       try {
         const { data } = await _fetchDirectoriesConfig({ bizId });
-
-        const { configMap, buttonGroupConfig, firstInstitutionType } =
-          configParse(data || []);
-
-        const formValuesByInstitutionType: Record<
-          string,
-          Record<string, any>
-        > = {};
-        Object.keys(configMap).forEach((institutionType) => {
-          formValuesByInstitutionType[institutionType] = configInitFormValues(
-            configMap[institutionType],
-          );
-        });
-
-        const queryConfig = configMap[firstInstitutionType] || [];
-        const currentFormValues =
-          formValuesByInstitutionType[firstInstitutionType];
-
-        set({
-          configMap,
-          buttonGroupConfig,
-          queryConfig,
-          institutionType: firstInstitutionType,
-          formValuesByInstitutionType,
-          formValues: currentFormValues,
-          isLoadingConfig: false,
-        });
-
-        directoriesDataFlow.updateFormValues({
+        const { configMap, buttonGroupConfig, firstKey } = configParse(
+          data || [],
           bizId,
-          institutionType: firstInstitutionType,
-          entityType: currentFormValues.entityType || '',
-          formValues: currentFormValues,
-        });
+        );
+
+        const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId);
+
+        if (isHierarchical) {
+          // Hierarchical config: store grouped by institutionType
+          const formValuesByInstitutionType: Record<
+            string,
+            Record<string, any>
+          > = {};
+          Object.keys(configMap).forEach((key) => {
+            formValuesByInstitutionType[key] = configInitFormValues(
+              configMap[key],
+            );
+          });
+
+          const queryConfig = configMap[firstKey] || [];
+          const currentFormValues = formValuesByInstitutionType[firstKey];
+
+          set({
+            configMap,
+            buttonGroupConfig,
+            queryConfig,
+            institutionType: firstKey,
+            formValuesByInstitutionType,
+            formValues: currentFormValues || {},
+            isLoadingConfig: false,
+          });
+
+          directoriesDataFlow.updateFormValues({
+            bizId,
+            institutionType: firstKey,
+            entityType: currentFormValues?.entityType || '',
+            formValues: currentFormValues || {},
+          });
+        } else {
+          // Flat config: store directly
+          const queryConfig = configMap[firstKey] || [];
+          const currentFormValues = configInitFormValues(queryConfig);
+
+          set({
+            configMap: {},
+            buttonGroupConfig: null,
+            queryConfig,
+            institutionType: '',
+            formValuesByInstitutionType: {},
+            formValues: currentFormValues || {},
+            isLoadingConfig: false,
+          });
+
+          directoriesDataFlow.updateFormValues({
+            bizId,
+            formValues: currentFormValues || {},
+          });
+        }
 
         return true;
       } catch (err) {

@@ -3,7 +3,11 @@ import { Icon, Stack, Typography } from '@mui/material';
 
 import ICON_LOCK from './assets/icon-lock.svg';
 
-export const QueryBadgeAuth: FC = () => {
+interface QueryBadgeAuthProps {
+  planName: string;
+}
+
+export const QueryBadgeAuth: FC<QueryBadgeAuthProps> = ({ planName }) => {
   return (
     <Stack
       sx={{
@@ -23,7 +27,7 @@ export const QueryBadgeAuth: FC = () => {
           fontSize: 10,
         }}
       >
-        Requires Intelligence
+        Requires {planName}
       </Typography>
     </Stack>
   );

@@ -182,6 +182,12 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               ? placeholder
               : ''
           }
+          slotProps={{
+            htmlInput: {
+              ...params.inputProps,
+              autoComplete: 'off',
+            },
+          }}
         />
       )}
       renderOption={(props, option) => {

@@ -21,10 +21,10 @@ import ICON_NO_RESULT from './assets/icon-no-result.svg';
 
 const getRandomWidth = () => `${Math.floor(Math.random() * 50 + 40)}%`;
 
-// 固定骨架屏配置
+// Skeleton config
 const SKELETON_CONFIG = {
-  COLUMNS: 6, // 默认显示 6 列
-  ROWS: 5, // 默认显示 5 行
+  COLUMNS: 6, // Default 6 columns
+  ROWS: 5, // Default 5 rows
 };
 
 export interface PreviewTableProps {
@@ -54,12 +54,12 @@ export const PreviewTable: FC<PreviewTableProps> = ({
     ];
   }, [header]);
 
-  // 骨架屏渲染用的列数组：有 header 用 reducedHeader，否则用固定数量
+  // Columns array for skeleton: use reducedHeader if header exists, otherwise use fixed count
   const skeletonColumns = useMemo(() => {
     if (header.length > 0) {
       return reducedHeader;
     }
-    // 固定骨架屏列：序号列 + N 个占位列
+    // Fixed skeleton columns: index column + N placeholder columns
     return [
       {
         columnKey: 'inside_sort_number',

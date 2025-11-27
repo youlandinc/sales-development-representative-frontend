@@ -1,4 +1,4 @@
-import { post } from '@/request/request';
+import { get, post } from '@/request/request';
 
 import {
   DirectoriesBizIdEnum,
@@ -7,13 +7,7 @@ import {
   DirectoriesQueryTableBodyApiResponse,
   DirectoriesQueryTableHeaderApiResponse,
 } from '@/types/directories';
-
-export const _fetchOptionsViaDirectoriesKey = (params: {
-  dataType: string;
-  keyword?: string;
-}) => {
-  return post('/sdr/search/dict/options', params);
-};
+import { ResponseProspectTableViaSearch } from '@/types';
 
 export const _fetchDirectoriesConfig = (params: {
   bizId: DirectoriesBizIdEnum;
@@ -37,4 +31,14 @@ export const _fetchPreviewHeader = (params: any) => {
 
 export const _fetchPreviewBody = (params: any) => {
   return post<DirectoriesQueryTableBodyApiResponse>('/sdr/search', params);
+};
+
+export const _fetchAllProspectTable = () => {
+  return post<ResponseProspectTableViaSearch>('/sdr/table/all', {
+    params: { size: 1000, page: 0 },
+  });
+};
+
+export const _fetchCompanyNameViaTableId = (tableId: string) => {
+  return get<string[]>(`/sdr/prospect/table/companyName/${tableId}`);
 };

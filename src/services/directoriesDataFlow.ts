@@ -23,6 +23,7 @@ import {
   buildAdditionalRequestParams,
   buildFinalData,
   buildSearchRequestParams,
+  DirectoriesFormValues,
 } from '@/utils/directories';
 import {
   _fetchDirectoriesAdditionalConfig,
@@ -30,6 +31,10 @@ import {
   _fetchPreviewHeader,
 } from '@/request/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
+import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
+
+// Re-export for convenience
+export type { DirectoriesFormValues } from '@/utils/directories';
 
 /**
  * Directories Data Flow Service
@@ -71,16 +76,12 @@ class DirectoriesDataFlow {
   /**
    * Raw form values stream (no debounce)
    * Updated immediately when user interacts with form controls
+   *
+   * 扁平配置: { bizId, formValues }
+   * 层级配置: { bizId, institutionType, entityType, formValues }
    */
-  private formValuesRaw$ = new BehaviorSubject<{
-    bizId: DirectoriesBizIdEnum | '';
-    institutionType: string;
-    entityType: string;
-    formValues: Record<string, any>;
-  }>({
+  private formValuesRaw$ = new BehaviorSubject<DirectoriesFormValues>({
     bizId: '',
-    institutionType: '',
-    entityType: '',
     formValues: {},
   });
 
@@ -106,13 +107,19 @@ class DirectoriesDataFlow {
    * Uses switchMap to cancel outdated requests
    */
   private additionalFromA$ = this.formValuesDebounced$.pipe(
-    filter(
-      (values) =>
-        !!values.bizId &&
-        !!values.institutionType &&
-        !!values.entityType &&
-        Object.keys(values.formValues).length > 0,
-    ),
+    filter((values) => {
+      if (!values.bizId || Object.keys(values.formValues).length === 0) {
+        return false;
+      }
+
+      // Hierarchical config: requires institutionType + entityType
+      if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(values.bizId)) {
+        return !!values.institutionType && !!values.entityType;
+      }
+
+      // Flat config: only requires bizId + formValues
+      return true;
+    }),
     tap(() => {
       // Set loading state immediately when A changes
       this.loadingAdditionalSubject.next(true);
@@ -125,13 +132,13 @@ class DirectoriesDataFlow {
       return from(_fetchDirectoriesAdditionalConfig(requestData)).pipe(
         map(({ data }) => ({
           source: 'api' as const,
-          data: data || null,
+          data: Array.isArray(data) ? data : [], // Ensure return array
           formValuesKey, // Attach A's key for later matching
         })),
         catchError(
           this._handleError({
             source: 'api' as const,
-            data: {},
+            data: [], // Keep consistent with success response, return empty array
             formValuesKey,
           }),
         ),
@@ -203,7 +210,7 @@ class DirectoriesDataFlow {
       },
       {
         source: 'api' as const,
-        data: null,
+        data: [], // Initial value as empty array, consistent with API response format
         hasManualEdit: false,
         formValuesKey: null,
       },
@@ -230,14 +237,16 @@ class DirectoriesDataFlow {
   // 3. filter: Block when loading=true or formValuesKey mismatch
   public finalData$ = this.formValuesDebounced$.pipe(
     switchMap((formData) => {
-      // Validate A completeness - skip if missing required fields
-      if (
-        !formData.bizId ||
-        !formData.institutionType ||
-        !formData.entityType ||
-        Object.keys(formData.formValues).length === 0
-      ) {
+      // Validate required fields
+      if (!formData.bizId || Object.keys(formData.formValues).length === 0) {
         return EMPTY;
+      }
+
+      // Hierarchical config: requires institutionType + entityType
+      if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(formData.bizId)) {
+        if (!formData.institutionType || !formData.entityType) {
+          return EMPTY;
+        }
       }
 
       // Capture current A's key for matching with B
@@ -371,13 +380,11 @@ class DirectoriesDataFlow {
    * Update form values (A)
    * Called by Zustand when user interacts with form controls
    * Triggers the entire data flow pipeline
+   *
+   * 扁平配置: { bizId, formValues }
+   * 层级配置: { bizId, institutionType, entityType, formValues }
    */
-  updateFormValues(data: {
-    bizId: DirectoriesBizIdEnum | '';
-    institutionType: string;
-    entityType: string;
-    formValues: Record<string, any>;
-  }) {
+  updateFormValues(data: DirectoriesFormValues) {
     this.formValuesRaw$.next(data);
   }
 
@@ -397,8 +404,6 @@ class DirectoriesDataFlow {
   reset() {
     this.formValuesRaw$.next({
       bizId: '',
-      institutionType: '',
-      entityType: '',
       formValues: {},
     });
     this.additionalManualEdit$.next(null);

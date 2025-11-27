@@ -1,5 +1,23 @@
 import { DirectoriesBizIdEnum } from '@/types/directories';
 import { UTypeOf } from '@/utils/UTypeOf';
+import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
+
+/**
+ * Form Values Data Structure
+ *
+ * Flat config (non-CAPITAL_MARKETS):
+ * { bizId, formValues }
+ *
+ * Hierarchical config (CAPITAL_MARKETS):
+ * { bizId, institutionType, entityType, formValues }
+ */
+export type DirectoriesFormValues = {
+  bizId: DirectoriesBizIdEnum | '';
+  formValues: Record<string, any>;
+  // Hierarchical config only (CAPITAL_MARKETS only)
+  institutionType?: string;
+  entityType?: string;
+};
 
 // ============================================
 // Internal Helpers
@@ -45,13 +63,14 @@ const mergeNonEmptyDirectoriesFields = (
  * Output format: { additionalFields: ['checkedKey1', 'checkedKey2'], ...otherValues }
  */
 export const processAdditionalDetails = (additional: any): any => {
-  if (!additional || typeof additional !== 'object') {
+  if (!UTypeOf.isObject(additional) || UTypeOf.isEmptyObject(additional)) {
     return { additionalFields: [] };
   }
 
   // Handle dual-state format (manual edits)
   if ('checkbox' in additional && 'values' in additional) {
-    const { checkbox, values } = additional;
+    const checkbox = additional.checkbox as Record<string, boolean>;
+    const values = additional.values as Record<string, any>;
 
     const additionalFieldsKeys = Object.entries(checkbox)
       .filter(([, value]) => value === true)
@@ -73,24 +92,36 @@ export const processAdditionalDetails = (additional: any): any => {
 
 /**
  * Build additional details request params from form values
- * Input: { bizId, entityType: 'FIRM', formValues: { FIRM: {...}, EXECUTIVE: {...} } }
- * Output: { bizId, entityType: 'FIRM', ...FIRM fields }
+ *
+ * Flat config: { bizId, ...formValues }
+ * Hierarchical config: { bizId, institutionType, entityType, ...formValues[entityType] }
  */
-export const buildAdditionalRequestParams = (data: {
-  bizId: DirectoriesBizIdEnum | '';
-  institutionType: string;
-  entityType: string;
-  formValues: Record<string, any>;
-}): Record<string, any> => {
+export const buildAdditionalRequestParams = (
+  data: DirectoriesFormValues,
+): Record<string, any> => {
   const { bizId, institutionType, entityType, formValues } = data;
-
-  const entityData = formValues[entityType] || {};
 
   const requestData: Record<string, any> = {
     bizId,
-    institutionType,
-    entityType,
   };
+
+  // Hierarchical config: send institutionType and entityType
+  const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
+    bizId as DirectoriesBizIdEnum,
+  );
+
+  if (isHierarchical) {
+    if (institutionType) {
+      requestData.institutionType = institutionType;
+    }
+    if (entityType) {
+      requestData.entityType = entityType;
+    }
+  }
+
+  // Hierarchical config: group by entityType, Flat config: use formValues directly
+  const entityData =
+    isHierarchical && entityType ? formValues[entityType] || {} : formValues;
 
   mergeNonEmptyDirectoriesFields(requestData, entityData);
 
@@ -99,31 +130,37 @@ export const buildAdditionalRequestParams = (data: {
 
 /**
  * Build final combined data (query + additionalDetails)
- * Output structure:
- * {
- *   query: { bizId, institutionType, entityType, ...all formValues },
- *   additionalDetails: { additionalFields: ['key1'], ...values },
- *   timestamp: number
- * }
+ *
+ * Flat config: { query: { bizId, ...formValues }, additionalDetails, timestamp }
+ * Hierarchical config: { query: { bizId, institutionType, entityType, ...formValues }, additionalDetails, timestamp }
  */
 export const buildFinalData = (
-  formData: {
-    bizId: DirectoriesBizIdEnum | '';
-    institutionType: string;
-    entityType: string;
-    formValues: Record<string, any>;
-  },
+  formData: DirectoriesFormValues,
   additional: any,
 ) => {
   const processedAdditional = processAdditionalDetails(additional);
 
+  const query: Record<string, any> = {
+    bizId: formData.bizId,
+    ...formData.formValues,
+  };
+
+  // Hierarchical config: add institutionType and entityType
+  const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
+    formData.bizId as DirectoriesBizIdEnum,
+  );
+
+  if (isHierarchical) {
+    if (formData.institutionType) {
+      query.institutionType = formData.institutionType;
+    }
+    if (formData.entityType) {
+      query.entityType = formData.entityType;
+    }
+  }
+
   return {
-    query: {
-      bizId: formData.bizId,
-      institutionType: formData.institutionType,
-      entityType: formData.entityType,
-      ...formData.formValues,
-    },
+    query,
     additionalDetails: processedAdditional,
     timestamp: Date.now(),
   };
@@ -132,8 +169,9 @@ export const buildFinalData = (
 /**
  * Build search/preview/import request params from finalData
  * Flattens nested structure into flat key-value pairs
- * Input: { query: { bizId, entityType, FIRM: {...} }, additionalDetails: {...} }
- * Output: { bizId, entityType, ...FIRM fields, ...additionalDetails }
+ *
+ * Flat config: { bizId, ...formValues, ...additionalDetails }
+ * Hierarchical config: { bizId, institutionType, entityType, ...formValues[entityType], ...additionalDetails }
  */
 export const buildSearchRequestParams = (
   finalData: any,
@@ -147,12 +185,25 @@ export const buildSearchRequestParams = (
 
   const requestData: Record<string, any> = {
     bizId,
-    institutionType,
-    entityType,
   };
 
-  // Flatten current entityType's fields
-  const entityData = query[entityType] || {};
+  // Hierarchical config: send institutionType and entityType
+  const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
+    bizId as DirectoriesBizIdEnum,
+  );
+
+  if (isHierarchical) {
+    if (institutionType) {
+      requestData.institutionType = institutionType;
+    }
+    if (entityType) {
+      requestData.entityType = entityType;
+    }
+  }
+
+  // Hierarchical config: group by entityType, Flat config: use query directly
+  const entityData =
+    isHierarchical && entityType ? query[entityType] || {} : query;
   mergeNonEmptyDirectoriesFields(requestData, entityData);
 
   // Flatten additional details fields

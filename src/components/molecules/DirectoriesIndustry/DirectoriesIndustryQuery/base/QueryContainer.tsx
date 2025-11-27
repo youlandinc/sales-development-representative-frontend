@@ -18,7 +18,8 @@ interface QueryContainerProps extends StackProps {
   description?: string | null;
   tooltip?: string | null;
   children: ReactNode;
-  isAuth: boolean;
+  isAuth?: boolean;
+  planName?: string;
 }
 
 export const QueryContainer: FC<QueryContainerProps> = ({
@@ -28,7 +29,8 @@ export const QueryContainer: FC<QueryContainerProps> = ({
   children,
   sx,
   labelSx,
-  isAuth,
+  isAuth = true,
+  planName,
   ...props
 }) => {
   return (
@@ -67,7 +69,7 @@ export const QueryContainer: FC<QueryContainerProps> = ({
               )}
             </Stack>
           )}
-          {!isAuth && <QueryBadgeAuth />}
+          {!isAuth && <QueryBadgeAuth planName={planName || ''} />}
         </Stack>
 
         {description && (
