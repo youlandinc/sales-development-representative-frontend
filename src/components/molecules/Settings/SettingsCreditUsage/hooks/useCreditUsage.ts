@@ -13,6 +13,7 @@ import {
   FetchCreditUsageListRequest,
   UsageTypeOptions,
 } from '@/types/Settings/creditUsage';
+import { UTypeOf } from '@/utils';
 
 export const useCreditUsage = () => {
   const [queryConditions, setQueryConditions] = useState<
@@ -38,10 +39,13 @@ export const useCreditUsage = () => {
     async () => {
       try {
         const res = await _fetchUsageType();
-        setQueryConditions({
-          ...queryConditions,
-          category: res.data[0].children[0].category,
-        });
+        const firstCategory = res.data?.[0]?.children?.[0]?.category;
+        if (firstCategory) {
+          setQueryConditions((prev) => ({
+            ...prev,
+            category: firstCategory,
+          }));
+        }
         return res;
       } catch (error) {
         const { message, header, variant } = error as HttpError;
