@@ -131,10 +131,37 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
       let updatedFormValues: Record<string, any>;
 
       if (key === 'entityType') {
-        updatedFormValues = {
-          ...formValues,
-          [key]: value,
-        };
+        const currentEntityType = formValues.entityType;
+        const targetEntityType = value;
+
+        // 切换 tab 时，将共同字段的值从当前 tab 带到目标 tab
+        if (
+          currentEntityType &&
+          targetEntityType &&
+          currentEntityType !== targetEntityType
+        ) {
+          const currentTabValues = formValues[currentEntityType] || {};
+          const targetTabValues = formValues[targetEntityType] || {};
+
+          // 找出共同的 keys，并将当前 tab 的值复制到目标 tab
+          const mergedTargetValues = { ...targetTabValues };
+          Object.keys(currentTabValues).forEach((fieldKey) => {
+            if (fieldKey in targetTabValues) {
+              mergedTargetValues[fieldKey] = currentTabValues[fieldKey];
+            }
+          });
+
+          updatedFormValues = {
+            ...formValues,
+            [key]: value,
+            [targetEntityType]: mergedTargetValues,
+          };
+        } else {
+          updatedFormValues = {
+            ...formValues,
+            [key]: value,
+          };
+        }
       } else if (groupPath) {
         updatedFormValues = {
           ...formValues,

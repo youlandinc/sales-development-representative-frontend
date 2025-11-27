@@ -140,6 +140,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
               }}
               options={item.optionValues ?? []}
               placeholder={item.placeholder ?? undefined}
+              url={item.url}
               value={safeValue}
             />
           </Stack>
@@ -157,6 +158,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
             }}
             options={item.optionValues ?? []}
             placeholder={item.placeholder ?? undefined}
+            url={item.url}
             value={safeValue}
           />
         </Stack>
