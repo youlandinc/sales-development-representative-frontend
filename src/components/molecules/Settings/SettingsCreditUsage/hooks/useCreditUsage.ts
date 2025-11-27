@@ -59,7 +59,17 @@ export const useCreditUsage = () => {
   );
 
   const { data, isLoading } = useSWR(
-    queryConditions.category ? { ...queryConditions, page, size: 10 } : null,
+    queryConditions.category
+      ? {
+          ...queryConditions,
+          dateType:
+            queryConditions.dateType === DateRangeEnum.range
+              ? undefined
+              : queryConditions.dateType,
+          page,
+          size: 10,
+        }
+      : null,
     async (param) => {
       const res = await _fetchCreditUsageList(param);
       return res;

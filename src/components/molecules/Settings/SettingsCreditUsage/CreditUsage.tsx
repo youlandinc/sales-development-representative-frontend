@@ -48,6 +48,7 @@ export const CreditUsage: FC = () => {
     setPage,
     totalPages,
     usageType,
+    isLoading,
   } = useCreditUsage();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
@@ -359,6 +360,7 @@ export const CreditUsage: FC = () => {
         <CreditUsageGrid
           columns={columns}
           expandedRows={expandedRows}
+          isLoading={isLoading}
           list={data?.data?.content || []}
           renderDetail={renderDetail}
         />
@@ -366,7 +368,6 @@ export const CreditUsage: FC = () => {
           alignItems="center"
           direction="row"
           justifyContent="space-between"
-          sx={{ pt: 1.5 }}
         >
           <Typography sx={{ fontSize: 12, color: '#7D7D7D' }}>
             {data?.data?.content?.length} records
