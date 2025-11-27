@@ -1,5 +1,6 @@
 import { Box, Icon, Stack, Typography } from '@mui/material';
 import { FC, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { SDRToast, StyledButton } from '@/components/atoms';
 import { useAsyncFn, useSwitch } from '@/hooks';
@@ -50,8 +51,12 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
   category,
 }) => {
   const { visible, toggle } = useSwitch();
-  const paidPlan = useCurrentPlanStore((state) => state.paidPlan);
-  const sendEmailPlan = useCurrentPlanStore((state) => state.sendEmailPlan);
+  const { paidPlan, sendEmailPlan } = useCurrentPlanStore(
+    useShallow((state) => ({
+      paidPlan: state.paidPlan,
+      sendEmailPlan: state.sendEmailPlan,
+    })),
+  );
 
   // Computed states
   const isHighlighted = plan.isDefault;
@@ -116,7 +121,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
     }
   }, [paymentType, plan.planType]);
 
-  const handleClick = () => {
+  const onClickToCreatePayment = () => {
     if (!plan.monthlyPrice && !plan.yearlyPrice) {
       toggle();
       return;
@@ -125,7 +130,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
   };
 
   // Price description
-  const priceDesc = useMemo(() => {
+  const priceDescription = useMemo(() => {
     if (isCapitalMarkets || !plan.creditType) {
       return null;
     }
@@ -260,7 +265,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
                 disabled={isPaid}
                 fullWidth
                 loading={state.loading}
-                onClick={handleClick}
+                onClick={onClickToCreatePayment}
                 size="medium"
                 sx={buttonStyles}
                 variant={buttonConfig.variant}
@@ -275,7 +280,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
                 )}
               </StyledButton>
 
-              {priceDesc}
+              {priceDescription}
             </>
           )}
 
