@@ -36,7 +36,7 @@ const HOVER_BG_COLOR = '#F8F8FA';
 const ROW_BORDER_COLOR = '#D0CEDA';
 const TEXT_PRIMARY_COLOR = '#363440';
 const TEXT_SECONDARY_COLOR = '#6F6C7D';
-const NEUTRAL_BG_COLOR = '#F0F1F2';
+const NEUTRAL_BG_COLOR = '#EAE9EF';
 
 export const CreditUsage: FC = () => {
   // const debouncedConditions = useDebounce(conditions, 400);
@@ -68,8 +68,10 @@ export const CreditUsage: FC = () => {
     (provider: Provider[], rowIndex: number) => {
       const isExpanded = expandedRows.has(rowIndex);
       const hasMultiple = provider.length > 1;
-      const displayCount = Math.min(provider.length, 3);
-      const remainingCount = provider.length - 3;
+      // Avatar display: 1-4 show all, ≥5 show 3 + remaining count
+      const shouldCollapseAvatars = provider.length >= 5;
+      const displayCount = shouldCollapseAvatars ? 3 : provider.length;
+      const remainingCount = shouldCollapseAvatars ? provider.length - 3 : 0;
 
       return (
         <Stack
@@ -111,7 +113,7 @@ export const CreditUsage: FC = () => {
                 position: 'relative',
                 zIndex: 1,
                 fontSize: 10,
-                color: 'text.primary',
+                color: '#6F6C7D',
               }}
             >
               +{remainingCount}
@@ -120,7 +122,6 @@ export const CreditUsage: FC = () => {
           <Typography
             sx={{
               fontSize: 12,
-              color: TEXT_PRIMARY_COLOR,
               ml: 1,
               userSelect: 'none',
             }}
@@ -211,7 +212,7 @@ export const CreditUsage: FC = () => {
             return '-';
           }
           try {
-            return format(new Date(value), 'h:mma MMM d, yyyy');
+            return format(new Date(value), ' MMMM d, yyyy h:mma');
           } catch (e) {
             return value;
           }
