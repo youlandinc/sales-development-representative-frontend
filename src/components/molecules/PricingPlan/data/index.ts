@@ -85,6 +85,13 @@ export const isPaidPlan = (
   return planType === PlanTypeEnum.free || paidPlans.includes(planType);
 };
 
+export const isCancelledPlan = (
+  planType: PlanTypeEnum,
+  cancelledPlans: PlanTypeEnum[],
+) => {
+  return cancelledPlans.includes(planType);
+};
+
 export const hasPrice = (plan: PlanInfo) => {
   return Boolean(plan.monthlyPrice && plan.yearlyPrice);
 };

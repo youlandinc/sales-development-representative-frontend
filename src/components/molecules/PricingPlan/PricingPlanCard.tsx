@@ -17,6 +17,7 @@ import {
   DIMENSIONS,
   hasPrice,
   ICON_STYLES,
+  isCancelledPlan,
   isPaidPlan,
   isUnlimitedPlan,
   packageTitle,
@@ -51,21 +52,29 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
   category,
 }) => {
   const { visible, toggle } = useSwitch();
-  const { paidPlan, sendEmailPlan } = useCurrentPlanStore(
+  const { paidPlan, sendEmailPlan, cancelledPlan } = useCurrentPlanStore(
     useShallow((state) => ({
       paidPlan: state.paidPlan,
       sendEmailPlan: state.sendEmailPlan,
+      cancelledPlan: state.cancelledPlan,
     })),
   );
 
   // Computed states
   const isHighlighted = plan.isDefault;
   const isPaid = isPaidPlan(plan.planType, paidPlan);
+  const isCancelled = isCancelledPlan(plan.planType, cancelledPlan);
   const isEmailSent = sendEmailPlan.includes(plan.planType);
   const isCapitalMarkets = category === DirectoriesBizIdEnum.capital_markets;
 
   // Button configuration
+  // Priority: isPaid > isCancelled > isCapitalMarkets > hasPrice > isDefault > fallback
   const buttonConfig = useMemo(() => {
+    const variant = plan.isDefault
+      ? ('contained' as const)
+      : ('outlined' as const);
+
+    // 1. Already paid - show current plan
     if (isPaid) {
       return {
         text: 'Current plan',
@@ -73,20 +82,30 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
         showIcon: true,
       };
     }
+
+    // 2. Cancelled - show resume option
+    if (isCancelled) {
+      return { text: 'Resume subscription', variant };
+    }
+
+    // 3. Capital markets - always request access
     if (isCapitalMarkets) {
       return { text: 'Request access', variant: 'outlined' as const };
     }
+
+    // 4. Has price - show choose plan
     if (hasPrice(plan)) {
-      if (plan.isDefault) {
-        return { text: 'Choose plan', variant: 'contained' as const };
-      }
-      return { text: 'Choose plan', variant: 'outlined' as const };
+      return { text: 'Choose plan', variant };
     }
+
+    // 5. Default plan without price - talk to team
     if (plan.isDefault) {
       return { text: 'Talk to our team', variant: 'contained' as const };
     }
+
+    // 6. Fallback - request access
     return { text: 'Request access', variant: 'outlined' as const };
-  }, [isCapitalMarkets, plan, isPaid]);
+  }, [isPaid, isCancelled, isCapitalMarkets, plan]);
 
   // Button styles
   const buttonStyles = useMemo(
@@ -170,7 +189,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
     const isUnlimited = isUnlimitedPlan(plan.planType);
 
     // Paid plan with custom pricing
-    if (isPaid && (isCapitalMarkets || isUnlimited)) {
+    if ((isPaid || isCancelled) && (isCapitalMarkets || isUnlimited)) {
       return <CustomPricing />;
     }
 
@@ -196,7 +215,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
 
     // Default: show price
     return <PriceDisplay paymentType={paymentType} plan={plan} />;
-  }, [isCapitalMarkets, isEmailSent, isPaid, paymentType, plan]);
+  }, [isCapitalMarkets, isEmailSent, isPaid, paymentType, plan, isCancelled]);
 
   return (
     <Stack
