@@ -86,72 +86,84 @@ export const CreditUsageGrid: FC<CreditUsageGridProps> = ({
   renderDetail,
   expandedRows,
 }) => {
+  console.log('list', isLoading);
   return (
     <Stack flex={1} minWidth={0}>
       {/*grid*/}
-      {list?.length === 0 ? (
+      {/* {list?.length === 0 ? (
         <Typography margin={'auto'} textAlign={'center'} variant={'body2'}>
           No results found.
         </Typography>
-      ) : (
-        <Stack overflow={'auto'} width={'100%'}>
-          {/*header*/}
-          <Stack flexDirection={'row'} width={'100%'}>
-            {columns.length === 0
-              ? null
-              : columns.map((col, i) => (
+      ) : ( */}
+      <Stack overflow={'auto'} width={'100%'}>
+        {/*header*/}
+        <Stack flexDirection={'row'} width={'100%'}>
+          {columns.length === 0
+            ? null
+            : columns.map((col, i) => (
+                <Typography
+                  borderBottom={`1px solid ${BORDER_COLOR}`}
+                  color={'text.secondary'}
+                  flex={col.flex}
+                  key={i}
+                  lineHeight={1}
+                  minWidth={col.minWidth}
+                  pb={1}
+                  px={3}
+                  variant={'body3'}
+                  width={col.width}
+                >
+                  {col.headerName}
+                </Typography>
+              ))}
+        </Stack>
+        {/*content*/}
+        <Stack width={'100%'}>
+          {isLoading ? (
+            Array.from({ length: 3 }, (_, j) => (
+              <Stack flexDirection={'row'} key={j} width={'100%'}>
+                {columns.map((col, i) => (
                   <Typography
                     borderBottom={`1px solid ${BORDER_COLOR}`}
                     color={'text.secondary'}
                     flex={col.flex}
                     key={i}
-                    lineHeight={1}
                     minWidth={col.minWidth}
-                    pb={1}
                     px={3}
+                    py={1.5}
+                    textAlign={col.align || 'left'}
                     variant={'body3'}
                     width={col.width}
                   >
-                    {col.headerName}
+                    {col.field === 'id' ? j + 1 : <Skeleton />}
                   </Typography>
                 ))}
-          </Stack>
-          {/*content*/}
-          <Stack width={'100%'}>
-            {isLoading
-              ? Array.from({ length: 10 }, (_, j) => (
-                  <Stack flexDirection={'row'} key={j} width={'100%'}>
-                    {columns.map((col, i) => (
-                      <Typography
-                        borderBottom={`1px solid ${BORDER_COLOR}`}
-                        color={'text.secondary'}
-                        flex={col.flex}
-                        key={i}
-                        minWidth={col.minWidth}
-                        px={3}
-                        py={1.5}
-                        textAlign={col.align || 'left'}
-                        variant={'body3'}
-                        width={col.width}
-                      >
-                        {col.field === 'id' ? j + 1 : <Skeleton />}
-                      </Typography>
-                    ))}
-                  </Stack>
-                ))
-              : list?.map((row, i) => (
-                  <Row
-                    columns={columns}
-                    isExpanded={expandedRows?.has(i) ?? false}
-                    key={i}
-                    renderDetail={renderDetail}
-                    row={row}
-                    rowIndex={i}
-                  />
-                ))}
-          </Stack>
+              </Stack>
+            ))
+          ) : list?.length === 0 ? (
+            <Typography
+              margin={'auto'}
+              pt={2}
+              textAlign={'center'}
+              variant={'body2'}
+            >
+              No results found.
+            </Typography>
+          ) : (
+            list?.map((row, i) => (
+              <Row
+                columns={columns}
+                isExpanded={expandedRows?.has(i) ?? false}
+                key={i}
+                renderDetail={renderDetail}
+                row={row}
+                rowIndex={i}
+              />
+            ))
+          )}
         </Stack>
-      )}
+      </Stack>
+      {/* )} */}
     </Stack>
   );
 };
