@@ -1,6 +1,6 @@
 import { Box, Collapse, Skeleton, Stack, Typography } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { FC, ReactNode, memo } from 'react';
+import { FC, memo, ReactNode } from 'react';
 
 // Style constants
 const HOVER_BG_COLOR = '#F8F8FA';
