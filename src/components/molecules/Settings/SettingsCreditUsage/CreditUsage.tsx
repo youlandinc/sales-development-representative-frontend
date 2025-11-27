@@ -158,13 +158,18 @@ export const CreditUsage: FC = () => {
   const columns: GridColDef[] = useMemo(() => {
     const DIRECTORY_COLUMNS: GridColDef[] = [
       {
-        field: 'tableName',
-        headerName: 'Table Name',
+        field: 'directory',
+        headerName: 'Directory',
         width: 150,
       },
       {
-        field: 'directory',
-        headerName: 'Directory',
+        field: 'tableName',
+        headerName: 'Table name',
+        flex: 1,
+      },
+      {
+        field: 'creditsUsed',
+        headerName: 'Records used',
         width: 150,
       },
     ];
@@ -184,34 +189,18 @@ export const CreditUsage: FC = () => {
           return renderProvider(value, rowIndex);
         },
       },
+      {
+        field: 'creditsUsed',
+        headerName: 'Credits used',
+        width: 150,
+      },
     ];
 
     const DEFAULT_COLUMNS: GridColDef[] = [
       {
         field: 'remainingCredits',
-        headerName: 'Remaining Credits',
+        headerName: 'Remaining credits',
         width: 160,
-      },
-      {
-        field: 'searchTime',
-        headerName: 'Search Time',
-        width: 220,
-        renderCell: ({ value }) => {
-          if (!value) {
-            return '-';
-          }
-          try {
-            return format(new Date(value), 'h:mma MMM d, yyyy');
-          } catch (e) {
-            return value;
-          }
-        },
-      },
-
-      {
-        field: 'creditsUsed',
-        headerName: 'Credits Used',
-        width: 150,
       },
       {
         field: 'date',
@@ -227,11 +216,6 @@ export const CreditUsage: FC = () => {
             return value;
           }
         },
-      },
-      {
-        field: 'integrationName',
-        headerName: 'Integration Name',
-        width: 150,
       },
     ];
 
@@ -342,57 +326,63 @@ export const CreditUsage: FC = () => {
   );
 
   return (
-    <Stack
+    <Box
       sx={{
         bgcolor: 'white',
         border: '1px solid #E5E5E5',
         borderRadius: 4,
         p: 3,
-        gap: 3,
       }}
     >
-      <CreditUsageToolbar
-        onChange={setQueryConditions}
-        usageTypeList={usageType}
-        value={queryConditions}
-      />
-      <Stack gap={1.5}>
-        <CreditUsageGrid
-          columns={columns}
-          expandedRows={expandedRows}
-          isLoading={isLoading}
-          list={data?.data?.content || []}
-          renderDetail={renderDetail}
+      <Stack
+        sx={{
+          gap: 3,
+          maxWidth: 1100,
+        }}
+      >
+        <CreditUsageToolbar
+          onChange={setQueryConditions}
+          usageTypeList={usageType}
+          value={queryConditions}
         />
-        <Stack
-          alignItems="center"
-          direction="row"
-          justifyContent="space-between"
-        >
-          <Typography sx={{ fontSize: 12, color: '#7D7D7D' }}>
-            {data?.data?.content?.length} records
-          </Typography>
-          <Stack direction={'row'} gap={1.5}>
-            <StyledButton
-              disabled={page === 0}
-              onClick={() => setPage((p) => p - 1)}
-              size={'small'}
-              variant={'outlined'}
-            >
-              Previous
-            </StyledButton>
-            <StyledButton
-              color={'info'}
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage((p) => p + 1)}
-              size={'small'}
-              variant={'outlined'}
-            >
-              Next
-            </StyledButton>
+        <Stack gap={1.5}>
+          <CreditUsageGrid
+            columns={columns}
+            expandedRows={expandedRows}
+            isLoading={isLoading}
+            list={data?.data?.content || []}
+            renderDetail={renderDetail}
+          />
+          <Stack
+            alignItems="center"
+            direction="row"
+            justifyContent="space-between"
+          >
+            <Typography sx={{ fontSize: 12, color: '#7D7D7D' }}>
+              {data?.data?.content?.length} records
+            </Typography>
+            <Stack direction={'row'} gap={1.5}>
+              <StyledButton
+                disabled={page === 0}
+                onClick={() => setPage((p) => p - 1)}
+                size={'small'}
+                variant={'outlined'}
+              >
+                Previous
+              </StyledButton>
+              <StyledButton
+                color={'info'}
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage((p) => p + 1)}
+                size={'small'}
+                variant={'outlined'}
+              >
+                Next
+              </StyledButton>
+            </Stack>
           </Stack>
         </Stack>
       </Stack>
-    </Stack>
+    </Box>
   );
 };
