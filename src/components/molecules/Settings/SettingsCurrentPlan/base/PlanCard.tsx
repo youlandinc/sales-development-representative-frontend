@@ -1,7 +1,7 @@
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { FC, useMemo } from 'react';
 
-import { COLORS, CREDIT_TYPE_LABELS } from '../data';
+import { CREDIT_TYPE_LABELS } from '../data';
 
 import { CreditTypeEnum } from '@/types/pricingPlan';
 import { PlanStatusEnum, PlanTypeEnum } from '@/types';
@@ -113,7 +113,7 @@ export const PlanCard: FC<PlanCardProps> = ({
   return (
     <Box
       sx={{
-        bgcolor: COLORS.background,
+        bgcolor: '#F8F8FA',
         borderRadius: 1,
         p: 3,
         width: '100%',
@@ -131,7 +131,6 @@ export const PlanCard: FC<PlanCardProps> = ({
               sx={{
                 fontSize: 14,
                 fontWeight: 600,
-                color: COLORS.text.primary,
                 lineHeight: 1.2,
               }}
             >
@@ -147,7 +146,6 @@ export const PlanCard: FC<PlanCardProps> = ({
           <Typography
             sx={{
               fontSize: 14,
-              color: COLORS.text.primary,
               lineHeight: 1.4,
             }}
           >
@@ -157,9 +155,9 @@ export const PlanCard: FC<PlanCardProps> = ({
             sx={{
               height: 8,
               borderRadius: 1,
-              bgcolor: COLORS.progress.background,
+              bgcolor: '#EAE9EF',
               '& .MuiLinearProgress-bar': {
-                bgcolor: COLORS.progress.bar,
+                bgcolor: '#363440',
                 borderRadius: 1,
               },
             }}

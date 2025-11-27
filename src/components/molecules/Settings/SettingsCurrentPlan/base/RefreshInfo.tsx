@@ -1,7 +1,6 @@
 import { Icon, Stack, Typography } from '@mui/material';
 import { FC } from 'react';
 
-import { COLORS } from '../data';
 import ICON_REFRESH from '../assets/icon_refresh.svg';
 
 export interface RefreshInfoProps {
@@ -16,12 +15,11 @@ export const RefreshInfo: FC<RefreshInfoProps> = ({
   <Stack alignItems="center" direction="row" gap={0.5}>
     <Icon
       component={ICON_REFRESH}
-      sx={{ fontSize: 16, color: COLORS.text.primary }}
+      sx={{ fontSize: 16, color: 'text.secondary' }}
     />
     <Typography
       sx={{
         fontSize: 12,
-        color: COLORS.text.primary,
         lineHeight: 1.5,
       }}
     >

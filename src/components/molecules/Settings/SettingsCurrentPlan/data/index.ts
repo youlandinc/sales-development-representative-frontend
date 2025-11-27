@@ -18,19 +18,6 @@ export const FULL_ACCESS_PLAN_TYPES = [
   PlanTypeEnum.enterprise,
 ] as const;
 
-// Design tokens
-export const COLORS = {
-  background: '#F8F8FA',
-  text: {
-    primary: '#363440',
-    secondary: '#6F6C7D',
-  },
-  progress: {
-    background: '#EAE9EF',
-    bar: '#363440',
-  },
-} as const;
-
 // Credit type display mapping
 export const CREDIT_TYPE_LABELS: Record<CreditTypeEnum, string> = {
   [CreditTypeEnum.credit]: 'Credits',

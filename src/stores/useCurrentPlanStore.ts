@@ -5,6 +5,13 @@ import { SDRToast } from '@/components/atoms';
 import { _fetchCurrentPlan } from '@/request';
 import { CurrentPlanPlanInfoItem, PlanStatusEnum, PlanTypeEnum } from '@/types';
 
+const SEND_EMAIL_PLAN_TYPES = new Set([
+  PlanTypeEnum.research,
+  PlanTypeEnum.intelligence,
+  PlanTypeEnum.institutional,
+  PlanTypeEnum.enterprise,
+]);
+
 interface CurrentPlanStoreState {
   planList: CurrentPlanPlanInfoItem[];
   isLoading: boolean;
@@ -30,33 +37,38 @@ export const useCurrentPlanStore = create<CurrentPlanStoreProps>()((set) => ({
       set({ isLoading: true });
       const response = await _fetchCurrentPlan();
 
-      const paidPlan = response.data.currentPlans
-        .filter((plan) => plan.status === PlanStatusEnum.succeeded)
-        .map((plan) => plan.planType);
-
-      const sendEmailPlan = response.data.currentPlans
-        .filter(
-          (plan) =>
-            [
-              PlanTypeEnum.research,
-              PlanTypeEnum.intelligence,
-              PlanTypeEnum.institutional,
-              PlanTypeEnum.enterprise,
-            ].includes(plan.planType) && plan.status === PlanStatusEnum.created,
-        )
-        .map((plan) => plan.planType);
-
-      const cancelledPlan = response.data.currentPlans
-        .filter((plan) => plan.status === PlanStatusEnum.cancelled)
-        .map((plan) => plan.planType);
+      const { paidPlan, sendEmailPlan, cancelledPlan } =
+        response.data.currentPlans.reduce(
+          (acc, plan) => {
+            const { planType, status } = plan;
+            if (status === PlanStatusEnum.succeeded) {
+              acc.paidPlan.push(planType);
+            }
+            if (status === PlanStatusEnum.cancelled) {
+              acc.cancelledPlan.push(planType);
+            }
+            if (
+              status === PlanStatusEnum.created &&
+              SEND_EMAIL_PLAN_TYPES.has(planType)
+            ) {
+              acc.sendEmailPlan.push(planType);
+            }
+            return acc;
+          },
+          {
+            paidPlan: [] as PlanTypeEnum[],
+            sendEmailPlan: [] as PlanTypeEnum[],
+            cancelledPlan: [] as PlanTypeEnum[],
+          },
+        );
 
       set({
         planList: response.data.currentPlans,
         paidPlan,
         sendEmailPlan,
         cancelledPlan,
+        isLoading: false,
       });
-      set({ isLoading: false });
     } catch (err) {
       set({ isLoading: false });
       const { message, header, variant } = err as HttpError;

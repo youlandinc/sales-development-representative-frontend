@@ -1,31 +1,22 @@
 import { Box, Icon, Stack, Typography } from '@mui/material';
 import { FC, useMemo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
-import { SDRToast, StyledButton } from '@/components/atoms';
-import { useAsyncFn, useSwitch } from '@/hooks';
-import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
+import { StyledButton } from '@/components/atoms';
 
 import { PlanTypeEnum } from '@/types';
-import { DirectoriesBizIdEnum } from '@/types/directories';
-import { PaymentTypeEnum, PlanInfo } from '@/types/pricingPlan';
+import { CreditTypeEnum, PaymentTypeEnum, PlanInfo } from '@/types/pricingPlan';
 
-import { _createPaymentLink } from '@/request/pricingPlan';
 import {
-  CANCEL_URL,
   COLORS,
   DIMENSIONS,
-  hasPrice,
   ICON_STYLES,
-  isCancelledPlan,
-  isPaidPlan,
   isUnlimitedPlan,
   packageTitle,
   PERIOD_INFO,
   PRICE_INFO,
-  SUCCESS_URL,
   TYPOGRAPHY_STYLES,
 } from './data';
+import { usePricingPlanCard } from './hooks';
 
 import {
   CustomPricing,
@@ -51,102 +42,19 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
   paymentType,
   category,
 }) => {
-  const { visible, toggle } = useSwitch();
-  const { paidPlan, sendEmailPlan, cancelledPlan } = useCurrentPlanStore(
-    useShallow((state) => ({
-      paidPlan: state.paidPlan,
-      sendEmailPlan: state.sendEmailPlan,
-      cancelledPlan: state.cancelledPlan,
-    })),
-  );
-
-  // Computed states
-  const isHighlighted = plan.isDefault;
-  const isPaid = isPaidPlan(plan.planType, paidPlan);
-  const isCancelled = isCancelledPlan(plan.planType, cancelledPlan);
-  const isEmailSent = sendEmailPlan.includes(plan.planType);
-  const isCapitalMarkets = category === DirectoriesBizIdEnum.capital_markets;
-
-  // Button configuration
-  // Priority: isPaid > isCancelled > isCapitalMarkets > hasPrice > isDefault > fallback
-  const buttonConfig = useMemo(() => {
-    const variant = plan.isDefault
-      ? ('contained' as const)
-      : ('outlined' as const);
-
-    // 1. Already paid - show current plan
-    if (isPaid) {
-      return {
-        text: 'Current plan',
-        variant: 'contained' as const,
-        showIcon: true,
-      };
-    }
-
-    // 2. Cancelled - show resume option
-    if (isCancelled) {
-      return { text: 'Resume subscription', variant };
-    }
-
-    // 3. Capital markets - always request access
-    if (isCapitalMarkets) {
-      return { text: 'Request access', variant: 'outlined' as const };
-    }
-
-    // 4. Has price - show choose plan
-    if (hasPrice(plan)) {
-      return { text: 'Choose plan', variant };
-    }
-
-    // 5. Default plan without price - talk to team
-    if (plan.isDefault) {
-      return { text: 'Talk to our team', variant: 'contained' as const };
-    }
-
-    // 6. Fallback - request access
-    return { text: 'Request access', variant: 'outlined' as const };
-  }, [isPaid, isCancelled, isCapitalMarkets, plan]);
-
-  // Button styles
-  const buttonStyles = useMemo(
-    () => ({
-      bgcolor:
-        buttonConfig.variant === 'contained' ? COLORS.PRIMARY : 'transparent',
-      color: buttonConfig.variant === 'contained' ? 'white' : 'text.primary',
-      borderColor:
-        buttonConfig.variant === 'outlined' ? COLORS.BORDER : 'transparent',
-      '&:hover': {
-        bgcolor:
-          buttonConfig.variant === 'contained' ? COLORS.PRIMARY : 'transparent',
-      },
-    }),
-    [buttonConfig.variant],
-  );
-
-  const [state, createPaymentLink] = useAsyncFn(async () => {
-    try {
-      const { data } = await _createPaymentLink({
-        successUrl: SUCCESS_URL,
-        cancelUrl: CANCEL_URL,
-        planType: plan.planType,
-        pricingType: paymentType as PaymentTypeEnum,
-      });
-      if (data) {
-        window.location.href = data;
-      }
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    }
-  }, [paymentType, plan.planType]);
-
-  const onClickToCreatePayment = () => {
-    if (!plan.monthlyPrice && !plan.yearlyPrice) {
-      toggle();
-      return;
-    }
-    createPaymentLink();
-  };
+  const {
+    visible,
+    toggle,
+    isHighlighted,
+    isPaid,
+    isCancelled,
+    isEmailSent,
+    isCapitalMarkets,
+    buttonConfig,
+    buttonStyles,
+    isLoading,
+    onClickToCreatePayment,
+  } = usePricingPlanCard({ plan, paymentType, category });
 
   // Price description
   const priceDescription = useMemo(() => {
@@ -283,7 +191,7 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
               <StyledButton
                 disabled={isPaid}
                 fullWidth
-                loading={state.loading}
+                loading={isLoading}
                 onClick={onClickToCreatePayment}
                 size="medium"
                 sx={buttonStyles}
@@ -343,7 +251,11 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
         onClose={toggle}
         open={visible}
         planType={plan.planType}
-        pricingType={paymentType as PaymentTypeEnum}
+        pricingType={
+          plan.creditType === CreditTypeEnum.full_access
+            ? PaymentTypeEnum.YEARLY
+            : (paymentType as PaymentTypeEnum)
+        }
       />
     </Stack>
   );

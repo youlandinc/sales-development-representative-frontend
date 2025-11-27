@@ -69,9 +69,9 @@ export const useCurrentPlan = () => {
     }
     try {
       await _cancelPlan(selectedPlan.planType);
+      await fetchCurrentPlan();
       setCancelDialogOpen(false);
       setSelectedPlan(null);
-      fetchCurrentPlan();
     } catch (e) {
       const { message, header, variant } = e as HttpError;
       SDRToast({ message, header, variant });

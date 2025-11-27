@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { Skeleton, Stack } from '@mui/material';
 import { FC, useCallback } from 'react';
 
 import { PlanCard, PlanCardProps } from '.';
@@ -29,8 +29,8 @@ export const PlanList: FC<PlanListProps> = ({
     [onCancelClick],
   );
 
-  if (isLoading) {
-    return <PlanListState message="Loading plans..." />;
+  if (isLoading && PlanList.length === 0) {
+    return <Skeleton variant="rounded" />;
   }
 
   if (plans.length === 0) {
