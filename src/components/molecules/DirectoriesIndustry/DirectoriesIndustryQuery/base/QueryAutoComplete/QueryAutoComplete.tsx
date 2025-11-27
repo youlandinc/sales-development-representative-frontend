@@ -96,12 +96,11 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
             opt.label.toLowerCase() === state.inputValue.toLowerCase(),
         );
 
-        if (!existsInOptions) {
+        // Only show "Add" option, not "Delete" (delete via chip X button)
+        if (!existsInOptions && !isAlreadySelected) {
           filtered.push({
             inputValue: state.inputValue,
-            label: isAlreadySelected
-              ? `Delete "${state.inputValue}"`
-              : `Add "${state.inputValue}"`,
+            label: `Add "${state.inputValue}"`,
           });
         }
       }
@@ -126,30 +125,16 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           (v) => (UTypeOf.isString(v) ? { inputValue: v, label: v } : v),
         );
 
-        const lastItem = normalized[normalized.length - 1];
-        if (lastItem?.label.startsWith('Delete "')) {
-          const valueToDelete = lastItem.inputValue;
-          const currentValues = (value as string[]) ?? [];
-          const newValues = currentValues.filter((v) => v !== valueToDelete);
-          (onFormChange as (v: string[]) => void)(newValues);
-          return;
-        }
-
         onChangeToUpdateValue(_, normalized);
       } else {
         const normalized = UTypeOf.isString(newValue)
           ? { inputValue: newValue, label: newValue }
           : (newValue as AutoCompleteOption | null);
 
-        if (normalized?.label.startsWith('Delete "')) {
-          (onFormChange as (v: string | null) => void)(null);
-          return;
-        }
-
         onChangeToUpdateValue(_, normalized);
       }
     },
-    [multiple, value, onFormChange, onChangeToUpdateValue],
+    [multiple, onChangeToUpdateValue],
   );
 
   return (
@@ -271,6 +256,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
         },
         '& .MuiInputBase-input': {
           padding: '0 !important',
+          paddingRight: '56px !important',
           minHeight: '24px',
           fontSize: '12px',
         },

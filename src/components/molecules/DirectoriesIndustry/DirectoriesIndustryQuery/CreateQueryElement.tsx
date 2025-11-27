@@ -271,6 +271,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
               onFormChange?.(config.key, value, groupPath)
             }
             placeholder={config.placeholder || ''}
+            size={'small'}
             value={formData[config.key!] ?? ''}
           />
         </QueryContainer>

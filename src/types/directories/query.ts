@@ -21,8 +21,8 @@ export enum DirectoriesQueryGroupTypeEnum {
   general = 'GENERAL',
   button_group = 'BUTTON_GROUP',
   tab = 'TAB',
-  // firms => have list table(companyNames)
-  // individuals => don't have list table
+  // Firms: has list table (companyNames)
+  // Individuals: no list table
   exclude_firms = 'EXCLUDE_FIRMS',
   exclude_individuals = 'EXCLUDE_INDIVIDUALS',
   additional_details = 'ADDITIONAL_DETAILS',
@@ -78,7 +78,7 @@ export interface DirectoriesQueryItem {
   url: string | null; // if url exists, fetch options from API
 
   // ========== Nested Structure ==========
-  children: DirectoriesQueryItem[] | null; // sub components
+  children: DirectoriesQueryItem[] | null; // sub-components
 }
 
 export type DirectoriesQueryDefaultApiResponse = DirectoriesQueryItem[];

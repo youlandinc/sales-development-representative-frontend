@@ -105,18 +105,31 @@ export const configInitFormValues = (
     return result;
   }
 
+  // Find TAB config for hierarchical structure
   const entityTypeConfig = configs.find(
     (c) =>
       c.groupType === DirectoriesQueryGroupTypeEnum.tab && c.isGroup && c.key,
   );
 
-  if (!entityTypeConfig || !entityTypeConfig.children) {
+  const isHierarchical = !!(
+    entityTypeConfig && entityTypeConfig.children?.length
+  );
+
+  // ========================================
+  // Flat Config: process all configs directly
+  // ========================================
+  if (!isHierarchical) {
     configs.forEach((config) => {
       collectFormKeys(config, result);
     });
     return result;
   }
 
+  // ========================================
+  // Hierarchical Config: process by tabs
+  // ========================================
+
+  // 1. Set entityType default value
   const defaultEntityType =
     entityTypeConfig.defaultValue ?? entityTypeConfig.optionValues?.[0]?.value;
 
@@ -125,28 +138,12 @@ export const configInitFormValues = (
       defaultEntityType ?? DirectoriesEntityTypeEnum.firm;
   }
 
-  entityTypeConfig.children.forEach((tabChild, index) => {
-    const optionValue = entityTypeConfig.optionValues?.[index];
-    const tabKey = optionValue?.value;
-
+  // 2. Process each tab's children (exclude_* is inside tab children, handled by recursion)
+  entityTypeConfig.children!.forEach((tabChild, index) => {
+    const tabKey = entityTypeConfig.optionValues?.[index]?.value;
     if (tabKey) {
       result[tabKey] = {};
       collectFormKeys(tabChild, result[tabKey]);
-    }
-  });
-
-  configs.forEach((child) => {
-    if (
-      child.groupType === DirectoriesQueryGroupTypeEnum.exclude_individuals ||
-      child.groupType === DirectoriesQueryGroupTypeEnum.exclude_firms
-    ) {
-      entityTypeConfig.children?.forEach((tabChild, index) => {
-        const optionValue = entityTypeConfig.optionValues?.[index];
-        const tabKey = optionValue?.value;
-        if (tabKey && result[tabKey]) {
-          collectFormKeys(child, result[tabKey]);
-        }
-      });
     }
   });
 

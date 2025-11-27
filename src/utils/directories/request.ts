@@ -63,11 +63,12 @@ const mergeNonEmptyDirectoriesFields = (
  * Output format: { additionalFields: ['checkedKey1', 'checkedKey2'], ...otherValues }
  */
 export const processAdditionalDetails = (additional: any): any => {
+  // Handle array format (initial API data) or empty/invalid input
   if (!UTypeOf.isObject(additional) || UTypeOf.isEmptyObject(additional)) {
     return { additionalFields: [] };
   }
 
-  // Handle dual-state format (manual edits)
+  // Handle dual-state format (manual edits): { checkbox: {...}, values: {...} }
   if ('checkbox' in additional && 'values' in additional) {
     const checkbox = additional.checkbox as Record<string, boolean>;
     const values = additional.values as Record<string, any>;
@@ -80,11 +81,6 @@ export const processAdditionalDetails = (additional: any): any => {
       additionalFields: additionalFieldsKeys,
       ...values,
     };
-  }
-
-  // Handle array format (initial API data)
-  if (Array.isArray(additional)) {
-    return { additionalFields: [] };
   }
 
   return { additionalFields: [] };
@@ -201,13 +197,14 @@ export const buildSearchRequestParams = (
     }
   }
 
-  // Hierarchical config: group by entityType, Flat config: use query directly
+  // Hierarchical config: extract entityType's fields
+  // Flat config: use query directly
   const entityData =
     isHierarchical && entityType ? query[entityType] || {} : query;
   mergeNonEmptyDirectoriesFields(requestData, entityData);
 
   // Flatten additional details fields
-  if (additionalDetails && typeof additionalDetails === 'object') {
+  if (UTypeOf.isObject(additionalDetails)) {
     mergeNonEmptyDirectoriesFields(requestData, additionalDetails);
   }
 
