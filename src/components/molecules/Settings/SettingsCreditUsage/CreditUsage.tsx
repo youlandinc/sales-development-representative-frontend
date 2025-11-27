@@ -213,7 +213,7 @@ export const CreditUsage: FC = () => {
           }
           try {
             return format(new Date(value), ' MMMM d, yyyy h:mma');
-          } catch (e) {
+          } catch {
             return value;
           }
         },
@@ -266,7 +266,8 @@ export const CreditUsage: FC = () => {
                       gap={1}
                       key={colIndex}
                       minWidth={col.minWidth}
-                      px={3}
+                      pl={6}
+                      pr={3}
                       width={col.width}
                     >
                       <Avatar

@@ -13,7 +13,6 @@ import {
   FetchCreditUsageListRequest,
   UsageTypeOptions,
 } from '@/types/Settings/creditUsage';
-import { UTypeOf } from '@/utils';
 
 export const useCreditUsage = () => {
   const [queryConditions, setQueryConditions] = useState<
