@@ -86,7 +86,6 @@ export const CreditUsageGrid: FC<CreditUsageGridProps> = ({
   renderDetail,
   expandedRows,
 }) => {
-  console.log('list', isLoading);
   return (
     <Stack flex={1} minWidth={0}>
       {/*grid*/}
