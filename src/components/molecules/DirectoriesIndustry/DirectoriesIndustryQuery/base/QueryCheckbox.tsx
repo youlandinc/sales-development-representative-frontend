@@ -33,7 +33,7 @@ export const QueryCheckbox: FC<QueryCheckboxProps> = ({
           <Stack sx={{ flexDirection: 'row', alignItems: 'center', gap: 0.5 }}>
             <Typography sx={{ fontSize: 12 }}>{subLabel}</Typography>
             {subTooltip && (
-              <Tooltip title={subTooltip}>
+              <Tooltip arrow title={subTooltip}>
                 <Icon component={ICON_INFO} sx={{ width: 11, height: 11 }} />
               </Tooltip>
             )}

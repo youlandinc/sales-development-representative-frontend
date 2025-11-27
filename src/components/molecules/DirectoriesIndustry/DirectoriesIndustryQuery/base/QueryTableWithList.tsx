@@ -28,6 +28,7 @@ interface QueryTableWithListProps {
     key: CompaniesRadioEnum | string;
     value: CompaniesRadioEnum | string;
     selected?: boolean | null;
+    title?: string;
   }>;
   onFormChange: (key: string, value: QueryTableWithListValue) => void;
 }
@@ -50,6 +51,9 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
   >(undefined);
 
   const [keywords, setKeywords] = useState<string[]>(value?.keywords || []);
+
+  const reducedTitle =
+    optionValues.find((item) => item.value === mode)?.title || '';
 
   const renderNode = () => {
     switch (mode) {
@@ -74,6 +78,7 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
             selectedTableId={selectedTableId}
             selectedTableName={selectedTableName}
             selectedTableSource={selectedTableSource}
+            title={reducedTitle}
             type={type}
           />
         );
@@ -90,6 +95,7 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
                 keywords: keywords,
               });
             }}
+            title={reducedTitle}
             value={keywords}
           />
         );

@@ -23,6 +23,7 @@ interface FilterTableSelectProps {
     tableName: string;
     tableSource?: ProspectTableEnum;
   }) => void;
+  title?: string;
 }
 
 export const QueryTableSelect: FC<FilterTableSelectProps> = ({
@@ -33,6 +34,7 @@ export const QueryTableSelect: FC<FilterTableSelectProps> = ({
   selectedTableSource,
   onFormDataChange,
   onDisplayDataChange,
+  title,
 }) => {
   const { open, visible, close } = useSwitch(false);
   const {
@@ -90,7 +92,7 @@ export const QueryTableSelect: FC<FilterTableSelectProps> = ({
 
   return (
     <Stack>
-      <QueryContainer isAuth={true} label={'Table'} planName={'123'}>
+      <QueryContainer label={title}>
         <QueryTableSelectInput
           isLoading={isLoading || fetchingTable || fetchingKeywords}
           onClearSelection={onClickClearSelection}

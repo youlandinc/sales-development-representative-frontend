@@ -238,6 +238,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         isAuth={containerIsAuth}
         label={config.label}
         planName={config.planName}
+        tooltip={config.tooltip}
       >
         <QueryAutoComplete
           freeSolo={false}
@@ -263,6 +264,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           isAuth={containerIsAuth}
           label={config.label}
           planName={config.planName}
+          tooltip={config.tooltip}
         >
           <StyledTextFieldNumber
             onValueChange={({ value }) =>
@@ -282,6 +284,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         isAuth={containerIsAuth}
         label={config.label}
         planName={config.planName}
+        tooltip={config.tooltip}
       >
         <QueryAutoComplete
           freeSolo={true}
@@ -324,6 +327,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         description={config.description}
         isAuth={containerIsAuth}
         planName={config.planName}
+        tooltip={config.tooltip}
       >
         <QuerySwitch
           checked={formData[config.key!] || false}

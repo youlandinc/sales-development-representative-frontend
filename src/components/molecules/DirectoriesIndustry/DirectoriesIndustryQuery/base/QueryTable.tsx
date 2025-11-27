@@ -45,6 +45,7 @@ export const QueryTable: FC<QueryTableProps> = ({
         selectedTableId={selectedTableId}
         selectedTableName={selectedTableName}
         selectedTableSource={selectedTableSource}
+        title={''}
         type={type}
       />
     </>

@@ -5,14 +5,16 @@ import { QueryAutoComplete, QueryContainer } from './index';
 interface QueryListTextAreaProps {
   value: string[];
   onInsideFormChange: (param: string[]) => void;
+  title: string;
 }
 
 export const QueryListTextArea: FC<QueryListTextAreaProps> = ({
   value = [],
   onInsideFormChange,
+  title,
 }) => {
   return (
-    <QueryContainer isAuth={true}>
+    <QueryContainer isAuth={true} label={title}>
       <QueryAutoComplete
         freeSolo={true}
         multiple={true}
