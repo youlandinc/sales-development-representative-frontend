@@ -1,6 +1,10 @@
 import { Box, Collapse, Skeleton, Stack, Typography } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, memo } from 'react';
+
+// Style constants
+const HOVER_BG_COLOR = '#F8F8FA';
+const BORDER_COLOR = '#D0CEDA';
 
 type CreditUsageGridProps = {
   list?: Record<string, any>[];
@@ -16,52 +20,64 @@ const Row: FC<{
   renderDetail?: (row: Record<string, any>, rowIndex: number) => ReactNode;
   rowIndex: number;
   isExpanded: boolean;
-}> = ({ row, columns, renderDetail, rowIndex, isExpanded }) => {
-  return (
-    <Stack width={'100%'}>
-      <Stack
-        alignItems={'center'}
-        direction={'row'}
-        sx={{
-          '&:hover': {
-            bgcolor: '#F8F8FA',
-          },
-        }}
-        width={'100%'}
-      >
-        {columns.map((col, j) => (
-          <Typography
-            borderBottom={'1px solid #D0CEDA'}
-            component={'div'}
-            flex={col.flex}
-            key={j}
-            minWidth={col.minWidth}
-            px={3}
-            py={1.5}
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-            textAlign={col.align || 'left'}
-            variant={'body3'}
-            width={col.width}
-          >
-            {col?.renderCell?.({
-              value: row[col.field],
-              row: row,
-            } as any) || row[col.field]}
-          </Typography>
-        ))}
+}> = memo(
+  ({ row, columns, renderDetail, rowIndex, isExpanded }) => {
+    return (
+      <Stack width={'100%'}>
+        <Stack
+          alignItems={'center'}
+          direction={'row'}
+          sx={{
+            '&:hover': {
+              bgcolor: HOVER_BG_COLOR,
+            },
+          }}
+          width={'100%'}
+        >
+          {columns.map((col, j) => (
+            <Typography
+              borderBottom={`1px solid ${BORDER_COLOR}`}
+              component={'div'}
+              flex={col.flex}
+              key={j}
+              minWidth={col.minWidth}
+              px={3}
+              py={1.5}
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+              textAlign={col.align || 'left'}
+              variant={'body3'}
+              width={col.width}
+            >
+              {col?.renderCell?.({
+                value: row[col.field],
+                row: row,
+              } as any) || row[col.field]}
+            </Typography>
+          ))}
+        </Stack>
+        {renderDetail && (
+          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+            <Box sx={{ width: '100%' }}>{renderDetail(row, rowIndex)}</Box>
+          </Collapse>
+        )}
       </Stack>
-      {renderDetail && (
-        <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-          <Box sx={{ width: '100%' }}>{renderDetail(row, rowIndex)}</Box>
-        </Collapse>
-      )}
-    </Stack>
-  );
-};
+    );
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison to prevent unnecessary rerenders
+    return (
+      prevProps.row === nextProps.row &&
+      prevProps.isExpanded === nextProps.isExpanded &&
+      prevProps.rowIndex === nextProps.rowIndex &&
+      prevProps.columns === nextProps.columns &&
+      prevProps.renderDetail === nextProps.renderDetail
+    );
+  },
+);
 
 export const CreditUsageGrid: FC<CreditUsageGridProps> = ({
   list,
@@ -85,7 +101,7 @@ export const CreditUsageGrid: FC<CreditUsageGridProps> = ({
               ? null
               : columns.map((col, i) => (
                   <Typography
-                    borderBottom={'1px solid #D0CEDA'}
+                    borderBottom={`1px solid ${BORDER_COLOR}`}
                     color={'text.secondary'}
                     flex={col.flex}
                     key={i}
@@ -107,7 +123,7 @@ export const CreditUsageGrid: FC<CreditUsageGridProps> = ({
                   <Stack flexDirection={'row'} key={j} width={'100%'}>
                     {columns.map((col, i) => (
                       <Typography
-                        borderBottom={'1px solid #D0CEDA'}
+                        borderBottom={`1px solid ${BORDER_COLOR}`}
                         color={'text.secondary'}
                         flex={col.flex}
                         key={i}
