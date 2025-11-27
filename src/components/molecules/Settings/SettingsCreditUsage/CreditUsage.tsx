@@ -213,7 +213,7 @@ export const CreditUsage: FC = () => {
           }
           try {
             return format(new Date(value), ' MMMM d, yyyy h:mma');
-          } catch (e) {
+          } catch {
             return value;
           }
         },
