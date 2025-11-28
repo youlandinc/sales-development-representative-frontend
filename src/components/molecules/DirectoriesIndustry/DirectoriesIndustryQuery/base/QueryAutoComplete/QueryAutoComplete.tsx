@@ -96,11 +96,12 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
             opt.label.toLowerCase() === state.inputValue.toLowerCase(),
         );
 
-        // Only show "Add" option, not "Delete" (delete via chip X button)
-        if (!existsInOptions && !isAlreadySelected) {
+        if (!existsInOptions) {
           filtered.push({
             inputValue: state.inputValue,
-            label: `Add "${state.inputValue}"`,
+            label: isAlreadySelected
+              ? `Delete ${state.inputValue}`
+              : `Add "${state.inputValue}"`,
           });
         }
       }
@@ -259,6 +260,9 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           paddingRight: '56px !important',
           minHeight: '24px',
           fontSize: '12px',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         },
         '& .MuiAutocomplete-endAdornment': {
           position: 'absolute',

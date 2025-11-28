@@ -34,3 +34,21 @@ export const TITLE_MAP: Record<string, string> = {
   'business-corporate':
     DIRECTORIES[DirectoriesBizIdEnum.business_corporate].title,
 };
+
+export const DIRECTORIES_BADGE_AUTH: Record<
+  DirectoriesBizIdEnum,
+  { title: string; strong: string }
+> = {
+  [DirectoriesBizIdEnum.capital_markets]: {
+    title: 'Requires Intelligence',
+    strong: 'Intelligence',
+  },
+  [DirectoriesBizIdEnum.real_estate_lending]: {
+    title: 'Requires Professional',
+    strong: 'Professional',
+  },
+  [DirectoriesBizIdEnum.business_corporate]: {
+    title: 'Requires Business',
+    strong: 'Business',
+  },
+};

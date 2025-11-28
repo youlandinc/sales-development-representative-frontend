@@ -8,6 +8,7 @@ import {
   DirectoriesQueryTableHeaderApiResponse,
 } from '@/types/directories';
 import { ResponseProspectTableViaSearch } from '@/types';
+import { CreditTypeEnum } from '@/types/pricingPlan';
 
 export const _fetchDirectoriesConfig = (params: {
   bizId: DirectoriesBizIdEnum;
@@ -40,5 +41,16 @@ export const _fetchAllProspectTable = () => {
 };
 
 export const _fetchCompanyNameViaTableId = (tableId: string) => {
-  return get<string[]>(`/sdr/prospect/table/companyName/${tableId}`);
+  return get<string[]>(`/sdr/table/data/companyName/${tableId}`);
+};
+
+export const _fetchPlanCredits = (bizId: DirectoriesBizIdEnum) => {
+  return post<{
+    creditType: CreditTypeEnum;
+    remainingCredits: number | null;
+    totalCredits: number | null;
+    planLimitRecordCount: number | null;
+  }>('/sdr/pricing/plan/credits', {
+    bizId,
+  });
 };

@@ -69,7 +69,7 @@ export const QueryContainer: FC<QueryContainerProps> = ({
               )}
             </Stack>
           )}
-          {!isAuth && <QueryBadgeAuth planName={planName || ''} />}
+          {!isAuth && <QueryBadgeAuth />}
         </Stack>
 
         {description && (

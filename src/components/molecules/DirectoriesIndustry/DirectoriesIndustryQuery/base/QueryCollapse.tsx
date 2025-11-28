@@ -69,7 +69,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                 {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}
               </Box>
             )}
-            {!isAuth && <QueryBadgeAuth planName={planName} />}
+            {!isAuth && <QueryBadgeAuth />}
             <Icon
               component={ICON_ARROW}
               sx={{

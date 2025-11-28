@@ -11,8 +11,8 @@ import { useDirectoriesStore } from '@/stores/directories';
 import { DirectoriesIndustry, Layout } from '@/components/molecules';
 
 export default function DirectoriesIndustryPage() {
-  const params = useParams();
   const router = useRouter();
+  const params = useParams();
   const industrySlug = params.industry as string;
   const bizId = getDirectoriesBizId(industrySlug);
 

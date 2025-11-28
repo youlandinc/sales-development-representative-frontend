@@ -83,7 +83,6 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
           <Stack key={itemKey || item.label} sx={{ gap: 1 }}>
             <StyledCheckbox
               checked={isChecked}
-              disabled={!isAuth}
               indeterminate={indeterminate}
               label={item.subLabel || item.label || ''}
               onChange={(_, checked) => {
@@ -109,7 +108,6 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
         <Stack key={itemKey}>
           <StyledCheckbox
             checked={isChecked}
-            disabled={!isAuth}
             label={item.subLabel || item.label || ''}
             onChange={(_, checked) => {
               updateAdditionalSelection(itemKey, checked, item);

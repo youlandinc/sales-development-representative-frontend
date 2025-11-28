@@ -1,6 +1,6 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { CircularProgress, Stack, Typography } from '@mui/material';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
 
 import {
@@ -8,27 +8,16 @@ import {
   TITLE_MAP,
 } from '@/constants/directories';
 import { useDirectoriesStore } from '@/stores/directories';
-import {
-  buildSearchRequestParams,
-  getDirectoriesBizId,
-} from '@/utils/directories';
-import { _importDirectoriesDataToTable } from '@/request/directories';
-import {
-  DirectoriesBizIdEnum,
-  DirectoriesQueryItem,
-} from '@/types/directories';
+import { getDirectoriesBizId } from '@/utils/directories';
+import { DirectoriesQueryItem } from '@/types/directories';
 
 import { QueryBreadcrumbs } from './base';
-import { CreateQueryElement } from './index';
-import { SDRToast, StyledButton } from '@/components/atoms';
-import { HttpError } from '@/types';
+import { CreateQueryElement, DirectoriesIndustryQueryFooter } from './index';
 
 export const DirectoriesIndustryQuery: FC = () => {
-  const router = useRouter();
   const params = useParams();
   const industrySlug = params.industry as string;
-
-  const [isImporting, setIsImporting] = useState(false);
+  const bizId = getDirectoriesBizId(industrySlug);
 
   const {
     formValues,
@@ -38,10 +27,6 @@ export const DirectoriesIndustryQuery: FC = () => {
     buttonGroupConfig,
     updateFormValues,
     updateInstitutionType,
-    isLoadingPreview,
-    hasSubmittedSearch,
-    previewBody,
-    lastSearchParams,
   } = useDirectoriesStore(
     useShallow((state) => ({
       formValues: state.formValues,
@@ -51,10 +36,6 @@ export const DirectoriesIndustryQuery: FC = () => {
       buttonGroupConfig: state.buttonGroupConfig,
       updateFormValues: state.updateFormValues,
       updateInstitutionType: state.updateInstitutionType,
-      isLoadingPreview: state.isLoadingPreview,
-      hasSubmittedSearch: state.hasSubmittedSearch,
-      previewBody: state.previewBody,
-      lastSearchParams: state.lastSearchParams,
     })),
   );
 
@@ -73,30 +54,6 @@ export const DirectoriesIndustryQuery: FC = () => {
     }
 
     updateFormValues(key, value, groupPath);
-  };
-
-  const onContinueToImport = async () => {
-    if (isImporting || !lastSearchParams) {
-      return;
-    }
-
-    try {
-      setIsImporting(true);
-
-      const requestParams = buildSearchRequestParams(lastSearchParams);
-      const { data } = await _importDirectoriesDataToTable(requestParams);
-
-      if (data.tableId) {
-        router.push(`/prospect-enrich/${data.tableId}`);
-      }
-
-      // TODO: access not enough show dialog
-    } catch (err) {
-      const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      setIsImporting(false);
-    }
   };
 
   if (isLoadingConfig) {
@@ -118,7 +75,6 @@ export const DirectoriesIndustryQuery: FC = () => {
   }
 
   // Hierarchical config must have buttonGroupConfig
-  const bizId = getDirectoriesBizId(industrySlug);
   if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId) && !buttonGroupConfig) {
     return (
       <Stack
@@ -178,29 +134,7 @@ export const DirectoriesIndustryQuery: FC = () => {
         ))}
       </Stack>
 
-      <Stack
-        sx={{
-          px: 3,
-          py: 1.5,
-          borderTop: '1px solid #DFDEE6',
-          alignItems: 'flex-end',
-        }}
-      >
-        <StyledButton
-          disabled={
-            isImporting ||
-            isLoadingConfig ||
-            isLoadingPreview ||
-            !hasSubmittedSearch ||
-            previewBody.findCount === 0
-          }
-          loading={isImporting}
-          onClick={onContinueToImport}
-          size={'medium'}
-        >
-          Continue
-        </StyledButton>
-      </Stack>
+      <DirectoriesIndustryQueryFooter />
     </Stack>
   );
 };

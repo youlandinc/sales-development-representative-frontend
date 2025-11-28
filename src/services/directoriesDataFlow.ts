@@ -30,7 +30,6 @@ import {
   _fetchPreviewBody,
   _fetchPreviewHeader,
 } from '@/request/directories';
-import { DirectoriesBizIdEnum } from '@/types/directories';
 import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
 
 // Re-export for convenience
