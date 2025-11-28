@@ -49,7 +49,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         isAuth={config.isAuth}
         label={config.label}
         labelSx={{ fontWeight: 600, fontSize: 14 }}
-        planName={config.planName}
       >
         <StyledButtonGroup
           onChange={(event, newValue) => {
@@ -113,7 +112,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
-        planName={config.planName}
         title={config.label}
       >
         {config.children && config.children.length > 0
@@ -141,7 +139,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
-        planName={config.planName}
         title={config.label}
       >
         <QueryTableWithList
@@ -172,7 +169,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
-        planName={config.planName}
         title={config.label}
       >
         <QueryTable
@@ -202,7 +198,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
-        planName={config.planName}
         title={config.label}
       >
         <QueryAdditionalDetails isAuth={config.isAuth} />
@@ -237,7 +232,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         description={config.description}
         isAuth={containerIsAuth}
         label={config.label}
-        planName={config.planName}
         tooltip={config.tooltip}
       >
         <QueryAutoComplete
@@ -263,7 +257,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           description={config.description}
           isAuth={containerIsAuth}
           label={config.label}
-          planName={config.planName}
           tooltip={config.tooltip}
         >
           <StyledTextFieldNumber
@@ -284,7 +277,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         description={config.description}
         isAuth={containerIsAuth}
         label={config.label}
-        planName={config.planName}
         tooltip={config.tooltip}
       >
         <QueryAutoComplete
@@ -307,7 +299,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     const isChecked = formData[config.key!] || false;
 
     return (
-      <QueryContainer isAuth={containerIsAuth} planName={config.planName}>
+      <QueryContainer isAuth={containerIsAuth}>
         <QueryCheckbox
           onFormChange={(checked) =>
             onFormChange?.(config.key, checked, groupPath)
@@ -327,7 +319,6 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
       <QueryContainer
         description={config.description}
         isAuth={containerIsAuth}
-        planName={config.planName}
         tooltip={config.tooltip}
       >
         <QuerySwitch

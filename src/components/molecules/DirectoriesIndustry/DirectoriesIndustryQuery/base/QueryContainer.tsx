@@ -19,7 +19,6 @@ interface QueryContainerProps extends StackProps {
   tooltip?: string | null;
   children: ReactNode;
   isAuth?: boolean;
-  planName?: string;
 }
 
 export const QueryContainer: FC<QueryContainerProps> = ({

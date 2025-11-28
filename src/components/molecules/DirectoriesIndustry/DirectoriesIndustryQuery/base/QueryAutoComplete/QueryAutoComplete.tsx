@@ -142,7 +142,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     <Autocomplete<AutoCompleteOption, typeof multiple, false, typeof freeSolo>
       disableCloseOnSelect={multiple}
       filterOptions={filterOptions}
-      freeSolo={freeSolo}
+      freeSolo={freeSolo && isAuth}
       getOptionDisabled={isAuth ? undefined : () => true}
       getOptionKey={(option) =>
         UTypeOf.isString(option) ? option : option.inputValue
