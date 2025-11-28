@@ -30,7 +30,6 @@ export const QueryContainer: FC<QueryContainerProps> = ({
   sx,
   labelSx,
   isAuth = true,
-  planName,
   ...props
 }) => {
   return (
