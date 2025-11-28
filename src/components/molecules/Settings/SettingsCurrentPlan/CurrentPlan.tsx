@@ -2,7 +2,6 @@ import { Box, Stack, Typography } from '@mui/material';
 import { FC } from 'react';
 
 import { CancelSubscriptionDialog, PaymentSetting, PlanList } from './base';
-import { COLORS } from './data';
 
 import { useCurrentPlan } from './hooks';
 
@@ -28,7 +27,6 @@ export const CurrentPlan: FC = () => {
           sx={{
             fontSize: 18,
             fontWeight: 600,
-            color: COLORS.text.primary,
             lineHeight: 1.2,
           }}
         >

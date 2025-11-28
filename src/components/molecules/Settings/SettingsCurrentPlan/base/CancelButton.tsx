@@ -1,7 +1,6 @@
 import { Typography } from '@mui/material';
 import { FC } from 'react';
 
-import { COLORS } from '../data';
 import { PlanStatusEnum } from '@/types';
 
 export interface CancelButtonProps {
@@ -16,7 +15,7 @@ export const CancelButton: FC<CancelButtonProps> = ({ status, onCancel }) => {
         onClick={onCancel}
         sx={{
           fontSize: 12,
-          color: COLORS.text.secondary,
+          color: 'text.secondary',
           cursor: 'pointer',
           lineHeight: 1.5,
           '&:hover': {
@@ -33,7 +32,7 @@ export const CancelButton: FC<CancelButtonProps> = ({ status, onCancel }) => {
     <Typography
       sx={{
         fontSize: 12,
-        color: COLORS.text.secondary,
+        color: 'text.secondary',
         lineHeight: 1.5,
       }}
     >
