@@ -1,15 +1,16 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import { SDRToast } from '@/components/atoms';
 import { PricingPlanCard } from '@/components/molecules';
 
+import { getParamsFromUrl } from '@/utils';
+
 import { _fetchAllPlan } from '@/request/pricingPlan';
 
 export const PricingPlan = () => {
-  const bizId = useSearchParams().get('bizId');
+  const { bizId } = getParamsFromUrl(location.href);
   const [planType, setPlanType] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [paymentType, setPaymentType] = useState<string>('MONTH');
