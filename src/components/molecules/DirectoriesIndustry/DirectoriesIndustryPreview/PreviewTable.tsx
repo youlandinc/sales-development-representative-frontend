@@ -1,5 +1,6 @@
-import { FC, useMemo } from 'react';
+import { FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
+  Box,
   Icon,
   Skeleton,
   Stack,
@@ -17,15 +18,39 @@ import {
   DirectoriesQueryTableHeaderItem,
 } from '@/types/directories';
 
+import ICON_LOCK from './assets/icon-lock.svg';
 import ICON_NO_RESULT from './assets/icon-no-result.svg';
 
 const getRandomWidth = () => `${Math.floor(Math.random() * 50 + 40)}%`;
 
-// Skeleton config
-const SKELETON_CONFIG = {
-  COLUMNS: 6, // Default 6 columns
-  ROWS: 5, // Default 5 rows
-};
+const FALLBACK_SKELETON_COLUMNS: DirectoriesQueryTableHeaderItem[] = [
+  {
+    columnKey: 'inside_sort_number',
+    columnName: '',
+    columnType: TableColumnTypeEnum.number,
+    groupLabel: null,
+    groupOrder: null,
+    width: 60,
+    isAuth: true,
+  },
+  ...Array.from({ length: 6 }, (_, i) => ({
+    columnKey: `skeleton_${i}`,
+    columnName: '',
+    columnType: TableColumnTypeEnum.text,
+    groupLabel: null,
+    groupOrder: null,
+    width: undefined,
+    isAuth: true,
+  })),
+];
+
+// Pre-generated stable widths to avoid skeleton flickering
+const STABLE_HEADER_WIDTHS = Array.from({ length: 10 }, () => getRandomWidth());
+const STABLE_BODY_WIDTHS = Array.from({ length: 20 }, () =>
+  Array.from({ length: 10 }, () => getRandomWidth()),
+);
+
+const SKELETON_ROW_COUNT = 5;
 
 export interface PreviewTableProps {
   header: DirectoriesQueryTableHeaderItem[];
@@ -40,7 +65,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
   loading,
   isShowResult,
 }) => {
-  const reducedHeader = useMemo(() => {
+  const reducedHeader = useMemo((): DirectoriesQueryTableHeaderItem[] => {
     return [
       {
         columnKey: 'inside_sort_number',
@@ -49,151 +74,241 @@ export const PreviewTable: FC<PreviewTableProps> = ({
         groupLabel: null,
         groupOrder: null,
         width: 60,
+        isAuth: true,
       },
       ...header,
     ];
   }, [header]);
 
-  // Columns array for skeleton: use reducedHeader if header exists, otherwise use fixed count
-  const skeletonColumns = useMemo(() => {
-    if (header.length > 0) {
-      return reducedHeader;
-    }
-    // Fixed skeleton columns: index column + N placeholder columns
-    return [
-      {
-        columnKey: 'inside_sort_number',
-        columnName: '',
-        columnType: TableColumnTypeEnum.number,
-        width: 60,
-      },
-      ...Array.from({ length: SKELETON_CONFIG.COLUMNS }, (_, i) => ({
-        columnKey: `skeleton_${i}`,
-        columnName: '',
-        columnType: null,
-        width: null,
-      })),
-    ];
-  }, [header.length, reducedHeader]);
+  const skeletonColumns =
+    header.length > 0 ? reducedHeader : FALLBACK_SKELETON_COLUMNS;
 
-  const headerSkeletonWidths = useMemo(() => {
-    return skeletonColumns.map(() => getRandomWidth());
-  }, [skeletonColumns]);
+  const lockedStartIndex = reducedHeader.findIndex((h) => !h.isAuth);
+  const hasLockedColumns = lockedStartIndex > -1;
 
-  const bodySkeletonWidths = useMemo(() => {
-    if (!loading) {
-      return [];
+  const lockStartRef = useRef<HTMLTableCellElement>(null);
+  const [blurLeft, setBlurLeft] = useState(0);
+  const [blurWidth, setBlurWidth] = useState(0);
+
+  const bodyRef = useRef<HTMLTableSectionElement>(null);
+  const [bodyTop, setBodyTop] = useState(0);
+  const [bodyHeight, setBodyHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    if (!hasLockedColumns || !lockStartRef.current || !bodyRef.current) {
+      return;
     }
-    const rows = body.length === 0 ? SKELETON_CONFIG.ROWS : body.length;
-    return Array.from({ length: rows }, () =>
-      skeletonColumns.map(() => getRandomWidth()),
+
+    const th = lockStartRef.current;
+    const bodyEl = bodyRef.current;
+    const table = th.closest('table') as HTMLTableElement;
+    if (!table) {
+      return;
+    }
+
+    const updatePositions = () => {
+      const left = th.offsetLeft;
+      const width = table.scrollWidth - left;
+      const tableRect = table.getBoundingClientRect();
+      const bodyRect = bodyEl.getBoundingClientRect();
+      const relativeTop = bodyRect.top - tableRect.top;
+
+      setBlurLeft(left);
+      setBlurWidth(width);
+      setBodyTop(relativeTop);
+      setBodyHeight(bodyRect.height);
+    };
+
+    updatePositions();
+
+    const resizeObserver = new ResizeObserver(updatePositions);
+    resizeObserver.observe(table);
+
+    return () => resizeObserver.disconnect();
+  }, [reducedHeader, body, loading, hasLockedColumns]);
+
+  if (!isShowResult) {
+    return (
+      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Icon component={ICON_NO_RESULT} sx={{ width: 120, height: 93 }} />
+        <Typography
+          sx={{ mt: 1, fontSize: 14, fontWeight: 600, color: 'text.secondary' }}
+        >
+          No matching results
+        </Typography>
+        <Typography sx={{ fontSize: 14, color: 'text.secondary' }}>
+          Try adjusting your filters or search terms.
+        </Typography>
+      </Stack>
     );
-  }, [loading, body.length, skeletonColumns]);
+  }
 
-  return isShowResult ? (
-    <Table
-      sx={{
-        '& .MuiTableCell-root': {
-          height: '40px !important',
-          minHeight: 'auto !important',
-        },
-        '& .MuiTableHead-root': {
-          height: '40px !important',
-          minHeight: 'auto !important',
-        },
-      }}
-    >
-      <TableHead>
-        <TableRow>
-          {(loading ? skeletonColumns : reducedHeader).map((head, index) => (
-            <TableCell
-              key={`header-${index}`}
+  return (
+    <Box sx={{ position: 'relative', overflowX: 'auto', width: '100%' }}>
+      <Box sx={{ width: 'fit-content' }}>
+        <Table
+          sx={{
+            '& .MuiTableCell-root': {
+              height: '40px !important',
+            },
+          }}
+        >
+          <TableHead>
+            <TableRow>
+              {(loading ? skeletonColumns : reducedHeader).map(
+                (head, index) => (
+                  <TableCell
+                    key={`header-${index}`}
+                    ref={index === lockedStartIndex ? lockStartRef : null}
+                    sx={{
+                      py: 0,
+                      px: 1.5,
+                      borderTop: '1px solid #D0CEDA',
+                      borderRight: '1px solid #D0CEDA',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: 'primary.main',
+                      whiteSpace: 'nowrap',
+                      width: head.width ? `${head.width}px` : 'auto',
+                      minWidth: head.width ? `${head.width}px` : 160,
+                    }}
+                  >
+                    {loading ? (
+                      <Skeleton
+                        animation="wave"
+                        width={
+                          STABLE_HEADER_WIDTHS[
+                            index % STABLE_HEADER_WIDTHS.length
+                          ]
+                        }
+                      />
+                    ) : (
+                      head.columnName
+                    )}
+                  </TableCell>
+                ),
+              )}
+            </TableRow>
+          </TableHead>
+
+          <TableBody ref={bodyRef}>
+            {(loading && body.length === 0
+              ? Array.from<DirectoriesQueryTableBodyItem | null>({
+                  length: SKELETON_ROW_COUNT,
+                })
+              : body
+            ).map((row, rowIndex) => (
+              <TableRow key={rowIndex}>
+                {(loading ? skeletonColumns : reducedHeader).map(
+                  (head, colIndex) => {
+                    const isLocked = !head.isAuth && !loading;
+
+                    return (
+                      <TableCell
+                        key={`${rowIndex}-${colIndex}`}
+                        sx={{
+                          py: 0,
+                          px: 1.5,
+                          borderRight: '1px solid #D0CEDA',
+                          borderBottom: '1px solid #D0CEDA',
+                          fontSize: 14,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: 300,
+                        }}
+                      >
+                        {loading ? (
+                          <Skeleton
+                            animation="wave"
+                            width={
+                              STABLE_BODY_WIDTHS[
+                                rowIndex % STABLE_BODY_WIDTHS.length
+                              ]?.[colIndex % STABLE_BODY_WIDTHS[0].length]
+                            }
+                          />
+                        ) : isLocked ? (
+                          <Box
+                            sx={{
+                              filter: 'blur(4px)',
+                              opacity: 0.7,
+                              userSelect: 'none',
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            {row?.[head.columnKey as keyof typeof row] ||
+                              'LOCKED INFORMATION'}
+                          </Box>
+                        ) : colIndex === 0 ? (
+                          rowIndex + 1
+                        ) : (
+                          row?.[head.columnKey as keyof typeof row] || '-'
+                        )}
+                      </TableCell>
+                    );
+                  },
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
+
+      {hasLockedColumns && (
+        <Stack
+          sx={{
+            position: 'absolute',
+            top: bodyTop,
+            left: blurLeft,
+            width: blurWidth,
+            height: bodyHeight,
+
+            background: 'rgba(255,255,255,0.75)',
+            backdropFilter: 'none',
+
+            pointerEvents: 'none',
+            zIndex: 20,
+
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}
+        >
+          <Stack
+            sx={{
+              ml: 3,
+              maxWidth: 90,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1.5,
+            }}
+          >
+            <Stack
               sx={{
-                py: 0,
-                px: 1.5,
-                borderTop: '1px solid #D0CEDA',
-                borderRight: '1px solid #D0CEDA',
-                fontSize: 14,
-                fontWeight: 600,
-                color: 'primary.main',
-                whiteSpace: 'nowrap',
-                width: head.width ? `${head.width}px` : 'auto',
-                minWidth: head.width ? `${head.width}px` : 160,
-                textAlign: index === 0 ? 'center' : 'left',
+                bgcolor: 'rgba(0, 0, 0, 0.05)',
+                borderRadius: 2,
+                width: 48,
+                height: 48,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              {loading ? (
-                <Skeleton
-                  animation="wave"
-                  width={headerSkeletonWidths[index]}
-                />
-              ) : (
-                head.columnName
-              )}
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {(loading && body.length === 0
-          ? (Array.from({
-              length: SKELETON_CONFIG.ROWS,
-            }) as DirectoriesQueryTableBodyItem[])
-          : body
-        ).map((row, rowIndex) => (
-          <TableRow key={rowIndex}>
-            {(loading ? skeletonColumns : reducedHeader).map(
-              (head, colIndex) => (
-                <TableCell
-                  key={`${rowIndex}-${colIndex}`}
-                  sx={{
-                    py: 0,
-                    px: 1.5,
-                    borderRight: '1px solid #D0CEDA',
-                    borderBottom: '1px solid #D0CEDA',
-                    fontSize: 14,
-                    color: 'text.primary',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    maxWidth: 300,
-                    textAlign: colIndex === 0 ? 'center' : 'left',
-                  }}
-                >
-                  {loading ? (
-                    <Skeleton
-                      animation="wave"
-                      width={bodySkeletonWidths[rowIndex]?.[colIndex]}
-                    />
-                  ) : colIndex === 0 ? (
-                    rowIndex + 1
-                  ) : (
-                    row[head.columnKey as keyof typeof row] || '-'
-                  )}
-                </TableCell>
-              ),
-            )}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  ) : (
-    <Stack
-      sx={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Icon component={ICON_NO_RESULT} sx={{ width: 120, height: 93 }} />
-      <Typography
-        sx={{ mt: 1, fontSize: 14, fontWeight: 600, color: 'text.secondary' }}
-      >
-        No matching results
-      </Typography>
-      <Typography sx={{ fontSize: 14, color: 'text.secondary' }}>
-        Try adjusting your filters or search terms.
-      </Typography>
-    </Stack>
+              <Icon component={ICON_LOCK} sx={{ width: 24, height: 24 }} />
+            </Stack>
+
+            <Typography
+              sx={{
+                fontSize: 12,
+                textAlign: 'center',
+                color: 'text.secondary',
+              }}
+            >
+              Use credits to unlock details
+            </Typography>
+          </Stack>
+        </Stack>
+      )}
+    </Box>
   );
 };

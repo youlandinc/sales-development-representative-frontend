@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import {
   Autocomplete,
   AutocompleteChangeReason,
@@ -110,6 +110,27 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     },
     [freeSolo, isAuth, multiple, value],
   );
+
+  // When static options are filtered to empty in non-freeSolo mode,
+  // pass empty options array to trigger MUI's noOptionsText
+  const displayOptions = useMemo(() => {
+    // Only check for static-only mode (no URL)
+    if (url || !open || loading || freeSolo) {
+      return options;
+    }
+    // Check if input would filter all options out
+    if (options.length > 0 && inputValue) {
+      const filtered = createFilterOptions<AutoCompleteOption>()(options, {
+        inputValue,
+        getOptionLabel: (opt) => opt.label,
+      });
+      if (filtered.length === 0) {
+        // Return empty array to trigger noOptionsText
+        return [];
+      }
+    }
+    return options;
+  }, [url, open, loading, freeSolo, options, inputValue]);
 
   const onChangeToHandleSelection = useCallback(
     (
@@ -257,7 +278,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
         },
         '& .MuiInputBase-input': {
           padding: '0 !important',
-          paddingRight: '56px !important',
+          paddingRight: '64px !important',
           minHeight: '24px',
           fontSize: '12px',
           overflow: 'hidden',

@@ -11,7 +11,6 @@ interface QueryCollapseProps {
   defaultOpen?: boolean;
   filterCount?: number;
   isAuth: boolean;
-  planName: string;
 }
 
 export const QueryCollapse: FC<QueryCollapseProps> = ({

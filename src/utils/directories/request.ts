@@ -17,6 +17,9 @@ export type DirectoriesFormValues = {
   // Hierarchical config only (CAPITAL_MARKETS only)
   institutionType?: string;
   entityType?: string;
+  // Additional details authorization
+  // When false, B (additional details) changes are ignored
+  additionalIsAuth?: boolean;
 };
 
 // ============================================

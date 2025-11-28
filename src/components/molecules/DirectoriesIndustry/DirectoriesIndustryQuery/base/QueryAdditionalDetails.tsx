@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { Divider, Skeleton, Stack, Typography } from '@mui/material';
+import { useShallow } from 'zustand/react/shallow';
+
+import { UTypeOf } from '@/utils/UTypeOf';
 
 import { useDirectoriesStore } from '@/stores/directories';
-import { useShallow } from 'zustand/react/shallow';
-import { UTypeOf } from '@/utils/UTypeOf';
 import {
   DirectoriesQueryActionTypeEnum,
   DirectoriesQueryItem,
@@ -79,18 +80,22 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
       }
 
       if (item.children && item.children.length > 0) {
+        // When isAuth=false: always expand children, but disabled
+        const shouldShowChildren = !isAuth || isChecked || indeterminate;
+
         return (
           <Stack key={itemKey || item.label} sx={{ gap: 1 }}>
             <StyledCheckbox
-              checked={isChecked}
-              indeterminate={indeterminate}
+              checked={!isAuth || isChecked}
+              disabled={!isAuth}
+              indeterminate={isAuth && indeterminate}
               label={item.subLabel || item.label || ''}
               onChange={(_, checked) => {
                 updateAdditionalSelection(itemKey, checked, item);
               }}
             />
 
-            {(isChecked || indeterminate) && (
+            {shouldShowChildren && (
               <Stack sx={{ pl: 3, gap: 1 }}>
                 {item.children.map((child) => renderItem(child))}
               </Stack>
@@ -107,7 +112,8 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
       return (
         <Stack key={itemKey}>
           <StyledCheckbox
-            checked={isChecked}
+            checked={!isAuth || isChecked}
+            disabled={!isAuth}
             label={item.subLabel || item.label || ''}
             onChange={(_, checked) => {
               updateAdditionalSelection(itemKey, checked, item);

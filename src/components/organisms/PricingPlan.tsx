@@ -1,25 +1,24 @@
-import { Box, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
+'use client';
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import { Box, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import useSWR from 'swr';
 
 import { SDRToast } from '@/components/atoms';
 import { PricingPlanCard } from '@/components/molecules';
 
+import { _fetchAllPlan } from '@/request/pricingPlan';
 import { getParamsFromUrl } from '@/utils';
 
-import { _fetchAllPlan } from '@/request/pricingPlan';
-
 export const PricingPlan = () => {
-  const { bizId } = getParamsFromUrl(location.href);
   const [planType, setPlanType] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [paymentType, setPaymentType] = useState<string>('MONTH');
+
   const { data, isLoading } = useSWR(
     'pricing-plan',
     async () => {
       try {
-        const res = await _fetchAllPlan();
-        return res;
+        return await _fetchAllPlan();
       } catch (err) {
         const { message, header, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -32,6 +31,8 @@ export const PricingPlan = () => {
     if (!data?.data) {
       return;
     }
+
+    const { bizId } = getParamsFromUrl(location.href);
 
     // 如果有 categoryEnum，找到包含该 category 的父级 planType
     if (bizId) {
@@ -52,7 +53,7 @@ export const PricingPlan = () => {
       setPlanType(firstPlanTypeKey);
       setCategory(firstCategory);
     }
-  }, [data, bizId]);
+  }, [data]);
 
   const onPlanTypeChange = (newValue: string) => {
     setPlanType(newValue);
