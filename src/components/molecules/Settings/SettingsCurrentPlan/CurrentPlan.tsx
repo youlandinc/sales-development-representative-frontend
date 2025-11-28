@@ -10,34 +10,36 @@ export const CurrentPlan: FC = () => {
     useCurrentPlan();
 
   return (
-    <Box
-      sx={{
-        border: '1px solid #E5E5E5',
-        borderRadius: 4,
-        p: 3,
-      }}
-    >
+    <Box>
       <Stack
         gap={3}
         sx={{
           width: 900,
         }}
       >
-        <Typography
+        <Stack
+          gap={3}
           sx={{
-            fontSize: 18,
-            fontWeight: 600,
-            lineHeight: 1.2,
+            border: '1px solid #E5E5E5',
+            borderRadius: 4,
+            p: 3,
           }}
         >
-          Current plan
-        </Typography>
-        <PlanList
-          isLoading={isLoading}
-          onCancelClick={handleCancelClick}
-          plans={plans}
-        />
-
+          <Typography
+            sx={{
+              fontSize: 18,
+              fontWeight: 600,
+              lineHeight: 1.2,
+            }}
+          >
+            Current plan
+          </Typography>
+          <PlanList
+            isLoading={isLoading}
+            onCancelClick={handleCancelClick}
+            plans={plans}
+          />
+        </Stack>
         <PaymentSetting />
 
         {cancelDialog.selectedPlan && (

@@ -212,9 +212,7 @@ export const PricingPlan = () => {
             direction="row"
             gap={3}
             sx={{
-              justifyContent: 'center',
               alignItems: 'flex-start',
-              mx: 'auto',
               flexWrap: 'wrap',
             }}
           >
