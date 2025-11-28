@@ -28,7 +28,7 @@ export const PaymentSetting: FC = () => {
       sx={{
         bgcolor: 'white',
         border: '1px solid #E5E5E5',
-        borderRadius: 2,
+        borderRadius: 4,
         p: 3,
         width: '100%',
       }}
