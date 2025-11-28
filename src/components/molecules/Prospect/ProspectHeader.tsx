@@ -9,18 +9,10 @@ import {
   Typography,
 } from '@mui/material';
 import { ChangeEvent, FC, MouseEvent, useMemo, useState } from 'react';
-import { useRouter } from 'nextjs-toploader/app';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
-import { DialogCompanyType } from '@/components/molecules';
-
-import { useFindPeopleCompanyStore } from '@/stores/useFindPeopleCompanyStore';
-
-import { FindType } from '@/types';
 
 import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
-import ICON_FIND_COMPANIES from './assets/icon_find_companies.svg';
-import ICON_FIND_PEOPLE from './assets/icon_find_people.svg';
 import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
@@ -36,42 +28,9 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
   store,
   openDialog,
 }) => {
-  const router = useRouter();
-  const {
-    setFindType,
-    setDialogSourceFromOpen,
-    findType,
-    fetchSource,
-    fetchFiltersByType,
-  } = useFindPeopleCompanyStore((store) => store);
-
   const [value, setValue] = useState(store.searchWord);
 
   const sourceOptions = [
-    {
-      label: 'Find people',
-      icon: ICON_FIND_PEOPLE,
-      disabled: false,
-      onClick: () => {
-        setFindType(FindType.find_people);
-        setDialogSourceFromOpen(true);
-        // if (findType !== FindType.find_people) {
-        fetchSource();
-        // }
-      },
-    },
-    {
-      label: 'Find companies',
-      icon: ICON_FIND_COMPANIES,
-      disabled: false,
-      onClick: () => {
-        setFindType(FindType.find_company);
-        setDialogSourceFromOpen(true);
-        // if (findType !== FindType.find_company) {
-        fetchSource();
-        // }
-      },
-    },
     {
       label: 'Import from CSV',
       icon: ICON_IMPORT_CSV,
@@ -272,18 +231,6 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
           </Menu>
         </Stack>
       </Stack>
-
-      <DialogCompanyType
-        cb={() => {
-          if (findType === FindType.find_company) {
-            router.push('/find-companies');
-          }
-          if (findType === FindType.find_people) {
-            router.push('/find-people');
-          }
-          fetchFiltersByType();
-        }}
-      />
     </Stack>
   );
 };

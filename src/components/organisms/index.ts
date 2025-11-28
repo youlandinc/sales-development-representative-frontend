@@ -16,6 +16,4 @@ export * from './ContactsListsPage';
 export * from './ContactsCompaniesPage';
 export * from './ContactsPeoplePage';
 
-export * from './FindPeoplePage';
-export * from './FindCompaniesPage';
 export * from './PricingPlan';
