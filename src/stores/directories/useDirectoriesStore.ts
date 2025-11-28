@@ -7,6 +7,7 @@ import {
   additionalInit,
   configInitFormValues,
   configParse,
+  getAdditionalIsAuth,
 } from '@/utils/directories';
 import {
   DirectoriesBizIdEnum,
@@ -126,6 +127,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         institutionType: value,
         entityType: formValues?.entityType || '',
         formValues: formValues || {},
+        additionalIsAuth: getAdditionalIsAuth(queryConfig),
       });
     },
 
@@ -135,6 +137,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         institutionType,
         formValuesByInstitutionType,
         bizId,
+        queryConfig,
       } = get();
 
       let updatedFormValues: Record<string, any>;
@@ -205,6 +208,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           institutionType,
           entityType: updatedFormValues.entityType || '',
           formValues: updatedFormValues,
+          additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
       } else {
         // Flat config: store directly
@@ -213,6 +217,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         directoriesDataFlow.updateFormValues({
           bizId,
           formValues: updatedFormValues,
+          additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
       }
     },
@@ -266,6 +271,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
             institutionType: firstKey,
             entityType: currentFormValues?.entityType || '',
             formValues: currentFormValues || {},
+            additionalIsAuth: getAdditionalIsAuth(queryConfig),
           });
         } else {
           // Flat config: store directly
@@ -285,6 +291,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           directoriesDataFlow.updateFormValues({
             bizId,
             formValues: currentFormValues || {},
+            additionalIsAuth: getAdditionalIsAuth(queryConfig),
           });
         }
 

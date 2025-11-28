@@ -1,5 +1,3 @@
-import { isNumber, isString } from 'lodash-es';
-
 export const UGetRoundedCanvas = (
   sourceCanvas: HTMLCanvasElement,
   xWidth?: number,
@@ -22,41 +20,6 @@ export const UGetRoundedCanvas = (
   context.beginPath();
   context.fill();
   return canvas;
-};
-
-export const computedFilterCount = (
-  t: (Option[] | boolean | string | number | undefined)[] = [],
-) =>
-  t.reduce(
-    (pre, cur) =>
-      cur == null || cur === 0 || cur === ''
-        ? pre
-        : Array.isArray(cur)
-          ? (pre as number) + cur.length
-          : cur === !0 || isNumber(cur) || isString(cur)
-            ? (pre as number) + 1
-            : pre,
-    0,
-  ) as number;
-
-export const handleParam = (param: Record<string, any>) => {
-  return Object.entries(param).reduce(
-    (pre, [key, value]) => {
-      // Always include tableInclude if it exists in queryConditions
-      // Don't skip even if both tableId and keywords are empty
-      // This allows clearing the filter properly
-
-      if (Array.isArray(value)) {
-        pre[key] = value.map((item) =>
-          typeof item === 'string' ? item : item.value,
-        );
-        return pre;
-      }
-      pre[key] = value;
-      return pre;
-    },
-    {} as Record<string, any>,
-  );
 };
 
 export const getParamsFromUrl = (url: string): Record<string, string> => {

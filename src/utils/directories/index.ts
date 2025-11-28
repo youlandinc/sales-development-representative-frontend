@@ -1,6 +1,6 @@
 export { getDirectoriesBizId } from './config';
 
-export { configParse, configInitFormValues } from './config';
+export { configParse, configInitFormValues, getAdditionalIsAuth } from './config';
 
 export { additionalInit, additionalCollectKeys } from './additional';
 

@@ -257,7 +257,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
         },
         '& .MuiInputBase-input': {
           padding: '0 !important',
-          paddingRight: '56px !important',
+          paddingRight: '64px !important',
           minHeight: '24px',
           fontSize: '12px',
           overflow: 'hidden',

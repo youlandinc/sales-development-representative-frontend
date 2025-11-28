@@ -1,6 +1,8 @@
 import { FC } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { Icon, Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
+
+import ICON_BACK from './assets/icon-back.svg';
 
 interface QueryBreadcrumbsProps {
   current: string;
@@ -17,24 +19,37 @@ export const QueryBreadcrumbs: FC<QueryBreadcrumbsProps> = ({ current }) => {
           fontSize: 12,
         }}
       >
-        <Typography
-          onClick={() => router.push('/directories')}
+        <Stack
           sx={{
+            flexDirection: 'row',
+            gap: 0.5,
             fontSize: 12,
-            color: 'text.focus',
+            alignItems: 'center',
             cursor: 'pointer',
             '&:hover': {
-              textDecorationLine: 'underline',
-              textDecorationStyle: 'solid',
-              textDecorationSkipInk: 'none',
-              textDecorationThickness: 'auto',
-              textUnderlineOffset: 'auto',
-              textUnderlinePosition: 'from-font',
+              '& > .previous': {
+                textDecorationLine: 'underline',
+                textDecorationStyle: 'solid',
+                textDecorationSkipInk: 'none',
+                textDecorationThickness: 'auto',
+                textUnderlineOffset: 'auto',
+                textUnderlinePosition: 'from-font',
+              },
             },
           }}
         >
-          Directory
-        </Typography>
+          <Icon component={ICON_BACK} sx={{ width: 12, height: 12 }} />
+          <Typography
+            className={'previous'}
+            onClick={() => router.push('/directories')}
+            sx={{
+              fontSize: 12,
+              color: 'text.focus',
+            }}
+          >
+            Directory
+          </Typography>
+        </Stack>
         /
         <Typography
           sx={{

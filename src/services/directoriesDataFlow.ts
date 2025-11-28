@@ -234,6 +234,7 @@ class DirectoriesDataFlow {
   // 1. switchMap: Resubscribe when A changes to avoid incorrect combination of old B + new A
   // 2. combineLatest: Inner observer monitors B and loading, can be triggered by manual B edits
   // 3. filter: Block when loading=true or formValuesKey mismatch
+  // 4. When additionalIsAuth=false: Ignore B changes, only use A
   public finalData$ = this.formValuesDebounced$.pipe(
     switchMap((formData) => {
       // Validate required fields
@@ -246,6 +247,11 @@ class DirectoriesDataFlow {
         if (!formData.institutionType || !formData.entityType) {
           return EMPTY;
         }
+      }
+
+      // When additionalIsAuth=false, ignore B changes - only use A
+      if (formData.additionalIsAuth === false) {
+        return of(buildFinalData(formData, []));
       }
 
       // Capture current A's key for matching with B

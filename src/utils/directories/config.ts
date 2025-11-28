@@ -194,3 +194,34 @@ const collectFormKeys = (
     });
   }
 };
+
+/**
+ * Get additionalIsAuth from queryConfig
+ * Returns true if ADDITIONAL_DETAILS config has isAuth=true or not found
+ */
+export const getAdditionalIsAuth = (
+  queryConfig: DirectoriesQueryItem[],
+): boolean => {
+  const findAdditionalDetails = (
+    configs: DirectoriesQueryItem[],
+  ): DirectoriesQueryItem | undefined => {
+    for (const config of configs) {
+      if (
+        config.groupType === DirectoriesQueryGroupTypeEnum.additional_details
+      ) {
+        return config;
+      }
+      if (config.children?.length) {
+        const found = findAdditionalDetails(config.children);
+        if (found) {
+          return found;
+        }
+      }
+    }
+    return undefined;
+  };
+
+  const additionalConfig = findAdditionalDetails(queryConfig);
+  // Default to true if not found
+  return additionalConfig?.isAuth ?? true;
+};
