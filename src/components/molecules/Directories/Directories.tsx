@@ -98,7 +98,7 @@ export const Directories: FC = () => {
                   }
                   setClickedBizId(null);
                 }
-                router.push('/pricing');
+                router.push(`/pricing?bizId=${bizId}`);
               }}
             />
           ))}

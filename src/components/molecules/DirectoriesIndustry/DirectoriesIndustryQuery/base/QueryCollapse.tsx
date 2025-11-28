@@ -20,7 +20,6 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
   defaultOpen = true,
   filterCount = 0,
   isAuth,
-  planName,
 }) => {
   const [expanded, setExpanded] = useState(defaultOpen);
 

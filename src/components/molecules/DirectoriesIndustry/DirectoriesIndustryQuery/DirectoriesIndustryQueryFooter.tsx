@@ -76,6 +76,9 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
     planLimitRecordCount ?? 0,
   );
 
+  const [resetCredit, setResetCredit] = useState(0);
+  const [requestAmount, setRequestAmount] = useState(0);
+
   const onContinueToImport = async () => {
     if (isImporting || !requestParams) {
       return;
@@ -86,13 +89,13 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
 
       const { data } = await _importDirectoriesDataToTable(requestParams);
 
-      console.log(data);
-
-      //if (data.tableId) {
-      //  router.push(`/prospect-enrich/${data.tableId}`);
-      //}
-
-      // TODO: access not enough show dialog
+      if (data.tableId) {
+        router.push(`/prospect-enrich/${data.tableId}`);
+      } else {
+        setResetCredit(data?.remainingCredit || 0);
+        setRequestAmount(data?.actualNeedCredit || 0);
+        open();
+      }
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
@@ -101,7 +104,26 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
     }
   };
 
-  const onClickToConfirmContinue = () => {};
+  const [confirming, setConfirming] = useState(false);
+
+  const onClickToConfirmContinue = async () => {
+    if (isImporting || !requestParams || confirming) {
+      return;
+    }
+    setConfirming(true);
+    try {
+      const { data } = await _importDirectoriesDataToTable({
+        ...requestParams,
+        userRemainingImport: true,
+      });
+      router.push(`/prospect-enrich/${data.tableId}`);
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   return (
     <>
@@ -164,9 +186,9 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
                 color: 'text.secondary',
               }}
             >
-              Only {remainingCredits} of the {accessRecordCount} requested
-              records can be retrieved with your current balance.{' '}
-              {remainingCredits} tokens will be deducted.
+              Only {resetCredit} of the {requestAmount} requested records can be
+              retrieved with your current balance. {resetCredit} tokens will be
+              deducted.
             </Typography>
             <Typography
               sx={{
@@ -188,6 +210,8 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
               Cancel
             </StyledButton>
             <StyledButton
+              disabled={confirming}
+              loading={confirming}
               onClick={() => onClickToConfirmContinue()}
               size={'medium'}
             >
@@ -208,7 +232,12 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
             </Typography>
             <Icon
               component={ICON_CLOSE}
-              onClick={() => close()}
+              onClick={() => {
+                if (confirming) {
+                  return;
+                }
+                close();
+              }}
               sx={{
                 width: 24,
                 height: 24,
@@ -219,7 +248,12 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
             />
           </Stack>
         }
-        onClose={() => close()}
+        onClose={() => {
+          if (confirming) {
+            return;
+          }
+          close();
+        }}
         open={visible}
       />
     </>
