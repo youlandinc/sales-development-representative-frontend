@@ -1,4 +1,5 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { useSearchParams } from 'next/navigation';
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -8,6 +9,7 @@ import { PricingPlanCard } from '@/components/molecules';
 import { _fetchAllPlan } from '@/request/pricingPlan';
 
 export const PricingPlan = () => {
+  const bizId = useSearchParams().get('bizId');
   const [planType, setPlanType] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [paymentType, setPaymentType] = useState<string>('MONTH');
@@ -26,13 +28,30 @@ export const PricingPlan = () => {
   );
 
   useEffect(() => {
-    const firstPlanTypeKey = Object.keys(data?.data || {})[0];
-    const firstCategory = data?.data?.[firstPlanTypeKey]?.[0]?.category;
+    if (!data?.data) {
+      return;
+    }
+
+    // 如果有 categoryEnum，找到包含该 category 的父级 planType
+    if (bizId) {
+      const matchedPlanType = Object.keys(data.data).find((key) =>
+        data.data[key].some((item) => item.category === bizId),
+      );
+      if (matchedPlanType) {
+        setPlanType(matchedPlanType);
+        setCategory(bizId);
+        return;
+      }
+    }
+
+    // 默认逻辑：使用第一个 planType 和第一个 category
+    const firstPlanTypeKey = Object.keys(data.data)[0];
+    const firstCategory = data.data[firstPlanTypeKey]?.[0]?.category;
     if (firstPlanTypeKey && firstCategory) {
       setPlanType(firstPlanTypeKey);
       setCategory(firstCategory);
     }
-  }, [data]);
+  }, [data, bizId]);
 
   const onPlanTypeChange = (newValue: string) => {
     setPlanType(newValue);
