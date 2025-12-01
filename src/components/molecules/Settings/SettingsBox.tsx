@@ -14,7 +14,14 @@ export const SettingsBox = ({
   children,
 }: SettingsBoxProps) => {
   return (
-    <Stack border={'1px solid #DFDEE6'} borderRadius={4} gap={1.5} p={3}>
+    <Stack
+      border={'1px solid #DFDEE6'}
+      borderRadius={4}
+      gap={1.5}
+      maxWidth={900}
+      p={3}
+      width={'100%'}
+    >
       <Stack component={'form'} gap={'12px'} maxWidth={'900px'}>
         <Stack
           alignItems="center"

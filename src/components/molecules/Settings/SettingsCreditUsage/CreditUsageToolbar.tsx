@@ -117,6 +117,9 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
           }}
           sxList={{
             '& .MuiMenuItem-root:hover': {
+              bgcolor: '#F8F8FA !important',
+            },
+            '& .Mui-selected:hover': {
               bgcolor: '#EAE9EF !important',
             },
           }}
@@ -185,18 +188,18 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
         }}
         sx={{ width: 320 }}
         sxList={{
-          '& .MuiMenuItem-root:hover': {
-            bgcolor: '#EAE9EF !important',
-          },
           '& .MuiMenuItem-root': {
             py: '8px',
             px: 1.5,
             lineHeight: 1.5,
             borderRadius: 2,
           },
-          // '& .Mui-selected': {
-          //   bgcolor: '#EAE9EF !important',
-          // },
+          '& .MuiMenuItem-root:hover': {
+            bgcolor: '#F8F8FA !important',
+          },
+          '& .Mui-selected:hover': {
+            bgcolor: '#EAE9EF !important',
+          },
         }}
         value={value.dateType}
       />

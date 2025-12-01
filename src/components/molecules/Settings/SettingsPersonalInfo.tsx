@@ -193,7 +193,6 @@ export const SettingsPersonalInfo: FC = () => {
                 First name
               </Typography>
               <StyledTextField
-                label={'First name'}
                 onChange={(e) => setFirstNameText(e.target.value.trim())}
                 value={firstNameText}
               />
@@ -209,7 +208,6 @@ export const SettingsPersonalInfo: FC = () => {
                 Last name
               </Typography>
               <StyledTextField
-                label={'Last name'}
                 onChange={(e) => setLastNameText(e.target.value.trim())}
                 value={lastNameText}
               />

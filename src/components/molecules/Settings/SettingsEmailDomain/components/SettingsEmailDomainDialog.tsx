@@ -327,10 +327,8 @@ export const SettingsEmailDomainDialog = ({
             id={`account-custom-payment-link-email-button-confirm-${activeStep}`}
             loading={stepButtonLoading}
             onClick={onClickContinue}
-            size={'small'}
             sx={{
               width: '84px',
-              height: '40px !important',
               backgroundColor: '#6E4EFB',
             }}
             variant={'contained'}
@@ -345,10 +343,8 @@ export const SettingsEmailDomainDialog = ({
             id={`account-custom-payment-link-email-button-confirm-${activeStep}`}
             loading={stepButtonLoading}
             onClick={() => onClickVerify(domain)}
-            size={'small'}
             sx={{
               width: '63px',
-              height: '40px !important',
               backgroundColor: '#6E4EFB',
             }}
             variant={'contained'}
@@ -363,10 +359,8 @@ export const SettingsEmailDomainDialog = ({
             id={`account-custom-payment-link-email-button-confirm-${activeStep}`}
             loading={stepButtonLoading}
             onClick={() => onClickSave(domain)}
-            size={'small'}
             sx={{
               width: '58px',
-              height: '40px !important',
               backgroundColor: '#6E4EFB',
             }}
             variant={'contained'}
@@ -400,9 +394,7 @@ export const SettingsEmailDomainDialog = ({
           <StyledButton
             id={`account-custom-payment-link-email-button-cancel-${activeStep}`}
             onClick={onCancelDialog}
-            size={'small'}
             sx={{
-              height: '40px !important',
               color: '#1E1645',
               borderColor: '#DFDEE6 !important',
             }}

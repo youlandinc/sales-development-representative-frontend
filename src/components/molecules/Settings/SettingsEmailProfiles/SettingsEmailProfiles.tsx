@@ -150,7 +150,7 @@ export const SettingsEmailProfiles: FC = () => {
         content={
           <Stack gap={3} pt={3}>
             <StyledTooltipLabel
-              label={'Signature name'}
+              label={'Sender name'}
               tooltip={
                 "The name that appears in recipients' inboxes. Use your real name or a consistent team identity (e.g., Alex from Marketing or Customer Success Team)."
               }
@@ -256,8 +256,7 @@ export const SettingsEmailProfiles: FC = () => {
             </StyledButton>
           </Stack>
         }
-        header={'Email signature'}
-        onClose={close}
+        header={'Create email profile'}
         open={visible}
         slotProps={{
           paper: {

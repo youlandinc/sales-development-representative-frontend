@@ -25,7 +25,7 @@ export const StyledButton: FC<StyledButtonProps> = ({
   variant = 'contained',
   children,
   color = 'primary',
-  size = 'large',
+  size = 'medium',
   ...rest
 }) => {
   return (

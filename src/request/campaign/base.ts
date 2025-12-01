@@ -26,7 +26,7 @@ export const _renameCampaign = (params: {
 
 export const _fetchEnrichmentTableOptions = (tableId: string) => {
   return get<{ fieldName: string; fieldId: string }[]>(
-    `/sdr/table/${tableId}/fields`,
+    `/sdr/table/field/${tableId}`,
   );
 };
 

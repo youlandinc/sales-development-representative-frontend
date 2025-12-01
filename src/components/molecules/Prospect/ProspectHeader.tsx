@@ -151,14 +151,11 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
             aria-controls={open ? 'basic-menu' : undefined}
             aria-expanded={open ? 'true' : undefined}
             aria-haspopup="true"
+            color={'primary'}
             id="basic-button"
             onClick={onMenuOpen}
             size={'small'}
-            sx={{
-              bgcolor: 'text.primary',
-              color: '#FFFFFF !important',
-            }}
-            variant={'outlined'}
+            variant={'contained'}
           >
             <Icon
               component={ICON_NEW_TABLE}

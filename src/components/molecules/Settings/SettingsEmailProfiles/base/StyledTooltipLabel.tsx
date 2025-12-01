@@ -12,11 +12,16 @@ export const StyledTooltipLabel: FC<
   PropsWithChildren<StyledTooltipLabelProps>
 > = ({ label, tooltip, children, ...props }) => {
   return (
-    <Stack gap={1.5} {...props}>
-      <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
-        <Typography>{label}</Typography>
+    <Stack gap={0.5} {...props}>
+      <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+        <Typography fontSize={14} lineHeight={1.4}>
+          {label}
+        </Typography>
         <Tooltip title={tooltip}>
-          <Icon component={ICON_INFO} sx={{ width: 16, height: 16 }} />
+          <Icon
+            component={ICON_INFO}
+            sx={{ width: 12, height: 12, '& path': { fill: '#6F6C7D' } }}
+          />
         </Tooltip>
       </Stack>
       {children}

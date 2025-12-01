@@ -52,7 +52,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
 
   return (
     <Box
-      minHeight={400}
       sx={{
         '& .tox-promotion': { display: 'none' },
         '& .tox-tinymce': {
@@ -125,7 +124,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
             'searchreplace',
             'table',
             'visualblocks',
-            'wordcount',
             'image',
             // Your account includes a free trial of TinyMCE premium features
             // Try the most popular premium features until Nov 6, 2025:

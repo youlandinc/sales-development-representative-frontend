@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { Icon, Stack, Tooltip, Typography } from '@mui/material';
 
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import {
@@ -7,7 +7,6 @@ import {
   StyledDialog,
   StyledSelect,
   StyledTextField,
-  StyledTooltip,
 } from '@/components/atoms';
 import { EmailDomainState } from '@/types';
 
@@ -54,7 +53,7 @@ export const SettingsDialog = ({
 
   const renderContent = useMemo(() => {
     return (
-      <Stack gap={1}>
+      <Stack gap={0.5}>
         <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
           <Stack
             alignItems={'center'}
@@ -62,16 +61,15 @@ export const SettingsDialog = ({
             flexDirection={'row'}
             gap={'2px'}
           >
-            <Typography color="#202939" fontSize={16} lineHeight={1.5}>
+            <Typography color="#202939" fontSize={14} lineHeight={1.5}>
               Mailbox prefix
             </Typography>
-            <StyledTooltip
-              mode="hover"
-              theme="darker"
-              title="The first part of the email address before the “@” (e.g., john in john@yourdomain.com). Each mailbox must be tied to a verified domain (from the step above)."
-            >
-              <Icon component={ICON_INFO} sx={{ width: 20, height: 20 }} />
-            </StyledTooltip>
+            <Tooltip title="The first part of the email address before the “@” (e.g., john in john@yourdomain.com). Each mailbox must be tied to a verified domain (from the step above).">
+              <Icon
+                component={ICON_INFO}
+                sx={{ width: 12, height: 12, '& path': { fill: '#6F6C7D' } }}
+              />
+            </Tooltip>
           </Stack>
           <Typography width={15} />
           <Stack
@@ -80,22 +78,25 @@ export const SettingsDialog = ({
             flexDirection={'row'}
             gap={'2px'}
           >
-            <Typography color="#202939" fontSize={16} lineHeight={1.5}>
+            <Typography color="#202939" fontSize={14} lineHeight={1.5}>
               Domain
             </Typography>
-            <StyledTooltip
-              mode="hover"
-              theme="darker"
-              title="The domain after the “@” (e.g., yourdomain.com). Only domains verified in the previous step will appear here."
-            >
-              <Icon component={ICON_INFO} sx={{ width: 20, height: 20 }} />
-            </StyledTooltip>
+            <Tooltip title="The domain after the “@” (e.g., yourdomain.com). Only domains verified in the previous step will appear here.">
+              <Icon
+                component={ICON_INFO}
+                sx={{
+                  width: 12,
+                  height: 12,
+                  '& path': { fill: '#6F6C7D' },
+                }}
+              />
+            </Tooltip>
           </Stack>
         </Stack>
         <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
           <StyledTextField
             disabled={saveLoading}
-            label={'Mailbox prefix'}
+            label={''}
             onChange={(e) => setMailboxPrefix(e.target.value)}
             placeholder={'Mailbox prefix'}
             value={mailboxPrefix}
@@ -105,7 +106,6 @@ export const SettingsDialog = ({
           </Typography>
           <StyledSelect
             disabled={saveLoading}
-            label={'Domain'}
             onChange={(e) => setDomain(e.target.value as string)}
             options={domainOptions}
             value={domain}
@@ -136,7 +136,6 @@ export const SettingsDialog = ({
         >
           <StyledButton
             onClick={onCancelDialog}
-            size={'small'}
             sx={{
               height: '40px !important',
               color: '#1E1645',
@@ -150,7 +149,6 @@ export const SettingsDialog = ({
             disabled={saveDisabled}
             loading={saveLoading}
             onClick={onClickSave}
-            size={'small'}
             sx={{
               width: '57px',
               height: '40px !important',
