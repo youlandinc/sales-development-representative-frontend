@@ -79,7 +79,6 @@ export const SettingsContent = ({
             width={180}
           >
             <Typography
-              color={'#6E4EFB'}
               fontWeight={400}
               mr={'10px'}
               onClick={() => {
