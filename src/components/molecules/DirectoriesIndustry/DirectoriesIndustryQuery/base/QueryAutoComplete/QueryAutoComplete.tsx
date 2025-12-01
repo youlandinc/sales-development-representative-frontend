@@ -213,7 +213,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           clearIcon={
             <Icon
               component={ICON_CLOSE}
-              sx={{ width: 16, height: 16, cursor: 'pointer' }}
+              sx={{ width: 14, height: 14, cursor: 'pointer' }}
             />
           }
           disableCloseOnSelect={multiple}
@@ -236,7 +236,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           open={open}
           options={options}
           popupIcon={
-            <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
+            <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
           }
           renderInput={(params) => (
             <StyledTextField

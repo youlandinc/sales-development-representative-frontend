@@ -7,17 +7,16 @@ import { useShallow } from 'zustand/react/shallow';
 import { PreviewSummary, PreviewTable } from './index';
 
 export const DirectoriesIndustryPreview: FC = () => {
-  const { previewHeader, previewBody, isLoadingPreview, hasSubmittedSearch } =
+  const { previewBody, isLoadingPreview, hasSubmittedSearch } =
     useDirectoriesStore(
       useShallow((state) => ({
-        previewHeader: state.previewHeader,
         previewBody: state.previewBody,
         isLoadingPreview: state.isLoadingPreview,
         hasSubmittedSearch: state.hasSubmittedSearch,
       })),
     );
 
-  const { findCount, findList, maxImportCount } = previewBody;
+  const { findCount, maxImportCount } = previewBody;
 
   const isShowResult =
     isLoadingPreview || (hasSubmittedSearch && findCount > 0);
@@ -31,12 +30,7 @@ export const DirectoriesIndustryPreview: FC = () => {
         totalCount={findCount}
       />
       <Stack sx={{ flex: 1, overflowX: 'auto', overflowY: 'auto' }}>
-        <PreviewTable
-          body={findList}
-          header={previewHeader}
-          isShowResult={isShowResult}
-          loading={isLoadingPreview}
-        />
+        <PreviewTable />
       </Stack>
     </Stack>
   );

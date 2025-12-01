@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { CircularProgress, Stack, Typography } from '@mui/material';
+import { CircularProgress, Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
 

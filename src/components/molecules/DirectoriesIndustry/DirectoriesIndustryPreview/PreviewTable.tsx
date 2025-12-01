@@ -1,4 +1,5 @@
 import { FC, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import {
   Box,
   Icon,
@@ -12,15 +13,12 @@ import {
   Typography,
 } from '@mui/material';
 
+import { useDirectoriesStore } from '@/stores/directories';
 import { TableColumnTypeEnum } from '@/types/Prospect/table';
 import {
   DirectoriesQueryTableBodyItem,
   DirectoriesQueryTableHeaderItem,
 } from '@/types/directories';
-
-import ICON_LOCK from './assets/icon-lock.svg';
-import ICON_NO_RESULT from './assets/icon-no-result.svg';
-import ICON_REDIRECT_URL from './assets/icon-redirect-url.svg';
 
 import { OverflowTooltip } from './OverflowTooltip';
 import { COLUMN_TYPE_ICONS } from '@/constants';
@@ -31,7 +29,9 @@ import {
   UFormatPhone,
 } from '@/utils';
 
-const getRandomWidth = () => `${Math.floor(Math.random() * 50 + 40)}%`;
+import ICON_LOCK from './assets/icon-lock.svg';
+import ICON_NO_RESULT from './assets/icon-no-result.svg';
+import ICON_REDIRECT_URL from './assets/icon-redirect-url.svg';
 
 const formatCellValue = (
   value: unknown,
@@ -76,27 +76,47 @@ const FALLBACK_SKELETON_COLUMNS: DirectoriesQueryTableHeaderItem[] = [
   })),
 ];
 
-// Pre-generated stable widths to avoid skeleton flickering
-const STABLE_HEADER_WIDTHS = Array.from({ length: 10 }, () => getRandomWidth());
-const STABLE_BODY_WIDTHS = Array.from({ length: 20 }, () =>
-  Array.from({ length: 10 }, () => getRandomWidth()),
+const FIXED_WIDTHS = [
+  '65%',
+  '80%',
+  '45%',
+  '70%',
+  '55%',
+  '75%',
+  '60%',
+  '85%',
+  '50%',
+  '72%',
+];
+const STABLE_HEADER_WIDTHS = FIXED_WIDTHS;
+const STABLE_BODY_WIDTHS = Array.from({ length: 20 }, (_, rowIndex) =>
+  FIXED_WIDTHS.map(
+    (_, colIndex) => FIXED_WIDTHS[(rowIndex + colIndex) % FIXED_WIDTHS.length],
+  ),
 );
 
 const SKELETON_ROW_COUNT = 5;
 
-export interface PreviewTableProps {
-  header: DirectoriesQueryTableHeaderItem[];
-  body: DirectoriesQueryTableBodyItem[];
-  loading: boolean;
-  isShowResult: boolean;
-}
+export const PreviewTable: FC = () => {
+  const {
+    previewHeader: header,
+    previewBody,
+    isLoadingConfig,
+    isLoadingPreview,
+    hasSubmittedSearch,
+  } = useDirectoriesStore(
+    useShallow((state) => ({
+      previewHeader: state.previewHeader,
+      previewBody: state.previewBody,
+      isLoadingConfig: state.isLoadingConfig,
+      isLoadingPreview: state.isLoadingPreview,
+      hasSubmittedSearch: state.hasSubmittedSearch,
+    })),
+  );
 
-export const PreviewTable: FC<PreviewTableProps> = ({
-  header,
-  body,
-  loading,
-  isShowResult,
-}) => {
+  const { findCount, findList: body } = previewBody;
+  const isLoading = isLoadingPreview || isLoadingConfig || header.length === 0;
+
   const reducedHeader = useMemo((): DirectoriesQueryTableHeaderItem[] => {
     return [
       {
@@ -157,9 +177,9 @@ export const PreviewTable: FC<PreviewTableProps> = ({
     resizeObserver.observe(table);
 
     return () => resizeObserver.disconnect();
-  }, [reducedHeader, body, loading, hasLockedColumns]);
+  }, [reducedHeader, body, isLoading, hasLockedColumns]);
 
-  if (!isShowResult) {
+  if (!isLoading && hasSubmittedSearch && findCount === 0) {
     return (
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Icon component={ICON_NO_RESULT} sx={{ width: 120, height: 93 }} />
@@ -187,7 +207,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
         >
           <TableHead>
             <TableRow>
-              {(loading ? skeletonColumns : reducedHeader).map(
+              {(isLoading ? skeletonColumns : reducedHeader).map(
                 (head, index) => (
                   <TableCell
                     key={`header-${index}`}
@@ -195,8 +215,8 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                     sx={{
                       py: 0,
                       px: 1.5,
-                      borderTop: '1px solid #D0CEDA',
-                      borderRight: '1px solid #D0CEDA',
+                      borderTop: '1px solid #EAE9EF',
+                      borderRight: '1px solid #EAE9EF',
                       fontSize: 14,
                       fontWeight: 600,
                       color: 'primary.main',
@@ -206,7 +226,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                       ...(index === 0 && { textAlign: 'center' }),
                     }}
                   >
-                    {loading ? (
+                    {isLoading ? (
                       <Skeleton
                         animation="wave"
                         width={
@@ -243,16 +263,16 @@ export const PreviewTable: FC<PreviewTableProps> = ({
           </TableHead>
 
           <TableBody ref={bodyRef}>
-            {(loading && body.length === 0
+            {(isLoading && body.length === 0
               ? Array.from<DirectoriesQueryTableBodyItem | null>({
                   length: SKELETON_ROW_COUNT,
                 })
               : body
             ).map((row, rowIndex) => (
               <TableRow key={rowIndex}>
-                {(loading ? skeletonColumns : reducedHeader).map(
+                {(isLoading ? skeletonColumns : reducedHeader).map(
                   (head, colIndex) => {
-                    const isLocked = !head.isAuth && !loading;
+                    const isLocked = !head.isAuth && !isLoading;
 
                     return (
                       <TableCell
@@ -260,8 +280,8 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                         sx={{
                           py: 0,
                           px: 1.5,
-                          borderRight: '1px solid #D0CEDA',
-                          borderBottom: '1px solid #D0CEDA',
+                          borderRight: '1px solid #EAE9EF',
+                          borderBottom: '1px solid #EAE9EF',
                           fontSize: 14,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -270,7 +290,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                           ...(colIndex === 0 && { textAlign: 'center' }),
                         }}
                       >
-                        {loading ? (
+                        {isLoading ? (
                           <Skeleton
                             animation="wave"
                             width={

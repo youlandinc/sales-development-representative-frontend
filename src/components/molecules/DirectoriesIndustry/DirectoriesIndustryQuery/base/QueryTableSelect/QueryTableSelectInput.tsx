@@ -72,7 +72,7 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
           gap: 0.5,
           height: 32,
           borderRadius: 2,
-          border: '1px solid #E5E5E5',
+          border: '1px solid #DFDEE6',
           flexDirection: 'row',
           alignItems: 'center',
           flex: 1,

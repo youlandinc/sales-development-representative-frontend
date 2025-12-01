@@ -106,7 +106,7 @@ export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
 export const StyledTextField: FC<StyledTextFieldProps> = ({
   onChange,
   variant = 'outlined',
-  disabledAutoFill = true,
+  //disabledAutoFill = true,
   size = 'medium',
   sx,
   ...rest

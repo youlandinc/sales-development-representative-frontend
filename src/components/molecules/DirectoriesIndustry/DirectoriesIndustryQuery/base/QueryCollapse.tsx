@@ -83,7 +83,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                     e.preventDefault();
                     onClearFilters?.();
                   }}
-                  sx={{ width: 12, height: 12, cursor: 'pointer' }}
+                  sx={{ width: 14, height: 14, cursor: 'pointer' }}
                 />{' '}
                 {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}
               </Stack>
