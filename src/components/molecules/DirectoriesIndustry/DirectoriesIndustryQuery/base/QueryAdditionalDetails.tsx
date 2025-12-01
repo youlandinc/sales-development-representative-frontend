@@ -91,7 +91,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
                 updateAdditionalSelection(itemKey, checked, item);
               }}
               subLabel={item.subLabel || item.label || ''}
-              value={!isAuth || isChecked}
+              value={isChecked}
             />
 
             {shouldShowChildren && (
@@ -113,12 +113,12 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
       return (
         <Stack key={itemKey} sx={isLast ? { mb: 1 } : undefined}>
           <QueryCheckbox
-            disabled={!isAuth || isChecked}
+            disabled={!isAuth}
             onFormChange={(checked) => {
               updateAdditionalSelection(itemKey, checked, item);
             }}
             subLabel={item.subLabel || item.label || ''}
-            value={!isAuth || isChecked}
+            value={isChecked}
           />
         </Stack>
       );
