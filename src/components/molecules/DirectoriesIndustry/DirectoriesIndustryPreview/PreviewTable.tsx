@@ -48,8 +48,6 @@ const formatCellValue = (
       return UFormatDollar(value as string | number);
     case TableColumnTypeEnum.date:
       return UFormatDate(value as string | Date);
-    case TableColumnTypeEnum.phone:
-      return UFormatPhone(value as string);
     default:
       return String(value);
   }
@@ -324,23 +322,39 @@ export const PreviewTable: FC = () => {
                             >
                               <Icon
                                 component={ICON_REDIRECT_URL}
-                                sx={{ width: 16, height: 16, flexShrink: 0 }}
+                                sx={{
+                                  width: 16,
+                                  height: 16,
+                                  flexShrink: 0,
+                                  '& path': {
+                                    fill: 'rgba(111, 108, 125, .8)',
+                                  },
+                                }}
                               />
                               <Typography
                                 onClick={() => {
-                                  window.open(
-                                    row?.[head.columnKey as keyof typeof row],
-                                    '_blank',
-                                  );
+                                  const url =
+                                    row?.[head.columnKey as keyof typeof row];
+                                  if (!url) return;
+                                  const finalUrl =
+                                    url.startsWith('http://') ||
+                                    url.startsWith('https://')
+                                      ? url
+                                      : `https://${url}`;
+                                  window.open(finalUrl, '_blank');
                                 }}
                                 sx={{
                                   flex: 1,
+                                  color: 'rgba(111, 108, 125, .8)',
                                   minWidth: 0,
-                                  fontSize: 12,
+                                  fontSize: 14,
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
                                   textDecoration: 'underline',
                                   cursor: 'pointer',
+                                  textDecorationColor:
+                                    'rgba(111, 108, 125, .5)',
+                                  textUnderlineOffset: '2px',
                                 }}
                               >
                                 {row?.[head.columnKey as keyof typeof row]}
