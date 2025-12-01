@@ -33,7 +33,6 @@ export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
       borderWidth: '1px',
     },
   [`& .${inputBaseClasses.input}`]: {
-    // medium
     lineHeight: 1.5,
     height: 24,
     color: 'text.primary',
@@ -44,41 +43,62 @@ export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
     paddingBottom: '8px',
     fontSize: 14,
   },
-  //small
+  '&  legend': {
+    fontSize: 14 * 0.75,
+  },
+  //label
+  [`& .${inputLabelClasses.root}`]: {
+    transform: 'translate(14px, 8px) scale(1)',
+    fontSize: 14,
+    lineHeight: 24 / 14,
+  },
+
+  [`& .${inputLabelClasses.root}.Mui-focused`]: {
+    color: 'text.primary',
+  },
+  [`& .${inputLabelClasses.shrink}.${inputLabelClasses.sizeSmall}`]: {
+    transform: 'translate(14px, -7px) scale(0.75)',
+  },
+
+  //small - input
   '& .MuiInputBase-inputSizeSmall': {
     paddingTop: '6px',
     paddingBottom: '6px',
     height: '20px',
+    lineHeight: 20 / 12,
+    fontSize: 12,
   },
-  //large
+  //small - label
+  [`& .${inputLabelClasses.sizeSmall}`]: {
+    transform: 'translate(14px, 7px) scale(1)',
+    fontSize: 12,
+    lineHeight: 18 / 12,
+  },
+  //small - legend
+  '& .MuiInputBase-sizeSmall legend': {
+    fontSize: 12 * 0.75,
+  },
+
+  //large - input
   '& .MuiInputBase-sizeLarge .MuiInputBase-input': {
     paddingTop: '12px',
     paddingBottom: '12px',
     fontSize: 16,
   },
-  //label
-  [`& .${inputLabelClasses.root}`]: {
-    transform: 'translate(14px, 9px) scale(1)',
-    fontSize: 14,
-    lineHeight: 1.5,
-  },
-  [`& .${inputLabelClasses.root}.Mui-focused`]: {
-    color: 'text.primary',
-  },
-  //label - small
-  [`& .${inputLabelClasses.sizeSmall}`]: {
-    transform: 'translate(14px, 5px) scale(1)',
-    fontSize: 14,
-  },
-  //large
+  //large - label
   '& .MuiInputLabel-sizeLarge ': {
     transform: 'translate(14px, 12px) scale(1)',
     fontSize: 16,
-    lineHeight: 1.5,
+    lineHeight: 24 / 16,
   },
+  //large - legend
+  '& .MuiInputBase-sizeLarge legend': {
+    fontSize: 16 * 0.75,
+  },
+
   //label - shrink
   [`& .${inputLabelClasses.shrink}`]: {
-    transform: 'translate(14px, -8px) scale(0.75)',
+    transform: 'translate(14px, -9px) scale(0.75)',
     color: 'text.primary',
   },
 };
