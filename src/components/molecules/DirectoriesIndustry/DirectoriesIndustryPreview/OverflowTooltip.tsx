@@ -73,7 +73,7 @@ export const OverflowTooltip: FC<OverflowTooltipProps> = ({
   }
 
   return (
-    <Tooltip title={title ?? children} {...tooltipProps}>
+    <Tooltip arrow placement={'top'} title={title ?? children} {...tooltipProps}>
       {content}
     </Tooltip>
   );
