@@ -12,3 +12,5 @@ export * from './CommonSegmentsDrawer';
 export * from './CommonSelectWithAction';
 
 export * from './CommonSelectFieldType';
+
+export * from './CommonVerticalLabelContainer';

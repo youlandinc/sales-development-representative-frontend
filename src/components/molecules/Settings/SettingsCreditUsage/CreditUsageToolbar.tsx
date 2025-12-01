@@ -1,9 +1,10 @@
-import { ListSubheader, MenuItem, Stack, Typography } from '@mui/material';
+import { ListSubheader, MenuItem, Stack } from '@mui/material';
 import { format } from 'date-fns';
 import { FC, useState } from 'react';
 
 import { StyledSelect } from '@/components/atoms';
 import { DateRangeDialog } from './DateRangeDialog';
+import { CommonVerticalLabelContainer } from '@/components/molecules/Common';
 
 import { PlanCategoryEnum } from '@/types';
 import {
@@ -42,10 +43,11 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
       direction={'row'}
       justifyContent={'space-between'}
     >
-      <Stack sx={{ width: 320, gap: 0.5 }}>
-        <Typography sx={{ fontSize: 14, color: '#363440', mb: 0.5 }}>
-          Usage type
-        </Typography>
+      <CommonVerticalLabelContainer
+        hasIcon={false}
+        label={'Usage type'}
+        maxWidth={320}
+      >
         <StyledSelect
           menuPaperSx={{
             px: 3,
@@ -125,7 +127,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
           }}
           value={value.category}
         />
-      </Stack>
+      </CommonVerticalLabelContainer>
 
       <StyledSelect
         menuPaperSx={{

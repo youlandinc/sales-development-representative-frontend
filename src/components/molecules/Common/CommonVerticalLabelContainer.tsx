@@ -1,56 +1,59 @@
-import { PropsWithChildren } from 'react';
-import { StackProps } from '@mui/material';
-import { FC } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
-import ICON_INFO from '@/components/molecules/Library/assets/icon_info.svg';
-import { Tooltip } from '@mui/material';
+import { FC, PropsWithChildren } from 'react';
+import { Icon, Stack, StackProps, Tooltip, Typography } from '@mui/material';
+
+import ICON_INFO from './assets/icon_info.svg';
+
+type SizeType = 'small' | 'medium' | 'large';
 
 interface CommonVerticalLabelContainerProps extends StackProps {
   label: string;
-  tooltip: string;
-  size?: 'small' | 'medium' | 'large';
+  tooltip?: string;
+  size?: SizeType;
+  iconFillColor?: string;
+  hasIcon?: boolean;
 }
 
-const STYLE_MAP = {
-  small: {
-    fontSize: 12,
-    lineHeight: 1.4,
-    gap: 0.5,
-  },
-  medium: {
-    fontSize: 14,
-    lineHeight: 1.4,
-    gap: 0.5,
-  },
-  large: {
-    fontSize: 16,
-    lineHeight: 1.4,
-    gap: 1,
-  },
+const STYLE_MAP: Record<
+  SizeType,
+  { fontSize: number; lineHeight: number; iconSize: number; gap: number }
+> = {
+  small: { fontSize: 12, lineHeight: 1.4, iconSize: 12, gap: 0.5 },
+  medium: { fontSize: 14, lineHeight: 1.4, iconSize: 12, gap: 0.5 },
+  large: { fontSize: 16, lineHeight: 1.4, iconSize: 12, gap: 1 },
 };
 
 export const CommonVerticalLabelContainer: FC<
   PropsWithChildren<CommonVerticalLabelContainerProps>
-> = ({ label, tooltip, size = 'medium', children, ...props }) => {
+> = ({
+  label,
+  tooltip,
+  size = 'medium',
+  children,
+  iconFillColor = '#6F6C7D',
+  hasIcon = true,
+  ...props
+}) => {
+  const styles = STYLE_MAP[size];
+  const shouldShowIcon = hasIcon && tooltip;
+
   return (
-    <Stack gap={STYLE_MAP[size].gap} {...props}>
-      <Stack
-        alignItems={'center'}
-        flexDirection={'row'}
-        gap={STYLE_MAP[size].gap}
-      >
-        <Typography
-          fontSize={STYLE_MAP[size].fontSize}
-          lineHeight={STYLE_MAP[size].lineHeight}
-        >
+    <Stack gap={styles.gap} width={'100%'} {...props}>
+      <Stack alignItems={'center'} flexDirection={'row'} gap={styles.gap}>
+        <Typography fontSize={styles.fontSize} lineHeight={styles.lineHeight}>
           {label}
         </Typography>
-        <Tooltip title={tooltip}>
-          <Icon
-            component={ICON_INFO}
-            sx={{ width: 12, height: 12, '& path': { fill: '#6F6C7D' } }}
-          />
-        </Tooltip>
+        {shouldShowIcon && (
+          <Tooltip title={tooltip}>
+            <Icon
+              component={ICON_INFO}
+              sx={{
+                width: styles.iconSize,
+                height: styles.iconSize,
+                '& path': { fill: iconFillColor },
+              }}
+            />
+          </Tooltip>
+        )}
       </Stack>
       {children}
     </Stack>

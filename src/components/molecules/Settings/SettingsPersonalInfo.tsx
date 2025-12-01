@@ -8,6 +8,7 @@ import { _modifyUserInfo, _userResetPassword } from '@/request';
 import GOOGLE_ICON from './assets/icon_google.svg';
 import EMAIL_ICON from './assets/icon_email.svg';
 import { HttpVariantEnum } from '@/types';
+import { CommonVerticalLabelContainer } from '@/components/molecules/Common';
 
 export const SettingsPersonalInfo: FC = () => {
   const { userProfile, setUserProfile } = useUserStore((state) => state);
@@ -182,36 +183,18 @@ export const SettingsPersonalInfo: FC = () => {
         </Stack>
         <Stack gap={1.5}>
           <Stack flexDirection={'row'} gap={3} maxWidth={900}>
-            <Stack flex={1} gap={'4px'}>
-              <Typography
-                color={'#202939'}
-                fontSize={14}
-                fontWeight={400}
-                lineHeight={1.5}
-                variant={'body2'}
-              >
-                First name
-              </Typography>
+            <CommonVerticalLabelContainer hasIcon={false} label={'First name'}>
               <StyledTextField
                 onChange={(e) => setFirstNameText(e.target.value.trim())}
                 value={firstNameText}
               />
-            </Stack>
-            <Stack flex={1} gap={'4px'}>
-              <Typography
-                color={'#202939'}
-                fontSize={14}
-                fontWeight={400}
-                lineHeight={1.5}
-                variant={'body2'}
-              >
-                Last name
-              </Typography>
+            </CommonVerticalLabelContainer>
+            <CommonVerticalLabelContainer hasIcon={false} label={'Last name'}>
               <StyledTextField
                 onChange={(e) => setLastNameText(e.target.value.trim())}
                 value={lastNameText}
               />
-            </Stack>
+            </CommonVerticalLabelContainer>
           </Stack>
         </Stack>
       </Stack>

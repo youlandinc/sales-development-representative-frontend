@@ -11,7 +11,7 @@ import {
   StyledTextField,
 } from '@/components/atoms';
 import { SettingsBox } from '../SettingsBox';
-import { StyledTooltipLabel } from './base';
+import { CommonVerticalLabelContainer } from '@/components/molecules/Common';
 
 import { useEmailProfilesRequest } from './hooks';
 
@@ -149,7 +149,7 @@ export const SettingsEmailProfiles: FC = () => {
       <StyledDialog
         content={
           <Stack gap={3} pt={3}>
-            <StyledTooltipLabel
+            <CommonVerticalLabelContainer
               label={'Sender name'}
               tooltip={
                 "The name that appears in recipients' inboxes. Use your real name or a consistent team identity (e.g., Alex from Marketing or Customer Success Team)."
@@ -160,8 +160,8 @@ export const SettingsEmailProfiles: FC = () => {
                 placeholder={'Sender name (ex: Tim Cook)'}
                 value={name}
               />
-            </StyledTooltipLabel>
-            <StyledTooltipLabel
+            </CommonVerticalLabelContainer>
+            <CommonVerticalLabelContainer
               label={'Email signature'}
               tooltip={
                 'The closing block added to every email you send. Include details like your name, title, and contact info (e.g., “Best, Alex - Marketing Manager”).'
@@ -174,8 +174,8 @@ export const SettingsEmailProfiles: FC = () => {
                 placeholder={'Autosize height based on content lines'}
                 value={content}
               />
-            </StyledTooltipLabel>
-            <StyledTooltipLabel
+            </CommonVerticalLabelContainer>
+            <CommonVerticalLabelContainer
               label={'Connected mailboxes'}
               tooltip={
                 'The email addresses your messages will be sent from (e.g., outreach@company.com). These mailboxes will be linked to this email profile — any campaigns sent using this profile will use them to send emails.'
@@ -195,8 +195,8 @@ export const SettingsEmailProfiles: FC = () => {
                 options={mailboxes}
                 value={connectedMailboxes}
               />
-            </StyledTooltipLabel>
-            <StyledTooltipLabel
+            </CommonVerticalLabelContainer>
+            <CommonVerticalLabelContainer
               label={'Default mailbox'}
               tooltip={
                 'The primary email address used when sending from this profile. If rotation is off, all emails will send from this mailbox. If rotation is on, it serves as the fallback when others are paused or reach their limits.'
@@ -210,8 +210,8 @@ export const SettingsEmailProfiles: FC = () => {
                 options={connectedMailboxes}
                 value={defaultMailbox}
               />
-            </StyledTooltipLabel>
-            <StyledTooltipLabel
+            </CommonVerticalLabelContainer>
+            <CommonVerticalLabelContainer
               alignItems={'center'}
               flexDirection={'row'}
               label={'Mailbox rotation'}
@@ -225,7 +225,7 @@ export const SettingsEmailProfiles: FC = () => {
                   setRotationEnabled(e.target.checked);
                 }}
               />
-            </StyledTooltipLabel>
+            </CommonVerticalLabelContainer>
           </Stack>
         }
         footer={

@@ -11,6 +11,7 @@ import {
 import { EmailDomainState } from '@/types';
 
 import ICON_INFO from '../assets/icon_info.svg';
+import { CommonVerticalLabelContainer } from '@/components/molecules/Common';
 
 interface SettingsDialogProps {
   onCancelDialog: () => void;
@@ -53,64 +54,40 @@ export const SettingsDialog = ({
 
   const renderContent = useMemo(() => {
     return (
-      <Stack gap={0.5}>
-        <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
-          <Stack
-            alignItems={'center'}
-            flex={1}
-            flexDirection={'row'}
-            gap={'2px'}
-          >
-            <Typography color="#202939" fontSize={14} lineHeight={1.5}>
-              Mailbox prefix
-            </Typography>
-            <Tooltip title="The first part of the email address before the “@” (e.g., john in john@yourdomain.com). Each mailbox must be tied to a verified domain (from the step above).">
-              <Icon
-                component={ICON_INFO}
-                sx={{ width: 12, height: 12, '& path': { fill: '#6F6C7D' } }}
-              />
-            </Tooltip>
-          </Stack>
-          <Typography width={15} />
-          <Stack
-            alignItems={'center'}
-            flex={1}
-            flexDirection={'row'}
-            gap={'2px'}
-          >
-            <Typography color="#202939" fontSize={14} lineHeight={1.5}>
-              Domain
-            </Typography>
-            <Tooltip title="The domain after the “@” (e.g., yourdomain.com). Only domains verified in the previous step will appear here.">
-              <Icon
-                component={ICON_INFO}
-                sx={{
-                  width: 12,
-                  height: 12,
-                  '& path': { fill: '#6F6C7D' },
-                }}
-              />
-            </Tooltip>
-          </Stack>
-        </Stack>
-        <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
+      <Stack alignItems={'flex-end'} flexDirection={'row'} gap={1.5}>
+        <CommonVerticalLabelContainer
+          label="Mailbox prefix"
+          tooltip="The first part of the email address before the “@” (e.g., john in john@yourdomain.com). Each mailbox must be tied to a verified domain (from the step above)."
+        >
           <StyledTextField
             disabled={saveLoading}
+            fullWidth
             label={''}
             onChange={(e) => setMailboxPrefix(e.target.value)}
             placeholder={'Mailbox prefix'}
             value={mailboxPrefix}
           />
-          <Typography color="#363440" fontSize={16} lineHeight={1.5} width={15}>
-            @
-          </Typography>
+        </CommonVerticalLabelContainer>
+        <Typography
+          color="#363440"
+          fontSize={16}
+          lineHeight={'40px'}
+          width={15}
+        >
+          @
+        </Typography>
+        <CommonVerticalLabelContainer
+          label="Domain"
+          tooltip="The domain after the “@” (e.g., yourdomain.com). Only domains verified in the previous step will appear here."
+        >
           <StyledSelect
             disabled={saveLoading}
+            fullWidth
             onChange={(e) => setDomain(e.target.value as string)}
             options={domainOptions}
             value={domain}
           />
-        </Stack>
+        </CommonVerticalLabelContainer>
       </Stack>
     );
   }, [
