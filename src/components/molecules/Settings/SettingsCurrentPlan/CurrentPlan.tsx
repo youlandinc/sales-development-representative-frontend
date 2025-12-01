@@ -6,7 +6,7 @@ import { CancelSubscriptionDialog, PaymentSetting, PlanList } from './base';
 import { useCurrentPlan } from './hooks';
 
 export const CurrentPlan: FC = () => {
-  const { plans, isLoading, handleCancelClick, cancelDialog } =
+  const { plans, isLoading, onClickToCancelPlan, cancelDialog } =
     useCurrentPlan();
 
   return (
@@ -36,7 +36,7 @@ export const CurrentPlan: FC = () => {
           </Typography>
           <PlanList
             isLoading={isLoading}
-            onCancelClick={handleCancelClick}
+            onClickToCancelPlan={onClickToCancelPlan}
             plans={plans}
           />
         </Stack>

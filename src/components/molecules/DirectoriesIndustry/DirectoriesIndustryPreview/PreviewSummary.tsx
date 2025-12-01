@@ -15,7 +15,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
   isShowResult,
 }) => {
   return (
-    <Stack sx={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+    <Stack sx={{ flexDirection: 'row', alignItems: 'flex-end', px: 1.5 }}>
       <Typography
         sx={{
           color: 'text.focus',
@@ -23,7 +23,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
           lineHeight: 1.2,
         }}
       >
-        Preview leads
+        Preview records
       </Typography>
 
       {isShowResult && (
@@ -33,10 +33,9 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
             fontSize: 14,
             color: 'text.secondary',
             bgcolor: 'background.paper',
-            pl: 2,
           }}
         >
-          Previewing 25 of{' '}
+          Previewing {Math.min(totalCount, 25)} of{' '}
           <Box
             component="span"
             sx={{
@@ -46,7 +45,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
           >
             {totalCount.toLocaleString()}
           </Box>{' '}
-          results.{' '}
+          {totalCount === 1 ? 'record' : 'records'}.{' '}
           <Box
             component="span"
             sx={{

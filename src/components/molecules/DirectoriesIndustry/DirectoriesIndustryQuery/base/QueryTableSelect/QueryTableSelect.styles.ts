@@ -120,7 +120,7 @@ export const selectButtonSx: SxProps<Theme> = {
 };
 
 export const CONSTANTS = {
-  PLACEHOLDER_TEXT: 'Select company table',
+  PLACEHOLDER_TEXT: 'Select table',
   DIALOG_TITLE: 'Select table',
   BUTTON_TEXT: 'Select table',
   FILTER_TITLE: 'Company table',

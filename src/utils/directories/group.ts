@@ -1,23 +1,31 @@
 import { DirectoriesQueryItem } from '@/types/directories';
+import { UTypeOf } from '@/utils';
 
-const isValueFilled = (value: any): boolean => {
-  if (value == null) {
-    return false;
+const getValueCount = (value: unknown): number => {
+  if (UTypeOf.isNullish(value)) {
+    return 0;
   }
-  if (typeof value === 'string') {
-    return value.trim() !== '';
+
+  if (UTypeOf.isArray(value)) {
+    return value.length;
   }
-  if (typeof value === 'boolean') {
-    return value;
+
+  if (UTypeOf.isString(value)) {
+    return value.trim() === '' ? 0 : 1;
   }
-  if (Array.isArray(value)) {
-    return value.length > 0;
+
+  if (UTypeOf.isNumber(value) || UTypeOf.isBoolean(value)) {
+    return 1;
   }
-  if (typeof value === 'object') {
-    const values = Object.values(value);
-    return values.length > 0 && values.some((v) => isValueFilled(v));
+
+  if (UTypeOf.isObject(value)) {
+    return Object.values(value).reduce(
+      (sum: number, v) => sum + getValueCount(v),
+      0,
+    );
   }
-  return true;
+
+  return 1;
 };
 
 export const countFilledFieldsInGroup = (
@@ -40,11 +48,9 @@ export const countFilledFieldsInGroup = (
       return;
     }
 
-    // Check if this field has a value
+    // Count based on value type
     const value = formValues[item.key];
-    if (isValueFilled(value)) {
-      count++;
-    }
+    count += getValueCount(value);
 
     // Recursively check children
     if (item.children && item.children.length > 0) {

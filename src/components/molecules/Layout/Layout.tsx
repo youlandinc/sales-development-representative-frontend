@@ -46,7 +46,7 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children, contentSx }) => {
       }}
     >
       <LayoutHeader />
-      <Stack flexDirection={'row'} height={'calc(100% - 72px)'} width={'100%'}>
+      <Stack flexDirection={'row'} height={'calc(100% - 54px)'} width={'100%'}>
         <LayoutSide />
         <Stack
           sx={{

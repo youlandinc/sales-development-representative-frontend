@@ -32,7 +32,7 @@ const ICON_HASH: Record<ProspectTableEnum, any> = {
   [ProspectTableEnum.find_people]: ICON_PEOPLE,
   [ProspectTableEnum.find_companies]: ICON_COMPANY,
   [ProspectTableEnum.from_csv]: ICON_CSV,
-  [ProspectTableEnum.black_table]: ICON_FOLDER,
+  [ProspectTableEnum.blank_table]: ICON_FOLDER,
   [ProspectTableEnum.crm_list]: ICON_FOLDER,
   [ProspectTableEnum.agent]: ICON_FOLDER,
 };
@@ -87,9 +87,9 @@ export const QueryTableSelectInput: FC<FilterTableSelectInputProps> = ({
         >
           {selectedTableName || CONSTANTS.PLACEHOLDER_TEXT}
         </Typography>
-        {selectedTableName && (
-          <Stack flexDirection={'row'} gap={1.5} ml={'auto'}>
-            {isLoading ? (
+        <Stack flexDirection={'row'} gap={1.5} ml={'auto'}>
+          {selectedTableName ? (
+            isLoading ? (
               <CircularProgress size={16} sx={{ color: '#6F6C7D' }} />
             ) : (
               <>
@@ -104,9 +104,15 @@ export const QueryTableSelectInput: FC<FilterTableSelectInputProps> = ({
                   sx={closeIconSx}
                 />
               </>
-            )}
-          </Stack>
-        )}
+            )
+          ) : (
+            <Icon
+              component={ICON_FOLDER}
+              onClick={onOpenDialog}
+              sx={hoverableIconSx}
+            />
+          )}
+        </Stack>
       </Stack>
       {selectedTableName && (
         <>

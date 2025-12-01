@@ -23,7 +23,7 @@ export interface SelectedPlan {
 }
 
 export const useCurrentPlan = () => {
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SelectedPlan | null>(null);
   const planList = useCurrentPlanStore((state) => state.planList);
   const fetchCurrentPlan = useCurrentPlanStore(
@@ -63,14 +63,14 @@ export const useCurrentPlan = () => {
       };
     });
 
-  const [cancelState, handleConfirmCancellation] = useAsyncFn(async () => {
+  const [cancelState, onClickToConfirmCancellation] = useAsyncFn(async () => {
     if (!selectedPlan) {
       return;
     }
     try {
       await _cancelPlan(selectedPlan.planType);
       await fetchCurrentPlan();
-      setCancelDialogOpen(false);
+      setIsCancelDialogOpen(false);
       setSelectedPlan(null);
     } catch (e) {
       const { message, header, variant } = e as HttpError;
@@ -78,29 +78,29 @@ export const useCurrentPlan = () => {
     }
   }, [selectedPlan]);
 
-  const handleCancelClick = useCallback(
+  const onClickToCancelPlan = useCallback(
     (planName: string, planType: PlanTypeEnum, renewalDate?: string) => {
       setSelectedPlan({ planName, renewalDate: renewalDate ?? '', planType });
-      setCancelDialogOpen(true);
+      setIsCancelDialogOpen(true);
     },
     [],
   );
 
-  const handleCloseDialog = useCallback(() => {
-    setCancelDialogOpen(false);
+  const onClickToCloseDialog = useCallback(() => {
+    setIsCancelDialogOpen(false);
     setSelectedPlan(null);
   }, []);
 
   return {
     plans,
     isLoading,
-    handleCancelClick,
+    onClickToCancelPlan,
     cancelDialog: {
-      open: cancelDialogOpen,
+      open: isCancelDialogOpen,
       selectedPlan,
       loading: cancelState.loading,
-      onClose: handleCloseDialog,
-      onConfirm: handleConfirmCancellation,
+      onClose: onClickToCloseDialog,
+      onConfirm: onClickToConfirmCancellation,
     },
   };
 };

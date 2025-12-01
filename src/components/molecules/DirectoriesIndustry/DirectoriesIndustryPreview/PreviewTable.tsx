@@ -21,7 +21,38 @@ import {
 import ICON_LOCK from './assets/icon-lock.svg';
 import ICON_NO_RESULT from './assets/icon-no-result.svg';
 
+import { OverflowTooltip } from './OverflowTooltip';
+import { COLUMN_TYPE_ICONS } from '@/constants';
+import {
+  UFormatDate,
+  UFormatDollar,
+  UFormatNumber,
+  UFormatPhone,
+} from '@/utils';
+
 const getRandomWidth = () => `${Math.floor(Math.random() * 50 + 40)}%`;
+
+const formatCellValue = (
+  value: unknown,
+  columnType: TableColumnTypeEnum,
+): string => {
+  if (value == null || value === '') {
+    return '-';
+  }
+
+  switch (columnType) {
+    case TableColumnTypeEnum.number:
+      return UFormatNumber(value as string | number);
+    case TableColumnTypeEnum.currency:
+      return UFormatDollar(value as string | number);
+    case TableColumnTypeEnum.date:
+      return UFormatDate(value as string | Date);
+    case TableColumnTypeEnum.phone:
+      return UFormatPhone(value as string);
+    default:
+      return String(value);
+  }
+};
 
 const FALLBACK_SKELETON_COLUMNS: DirectoriesQueryTableHeaderItem[] = [
   {
@@ -171,6 +202,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                       whiteSpace: 'nowrap',
                       width: head.width ? `${head.width}px` : 'auto',
                       minWidth: head.width ? `${head.width}px` : 160,
+                      ...(index === 0 && { textAlign: 'center' }),
                     }}
                   >
                     {loading ? (
@@ -183,7 +215,25 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                         }
                       />
                     ) : (
-                      head.columnName
+                      <Stack
+                        sx={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 0.5,
+                        }}
+                      >
+                        {index > 0 && (
+                          <Icon
+                            component={
+                              COLUMN_TYPE_ICONS[
+                                head.columnType as TableColumnTypeEnum
+                              ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+                            }
+                            sx={{ width: 16, height: 16 }}
+                          />
+                        )}
+                        <OverflowTooltip>{head.columnName}</OverflowTooltip>
+                      </Stack>
                     )}
                   </TableCell>
                 ),
@@ -216,6 +266,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           maxWidth: 300,
+                          ...(colIndex === 0 && { textAlign: 'center' }),
                         }}
                       >
                         {loading ? (
@@ -242,7 +293,12 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                         ) : colIndex === 0 ? (
                           rowIndex + 1
                         ) : (
-                          row?.[head.columnKey as keyof typeof row] || '-'
+                          <OverflowTooltip>
+                            {formatCellValue(
+                              row?.[head.columnKey as keyof typeof row],
+                              head.columnType,
+                            )}
+                          </OverflowTooltip>
                         )}
                       </TableCell>
                     );
@@ -278,8 +334,8 @@ export const PreviewTable: FC<PreviewTableProps> = ({
             sx={{
               ml: 3,
               maxWidth: 90,
+              top: 30,
               alignItems: 'center',
-              justifyContent: 'center',
               gap: 1.5,
             }}
           >
@@ -304,7 +360,7 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                 color: 'text.secondary',
               }}
             >
-              Use credits to unlock details
+              Access records to view details
             </Typography>
           </Stack>
         </Stack>

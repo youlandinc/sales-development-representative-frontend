@@ -11,7 +11,7 @@ export const LayoutHeader: FC = () => {
       alignItems={'center'}
       borderBottom={'1px solid #DFDEE6'}
       flexDirection={'row'}
-      height={72}
+      height={54}
       px={4}
       width={'100%'}
     >

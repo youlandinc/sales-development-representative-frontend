@@ -423,83 +423,83 @@ const defaultOptions: ThemeOptions = {
     //     },
     //   },
     // },
-    MuiAutocomplete: {
-      styleOverrides: {
-        inputRoot: {
-          paddingTop: '0',
-          paddingBottom: '0',
-        },
-        input: {
-          paddingTop: '8px',
-          paddingBottom: '8px',
-        },
-        endAdornment: {
-          zIndex: 1,
-        },
-        paper: {
-          fontSize: 14,
-          borderRadius: 2,
-          bgcolor: 'white',
-          boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
-        },
-        listbox: {
-          padding: '0px 0px 0px 0px',
-        },
-        tag: {
-          maxHeight: 24,
-          fontSize: 12,
-        },
-        tagSizeMedium: {
-          maxHeight: 24,
-          fontSize: 12,
-        },
-        tagSizeSmall: {
-          maxHeight: 18,
-          fontSize: 12,
-        },
-        root: ({ theme }) => ({
-          '& .MuiOutlinedInput-root .MuiAutocomplete-input': {
-            paddingTop: '8px',
-            paddingBottom: '8px',
-          },
-          //small
-          '&  .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
-            paddingTop: '0px',
-            paddingBottom: '0px',
-          },
-          '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-input':
-            {
-              paddingTop: '6px',
-              paddingBottom: '6px',
-            },
-          '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-endAdornment':
-            {
-              top: 2,
-            },
-          '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-tag':
-            {
-              maxHeight: 18,
-              fontSize: 12,
-            },
-          //large
-          '& .MuiInputBase-sizeLarge .MuiAutocomplete-input': {
-            paddingTop: '12px',
-            paddingBottom: '12px',
-          },
-          '& .MuiInputBase-sizeLarge .MuiAutocomplete-endAdornment': {
-            top: 9,
-          },
-          '& .MuiInputBase-sizeLarge .MuiAutocomplete-tag': {
-            maxHeight: 28,
-            fontSize: 12,
-          },
-          '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderWidth: '1px !important',
-            borderColor: `${theme.palette.border.hover} !important`,
-          },
-        }),
-      },
-    },
+    //MuiAutocomplete: {
+    //  styleOverrides: {
+    //    inputRoot: {
+    //      paddingTop: '0',
+    //      paddingBottom: '0',
+    //    },
+    //    input: {
+    //      paddingTop: '8px',
+    //      paddingBottom: '8px',
+    //    },
+    //    endAdornment: {
+    //      zIndex: 1,
+    //    },
+    //    paper: {
+    //      fontSize: 14,
+    //      borderRadius: 2,
+    //      bgcolor: 'white',
+    //      boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
+    //    },
+    //    listbox: {
+    //      padding: '0px 0px 0px 0px',
+    //    },
+    //    tag: {
+    //      maxHeight: 24,
+    //      fontSize: 12,
+    //    },
+    //    tagSizeMedium: {
+    //      maxHeight: 24,
+    //      fontSize: 12,
+    //    },
+    //    tagSizeSmall: {
+    //      maxHeight: 18,
+    //      fontSize: 12,
+    //    },
+    //    root: ({ theme }) => ({
+    //      '& .MuiOutlinedInput-root .MuiAutocomplete-input': {
+    //        paddingTop: '8px',
+    //        paddingBottom: '8px',
+    //      },
+    //      //small
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
+    //        paddingTop: '0px',
+    //        paddingBottom: '0px',
+    //      },
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-input':
+    //        {
+    //          paddingTop: '6px',
+    //          paddingBottom: '6px',
+    //        },
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-endAdornment':
+    //        {
+    //          top: 2,
+    //        },
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-tag':
+    //        {
+    //          maxHeight: 18,
+    //          fontSize: 12,
+    //        },
+    //      //large
+    //      '& .MuiInputBase-sizeLarge .MuiAutocomplete-input': {
+    //        paddingTop: '12px',
+    //        paddingBottom: '12px',
+    //      },
+    //      '& .MuiInputBase-sizeLarge .MuiAutocomplete-endAdornment': {
+    //        top: 9,
+    //      },
+    //      '& .MuiInputBase-sizeLarge .MuiAutocomplete-tag': {
+    //        maxHeight: 28,
+    //        fontSize: 12,
+    //      },
+    //      '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+    //        borderWidth: '1px !important',
+    //        borderColor: `${theme.palette.border.hover} !important`,
+    //      },
+    //    }),
+    //  },
+    //},
     MuiSelect: {
       styleOverrides: {
         icon: {

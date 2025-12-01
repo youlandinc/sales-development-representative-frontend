@@ -4,8 +4,9 @@ import { ResponseProspectTableViaSearch } from '@/types';
 
 import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
 import ICON_FOLDER from './assets/icon-folder.svg';
-import ICON_TABLE_NORMAL from './assets/icon-table-normal.svg';
 import ICON_TICK from './assets/icon-tick.svg';
+
+import ICON_TABLE_NORMAL from './assets/icon-table-normal.svg';
 
 interface FilterTableSelectItemProps {
   item: ResponseProspectTableViaSearch[0];
@@ -41,7 +42,8 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
           }
         }}
         sx={{
-          pl: 1,
+          // todo : There will be children in the future
+          //pl: 1,
           pr: 1,
           borderRadius: 2,
           cursor: 'pointer',
@@ -66,9 +68,6 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
           sx={{
             width: 20,
             height: 20,
-            '& path': {
-              fill: isSelected ? '#6E4EFB' : '#363440',
-            },
           }}
         />
 
@@ -79,7 +78,6 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            color: isSelected ? '#6E4EFB' : '#2A292E',
           }}
         >
           {item.tableName}

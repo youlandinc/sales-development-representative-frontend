@@ -90,6 +90,22 @@ export const UFormatDate = (
   }
 };
 
+export const UFormatPhone = (entry = '') => {
+  if (UTypeOf.isNull(entry)) {
+    return '';
+  }
+  const cleaned: string = ('' + entry).replace(/\D/g, '');
+  const match: RegExpMatchArray | null = cleaned.match(
+    /^(\d{3})?(\d{3})(\d{4})$/,
+  );
+  if (match) {
+    const areaCode: string = match[1] ? `(${match[1]}) ` : '';
+    const formattedNumber = `${areaCode}${match[2]}-${match[3]}`;
+    return formattedNumber;
+  }
+  return cleaned;
+};
+
 /**
  * 格式化时间：小于48小时显示小时，大于48小时显示天
  * @param minutes 分钟数

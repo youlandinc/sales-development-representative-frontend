@@ -45,7 +45,19 @@ export const QueryBadgeAuth: FC = () => {
           >
             {DIRECTORIES_BADGE_AUTH[bizId].strong}
           </Typography>{' '}
-          plan. Upgrade to access.
+          plan.{' '}
+          <Typography
+            component={'span'}
+            onClick={() => window.open(`/pricing?bizId=${bizId}`, '_blank')}
+            sx={{
+              fontSize: 12,
+              textDecoration: 'underline',
+              cursor: 'pointer',
+            }}
+          >
+            Upgrade to access
+          </Typography>
+          .
         </Typography>
       }
     >

@@ -9,6 +9,7 @@ export enum DirectoriesQueryActionTypeEnum {
   input = 'INPUT',
   switch = 'SWITCH',
   between = 'BETWEEN',
+  date = 'DATE'
 }
 
 export enum DirectoriesQueryInputTypeEnum {

@@ -8,7 +8,7 @@ import { PlanTypeEnum } from '@/types';
 interface PlanListProps {
   plans: PlanCardProps[];
   isLoading: boolean;
-  onCancelClick: (
+  onClickToCancelPlan: (
     planName: string,
     planType: PlanTypeEnum,
     renewalDate?: string,
@@ -18,15 +18,15 @@ interface PlanListProps {
 export const PlanList: FC<PlanListProps> = ({
   plans,
   isLoading,
-  onCancelClick,
+  onClickToCancelPlan,
 }) => {
-  const handleCancel = useCallback(
+  const onClickToCancel = useCallback(
     (plan: PlanCardProps) => () => {
       if (plan.renewalDate) {
-        onCancelClick(plan.planName, plan.planType, plan.renewalDate);
+        onClickToCancelPlan(plan.planName, plan.planType, plan.renewalDate);
       }
     },
-    [onCancelClick],
+    [onClickToCancelPlan],
   );
 
   if (isLoading && PlanList.length === 0) {
@@ -43,7 +43,7 @@ export const PlanList: FC<PlanListProps> = ({
         <PlanCard
           key={plan.planBadge.label + index}
           {...plan}
-          onCancel={plan.renewalDate ? handleCancel(plan) : undefined}
+          onCancel={plan.renewalDate ? onClickToCancel(plan) : undefined}
         />
       ))}
     </Stack>
