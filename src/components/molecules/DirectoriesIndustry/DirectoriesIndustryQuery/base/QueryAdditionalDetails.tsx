@@ -113,7 +113,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
       return (
         <Stack key={itemKey} sx={isLast ? { mb: 1 } : undefined}>
           <QueryCheckbox
-            disabled={!isAuth || isChecked}
+            disabled={!isAuth}
             onFormChange={(checked) => {
               updateAdditionalSelection(itemKey, checked, item);
             }}
