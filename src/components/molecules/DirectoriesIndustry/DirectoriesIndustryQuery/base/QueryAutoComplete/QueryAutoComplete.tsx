@@ -16,6 +16,8 @@ import { Check } from '@mui/icons-material';
 import { StyledTextField } from '@/components/atoms';
 import { UTypeOf } from '@/utils/UTypeOf';
 
+import { PLANS_ROUTE } from '@/components/molecules/Layout/Layout.data';
+
 import { AutoCompleteOption, useQueryAutoComplete } from './hooks';
 import { QueryAutoCompleteChip } from './index';
 
@@ -170,7 +172,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     <Typography sx={{ fontSize: 12 }}>
       Available in the <strong>Intelligence</strong> plan.{' '}
       <Link
-        href="/pricing"
+        href={PLANS_ROUTE}
         sx={{ color: 'inherit', textDecoration: 'underline' }}
       >
         Upgrade to access.

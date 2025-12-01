@@ -5,6 +5,7 @@ import ICON_USER from '../assets/icon_users.svg';
 import ICON_BUILD from '../assets/icon_build.svg';
 
 import { BASE_URL } from '@/constants';
+import { PLANS_ROUTE } from '@/components/molecules/Layout/Layout.data';
 
 export const PRICE_INFO: Record<string, string> = {
   [CreditTypeEnum.credit]: 'credits',
@@ -30,7 +31,7 @@ export const CAPITAL_PLAN_DESC_ICON: Record<string, string> = {
 };
 
 export const SUCCESS_URL = `${BASE_URL}/directories`;
-export const CANCEL_URL = `${BASE_URL}/pricing`;
+export const CANCEL_URL = `${BASE_URL}${PLANS_ROUTE}`;
 
 // Constants
 export const COLORS = {

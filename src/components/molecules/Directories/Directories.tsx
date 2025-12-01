@@ -9,6 +9,7 @@ import { useDirectoriesStore } from '@/stores/directories';
 import { useShallow } from 'zustand/react/shallow';
 import { _fetchDirectoriesInfo } from '@/request/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
+import { PLANS_ROUTE } from '@/components/molecules/Layout/Layout.data';
 
 import { DirectoriesCard, DirectoriesCardSkeleton } from './index';
 
@@ -98,7 +99,7 @@ export const Directories: FC = () => {
                   }
                   setClickedBizId(null);
                 }
-                router.push(`/pricing?bizId=${bizId}`);
+                router.push(`${PLANS_ROUTE}?bizId=${bizId}`);
               }}
             />
           ))}

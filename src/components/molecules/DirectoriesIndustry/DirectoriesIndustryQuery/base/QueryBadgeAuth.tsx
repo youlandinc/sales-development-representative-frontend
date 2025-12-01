@@ -4,6 +4,7 @@ import { Icon, Stack, Tooltip, Typography } from '@mui/material';
 import { useDirectoriesStore } from '@/stores/directories';
 import { DIRECTORIES_BADGE_AUTH } from '@/constants/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
+import { PLANS_ROUTE } from '@/components/molecules/Layout/Layout.data';
 
 import ICON_LOCK from './assets/icon-lock.svg';
 
@@ -48,7 +49,9 @@ export const QueryBadgeAuth: FC = () => {
           plan.{' '}
           <Typography
             component={'span'}
-            onClick={() => window.open(`/pricing?bizId=${bizId}`, '_blank')}
+            onClick={() =>
+              window.open(`${PLANS_ROUTE}?bizId=${bizId}`, '_blank')
+            }
             sx={{
               fontSize: 12,
               textDecoration: 'underline',

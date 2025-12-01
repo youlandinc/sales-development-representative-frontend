@@ -19,6 +19,8 @@ import ICON_SIDE_DIRECTORIES_ACTIVE from './assets/icon_directories_active.svg';
 import ICON_SIDE_PRICING_DEFAULT from './assets/icon_side_pricing_default.svg';
 import ICON_SIDE_PRICING_ACTIVE from './assets/icon_side_pricing_active.svg';
 
+export const PLANS_ROUTE = '/plans';
+
 /* import ICON_SIDE_CONTACTS_DEFAULT from './assets/icon_side_contacts_default.svg';
 import ICON_SIDE_CONTACTS_ACTIVE from './assets/icon_side_contacts_active.svg';
 
@@ -110,8 +112,8 @@ export const LAYOUT_SIDE_MENU = [
 export const LAYOUT_SIDE_MENU_BOTTOM = [
   {
     label: 'Manage plan',
-    url: '/pricing',
-    key: 'pricing',
+    url: PLANS_ROUTE,
+    key: 'plans',
     defaultIcon: ICON_SIDE_PRICING_DEFAULT,
     activeIcon: ICON_SIDE_PRICING_ACTIVE,
     type: 'link',
