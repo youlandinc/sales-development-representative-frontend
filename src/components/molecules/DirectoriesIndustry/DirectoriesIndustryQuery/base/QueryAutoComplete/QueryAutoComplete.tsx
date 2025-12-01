@@ -120,10 +120,10 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     }
     // Check if input would filter all options out
     if (options.length > 0 && inputValue) {
-      const filtered = createFilterOptions<AutoCompleteOption>()(
-        options,
-        { inputValue, getOptionLabel: (opt) => opt.label },
-      );
+      const filtered = createFilterOptions<AutoCompleteOption>()(options, {
+        inputValue,
+        getOptionLabel: (opt) => opt.label,
+      });
       if (filtered.length === 0) {
         // Return empty array to trigger noOptionsText
         return [];

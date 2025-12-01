@@ -80,7 +80,8 @@ export const PreviewTable: FC<PreviewTableProps> = ({
     ];
   }, [header]);
 
-  const skeletonColumns = header.length > 0 ? reducedHeader : FALLBACK_SKELETON_COLUMNS;
+  const skeletonColumns =
+    header.length > 0 ? reducedHeader : FALLBACK_SKELETON_COLUMNS;
 
   const lockedStartIndex = reducedHeader.findIndex((h) => !h.isAuth);
   const hasLockedColumns = lockedStartIndex > -1;
@@ -175,7 +176,11 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                     {loading ? (
                       <Skeleton
                         animation="wave"
-                        width={STABLE_HEADER_WIDTHS[index % STABLE_HEADER_WIDTHS.length]}
+                        width={
+                          STABLE_HEADER_WIDTHS[
+                            index % STABLE_HEADER_WIDTHS.length
+                          ]
+                        }
                       />
                     ) : (
                       head.columnName
@@ -187,12 +192,11 @@ export const PreviewTable: FC<PreviewTableProps> = ({
           </TableHead>
 
           <TableBody ref={bodyRef}>
-            {(
-              loading && body.length === 0
-                ? Array.from<DirectoriesQueryTableBodyItem | null>({
-                    length: SKELETON_ROW_COUNT,
-                  })
-                : body
+            {(loading && body.length === 0
+              ? Array.from<DirectoriesQueryTableBodyItem | null>({
+                  length: SKELETON_ROW_COUNT,
+                })
+              : body
             ).map((row, rowIndex) => (
               <TableRow key={rowIndex}>
                 {(loading ? skeletonColumns : reducedHeader).map(
@@ -218,9 +222,9 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                           <Skeleton
                             animation="wave"
                             width={
-                              STABLE_BODY_WIDTHS[rowIndex % STABLE_BODY_WIDTHS.length]?.[
-                                colIndex % STABLE_BODY_WIDTHS[0].length
-                              ]
+                              STABLE_BODY_WIDTHS[
+                                rowIndex % STABLE_BODY_WIDTHS.length
+                              ]?.[colIndex % STABLE_BODY_WIDTHS[0].length]
                             }
                           />
                         ) : isLocked ? (
