@@ -56,9 +56,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   //sxHelperText,
 }) => {
   //const breakpoints = useBreakpoints();
-
   const [showClear, setShowClear] = useState(false);
-
   return (
     <FormControl
       error={!!(validate?.length && validate[0])}
@@ -161,7 +159,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
       <InputLabel id="styled-select-label">{label}</InputLabel>
       <Select
         disabled={disabled}
-        // displayEmpty
+        displayEmpty
         endAdornment={
           clearable &&
           showClear &&
@@ -220,11 +218,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         renderValue={(value) => {
           if (!value) {
             return (
-              <Typography
-                color={'text.secondary'}
-                sx={{ opacity: 0.7 }}
-                variant={'body2'}
-              >
+              <Typography color={'text.secondary'} variant={'body2'}>
                 {placeholder}
               </Typography>
             );

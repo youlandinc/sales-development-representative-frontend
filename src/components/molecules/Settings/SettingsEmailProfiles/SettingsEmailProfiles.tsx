@@ -193,6 +193,7 @@ export const SettingsEmailProfiles: FC = () => {
                   }
                 }}
                 options={mailboxes}
+                placeholder={'Connected mailboxes'}
                 value={connectedMailboxes}
               />
             </CommonVerticalLabelContainer>
@@ -208,6 +209,7 @@ export const SettingsEmailProfiles: FC = () => {
                   setDefaultMailbox(e.target.value as string);
                 }}
                 options={connectedMailboxes}
+                placeholder={'Default mailbox'}
                 value={defaultMailbox}
               />
             </CommonVerticalLabelContainer>
@@ -232,9 +234,7 @@ export const SettingsEmailProfiles: FC = () => {
           <Stack flexDirection={'row'} gap={1.5} pt={3}>
             <StyledButton
               color={'info'}
-              onClick={() => {
-                close();
-              }}
+              onClick={close}
               size={'medium'}
               variant={'outlined'}
             >

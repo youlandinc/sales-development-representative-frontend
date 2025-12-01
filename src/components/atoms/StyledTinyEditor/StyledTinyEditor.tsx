@@ -172,6 +172,8 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           promotion: false,
           // 禁用品牌标志
           branding: false,
+          // 禁用元素路径显示
+          elementpath: false,
           // 禁用帮助菜单
           // help_tabs: [],
           // 禁用状态栏

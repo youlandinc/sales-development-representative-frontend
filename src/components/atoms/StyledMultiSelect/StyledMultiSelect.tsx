@@ -153,6 +153,18 @@ export const StyledMultiSelect: FC<
             borderWidth: '1px !important',
             borderColor: '#4C4957 !important',
           },
+          '& .MuiAutocomplete-tag': {
+            maxHeight: 24,
+            fontSize: 12,
+          },
+          '& .MuiAutocomplete-tagSizeMedium': {
+            maxHeight: 24,
+            fontSize: 12,
+          },
+          '& .MuiAutocomplete-tagSizeSmall': {
+            maxHeight: 18,
+            fontSize: 12,
+          },
         },
         ...(Array.isArray(props?.sx) ? props.sx : [props?.sx]),
       ]}

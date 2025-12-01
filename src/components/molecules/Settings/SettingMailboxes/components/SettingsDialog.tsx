@@ -155,9 +155,6 @@ export const SettingsDialog = ({
           </Typography>
         </Stack>
       }
-      headerSx={{
-        bgcolor: '#FBFCFD',
-      }}
       open={visible}
       sx={{
         '&.MuiDialog-root': {
