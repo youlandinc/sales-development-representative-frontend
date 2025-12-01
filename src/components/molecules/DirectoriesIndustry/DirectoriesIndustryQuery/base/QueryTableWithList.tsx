@@ -97,6 +97,7 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
                 keywords: keywords,
               });
             }}
+            placeholder={placeholder}
             title={title}
             value={keywords}
           />

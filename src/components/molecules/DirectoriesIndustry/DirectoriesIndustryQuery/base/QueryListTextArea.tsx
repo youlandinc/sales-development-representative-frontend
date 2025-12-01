@@ -6,12 +6,14 @@ interface QueryListTextAreaProps {
   value: string[];
   onInsideFormChange: (param: string[]) => void;
   title: string;
+  placeholder: string;
 }
 
 export const QueryListTextArea: FC<QueryListTextAreaProps> = ({
   value = [],
   onInsideFormChange,
   title,
+  placeholder,
 }) => {
   return (
     <QueryContainer isAuth={true} label={title}>
@@ -22,7 +24,7 @@ export const QueryListTextArea: FC<QueryListTextAreaProps> = ({
           onInsideFormChange(newValue);
         }}
         options={[]}
-        placeholder={'e.g. Amazon'}
+        placeholder={placeholder}
         url={''}
         value={value}
       />
