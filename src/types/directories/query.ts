@@ -91,6 +91,7 @@ export interface DirectoriesQueryTableHeaderItem {
   groupLabel: string | null;
   groupOrder: number | null;
   width?: number;
+  isAuth: boolean;
 }
 
 export type DirectoriesQueryTableHeaderApiResponse =

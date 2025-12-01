@@ -22,6 +22,14 @@ export const DirectoriesIndustryPreview: FC = () => {
   const isShowResult =
     isLoadingPreview || (hasSubmittedSearch && findCount > 0);
 
+  // Debug: check which columns have isAuth === false
+  if (previewHeader.length > 0) {
+    console.log(
+      'previewHeader:',
+      previewHeader.map((h) => ({ name: h.columnName, isAuth: h.isAuth })),
+    );
+  }
+
   return (
     <Stack sx={{ flex: 1, p: 3, gap: 3, overflow: 'hidden' }}>
       <PreviewSummary
