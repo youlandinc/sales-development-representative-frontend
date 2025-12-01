@@ -9,6 +9,7 @@ interface QueryTableProps {
   fieldKey: string;
   value?: QueryTableWithListValue;
   onFormChange: (key: string, value: QueryTableWithListValue) => void;
+  placeholder: string;
 }
 
 export const QueryTable: FC<QueryTableProps> = ({
@@ -16,6 +17,7 @@ export const QueryTable: FC<QueryTableProps> = ({
   fieldKey,
   value,
   onFormChange,
+  placeholder,
 }) => {
   const [selectedTableId, setSelectedTableId] = useState<string>(
     value?.tableId || '',
@@ -42,6 +44,7 @@ export const QueryTable: FC<QueryTableProps> = ({
             keywords: [],
           });
         }}
+        placeholder={placeholder}
         selectedTableId={selectedTableId}
         selectedTableName={selectedTableName}
         selectedTableSource={selectedTableSource}

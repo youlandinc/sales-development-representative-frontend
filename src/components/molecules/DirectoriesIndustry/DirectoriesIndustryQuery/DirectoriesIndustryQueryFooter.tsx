@@ -187,8 +187,7 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
               }}
             >
               Only {resetCredit} of the {requestAmount} requested records can be
-              retrieved with your current balance. {resetCredit} tokens will be
-              deducted.
+              retrieved with your current balance.
             </Typography>
             <Typography
               sx={{

@@ -30,10 +30,6 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
     <Box>
       {/* Parent Item */}
       <Stack
-        alignItems={'center'}
-        flexDirection={'row'}
-        gap={0.5}
-        height={40}
         onClick={() => {
           if (hasChildren) {
             onToggleExpand(item.tableId);
@@ -42,14 +38,14 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
           }
         }}
         sx={{
-          // todo : There will be children in the future
-          //pl: 1,
+          alignItems: 'center',
+          flexDirection: 'row',
+          gap: 0.5,
+          height: 40,
           pr: 1,
           borderRadius: 2,
           cursor: 'pointer',
-          '&:hover': {
-            bgcolor: '#F8F8FA',
-          },
+          '&:hover': { bgcolor: '#F8F8FA' },
         }}
       >
         <Icon
@@ -96,25 +92,23 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
       {/* Children Items */}
       {hasChildren && (
         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-          <Stack gap={0.5} sx={{ mt: 0.5 }}>
+          <Stack sx={{ gap: 0.5, mt: 0.5 }}>
             {item.children!.map((child) => {
               const isChildSelected = selectedTableId === child.tableId;
               return (
                 <Stack
-                  alignItems={'center'}
-                  flexDirection={'row'}
-                  gap={0.5}
-                  height={40}
                   key={child.tableId}
                   onClick={() => onSelectTable(child.tableId)}
                   sx={{
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    gap: 0.5,
+                    height: 40,
                     pl: 5.5,
                     pr: 1,
                     borderRadius: 2,
                     cursor: 'pointer',
-                    '&:hover': {
-                      bgcolor: '#F8F8FA',
-                    },
+                    '&:hover': { bgcolor: '#F8F8FA' },
                   }}
                 >
                   <Icon

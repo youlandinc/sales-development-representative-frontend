@@ -5,6 +5,7 @@ import { directoriesDataFlow } from '@/services';
 import {
   additionalCollectKeys,
   additionalInit,
+  collectKeysFromGroup,
   configInitFormValues,
   configParse,
   getAdditionalIsAuth,
@@ -47,6 +48,10 @@ interface DirectoriesStoreState {
 interface DirectoriesStoreActions {
   updateInstitutionType: (value: string) => void;
   updateFormValues: (key: string, value: any, groupPath?: string) => void;
+  resetGroupFormValues: (
+    config: DirectoriesQueryItem,
+    groupPath?: string,
+  ) => void;
   // RxJS
   initializeDataFlow: (bizId: DirectoriesBizIdEnum) => Promise<boolean>;
   syncFromRxJS: () => () => void;
@@ -212,6 +217,91 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         });
       } else {
         // Flat config: store directly
+        set({ formValues: updatedFormValues });
+
+        directoriesDataFlow.updateFormValues({
+          bizId,
+          formValues: updatedFormValues,
+          additionalIsAuth: getAdditionalIsAuth(queryConfig),
+        });
+      }
+    },
+
+    resetGroupFormValues: (
+      config: DirectoriesQueryItem,
+      groupPath?: string,
+    ) => {
+      const {
+        formValues,
+        institutionType,
+        formValuesByInstitutionType,
+        bizId,
+        queryConfig,
+      } = get();
+
+      const keysToReset = collectKeysFromGroup(config);
+      let updatedFormValues: Record<string, any>;
+
+      if (groupPath) {
+        // Reset fields within a group path
+        const groupValues = { ...(formValues[groupPath] || {}) };
+        keysToReset.forEach((key) => {
+          if (key in groupValues) {
+            groupValues[key] = null;
+          }
+        });
+        updatedFormValues = {
+          ...formValues,
+          [groupPath]: groupValues,
+        };
+      } else {
+        // Reset fields at root level
+        updatedFormValues = { ...formValues };
+        keysToReset.forEach((key) => {
+          if (key in updatedFormValues) {
+            // Reset to appropriate initial value based on type
+            const currentValue = updatedFormValues[key];
+            if (Array.isArray(currentValue)) {
+              updatedFormValues[key] = [];
+            } else if (
+              typeof currentValue === 'object' &&
+              currentValue !== null
+            ) {
+              // Reset object fields (like excludeFirms) to initial structure
+              updatedFormValues[key] = {
+                tableId: '',
+                tableFieldId: '',
+                tableViewId: '',
+                keywords: [],
+              };
+            } else {
+              updatedFormValues[key] = null;
+            }
+          }
+        });
+      }
+
+      const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
+        bizId as DirectoriesBizIdEnum,
+      );
+
+      if (isHierarchical) {
+        set({
+          formValues: updatedFormValues,
+          formValuesByInstitutionType: {
+            ...formValuesByInstitutionType,
+            [institutionType]: updatedFormValues,
+          },
+        });
+
+        directoriesDataFlow.updateFormValues({
+          bizId,
+          institutionType,
+          entityType: updatedFormValues.entityType || '',
+          formValues: updatedFormValues,
+          additionalIsAuth: getAdditionalIsAuth(queryConfig),
+        });
+      } else {
         set({ formValues: updatedFormValues });
 
         directoriesDataFlow.updateFormValues({

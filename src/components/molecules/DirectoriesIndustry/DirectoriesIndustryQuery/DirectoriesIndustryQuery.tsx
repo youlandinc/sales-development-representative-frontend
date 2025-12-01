@@ -69,7 +69,14 @@ export const DirectoriesIndustryQuery: FC = () => {
           minHeight: 400,
         }}
       >
-        <CircularProgress />
+        <CircularProgress
+          enableTrackSlot
+          size="36px"
+          sx={{
+            color: '#D0CEDA',
+            '& .MuiCircularProgress-track': { stroke: '#EAE9EF' },
+          }}
+        />
       </Stack>
     );
   }
@@ -87,9 +94,10 @@ export const DirectoriesIndustryQuery: FC = () => {
           justifyContent: 'center',
           minHeight: 400,
           color: 'text.secondary',
+          fontSize: 12,
         }}
       >
-        <Typography>Configuration not available</Typography>
+        Configuration not available
       </Stack>
     );
   }

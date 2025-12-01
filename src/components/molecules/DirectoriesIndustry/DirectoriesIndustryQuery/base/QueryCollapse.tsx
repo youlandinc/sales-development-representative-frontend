@@ -1,9 +1,10 @@
-import { FC, ReactNode, useState } from 'react';
-import { Box, Collapse, Icon, Stack } from '@mui/material';
+import { FC, MouseEvent, ReactNode, useState } from 'react';
+import { Collapse, Icon, Stack } from '@mui/material';
 
 import { QueryBadgeAuth } from './index';
 
 import ICON_ARROW from './assets/icon-arrow.svg';
+import ICON_CLOSE from './assets/icon-close.svg';
 
 interface QueryCollapseProps {
   title?: ReactNode;
@@ -11,6 +12,7 @@ interface QueryCollapseProps {
   defaultOpen?: boolean;
   filterCount?: number;
   isAuth: boolean;
+  onClearFilters?: () => void;
 }
 
 export const QueryCollapse: FC<QueryCollapseProps> = ({
@@ -19,6 +21,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
   defaultOpen = true,
   filterCount = 0,
   isAuth,
+  onClearFilters,
 }) => {
   const [expanded, setExpanded] = useState(defaultOpen);
 
@@ -54,7 +57,11 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
             }}
           >
             {filterCount > 0 && (
-              <Box
+              <Stack
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
                 sx={{
                   bgcolor: '#EAE9EF',
                   borderRadius: 1,
@@ -62,10 +69,24 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                   px: 1,
                   py: '2px',
                   userSelect: 'none',
+                  fontWeight: 400,
+                  flexDirection: 'row',
+                  gap: 0.5,
+                  alignItems: 'center',
+                  cursor: 'default',
                 }}
               >
+                <Icon
+                  component={ICON_CLOSE}
+                  onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onClearFilters?.();
+                  }}
+                  sx={{ width: 12, height: 12, cursor: 'pointer' }}
+                />{' '}
                 {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}
-              </Box>
+              </Stack>
             )}
             {!isAuth && <QueryBadgeAuth />}
             <Icon

@@ -341,6 +341,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
+              paddingLeft: '8px !important',
             },
             '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
               py: 0.5,

@@ -8,7 +8,11 @@ export {
 
 export { additionalInit, additionalCollectKeys } from './additional';
 
-export { countFilledFieldsInGroup, getGroupFilterSummary } from './group';
+export {
+  collectKeysFromGroup,
+  countFilledFieldsInGroup,
+  getGroupFilterSummary,
+} from './group';
 
 export {
   buildSearchRequestParams,

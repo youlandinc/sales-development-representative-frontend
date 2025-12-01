@@ -20,6 +20,7 @@ import {
 
 import ICON_LOCK from './assets/icon-lock.svg';
 import ICON_NO_RESULT from './assets/icon-no-result.svg';
+import ICON_REDIRECT_URL from './assets/icon-redirect-url.svg';
 
 import { OverflowTooltip } from './OverflowTooltip';
 import { COLUMN_TYPE_ICONS } from '@/constants';
@@ -292,6 +293,42 @@ export const PreviewTable: FC<PreviewTableProps> = ({
                           </Box>
                         ) : colIndex === 0 ? (
                           rowIndex + 1
+                        ) : head.columnType === TableColumnTypeEnum.url ? (
+                          row?.[head.columnKey as keyof typeof row] ? (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                              }}
+                            >
+                              <Icon
+                                component={ICON_REDIRECT_URL}
+                                sx={{ width: 16, height: 16, flexShrink: 0 }}
+                              />
+                              <Typography
+                                onClick={() => {
+                                  window.open(
+                                    row?.[head.columnKey as keyof typeof row],
+                                    '_blank',
+                                  );
+                                }}
+                                sx={{
+                                  flex: 1,
+                                  minWidth: 0,
+                                  fontSize: 12,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  textDecoration: 'underline',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                {row?.[head.columnKey as keyof typeof row]}
+                              </Typography>
+                            </Box>
+                          ) : (
+                            '-'
+                          )
                         ) : (
                           <OverflowTooltip>
                             {formatCellValue(

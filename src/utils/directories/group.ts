@@ -69,3 +69,32 @@ export const getGroupFilterSummary = (count: number): string => {
   }
   return `${count} filter${count > 1 ? 's' : ''}`;
 };
+
+/**
+ * Collect all keys from a group config tree
+ */
+export const collectKeysFromGroup = (
+  groupConfig: DirectoriesQueryItem,
+): string[] => {
+  const keys: string[] = [];
+
+  const collectItem = (item: DirectoriesQueryItem) => {
+    if (item.key) {
+      keys.push(item.key);
+    }
+    if (item.children && item.children.length > 0) {
+      item.children.forEach(collectItem);
+    }
+  };
+
+  if (groupConfig.children && groupConfig.children.length > 0) {
+    groupConfig.children.forEach(collectItem);
+  }
+
+  // Also include the group's own key if it has one (e.g., excludeFirms)
+  if (groupConfig.key) {
+    keys.push(groupConfig.key);
+  }
+
+  return keys;
+};
