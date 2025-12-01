@@ -91,7 +91,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
                 updateAdditionalSelection(itemKey, checked, item);
               }}
               subLabel={item.subLabel || item.label || ''}
-              value={isChecked}
+              value={!isAuth || isChecked}
             />
 
             {shouldShowChildren && (
@@ -118,7 +118,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
               updateAdditionalSelection(itemKey, checked, item);
             }}
             subLabel={item.subLabel || item.label || ''}
-            value={isChecked}
+            value={!isAuth || isChecked}
           />
         </Stack>
       );
