@@ -29,6 +29,7 @@ interface QueryTableWithListProps {
     value: CompaniesRadioEnum | string;
     selected?: boolean | null;
     title?: string;
+    placeholder?: string;
   }>;
   onFormChange: (key: string, value: QueryTableWithListValue) => void;
 }
@@ -52,8 +53,8 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
 
   const [keywords, setKeywords] = useState<string[]>(value?.keywords || []);
 
-  const reducedTitle =
-    optionValues.find((item) => item.value === mode)?.title || '';
+  const { title = '', placeholder = '' } =
+    optionValues.find((item) => item.value === mode) ?? {};
 
   const renderNode = () => {
     switch (mode) {
@@ -75,10 +76,11 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
                 keywords: data.keywords,
               });
             }}
+            placeholder={placeholder}
             selectedTableId={selectedTableId}
             selectedTableName={selectedTableName}
             selectedTableSource={selectedTableSource}
-            title={reducedTitle}
+            title={title}
             type={type}
           />
         );
@@ -95,7 +97,7 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
                 keywords: keywords,
               });
             }}
-            title={reducedTitle}
+            title={title}
             value={keywords}
           />
         );
@@ -103,8 +105,8 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
   };
 
   return (
-    <Stack gap={1.5}>
-      <Stack mt={0.5}>
+    <Stack sx={{ gap: 1.5 }}>
+      <Stack sx={{ mt: 0.5 }}>
         <StyledRadioGroup
           onChange={(_, val) => setMode(val as string as CompaniesRadioEnum)}
           options={optionValues}

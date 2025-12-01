@@ -61,7 +61,7 @@ export const QueryContainer: FC<QueryContainerProps> = ({
                 {label}
               </Typography>
               {tooltip && (
-                <Tooltip arrow title={tooltip}>
+                <Tooltip arrow placement={'top'} title={tooltip}>
                   <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
                 </Tooltip>
               )}

@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import { Stack } from '@mui/material';
+import { FC, useCallback } from 'react';
+import { Icon, Stack, Tooltip } from '@mui/material';
 
 import { StyledButtonGroup, StyledTextFieldNumber } from '@/components/atoms';
 import {
@@ -20,6 +20,9 @@ import {
   DirectoriesQueryItem,
 } from '@/types/directories';
 import { countFilledFieldsInGroup } from '@/utils/directories';
+import { useDirectoriesStore } from '@/stores/directories';
+
+import ICON_INFO from './base/assets/icon-info.svg';
 
 interface CreateQueryElementProps {
   config: DirectoriesQueryItem;
@@ -42,6 +45,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
   disabledLoading = false,
   hideAuthBadge = false,
 }) => {
+  const resetGroupFormValues = useDirectoriesStore(
+    (state) => state.resetGroupFormValues,
+  );
+
+  const onFiltersReset = useCallback(() => {
+    resetGroupFormValues(config, groupPath);
+  }, [resetGroupFormValues, config, groupPath]);
+
   const containerIsAuth = hideAuthBadge ? true : config.isAuth;
   if (config.groupType === DirectoriesQueryGroupTypeEnum.button_group) {
     return (
@@ -112,6 +123,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
+        onClearFilters={onFiltersReset}
         title={config.label}
       >
         {config.children && config.children.length > 0
@@ -139,6 +151,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
+        onClearFilters={onFiltersReset}
         title={config.label}
       >
         <QueryTableWithList
@@ -169,12 +182,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
+        onClearFilters={onFiltersReset}
         title={config.label}
       >
         <QueryTable
           fieldKey={config.key!}
           key={`${groupPath}-${config.key}`}
           onFormChange={(key, value) => onFormChange(key, value, groupPath)}
+          placeholder={config.placeholder || 'Select table'}
           type={DirectoriesQueryGroupTypeEnum.exclude_individuals}
           value={
             formData[config.key!] ?? {
@@ -198,7 +213,21 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         defaultOpen={config.isDefaultOpen ?? false}
         filterCount={filterCount}
         isAuth={config.isAuth}
-        title={config.label}
+        onClearFilters={onFiltersReset}
+        title={
+          <Stack sx={{ flexDirection: 'row', gap: 0.5, alignItems: 'center' }}>
+            {config.label}
+            <Tooltip
+              arrow
+              placement={'top'}
+              title={
+                'These are additional data fields found based on the current filters above. Select fields you want to display or use for additional filtering.'
+              }
+            >
+              <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
+            </Tooltip>
+          </Stack>
+        }
       >
         <QueryAdditionalDetails isAuth={config.isAuth} />
       </QueryCollapse>

@@ -84,7 +84,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
         const shouldShowChildren = !isAuth || isChecked || indeterminate;
 
         return (
-          <Stack key={itemKey || item.label} sx={{ gap: 1 }}>
+          <Stack key={itemKey || item.label} sx={{ gap: 1, pl: 0.5 }}>
             <StyledCheckbox
               checked={!isAuth || isChecked}
               disabled={!isAuth}
@@ -96,7 +96,7 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
             />
 
             {shouldShowChildren && (
-              <Stack sx={{ pl: 3, gap: 1 }}>
+              <Stack sx={{ pl: 3.5, gap: 1 }}>
                 {item.children.map((child) => renderItem(child))}
               </Stack>
             )}

@@ -7,15 +7,7 @@ import { QueryTableSelectItem } from './index';
 
 import ICON_CLOSE from './assets/icon-close.svg';
 
-import {
-  closeIconLargeSx,
-  CONSTANTS,
-  dialogStyles,
-  dialogTitleSx,
-  selectButtonSx,
-} from './QueryTableSelect.styles';
-
-interface FilterTableSelectDialogProps {
+interface QueryTableSelectDialogProps {
   visible: boolean;
   fetchingTable: boolean;
   fetchingKeywords: boolean;
@@ -26,9 +18,11 @@ interface FilterTableSelectDialogProps {
   onToggleExpand: (tableId: string) => void;
   onSelectTable: (tableId: string) => void;
   onConfirm: () => void;
+  dialogTitle?: string;
+  buttonText?: string;
 }
 
-export const QueryTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
+export const QueryTableSelectDialog: FC<QueryTableSelectDialogProps> = ({
   visible,
   fetchingTable,
   fetchingKeywords,
@@ -39,24 +33,31 @@ export const QueryTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
   onToggleExpand,
   onSelectTable,
   onConfirm,
+  dialogTitle = 'Select table',
+  buttonText = 'Select table',
 }) => {
-  const contentSx = fetchingTable
-    ? dialogStyles.loadingContentSx
-    : tableList.length === 0
-      ? dialogStyles.emptyContentSx
-      : dialogStyles.contentSx;
+  const isEmptyOrLoading = fetchingTable || tableList.length === 0;
+  const contentSx = isEmptyOrLoading
+    ? {
+        height: 600,
+        overflow: 'auto' as const,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }
+    : { height: 600, overflow: 'auto' as const };
 
   return (
     <StyledDialog
       content={
         fetchingTable ? (
-          <StyledLoading size={CONSTANTS.LOADING_SIZE} />
+          <StyledLoading size={36} />
         ) : tableList.length === 0 ? (
-          <Typography color={'text.secondary'} fontSize={14}>
+          <Typography color="text.secondary" fontSize={14}>
             You don&apos;t have any table yet.
           </Typography>
         ) : (
-          <Stack gap={0.5}>
+          <Stack sx={{ gap: 0.5 }}>
             {tableList.map((item) => (
               <QueryTableSelectItem
                 isExpanded={expandedIds.has(item.tableId)}
@@ -75,28 +76,32 @@ export const QueryTableSelectDialog: FC<FilterTableSelectDialogProps> = ({
         <StyledButton
           disabled={!selectedTableId || fetchingKeywords}
           onClick={onConfirm}
-          size={'medium'}
-          sx={selectButtonSx}
+          size="medium"
+          sx={{ width: 104 }}
         >
-          {CONSTANTS.BUTTON_TEXT}
+          {buttonText}
         </StyledButton>
       }
-      footerSx={dialogStyles.footerSx}
+      footerSx={{ pt: 3 }}
       header={
         <Stack
-          alignItems={'center'}
-          flexDirection={'row'}
-          justifyContent={'space-between'}
+          sx={{
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
         >
-          <Typography sx={dialogTitleSx}>{CONSTANTS.DIALOG_TITLE}</Typography>
+          <Typography sx={{ fontSize: 20, fontWeight: 600, lineHeight: 1.2 }}>
+            {dialogTitle}
+          </Typography>
           <Icon
             component={ICON_CLOSE}
             onClick={onClose}
-            sx={closeIconLargeSx}
+            sx={{ width: 24, height: 24, cursor: 'pointer' }}
           />
         </Stack>
       }
-      headerSx={dialogStyles.headerSx}
+      headerSx={{ pb: 3 }}
       onClose={onClose}
       open={visible}
     />

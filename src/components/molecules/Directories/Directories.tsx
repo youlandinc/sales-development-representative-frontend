@@ -34,7 +34,7 @@ export const Directories: FC = () => {
 
   if (isLoading) {
     return (
-      <Stack gap={6}>
+      <Stack gap={4.5}>
         <Stack gap={1}>
           <Typography lineHeight={1.2} variant={'h5'}>
             Directories
@@ -48,7 +48,7 @@ export const Directories: FC = () => {
         <Stack
           sx={{
             flexDirection: 'row',
-            gap: 6,
+            gap: 4.5,
             maxWidth: 1100,
             flexWrap: 'wrap',
           }}
@@ -62,7 +62,7 @@ export const Directories: FC = () => {
 
   return (
     <Fade in>
-      <Stack gap={6}>
+      <Stack gap={4.5}>
         <Stack gap={1}>
           <Typography lineHeight={1.2} variant={'h5'}>
             Directories
@@ -76,7 +76,7 @@ export const Directories: FC = () => {
         <Stack
           sx={{
             flexDirection: 'row',
-            gap: 6,
+            gap: 4.5,
             maxWidth: 1100,
             flexWrap: 'wrap',
           }}
