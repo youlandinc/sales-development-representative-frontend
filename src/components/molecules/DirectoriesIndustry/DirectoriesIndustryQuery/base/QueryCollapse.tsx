@@ -44,7 +44,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
             fontSize: 14,
             height: 20,
             fontWeight: 600,
-            gap: 1.5,
+            gap: 0.25,
           }}
         >
           {title}
