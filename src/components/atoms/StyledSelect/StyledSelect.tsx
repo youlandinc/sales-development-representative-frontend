@@ -101,10 +101,10 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             transform: 'translate(14px, 8px) scale(1)',
           },
           '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
-            transform:
-              size === 'medium'
-                ? 'translate(14px, -8px) scale(0.75)'
-                : 'translate(12px, -8px) scale(0.75)',
+            '&.MuiInputLabel-sizeSmall': {
+              transform: 'translate(14px, -8px) scale(0.75)',
+            },
+            transform: 'translate(14px, -9px) scale(0.75)',
             color: 'text.primary',
           },
           '& .MuiSelect-outlined': {
@@ -112,25 +112,40 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             fontSize: 14,
             lineHeight: 1.5,
           },
-          '& .MuiInputBase-sizeSmall .MuiSelect-outlined': {
-            py: '7px',
-            fontSize: 12,
-            lineHeight: 1.5,
+          '& legend': {
+            fontSize: 14 * 0.75,
           },
-          '& .MuiInputBase-sizeLarge .MuiSelect-outlined': {
-            py: '12px',
-            fontSize: 16,
-            lineHeight: 1.5,
+          '& .MuiInputBase-sizeSmall ': {
+            '& .MuiSelect-outlined': {
+              py: '7px',
+              fontSize: 12,
+              lineHeight: 1.5,
+            },
+            '& legend': {
+              fontSize: 12 * 0.75,
+            },
+          },
+          '& .MuiInputBase-sizeLarge': {
+            '& .MuiSelect-outlined': {
+              py: '12px',
+              fontSize: 16,
+              lineHeight: 1.5,
+            },
+            '& legend': {
+              fontSize: 16 * 0.75,
+            },
           },
           //label
           '& .MuiInputLabel-root': {
-            transform: 'translate(14px, 9px) scale(1)',
+            transform: 'translate(14px, 9.5px) scale(1)',
             fontSize: 14,
             lineHeight: 1.5,
           },
           //label - small
           [`& .${inputLabelClasses.sizeSmall}`]: {
-            transform: 'translate(14px, 5px) scale(1)',
+            transform: 'translate(14px, 7px) scale(1)',
+            fontSize: 12,
+            lineHeight: 1.5,
           },
           //large
           '& .MuiInputLabel-sizeLarge ': {
