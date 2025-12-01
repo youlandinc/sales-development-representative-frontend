@@ -335,7 +335,9 @@ export const PreviewTable: FC = () => {
                                 onClick={() => {
                                   const url =
                                     row?.[head.columnKey as keyof typeof row];
-                                  if (!url) return;
+                                  if (!url) {
+                                    return;
+                                  }
                                   const finalUrl =
                                     url.startsWith('http://') ||
                                     url.startsWith('https://')
