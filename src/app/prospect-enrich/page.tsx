@@ -7,7 +7,7 @@ import { Prospect } from '@/components/organisms';
 
 const ProsectAndEnrich = () => {
   return (
-    <Layout>
+    <Layout contentSx={{ pb: 1 }}>
       <Prospect />
     </Layout>
   );
