@@ -1,4 +1,5 @@
 import {
+  Box,
   debounce,
   Divider,
   Icon,
@@ -9,12 +10,14 @@ import {
   Typography,
 } from '@mui/material';
 import { ChangeEvent, FC, MouseEvent, useMemo, useState } from 'react';
+import { useRouter } from 'nextjs-toploader/app';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 
 import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
 import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
 import ICON_NEW_TABLE from './assets/icon_new_table.svg';
+import ICON_DIRECTORY from './assets/icon_directory.svg';
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 
 interface ProspectHeaderProps {
@@ -30,7 +33,15 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
 }) => {
   const [value, setValue] = useState(store.searchWord);
 
+  const router = useRouter();
+
   const sourceOptions = [
+    {
+      label: 'Search directories',
+      icon: ICON_DIRECTORY,
+      disabled: false,
+      onClick: () => router.push('/directories'),
+    },
     {
       label: 'Import from CSV',
       icon: ICON_IMPORT_CSV,
@@ -108,7 +119,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
       </Stack>
 
       <Stack flexDirection={'row'} gap={3} justifyContent={'space-between'}>
-        <Typography variant={'h5'}>Prospect & Enrich</Typography>
+        <Typography variant={'h5'}>Enrichment tables</Typography>
 
         <Stack flexDirection={'row'} gap={1}>
           <StyledTextField
@@ -143,6 +154,10 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
             id="basic-button"
             onClick={onMenuOpen}
             size={'small'}
+            sx={{
+              bgcolor: 'text.primary',
+              color: '#FFFFFF !important',
+            }}
             variant={'outlined'}
           >
             <Icon
@@ -200,10 +215,16 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
                   alignItems: 'center',
                 }}
               >
-                <Icon
-                  component={item.icon}
-                  sx={{ width: 20, height: 20, mr: 1 }}
-                />
+                <Box
+                  sx={{
+                    bgcolor: '#EAE9EF',
+                    p: 0.5,
+                    mr: 1,
+                    borderRadius: 1,
+                  }}
+                >
+                  <Icon component={item.icon} sx={{ width: 20, height: 20 }} />
+                </Box>
                 {item.label}
               </MenuItem>
             ))}
@@ -211,7 +232,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
             <Typography variant={'h7'}>Tables</Typography>
             {tableOptions.map((item, index) => (
               <MenuItem
-                disabled
+                disabled={item.disabled}
                 key={`${item.label}-${index}`}
                 sx={{
                   fontSize: 14,
@@ -221,10 +242,16 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
                   alignItems: 'center',
                 }}
               >
-                <Icon
-                  component={item.icon}
-                  sx={{ width: 20, height: 20, mr: 1 }}
-                />
+                <Box
+                  sx={{
+                    bgcolor: '#EAE9EF',
+                    p: 0.5,
+                    mr: 1,
+                    borderRadius: 1,
+                  }}
+                >
+                  <Icon component={item.icon} sx={{ width: 20, height: 20 }} />
+                </Box>
                 {item.label}
               </MenuItem>
             ))}
