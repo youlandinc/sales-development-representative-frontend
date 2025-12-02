@@ -27,6 +27,8 @@ interface UseQueryAutoCompleteParams {
     | ((newValue: string | null) => void);
 }
 
+const PAGE_SIZE = 20;
+
 const normalizeOption = (item: RawOption): AutoCompleteOption => ({
   label: item.label,
   inputValue: item.value || item.label,
@@ -58,6 +60,11 @@ export const useQueryAutoComplete = ({
     }
     return '';
   });
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   const abortControllerRef = useRef<AbortController | null>(null);
   const debouncedInputValue = useDebounce(inputValue, 300);
   const hasStatic = staticOptions.length > 0;
@@ -84,9 +91,21 @@ export const useQueryAutoComplete = ({
   useEffect(() => {
     if (hasStatic && hasDynamic && !inputValue && open) {
       setOptions(staticOptions.map(normalizeOption));
+      // Reset pagination when showing static options
+      setPage(1);
+      setHasMore(true);
     }
   }, [hasStatic, hasDynamic, inputValue, open, staticOptions]);
 
+  // Reset pagination when keyword changes
+  useEffect(() => {
+    if (hasDynamic) {
+      setPage(1);
+      setHasMore(true);
+    }
+  }, [debouncedInputValue, hasDynamic]);
+
+  // Fetch options (page 1)
   useEffect(() => {
     const shouldSearch =
       hasDynamic &&
@@ -103,7 +122,7 @@ export const useQueryAutoComplete = ({
     abortControllerRef.current = controller;
 
     setLoading(true);
-    const requestUrl = `${url}?keyword=${encodeURIComponent(debouncedInputValue)}`;
+    const requestUrl = `${url}?keyword=${encodeURIComponent(debouncedInputValue)}&pageNumber=1`;
 
     get(requestUrl, { signal: controller.signal })
       .then((res) => {
@@ -120,6 +139,7 @@ export const useQueryAutoComplete = ({
           inputValue: item.value || item.label || item.name || String(item),
         }));
         setOptions(mappedOptions);
+        setHasMore(items.length >= PAGE_SIZE);
       })
       .catch((error: any) => {
         if (error?.code !== 'ERR_CANCELED') {
@@ -134,6 +154,63 @@ export const useQueryAutoComplete = ({
 
     return () => controller.abort();
   }, [debouncedInputValue, url, open, hasStatic, hasDynamic]);
+
+  // Load next page
+  const loadNextPage = useCallback(() => {
+    if (!hasDynamic || !hasMore || isLoadingMore || loading) {
+      return;
+    }
+
+    const nextPage = page + 1;
+    const controller = new AbortController();
+
+    setIsLoadingMore(true);
+    const requestUrl = `${url}?keyword=${encodeURIComponent(inputValue)}&pageNumber=${nextPage}`;
+
+    get(requestUrl, { signal: controller.signal })
+      .then((res) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        const responseData = res.data;
+        const items = Array.isArray(responseData)
+          ? responseData
+          : responseData?.data || [];
+
+        const mappedOptions = items.map((item: any) => ({
+          label: item.label || item.name || item.value || String(item),
+          inputValue: item.value || item.label || item.name || String(item),
+        }));
+
+        setOptions((prev) => [...prev, ...mappedOptions]);
+        setPage(nextPage);
+        setHasMore(items.length >= PAGE_SIZE);
+      })
+      .catch((error: any) => {
+        if (error?.code !== 'ERR_CANCELED') {
+          console.error('Failed to load more options:', error);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setIsLoadingMore(false);
+        }
+      });
+  }, [hasDynamic, hasMore, isLoadingMore, loading, page, url, inputValue]);
+
+  // Listbox scroll handler
+  const onListboxScroll = useCallback(
+    (event: React.UIEvent<HTMLUListElement>) => {
+      const listbox = event.currentTarget;
+      const isNearBottom =
+        listbox.scrollTop + listbox.clientHeight >= listbox.scrollHeight - 50;
+
+      if (isNearBottom && hasMore && !isLoadingMore && !loading) {
+        loadNextPage();
+      }
+    },
+    [hasMore, isLoadingMore, loading, loadNextPage],
+  );
 
   const autocompleteValue = useMemo(() => {
     if (multiple) {
@@ -161,6 +238,9 @@ export const useQueryAutoComplete = ({
 
   const onCloseToReset = useCallback(() => {
     setOpen(false);
+    // Reset pagination when menu closes
+    setPage(1);
+    setHasMore(true);
     if (!multiple && value) {
       const selectedOption = options.find((opt) => opt.inputValue === value);
       setInputValue(selectedOption?.label || (value as string));
@@ -227,11 +307,13 @@ export const useQueryAutoComplete = ({
     loading,
     inputValue,
     autocompleteValue,
+    isLoadingMore,
     onOpenToTrigger,
     onCloseToReset,
     onChangeToUpdateValue,
     onInputChangeToSearch,
     onGetOptionLabel,
     onIsOptionEqualToValue,
+    onListboxScroll,
   };
 };

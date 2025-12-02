@@ -1,18 +1,15 @@
+import { FC } from 'react';
 import {
   inputClasses,
   inputLabelClasses,
-  StandardTextFieldProps,
   SxProps,
   TextField,
+  TextFieldProps,
 } from '@mui/material';
-import { FC } from 'react';
 import { inputBaseClasses } from '@mui/material';
 
-export interface StyledTextFieldProps
-  extends Omit<StandardTextFieldProps, 'variant'> {
-  sx?: SxProps;
-  disabledAutoFill?: boolean;
-  variant?: 'outlined' | 'standard' | 'filled';
+export interface StyledTextFieldProps extends Omit<TextFieldProps, 'variant'> {
+  variant?: TextFieldProps['variant'];
 }
 
 export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
@@ -106,7 +103,6 @@ export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
 export const StyledTextField: FC<StyledTextFieldProps> = ({
   onChange,
   variant = 'outlined',
-  //disabledAutoFill = true,
   size = 'medium',
   sx,
   ...rest

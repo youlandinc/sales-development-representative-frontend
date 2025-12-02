@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useId, useMemo } from 'react';
 import {
   Autocomplete,
   AutocompleteChangeReason,
@@ -69,12 +69,14 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     loading,
     inputValue,
     autocompleteValue,
+    isLoadingMore,
     onOpenToTrigger,
     onCloseToReset,
     onChangeToUpdateValue,
     onInputChangeToSearch,
     onGetOptionLabel,
     onIsOptionEqualToValue,
+    onListboxScroll,
   } = useQueryAutoComplete({
     url,
     staticOptions,
@@ -90,7 +92,11 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
       opts: AutoCompleteOption[],
       state: FilterOptionsState<AutoCompleteOption>,
     ) => {
-      const filtered = createFilterOptions<AutoCompleteOption>()(opts, state);
+      // Dynamic search: API already filtered, skip client-side filtering
+      // Static only: use createFilterOptions for client-side filtering
+      const filtered = url
+        ? opts.filter((opt) => opt.inputValue !== '__loading_more__')
+        : createFilterOptions<AutoCompleteOption>()(opts, state);
 
       if (freeSolo && isAuth && state.inputValue !== '') {
         const currentValues = multiple
@@ -115,9 +121,26 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
         }
       }
 
+      // Always keep loading indicator at the end
+      if (opts.some((opt) => opt.inputValue === '__loading_more__')) {
+        filtered.push({
+          inputValue: '__loading_more__',
+          label: 'Loading more...',
+        });
+      }
+
       return filtered;
     },
-    [freeSolo, isAuth, multiple, value],
+    [freeSolo, isAuth, multiple, value, url],
+  );
+
+  // Special option for loading more indicator
+  const LOADING_MORE_OPTION: AutoCompleteOption = useMemo(
+    () => ({
+      inputValue: '__loading_more__',
+      label: 'Loading more...',
+    }),
+    [],
   );
 
   // When static options are filtered to empty and user can't add new values,
@@ -140,8 +163,22 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
         return [];
       }
     }
+    // Add loading indicator at the end when loading more
+    if (isLoadingMore) {
+      return [...options, LOADING_MORE_OPTION];
+    }
     return options;
-  }, [url, open, loading, freeSolo, isAuth, options, inputValue]);
+  }, [
+    url,
+    open,
+    loading,
+    freeSolo,
+    isAuth,
+    options,
+    inputValue,
+    isLoadingMore,
+    LOADING_MORE_OPTION,
+  ]);
 
   const onChangeToHandleSelection = useCallback(
     (
@@ -182,6 +219,8 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     </Typography>
   );
 
+  const id = useId();
+
   return (
     <Tooltip
       arrow
@@ -221,7 +260,12 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           disableCloseOnSelect={multiple}
           filterOptions={filterOptions}
           freeSolo={freeSolo && isAuth}
-          getOptionDisabled={isAuth ? undefined : () => true}
+          getOptionDisabled={(option) => {
+            if (!isAuth) {
+              return true;
+            }
+            return option.inputValue === '__loading_more__';
+          }}
           getOptionKey={(option) =>
             UTypeOf.isString(option) ? option : option.inputValue
           }
@@ -243,6 +287,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           renderInput={(params) => (
             <StyledTextField
               {...params}
+              id={id}
               placeholder={
                 (multiple && (!value || (value as string[]).length === 0)) ||
                 (!multiple && !value)
@@ -253,14 +298,38 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               slotProps={{
                 htmlInput: {
                   ...params.inputProps,
-                  autoComplete: 'new-password',
+                  autoComplete: 'off',
+                  autoCorrect: 'off',
+                  autoCapitalize: 'off',
+                  spellCheck: false,
                   'data-form-type': 'other',
+                  'data-lpignore': 'true',
+                  'data-1p-ignore': 'true',
                 },
               }}
             />
           )}
           renderOption={(props, option) => {
             const { key, ...rest } = props;
+
+            // Loading more indicator - non-clickable
+            if (option.inputValue === '__loading_more__') {
+              return (
+                <li
+                  key={key}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: 14,
+                    color: '#999',
+                    textAlign: 'center',
+                    cursor: 'default',
+                  }}
+                >
+                  Loading more...
+                </li>
+              );
+            }
+
             return (
               <li key={key} {...rest}>
                 <Stack
@@ -321,8 +390,10 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               },
             },
             listbox: {
+              onScroll: onListboxScroll,
               sx: {
                 py: 0,
+                maxHeight: 300,
                 '& .MuiAutocomplete-option': {
                   px: 2,
                   py: 1,

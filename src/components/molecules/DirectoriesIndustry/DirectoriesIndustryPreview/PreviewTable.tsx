@@ -22,12 +22,7 @@ import {
 
 import { OverflowTooltip } from './OverflowTooltip';
 import { COLUMN_TYPE_ICONS } from '@/constants';
-import {
-  UFormatDate,
-  UFormatDollar,
-  UFormatNumber,
-  UFormatPhone,
-} from '@/utils';
+import { UFormatDate, UFormatDollar, UFormatNumber } from '@/utils';
 
 import ICON_LOCK from './assets/icon-lock.svg';
 import ICON_NO_RESULT from './assets/icon-no-result.svg';
