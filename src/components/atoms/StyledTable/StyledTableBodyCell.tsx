@@ -37,7 +37,7 @@ const CELL_CONSTANTS = {
 } as const;
 
 const CELL_COLORS = {
-  ACTIVE_BG: '#F8F8FA',
+  ACTIVE_BG: '#F4F5F9',
   DEFAULT_BG: '#fff',
   BORDER: '#DFDEE6',
   PINNED_BORDER: '3px solid #DFDEE6',

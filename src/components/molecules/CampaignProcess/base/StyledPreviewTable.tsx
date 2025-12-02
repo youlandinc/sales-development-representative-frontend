@@ -62,7 +62,7 @@ export const StyledPreviewTable = ({
               {Object.entries(data[0]).map(([key, value], index, array) => (
                 <Stack
                   alignItems={'center'}
-                  bgcolor={'#F8F8FA'}
+                  bgcolor={'#F4F5F9'}
                   borderBottom={'1px solid #E5E7EB'}
                   borderRight={
                     index < array.length - 1 ? '1px solid #E5E7EB' : 'none'
@@ -132,7 +132,7 @@ export const StyledPreviewTable = ({
                 zIndex: 10,
                 left: 0,
                 right: 0,
-                bgcolor: '#F8F8FA',
+                bgcolor: '#F4F5F9',
                 borderBottom: '1px solid #E5E7EB',
               }}
             >

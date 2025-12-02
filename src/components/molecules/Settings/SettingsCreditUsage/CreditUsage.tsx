@@ -31,12 +31,12 @@ interface CreditUsageRow {
 // Style constants
 const AVATAR_SIZE = 18;
 const AVATAR_OVERLAP = '-4px';
-const BORDER_COLOR = '#F8F8FA';
-const HOVER_BG_COLOR = '#F8F8FA';
+const BORDER_COLOR = '#F4F5F9';
+const HOVER_BG_COLOR = '#F4F5F9';
 const ROW_BORDER_COLOR = '#D0CEDA';
 const TEXT_PRIMARY_COLOR = '#363440';
 const TEXT_SECONDARY_COLOR = '#6F6C7D';
-const NEUTRAL_BG_COLOR = '#EAE9EF';
+const NEUTRAL_BG_COLOR = '#F0F0F4';
 
 export const CreditUsage: FC = () => {
   // const debouncedConditions = useDebounce(conditions, 400);

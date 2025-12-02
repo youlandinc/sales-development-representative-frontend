@@ -13,7 +13,7 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
   backgroundColor = '#fff',
 }) => {
   const getGradientBackground = (bgColor: string) => {
-    if (bgColor === '#F8F8FA') {
+    if (bgColor === '#F4F5F9') {
       return 'linear-gradient(to right, transparent 0%, rgba(247, 244, 253, 0.8) 30%, rgba(247, 244, 253, 1) 60%)';
     }
     if (bgColor === '#FFFFFF' || bgColor === '#fff') {
@@ -68,7 +68,7 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
           border: '1px solid #DFDEE6',
           bgcolor: '#ffffff',
           '&:hover': {
-            bgcolor: '#F8F8FA',
+            bgcolor: '#F4F5F9',
           },
         }}
       >

@@ -183,13 +183,13 @@ export const StyledSelect: FC<StyledSelectProps> = ({
                   p: 0,
                   m: 0,
                   '& .MuiMenuItem-root:hover': {
-                    bgcolor: '#F8F8FA !important',
+                    bgcolor: '#F4F5F9 !important',
                   },
                   '& .Mui-selected': {
-                    bgcolor: '#EAE9EF !important',
+                    bgcolor: '#F0F0F4 !important',
                   },
                   '& .Mui-selected:hover': {
-                    bgcolor: '#EAE9EF !important',
+                    bgcolor: '#F0F0F4 !important',
                   },
                   '& .MuiMenuItem-root': {
                     fontSize: 14,

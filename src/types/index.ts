@@ -14,4 +14,4 @@ export * from './Contacts';
 
 export * from './findPeopleCompany';
 
-export * from './Settings';
+export * from './settings';

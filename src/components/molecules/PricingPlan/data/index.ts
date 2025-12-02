@@ -37,7 +37,7 @@ export const CANCEL_URL = `${BASE_URL}${PLANS_ROUTE}`;
 export const COLORS = {
   PRIMARY: '#363440',
   BORDER: '#DFDEE6',
-  BACKGROUND: '#EAE9EF',
+  BACKGROUND: '#F0F0F4',
 } as const;
 
 export const DIMENSIONS = {

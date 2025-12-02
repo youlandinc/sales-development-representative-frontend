@@ -191,7 +191,7 @@ export const DialogHeaderActions = () => {
                     py={0.5}
                     sx={{
                       '&:hover': {
-                        bgcolor: '#F8F8FA',
+                        bgcolor: '#F4F5F9',
                       },
                       cursor: 'pointer',
                     }}

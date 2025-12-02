@@ -129,3 +129,11 @@ export enum PlanCategoryEnum {
   capital = 'CAPITAL_MARKETS',
   enrichment = 'ENRICHMENT_CREDITS',
 }
+
+export enum SettingTabEnum {
+  Email = 'Email',
+  Integrations = 'Integrations',
+  Account = 'Account',
+  Plan = 'Plan',
+  Usage = 'Usage',
+}

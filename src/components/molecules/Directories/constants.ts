@@ -1,8 +1,8 @@
 export const DIRECTORIES_COLORS = {
   light: {
     card: {
-      background: '#F8F8FA',
-      border: '#EAE9EF',
+      background: '#F4F5F9',
+      border: '#F0F0F4',
     },
     title: '#363440',
     description: '#2A292E',
@@ -16,7 +16,7 @@ export const DIRECTORIES_COLORS = {
   dark: {
     card: {
       background: '#282828',
-      border: '#EAE9EF',
+      border: '#F0F0F4',
     },
     title: '#F7F4FD',
     description: '#F7F4FD',

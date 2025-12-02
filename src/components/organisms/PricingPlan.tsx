@@ -107,7 +107,7 @@ export const PricingPlan = () => {
           direction="row"
           gap={1.25}
           sx={{
-            bgcolor: '#F8F8FA',
+            bgcolor: '#F4F5F9',
             borderRadius: 2,
             p: 0.5,
             boxShadow: '0px 1px 1px 0px rgba(46, 46, 46, 0.25)',

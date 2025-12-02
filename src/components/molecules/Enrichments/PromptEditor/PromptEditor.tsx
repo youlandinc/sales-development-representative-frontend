@@ -286,7 +286,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
                 Type
               </Typography>
               <Box
-                bgcolor={'#EAE9EF'}
+                bgcolor={'#F0F0F4'}
                 border={'1px solid #DFDEE6'}
                 borderRadius={'2px'}
                 color={'secondary'}

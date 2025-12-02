@@ -13,7 +13,7 @@ export const StyledCellItemContainer: FC<
   return (
     <Stack
       alignItems={'center'}
-      bgcolor={'#F8F8FA'}
+      bgcolor={'#F4F5F9'}
       border={'1px solid #E5E5E5'}
       borderRadius={2}
       flexDirection={'row'}
@@ -25,7 +25,7 @@ export const StyledCellItemContainer: FC<
         userSelect: 'none',
         '&:hover': {
           borderColor: '#6E4EFB',
-          bgcolor: '#F8F8FA',
+          bgcolor: '#F4F5F9',
           '& .icon_copy': {
             display: 'block',
           },

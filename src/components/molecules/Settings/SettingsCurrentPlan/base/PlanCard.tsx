@@ -113,7 +113,7 @@ export const PlanCard: FC<PlanCardProps> = ({
   return (
     <Box
       sx={{
-        bgcolor: '#F8F8FA',
+        bgcolor: '#F4F5F9',
         borderRadius: 2,
         p: 3,
         px: 2,
@@ -156,7 +156,7 @@ export const PlanCard: FC<PlanCardProps> = ({
             sx={{
               height: 8,
               borderRadius: 1,
-              bgcolor: '#EAE9EF',
+              bgcolor: '#F0F0F4',
               '& .MuiLinearProgress-bar': {
                 bgcolor: '#363440',
                 borderRadius: 1,

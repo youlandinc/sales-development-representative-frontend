@@ -117,7 +117,7 @@ export const SettingsIntegrations: FC = () => {
             key={`${integration.provider}-${index}`}
             p={1.5}
             sx={{
-              backgroundColor: integration.connected ? '#fff' : '#F8F8FA',
+              backgroundColor: integration.connected ? '#fff' : '#F4F5F9',
             }}
             width={438}
           >

@@ -193,7 +193,7 @@ export const Prospect: FC = () => {
             <Stack
               {...dragEvents}
               alignItems={'center'}
-              bgcolor={'#F8F8FA'}
+              bgcolor={'#F4F5F9'}
               border={'2px dashed #D2D6E1'}
               borderRadius={2}
               display={!selectedFile ? 'flex' : 'none'}
@@ -240,7 +240,7 @@ export const Prospect: FC = () => {
             <Stack display={!selectedFile ? 'none' : 'flex'} gap={3}>
               <Stack
                 alignItems={'center'}
-                bgcolor={'#F8F8FA'}
+                bgcolor={'#F4F5F9'}
                 border={'1px dashed #D2D6E1'}
                 borderRadius={2}
                 flexDirection={'row'}

@@ -348,12 +348,12 @@ export const InboxSide: FC = () => {
               px: 2.5,
               py: 1.5,
               '&:hover': {
-                bgcolor: '#F8F8FA',
+                bgcolor: '#F4F5F9',
               },
               cursor: 'pointer',
               bgcolor:
                 selectedEmail?.emailId === item.emailId
-                  ? '#F8F8FA'
+                  ? '#F4F5F9'
                   : 'transparent',
             }}
             title={

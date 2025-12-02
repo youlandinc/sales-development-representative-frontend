@@ -74,7 +74,7 @@ export const DirectoriesIndustryQuery: FC = () => {
           size="36px"
           sx={{
             color: '#D0CEDA',
-            '& .MuiCircularProgress-track': { stroke: '#EAE9EF' },
+            '& .MuiCircularProgress-track': { stroke: '#F0F0F4' },
           }}
         />
       </Stack>

@@ -25,7 +25,7 @@ export const StyledButtonGroupStyles = {
       borderLeft: '1px solid transparent',
     },
     '&.MuiToggleButtonGroup-grouped.Mui-selected': {
-      bgcolor: '#EAE9EF',
+      bgcolor: '#F0F0F4',
       borderColor: 'primary.main',
       color: 'primary.main',
     },

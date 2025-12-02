@@ -45,7 +45,7 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
           pr: 1,
           borderRadius: 2,
           cursor: 'pointer',
-          '&:hover': { bgcolor: '#F8F8FA' },
+          '&:hover': { bgcolor: '#F4F5F9' },
         }}
       >
         <Icon
@@ -108,7 +108,7 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
                     pr: 1,
                     borderRadius: 2,
                     cursor: 'pointer',
-                    '&:hover': { bgcolor: '#F8F8FA' },
+                    '&:hover': { bgcolor: '#F4F5F9' },
                   }}
                 >
                   <Icon

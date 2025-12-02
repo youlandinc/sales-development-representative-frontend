@@ -12,7 +12,7 @@ const useStyles = createUseStyles({
     flexDirection: 'row',
     alignItems: 'center',
     gap: '4px',
-    backgroundColor: '#EAE9EF',
+    backgroundColor: '#F0F0F4',
   },
   button: {
     width: '12px',

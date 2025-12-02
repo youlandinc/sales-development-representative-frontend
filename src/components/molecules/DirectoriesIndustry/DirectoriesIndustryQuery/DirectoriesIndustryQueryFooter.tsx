@@ -145,7 +145,7 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
               sx={{
                 height: 8,
                 borderRadius: 1,
-                bgcolor: '#EAE9EF',
+                bgcolor: '#F0F0F4',
                 width: 120,
                 '& .MuiLinearProgress-bar': {
                   bgcolor: '#363440',

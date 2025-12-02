@@ -208,8 +208,8 @@ export const PreviewTable: FC = () => {
                     sx={{
                       py: 0,
                       px: 1.5,
-                      borderTop: '1px solid #EAE9EF',
-                      borderRight: '1px solid #EAE9EF',
+                      borderTop: '1px solid #F0F0F4',
+                      borderRight: '1px solid #F0F0F4',
                       fontSize: 14,
                       fontWeight: 600,
                       color: 'primary.main',
@@ -273,8 +273,8 @@ export const PreviewTable: FC = () => {
                         sx={{
                           py: 0,
                           px: 1.5,
-                          borderRight: '1px solid #EAE9EF',
-                          borderBottom: '1px solid #EAE9EF',
+                          borderRight: '1px solid #F0F0F4',
+                          borderBottom: '1px solid #F0F0F4',
                           fontSize: 14,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',

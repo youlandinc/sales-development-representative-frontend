@@ -175,7 +175,7 @@ export const ContentLaunch = () => {
         <CommonSelectWithAction
           actionsNode={
             <>
-              <Stack bgcolor={'#EAE9EF'} height={'1px'} my={1.5} />
+              <Stack bgcolor={'#F0F0F4'} height={'1px'} my={1.5} />
               <Typography
                 color={'#363440'}
                 fontSize={14}

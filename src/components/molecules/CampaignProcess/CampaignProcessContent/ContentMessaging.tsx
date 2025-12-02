@@ -627,7 +627,7 @@ export const ContentMessaging = () => {
                               ? '1px solid #363440'
                               : '1px solid #DFDEE6',
                           bgcolor:
-                            activeValue === index ? '#F8F8FA' : '#ffffff',
+                            activeValue === index ? '#F4F5F9' : '#ffffff',
                           borderRadius: 2,
                           width: 320,
                           flexShrink: 0,
@@ -791,7 +791,7 @@ export const ContentMessaging = () => {
       </Stack>
 
       <Stack
-        bgcolor={'#F8F8FA'}
+        bgcolor={'#F4F5F9'}
         border={'1px solid #D2D6E1'}
         borderRadius={4}
         flex={1}

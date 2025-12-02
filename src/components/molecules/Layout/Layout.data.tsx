@@ -18,6 +18,7 @@ import ICON_SIDE_DIRECTORIES_ACTIVE from './assets/icon_directories_active.svg';
 
 import ICON_SIDE_PRICING_DEFAULT from './assets/icon_side_pricing_default.svg';
 import ICON_SIDE_PRICING_ACTIVE from './assets/icon_side_pricing_active.svg';
+import { SettingTabEnum } from '@/types';
 
 export const PLANS_ROUTE = '/plans';
 
@@ -112,8 +113,8 @@ export const LAYOUT_SIDE_MENU = [
 export const LAYOUT_SIDE_MENU_BOTTOM = [
   {
     label: 'Manage plan',
-    url: PLANS_ROUTE,
-    key: 'plans',
+    url: `/settings?tab=${SettingTabEnum.Plan}`,
+    key: 'settings-tab-plan',
     defaultIcon: ICON_SIDE_PRICING_DEFAULT,
     activeIcon: ICON_SIDE_PRICING_ACTIVE,
     type: 'link',

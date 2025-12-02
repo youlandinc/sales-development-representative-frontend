@@ -213,7 +213,7 @@ export const DataSourceCSV: FC = () => {
         >
           <Stack
             alignItems={'center'}
-            bgcolor={'#F8F8FA'}
+            bgcolor={'#F4F5F9'}
             border={'1px dashed #D2D6E1'}
             borderRadius={2}
             flexDirection={'row'}
@@ -279,7 +279,7 @@ export const DataSourceCSV: FC = () => {
       <Fade in={!localFormData.fileInfo.originalFileName}>
         <Stack
           alignItems={'center'}
-          bgcolor={'#F8F8FA'}
+          bgcolor={'#F4F5F9'}
           border={'2px dashed #D2D6E1'}
           borderRadius={2}
           display={!localFormData.fileInfo.originalFileName ? 'flex' : 'none'}

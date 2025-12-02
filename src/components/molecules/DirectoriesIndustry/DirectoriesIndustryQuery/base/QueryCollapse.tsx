@@ -28,7 +28,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
   return (
     <Stack
       sx={{
-        border: '1px solid #eae9ef',
+        border: '1px solid #F0F0F4',
         borderRadius: 2,
         p: 2,
       }}
@@ -63,7 +63,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                   e.preventDefault();
                 }}
                 sx={{
-                  bgcolor: '#EAE9EF',
+                  bgcolor: '#F0F0F4',
                   borderRadius: 1,
                   fontSize: 12,
                   px: 1,

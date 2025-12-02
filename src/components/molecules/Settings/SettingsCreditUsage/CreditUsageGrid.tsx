@@ -3,7 +3,7 @@ import { GridColDef } from '@mui/x-data-grid';
 import { FC, memo, ReactNode } from 'react';
 
 // Style constants
-const HOVER_BG_COLOR = '#F8F8FA';
+const HOVER_BG_COLOR = '#F4F5F9';
 const BORDER_COLOR = '#D0CEDA';
 
 type CreditUsageGridProps = {

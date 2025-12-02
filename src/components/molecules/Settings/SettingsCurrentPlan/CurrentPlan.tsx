@@ -1,13 +1,20 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { FC } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { CancelSubscriptionDialog, PaymentSetting, PlanList } from './base';
 
 import { useCurrentPlan } from './hooks';
+import { StyledButton } from '@/components/atoms';
 
 export const CurrentPlan: FC = () => {
+  const router = useRouter();
   const { plans, isLoading, onClickToCancelPlan, cancelDialog } =
     useCurrentPlan();
+
+  const onClickToViewPlans = () => {
+    router.push('/plans');
+  };
 
   return (
     <Box>
@@ -25,15 +32,29 @@ export const CurrentPlan: FC = () => {
             p: 3,
           }}
         >
-          <Typography
-            sx={{
-              fontSize: 18,
-              fontWeight: 600,
-              lineHeight: 1.2,
-            }}
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            justifyContent={'space-between'}
           >
-            Current plan
-          </Typography>
+            <Typography
+              sx={{
+                fontSize: 18,
+                fontWeight: 600,
+                lineHeight: 1.2,
+              }}
+            >
+              Current plan
+            </Typography>
+            <StyledButton
+              color={'info'}
+              onClick={onClickToViewPlans}
+              size={'small'}
+              variant={'outlined'}
+            >
+              View plans
+            </StyledButton>
+          </Stack>
           <PlanList
             isLoading={isLoading}
             onClickToCancelPlan={onClickToCancelPlan}

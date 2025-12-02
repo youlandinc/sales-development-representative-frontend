@@ -208,7 +208,7 @@ const defaultOptions: ThemeOptions = {
       disabled: '#BABCBE',
       hover: '#4C4957',
       focus: '#5B76BC',
-      active: '#F8F8FA',
+      active: '#F4F5F9',
       primary: '#2A292E',
       secondary: '#6F6C7D',
       avatar_defaultBg: '#DFE2E7',

@@ -122,7 +122,7 @@ export const CommonSelectWithAction: FC<CommonSelectWithActionProps> = ({
           )}
           {options.map((item, index) => (
             <Stack
-              bgcolor={value === item.value ? '#F8F8FA' : '#fff'}
+              bgcolor={value === item.value ? '#F4F5F9' : '#fff'}
               borderRadius={2}
               color={value === item.value ? 'primary.main' : 'text.primary'}
               fontSize={14}

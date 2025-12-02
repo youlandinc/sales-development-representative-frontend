@@ -160,7 +160,7 @@ export const Chat: FC = () => {
               >
                 {item.source === SourceEnum.user ? (
                   <Typography
-                    bgcolor={'#EAE9EF'}
+                    bgcolor={'#F0F0F4'}
                     borderRadius={2}
                     color={'#6F6C7D'}
                     px={2}
@@ -184,7 +184,7 @@ export const Chat: FC = () => {
 
       <Stack
         alignSelf={'center'}
-        bgcolor={'#F8F8FA'}
+        bgcolor={'#F4F5F9'}
         borderRadius={4}
         component={'form'}
         flexShrink={0}

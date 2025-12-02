@@ -214,7 +214,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               >
                 <Box
                   sx={{
-                    bgcolor: '#EAE9EF',
+                    bgcolor: '#F0F0F4',
                     p: 0.5,
                     mr: 1,
                     borderRadius: 1,
@@ -241,7 +241,7 @@ export const ProspectHeader: FC<ProspectHeaderProps> = ({
               >
                 <Box
                   sx={{
-                    bgcolor: '#EAE9EF',
+                    bgcolor: '#F0F0F4',
                     p: 0.5,
                     mr: 1,
                     borderRadius: 1,

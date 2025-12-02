@@ -121,7 +121,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
 
   // 计算背景色：选中 > hover > 默认
   const headerBackgroundColor =
-    isActive || (isHovered && !isEditing) ? '#F8F8FA' : '#FFFFFF';
+    isActive || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 
   return (
     <Stack
@@ -143,13 +143,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           isPinned && showPinnedRightShadow && !isSelectColumn
             ? 'none'
             : '0.5px solid #DFDEE6',
-        bgcolor: isActive ? '#F8F8FA' : '#FFFFFF',
+        bgcolor: isActive ? '#F4F5F9' : '#FFFFFF',
         cursor: 'pointer',
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
         '&:hover': {
-          bgcolor: !isEditing ? '#F8F8FA' : '#F6F6F6',
+          bgcolor: !isEditing ? '#F4F5F9' : '#F6F6F6',
         },
         height: '36px',
         justifyContent: 'center',

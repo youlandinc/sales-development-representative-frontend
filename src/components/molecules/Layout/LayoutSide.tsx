@@ -52,7 +52,7 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
               color: active ? 'primary.main' : 'text.secondary',
             },
           },
-          bgcolor: active && expend ? '#EAE9EF' : 'transparent',
+          bgcolor: active && expend ? '#F4F5F9' : 'transparent',
           borderRadius: 2,
         },
         ...(Array.isArray(sx) ? sx : [sx]),
@@ -130,7 +130,9 @@ export const LayoutSide: FC = () => {
   const isSelected = (key?: string) => pathname.includes(key || '');
 
   const onClickToRedirect = (url: string) => {
-    if (isSelected(url) && url !== '/directories') {
+    const currentFullPath = pathname + (window.location.search || '');
+    // Allow navigation if URLs differ (including query params)
+    if (currentFullPath === url && url !== '/directories') {
       return;
     }
     router.push(url);

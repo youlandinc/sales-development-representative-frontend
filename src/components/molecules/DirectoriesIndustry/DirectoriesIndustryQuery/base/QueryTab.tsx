@@ -66,7 +66,7 @@ export const QueryTab: FC<QueryTabProps> = ({
         sx={{
           height: 36,
           minHeight: 36,
-          borderBottom: '1px solid #EAE9EF',
+          borderBottom: '1px solid #F0F0F4',
           '& .MuiTabs-flexContainer': {
             height: 36,
           },

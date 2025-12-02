@@ -11,7 +11,7 @@ import {
   DateRangeEnum,
   FetchCreditUsageListRequest,
   UsageTypeOptions,
-} from '@/types/Settings/creditUsage';
+} from '@/types/settings/creditUsage';
 
 import {
   computedPlanBadgeStyle,
@@ -119,10 +119,10 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
           }}
           sxList={{
             '& .MuiMenuItem-root:hover': {
-              bgcolor: '#F8F8FA !important',
+              bgcolor: '#F4F5F9 !important',
             },
             '& .Mui-selected:hover': {
-              bgcolor: '#EAE9EF !important',
+              bgcolor: '#F0F0F4 !important',
             },
           }}
           value={value.category}
@@ -197,10 +197,10 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
             borderRadius: 2,
           },
           '& .MuiMenuItem-root:hover': {
-            bgcolor: '#F8F8FA !important',
+            bgcolor: '#F4F5F9 !important',
           },
           '& .Mui-selected:hover': {
-            bgcolor: '#EAE9EF !important',
+            bgcolor: '#F0F0F4 !important',
           },
         }}
         value={value.dateType}
