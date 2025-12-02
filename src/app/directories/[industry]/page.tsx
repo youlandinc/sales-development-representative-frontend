@@ -47,6 +47,8 @@ export default function DirectoriesIndustryPage() {
   useEffect(() => {
     if (!TITLE_MAP[industrySlug]) {
       router.replace('/directories');
+    } else {
+      document.title = `${TITLE_MAP[industrySlug]} - Directories - Corepass SalesOS`;
     }
   }, [industrySlug, router]);
 

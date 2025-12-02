@@ -224,7 +224,7 @@ export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
         loading={isLoading}
         onPaginationModelChange={setPaginationModel}
         onRowClick={({ row }) => {
-          router.push(`/prospect-enrich/${row.tableId}`);
+          router.push(`/enrichment/${row.tableId}`);
         }}
         paginationMode={'server'}
         paginationModel={paginationModel}

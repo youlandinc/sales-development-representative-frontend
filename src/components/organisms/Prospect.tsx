@@ -172,7 +172,7 @@ export const Prospect: FC = () => {
     setCreating(true);
     try {
       const { data } = await _createProspectTableViaCsv(formData);
-      router.push(`/prospect-enrich/${data}`);
+      router.push(`/enrichment/${data}`);
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ header, message, variant });

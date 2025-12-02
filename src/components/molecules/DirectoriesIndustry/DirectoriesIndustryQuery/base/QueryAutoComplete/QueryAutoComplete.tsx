@@ -120,15 +120,17 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     [freeSolo, isAuth, multiple, value],
   );
 
-  // When static options are filtered to empty in non-freeSolo mode,
+  // When static options are filtered to empty and user can't add new values,
   // pass empty options array to trigger MUI's noOptionsText
   const displayOptions = useMemo(() => {
-    // Only check for static-only mode (no URL)
-    if (url || !open || loading || freeSolo) {
+    // Skip if not open or loading
+    if (!open || loading) {
       return options;
     }
-    // Check if input would filter all options out
-    if (options.length > 0 && inputValue) {
+    // Check if user can add new values (freeSolo AND authenticated)
+    const canAddNewValue = freeSolo && isAuth;
+    // If user can't add new values and we have static options, check filter result
+    if (!canAddNewValue && !url && options.length > 0 && inputValue) {
       const filtered = createFilterOptions<AutoCompleteOption>()(options, {
         inputValue,
         getOptionLabel: (opt) => opt.label,
@@ -139,7 +141,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
       }
     }
     return options;
-  }, [url, open, loading, freeSolo, options, inputValue]);
+  }, [url, open, loading, freeSolo, isAuth, options, inputValue]);
 
   const onChangeToHandleSelection = useCallback(
     (
@@ -218,7 +220,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           }
           disableCloseOnSelect={multiple}
           filterOptions={filterOptions}
-          freeSolo={freeSolo}
+          freeSolo={freeSolo && isAuth}
           getOptionDisabled={isAuth ? undefined : () => true}
           getOptionKey={(option) =>
             UTypeOf.isString(option) ? option : option.inputValue
@@ -234,7 +236,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           onInputChange={onInputChangeToSearch}
           onOpen={onOpenToTrigger}
           open={open}
-          options={options}
+          options={displayOptions}
           popupIcon={
             <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
           }
@@ -251,7 +253,8 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               slotProps={{
                 htmlInput: {
                   ...params.inputProps,
-                  autoComplete: 'off',
+                  autoComplete: 'new-password',
+                  'data-form-type': 'other',
                 },
               }}
             />

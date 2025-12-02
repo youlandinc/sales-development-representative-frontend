@@ -90,7 +90,7 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
       const { data } = await _importDirectoriesDataToTable(requestParams);
 
       if (data.tableId) {
-        router.push(`/prospect-enrich/${data.tableId}`);
+        router.push(`/enrichment/${data.tableId}`);
       } else {
         setResetCredit(data?.remainingCredit || 0);
         setRequestAmount(data?.actualNeedCredit || 0);
@@ -116,7 +116,7 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
         ...requestParams,
         userRemainingImport: true,
       });
-      router.push(`/prospect-enrich/${data.tableId}`);
+      router.push(`/enrichment/${data.tableId}`);
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });

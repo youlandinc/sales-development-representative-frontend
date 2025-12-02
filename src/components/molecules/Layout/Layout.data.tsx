@@ -44,8 +44,8 @@ export const LAYOUT_SIDE_MENU = [
   },
   {
     label: 'Enrichment',
-    url: '/prospect-enrich',
-    key: 'prospect-enrich',
+    url: '/enrichment',
+    key: 'enrichment',
     defaultIcon: ICON_SIDE_ENRICH_DEFAULT,
     activeIcon: ICON_SIDE_ENRICH_ACTIVE,
     type: 'link',

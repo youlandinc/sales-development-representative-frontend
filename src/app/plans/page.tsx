@@ -1,18 +1,21 @@
 'use client';
 
-export const fetchCache = 'force-no-store';
+import { useEffect } from 'react';
 
 import { Layout } from '@/components/molecules';
 import { PricingPlan } from '@/components/organisms';
 
+export const fetchCache = 'force-no-store';
+
 const PlansPage = () => {
+  useEffect(() => {
+    document.title = 'View plans - Corepass SalesOS';
+  }, []);
+
   return (
-    <>
-      <title>View plans - Corepass SalesOS</title>
-      <Layout>
-        <PricingPlan />
-      </Layout>
-    </>
+    <Layout>
+      <PricingPlan />
+    </Layout>
   );
 };
 
