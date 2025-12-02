@@ -30,7 +30,7 @@ export const SettingsEmailProfiles: FC = () => {
     data,
     visible,
     deleteVisible,
-    close,
+    onClickCancel,
     deleteClose,
     onClickCreateProfile,
     onClickEdit,
@@ -234,7 +234,7 @@ export const SettingsEmailProfiles: FC = () => {
           <Stack flexDirection={'row'} gap={1.5} pt={3}>
             <StyledButton
               color={'info'}
-              onClick={close}
+              onClick={onClickCancel}
               size={'medium'}
               variant={'outlined'}
             >

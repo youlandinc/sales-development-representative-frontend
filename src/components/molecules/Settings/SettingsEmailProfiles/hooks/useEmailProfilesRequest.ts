@@ -63,6 +63,17 @@ export const useEmailProfilesRequest = () => {
     deleteOpen();
   };
 
+  const onClickCancel = () => {
+    close();
+    deleteClose();
+    setEditId(null);
+    setName('');
+    setContent('');
+    setConnectedMailboxes([]);
+    setDefaultMailbox('');
+    setRotationEnabled(false);
+  };
+
   const onClickCreateProfile = () => {
     if (typeof editId === 'number') {
       setEditId(null);
@@ -157,7 +168,7 @@ export const useEmailProfilesRequest = () => {
     visible,
     deleteVisible,
     open,
-    close,
+    onClickCancel,
     deleteOpen,
     deleteClose,
     onClickEdit,

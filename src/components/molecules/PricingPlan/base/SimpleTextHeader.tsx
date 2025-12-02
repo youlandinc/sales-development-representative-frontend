@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import { FC } from 'react';
 
 const TYPOGRAPHY_STYLES = {
-  fontSize: 22,
+  fontSize: 'clamp(18px, 1.145vw, 22px)',
   lineHeight: '36px',
   color: 'text.secondary',
   minHeight: 36,
