@@ -13,6 +13,7 @@ import { DirectoriesQueryItem } from '@/types/directories';
 
 import { QueryBreadcrumbs } from './base';
 import { CreateQueryElement, DirectoriesIndustryQueryFooter } from './index';
+import { QueryDateSelectRange } from '@/components/molecules/DirectoriesIndustry/DirectoriesIndustryQuery/base/QueryDateSelectRange';
 
 export const DirectoriesIndustryQuery: FC = () => {
   const params = useParams();
@@ -120,6 +121,8 @@ export const DirectoriesIndustryQuery: FC = () => {
         }}
       >
         <QueryBreadcrumbs current={TITLE_MAP[industrySlug] || 'Directory'} />
+
+        {/*<QueryDateSelectRange />*/}
 
         {buttonGroupConfig && (
           <CreateQueryElement

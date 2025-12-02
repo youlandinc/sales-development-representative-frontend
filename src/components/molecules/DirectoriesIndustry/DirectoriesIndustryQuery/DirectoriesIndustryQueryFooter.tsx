@@ -8,18 +8,22 @@ import { useSwitch } from '@/hooks';
 
 import { useDirectoriesStore } from '@/stores/directories';
 import { buildSearchRequestParams } from '@/utils/directories';
-import { DirectoriesBizIdEnum } from '@/types/directories';
 import {
   _fetchPlanCredits,
   _importDirectoriesDataToTable,
 } from '@/request/directories';
-
-import { HttpError } from '@/types';
+import { DirectoriesBizIdEnum } from '@/types/directories';
 import { CreditTypeEnum } from '@/types/pricingPlan';
+import { HttpError } from '@/types';
 
 import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 
 import ICON_CLOSE from './assets/icon-close.svg';
+
+const DIALOG_TEXT_SX = {
+  fontSize: 14,
+  color: 'text.secondary',
+} as const;
 
 export const DirectoriesIndustryQueryFooter: FC = () => {
   const router = useRouter();
@@ -76,8 +80,11 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
     planLimitRecordCount ?? 0,
   );
 
-  const [resetCredit, setResetCredit] = useState(0);
-  const [requestAmount, setRequestAmount] = useState(0);
+  const [dialogState, setDialogState] = useState({
+    remainingCredit: 0,
+    requestAmount: 0,
+    type: 'insufficient' as 'insufficient' | 'empty',
+  });
 
   const onContinueToImport = async () => {
     if (isImporting || !requestParams) {
@@ -92,8 +99,12 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
       if (data.tableId) {
         router.push(`/enrichment/${data.tableId}`);
       } else {
-        setResetCredit(data?.remainingCredit || 0);
-        setRequestAmount(data?.actualNeedCredit || 0);
+        const remaining = data?.remainingCredit || 0;
+        setDialogState({
+          remainingCredit: remaining,
+          requestAmount: data?.actualNeedCredit || 0,
+          type: remaining === 0 ? 'empty' : 'insufficient',
+        });
         open();
       }
     } catch (err) {
@@ -104,24 +115,36 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
     }
   };
 
-  const [confirming, setConfirming] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
-  const onClickToConfirmContinue = async () => {
-    if (isImporting || !requestParams || confirming) {
+  const onClickToCloseDialog = () => {
+    if (isConfirming) {
       return;
     }
-    setConfirming(true);
-    try {
-      const { data } = await _importDirectoriesDataToTable({
-        ...requestParams,
-        userRemainingImport: true,
-      });
-      router.push(`/enrichment/${data.tableId}`);
-    } catch (err) {
-      const { message, header, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      setIsImporting(false);
+    close();
+  };
+
+  const onClickToConfirmContinue = async () => {
+    if (isImporting || !requestParams || isConfirming) {
+      return;
+    }
+    if (dialogState.type === 'insufficient') {
+      setIsConfirming(true);
+      try {
+        const { data } = await _importDirectoriesDataToTable({
+          ...requestParams,
+          userRemainingImport: true,
+        });
+        router.push(`/enrichment/${data.tableId}`);
+      } catch (err) {
+        const { message, header, variant } = err as HttpError;
+        SDRToast({ message, header, variant });
+      } finally {
+        setIsImporting(false);
+        setIsConfirming(false);
+      }
+    } else {
+      router.push(`/plans?bizId=${bizId}`);
     }
   };
 
@@ -180,46 +203,52 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
       <StyledDialog
         content={
           <Stack sx={{ py: 2.25, gap: 1.5 }}>
-            <Typography
-              sx={{
-                fontSize: 14,
-                color: 'text.secondary',
-              }}
-            >
-              Only {resetCredit} of the {requestAmount} requested records can be
-              retrieved with your current balance.
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: 14,
-                color: 'text.secondary',
-              }}
-            >
-              Are you sure you want to proceed?
-            </Typography>
+            {dialogState.type === 'insufficient' ? (
+              <>
+                <Typography sx={DIALOG_TEXT_SX}>
+                  Only {dialogState.remainingCredit} of the{' '}
+                  {dialogState.requestAmount} requested records can be retrieved
+                  with your current balance.
+                </Typography>
+                <Typography sx={DIALOG_TEXT_SX}>
+                  Are you sure you want to proceed?
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Typography sx={DIALOG_TEXT_SX}>
+                  You&#39;ve used all your available records.
+                </Typography>
+                <Typography sx={DIALOG_TEXT_SX}>
+                  Upgrade your plan to continue accessing full details.
+                </Typography>
+              </>
+            )}
           </Stack>
         }
         footer={
           <Stack sx={{ flexDirection: 'row', gap: 1.5 }}>
             <StyledButton
-              onClick={() => close()}
+              onClick={onClickToCloseDialog}
               size={'medium'}
               variant={'outlined'}
             >
               Cancel
             </StyledButton>
             <StyledButton
-              disabled={confirming}
-              loading={confirming}
-              onClick={() => onClickToConfirmContinue()}
+              disabled={isConfirming}
+              loading={isConfirming}
+              onClick={onClickToConfirmContinue}
               size={'medium'}
             >
-              Continue
+              {dialogState.type === 'insufficient'
+                ? 'Continue'
+                : 'Upgrade plan'}
             </StyledButton>
           </Stack>
         }
         header={
-          <Stack sx={{ flexDirection: 'row', alignItem: 'center' }}>
+          <Stack sx={{ flexDirection: 'row', alignItems: 'center' }}>
             <Typography
               sx={{
                 fontSize: 18,
@@ -227,16 +256,13 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
                 color: 'primary.main',
               }}
             >
-              Access limited by available tokens
+              {dialogState.type === 'insufficient'
+                ? 'Access limited by available tokens'
+                : 'No records remaining'}
             </Typography>
             <Icon
               component={ICON_CLOSE}
-              onClick={() => {
-                if (confirming) {
-                  return;
-                }
-                close();
-              }}
+              onClick={onClickToCloseDialog}
               sx={{
                 width: 24,
                 height: 24,
@@ -247,12 +273,7 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
             />
           </Stack>
         }
-        onClose={() => {
-          if (confirming) {
-            return;
-          }
-          close();
-        }}
+        onClose={onClickToCloseDialog}
         open={visible}
       />
     </>
