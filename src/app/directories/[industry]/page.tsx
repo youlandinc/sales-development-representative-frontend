@@ -1,4 +1,5 @@
 'use client';
+export const fetchCache = 'force-no-store';
 
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
