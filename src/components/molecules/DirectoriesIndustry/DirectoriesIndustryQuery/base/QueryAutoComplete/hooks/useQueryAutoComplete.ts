@@ -143,6 +143,7 @@ export const useQueryAutoComplete = ({
       })
       .catch((error: any) => {
         if (error?.code !== 'ERR_CANCELED') {
+          // eslint-disable-next-line no-console
           console.error('Failed to search options:', error);
         }
       })
@@ -188,6 +189,7 @@ export const useQueryAutoComplete = ({
       })
       .catch((error: any) => {
         if (error?.code !== 'ERR_CANCELED') {
+          // eslint-disable-next-line no-console
           console.error('Failed to load more options:', error);
         }
       })

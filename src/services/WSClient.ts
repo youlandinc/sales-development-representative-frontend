@@ -49,6 +49,7 @@ export class WSClient {
     try {
       this.ws = new WebSocket(wsUrl);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(error);
       return;
     }
@@ -68,6 +69,7 @@ export class WSClient {
           timestamp: Date.now(),
         });
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Invalid WS message format:', e, 'Raw message:', ev.data);
       }
     };

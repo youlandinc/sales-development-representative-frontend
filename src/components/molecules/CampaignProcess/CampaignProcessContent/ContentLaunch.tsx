@@ -11,6 +11,7 @@ import { UNotUndefined } from '@/utils';
 import {
   SDRToast,
   StyledDatePicker,
+  StyledDateTimePicker,
   StyledRadioGroup,
   StyledSwitch,
 } from '@/components/atoms';
@@ -357,7 +358,7 @@ export const ContentLaunch = () => {
                 date and time below are in Pacific Standard Time (PST).
               </Typography>
               <Stack maxWidth={600}>
-                <StyledDatePicker
+                <StyledDateTimePicker
                   disablePast
                   error={UNotUndefined(isValidate) ? !isValidate : false}
                   minDate={tomorrow}

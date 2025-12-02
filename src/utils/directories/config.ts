@@ -4,15 +4,16 @@ import {
   DirectoriesQueryGroupTypeEnum,
   DirectoriesQueryItem,
 } from '@/types/directories';
-import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
+import {
+  DIRECTORIES,
+  HIERARCHICAL_CONFIG_BIZ_IDS,
+} from '@/constants/directories';
 
 export const getDirectoriesBizId = (slug: string): DirectoriesBizIdEnum => {
-  const slugMap: Record<string, DirectoriesBizIdEnum> = {
-    'capital-markets': DirectoriesBizIdEnum.capital_markets,
-    'real-estate': DirectoriesBizIdEnum.real_estate_lending,
-  };
-
-  return slugMap[slug] || DirectoriesBizIdEnum.capital_markets;
+  const entry = Object.entries(DIRECTORIES).find(([, v]) => v.slug === slug);
+  return (
+    (entry?.[0] as DirectoriesBizIdEnum) || DirectoriesBizIdEnum.capital_markets
+  );
 };
 
 // ========================================

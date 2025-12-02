@@ -3,6 +3,7 @@ import {
   Autocomplete,
   AutocompleteChangeReason,
   Box,
+  CircularProgress,
   createFilterOptions,
   FilterOptionsState,
   Icon,
@@ -30,7 +31,6 @@ interface QueryAutoCompletePropsBase {
   options?: Array<{ key?: string; label: string; value?: string }>;
   freeSolo?: boolean;
   isAuth?: boolean;
-  loadingText?: string;
   noOptionsText?: string;
 }
 
@@ -59,7 +59,6 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
   multiple = false,
   freeSolo = true,
   isAuth = true,
-  loadingText = 'searching...',
   noOptionsText = 'No option',
   ...props
 }) => {
@@ -272,7 +271,16 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           getOptionLabel={onGetOptionLabel}
           isOptionEqualToValue={onIsOptionEqualToValue}
           loading={loading}
-          loadingText={loadingText}
+          loadingText={
+            <Stack alignItems="center" justifyContent="center" py={1}>
+              <CircularProgress
+                size="20px"
+                sx={{
+                  color: '#D0CEDA',
+                }}
+              />
+            </Stack>
+          }
           multiple={multiple}
           noOptionsText={noOptionsText}
           onChange={onChangeToHandleSelection}
@@ -318,14 +326,19 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
                 <li
                   key={key}
                   style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     padding: '8px 16px',
-                    fontSize: 14,
-                    color: '#999',
-                    textAlign: 'center',
                     cursor: 'default',
                   }}
                 >
-                  Loading more...
+                  <CircularProgress
+                    size="20px"
+                    sx={{
+                      color: '#D0CEDA',
+                    }}
+                  />
                 </li>
               );
             }
