@@ -19,22 +19,14 @@ export const DIRECTORIES = {
   },
 } as const;
 
-export const SLUG_MAP: Record<DirectoriesBizIdEnum, string> = {
-  [DirectoriesBizIdEnum.capital_markets]:
-    DIRECTORIES[DirectoriesBizIdEnum.capital_markets].slug,
-  [DirectoriesBizIdEnum.real_estate_lending]:
-    DIRECTORIES[DirectoriesBizIdEnum.real_estate_lending].slug,
-  [DirectoriesBizIdEnum.business_corporate]:
-    DIRECTORIES[DirectoriesBizIdEnum.business_corporate].slug,
-};
+// Auto-generated from DIRECTORIES
+export const SLUG_MAP = Object.fromEntries(
+  Object.entries(DIRECTORIES).map(([k, v]) => [k, v.slug]),
+) as Record<DirectoriesBizIdEnum, string>;
 
-export const TITLE_MAP: Record<string, string> = {
-  'capital-markets': DIRECTORIES[DirectoriesBizIdEnum.capital_markets].title,
-  'real-estate-and-lending':
-    DIRECTORIES[DirectoriesBizIdEnum.real_estate_lending].title,
-  'business-and-corporate':
-    DIRECTORIES[DirectoriesBizIdEnum.business_corporate].title,
-};
+export const TITLE_MAP = Object.fromEntries(
+  Object.values(DIRECTORIES).map((v) => [v.slug, v.title]),
+) as Record<string, string>;
 
 export const DIRECTORIES_BADGE_AUTH: Record<
   DirectoriesBizIdEnum,
