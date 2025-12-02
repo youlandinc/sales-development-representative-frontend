@@ -11,7 +11,9 @@ import {
 
 export const getDirectoriesBizId = (slug: string): DirectoriesBizIdEnum => {
   const entry = Object.entries(DIRECTORIES).find(([, v]) => v.slug === slug);
-  return (entry?.[0] as DirectoriesBizIdEnum) || DirectoriesBizIdEnum.capital_markets;
+  return (
+    (entry?.[0] as DirectoriesBizIdEnum) || DirectoriesBizIdEnum.capital_markets
+  );
 };
 
 // ========================================
