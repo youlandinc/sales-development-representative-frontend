@@ -93,6 +93,7 @@ export const PricingPlan = () => {
         gap: 3,
         width: '100%',
         pb: 3,
+        minWidth: 1088,
       }}
     >
       {/* Header Section */}
@@ -152,7 +153,7 @@ export const PricingPlan = () => {
           ))}
         </Stack>
       </Stack>
-      <Stack sx={{ gap: 3, width: 'fit-content', mx: 'auto', minWidth: 1200 }}>
+      <Stack sx={{ gap: 3, width: 'fit-content', mx: 'auto' }}>
         {/* Category Tabs */}
         <Stack
           sx={{

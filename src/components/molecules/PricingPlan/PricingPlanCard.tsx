@@ -128,8 +128,8 @@ export const PricingPlanCard: FC<PricingCardProps> = ({
   return (
     <Stack
       sx={{
-        width: DIMENSIONS.CARD_WIDTH,
-        flexShrink: 0,
+        maxWidth: DIMENSIONS.CARD_WIDTH,
+        flex: 1,
         overflow: 'hidden',
         position: 'relative',
         bgcolor: isHighlighted ? COLORS.PRIMARY : COLORS.BACKGROUND,
