@@ -7,9 +7,12 @@ import { Settings } from '@/components/organisms';
 
 const SettingsPage = () => {
   return (
-    <Layout>
-      <Settings />
-    </Layout>
+    <>
+      <title>Settings - Corepass SalesOS</title>
+      <Layout>
+        <Settings />
+      </Layout>
+    </>
   );
 };
 

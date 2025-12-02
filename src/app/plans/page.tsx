@@ -7,9 +7,12 @@ import { PricingPlan } from '@/components/organisms';
 
 const PlansPage = () => {
   return (
-    <Layout>
-      <PricingPlan />
-    </Layout>
+    <>
+      <title>View plans - Corepass SalesOS</title>
+      <Layout>
+        <PricingPlan />
+      </Layout>
+    </>
   );
 };
 

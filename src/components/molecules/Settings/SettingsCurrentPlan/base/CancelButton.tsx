@@ -36,7 +36,7 @@ export const CancelButton: FC<CancelButtonProps> = ({ status, onCancel }) => {
         lineHeight: 1.5,
       }}
     >
-      Cancelled
+      Canceled
     </Typography>
   );
 };
