@@ -61,7 +61,7 @@ export const ProspectDetailHeader: FC<ProspectDetailHeaderProps> = ({
             component={ICON_BACK}
             onClick={() => {
               resetTable();
-              router.push('/prospect-enrich');
+              router.push('/enrichment');
             }}
             sx={{ width: 20, height: 20, mt: 0.25, cursor: 'pointer' }}
           />

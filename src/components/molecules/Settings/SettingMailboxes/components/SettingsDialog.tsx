@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
-import { Icon, Stack, Tooltip, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import {
@@ -10,7 +10,6 @@ import {
 } from '@/components/atoms';
 import { EmailDomainState } from '@/types';
 
-import ICON_INFO from '../assets/icon_info.svg';
 import { CommonVerticalLabelContainer } from '@/components/molecules/Common';
 
 interface SettingsDialogProps {

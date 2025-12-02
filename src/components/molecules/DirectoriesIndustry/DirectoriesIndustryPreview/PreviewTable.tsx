@@ -314,10 +314,24 @@ export const PreviewTable: FC = () => {
                         ) : head.columnType === TableColumnTypeEnum.url ? (
                           row?.[head.columnKey as keyof typeof row] ? (
                             <Box
+                              onClick={() => {
+                                const url =
+                                  row?.[head.columnKey as keyof typeof row];
+                                if (!url) {
+                                  return;
+                                }
+                                const finalUrl =
+                                  url.startsWith('http://') ||
+                                  url.startsWith('https://')
+                                    ? url
+                                    : `https://${url}`;
+                                window.open(finalUrl, '_blank');
+                              }}
                               sx={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 0.5,
+                                width: 'fit-content',
                               }}
                             >
                               <Icon
@@ -326,25 +340,13 @@ export const PreviewTable: FC = () => {
                                   width: 16,
                                   height: 16,
                                   flexShrink: 0,
+                                  cursor: 'pointer',
                                   '& path': {
                                     fill: 'rgba(111, 108, 125, .8)',
                                   },
                                 }}
                               />
                               <Typography
-                                onClick={() => {
-                                  const url =
-                                    row?.[head.columnKey as keyof typeof row];
-                                  if (!url) {
-                                    return;
-                                  }
-                                  const finalUrl =
-                                    url.startsWith('http://') ||
-                                    url.startsWith('https://')
-                                      ? url
-                                      : `https://${url}`;
-                                  window.open(finalUrl, '_blank');
-                                }}
                                 sx={{
                                   flex: 1,
                                   color: 'rgba(111, 108, 125, .8)',

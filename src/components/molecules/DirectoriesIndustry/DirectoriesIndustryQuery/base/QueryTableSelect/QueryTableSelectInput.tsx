@@ -59,7 +59,7 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
 
   const onClickToOpenTable = () => {
     if (selectedTableId) {
-      window.open(`/prospect-enrich/${selectedTableId}`, '_blank');
+      window.open(`/enrichment/${selectedTableId}`, '_blank');
     }
     onClickToCloseMenu();
   };

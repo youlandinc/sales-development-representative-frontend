@@ -3,6 +3,7 @@ import { Box, Stack, Typography } from '@mui/material';
 
 interface PreviewSummaryProps {
   totalCount: number;
+  previewCount: number;
   importCount: number;
   loading: boolean;
   isShowResult: boolean;
@@ -10,6 +11,7 @@ interface PreviewSummaryProps {
 
 export const PreviewSummary: FC<PreviewSummaryProps> = ({
   totalCount,
+  previewCount,
   importCount,
   loading,
   isShowResult,
@@ -35,7 +37,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          Previewing {Math.min(totalCount, 25)} of{' '}
+          Previewing {previewCount} of{' '}
           <Box
             component="span"
             sx={{

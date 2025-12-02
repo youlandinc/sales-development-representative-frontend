@@ -10,11 +10,11 @@ export const DIRECTORIES = {
     title: 'Capital Markets Directory',
   },
   [DirectoriesBizIdEnum.real_estate_lending]: {
-    slug: 'real-estate',
+    slug: 'real-estate-and-lending',
     title: 'Real Estate & Lending Directory',
   },
   [DirectoriesBizIdEnum.business_corporate]: {
-    slug: 'business-corporate',
+    slug: 'business-and-corporate',
     title: 'Business & Corporate Directory',
   },
 } as const;
@@ -30,8 +30,9 @@ export const SLUG_MAP: Record<DirectoriesBizIdEnum, string> = {
 
 export const TITLE_MAP: Record<string, string> = {
   'capital-markets': DIRECTORIES[DirectoriesBizIdEnum.capital_markets].title,
-  'real-estate': DIRECTORIES[DirectoriesBizIdEnum.real_estate_lending].title,
-  'business-corporate':
+  'real-estate-and-lending':
+    DIRECTORIES[DirectoriesBizIdEnum.real_estate_lending].title,
+  'business-and-corporate':
     DIRECTORIES[DirectoriesBizIdEnum.business_corporate].title,
 };
 

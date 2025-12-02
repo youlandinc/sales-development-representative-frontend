@@ -16,7 +16,7 @@ export const DirectoriesIndustryPreview: FC = () => {
       })),
     );
 
-  const { findCount, maxImportCount } = previewBody;
+  const { findCount, maxImportCount, defaultPreviewCount } = previewBody;
 
   const isShowResult =
     isLoadingPreview || (hasSubmittedSearch && findCount > 0);
@@ -27,6 +27,7 @@ export const DirectoriesIndustryPreview: FC = () => {
         importCount={maxImportCount}
         isShowResult={isShowResult}
         loading={isLoadingPreview}
+        previewCount={defaultPreviewCount}
         totalCount={findCount}
       />
       <Stack sx={{ flex: 1, overflowX: 'auto', overflowY: 'auto' }}>
