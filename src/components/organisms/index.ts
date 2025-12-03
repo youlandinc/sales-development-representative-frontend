@@ -1,4 +1,4 @@
-export * from './Prospect';
+export * from './Enrichment';
 export * from './EnrichmentDetail';
 
 export * from './Campaigns';

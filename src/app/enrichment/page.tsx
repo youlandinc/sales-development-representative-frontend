@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 import { Layout } from '@/components/molecules';
-import { Prospect } from '@/components/organisms';
+import { Enrichment } from '@/components/organisms';
 
 export const fetchCache = 'force-no-store';
 
@@ -14,7 +14,7 @@ const EnrichmentPage = () => {
 
   return (
     <Layout contentSx={{ pb: 1 }}>
-      <Prospect />
+      <Enrichment />
     </Layout>
   );
 };

@@ -28,12 +28,15 @@ import ICON_TABLE_ACTION from './assets/icon_table_action.svg';
 import ICON_TABLE_RENAME from './assets/icon_table_rename.svg';
 import ICON_TABLE_DELETE from './assets/icon_table_delete.svg';
 
-interface ProspectTableProps {
+interface EnrichmentTableProps {
   store: { searchWord: string };
   openDialog: () => void;
 }
 
-export const ProspectList: FC<ProspectTableProps> = ({ store, openDialog }) => {
+export const EnrichmentList: FC<EnrichmentTableProps> = ({
+  store,
+  openDialog,
+}) => {
   const router = useRouter();
 
   const columns: GridColDef<ProspectTableItem>[] = [

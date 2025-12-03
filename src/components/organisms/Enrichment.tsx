@@ -19,8 +19,8 @@ import {
   StyledDialog,
 } from '@/components/atoms';
 import {
-  ProspectHeader,
-  ProspectList,
+  EnrichmentHeader,
+  EnrichmentList,
   StyledCustomButtonGroup,
 } from '@/components/molecules';
 
@@ -54,7 +54,7 @@ const initialState: { searchWord: string } = {
   searchWord: '',
 };
 
-export const Prospect: FC = () => {
+export const Enrichment: FC = () => {
   const router = useRouter();
   const [store, dispatch] = useReducer(reducer, initialState);
 
@@ -184,8 +184,8 @@ export const Prospect: FC = () => {
 
   return (
     <Stack gap={1} height={'100%'} width={'100%'}>
-      <ProspectHeader dispatch={dispatch} openDialog={open} store={store} />
-      <ProspectList openDialog={open} store={store} />
+      <EnrichmentHeader dispatch={dispatch} openDialog={open} store={store} />
+      <EnrichmentList openDialog={open} store={store} />
 
       <StyledDialog
         content={

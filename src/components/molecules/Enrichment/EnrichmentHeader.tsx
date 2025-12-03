@@ -20,13 +20,13 @@ import ICON_NEW_TABLE from './assets/icon_new_table.svg';
 import ICON_DIRECTORY from './assets/icon_directory.svg';
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 
-interface ProspectHeaderProps {
+interface EnrichmentHeaderProps {
   dispatch: any;
   store: { searchWord: string };
   openDialog: () => void;
 }
 
-export const ProspectHeader: FC<ProspectHeaderProps> = ({
+export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
   dispatch,
   store,
   openDialog,
