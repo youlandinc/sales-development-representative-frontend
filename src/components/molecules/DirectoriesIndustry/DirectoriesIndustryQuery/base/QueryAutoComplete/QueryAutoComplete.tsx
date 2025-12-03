@@ -253,6 +253,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           <StyledTextField
             {...params}
             id={id}
+            name={id}
             placeholder={
               (multiple && (!value || (value as string[]).length === 0)) ||
               (!multiple && !value)
@@ -264,12 +265,9 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               htmlInput: {
                 ...params.inputProps,
                 autoComplete: 'off',
-                autoCorrect: 'off',
-                autoCapitalize: 'off',
-                spellCheck: false,
-                'data-form-type': 'other',
-                'data-lpignore': 'true',
-                'data-1p-ignore': 'true',
+              },
+              input: {
+                autoComplete: 'off',
               },
             }}
           />

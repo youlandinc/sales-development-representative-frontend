@@ -119,7 +119,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
     [isAiColumn, tableMeta, header],
   );
 
-  // 计算背景色：选中 > hover > 默认
+  // Calculate background color: active > hover > default
   const headerBackgroundColor =
     isActive || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 
