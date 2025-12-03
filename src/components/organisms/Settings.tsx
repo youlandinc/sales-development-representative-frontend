@@ -54,28 +54,31 @@ export const Settings = () => {
     },
   ];
 
-  const syncTabFromUrl = useCallback(() => {
-    const { tab } = getParamsFromUrl(location.href);
+  const syncTabFromUrl = useCallback((url?: string) => {
+    const { tab } = getParamsFromUrl(url || location.href);
     const validTabs = Object.values(SettingTabEnum);
     if (tab && validTabs.includes(tab as SettingTabEnum)) {
       setValue(tab as SettingTabEnum);
-    } else {
-      setValue(SettingTabEnum.Email);
     }
   }, []);
 
   useEffect(() => {
+    // 初始加载
     syncTabFromUrl();
-    //TODO
-    // // 监听自定义 urlchange 事件 (由 LayoutSide 的 router.push 触发)
-    // window.addEventListener('hashchange', syncTabFromUrl);
-    // // 监听浏览器前进/后退
-    // window.addEventListener('popstate', syncTabFromUrl);
 
-    // return () => {
-    //   window.removeEventListener('hashchange', syncTabFromUrl);
-    //   window.removeEventListener('popstate', syncTabFromUrl);
-    // };
+    // 监听自定义 urlchange 事件 (由 LayoutSide 的 router.push 触发)
+    const onUrlChange = (e: Event) => {
+      const url = (e as CustomEvent).detail?.url;
+      syncTabFromUrl(`${window.location.origin}${url}`);
+    };
+    window.addEventListener('urlchange', onUrlChange);
+    // 监听浏览器前进/后退
+    window.addEventListener('popstate', () => syncTabFromUrl());
+
+    return () => {
+      window.removeEventListener('urlchange', onUrlChange);
+      window.removeEventListener('popstate', () => syncTabFromUrl());
+    };
   }, [syncTabFromUrl]);
 
   return (
