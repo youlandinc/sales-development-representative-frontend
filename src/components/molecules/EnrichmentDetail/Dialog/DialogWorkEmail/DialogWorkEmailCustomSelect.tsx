@@ -12,6 +12,7 @@ import { useProspectTableStore } from '@/stores/enrichment';
 import { StyledTextField } from '@/components/atoms';
 import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import { DEFAULT_AUTOCOMPLETE_SX } from '@/styles';
 
 export const DialogWorkEmailCustomSelect: FC<
   { title?: string | ReactNode; required?: boolean } & Pick<
@@ -101,6 +102,7 @@ export const DialogWorkEmailCustomSelect: FC<
             </Stack>
           );
         }}
+        sx={DEFAULT_AUTOCOMPLETE_SX}
         value={value || null}
       />
     </Stack>
