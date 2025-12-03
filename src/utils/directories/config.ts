@@ -1,6 +1,8 @@
 import {
   DirectoriesBizIdEnum,
   DirectoriesEntityTypeEnum,
+  DirectoriesQueryActionTypeEnum,
+  DirectoriesQueryComponentNameEnum,
   DirectoriesQueryGroupTypeEnum,
   DirectoriesQueryItem,
 } from '@/types/directories';
@@ -155,7 +157,18 @@ const collectFormKeys = (
   config: DirectoriesQueryItem,
   result: Record<string, any>,
 ): void => {
-  const { groupType, key, children } = config;
+  const { groupType, key, children, componentName } = config;
+
+  if (componentName === DirectoriesQueryComponentNameEnum.date_range_select) {
+    if (key) {
+      result[key] = {
+        selectType: '',
+        startDate: '',
+        endDate: '',
+      };
+    }
+    return;
+  }
 
   if (groupType === DirectoriesQueryGroupTypeEnum.general) {
     if (children && children.length > 0) {

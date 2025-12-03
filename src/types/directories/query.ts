@@ -29,6 +29,10 @@ export enum DirectoriesQueryGroupTypeEnum {
   additional_details = 'ADDITIONAL_DETAILS',
 }
 
+export enum DirectoriesQueryComponentNameEnum {
+  date_range_select = 'DATE_RANGE_SELECT',
+}
+
 export enum DirectoriesEntityTypeEnum {
   firm = 'FIRM',
   executive = 'EXECUTIVE',

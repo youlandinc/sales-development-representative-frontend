@@ -7,20 +7,16 @@ import {
   createFilterOptions,
   FilterOptionsState,
   Icon,
-  Link,
   Stack,
-  Tooltip,
-  Typography,
 } from '@mui/material';
 import { Check } from '@mui/icons-material';
 
 import { StyledTextField } from '@/components/atoms';
 import { UTypeOf } from '@/utils/UTypeOf';
 
-import { PLANS_ROUTE } from '@/components/molecules/Layout/Layout.data';
-
 import { AutoCompleteOption, useQueryAutoComplete } from './hooks';
 import { QueryAutoCompleteChip } from './index';
+import { QueryTooltip } from '../QueryTooltip';
 
 import ICON_ARROW from './assets/icon-arrow.svg';
 import ICON_CLOSE from './assets/icon-close.svg';
@@ -206,239 +202,200 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     [multiple, onChangeToUpdateValue],
   );
 
-  const tooltipContent = (
-    <Typography sx={{ fontSize: 12 }}>
-      Available in the <strong>Intelligence</strong> plan.{' '}
-      <Link
-        href={PLANS_ROUTE}
-        sx={{ color: 'inherit', textDecoration: 'underline' }}
-      >
-        Upgrade to access.
-      </Link>
-    </Typography>
-  );
-
   const id = useId();
 
   return (
-    <Tooltip
-      arrow
-      disableHoverListener
-      open={!isAuth && open}
-      placement="top"
-      slotProps={{
-        tooltip: {
-          sx: {
-            bgcolor: 'rgba(97, 97, 97, 0.92)',
-            maxWidth: 280,
-            py: 1,
-            px: 1.5,
-          },
-        },
-        arrow: {
-          sx: {
-            color: 'rgba(97, 97, 97, 0.92)',
-          },
-        },
-      }}
-      title={tooltipContent}
-    >
-      <Box>
-        <Autocomplete<
-          AutoCompleteOption,
-          typeof multiple,
-          false,
-          typeof freeSolo
-        >
-          clearIcon={
-            <Icon
-              component={ICON_CLOSE}
-              sx={{ width: 14, height: 14, cursor: 'pointer' }}
-            />
+    <QueryTooltip open={!isAuth && open} variant="access">
+      <Autocomplete<AutoCompleteOption, typeof multiple, false, typeof freeSolo>
+        clearIcon={
+          <Icon
+            component={ICON_CLOSE}
+            sx={{ width: 14, height: 14, cursor: 'pointer' }}
+          />
+        }
+        disableCloseOnSelect={multiple}
+        filterOptions={filterOptions}
+        freeSolo={freeSolo && isAuth}
+        getOptionDisabled={(option) => {
+          if (!isAuth) {
+            return true;
           }
-          disableCloseOnSelect={multiple}
-          filterOptions={filterOptions}
-          freeSolo={freeSolo && isAuth}
-          getOptionDisabled={(option) => {
-            if (!isAuth) {
-              return true;
-            }
-            return option.inputValue === '__loading_more__';
-          }}
-          getOptionKey={(option) =>
-            UTypeOf.isString(option) ? option : option.inputValue
-          }
-          getOptionLabel={onGetOptionLabel}
-          isOptionEqualToValue={onIsOptionEqualToValue}
-          loading={loading}
-          loadingText={
-            <Stack alignItems="center" justifyContent="center" py={1}>
-              <CircularProgress
-                size="20px"
-                sx={{
-                  color: '#D0CEDA',
-                }}
-              />
-            </Stack>
-          }
-          multiple={multiple}
-          noOptionsText={noOptionsText}
-          onChange={onChangeToHandleSelection}
-          onClose={onCloseToReset}
-          onInputChange={onInputChangeToSearch}
-          onOpen={onOpenToTrigger}
-          open={open}
-          options={displayOptions}
-          popupIcon={
-            <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
-          }
-          renderInput={(params) => (
-            <StyledTextField
-              {...params}
-              id={id}
-              placeholder={
-                (multiple && (!value || (value as string[]).length === 0)) ||
-                (!multiple && !value)
-                  ? placeholder
-                  : ''
-              }
-              size={'small'}
-              slotProps={{
-                htmlInput: {
-                  ...params.inputProps,
-                  autoComplete: 'off',
-                  autoCorrect: 'off',
-                  autoCapitalize: 'off',
-                  spellCheck: false,
-                  'data-form-type': 'other',
-                  'data-lpignore': 'true',
-                  'data-1p-ignore': 'true',
-                },
+          return option.inputValue === '__loading_more__';
+        }}
+        getOptionKey={(option) =>
+          UTypeOf.isString(option) ? option : option.inputValue
+        }
+        getOptionLabel={onGetOptionLabel}
+        isOptionEqualToValue={onIsOptionEqualToValue}
+        loading={loading}
+        loadingText={
+          <Stack alignItems="center" justifyContent="center" py={1}>
+            <CircularProgress
+              size="20px"
+              sx={{
+                color: '#D0CEDA',
               }}
             />
-          )}
-          renderOption={(props, option) => {
-            const { key, ...rest } = props;
-
-            // Loading more indicator - non-clickable
-            if (option.inputValue === '__loading_more__') {
-              return (
-                <li
-                  key={key}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '8px 16px',
-                    cursor: 'default',
-                  }}
-                >
-                  <CircularProgress
-                    size="20px"
-                    sx={{
-                      color: '#D0CEDA',
-                    }}
-                  />
-                </li>
-              );
+          </Stack>
+        }
+        multiple={multiple}
+        noOptionsText={noOptionsText}
+        onChange={onChangeToHandleSelection}
+        onClose={onCloseToReset}
+        onInputChange={onInputChangeToSearch}
+        onOpen={onOpenToTrigger}
+        open={open}
+        options={displayOptions}
+        popupIcon={
+          <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
+        }
+        renderInput={(params) => (
+          <StyledTextField
+            {...params}
+            id={id}
+            placeholder={
+              (multiple && (!value || (value as string[]).length === 0)) ||
+              (!multiple && !value)
+                ? placeholder
+                : ''
             }
+            size={'small'}
+            slotProps={{
+              htmlInput: {
+                ...params.inputProps,
+                autoComplete: 'off',
+                autoCorrect: 'off',
+                autoCapitalize: 'off',
+                spellCheck: false,
+                'data-form-type': 'other',
+                'data-lpignore': 'true',
+                'data-1p-ignore': 'true',
+              },
+            }}
+          />
+        )}
+        renderOption={(props, option) => {
+          const { key, ...rest } = props;
 
+          // Loading more indicator - non-clickable
+          if (option.inputValue === '__loading_more__') {
             return (
-              <li key={key} {...rest}>
-                <Stack
-                  alignItems="center"
-                  bgcolor="transparent"
-                  flexDirection="row"
-                  gap={3}
-                  justifyContent="space-between"
-                  width="100%"
-                >
-                  <Box fontSize={14}>{option.label}</Box>
-                  {rest['aria-selected'] && <Check fontSize="small" />}
-                </Stack>
+              <li
+                key={key}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '8px 16px',
+                  cursor: 'default',
+                }}
+              >
+                <CircularProgress
+                  size="20px"
+                  sx={{
+                    color: '#D0CEDA',
+                  }}
+                />
               </li>
             );
-          }}
-          renderValue={(renderValueItems, getItemProps) => {
-            if (multiple) {
-              return (renderValueItems as AutoCompleteOption[]).map(
-                (item, index) => {
-                  const { key, onDelete } = getItemProps({
-                    index,
-                  }) as unknown as {
-                    key: number;
-                    onDelete: (event: any) => void;
-                  };
-                  return (
-                    <QueryAutoCompleteChip
-                      key={key}
-                      label={item.label || item.inputValue}
-                      onDelete={isAuth ? onDelete : undefined}
-                    />
-                  );
-                },
-              );
-            }
-            return null;
-          }}
-          slotProps={{
-            paper: {
-              sx: {
-                mt: 0.5,
-                borderRadius: 2,
-                boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
-                border: '1px solid #E0E0E0',
-                '& .MuiAutocomplete-noOptions': {
-                  fontSize: 14,
-                  color: 'text.secondary',
-                  py: 2,
-                  px: 2,
-                },
-                '& .MuiAutocomplete-loading': {
-                  fontSize: 14,
-                  color: 'text.secondary',
-                  py: 2,
-                  px: 2,
-                },
+          }
+
+          return (
+            <li key={key} {...rest}>
+              <Stack
+                alignItems="center"
+                bgcolor="transparent"
+                flexDirection="row"
+                gap={3}
+                justifyContent="space-between"
+                width="100%"
+              >
+                <Box fontSize={14}>{option.label}</Box>
+                {rest['aria-selected'] && <Check fontSize="small" />}
+              </Stack>
+            </li>
+          );
+        }}
+        renderValue={(renderValueItems, getItemProps) => {
+          if (multiple) {
+            return (renderValueItems as AutoCompleteOption[]).map(
+              (item, index) => {
+                const { key, onDelete } = getItemProps({
+                  index,
+                }) as unknown as {
+                  key: number;
+                  onDelete: (event: any) => void;
+                };
+                return (
+                  <QueryAutoCompleteChip
+                    key={key}
+                    label={item.label || item.inputValue}
+                    onDelete={isAuth ? onDelete : undefined}
+                  />
+                );
+              },
+            );
+          }
+          return null;
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 0.5,
+              borderRadius: 2,
+              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
+              border: '1px solid #E0E0E0',
+              '& .MuiAutocomplete-noOptions': {
+                fontSize: 14,
+                color: 'text.secondary',
+                py: 2,
+                px: 2,
+              },
+              '& .MuiAutocomplete-loading': {
+                fontSize: 14,
+                color: 'text.secondary',
+                py: 2,
+                px: 2,
               },
             },
-            listbox: {
-              onScroll: onListboxScroll,
-              sx: {
-                py: 0,
-                maxHeight: 300,
-                '& .MuiAutocomplete-option': {
-                  px: 2,
-                  py: 1,
-                  fontSize: 14,
-                  minHeight: 'auto',
-                },
+          },
+          listbox: {
+            onScroll: onListboxScroll,
+            sx: {
+              py: 0,
+              maxHeight: 300,
+              '& .MuiAutocomplete-option': {
+                px: 2,
+                py: 1,
+                fontSize: 14,
+                minHeight: 'auto',
               },
             },
-          }}
-          {...props}
-          inputValue={inputValue}
-          sx={{
-            '& .MuiInputBase-root': {
-              minHeight: '32px',
-              gap: 0.5,
-            },
-            '& .MuiInputBase-input': {
-              padding: '0 !important',
-              minHeight: '24px',
-              fontSize: '12px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              paddingLeft: '8px !important',
-            },
-            '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
-              py: 0.5,
-            },
-          }}
-          value={autocompleteValue}
-        />
-      </Box>
-    </Tooltip>
+          },
+        }}
+        {...props}
+        inputValue={inputValue}
+        sx={{
+          '& .MuiInputBase-root': {
+            minHeight: '32px',
+            gap: 0.5,
+          },
+          '& .MuiInputBase-input': {
+            padding: '0 !important',
+            minHeight: '24px',
+            fontSize: '12px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            paddingLeft: '4px !important',
+          },
+          '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
+            py: 0.5,
+            paddingLeft: '8px !important',
+          },
+        }}
+        value={autocompleteValue}
+      />
+    </QueryTooltip>
   );
 };

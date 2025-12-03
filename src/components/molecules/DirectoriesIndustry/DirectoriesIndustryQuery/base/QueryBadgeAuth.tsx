@@ -1,10 +1,11 @@
 import { FC } from 'react';
-import { Icon, Stack, Tooltip, Typography } from '@mui/material';
+import { Icon, Stack, Typography } from '@mui/material';
 
 import { useDirectoriesStore } from '@/stores/directories';
 import { DIRECTORIES_BADGE_AUTH } from '@/constants/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
-import { PLANS_ROUTE } from '@/components/molecules/Layout/Layout.data';
+
+import { QueryTooltip } from './index';
 
 import ICON_LOCK from './assets/icon-lock.svg';
 
@@ -18,53 +19,12 @@ export const QueryBadgeAuth: FC = () => {
   }
 
   return (
-    <Tooltip
-      arrow
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      placement={'top'}
-      slotProps={{
-        tooltip: {
-          sx: {
-            px: 0.75,
-            py: 0.5,
-            maxWidth: 200,
-          },
-        },
-      }}
-      title={
-        <Typography sx={{ fontSize: 12, lineHeight: 1.5, textAlign: 'center' }}>
-          Available in the{' '}
-          <Typography
-            component={'span'}
-            sx={{
-              fontSize: 12,
-              fontWeight: 600,
-            }}
-          >
-            {DIRECTORIES_BADGE_AUTH[bizId].strong}
-          </Typography>{' '}
-          plan.{' '}
-          <Typography
-            component={'span'}
-            onClick={() =>
-              window.open(`${PLANS_ROUTE}?bizId=${bizId}`, '_blank')
-            }
-            sx={{
-              fontSize: 12,
-              textDecoration: 'underline',
-              cursor: 'pointer',
-            }}
-          >
-            Upgrade to access
-          </Typography>
-          .
-        </Typography>
-      }
-    >
+    <QueryTooltip variant={'access'}>
       <Stack
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         sx={{
           flexDirection: 'row',
           gap: 0.25,
@@ -86,6 +46,6 @@ export const QueryBadgeAuth: FC = () => {
           {DIRECTORIES_BADGE_AUTH[bizId].title}
         </Typography>
       </Stack>
-    </Tooltip>
+    </QueryTooltip>
   );
 };

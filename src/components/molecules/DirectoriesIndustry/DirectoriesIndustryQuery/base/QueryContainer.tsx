@@ -1,14 +1,8 @@
 import { FC, ReactNode } from 'react';
-import {
-  Icon,
-  Stack,
-  StackProps,
-  SxProps,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Icon, Stack, StackProps, SxProps, Typography } from '@mui/material';
 
-import { QueryBadgeAuth } from './index';
+import { QueryBadgeAuth } from './QueryBadgeAuth';
+import { QueryTooltip } from './QueryTooltip';
 
 import ICON_INFO from './assets/icon-info.svg';
 
@@ -61,9 +55,9 @@ export const QueryContainer: FC<QueryContainerProps> = ({
                 {label}
               </Typography>
               {tooltip && (
-                <Tooltip arrow placement={'top'} title={tooltip}>
+                <QueryTooltip title={tooltip}>
                   <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
-                </Tooltip>
+                </QueryTooltip>
               )}
             </Stack>
           )}
