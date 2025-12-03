@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react';
-import { Icon, Stack, Tooltip } from '@mui/material';
+import { Icon, Stack } from '@mui/material';
 
 import {
   DirectoriesQueryActionTypeEnum,
@@ -23,6 +23,7 @@ import {
   QueryTab,
   QueryTable,
   QueryTableWithList,
+  QueryTooltip,
 } from './base';
 
 import ICON_INFO from './base/assets/icon-info.svg';
@@ -220,15 +221,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         title={
           <Stack sx={{ flexDirection: 'row', gap: 0.5, alignItems: 'center' }}>
             {config.label}
-            <Tooltip
-              arrow
-              placement={'top'}
+            <QueryTooltip
               title={
                 'These are additional data fields found based on the current filters above. Select fields you want to display or use for additional filtering.'
               }
             >
               <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
-            </Tooltip>
+            </QueryTooltip>
           </Stack>
         }
       >

@@ -1,7 +1,6 @@
 import {
   DirectoriesBizIdEnum,
   DirectoriesEntityTypeEnum,
-  DirectoriesQueryActionTypeEnum,
   DirectoriesQueryComponentNameEnum,
   DirectoriesQueryGroupTypeEnum,
   DirectoriesQueryItem,
