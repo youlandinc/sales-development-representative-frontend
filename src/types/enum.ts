@@ -131,9 +131,9 @@ export enum PlanCategoryEnum {
 }
 
 export enum SettingTabEnum {
-  Email = 'Email',
-  Integrations = 'Integrations',
-  Account = 'Account',
-  Plan = 'Plan',
-  Usage = 'Usage',
+  Email = 'email',
+  Integrations = 'integrations',
+  Account = 'account',
+  Plan = 'plan',
+  Usage = 'usage',
 }

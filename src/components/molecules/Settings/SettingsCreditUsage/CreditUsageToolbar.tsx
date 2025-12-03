@@ -6,12 +6,12 @@ import { StyledSelect } from '@/components/atoms';
 import { DateRangeDialog } from './DateRangeDialog';
 import { CommonVerticalLabelContainer } from '@/components/molecules/Common';
 
-import { PlanCategoryEnum } from '@/types';
 import {
   DateRangeEnum,
   FetchCreditUsageListRequest,
+  PlanCategoryEnum,
   UsageTypeOptions,
-} from '@/types/settings/creditUsage';
+} from '@/types';
 
 import {
   computedPlanBadgeStyle,

@@ -1,3 +1,4 @@
+import type { UIEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useDebounce } from '@/hooks';
@@ -202,7 +203,7 @@ export const useQueryAutoComplete = ({
 
   // Listbox scroll handler
   const onListboxScroll = useCallback(
-    (event: React.UIEvent<HTMLUListElement>) => {
+    (event: UIEvent<HTMLUListElement>) => {
       const listbox = event.currentTarget;
       const isNearBottom =
         listbox.scrollTop + listbox.clientHeight >= listbox.scrollHeight - 50;

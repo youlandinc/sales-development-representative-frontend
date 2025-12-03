@@ -1,6 +1,5 @@
-import { FetchCurrentPlanResponse } from '@/types/Settings';
+import { FetchCurrentPlanResponse, PlanTypeEnum } from '@/types';
 import { get, put } from '../request';
-import { PlanTypeEnum } from '@/types';
 
 export const _fetchCurrentPlan = () => {
   return get<FetchCurrentPlanResponse>('/sdr/pricing/planAndBilling');

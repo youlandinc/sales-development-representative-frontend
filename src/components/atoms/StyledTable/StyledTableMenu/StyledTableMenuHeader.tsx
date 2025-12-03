@@ -17,7 +17,7 @@ import ICON_ARROW from '../assets/icon-arrow.svg';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 import {
   checkIsAiColumn,
   getAiColumnMenuActions,

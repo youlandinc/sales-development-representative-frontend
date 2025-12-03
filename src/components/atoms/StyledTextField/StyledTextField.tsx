@@ -35,6 +35,7 @@ export const DEFAULT_TEXTFIELD_STYLE: SxProps = {
     color: 'text.primary',
     '&::placeholder': {
       color: 'text.secondary',
+      opacity: 0.5,
     },
     paddingTop: '8px',
     paddingBottom: '8px',

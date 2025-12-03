@@ -44,7 +44,7 @@ import ICON_TYPE_ADD from './assets/icon-type-add.svg';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 import {
   checkIsAiColumn,
   checkIsEditableColumn,
@@ -251,10 +251,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     };
 
     return {
-      // ===== 数据更新 =====
+      // ===== Data Update =====
       onCellEdit,
 
-      // ===== 单元格状态管理 =====
+      // ===== Cell State Management =====
       isEditing: (recordId: string, columnId: string) =>
         cellState?.recordId === recordId &&
         cellState?.columnId === columnId &&
@@ -286,7 +286,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         }
       },
 
-      // ===== AI 功能 =====
+      // ===== AI Features =====
       hasAiColumn,
       isAiLoading: (recordId: string, columnId: string) =>
         Boolean(aiLoading?.[recordId]?.[columnId]),
@@ -299,7 +299,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         setAiRunColumnId(columnId);
       },
 
-      // ===== 表头编辑 =====
+      // ===== Header Editing =====
       stopHeaderEdit,
       updateHeaderName: (columnId: string, newName: string) => {
         stopHeaderEdit();
@@ -310,7 +310,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         });
       },
 
-      // ===== 动态状态 =====
+      // ===== Dynamic State =====
       selectedColumnId,
     };
   }, [

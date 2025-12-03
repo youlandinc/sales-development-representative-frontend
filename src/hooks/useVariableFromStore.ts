@@ -1,4 +1,4 @@
-import { useProspectTableStore } from '@/stores/Prospect';
+import { useProspectTableStore } from '@/stores/enrichment';
 
 export const useVariableFromStore = () => {
   const { columns } = useProspectTableStore((store) => store);

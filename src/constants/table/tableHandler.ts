@@ -1,4 +1,4 @@
-import { TableColumnProps } from '@/types/Prospect/table';
+import { TableColumnProps } from '@/types/enrichment/table';
 import { NON_EDITABLE_ACTION_KEYS, SYSTEM_COLUMN_SELECT } from './index';
 
 /**

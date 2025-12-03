@@ -19,10 +19,10 @@ const getValueCount = (value: unknown): number => {
   }
 
   if (UTypeOf.isObject(value)) {
-    return Object.values(value).reduce(
-      (sum: number, v) => sum + getValueCount(v),
-      0,
-    );
+    // For objects (e.g., date_range_select with { selectType, startDate, endDate }),
+    // count as 1 if any value inside is filled
+    const hasAnyValue = Object.values(value).some((v) => getValueCount(v) > 0);
+    return hasAnyValue ? 1 : 0;
   }
 
   return 1;

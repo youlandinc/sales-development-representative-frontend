@@ -14,7 +14,7 @@ import { flexRender, Header } from '@tanstack/react-table';
 import { StyledTableAiIcon } from './index';
 
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
-import { TableColumnMeta, TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -119,7 +119,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
     [isAiColumn, tableMeta, header],
   );
 
-  // 计算背景色：选中 > hover > 默认
+  // Calculate background color: active > hover > default
   const headerBackgroundColor =
     isActive || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 

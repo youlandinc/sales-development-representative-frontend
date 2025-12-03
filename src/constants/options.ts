@@ -1,5 +1,5 @@
 import { FilterOperationEnum, ProspectDelimiterEnum } from '@/types';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
 import { ReactNode } from 'react';
 
 export const WORD_COUNT_OPTIONS: {

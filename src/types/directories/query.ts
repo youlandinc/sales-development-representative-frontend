@@ -1,5 +1,5 @@
 import { DirectoriesBizIdEnum } from './base';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 export enum DirectoriesQueryActionTypeEnum {
   click = 'CLICK',
@@ -27,6 +27,10 @@ export enum DirectoriesQueryGroupTypeEnum {
   exclude_firms = 'EXCLUDE_FIRMS',
   exclude_individuals = 'EXCLUDE_INDIVIDUALS',
   additional_details = 'ADDITIONAL_DETAILS',
+}
+
+export enum DirectoriesQueryComponentNameEnum {
+  date_range_select = 'DATE_RANGE_SELECT',
 }
 
 export enum DirectoriesEntityTypeEnum {

@@ -1,6 +1,6 @@
 export * from './user';
 
-export * from './prospect';
+export * from './enrichment';
 
 export * from './campaign';
 
@@ -13,9 +13,3 @@ export * from './settings';
 export * from './inbox';
 
 export * from './contacts';
-
-export * from './findPeople';
-
-export * from './findCompany';
-
-export * from './findPeopleCompany';

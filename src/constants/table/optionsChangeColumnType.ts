@@ -2,7 +2,7 @@ import { COLUMN_TYPE_ICONS } from './index';
 import {
   TableColumnActionOption,
   TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 
 // Column type labels mapping
 export const COLUMN_TYPE_LABELS: {

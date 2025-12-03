@@ -97,6 +97,7 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
             py: 0.5,
             cursor: 'pointer',
             color: selectedTableName ? 'text.primary' : 'text.secondary',
+            opacity: selectedTableName ? 1 : 0.5,
           }}
         >
           {selectedTableName || placeholder}

@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ClickAwayListener,
   Fade,
@@ -16,6 +16,9 @@ import {
 } from '@/components/atoms';
 
 import ICON_CLOSE from './assets/icon-close.svg';
+import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
+
+import { QueryTooltip } from './QueryTooltip';
 
 const DATE_PICKER_SLOT_PROPS = {
   textField: {
@@ -61,17 +64,19 @@ interface QueryDateSelectRangeProps {
   value?: string | null;
   dateRange?: DateRange | null;
   placeholder?: string;
+  isAuth?: boolean;
   onFormChange?: (value: string | null, dateRange?: DateRange | null) => void;
 }
 
 export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   options = [
     { label: 'This year', value: 'this_year', key: 'this_year' },
-    { label: 'Custom', value: 'custom', key: 'custom' },
+    { label: 'Custom', value: 'CUSTOM_RANGE', key: 'CUSTOM_RANGE' },
   ],
   value: externalValue,
   dateRange: externalDateRange,
-  placeholder = 'Select date range',
+  placeholder,
+  isAuth = true,
   onFormChange,
 }) => {
   const [selectValue, setSelectValue] = useState(externalValue || '');
@@ -82,8 +87,16 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
     externalDateRange?.endDate || null,
   );
   const [isPopperOpen, setIsPopperOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const anchorRef = useRef<HTMLDivElement | null>(null);
+
+  const displayOptions = useMemo(() => {
+    if (isAuth) {
+      return options;
+    }
+    return options.map((opt) => ({ ...opt, disabled: true }));
+  }, [options, isAuth]);
 
   useEffect(() => {
     if (externalValue !== undefined) {
@@ -101,7 +114,7 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   const onSelectChange = useCallback(
     (newValue: string) => {
       setSelectValue(newValue);
-      if (newValue === 'custom') {
+      if (newValue === 'CUSTOM_RANGE') {
         setIsPopperOpen(true);
       } else {
         setIsPopperOpen(false);
@@ -112,7 +125,7 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   );
 
   const onCloseToOpenPopper = useCallback(() => {
-    if (selectValue === 'custom' && !isPopperOpen) {
+    if (selectValue === 'CUSTOM_RANGE' && !isPopperOpen) {
       setIsPopperOpen(true);
     }
   }, [selectValue, isPopperOpen]);
@@ -121,10 +134,9 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
     setStartDate(externalDateRange?.startDate || null);
     setEndDate(externalDateRange?.endDate || null);
     setIsPopperOpen(false);
-    if (!externalDateRange?.startDate && !externalDateRange?.endDate) {
-      setSelectValue('');
-    }
-  }, [externalDateRange]);
+    // Restore selectValue to externalValue (previous committed value)
+    setSelectValue(externalValue || '');
+  }, [externalDateRange, externalValue]);
 
   const onClickToSave = useCallback(() => {
     setIsPopperOpen(false);
@@ -133,7 +145,7 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
       onFormChange?.(null, null);
       return;
     }
-    onFormChange?.('custom', { startDate, endDate });
+    onFormChange?.('CUSTOM_RANGE', { startDate, endDate });
   }, [startDate, endDate, onFormChange]);
 
   const onClickAwayToCancel = useCallback(() => {
@@ -141,6 +153,14 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
       onClickToCancel();
     }
   }, [isPopperOpen, onClickToCancel]);
+
+  const onClear = useCallback(() => {
+    setSelectValue('');
+    setStartDate(null);
+    setEndDate(null);
+    setIsPopperOpen(false);
+    onFormChange?.(null, null);
+  }, [onFormChange]);
 
   const formatDateRange = useCallback(
     (start: Date | null, end: Date | null) => {
@@ -167,12 +187,14 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
     (selected: unknown) => {
       if (!selected || selected === '') {
         return (
-          <Typography sx={{ color: 'text.secondary', fontSize: 12 }}>
+          <Typography
+            sx={{ color: 'text.secondary', fontSize: 12, opacity: 0.5 }}
+          >
             {placeholder}
           </Typography>
         );
       }
-      if (selected === 'custom') {
+      if (selected === 'CUSTOM_RANGE') {
         const dateRangeStr = formatDateRange(startDate, endDate);
         if (dateRangeStr) {
           return <Typography sx={{ fontSize: 12 }}>{dateRangeStr}</Typography>;
@@ -189,15 +211,66 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   return (
     <ClickAwayListener onClickAway={onClickAwayToCancel}>
       <Stack ref={anchorRef}>
-        <StyledSelect
-          onChange={(e) => onSelectChange(e.target.value as string)}
-          onClose={onCloseToOpenPopper}
-          options={options}
-          placeholder={placeholder}
-          renderValue={buildRenderValue}
-          size={'small'}
-          value={selectValue}
-        />
+        <QueryTooltip open={!isAuth && isMenuOpen} variant="access">
+          <StyledSelect
+            clearable={!!selectValue}
+            clearIcon={
+              <Icon
+                component={ICON_CLOSE}
+                sx={{ width: 14, height: 14, cursor: 'pointer' }}
+              />
+            }
+            IconComponent={({ className }) => {
+              return (
+                <Stack
+                  className={className}
+                  sx={{
+                    mr: 0.25,
+                  }}
+                >
+                  <Icon
+                    component={ICON_ARROW_DOWN}
+                    sx={{
+                      width: 14,
+                      height: 14,
+                    }}
+                  />
+                </Stack>
+              );
+            }}
+            menuPaperSx={{
+              mt: 0.5,
+              borderRadius: 2,
+              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
+              border: '1px solid #E0E0E0',
+            }}
+            onChange={(e) => onSelectChange(e.target.value as string)}
+            onClear={onClear}
+            onClose={() => {
+              setIsMenuOpen(false);
+              onCloseToOpenPopper();
+            }}
+            onOpen={() => setIsMenuOpen(true)}
+            options={displayOptions}
+            placeholder={placeholder}
+            renderValue={buildRenderValue}
+            size={'small'}
+            sxList={{
+              py: 0,
+              maxHeight: 300,
+              '& .MuiMenuItem-root': {
+                px: 2,
+                py: 1,
+                fontSize: 14,
+                minHeight: 'auto',
+                '&.Mui-selected': {
+                  bgcolor: 'transparent',
+                },
+              },
+            }}
+            value={selectValue}
+          />
+        </QueryTooltip>
         <Popper
           anchorEl={anchorRef.current}
           open={isPopperOpen}

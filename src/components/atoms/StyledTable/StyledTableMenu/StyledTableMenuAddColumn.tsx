@@ -16,7 +16,7 @@ import {
 } from './StyledTableMenu.styles';
 
 import { getAddColumnMenuActions } from '@/constants/table';
-import { TableColumnMenuActionEnum } from '@/types/Prospect/table';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 interface StyledTableMenuAddColumnProps {
   anchorEl: HTMLElement | null;

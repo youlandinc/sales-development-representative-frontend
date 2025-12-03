@@ -136,6 +136,8 @@ export const LayoutSide: FC = () => {
       return;
     }
     router.push(url);
+    // 派发自定义事件，直接传递新 URL
+    window.dispatchEvent(new CustomEvent('urlchange', { detail: { url } }));
   };
 
   return (

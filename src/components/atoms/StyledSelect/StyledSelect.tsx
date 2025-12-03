@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import {
   BaseSelectProps,
   FormControl,
@@ -25,10 +25,11 @@ export interface StyledSelectProps extends BaseSelectProps {
   isTooltip?: boolean;
   placeholder?: string;
   clearable?: boolean;
+  clearIcon?: ReactNode;
   onClear?: () => void;
   loading?: boolean;
   loadOptions?: () => Promise<void>;
-  renderOption?: (option: TOption, index: number) => React.ReactNode;
+  renderOption?: (option: TOption, index: number) => ReactNode;
 }
 
 export const StyledSelect: FC<StyledSelectProps> = ({
@@ -48,10 +49,12 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   //isTooltip = false,
   placeholder,
   clearable = false,
+  clearIcon,
   onClear,
   loading,
   loadOptions,
   renderOption,
+  onOpen,
   ...rest
   //sxHelperText,
 }) => {
@@ -116,6 +119,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           '& .MuiInputBase-sizeSmall ': {
             '& .MuiSelect-outlined': {
               py: '7px',
+              pl: '14px',
               fontSize: 12,
               lineHeight: 1.5,
             },
@@ -164,13 +168,14 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           clearable &&
           showClear &&
           !!value && (
-            <InputAdornment position="end" sx={{ mr: 3, cursor: 'pointer' }}>
-              <ClearIcon
-                onClick={() => {
-                  onClear?.();
-                }}
-                sx={{ fontSize: 20 }}
-              />
+            <InputAdornment
+              onClick={() => {
+                onClear?.();
+              }}
+              position="end"
+              sx={{ mr: 1.75, cursor: 'pointer' }}
+            >
+              {clearIcon || <ClearIcon sx={{ fontSize: 20 }} />}
             </InputAdornment>
           )
         }
@@ -212,7 +217,8 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           disableScrollLock: true,
         }}
         onChange={onChange}
-        onOpen={async () => {
+        onOpen={async (e) => {
+          onOpen?.(e);
           await loadOptions?.();
         }}
         renderValue={(value) => {

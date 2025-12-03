@@ -13,7 +13,6 @@ import { DirectoriesQueryItem } from '@/types/directories';
 
 import { QueryBreadcrumbs } from './base';
 import { CreateQueryElement, DirectoriesIndustryQueryFooter } from './index';
-import { QueryDateSelectRange } from '@/components/molecules/DirectoriesIndustry/DirectoriesIndustryQuery/base/QueryDateSelectRange';
 
 export const DirectoriesIndustryQuery: FC = () => {
   const params = useParams();

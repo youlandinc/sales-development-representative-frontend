@@ -3,7 +3,7 @@ import {
   TableColumnActionOption,
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 
 // Add column menu (p1 - highest priority)
 export const getAddColumnMenuActions = (): TableColumnActionOption[] => [

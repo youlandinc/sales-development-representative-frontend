@@ -7,7 +7,7 @@ import {
   subMonths,
 } from 'date-fns';
 
-import { DateRangeEnum } from '@/types/Settings/creditUsage';
+import { DateRangeEnum } from '@/types';
 
 /**
  * 格式化日期范围枚举为可读的字符串

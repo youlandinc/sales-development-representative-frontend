@@ -1,5 +1,15 @@
 import { FC, useCallback } from 'react';
-import { Icon, Stack, Tooltip } from '@mui/material';
+import { Icon, Stack } from '@mui/material';
+
+import {
+  DirectoriesQueryActionTypeEnum,
+  DirectoriesQueryComponentNameEnum,
+  DirectoriesQueryGroupTypeEnum,
+  DirectoriesQueryInputTypeEnum,
+  DirectoriesQueryItem,
+} from '@/types/directories';
+import { countFilledFieldsInGroup } from '@/utils/directories';
+import { useDirectoriesStore } from '@/stores/directories';
 
 import { StyledButtonGroup, StyledTextFieldNumber } from '@/components/atoms';
 import {
@@ -8,19 +18,13 @@ import {
   QueryCheckbox,
   QueryCollapse,
   QueryContainer,
+  QueryDateSelectRange,
   QuerySwitch,
   QueryTab,
   QueryTable,
   QueryTableWithList,
+  QueryTooltip,
 } from './base';
-import {
-  DirectoriesQueryActionTypeEnum,
-  DirectoriesQueryGroupTypeEnum,
-  DirectoriesQueryInputTypeEnum,
-  DirectoriesQueryItem,
-} from '@/types/directories';
-import { countFilledFieldsInGroup } from '@/utils/directories';
-import { useDirectoriesStore } from '@/stores/directories';
 
 import ICON_INFO from './base/assets/icon-info.svg';
 
@@ -53,7 +57,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     resetGroupFormValues(config, groupPath);
   }, [resetGroupFormValues, config, groupPath]);
 
-  const containerIsAuth = hideAuthBadge ? true : config.isAuth;
+  const containerIsAuth = hideAuthBadge ? true : (config.isAuth ?? true);
   if (config.groupType === DirectoriesQueryGroupTypeEnum.button_group) {
     return (
       <QueryContainer
@@ -217,15 +221,13 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         title={
           <Stack sx={{ flexDirection: 'row', gap: 0.5, alignItems: 'center' }}>
             {config.label}
-            <Tooltip
-              arrow
-              placement={'top'}
+            <QueryTooltip
               title={
                 'These are additional data fields found based on the current filters above. Select fields you want to display or use for additional filtering.'
               }
             >
               <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
-            </Tooltip>
+            </QueryTooltip>
           </Stack>
         }
       >
@@ -342,8 +344,59 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
     );
   }
 
-  // SWITCH
+  if (config.actionType === DirectoriesQueryActionTypeEnum.date) {
+    if (
+      config.componentName ===
+      DirectoriesQueryComponentNameEnum.date_range_select
+    ) {
+      return (
+        <QueryContainer
+          description={config.description}
+          isAuth={containerIsAuth}
+          label={config.label}
+          tooltip={config.tooltip}
+        >
+          <QueryDateSelectRange
+            dateRange={
+              formData[config.key!]?.startDate || formData[config.key!]?.endDate
+                ? {
+                    startDate: formData[config.key!]?.startDate
+                      ? new Date(formData[config.key!].startDate)
+                      : null,
+                    endDate: formData[config.key!]?.endDate
+                      ? new Date(formData[config.key!].endDate)
+                      : null,
+                  }
+                : null
+            }
+            isAuth={config.isAuth}
+            onFormChange={(selectType, dateRange) => {
+              onFormChange(
+                config.key,
+                {
+                  selectType: selectType ?? '',
+                  startDate: dateRange?.startDate
+                    ? dateRange.startDate.toISOString()
+                    : '',
+                  endDate: dateRange?.endDate
+                    ? dateRange.endDate.toISOString()
+                    : '',
+                },
+                groupPath,
+              );
+            }}
+            options={config.optionValues}
+            placeholder={config.placeholder || 'Select date range'}
+            value={formData[config.key!]?.selectType ?? ''}
+          />
+        </QueryContainer>
+      );
+    }
+
+    return null;
+  }
   if (config.actionType === DirectoriesQueryActionTypeEnum.switch) {
+    // SWITCH
     return (
       <QueryContainer
         description={config.description}
