@@ -1,22 +1,23 @@
 import { DirectoriesBizIdEnum } from '@/types/directories';
 import { UTypeOf } from '@/utils/UTypeOf';
-import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
 
 /**
  * Form Values Data Structure
  *
- * Flat config (non-CAPITAL_MARKETS):
- * { bizId, formValues }
- *
- * Hierarchical config (CAPITAL_MARKETS):
- * { bizId, institutionType, entityType, formValues }
+ * L4 Flat config: { bizId, formValues }
+ * L3 Tab-based flat config: { bizId, tabKey, tabValue, formValues }
+ * L1 Hierarchical config: { bizId, buttonGroupKey, buttonGroupValue, tabKey, tabValue, formValues }
+ * L2 ButtonGroup-only config: { bizId, buttonGroupKey, buttonGroupValue, formValues }
  */
 export type DirectoriesFormValues = {
   bizId: DirectoriesBizIdEnum | '';
   formValues: Record<string, any>;
-  // Hierarchical config only (CAPITAL_MARKETS only)
-  institutionType?: string;
-  entityType?: string;
+  // L1/L2: Dynamic key from BUTTON_GROUP config (e.g., 'institutionType')
+  buttonGroupKey?: string;
+  buttonGroupValue?: string;
+  // L1/L3: Dynamic key from TAB config (e.g., 'entityType')
+  tabKey?: string;
+  tabValue?: string;
   // Additional details authorization
   // When false, B (additional details) changes are ignored
   additionalIsAuth?: boolean;
@@ -93,36 +94,53 @@ export const processAdditionalDetails = (additional: any): any => {
  * Build additional details request params from form values
  *
  * Flat config: { bizId, ...formValues }
+ * Flat config with Tab: { bizId, entityType, ...formValues[entityType] }
  * Hierarchical config: { bizId, institutionType, entityType, ...formValues[entityType] }
  */
 export const buildAdditionalRequestParams = (
   data: DirectoriesFormValues,
 ): Record<string, any> => {
-  const { bizId, institutionType, entityType, formValues } = data;
+  const {
+    bizId,
+    buttonGroupKey,
+    buttonGroupValue,
+    tabKey,
+    tabValue,
+    formValues,
+  } = data;
 
   const requestData: Record<string, any> = {
     bizId,
   };
 
-  // Hierarchical config: send institutionType and entityType
-  const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
-    bizId as DirectoriesBizIdEnum,
-  );
+  // Detect config type by data structure:
+  // - hasButtonGroup: L1/L2 (has BUTTON_GROUP)
+  // - hasTab: L1/L3 (has TAB)
+  const hasButtonGroup = !!buttonGroupKey && !!buttonGroupValue;
+  const resolvedTabValue = tabValue || (tabKey ? formValues?.[tabKey] : null);
+  const hasTab = !!tabKey && !!resolvedTabValue;
 
-  if (isHierarchical) {
-    if (institutionType) {
-      requestData.institutionType = institutionType;
+  if (hasButtonGroup) {
+    // L1/L2: Has BUTTON_GROUP, send buttonGroupKey=buttonGroupValue
+    requestData[buttonGroupKey] = buttonGroupValue;
+    if (hasTab && tabKey) {
+      // L1: Has both BUTTON_GROUP + TAB
+      requestData[tabKey] = resolvedTabValue;
+      const tabData = formValues[resolvedTabValue] || {};
+      mergeNonEmptyDirectoriesFields(requestData, tabData);
+    } else {
+      // L2: Has BUTTON_GROUP only
+      mergeNonEmptyDirectoriesFields(requestData, formValues);
     }
-    if (entityType) {
-      requestData.entityType = entityType;
-    }
+  } else if (hasTab && tabKey) {
+    // L3: Tab-based flat config, send tabKey=tabValue
+    requestData[tabKey] = resolvedTabValue;
+    const tabData = formValues[resolvedTabValue] || {};
+    mergeNonEmptyDirectoriesFields(requestData, tabData);
+  } else {
+    // L4: Pure flat config, use formValues directly
+    mergeNonEmptyDirectoriesFields(requestData, formValues);
   }
-
-  // Hierarchical config: group by entityType, Flat config: use formValues directly
-  const entityData =
-    isHierarchical && entityType ? formValues[entityType] || {} : formValues;
-
-  mergeNonEmptyDirectoriesFields(requestData, entityData);
 
   return requestData;
 };
@@ -131,6 +149,7 @@ export const buildAdditionalRequestParams = (
  * Build final combined data (query + additionalDetails)
  *
  * Flat config: { query: { bizId, ...formValues }, additionalDetails, timestamp }
+ * Flat config with Tab: { query: { bizId, entityType, ...formValues[entityType] }, additionalDetails, timestamp }
  * Hierarchical config: { query: { bizId, institutionType, entityType, ...formValues }, additionalDetails, timestamp }
  */
 export const buildFinalData = (
@@ -139,29 +158,45 @@ export const buildFinalData = (
 ) => {
   const processedAdditional = processAdditionalDetails(additional);
 
+  const { buttonGroupKey, buttonGroupValue, tabKey, tabValue, formValues } =
+    formData;
+
+  // Detect config type by data structure
+  const hasButtonGroup = !!buttonGroupKey && !!buttonGroupValue;
+  const resolvedTabValue = tabValue || (tabKey ? formValues?.[tabKey] : null);
+  const hasTab = !!tabKey && !!resolvedTabValue;
+
   const query: Record<string, any> = {
     bizId: formData.bizId,
-    ...formData.formValues,
   };
 
-  // Hierarchical config: add institutionType and entityType
-  const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
-    formData.bizId as DirectoriesBizIdEnum,
-  );
-
-  if (isHierarchical) {
-    if (formData.institutionType) {
-      query.institutionType = formData.institutionType;
+  if (hasButtonGroup) {
+    // L1/L2: Has BUTTON_GROUP
+    query[buttonGroupKey] = buttonGroupValue;
+    if (hasTab && tabKey) {
+      // L1: Has both BUTTON_GROUP + TAB, include all formValues + tabKey
+      Object.assign(query, formValues);
+      query[tabKey] = resolvedTabValue;
+    } else {
+      // L2: Has BUTTON_GROUP only, include all formValues
+      Object.assign(query, formValues);
     }
-    if (formData.entityType) {
-      query.entityType = formData.entityType;
-    }
+  } else if (hasTab && tabKey) {
+    // L3: Tab-based flat config, only include tab's data
+    query[tabKey] = resolvedTabValue;
+    const tabData = formValues[resolvedTabValue] || {};
+    Object.assign(query, tabData);
+  } else {
+    // L4: Pure flat config, include all formValues
+    Object.assign(query, formValues);
   }
 
   return {
     query,
     additionalDetails: processedAdditional,
     timestamp: Date.now(),
+    // Pass keys for buildSearchRequestParams
+    _meta: { buttonGroupKey, tabKey },
   };
 };
 
@@ -170,6 +205,7 @@ export const buildFinalData = (
  * Flattens nested structure into flat key-value pairs
  *
  * Flat config: { bizId, ...formValues, ...additionalDetails }
+ * Flat config with Tab: { bizId, entityType, ...formValues[entityType], ...additionalDetails }
  * Hierarchical config: { bizId, institutionType, entityType, ...formValues[entityType], ...additionalDetails }
  */
 export const buildSearchRequestParams = (
@@ -179,32 +215,48 @@ export const buildSearchRequestParams = (
     return {};
   }
 
-  const { query, additionalDetails } = finalData;
-  const { bizId, institutionType, entityType } = query;
+  const { query, additionalDetails, _meta } = finalData;
+  const { bizId } = query;
+  const buttonGroupKey = _meta?.buttonGroupKey;
+  const tabKey = _meta?.tabKey;
 
   const requestData: Record<string, any> = {
     bizId,
   };
 
-  // Hierarchical config: send institutionType and entityType
-  const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
-    bizId as DirectoriesBizIdEnum,
-  );
+  // Detect config type by query structure using dynamic keys
+  const buttonGroupValue = buttonGroupKey ? query[buttonGroupKey] : null;
+  const tabValue = tabKey ? query[tabKey] : null;
+  const hasButtonGroup = !!buttonGroupKey && !!buttonGroupValue;
+  const hasTab = !!tabKey && !!tabValue;
 
-  if (isHierarchical) {
-    if (institutionType) {
-      requestData.institutionType = institutionType;
+  if (hasButtonGroup) {
+    // L1/L2: Has BUTTON_GROUP
+    requestData[buttonGroupKey] = buttonGroupValue;
+    if (hasTab) {
+      // L1: Has both BUTTON_GROUP + TAB, extract tab's fields
+      requestData[tabKey] = tabValue;
+      const tabData = query[tabValue] || {};
+      mergeNonEmptyDirectoriesFields(requestData, tabData);
+    } else {
+      // L2: Has BUTTON_GROUP only, merge query fields (excluding bizId and buttonGroupKey)
+      Object.keys(query).forEach((key) => {
+        if (key !== 'bizId' && key !== buttonGroupKey) {
+          const value = query[key];
+          if (!isEmptyDirectoriesFieldValue(value)) {
+            requestData[key] = value;
+          }
+        }
+      });
     }
-    if (entityType) {
-      requestData.entityType = entityType;
-    }
+  } else if (hasTab) {
+    // L3: Tab-based flat config, send tabKey=tabValue, query already contains only tab's fields
+    requestData[tabKey] = tabValue;
+    mergeNonEmptyDirectoriesFields(requestData, query);
+  } else {
+    // L4: Pure flat config, use query directly
+    mergeNonEmptyDirectoriesFields(requestData, query);
   }
-
-  // Hierarchical config: extract entityType's fields
-  // Flat config: use query directly
-  const entityData =
-    isHierarchical && entityType ? query[entityType] || {} : query;
-  mergeNonEmptyDirectoriesFields(requestData, entityData);
 
   // Flatten additional details fields
   if (UTypeOf.isObject(additionalDetails)) {

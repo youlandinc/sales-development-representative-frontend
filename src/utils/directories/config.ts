@@ -5,10 +5,7 @@ import {
   DirectoriesQueryGroupTypeEnum,
   DirectoriesQueryItem,
 } from '@/types/directories';
-import {
-  DIRECTORIES,
-  HIERARCHICAL_CONFIG_BIZ_IDS,
-} from '@/constants/directories';
+import { DIRECTORIES } from '@/constants/directories';
 
 export const getDirectoriesBizId = (slug: string): DirectoriesBizIdEnum => {
   const entry = Object.entries(DIRECTORIES).find(([, v]) => v.slug === slug);
@@ -50,9 +47,7 @@ const parseHierarchicalConfig = (
   apiData: DirectoriesQueryItem[],
 ): HierarchicalConfigResult => {
   const buttonGroup = apiData.find(
-    (item) =>
-      item.key === 'institutionType' &&
-      item.groupType === DirectoriesQueryGroupTypeEnum.button_group,
+    (item) => item.groupType === DirectoriesQueryGroupTypeEnum.button_group,
   );
 
   if (!buttonGroup || !buttonGroup.children) {
@@ -62,9 +57,9 @@ const parseHierarchicalConfig = (
   const configMap: Record<string, DirectoriesQueryItem[]> = {};
 
   buttonGroup.children.forEach((child) => {
-    const institutionType = child.defaultValue;
-    if (institutionType && child.children) {
-      configMap[institutionType] = child.children;
+    const buttonGroupValue = child.defaultValue;
+    if (buttonGroupValue && child.children) {
+      configMap[buttonGroupValue] = child.children;
     }
   });
 
@@ -83,6 +78,53 @@ const parseHierarchicalConfig = (
 // ========================================
 export type ConfigParseResult = FlatConfigResult | HierarchicalConfigResult;
 
+/**
+ * Get BUTTON_GROUP key from config (e.g., 'institutionType')
+ * Returns null if no BUTTON_GROUP found
+ */
+export const getButtonGroupKey = (
+  configs: DirectoriesQueryItem[],
+): string | null => {
+  const buttonGroup = configs.find(
+    (c) => c.groupType === DirectoriesQueryGroupTypeEnum.button_group,
+  );
+  return buttonGroup?.key || null;
+};
+
+/**
+ * Get TAB key from config (e.g., 'entityType')
+ * Returns null if no TAB found
+ * Searches recursively in children
+ */
+export const getTabKey = (configs: DirectoriesQueryItem[]): string | null => {
+  for (const config of configs) {
+    if (config.groupType === DirectoriesQueryGroupTypeEnum.tab && config.key) {
+      return config.key;
+    }
+    if (config.children?.length) {
+      const found = getTabKey(config.children);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
+};
+
+/**
+ * Check if config has BUTTON_GROUP
+ */
+export const hasButtonGroup = (configs: DirectoriesQueryItem[]): boolean => {
+  return getButtonGroupKey(configs) !== null;
+};
+
+/**
+ * Check if config has TAB
+ */
+export const hasTab = (configs: DirectoriesQueryItem[]): boolean => {
+  return getTabKey(configs) !== null;
+};
+
 export const configParse = (
   apiData: DirectoriesQueryItem[],
   bizId: DirectoriesBizIdEnum,
@@ -91,7 +133,8 @@ export const configParse = (
     return { configMap: {}, buttonGroupConfig: null, firstKey: '' };
   }
 
-  if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId)) {
+  // Detect by config feature: has BUTTON_GROUP → hierarchical
+  if (getButtonGroupKey(apiData) !== null) {
     return parseHierarchicalConfig(apiData);
   }
 

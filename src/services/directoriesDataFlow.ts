@@ -30,7 +30,6 @@ import {
   _fetchPreviewBody,
   _fetchPreviewHeader,
 } from '@/request/directories';
-import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
 
 // Re-export for convenience
 export type { DirectoriesFormValues } from '@/utils/directories';
@@ -76,8 +75,8 @@ class DirectoriesDataFlow {
    * Raw form values stream (no debounce)
    * Updated immediately when user interacts with form controls
    *
-   * 扁平配置: { bizId, formValues }
-   * 层级配置: { bizId, institutionType, entityType, formValues }
+   * L3/L4 Flat config: { bizId, formValues }
+   * L1/L2 Hierarchical config: { bizId, buttonGroupKey, buttonGroupValue, tabKey, tabValue, formValues }
    */
   private formValuesRaw$ = new BehaviorSubject<DirectoriesFormValues>({
     bizId: '',
@@ -111,12 +110,22 @@ class DirectoriesDataFlow {
         return false;
       }
 
-      // Hierarchical config: requires institutionType + entityType
-      if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(values.bizId)) {
-        return !!values.institutionType && !!values.entityType;
+      // L1/L2 (has buttonGroupKey): requires buttonGroupValue to be set
+      if (values.buttonGroupKey) {
+        if (!values.buttonGroupValue) {
+          return false;
+        }
+        // L1: if tabKey exists, tabValue must be non-empty
+        if (
+          values.tabKey &&
+          !values.tabValue &&
+          !values.formValues?.[values.tabKey]
+        ) {
+          return false;
+        }
       }
 
-      // Flat config: only requires bizId + formValues
+      // L3/L4: only requires bizId + formValues
       return true;
     }),
     tap(() => {
@@ -242,9 +251,17 @@ class DirectoriesDataFlow {
         return EMPTY;
       }
 
-      // Hierarchical config: requires institutionType + entityType
-      if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(formData.bizId)) {
-        if (!formData.institutionType || !formData.entityType) {
+      // L1/L2 (has buttonGroupKey): requires buttonGroupValue to be set
+      if (formData.buttonGroupKey) {
+        if (!formData.buttonGroupValue) {
+          return EMPTY;
+        }
+        // L1: if tabKey exists, tabValue must be non-empty
+        if (
+          formData.tabKey &&
+          !formData.tabValue &&
+          !formData.formValues?.[formData.tabKey]
+        ) {
           return EMPTY;
         }
       }
@@ -386,8 +403,8 @@ class DirectoriesDataFlow {
    * Called by Zustand when user interacts with form controls
    * Triggers the entire data flow pipeline
    *
-   * 扁平配置: { bizId, formValues }
-   * 层级配置: { bizId, institutionType, entityType, formValues }
+   * L3/L4 Flat config: { bizId, formValues }
+   * L1/L2 Hierarchical config: { bizId, buttonGroupKey, buttonGroupValue, tabKey, tabValue, formValues }
    */
   updateFormValues(data: DirectoriesFormValues) {
     this.formValuesRaw$.next(data);

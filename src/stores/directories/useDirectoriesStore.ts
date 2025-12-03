@@ -9,6 +9,8 @@ import {
   configInitFormValues,
   configParse,
   getAdditionalIsAuth,
+  getButtonGroupKey,
+  getTabKey,
 } from '@/utils/directories';
 import {
   DirectoriesBizIdEnum,
@@ -16,7 +18,6 @@ import {
   DirectoriesQueryItem,
   DirectoriesQueryTableBodyApiResponse,
 } from '@/types/directories';
-import { HIERARCHICAL_CONFIG_BIZ_IDS } from '@/constants/directories';
 
 import { SDRToast } from '@/components/atoms';
 
@@ -25,12 +26,15 @@ import { HttpError } from '@/types';
 
 interface DirectoriesStoreState {
   bizId: DirectoriesBizIdEnum | '';
-  institutionType: string;
+  // Dynamic keys from config
+  buttonGroupKey: string | null; // e.g., 'institutionType'
+  buttonGroupValue: string; // e.g., 'INVESTORS_FUNDS'
+  tabKey: string | null; // e.g., 'entityType'
   buttonGroupConfig: DirectoriesQueryItem | null;
   isLoadingConfig: boolean;
   queryConfig: DirectoriesQueryItem[];
   configMap: Record<string, DirectoriesQueryItem[]>;
-  formValuesByInstitutionType: Record<string, Record<string, any>>;
+  formValuesByButtonGroup: Record<string, Record<string, any>>;
   formValues: Record<string, any>;
   // Additional Details
   isLoadingAdditional: boolean;
@@ -46,7 +50,7 @@ interface DirectoriesStoreState {
 }
 
 interface DirectoriesStoreActions {
-  updateInstitutionType: (value: string) => void;
+  updateButtonGroupValue: (value: string) => void;
   updateFormValues: (key: string, value: any, groupPath?: string) => void;
   resetGroupFormValues: (
     config: DirectoriesQueryItem,
@@ -69,11 +73,13 @@ type DirectoriesStoreProps = DirectoriesStoreState & DirectoriesStoreActions;
 
 const INITIAL_STATE: DirectoriesStoreState = {
   bizId: '',
-  institutionType: '',
+  buttonGroupKey: null,
+  buttonGroupValue: '',
+  tabKey: null,
   configMap: {},
   buttonGroupConfig: null,
   queryConfig: [],
-  formValuesByInstitutionType: {},
+  formValuesByButtonGroup: {},
   formValues: {},
   isLoadingConfig: false,
   // Additional Details
@@ -98,39 +104,45 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
   (set, get) => ({
     ...INITIAL_STATE,
 
-    updateInstitutionType: (value: string) => {
+    updateButtonGroupValue: (value: string) => {
       const {
-        institutionType: currentInstitutionType,
+        buttonGroupValue: currentValue,
+        buttonGroupKey,
         configMap,
-        formValuesByInstitutionType,
+        formValuesByButtonGroup,
         bizId,
+        buttonGroupConfig,
       } = get();
 
-      // Only hierarchical config supports institutionType switching
-      if (
-        !HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId as DirectoriesBizIdEnum)
-      ) {
+      // Only hierarchical config (has BUTTON_GROUP) supports switching
+      if (!buttonGroupConfig || !buttonGroupKey) {
         return;
       }
 
-      if (currentInstitutionType === value || !value) {
+      if (currentValue === value || !value) {
         return;
       }
 
       const queryConfig = configMap[value] || [];
-      const formValues = formValuesByInstitutionType[value];
+      const formValues = formValuesByButtonGroup[value];
+      const resolvedTabKey = getTabKey(queryConfig);
 
       set({
-        institutionType: value,
+        buttonGroupValue: value,
+        tabKey: resolvedTabKey,
         queryConfig,
         formValues,
       });
 
-      // Hierarchical config: pass institutionType and entityType
+      // Pass dynamic keys to RxJS
       directoriesDataFlow.updateFormValues({
         bizId,
-        institutionType: value,
-        entityType: formValues?.entityType || '',
+        buttonGroupKey,
+        buttonGroupValue: value,
+        tabKey: resolvedTabKey || undefined,
+        tabValue: resolvedTabKey
+          ? formValues?.[resolvedTabKey] || ''
+          : undefined,
         formValues: formValues || {},
         additionalIsAuth: getAdditionalIsAuth(queryConfig),
       });
@@ -139,39 +151,44 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
     updateFormValues: (key: string, value: any, groupPath?: string) => {
       const {
         formValues,
-        institutionType,
-        formValuesByInstitutionType,
+        buttonGroupKey,
+        buttonGroupValue,
+        tabKey,
+        formValuesByButtonGroup,
         bizId,
         queryConfig,
       } = get();
 
       let updatedFormValues: Record<string, any>;
 
-      if (key === 'entityType') {
-        const currentEntityType = formValues.entityType;
-        const targetEntityType = value;
+      // Check if updating the tab key (e.g., 'entityType')
+      const isTabKeyUpdate = tabKey && key === tabKey;
+
+      if (isTabKeyUpdate) {
+        const currentTabValue = formValues[tabKey];
+        const targetTabValue = value;
 
         // When switching tab, copy shared field values from current tab to target tab
         if (
-          currentEntityType &&
-          targetEntityType &&
-          currentEntityType !== targetEntityType
+          currentTabValue &&
+          targetTabValue &&
+          currentTabValue !== targetTabValue
         ) {
-          const currentTabValues = formValues[currentEntityType] || {};
-          const targetTabValues = formValues[targetEntityType] || {};
+          const currentTabData = formValues[currentTabValue] || {};
+          const targetTabData = formValues[targetTabValue] || {};
 
           // Find shared keys and copy values from current tab to target tab
-          const mergedTargetValues = { ...targetTabValues };
-          Object.keys(currentTabValues).forEach((fieldKey) => {
-            if (fieldKey in targetTabValues) {
-              mergedTargetValues[fieldKey] = currentTabValues[fieldKey];
+          const mergedTargetData = { ...targetTabData };
+          Object.keys(currentTabData).forEach((fieldKey) => {
+            if (fieldKey in targetTabData) {
+              mergedTargetData[fieldKey] = currentTabData[fieldKey];
             }
           });
 
           updatedFormValues = {
             ...formValues,
             [key]: value,
-            [targetEntityType]: mergedTargetValues,
+            [targetTabValue]: mergedTargetData,
           };
         } else {
           updatedFormValues = {
@@ -194,24 +211,24 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         };
       }
 
-      const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
-        bizId as DirectoriesBizIdEnum,
-      );
+      const { buttonGroupConfig } = get();
 
-      // Hierarchical config: store by institutionType
-      if (isHierarchical) {
+      // Hierarchical config (has BUTTON_GROUP): store by buttonGroupValue
+      if (buttonGroupConfig && buttonGroupKey) {
         set({
           formValues: updatedFormValues,
-          formValuesByInstitutionType: {
-            ...formValuesByInstitutionType,
-            [institutionType]: updatedFormValues,
+          formValuesByButtonGroup: {
+            ...formValuesByButtonGroup,
+            [buttonGroupValue]: updatedFormValues,
           },
         });
 
         directoriesDataFlow.updateFormValues({
           bizId,
-          institutionType,
-          entityType: updatedFormValues.entityType || '',
+          buttonGroupKey,
+          buttonGroupValue,
+          tabKey: tabKey || undefined,
+          tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
@@ -221,6 +238,8 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
 
         directoriesDataFlow.updateFormValues({
           bizId,
+          tabKey: tabKey || undefined,
+          tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
@@ -233,8 +252,10 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
     ) => {
       const {
         formValues,
-        institutionType,
-        formValuesByInstitutionType,
+        buttonGroupKey,
+        buttonGroupValue,
+        tabKey,
+        formValuesByButtonGroup,
         bizId,
         queryConfig,
       } = get();
@@ -281,23 +302,24 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
         });
       }
 
-      const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(
-        bizId as DirectoriesBizIdEnum,
-      );
+      const { buttonGroupConfig } = get();
 
-      if (isHierarchical) {
+      // Hierarchical config (has BUTTON_GROUP): store by buttonGroupValue
+      if (buttonGroupConfig && buttonGroupKey) {
         set({
           formValues: updatedFormValues,
-          formValuesByInstitutionType: {
-            ...formValuesByInstitutionType,
-            [institutionType]: updatedFormValues,
+          formValuesByButtonGroup: {
+            ...formValuesByButtonGroup,
+            [buttonGroupValue]: updatedFormValues,
           },
         });
 
         directoriesDataFlow.updateFormValues({
           bizId,
-          institutionType,
-          entityType: updatedFormValues.entityType || '',
+          buttonGroupKey,
+          buttonGroupValue,
+          tabKey: tabKey || undefined,
+          tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
@@ -306,6 +328,8 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
 
         directoriesDataFlow.updateFormValues({
           bizId,
+          tabKey: tabKey || undefined,
+          tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
@@ -329,37 +353,43 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           bizId,
         );
 
-        const isHierarchical = HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId);
+        // Detect hierarchical config by buttonGroupConfig existence
+        const resolvedButtonGroupKey = getButtonGroupKey(data || []);
 
-        if (isHierarchical) {
-          // Hierarchical config: store grouped by institutionType
-          const formValuesByInstitutionType: Record<
+        if (buttonGroupConfig && resolvedButtonGroupKey) {
+          // Hierarchical config: store grouped by buttonGroupValue
+          const formValuesByButtonGroup: Record<
             string,
             Record<string, any>
           > = {};
           Object.keys(configMap).forEach((key) => {
-            formValuesByInstitutionType[key] = configInitFormValues(
-              configMap[key],
-            );
+            formValuesByButtonGroup[key] = configInitFormValues(configMap[key]);
           });
 
           const queryConfig = configMap[firstKey] || [];
-          const currentFormValues = formValuesByInstitutionType[firstKey];
+          const currentFormValues = formValuesByButtonGroup[firstKey];
+          const resolvedTabKey = getTabKey(queryConfig);
 
           set({
             configMap,
             buttonGroupConfig,
+            buttonGroupKey: resolvedButtonGroupKey,
+            buttonGroupValue: firstKey,
+            tabKey: resolvedTabKey,
             queryConfig,
-            institutionType: firstKey,
-            formValuesByInstitutionType,
+            formValuesByButtonGroup,
             formValues: currentFormValues || {},
             isLoadingConfig: false,
           });
 
           directoriesDataFlow.updateFormValues({
             bizId,
-            institutionType: firstKey,
-            entityType: currentFormValues?.entityType || '',
+            buttonGroupKey: resolvedButtonGroupKey,
+            buttonGroupValue: firstKey,
+            tabKey: resolvedTabKey || undefined,
+            tabValue: resolvedTabKey
+              ? currentFormValues?.[resolvedTabKey] || ''
+              : undefined,
             formValues: currentFormValues || {},
             additionalIsAuth: getAdditionalIsAuth(queryConfig),
           });
@@ -367,19 +397,26 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           // Flat config: store directly
           const queryConfig = configMap[firstKey] || [];
           const currentFormValues = configInitFormValues(queryConfig);
+          const resolvedTabKey = getTabKey(queryConfig);
 
           set({
             configMap: {},
             buttonGroupConfig: null,
+            buttonGroupKey: null,
+            buttonGroupValue: '',
+            tabKey: resolvedTabKey,
             queryConfig,
-            institutionType: '',
-            formValuesByInstitutionType: {},
+            formValuesByButtonGroup: {},
             formValues: currentFormValues || {},
             isLoadingConfig: false,
           });
 
           directoriesDataFlow.updateFormValues({
             bizId,
+            tabKey: resolvedTabKey || undefined,
+            tabValue: resolvedTabKey
+              ? currentFormValues?.[resolvedTabKey] || ''
+              : undefined,
             formValues: currentFormValues || {},
             additionalIsAuth: getAdditionalIsAuth(queryConfig),
           });
@@ -528,11 +565,13 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
       directoriesDataFlow.reset();
       set({
         bizId: '',
-        institutionType: '',
+        buttonGroupKey: null,
+        buttonGroupValue: '',
+        tabKey: null,
         configMap: {},
         buttonGroupConfig: null,
         queryConfig: [],
-        formValuesByInstitutionType: {},
+        formValuesByButtonGroup: {},
         formValues: {},
         isLoadingConfig: false,
         isLoadingAdditional: false,

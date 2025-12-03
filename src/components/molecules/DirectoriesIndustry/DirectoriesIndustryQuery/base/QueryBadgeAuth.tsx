@@ -1,11 +1,14 @@
 import { FC } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { Box, Icon, Stack, Tooltip, Typography } from '@mui/material';
 
 import { useDirectoriesStore } from '@/stores/directories';
 import { DIRECTORIES_BADGE_AUTH } from '@/constants/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
 
-import { QueryTooltip } from './index';
+import {
+  QUERY_TOOLTIP_SLOT_PROPS,
+  QueryTooltipAccessTitle,
+} from './QueryTooltip';
 
 import ICON_LOCK from './assets/icon-lock.svg';
 
@@ -19,33 +22,40 @@ export const QueryBadgeAuth: FC = () => {
   }
 
   return (
-    <QueryTooltip variant={'access'}>
-      <Stack
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        sx={{
-          flexDirection: 'row',
-          gap: 0.25,
-          alignItems: 'center',
-          px: 0.75,
-          py: 0.25,
-          borderRadius: 1,
-          border: '1px solid #C49F61',
-          cursor: 'default',
-        }}
-      >
-        <Icon component={ICON_LOCK} sx={{ width: 11, height: 11 }} />
-        <Typography
+    <Tooltip
+      arrow
+      placement={'top'}
+      slotProps={QUERY_TOOLTIP_SLOT_PROPS}
+      title={<QueryTooltipAccessTitle />}
+    >
+      <Box>
+        <Stack
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           sx={{
-            color: '#BC9166',
-            fontSize: 10,
+            flexDirection: 'row',
+            gap: 0.25,
+            alignItems: 'center',
+            px: 0.75,
+            py: 0.25,
+            borderRadius: 1,
+            border: '1px solid #C49F61',
+            cursor: 'default',
           }}
         >
-          {DIRECTORIES_BADGE_AUTH[bizId].title}
-        </Typography>
-      </Stack>
-    </QueryTooltip>
+          <Icon component={ICON_LOCK} sx={{ width: 11, height: 11 }} />
+          <Typography
+            sx={{
+              color: '#BC9166',
+              fontSize: 10,
+            }}
+          >
+            {DIRECTORIES_BADGE_AUTH[bizId].title}
+          </Typography>
+        </Stack>
+      </Box>
+    </Tooltip>
   );
 };

@@ -3,12 +3,8 @@ import { CircularProgress, Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
 
-import {
-  HIERARCHICAL_CONFIG_BIZ_IDS,
-  TITLE_MAP,
-} from '@/constants/directories';
+import { TITLE_MAP } from '@/constants/directories';
 import { useDirectoriesStore } from '@/stores/directories';
-import { getDirectoriesBizId } from '@/utils/directories';
 import { DirectoriesQueryItem } from '@/types/directories';
 
 import { QueryBreadcrumbs } from './base';
@@ -17,25 +13,26 @@ import { CreateQueryElement, DirectoriesIndustryQueryFooter } from './index';
 export const DirectoriesIndustryQuery: FC = () => {
   const params = useParams();
   const industrySlug = params.industry as string;
-  const bizId = getDirectoriesBizId(industrySlug);
 
   const {
     formValues,
     queryConfig,
-    institutionType,
+    buttonGroupKey,
+    buttonGroupValue,
     isLoadingConfig,
     buttonGroupConfig,
     updateFormValues,
-    updateInstitutionType,
+    updateButtonGroupValue,
   } = useDirectoriesStore(
     useShallow((state) => ({
       formValues: state.formValues,
       queryConfig: state.queryConfig,
-      institutionType: state.institutionType,
+      buttonGroupKey: state.buttonGroupKey,
+      buttonGroupValue: state.buttonGroupValue,
       isLoadingConfig: state.isLoadingConfig,
       buttonGroupConfig: state.buttonGroupConfig,
       updateFormValues: state.updateFormValues,
-      updateInstitutionType: state.updateInstitutionType,
+      updateButtonGroupValue: state.updateButtonGroupValue,
     })),
   );
 
@@ -48,8 +45,9 @@ export const DirectoriesIndustryQuery: FC = () => {
       return;
     }
 
-    if (key === 'institutionType') {
-      updateInstitutionType(value);
+    // Handle buttonGroup key change (e.g., 'institutionType')
+    if (buttonGroupKey && key === buttonGroupKey) {
+      updateButtonGroupValue(value);
       return;
     }
 
@@ -81,8 +79,9 @@ export const DirectoriesIndustryQuery: FC = () => {
     );
   }
 
-  // Hierarchical config must have buttonGroupConfig
-  if (HIERARCHICAL_CONFIG_BIZ_IDS.includes(bizId) && !buttonGroupConfig) {
+  // Hierarchical config (has BUTTON_GROUP) must have buttonGroupConfig
+  // This check handles config loading failure for hierarchical configs
+  if (buttonGroupConfig === null && queryConfig.length === 0) {
     return (
       <Stack
         sx={{
@@ -123,12 +122,12 @@ export const DirectoriesIndustryQuery: FC = () => {
 
         {/*<QueryDateSelectRange />*/}
 
-        {buttonGroupConfig && (
+        {buttonGroupConfig && buttonGroupKey && (
           <CreateQueryElement
             config={buttonGroupConfig}
             disabledLoading={isLoadingConfig}
-            formData={{ institutionType }}
-            key="institutionType-button-group"
+            formData={{ [buttonGroupKey]: buttonGroupValue }}
+            key={`${buttonGroupKey}-button-group`}
             onFormChange={onFormChange}
           />
         )}
@@ -137,7 +136,11 @@ export const DirectoriesIndustryQuery: FC = () => {
           <CreateQueryElement
             config={config}
             disabledLoading={isLoadingConfig}
-            formData={{ institutionType, ...formValues }}
+            formData={
+              buttonGroupKey
+                ? { [buttonGroupKey]: buttonGroupValue, ...formValues }
+                : formValues
+            }
             key={config.key || config.label || ''}
             onFormChange={onFormChange}
           />

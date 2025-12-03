@@ -1,10 +1,12 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Box,
   ClickAwayListener,
   Fade,
   Icon,
   Popper,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { format } from 'date-fns';
@@ -18,7 +20,10 @@ import {
 import ICON_CLOSE from './assets/icon-close.svg';
 import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
 
-import { QueryTooltip } from './QueryTooltip';
+import {
+  QUERY_TOOLTIP_SLOT_PROPS,
+  QueryTooltipAccessTitle,
+} from './QueryTooltip';
 
 const DATE_PICKER_SLOT_PROPS = {
   textField: {
@@ -211,66 +216,75 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   return (
     <ClickAwayListener onClickAway={onClickAwayToCancel}>
       <Stack ref={anchorRef}>
-        <QueryTooltip open={!isAuth && isMenuOpen} variant="access">
-          <StyledSelect
-            clearable={!!selectValue}
-            clearIcon={
-              <Icon
-                component={ICON_CLOSE}
-                sx={{ width: 14, height: 14, cursor: 'pointer' }}
-              />
-            }
-            IconComponent={({ className }) => {
-              return (
-                <Stack
-                  className={className}
-                  sx={{
-                    mr: 0.25,
-                  }}
-                >
-                  <Icon
-                    component={ICON_ARROW_DOWN}
+        <Tooltip
+          arrow
+          disableHoverListener
+          open={!isAuth && isMenuOpen}
+          placement={'top'}
+          slotProps={QUERY_TOOLTIP_SLOT_PROPS}
+          title={<QueryTooltipAccessTitle />}
+        >
+          <Box>
+            <StyledSelect
+              clearable={!!selectValue}
+              clearIcon={
+                <Icon
+                  component={ICON_CLOSE}
+                  sx={{ width: 14, height: 14, cursor: 'pointer' }}
+                />
+              }
+              IconComponent={({ className }) => {
+                return (
+                  <Stack
+                    className={className}
                     sx={{
-                      width: 14,
-                      height: 14,
+                      mr: 0.25,
                     }}
-                  />
-                </Stack>
-              );
-            }}
-            menuPaperSx={{
-              mt: 0.5,
-              borderRadius: 2,
-              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
-              border: '1px solid #E0E0E0',
-            }}
-            onChange={(e) => onSelectChange(e.target.value as string)}
-            onClear={onClear}
-            onClose={() => {
-              setIsMenuOpen(false);
-              onCloseToOpenPopper();
-            }}
-            onOpen={() => setIsMenuOpen(true)}
-            options={displayOptions}
-            placeholder={placeholder}
-            renderValue={buildRenderValue}
-            size={'small'}
-            sxList={{
-              py: 0,
-              maxHeight: 300,
-              '& .MuiMenuItem-root': {
-                px: 2,
-                py: 1,
-                fontSize: 14,
-                minHeight: 'auto',
-                '&.Mui-selected': {
-                  bgcolor: 'transparent',
+                  >
+                    <Icon
+                      component={ICON_ARROW_DOWN}
+                      sx={{
+                        width: 14,
+                        height: 14,
+                      }}
+                    />
+                  </Stack>
+                );
+              }}
+              menuPaperSx={{
+                mt: 0.5,
+                borderRadius: 2,
+                boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
+                border: '1px solid #E0E0E0',
+              }}
+              onChange={(e) => onSelectChange(e.target.value as string)}
+              onClear={onClear}
+              onClose={() => {
+                setIsMenuOpen(false);
+                onCloseToOpenPopper();
+              }}
+              onOpen={() => setIsMenuOpen(true)}
+              options={displayOptions}
+              placeholder={placeholder}
+              renderValue={buildRenderValue}
+              size={'small'}
+              sxList={{
+                py: 0,
+                maxHeight: 300,
+                '& .MuiMenuItem-root': {
+                  px: 2,
+                  py: 1,
+                  fontSize: 14,
+                  minHeight: 'auto',
+                  '&.Mui-selected': {
+                    bgcolor: 'transparent',
+                  },
                 },
-              },
-            }}
-            value={selectValue}
-          />
-        </QueryTooltip>
+              }}
+              value={selectValue}
+            />
+          </Box>
+        </Tooltip>
         <Popper
           anchorEl={anchorRef.current}
           open={isPopperOpen}

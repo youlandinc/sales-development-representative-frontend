@@ -1,13 +1,15 @@
 import { FC } from 'react';
 import {
+  Box,
   Checkbox,
   FormControlLabel,
   Icon,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 
-import { QueryTooltip } from './index';
+import { QUERY_TOOLTIP_SLOT_PROPS } from './index';
 
 import ICON_INFO from './assets/icon-info.svg';
 import ICON_STATIC from '@/components/atoms/StyledCheckbox/assets/icon_static.svg';
@@ -85,9 +87,16 @@ export const QueryCheckbox: FC<QueryCheckboxProps> = ({
           }}
         />
         {subTooltip && (
-          <QueryTooltip title={subTooltip}>
-            <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
-          </QueryTooltip>
+          <Tooltip
+            arrow
+            placement={'top'}
+            slotProps={QUERY_TOOLTIP_SLOT_PROPS}
+            title={subTooltip}
+          >
+            <Box>
+              <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
+            </Box>
+          </Tooltip>
         )}
       </Stack>
       {subDescription && (

@@ -4,6 +4,10 @@ export {
   configParse,
   configInitFormValues,
   getAdditionalIsAuth,
+  getButtonGroupKey,
+  getTabKey,
+  hasButtonGroup,
+  hasTab,
 } from './config';
 
 export { additionalInit, additionalCollectKeys } from './additional';
