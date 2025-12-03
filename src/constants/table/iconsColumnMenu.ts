@@ -1,11 +1,11 @@
-import ICON_COLUMN_USE_AI from '@/components/molecules/ProspectDetail/assets/table/icon-column-use-ai.svg';
-import ICON_COLUMN_EDIT from '@/components/molecules/ProspectDetail/assets/table/icon-column-edit.svg';
-import ICON_COLUMN_DESCRIPTION from '@/components/molecules/ProspectDetail/assets/table/icon-column-edit-description.svg';
-import ICON_COLUMN_RENAME from '@/components/molecules/ProspectDetail/assets/table/icon-column-rename.svg';
-import ICON_COLUMN_HIDE from '@/components/molecules/ProspectDetail/assets/table/icon-column-hide.svg';
-import ICON_COLUMN_DELETE from '@/components/molecules/ProspectDetail/assets/table/icon-column-delete.svg';
-import ICON_COLUMN_PIN from '@/components/molecules/ProspectDetail/assets/table/icon-column-pin.svg';
-import ICON_COLUMN_UNPIN from '@/components/molecules/ProspectDetail/assets/table/icon-column-unpin.svg';
+import ICON_COLUMN_USE_AI from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-use-ai.svg';
+import ICON_COLUMN_EDIT from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-edit.svg';
+import ICON_COLUMN_DESCRIPTION from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-edit-description.svg';
+import ICON_COLUMN_RENAME from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-rename.svg';
+import ICON_COLUMN_HIDE from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-hide.svg';
+import ICON_COLUMN_DELETE from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-delete.svg';
+import ICON_COLUMN_PIN from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-pin.svg';
+import ICON_COLUMN_UNPIN from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-unpin.svg';
 
 export const COLUMN_MENU_ICONS = {
   USE_AI: ICON_COLUMN_USE_AI,

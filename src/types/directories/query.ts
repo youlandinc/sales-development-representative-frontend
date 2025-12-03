@@ -1,5 +1,5 @@
 import { DirectoriesBizIdEnum } from './base';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 export enum DirectoriesQueryActionTypeEnum {
   click = 'CLICK',

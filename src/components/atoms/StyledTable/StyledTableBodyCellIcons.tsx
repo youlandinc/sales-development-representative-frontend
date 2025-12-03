@@ -5,7 +5,7 @@ import { COLUMN_TYPE_LABELS } from '@/constants/table';
 import {
   TableCellConfidenceEnum,
   TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 
 const CONFIDENCE_URL = {
   [TableCellConfidenceEnum.low]: '/images/icon-confidence-low.svg',

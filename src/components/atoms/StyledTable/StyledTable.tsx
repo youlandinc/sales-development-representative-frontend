@@ -44,7 +44,7 @@ import ICON_TYPE_ADD from './assets/icon-type-add.svg';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 import {
   checkIsAiColumn,
   checkIsEditableColumn,

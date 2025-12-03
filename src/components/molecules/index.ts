@@ -7,8 +7,8 @@ export * from './Auth';
 export * from './Directories';
 export * from './DirectoriesIndustry';
 
-export * from './Prospect';
-export * from './ProspectDetail';
+export * from './Enrichment';
+export * from './EnrichmentDetail';
 
 export * from './Campaigns';
 
@@ -28,7 +28,5 @@ export * from './Contacts';
 export * from './GridPagination';
 
 export * from './Segments';
-
-export * from './Enrichments';
 
 export * from './PricingPlan';

@@ -1,4 +1,4 @@
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 import ICON_TYPE_TEXT from '@/components/atoms/StyledTable/assets/icon-type-text.svg';
 import ICON_TYPE_NUMBER from '@/components/atoms/StyledTable/assets/icon-type-number.svg';

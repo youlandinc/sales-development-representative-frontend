@@ -2,7 +2,7 @@ import { COLUMN_MENU_ICONS, getAddColumnMenuActions } from './index';
 import {
   TableColumnActionOption,
   TableColumnMenuActionEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 
 // AI column menu (p3)
 export const getAiColumnMenuActions = (

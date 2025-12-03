@@ -14,7 +14,7 @@ import { flexRender, Header } from '@tanstack/react-table';
 import { StyledTableAiIcon } from './index';
 
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
-import { TableColumnMeta, TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;

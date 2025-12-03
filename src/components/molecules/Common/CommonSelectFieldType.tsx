@@ -5,7 +5,7 @@ import { StyledSelect, StyledSelectProps } from '@/components/atoms';
 import { getAddColumnMenuActions } from '@/constants';
 import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
 
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
 import { Icon, Stack, Typography } from '@mui/material';
 
 export const CommonSelectFieldType: FC<Omit<StyledSelectProps, 'options'>> = ({

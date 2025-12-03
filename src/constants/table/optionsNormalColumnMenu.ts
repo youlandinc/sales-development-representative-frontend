@@ -9,7 +9,7 @@ import {
   TableColumnActionOption,
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
-} from '@/types/Prospect/table';
+} from '@/types/enrichment/table';
 
 // Normal column menu (p2)
 export const getNormalColumnMenuActions = (

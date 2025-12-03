@@ -1,5 +1,5 @@
 export * from './Prospect';
-export * from './ProspectDetail';
+export * from './EnrichmentDetail';
 
 export * from './Campaigns';
 

@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 
 import { useDirectoriesStore } from '@/stores/directories';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
 import {
   DirectoriesQueryTableBodyItem,
   DirectoriesQueryTableHeaderItem,

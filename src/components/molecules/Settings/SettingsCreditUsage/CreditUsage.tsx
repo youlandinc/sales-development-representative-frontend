@@ -187,7 +187,7 @@ export const CreditUsage: FC = () => {
         flex: 1,
         renderCell: ({ value, row }) => {
           const rowIndex = rowIndexMap.get(row) ?? -1;
-          return renderProvider(value, rowIndex);
+          return renderProvider(value || [], rowIndex);
         },
       },
       {
