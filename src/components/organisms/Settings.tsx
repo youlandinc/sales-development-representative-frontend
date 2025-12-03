@@ -1,7 +1,6 @@
 'use client';
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
-import { Suspense, SyntheticEvent, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 
 import {
   CreditUsage,
@@ -11,6 +10,7 @@ import {
   SettingsPersonalInfo,
 } from '@/components/molecules';
 import { SettingTabEnum } from '@/types/enum';
+import { getParamsFromUrl } from '@/utils';
 
 const SettingTabEnumLabel: Record<SettingTabEnum, string> = {
   [SettingTabEnum.Email]: 'Email setup',
@@ -21,7 +21,6 @@ const SettingTabEnumLabel: Record<SettingTabEnum, string> = {
 };
 
 export const Settings = () => {
-  const tabParams = useSearchParams().get('tab');
   const [value, setValue] = useState<SettingTabEnum>(SettingTabEnum.Email);
   const onTabChange = (_: SyntheticEvent, newValue: SettingTabEnum) => {
     setValue(newValue);
@@ -55,49 +54,64 @@ export const Settings = () => {
     },
   ];
 
-  useEffect(() => {
+  const syncTabFromUrl = useCallback(() => {
+    const { tab } = getParamsFromUrl(location.href);
     const validTabs = Object.values(SettingTabEnum);
-    if (tabParams && validTabs.includes(tabParams as SettingTabEnum)) {
-      setValue(tabParams as SettingTabEnum);
+    if (tab && validTabs.includes(tab as SettingTabEnum)) {
+      setValue(tab as SettingTabEnum);
+    } else {
+      setValue(SettingTabEnum.Email);
     }
-  }, [tabParams]);
+  }, []);
+
+  useEffect(() => {
+    syncTabFromUrl();
+    //TODO
+    // // 监听自定义 urlchange 事件 (由 LayoutSide 的 router.push 触发)
+    // window.addEventListener('hashchange', syncTabFromUrl);
+    // // 监听浏览器前进/后退
+    // window.addEventListener('popstate', syncTabFromUrl);
+
+    // return () => {
+    //   window.removeEventListener('hashchange', syncTabFromUrl);
+    //   window.removeEventListener('popstate', syncTabFromUrl);
+    // };
+  }, [syncTabFromUrl]);
 
   return (
-    <Suspense>
-      <Stack sx={{ '& .tox-promotion': { display: 'none' }, height: '100%' }}>
-        <Typography pb={3} variant={'h5'}>
-          Settings
-        </Typography>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs
-            onChange={onTabChange}
-            sx={{
-              '& .MuiTab-root': {
-                padding: '12px',
-                fontSize: '16px',
-                textTransform: 'none',
-              },
-              '& .MuiTab-root.Mui-selected': {
-                fontWeight: '600',
-              },
-            }}
-            value={value}
-          >
-            {tabsData.map((item) => (
-              <Tab key={item.value} label={item.label} value={item.value} />
-            ))}
-          </Tabs>
+    <Stack sx={{ '& .tox-promotion': { display: 'none' }, height: '100%' }}>
+      <Typography pb={3} variant={'h5'}>
+        Settings
+      </Typography>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs
+          onChange={onTabChange}
+          sx={{
+            '& .MuiTab-root': {
+              padding: '12px',
+              fontSize: '16px',
+              textTransform: 'none',
+            },
+            '& .MuiTab-root.Mui-selected': {
+              fontWeight: '600',
+            },
+          }}
+          value={value}
+        >
+          {tabsData.map((item) => (
+            <Tab key={item.value} label={item.label} value={item.value} />
+          ))}
+        </Tabs>
+      </Box>
+      {tabsData.map((item) => (
+        <Box
+          hidden={value !== item.value}
+          key={item.value}
+          sx={{ flex: 1, minHeight: 0, overflow: 'auto', pt: 3 }}
+        >
+          {item.content}
         </Box>
-        {tabsData.map((item) => (
-          <Box
-            hidden={value !== item.value}
-            key={item.value}
-            sx={{ flex: 1, minHeight: 0, overflow: 'auto', pt: 3 }}
-          >
-            {item.content}
-          </Box>
-        ))}
-      </Stack>
-    </Suspense>
+      ))}
+    </Stack>
   );
 };
