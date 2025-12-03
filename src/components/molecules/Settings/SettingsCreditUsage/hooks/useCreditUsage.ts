@@ -12,7 +12,7 @@ import {
   DateRangeEnum,
   FetchCreditUsageListRequest,
   UsageTypeOptions,
-} from '@/types/settings/creditUsage';
+} from '@/types';
 
 export const useCreditUsage = () => {
   const [queryConditions, setQueryConditions] = useState<

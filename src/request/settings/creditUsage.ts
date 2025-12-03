@@ -1,10 +1,9 @@
-import { FetchUsageTypeItem } from '@/types';
-import { get, post } from '../request';
-
 import {
   CreditUsageItemInfo,
   FetchCreditUsageListRequest,
-} from '@/types/Settings/creditUsage';
+  FetchUsageTypeItem,
+} from '@/types';
+import { get, post } from '../request';
 
 export const _fetchCreditUsageList = (param: FetchCreditUsageListRequest) => {
   return post<PaginationResponse<CreditUsageItemInfo>>(
