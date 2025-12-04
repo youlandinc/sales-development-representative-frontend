@@ -9,6 +9,7 @@ import {
   SettingsIntegrations,
   SettingsPersonalInfo,
 } from '@/components/molecules';
+import { URL_CHANGE_EVENT } from '@/constants';
 import { SettingTabEnum } from '@/types/enum';
 import { getParamsFromUrl } from '@/utils';
 
@@ -71,12 +72,12 @@ export const Settings = () => {
       const url = (e as CustomEvent).detail?.url;
       syncTabFromUrl(`${window.location.origin}${url}`);
     };
-    window.addEventListener('urlchange', onUrlChange);
+    window.addEventListener(URL_CHANGE_EVENT, onUrlChange);
     // 监听浏览器前进/后退
     window.addEventListener('popstate', () => syncTabFromUrl());
 
     return () => {
-      window.removeEventListener('urlchange', onUrlChange);
+      window.removeEventListener(URL_CHANGE_EVENT, onUrlChange);
       window.removeEventListener('popstate', () => syncTabFromUrl());
     };
   }, [syncTabFromUrl]);

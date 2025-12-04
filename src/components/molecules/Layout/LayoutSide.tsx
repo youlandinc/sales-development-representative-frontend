@@ -3,6 +3,8 @@ import { Icon, Stack, SxProps, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 
+import { URL_CHANGE_EVENT } from '@/constants';
+
 import { LAYOUT_SIDE_MENU, LAYOUT_SIDE_MENU_BOTTOM } from './Layout.data';
 
 import ICON_EXPEND from './assets/icon_expend.svg';
@@ -137,7 +139,9 @@ export const LayoutSide: FC = () => {
     }
     router.push(url);
     // 派发自定义事件，直接传递新 URL
-    window.dispatchEvent(new CustomEvent('urlchange', { detail: { url } }));
+    window.dispatchEvent(
+      new CustomEvent(URL_CHANGE_EVENT, { detail: { url } }),
+    );
   };
 
   return (

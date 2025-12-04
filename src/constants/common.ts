@@ -14,3 +14,5 @@ export const PrivacyPolicy =
   'https://www.corepass.com/legal/terms-and-conditions';
 
 export const BASE_URL = `https://${process.env.NEXT_PUBLIC_BASE_DOMAIN_PREFIX}sales.corepass.com`;
+
+export const URL_CHANGE_EVENT = 'URL_CHANGE_EVENT';
