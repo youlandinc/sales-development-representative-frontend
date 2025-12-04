@@ -11,6 +11,7 @@ export * from './StyledTextField';
 export * from './StyledToast';
 
 export * from './StyledDatePicker';
+export * from './StyledDateTimePicker';
 
 export * from './StyledLoading';
 
@@ -33,3 +34,11 @@ export * from './StyledTextFieldSearch';
 export * from './StyledCost';
 
 export * from './StyledTinyEditor';
+
+export * from './StyledRadioGroup';
+
+export * from './StyledMultiSelect';
+
+export * from './StyledButtonGroup';
+
+export * from './StyledTab';

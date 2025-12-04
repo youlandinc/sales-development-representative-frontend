@@ -24,7 +24,7 @@ import {
   useContactsToolbarStore,
   useGridStore,
 } from '@/stores/ContactsStores';
-import { FILTER_OPERATIONS } from '@/constant';
+import { FILTER_OPERATIONS } from '@/constants';
 import {
   ContactsTableTypeEnum,
   FilterOperationEnum,

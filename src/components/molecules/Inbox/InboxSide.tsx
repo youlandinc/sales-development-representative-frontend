@@ -26,10 +26,6 @@ import { _fetchEmails, _fetchEmailsDetails } from '@/request';
 import { HttpError, SSE_EVENT_TYPE } from '@/types';
 import { useUserStore } from '@/providers';
 
-const computedContainerHeight = (height = 0) => {
-  return Math.floor(height / 65) + 5;
-};
-
 export const InboxSide: FC = () => {
   const {
     receiptType,
@@ -57,7 +53,7 @@ export const InboxSide: FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerHeight = useContainerHeight(scrollRef);
   const defaultPageSize = Math.floor(containerHeight / 65) + 5;
-  const [, fetchEmails] = useAsyncFn(
+  const [state, fetchEmails] = useAsyncFn(
     async (
       emailType: ReceiptTypeEnum,
       contacts?: string,
@@ -85,10 +81,10 @@ export const InboxSide: FC = () => {
             setInboxSideSentList(res.data.content);
             setTotalEmails(res.data.page.totalElements);
           }
-          setFetchEmailLoading(false);
           res.data.content.length > 0
             ? await fetchEmailDetails(res.data.content[0].emailId)
             : setInboxContentList([]);
+          setFetchEmailLoading(false);
         }
         return res;
       } catch (e) {
@@ -195,7 +191,7 @@ export const InboxSide: FC = () => {
         ReceiptTypeEnum.engaged,
         '',
         0,
-        computedContainerHeight(scrollRef.current.clientHeight),
+        Math.floor(scrollRef.current.clientHeight / 65) + 5,
       );
       // }
     }
@@ -233,7 +229,6 @@ export const InboxSide: FC = () => {
 
     // clear
     return () => {
-      console.log('clear');
       eventSource?.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -280,6 +275,15 @@ export const InboxSide: FC = () => {
         />
       </Stack>
       <Stack flex={1} onScroll={handleScroll} overflow={'auto'} ref={scrollRef}>
+        {!state.loading && inboxSideList.length === 0 && (
+          <Typography
+            color={'text.secondary'}
+            textAlign={'center'}
+            variant={'body2'}
+          >
+            No data found.
+          </Typography>
+        )}
         {(receiptType === ReceiptTypeEnum.engaged
           ? inboxSideList
           : inboxSideSentList
@@ -344,12 +348,12 @@ export const InboxSide: FC = () => {
               px: 2.5,
               py: 1.5,
               '&:hover': {
-                bgcolor: '#F8F8FA',
+                bgcolor: '#F4F5F9',
               },
               cursor: 'pointer',
               bgcolor:
                 selectedEmail?.emailId === item.emailId
-                  ? '#F8F8FA'
+                  ? '#F4F5F9'
                   : 'transparent',
             }}
             title={

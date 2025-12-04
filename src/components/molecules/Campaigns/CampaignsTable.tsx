@@ -10,14 +10,11 @@ import { UFormatDate, UFormatNumber, UFormatPercent } from '@/utils';
 import { useSwitch } from '@/hooks';
 
 import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
-import {
-  CampaignsStatusBadge,
-  CommonPagination,
-  CommonSkeletonLoadingOverlay,
-} from '@/components/molecules';
+import { CampaignsStatusBadge, CommonPagination } from '@/components/molecules';
 
 import {
   CampaignStatusEnum,
+  CampaignStepEnum,
   CampaignTableItem,
   HttpError,
   ProcessCreateTypeEnum,
@@ -38,11 +35,11 @@ interface CampaignsTableProps {
 }
 
 const ACTIVE_STEP_HASH: {
-  [key in SetupPhaseEnum]: number;
+  [key in SetupPhaseEnum]: CampaignStepEnum;
 } = {
-  [SetupPhaseEnum.audience]: 1,
-  [SetupPhaseEnum.messaging]: 2,
-  [SetupPhaseEnum.launch]: 3,
+  [SetupPhaseEnum.audience]: CampaignStepEnum.audience,
+  [SetupPhaseEnum.messaging]: CampaignStepEnum.messaging,
+  [SetupPhaseEnum.launch]: CampaignStepEnum.launch,
 };
 
 export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
@@ -253,7 +250,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setActiveStep,
     setCampaignType,
     setIsFirst,
-    setLeadsVisible,
+    setAiTableInfo,
     setLeadsCount,
     setLeadsList,
     setCampaignName,
@@ -264,7 +261,7 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
     setAiModel,
     // common
     setMessagingSteps,
-    setLunchInfo,
+    setLaunchInfo,
     setOfferOptions,
     setDetailsFetchLoading,
 
@@ -355,9 +352,11 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
       setupPhase,
       campaignName,
     } = row;
+
     if (!campaignId) {
       return;
     }
+
     switch (campaignStatus) {
       case CampaignStatusEnum.draft: {
         setDetailsFetchLoading(true);
@@ -368,60 +367,70 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         setCampaignName(campaignName || 'Untitled Campaign');
         setActiveStep(ACTIVE_STEP_HASH[setupPhase]);
         await setSetupPhase(setupPhase, false);
-        setLeadsVisible(true);
-        // pre open
-        openProcess();
+
+        // 先打开 dialog
+        await openProcess(campaignId);
 
         try {
-          const {
-            data: {
-              chatId,
-              data: {
-                leadInfo: { counts, leads },
-                aiModel,
-                steps,
-                launchInfo,
-                offerOptions,
-                // chat
-                chatRecord,
-                // filter
-                conditions,
-                // csv
-                fileInfo,
-                // crm
-                crmInfo,
-                // saved list
-                savedListInfo,
-              },
-            },
-          } = await _fetchCampaignInfo(campaignId);
+          const { data } = await _fetchCampaignInfo(campaignId);
 
+          const {
+            chatId,
+            data: {
+              // csv
+              csvInfo,
+              // crm
+              crmInfo,
+              // enrichment table
+              aiTableInfo,
+              aiModel,
+              steps,
+              launchInfo,
+
+              /** @deprecated*/
+              //leadInfo: { counts, leads },
+              //offerOptions,
+              // chat
+              chatRecord,
+              // filter
+              conditions,
+              // saved list
+              savedListInfo,
+            },
+          } = data;
+
+          setChatId(chatId);
           setAiModel(aiModel);
           // chat
-          setChatId(chatId);
           // step 1 & 2 leads
-          setLeadsList(leads);
-          setLeadsCount(counts);
+          /** @deprecated*/
+          //setLeadsList(leads);
+          //setLeadsCount(counts);
           // step 2
-          setOfferOptions(offerOptions);
+          /** @deprecated*/
+          //setOfferOptions(offerOptions);
           setMessagingSteps(steps);
           // step 3 lunch
-          setLunchInfo(launchInfo);
+          setLaunchInfo(launchInfo);
 
           switch (startingPoint) {
+            case ProcessCreateTypeEnum.csv:
+              setCSVFormData(csvInfo!);
+              break;
+            case ProcessCreateTypeEnum.crm:
+              setCRMFormData(crmInfo!);
+              await fetchProviderOptions();
+              break;
+            case ProcessCreateTypeEnum.ai_table:
+              setAiTableInfo(aiTableInfo!);
+              break;
+            // deprecated
             case ProcessCreateTypeEnum.agent:
               setMessageList(chatRecord!);
               await createChatSSE(chatId);
               break;
             case ProcessCreateTypeEnum.filter:
               setFilterFormData(conditions!);
-              break;
-            case ProcessCreateTypeEnum.csv:
-              setCSVFormData(fileInfo!);
-              break;
-            case ProcessCreateTypeEnum.crm:
-              setCRMFormData(crmInfo!);
-              await fetchProviderOptions();
               break;
             case ProcessCreateTypeEnum.saved_list:
               setSavedListFormData(savedListInfo!);
@@ -468,9 +477,14 @@ export const CampaignsTable: FC<CampaignsTableProps> = ({ store }) => {
         rowCount={totalElements}
         rowHeight={40}
         rows={data?.content || []}
+        slotProps={{
+          loadingOverlay: {
+            variant: 'skeleton',
+            noRowsVariant: 'skeleton',
+          },
+        }}
         slots={{
           pagination: CommonPagination,
-          loadingOverlay: CommonSkeletonLoadingOverlay,
           noRowsOverlay: () => (
             <Stack
               alignItems={'center'}

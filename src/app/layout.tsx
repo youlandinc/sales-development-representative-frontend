@@ -40,7 +40,7 @@ const RootLayout = ({
       <body className={inter.variable}>
         <InitColorSchemeScript attribute="class" />
         <NextTopLoader
-          color="#6E4EFB"
+          color="#363440"
           crawl={true}
           height={2}
           shadow={'none'}

@@ -1,7 +1,7 @@
 import { FC, MouseEvent } from 'react';
 import { Box, Icon, Stack } from '@mui/material';
 
-import { ICON_RUN_AI } from './columnTypeIcons';
+import ICON_RUN_AI from './assets/icon-run-ai.svg';
 
 interface StyledTableAiIconProps {
   onClick: (e: MouseEvent<HTMLDivElement>) => void;
@@ -13,7 +13,7 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
   backgroundColor = '#fff',
 }) => {
   const getGradientBackground = (bgColor: string) => {
-    if (bgColor === '#F7F4FD') {
+    if (bgColor === '#F4F5F9') {
       return 'linear-gradient(to right, transparent 0%, rgba(247, 244, 253, 0.8) 30%, rgba(247, 244, 253, 1) 60%)';
     }
     if (bgColor === '#FFFFFF' || bgColor === '#fff') {
@@ -54,7 +54,6 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
           e.stopPropagation();
           e.preventDefault();
           onClick(e);
-          console.log(onClick);
         }}
         sx={{
           position: 'absolute',
@@ -69,7 +68,7 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
           border: '1px solid #DFDEE6',
           bgcolor: '#ffffff',
           '&:hover': {
-            bgcolor: '#F7F4FD',
+            bgcolor: '#F4F5F9',
           },
         }}
       >

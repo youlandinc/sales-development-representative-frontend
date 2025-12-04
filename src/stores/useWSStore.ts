@@ -1,5 +1,7 @@
 // store.ts
 import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import { combine } from 'zustand/middleware';
 
 type WSMessage = {
   type: string;
@@ -7,21 +9,39 @@ type WSMessage = {
   timestamp: number;
 };
 
-type UseWSStoreState = {
+type WSStoreState = {
   connected: boolean;
   messages: WSMessage[];
+};
+
+type WSStoreActions = {
   setConnected: (connected: boolean) => void;
   pushMessage: (message: WSMessage) => void;
   clearMessages: () => void;
 };
 
-export const useWSStore = create<UseWSStoreState>((set) => ({
+type UseWSStoreState = WSStoreState & WSStoreActions;
+
+const initialState: WSStoreState = {
   connected: false,
   messages: [],
-  setConnected: (connected) => set({ connected }),
-  pushMessage: (message) =>
-    set((state) => ({
-      messages: [...state.messages, message],
+};
+
+export const useWSStore = create<UseWSStoreState>()(
+  immer(
+    combine(initialState, (set) => ({
+      setConnected: (connected) =>
+        set((state) => {
+          state.connected = connected;
+        }),
+      pushMessage: (message) =>
+        set((state) => {
+          state.messages.push(message);
+        }),
+      clearMessages: () =>
+        set((state) => {
+          state.messages = [];
+        }),
     })),
-  clearMessages: () => set({ messages: [] }),
-}));
+  ),
+);

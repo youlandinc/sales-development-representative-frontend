@@ -9,15 +9,20 @@ import {
   LayoutHeader,
   LayoutSide,
 } from '@/components/molecules';
+import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
 
 export interface StyledLayoutProps {
   sx?: SxProps;
   children?: ReactNode;
+  contentSx?: SxProps;
 }
 
-export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
+export const Layout: FC<StyledLayoutProps> = ({ sx, children, contentSx }) => {
   const router = useRouter();
   const { isHydration, accessToken } = useUserStore((state) => state);
+  const fetchCurrentPlan = useCurrentPlanStore(
+    (state) => state.fetchCurrentPlan,
+  );
 
   useEffect(
     () => {
@@ -25,6 +30,7 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
         if (!accessToken) {
           return router.push('/auth/sign-in');
         }
+        fetchCurrentPlan();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -44,7 +50,7 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
       }}
     >
       <LayoutHeader />
-      <Stack flexDirection={'row'} height={'calc(100% - 72px)'} width={'100%'}>
+      <Stack flexDirection={'row'} height={'calc(100% - 54px)'} width={'100%'}>
         <LayoutSide />
         <Stack
           sx={{
@@ -55,6 +61,7 @@ export const Layout: FC<StyledLayoutProps> = ({ sx, children }) => {
             p: 3,
             overflow: 'auto',
             minWidth: 720,
+            ...contentSx,
           }}
         >
           {children}

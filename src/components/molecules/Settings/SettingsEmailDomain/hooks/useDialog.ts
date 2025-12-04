@@ -1,33 +1,32 @@
-import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useSwitch } from '@/hooks';
 import {
   _addCustomEmailDomain,
-  _fetchCustomEmailDomains,
   _fetchIdentityCustomEmailDomain,
   _modifyCustomEmailDomain,
   _verifyCustomEmailDomain,
 } from '@/request';
 import {
   EmailDomainData,
-  EmailDomainDetails,
   EmailDomainState,
   HttpError,
   HttpVariantEnum,
 } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import { useUserStore } from '@/providers';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 
 interface UseDialogProps {
-  emailDomainList: EmailDomainDetails[];
-  setEmailDomainList: Dispatch<SetStateAction<EmailDomainDetails[]>>;
+  onOpenVerified: () => void;
 }
 
-export const useDialog = ({
-  emailDomainList,
-  setEmailDomainList,
-}: UseDialogProps) => {
-  const { userProfile } = useUserStore((state) => state);
+export const useDialog = ({ onOpenVerified }: UseDialogProps) => {
+  const userProfile = useUserStore((state) => state.userProfile);
+  const emailDomainList = useSettingsStore((state) => state.emailDomainList);
+  const fetchEmailDomainList = useSettingsStore(
+    (state) => state.fetchEmailDomainList,
+  );
   const { tenantId } = userProfile;
 
   const { open, close, visible } = useSwitch(false);
@@ -100,15 +99,14 @@ export const useDialog = ({
   );
 
   const onClickContinue = useCallback(async () => {
-    if (domain.trim() === '') {
+    if (!domain) {
       return;
     }
     setStepButtonLoading(true);
     try {
       const { data } = await _addCustomEmailDomain({ domain });
       setDomainVerifyList(data);
-      const res = await _fetchCustomEmailDomains(tenantId);
-      setEmailDomainList(res.data);
+      await fetchEmailDomainList(tenantId);
       setTimeout(() => {
         setActiveStep(1);
       }, 10);
@@ -118,7 +116,7 @@ export const useDialog = ({
     } finally {
       setStepButtonLoading(false);
     }
-  }, [domain, setEmailDomainList, tenantId]);
+  }, [domain, tenantId, fetchEmailDomainList]);
 
   const onClickVerify = useCallback(
     async (domain: string) => {
@@ -131,15 +129,18 @@ export const useDialog = ({
       setStepButtonLoading(true);
       try {
         const { emailDomain } = target;
-        await _verifyCustomEmailDomain({
+        const { data: verifyData } = await _verifyCustomEmailDomain({
           domain: emailDomain,
         });
-        const { data } = await _fetchCustomEmailDomains(tenantId);
-        setEmailDomainList(data);
-
-        setTimeout(() => {
-          setActiveStep(2);
-        }, 10);
+        await fetchEmailDomainList(tenantId);
+        if (
+          [EmailDomainState.SUCCESS, EmailDomainState.ACTIVE].includes(
+            verifyData.validStatus,
+          )
+        ) {
+          onCancelDialog();
+          onOpenVerified();
+        }
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -147,7 +148,13 @@ export const useDialog = ({
         setStepButtonLoading(false);
       }
     },
-    [emailDomainList, setEmailDomainList, tenantId],
+    [
+      emailDomainList,
+      tenantId,
+      onOpenVerified,
+      onCancelDialog,
+      fetchEmailDomainList,
+    ],
   );
 
   const onClickSave = useCallback(
@@ -166,8 +173,7 @@ export const useDialog = ({
       };
       try {
         await _modifyCustomEmailDomain(params);
-        const { data } = await _fetchCustomEmailDomains(tenantId);
-        setEmailDomainList(data);
+        await fetchEmailDomainList(tenantId);
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -176,7 +182,7 @@ export const useDialog = ({
       }
       onCancelDialog();
     },
-    [onCancelDialog, emailDomainList, setEmailDomainList, tenantId, userName],
+    [onCancelDialog, emailDomainList, tenantId, userName, fetchEmailDomainList],
   );
 
   const onClickCopy = useCallback(async (type: string, text: string) => {

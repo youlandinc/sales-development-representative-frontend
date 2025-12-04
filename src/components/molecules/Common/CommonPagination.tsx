@@ -34,7 +34,7 @@ export const CommonPagination: FC = () => {
           onClick={() =>
             setPaginationModel({ page: page - 1, pageSize: pageSize })
           }
-          size={'medium'}
+          size={'small'}
           variant={'outlined'}
         >
           Previous
@@ -45,7 +45,7 @@ export const CommonPagination: FC = () => {
           onClick={() => {
             setPaginationModel({ page: page + 1, pageSize: pageSize });
           }}
-          size={'medium'}
+          size={'small'}
           variant={'outlined'}
         >
           Next

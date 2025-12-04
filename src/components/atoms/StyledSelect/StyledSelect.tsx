@@ -1,10 +1,11 @@
-import { FC, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import {
   BaseSelectProps,
   FormControl,
   Icon,
   InputAdornment,
   InputLabel,
+  inputLabelClasses,
   MenuItem,
   Select,
   SxProps,
@@ -18,14 +19,17 @@ export interface StyledSelectProps extends BaseSelectProps {
   options: TOption[];
   sxHelperText?: SxProps;
   sxList?: SxProps;
+  menuPaperSx?: SxProps;
   tooltipTitle?: string;
   tooltipSx?: SxProps;
   isTooltip?: boolean;
   placeholder?: string;
   clearable?: boolean;
+  clearIcon?: ReactNode;
   onClear?: () => void;
   loading?: boolean;
   loadOptions?: () => Promise<void>;
+  renderOption?: (option: TOption, index: number) => ReactNode;
 }
 
 export const StyledSelect: FC<StyledSelectProps> = ({
@@ -36,6 +40,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   label,
   disabled,
   sxList,
+  menuPaperSx,
   sx,
   size,
   required,
@@ -44,16 +49,17 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   //isTooltip = false,
   placeholder,
   clearable = false,
+  clearIcon,
   onClear,
   loading,
   loadOptions,
+  renderOption,
+  onOpen,
   ...rest
   //sxHelperText,
 }) => {
   //const breakpoints = useBreakpoints();
-
   const [showClear, setShowClear] = useState(false);
-
   return (
     <FormControl
       error={!!(validate?.length && validate[0])}
@@ -67,43 +73,94 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         setShowClear(true);
       }}
       required={required}
-      sx={{
-        [disabled ? '& label' : '']: {
-          color: 'text.disabled',
-        },
-        width: '100%',
-        '& .Mui-disabled': {
-          color: 'text.disabled',
-          cursor: 'not-allowed',
-        },
-        '& .MuiInputBase-formControl': {
-          borderRadius: 2,
-        },
-        '& .MuiInputLabel-formControl.Mui-focused': {
-          color: 'text.primary',
-        },
-        '& .Mui-focused': {
-          '& .MuiOutlinedInput-notchedOutline': {
-            border: '1px solid #202939 !important',
+      size={size}
+      sx={[
+        {
+          [disabled ? '& label' : '']: {
+            color: 'text.disabled',
           },
-          '& .MuiOutlinedInput-input': {
-            background: 'transparent',
+          width: '100%',
+          '& .Mui-disabled': {
+            color: 'text.disabled',
+            cursor: 'not-allowed',
+          },
+          '& .MuiInputBase-formControl': {
+            borderRadius: 2,
+          },
+          '& .MuiInputLabel-formControl.Mui-focused': {
+            color: 'text.primary',
+          },
+          '& .Mui-focused': {
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: '1px solid #202939 !important',
+            },
+            '& .MuiOutlinedInput-input': {
+              background: 'transparent',
+            },
+          },
+          '& .MuiInputLabel-sizeMedium': {
+            transform: 'translate(14px, 8px) scale(1)',
+          },
+          '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
+            '&.MuiInputLabel-sizeSmall': {
+              transform: 'translate(14px, -8px) scale(0.75)',
+            },
+            transform: 'translate(14px, -9px) scale(0.75)',
+            color: 'text.primary',
+          },
+          '& .MuiSelect-outlined': {
+            py: '9.5px',
+            fontSize: 14,
+            lineHeight: 1.5,
+          },
+          '& legend': {
+            fontSize: 14 * 0.75,
+          },
+          '& .MuiInputBase-sizeSmall ': {
+            '& .MuiSelect-outlined': {
+              py: '7px',
+              pl: '14px',
+              fontSize: 12,
+              lineHeight: 1.5,
+            },
+            '& legend': {
+              fontSize: 12 * 0.75,
+            },
+          },
+          '& .MuiInputBase-sizeLarge': {
+            '& .MuiSelect-outlined': {
+              py: '12px',
+              fontSize: 16,
+              lineHeight: 1.5,
+            },
+            '& legend': {
+              fontSize: 16 * 0.75,
+            },
+          },
+          //label
+          '& .MuiInputLabel-root': {
+            transform: 'translate(14px, 9.5px) scale(1)',
+            fontSize: 14,
+            lineHeight: 1.5,
+          },
+          //label - small
+          [`& .${inputLabelClasses.sizeSmall}`]: {
+            transform: 'translate(14px, 7px) scale(1)',
+            fontSize: 12,
+            lineHeight: 1.5,
+          },
+          //large
+          '& .MuiInputLabel-sizeLarge ': {
+            transform: 'translate(14px, 12px) scale(1)',
+            fontSize: 16,
+            lineHeight: 1.5,
           },
         },
-        '& .MuiInputLabel-sizeMedium': {
-          // transform: 'translate(14px, 8px) scale(1)',
-        },
-        '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
-          // transform:
-          //   size === 'medium'
-          //     ? 'translate(14px, -8px) scale(0.75)'
-          //     : 'translate(12px, -8px) scale(0.75)',
-        },
-        ...sx,
-      }}
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
       variant={'outlined'}
     >
-      <InputLabel>{label}</InputLabel>
+      <InputLabel id="styled-select-label">{label}</InputLabel>
       <Select
         disabled={disabled}
         displayEmpty
@@ -111,60 +168,63 @@ export const StyledSelect: FC<StyledSelectProps> = ({
           clearable &&
           showClear &&
           !!value && (
-            <InputAdornment position="end" sx={{ mr: 3, cursor: 'pointer' }}>
-              <ClearIcon
-                onClick={() => {
-                  onClear?.();
-                }}
-                sx={{ fontSize: 20 }}
-              />
+            <InputAdornment
+              onClick={() => {
+                onClear?.();
+              }}
+              position="end"
+              sx={{ mr: 1.75, cursor: 'pointer' }}
+            >
+              {clearIcon || <ClearIcon sx={{ fontSize: 20 }} />}
             </InputAdornment>
           )
         }
+        id="styled-select"
         inputProps={{
           MenuProps: {
             MenuListProps: {
-              sx: {
-                p: 0,
-                m: 0,
-                '& .MuiMenuItem-root:hover': {
-                  bgcolor: 'rgba(144, 149, 163, 0.1) !important',
+              sx: [
+                {
+                  p: 0,
+                  m: 0,
+                  '& .MuiMenuItem-root:hover': {
+                    bgcolor: '#F4F5F9 !important',
+                  },
+                  '& .Mui-selected': {
+                    bgcolor: '#F0F0F4 !important',
+                  },
+                  '& .Mui-selected:hover': {
+                    bgcolor: '#F0F0F4 !important',
+                  },
+                  '& .MuiMenuItem-root': {
+                    fontSize: 14,
+                    color: 'text.primary',
+                    p: 1.5,
+                  },
                 },
-                '& .Mui-selected': {
-                  bgcolor: '#EFE9FB !important',
-                },
-                '& .Mui-selected:hover': {
-                  bgcolor: '#EFE9FB !important',
-                },
-                '& .MuiMenuItem-root': {
-                  fontSize: 14,
-                  color: 'text.primary',
-                  p: 1.5,
-                },
-                ...sxList,
-              },
+                ...(Array.isArray(sxList) ? sxList : [sxList]),
+              ],
             },
             PaperProps: {
               style: { marginTop: 12, borderRadius: 8 },
+              sx: menuPaperSx,
             },
           },
         }}
         label={label}
+        labelId="styled-select-label"
         MenuProps={{
           disableScrollLock: true,
         }}
         onChange={onChange}
-        onOpen={async () => {
+        onOpen={async (e) => {
+          onOpen?.(e);
           await loadOptions?.();
         }}
         renderValue={(value) => {
           if (!value) {
             return (
-              <Typography
-                color={'text.secondary'}
-                sx={{ opacity: 0.7 }}
-                variant={'body2'}
-              >
+              <Typography color={'text.secondary'} variant={'body2'}>
                 {placeholder}
               </Typography>
             );
@@ -176,34 +236,24 @@ export const StyledSelect: FC<StyledSelectProps> = ({
         {...rest}
         // size={['xs', 'sm', 'md'].includes(breakpoints) ? 'small' : 'medium'}
       >
-        {/*{placeholder && (*/}
-        {/*  <MenuItem disabled value="">*/}
-        {/*    {loading ? (*/}
-        {/*      <StyledLoading*/}
-        {/*        size={24}*/}
-        {/*        sx={{*/}
-        {/*          color: 'text.primary',*/}
-        {/*        }}*/}
-        {/*      />*/}
-        {/*    ) : (*/}
-        {/*      <Typography variant={'body2'}>{placeholder}</Typography>*/}
-        {/*    )}*/}
-        {/*  </MenuItem>*/}
-        {/*)}*/}
         {!loading &&
-          options.map((opt) => (
-            <MenuItem
-              disabled={opt.disabled}
-              key={opt.key}
-              sx={{ gap: 1 }}
-              value={opt.value}
-            >
-              {opt.icon && (
-                <Icon component={opt.icon} sx={{ width: 16, height: 16 }} />
-              )}
-              {opt.label}
-            </MenuItem>
-          ))}
+          options.map((opt, i) =>
+            renderOption ? (
+              renderOption(opt, i)
+            ) : (
+              <MenuItem
+                disabled={opt.disabled}
+                key={opt.key}
+                sx={{ gap: 1 }}
+                value={opt.value}
+              >
+                {opt.icon && (
+                  <Icon component={opt.icon} sx={{ width: 16, height: 16 }} />
+                )}
+                {opt.label}
+              </MenuItem>
+            ),
+          )}
       </Select>
     </FormControl>
   );

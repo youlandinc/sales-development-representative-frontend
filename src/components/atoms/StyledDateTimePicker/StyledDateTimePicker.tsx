@@ -1,0 +1,52 @@
+import { FC } from 'react';
+import { TextFieldProps } from '@mui/material';
+import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+
+import { DEFAULT_TEXTFIELD_STYLE } from '../StyledTextField';
+
+type StyledDatePickerProps = DateTimePickerProps & {
+  onClear?: () => void;
+  error?: boolean;
+  size?: TextFieldProps['size'];
+};
+
+export const StyledDateTimePicker: FC<StyledDatePickerProps> = ({
+  onClear,
+  slotProps,
+  error,
+  sx,
+  size = 'medium',
+  ...rest
+}) => {
+  const { textField, ...restSlotProps } = slotProps || {};
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <DateTimePicker
+        enableAccessibleFieldDOMStructure={false}
+        slotProps={{
+          textField: {
+            error,
+            size,
+            ...textField,
+            sx: [
+              DEFAULT_TEXTFIELD_STYLE,
+              ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
+            ],
+          },
+          field: { clearable: true, onClear: () => onClear?.() },
+          openPickerIcon: {
+            style: {
+              width: 20,
+              height: 20,
+            },
+          },
+          ...restSlotProps,
+        }}
+        {...rest}
+      />
+    </LocalizationProvider>
+  );
+};

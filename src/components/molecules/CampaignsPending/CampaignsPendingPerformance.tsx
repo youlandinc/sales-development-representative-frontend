@@ -357,7 +357,7 @@ export const CampaignsPendingPerformance: FC<CampaignMarketingPerformance> = ({
                   <Tooltip
                     arrow
                     title={
-                      'Contacts whose email opens cannot be tracked. This may happen if the recipient has disabled image display  or if their email service does not support open tracking.'
+                      'Contacts whose email opens cannot be tracked. This may happen if the recipient has disabled image display  or if their email services does not support open tracking.'
                     }
                   >
                     <Box component={'span'} height={20} ml={0.5} width={20}>

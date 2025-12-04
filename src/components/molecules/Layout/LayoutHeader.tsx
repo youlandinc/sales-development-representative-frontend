@@ -4,6 +4,7 @@ import { Icon, Stack } from '@mui/material';
 import { LayoutUserInfo } from './index';
 
 import ICON_LOGO_EXPEND from './assets/icon_logo_expend.svg';
+import { PlansRouteButton } from './base';
 
 export const LayoutHeader: FC = () => {
   return (
@@ -11,7 +12,7 @@ export const LayoutHeader: FC = () => {
       alignItems={'center'}
       borderBottom={'1px solid #DFDEE6'}
       flexDirection={'row'}
-      height={72}
+      height={54}
       px={4}
       width={'100%'}
     >
@@ -23,8 +24,8 @@ export const LayoutHeader: FC = () => {
           width: 141,
         }}
       />
-
-      <Stack ml={'auto'}>
+      <Stack flexDirection={'row'} gap={3} ml={'auto'}>
+        <PlansRouteButton />
         <LayoutUserInfo />
       </Stack>
     </Stack>

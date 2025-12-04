@@ -94,3 +94,46 @@ export enum BizCodeEnum {
   email_domain = 'EMAIL_DOMAIN',
   signature = 'SIGNATURE',
 }
+
+export enum ProspectTableEnum {
+  find_people = 'FIND_PEOPLE',
+  find_companies = 'FIND_COMPANIES',
+  from_csv = 'FROM_CSV',
+  blank_table = 'BLANK_TABLE',
+  crm_list = 'CRM_LIST',
+  agent = 'AGENT',
+}
+
+export enum PlanTypeEnum {
+  // capital
+  research = 'RESEARCH',
+  intelligence = 'INTELLIGENCE',
+  // real estate
+  essential = 'ESSENTIAL',
+  professional = 'PROFESSIONAL',
+  institutional = 'INSTITUTIONAL',
+  // corporate
+  starter = 'STARTER',
+  business = 'BUSINESS',
+  enterprise = 'ENTERPRISE',
+  // enrichment
+  free = 'FREE',
+  basic = 'BASIC',
+  plus = 'PLUS',
+  pro = 'PRO',
+}
+
+export enum PlanCategoryEnum {
+  business = 'BUSINESS_CORPORATE',
+  real_estate = 'REAL_ESTATE_LENDING',
+  capital = 'CAPITAL_MARKETS',
+  enrichment = 'ENRICHMENT_CREDITS',
+}
+
+export enum SettingTabEnum {
+  Email = 'email',
+  Integrations = 'integrations',
+  Account = 'account',
+  Plan = 'plan',
+  Usage = 'usage',
+}

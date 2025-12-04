@@ -1,13 +1,11 @@
-import { FC, Fragment, useEffect, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 import { Icon, Stack, SxProps, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { useDialogStore } from '@/stores/useDialogStore';
+import { URL_CHANGE_EVENT } from '@/constants';
 
-import { StyledButton } from '@/components/atoms';
-
-import { LAYOUT_SIDE_MENU } from './Layout.data';
+import { LAYOUT_SIDE_MENU, LAYOUT_SIDE_MENU_BOTTOM } from './Layout.data';
 
 import ICON_EXPEND from './assets/icon_expend.svg';
 
@@ -37,33 +35,43 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
       gap={0.5}
       justifyContent={expend ? 'unset' : 'center'}
       onClick={() => onClick?.()}
+      px={expend ? 1.5 : 0}
       py={1.5}
-      sx={{
-        cursor: 'pointer',
-        transitions: 'all .3s',
-        '& .layout_label': {
-          color: active ? 'primary.main' : 'text.primary',
-        },
-        '&:hover': {
-          '& .layout_icon': {
-            '& path': {
-              fill: active ? '' : '#6F6C7D',
+      sx={[
+        {
+          cursor: 'pointer',
+          transition: 'all .3s',
+          '& .layout_label': {
+            color: active ? '#363440' : 'text.primary',
+          },
+          '&:hover': {
+            '& .layout_icon': {
+              '& path': {
+                fill: active ? '' : '#6F6C7D',
+              },
+            },
+            '& .layout_label': {
+              color: active ? 'primary.main' : 'text.secondary',
             },
           },
-          '& .layout_label': {
-            color: active ? 'primary.main' : 'text.secondary',
-          },
+          bgcolor: active && expend ? '#F4F5F9' : 'transparent',
+          borderRadius: 2,
         },
-        ...sx,
-      }}
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
     >
       <Icon
         className={'layout_icon'}
         component={active ? activeIcon : defaultIcon}
+        sx={{ width: 20, height: 20 }}
       />
 
       {expend && (
-        <Typography className={'layout_label'} mb={0.5} variant={'body2'}>
+        <Typography
+          className={'layout_label'}
+          variant={'body2'}
+          whiteSpace={'nowrap'}
+        >
           {label}
         </Typography>
       )}
@@ -72,12 +80,20 @@ const StyledMenuItem: FC<StyledMenuItemProps> = ({
 };
 
 export const LayoutSide: FC = () => {
-  const { openProcess } = useDialogStore();
-
   const router = useRouter();
   const pathname = usePathname();
 
-  const [expend, setExpend] = useState(true);
+  const [expend, setExpend] = useState(() => {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+    const stored = localStorage.getItem('expend');
+    if (stored === null) {
+      localStorage.setItem('expend', '1');
+      return true;
+    }
+    return stored === '1';
+  });
 
   // 0 false, 1 true
 
@@ -115,21 +131,18 @@ export const LayoutSide: FC = () => {
 
   const isSelected = (key?: string) => pathname.includes(key || '');
 
-  const onClickToRedirect = (key: string) => {
-    if (isSelected(key)) {
+  const onClickToRedirect = (url: string) => {
+    const currentFullPath = pathname + (window.location.search || '');
+    // Allow navigation if URLs differ (including query params)
+    if (currentFullPath === url && url !== '/directories') {
       return;
     }
-    router.push(key);
+    router.push(url);
+    // 派发自定义事件，直接传递新 URL
+    window.dispatchEvent(
+      new CustomEvent(URL_CHANGE_EVENT, { detail: { url } }),
+    );
   };
-
-  useEffect(() => {
-    if (localStorage.getItem('expend') === null) {
-      localStorage.setItem('expend', '1');
-    }
-    if (localStorage.getItem('expend') === '1') {
-      setExpend(true);
-    }
-  }, []);
 
   return (
     <Stack
@@ -150,11 +163,30 @@ export const LayoutSide: FC = () => {
         sx={{
           width: '100%',
           overflowX: 'hidden',
+          flex: 1,
         }}
       >
         {LAYOUT_SIDE_MENU.map((item, index) => (
           <Fragment key={index}>
-            {item.subMenus && !expend ? null : (
+            <StyledMenuItem
+              active={isSelected(item.key)}
+              activeIcon={item.activeIcon}
+              defaultIcon={item.defaultIcon}
+              expend={expend}
+              key={`${item.key}-${index}`}
+              label={item.label}
+              onClick={() => {
+                if (item.url) {
+                  onClickToRedirect(item.url);
+                  return;
+                }
+              }}
+            />
+          </Fragment>
+        ))}
+        <Stack mt={'auto'}>
+          {LAYOUT_SIDE_MENU_BOTTOM.map((item, index) => (
+            <Fragment key={index}>
               <StyledMenuItem
                 active={isSelected(item.key)}
                 activeIcon={item.activeIcon}
@@ -167,38 +199,10 @@ export const LayoutSide: FC = () => {
                     onClickToRedirect(item.url);
                     return;
                   }
-                  if (item?.subMenus?.length) {
-                    onClickToRedirect(item.subMenus[0].url);
-                  }
                 }}
               />
-            )}
-            {item.subMenus && (
-              <Stack pl={expend ? '28px' : 0}>
-                {item.subMenus.map((subItem, i) => (
-                  <StyledMenuItem
-                    active={isSelected(subItem.key)}
-                    activeIcon={subItem.activeIcon}
-                    defaultIcon={subItem.defaultIcon}
-                    expend={expend}
-                    key={`${subItem.key}-${i}`}
-                    label={subItem.label}
-                    onClick={() => onClickToRedirect(subItem.url)}
-                  />
-                ))}
-              </Stack>
-            )}
-          </Fragment>
-        ))}
-        <Stack mt={3}>
-          <StyledButton
-            color={'info'}
-            onClick={() => openProcess()}
-            size={'medium'}
-            variant={'outlined'}
-          >
-            {expend ? 'Create new campaign' : '+'}
-          </StyledButton>
+            </Fragment>
+          ))}
         </Stack>
       </Stack>
     </Stack>

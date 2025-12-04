@@ -23,9 +23,9 @@ export const Library = () => {
           gap={1}
           sx={{
             '& .active': {
-              bgcolor: '#F7F4FD !important',
-              color: '#6E4EFB !important',
-              borderColor: '#6E4EFB !important',
+              // bgcolor: '#F4F5F9 !important',
+              // color: '#6E4EFB !important',
+              borderColor: 'primary.hover',
             },
           }}
         >

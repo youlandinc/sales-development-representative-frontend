@@ -1,8 +1,9 @@
 'use client';
+import { useShallow } from 'zustand/react/shallow';
 
-import { Box, Skeleton } from '@mui/material';
+import { Box } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect } from 'react';
 
 import { _uploadFile } from '@/request';
 
@@ -10,19 +11,24 @@ import { SDRToast } from '@/components/atoms/StyledToast';
 
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { TOOLBAR } from './data';
-import { useSwitch } from '@/hooks';
 
 interface StyledTinyEditorProps {
   onChange?: (dialogApi: any, details: any) => void;
   value?: string;
+  placeholder?: string;
 }
 
 export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   onChange,
   value,
+  placeholder = 'Start typing here...',
 }: StyledTinyEditorProps) => {
-  const { signatures, fetchSignatures, fetchSignatureLoading } =
-    useSettingsStore();
+  const { signatures, fetchSignatures } = useSettingsStore(
+    useShallow((state) => ({
+      signatures: state.signatures,
+      fetchSignatures: state.fetchSignatures,
+    })),
+  );
 
   useEffect(() => {
     // close();
@@ -44,13 +50,8 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
     };
   }, []);
 
-  if (!process.env.NEXT_PUBLIC_TINYMCE_API_KEY) {
-    return null;
-  }
-
   return (
     <Box
-      minHeight={400}
       sx={{
         '& .tox-promotion': { display: 'none' },
         '& .tox-tinymce': {
@@ -60,7 +61,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
       }}
     >
       <Editor
-        apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
         init={{
           content_style:
             'p { margin: 0;font-size:12px } body::before { font-size:12px }',
@@ -124,7 +124,6 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
             'searchreplace',
             'table',
             'visualblocks',
-            'wordcount',
             'image',
             // Your account includes a free trial of TinyMCE premium features
             // Try the most popular premium features until Nov 6, 2025:
@@ -168,11 +167,13 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           //   { value: 'Email', title: 'Email' },
           // ],
           // uploadcare_public_key: 'd198ba221e0237f6d192',
-          placeholder: 'Start typing here...',
+          placeholder: placeholder,
           // 禁用顶部的 "Explore Trial" 提示
           promotion: false,
           // 禁用品牌标志
           branding: false,
+          // 禁用元素路径显示
+          elementpath: false,
           // 禁用帮助菜单
           // help_tabs: [],
           // 禁用状态栏
@@ -210,7 +211,9 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           paste_data_images: true,
           menubar: false,
         }}
+        licenseKey="gpl"
         onEditorChange={onChange}
+        tinymceScriptSrc="/tinymce/tinymce.min.js"
         value={value}
       />
     </Box>

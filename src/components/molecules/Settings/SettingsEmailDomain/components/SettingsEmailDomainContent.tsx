@@ -1,35 +1,42 @@
-import { CircularProgress, Icon, Stack, Typography } from '@mui/material';
+import {
+  CircularProgress,
+  Divider,
+  Icon,
+  Skeleton,
+  Stack,
+  Typography,
+} from '@mui/material';
 
+import { useSettingsStore } from '@/stores/useSettingsStore';
 import { DomainSource, EmailDomainDetails, EmailDomainState } from '@/types';
 
 import ICON_PENDING from '../../assets/icon_email_pending.svg';
 import ICON_SUCCESS from '../../assets/icon_email_success.svg';
 
 const DomainStateHash = {
-  [EmailDomainState.ACTIVE]: 'Active',
-  [EmailDomainState.SUCCESS]: 'Waiting for sender setup',
+  [EmailDomainState.ACTIVE]: 'Verified',
+  [EmailDomainState.SUCCESS]: 'Verified',
   [EmailDomainState.PENDING]: 'Waiting for verification',
   [EmailDomainState.FAILED]: 'Waiting for verification',
 };
 
 const DomainStateActionHash = {
-  [EmailDomainState.ACTIVE]: 'Change sender name',
-  [EmailDomainState.SUCCESS]: 'View',
+  [EmailDomainState.ACTIVE]: '',
+  [EmailDomainState.SUCCESS]: '',
   [EmailDomainState.PENDING]: 'View',
   [EmailDomainState.FAILED]: 'View',
 };
 
 const DomainStateIconHash = {
-  [EmailDomainState.SUCCESS]: ICON_PENDING,
-  [EmailDomainState.PENDING]: ICON_PENDING,
   [EmailDomainState.ACTIVE]: ICON_SUCCESS,
+  [EmailDomainState.SUCCESS]: ICON_SUCCESS,
+  [EmailDomainState.PENDING]: ICON_PENDING,
   [EmailDomainState.FAILED]: ICON_PENDING,
 };
 
 interface SettingsEmailDomainContentProps {
   loading: boolean;
   viewLoading: boolean;
-  data: EmailDomainDetails[];
   domain: string;
   onRemove: (item: EmailDomainDetails) => void;
   onClickView: (domain: string) => void;
@@ -38,22 +45,30 @@ interface SettingsEmailDomainContentProps {
 export const SettingsEmailDomainContent = ({
   loading,
   viewLoading,
-  data,
   domain,
   onRemove,
   onClickView,
 }: SettingsEmailDomainContentProps) => {
+  const data = useSettingsStore((state) => state.emailDomainList);
   if (loading) {
     return (
-      <Stack alignItems={'center'} flex={1} justifyContent={'center'}>
-        <CircularProgress size={24} sx={{ width: '100%', color: '#E3E3EE' }} />
+      <Stack gap={1.5}>
+        <Stack flex={1} flexDirection={'row'} gap={1.5}>
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} sx={{ flex: 1 }} variant="rounded" />
+          ))}
+        </Stack>
       </Stack>
     );
   }
 
+  if (data.length === 0) {
+    return null;
+  }
+
   return (
-    <Stack color={'#202939'} gap={'14px'}>
-      <Stack flexDirection={'row'} gap={1.5}>
+    <Stack color={'#202939'} gap={'12px'}>
+      <Stack color="#6F6C7D" flexDirection={'row'} gap={1.5}>
         <Typography
           flex={3}
           flexShrink={0}
@@ -61,7 +76,7 @@ export const SettingsEmailDomainContent = ({
           fontWeight={600}
           lineHeight={'18px'}
         >
-          Email
+          Domain
         </Typography>
         <Typography
           flex={2}
@@ -75,10 +90,12 @@ export const SettingsEmailDomainContent = ({
         <Typography width={180} />
       </Stack>
 
+      <Divider sx={{ borderColor: '#DFDEE6' }} />
+
       {data.map((item) => (
         <Stack flexDirection={'row'} gap={1.5} key={`pc_${item.id}`}>
           <Typography flex={3} flexShrink={0} fontSize={12}>
-            {item.email || item.emailDomain}
+            {item.emailDomain}
           </Typography>
 
           <Stack
@@ -115,7 +132,6 @@ export const SettingsEmailDomainContent = ({
                   />
                 ) : (
                   <Typography
-                    color={'#6E4EFB'}
                     fontWeight={400}
                     mr={'10px'}
                     onClick={() => {
@@ -134,7 +150,7 @@ export const SettingsEmailDomainContent = ({
                   sx={{ cursor: 'pointer' }}
                   variant={'subtitle3'}
                 >
-                  Remove
+                  Delete
                 </Typography>
               </>
             )}

@@ -1,4 +1,8 @@
-import { CampaignStatusEnum, UserIntegrationEnum } from '@/types';
+import {
+  CampaignStatusEnum,
+  ProspectDelimiterEnum,
+  UserIntegrationEnum,
+} from '@/types';
 
 export enum SelectWithFlagTypeEnum {
   select = 'SELECT',
@@ -22,12 +26,13 @@ export enum AIModelEnum {
 }
 
 export enum ProcessCreateTypeEnum {
-  filter = 'FILTER',
-  csv = 'CSV',
+  ai_table = 'ENRICHMENT_TABLE',
   crm = 'CRM',
+  csv = 'CSV',
+  // deprecated
+  filter = 'FILTER',
   agent = 'AGENT',
   saved_list = 'SAVED_LIST',
-  ai_table = 'ENRICHMENT_TABLE',
 }
 
 export enum ProcessCreateChatEnum {
@@ -62,6 +67,14 @@ export interface CampaignLeadItem {
 export interface ResponseCampaignLeadsInfo {
   counts: number;
   leads: CampaignLeadItem[];
+}
+
+export enum CampaignStepEnum {
+  prepare = 'PREPARE',
+  choose = 'CHOOSE',
+  audience = 'AUDIENCE',
+  messaging = 'MESSAGING',
+  launch = 'LAUNCH',
 }
 
 export enum SetupPhaseEnum {
@@ -113,9 +126,10 @@ export interface ResponseCampaignLaunchInfo {
   autopilot: boolean;
   sendNow: boolean;
   scheduleTime: string | null;
-  sender: string | null;
-  senderName: string | null;
-  signatureId: string | null;
+  // sender: string | null;
+  // senderName: string | null;
+  // signatureId: string | null;
+  emilProfileId: number | null;
 }
 
 export interface ResponseCampaignEmail {
@@ -155,12 +169,25 @@ export interface ResponseCampaignInfo {
     // filter
     conditions?: ResponseCampaignFilterFormData;
     // csv
-    fileInfo?: FileInfo;
+    csvInfo?: CSVInfo;
     // crm
     crmInfo?: CRMInfo;
     // saved list
     savedListInfo?: SavedListInfo;
+    // enrichment table
+    aiTableInfo?: AITableInfo;
   };
+}
+
+export interface AITableMappingItem {
+  fieldId: string | null;
+  fieldName: string;
+  campaignRequiredColumnEnum: string;
+}
+
+export interface AITableInfo {
+  tableId: string;
+  mappings: AITableMappingItem[];
 }
 
 export interface FileInfo {
@@ -170,9 +197,23 @@ export interface FileInfo {
   [key: string]: any;
 }
 
+export interface CSVInfo {
+  fileInfo: FileInfo;
+  delimiter: ProspectDelimiterEnum;
+  hasHeader: boolean;
+  counts: number;
+  validCounts: number;
+  invalidCounts: number;
+  data?: Record<string, any>[];
+}
+
 export interface CRMInfo {
   listId: string;
   provider: UserIntegrationEnum | string;
+  counts: number;
+  validCounts: number;
+  invalidCounts: number;
+  data?: Record<string, any>[];
 }
 
 export interface SavedListInfo {
@@ -188,15 +229,10 @@ export interface ResponseCampaignSavedListLeads {
 export interface ResponseCampaignCRMLeads {
   counts: number;
   leads: CampaignLeadItem[];
-  data: { [key: string]: string };
+  data?: Record<string, any>[];
   crmInfo: CRMInfo;
-}
-
-export interface ResponseCampaignCSVLeads {
-  counts: number;
-  leads: CampaignLeadItem[];
-  data: { [key: string]: string };
-  fileInfo: FileInfo;
+  invalidCounts: number | null;
+  validCounts: number | null;
 }
 
 export interface ResponseCampaignCRMProvider {

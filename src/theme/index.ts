@@ -1,8 +1,6 @@
 'use client';
-import { CSSProperties } from 'react';
 import { createTheme, ThemeOptions } from '@mui/material/styles';
-import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { inputBaseClasses } from '@mui/material/InputBase';
+import { CSSProperties } from 'react';
 
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
@@ -34,6 +32,8 @@ declare module '@mui/material/styles' {
     background?: string;
     contrastHover?: string;
     contrastBackground?: string;
+    borderColor?: string;
+    contrastBorderColor?: string;
   }
 
   interface SimplePaletteColorOptions {
@@ -42,9 +42,11 @@ declare module '@mui/material/styles' {
     lighter?: string;
     lightest?: string;
     hover?: string;
-    background?: string;
     contrastHover?: string;
+    background?: string;
     contrastBackground?: string;
+    borderColor?: string;
+    contrastBorderColor?: string;
   }
 
   interface TypeText {
@@ -55,6 +57,7 @@ declare module '@mui/material/styles' {
     active: string;
     primary: string;
     secondary: string;
+    white: string;
   }
 
   interface TypeBorder {
@@ -115,6 +118,23 @@ declare module '@mui/material/TextField' {
   }
 }
 
+declare module '@mui/material/Autocomplete' {
+  interface AutocompletePropsSizeOverrides {
+    large: true;
+  }
+}
+declare module '@mui/material/InputBase' {
+  interface InputBasePropsSizeOverrides {
+    large: true;
+  }
+}
+
+declare module '@mui/material/FormControl' {
+  interface FormControlPropsSizeOverrides {
+    large: true;
+  }
+}
+
 const customBreakpoints = createTheme({
   breakpoints: {
     values: {
@@ -133,8 +153,8 @@ const defaultOptions: ThemeOptions = {
   ...customBreakpoints,
   palette: {
     primary: {
-      main: '#6E4EFB',
-      hover: '#5133D7',
+      main: '#363440',
+      hover: '#4C4957',
       light: '#AC99FB',
       lighter: '#D5CBFB',
       dark: '#3D25A8',
@@ -152,6 +172,7 @@ const defaultOptions: ThemeOptions = {
       hover: '#81889B',
       background: '#F4F4F6',
       contrastText: '#FFFFFF',
+      borderColor: '#E5E5E5',
     },
     success: {
       main: '#69C0A5',
@@ -171,21 +192,23 @@ const defaultOptions: ThemeOptions = {
       background: '#FFEEEA',
       contrastText: '#FFFFFF',
     },
+
     text: {
-      default: '#2A292E',
+      default: '#363440',
       disabled: '#BABCBE',
       hover: '#4C4957',
       focus: '#363440',
       active: '#6E4EFB',
-      primary: '#2A292E',
+      primary: '#363440',
       secondary: '#6F6C7D',
+      white: '#FFFFFF',
     },
     background: {
       default: '#FFFFFF',
       disabled: '#BABCBE',
       hover: '#4C4957',
       focus: '#5B76BC',
-      active: '#F7F4FD',
+      active: '#F4F5F9',
       primary: '#2A292E',
       secondary: '#6F6C7D',
       avatar_defaultBg: '#DFE2E7',
@@ -340,99 +363,143 @@ const defaultOptions: ThemeOptions = {
         },
       },
     },
-    MuiInputLabel: {
-      styleOverrides: {
-        root: {
-          color: 'var(--mui-palette-text-primary)',
-          fontSize: 14,
-          lineHeight: 1.43,
-          transform: 'translate(14px, 10px) scale(1)',
-          '&.Mui-focused': {
-            color: 'var(--mui-palette-text-primary)',
-          },
-        },
-        shrink: {
-          transform: 'translate(14px, -8px) scale(0.75)',
-        },
-        sizeSmall: {
-          transform: 'translate(12px, 5px) scale(1)',
-        },
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        //input element
-        input: {
-          paddingTop: '10px',
-          paddingBottom: '10px',
-          zIndex: 1,
-          fontSize: 14,
-          lineHeight: 1.43,
-          height: 'auto',
-        },
-        // border style
-        notchedOutline: {
-          borderColor: 'var(--mui-palette-border-default)',
-          borderWidth: '1px',
-          background: 'transparent',
-          borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
-        },
+    // MuiInputLabel: {
+    //   styleOverrides: {
+    //     root: {
+    //       color: 'var(--mui-palette-text-primary)',
+    //       fontSize: 14,
+    //       lineHeight: 1.43,
+    //       transform: 'translate(14px, 10px) scale(1)',
+    //       '&.Mui-focused': {
+    //         color: 'var(--mui-palette-text-primary)',
+    //       },
+    //     },
+    //     shrink: {
+    //       transform: 'translate(14px, -8px) scale(0.75)',
+    //     },
+    //     sizeSmall: {
+    //       transform: 'translate(12px, 5px) scale(1)',
+    //     },
+    //   },
+    // },
+    // MuiOutlinedInput: {
+    //   styleOverrides: {
+    //     //input element
+    //     input: {
+    //       paddingTop: '10px',
+    //       paddingBottom: '10px',
+    //       zIndex: 1,
+    //       fontSize: 14,
+    //       lineHeight: 1.43,
+    //       height: 'auto',
+    //     },
+    //     // border style
+    //     notchedOutline: {
+    //       borderColor: 'var(--mui-palette-border-default)',
+    //       borderWidth: '1px',
+    //       background: 'transparent',
+    //       borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+    //     },
 
-        //border style when hover
-        root: {
-          [`&.${inputBaseClasses.sizeSmall} > .${inputBaseClasses.input}`]: {
-            paddingTop: '6.5px',
-            paddingBottom: '6.5px',
-            fontSize: 14,
-          },
-          [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-            borderColor: 'var(--mui-palette-border-hover)',
-            borderWidth: '1px',
-            background: 'transparent',
-            borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
-          },
-          [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
-            borderColor: 'var(--mui-palette-border-hover)',
-            borderWidth: '1px',
-            background: 'transparent',
-            borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
-          },
-        },
-      },
-    },
-    MuiAutocomplete: {
-      styleOverrides: {
-        inputRoot: {
-          paddingTop: '2.5px',
-          paddingBottom: '2.5px',
-        },
-        input: {
-          paddingTop: '10px',
-          paddingBottom: '10px',
-        },
-        endAdornment: {
-          zIndex: 1,
-        },
-        paper: {
-          fontSize: 14,
-          borderRadius: 2,
-          bgcolor: 'white',
-          boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
-        },
-        listbox: {
-          padding: '0px 0px 0px 0px',
-        },
-        tagSizeMedium: {
-          maxHeight: 28,
-        },
-        tagSizeSmall: {
-          maxHeight: 20,
-        },
-        // option: {
-        //   padding: '12px 12px 12px 12px !important',
-        // },
-      },
-    },
+    //     //border style when hover
+    //     root: {
+    //       [`&.${inputBaseClasses.sizeSmall} > .${inputBaseClasses.input}`]: {
+    //         paddingTop: '6.5px',
+    //         paddingBottom: '6.5px',
+    //         fontSize: 14,
+    //       },
+    //       [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+    //         borderColor: 'var(--mui-palette-border-hover)',
+    //         borderWidth: '1px',
+    //         background: 'transparent',
+    //         borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+    //       },
+    //       [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+    //         borderColor: 'var(--mui-palette-border-hover)',
+    //         borderWidth: '1px',
+    //         background: 'transparent',
+    //         borderRadius: 'calc(2 * var(--mui-shape-borderRadius))',
+    //       },
+    //     },
+    //   },
+    // },
+    //MuiAutocomplete: {
+    //  styleOverrides: {
+    //    inputRoot: {
+    //      paddingTop: '0',
+    //      paddingBottom: '0',
+    //    },
+    //    input: {
+    //      paddingTop: '8px',
+    //      paddingBottom: '8px',
+    //    },
+    //    endAdornment: {
+    //      zIndex: 1,
+    //    },
+    //    paper: {
+    //      fontSize: 14,
+    //      borderRadius: 2,
+    //      bgcolor: 'white',
+    //      boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
+    //    },
+    //    listbox: {
+    //      padding: '0px 0px 0px 0px',
+    //    },
+    //    tag: {
+    //      maxHeight: 24,
+    //      fontSize: 12,
+    //    },
+    //    tagSizeMedium: {
+    //      maxHeight: 24,
+    //      fontSize: 12,
+    //    },
+    //    tagSizeSmall: {
+    //      maxHeight: 18,
+    //      fontSize: 12,
+    //    },
+    //    root: ({ theme }) => ({
+    //      '& .MuiOutlinedInput-root .MuiAutocomplete-input': {
+    //        paddingTop: '8px',
+    //        paddingBottom: '8px',
+    //      },
+    //      //small
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
+    //        paddingTop: '0px',
+    //        paddingBottom: '0px',
+    //      },
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-input':
+    //        {
+    //          paddingTop: '6px',
+    //          paddingBottom: '6px',
+    //        },
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-endAdornment':
+    //        {
+    //          top: 2,
+    //        },
+    //      '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-tag':
+    //        {
+    //          maxHeight: 18,
+    //          fontSize: 12,
+    //        },
+    //      //large
+    //      '& .MuiInputBase-sizeLarge .MuiAutocomplete-input': {
+    //        paddingTop: '12px',
+    //        paddingBottom: '12px',
+    //      },
+    //      '& .MuiInputBase-sizeLarge .MuiAutocomplete-endAdornment': {
+    //        top: 9,
+    //      },
+    //      '& .MuiInputBase-sizeLarge .MuiAutocomplete-tag': {
+    //        maxHeight: 28,
+    //        fontSize: 12,
+    //      },
+    //      '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+    //        borderWidth: '1px !important',
+    //        borderColor: `${theme.palette.border.hover} !important`,
+    //      },
+    //    }),
+    //  },
+    //},
     MuiSelect: {
       styleOverrides: {
         icon: {
@@ -481,4 +548,4 @@ const darkTheme = createTheme({
   },
 });
 
-export { lightTheme, darkTheme };
+export { darkTheme, lightTheme };

@@ -15,6 +15,7 @@ export interface StyledDialogProps
   footer?: ReactNode;
   headerSx?: SxProps;
   contentSx?: SxProps;
+  footerSx?: SxProps;
   paperWidth?: CSSProperties['width'];
 }
 
@@ -26,6 +27,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
   open,
   headerSx,
   contentSx,
+  footerSx,
   paperWidth = 600,
   ...rest
 }) => {
@@ -84,37 +86,40 @@ export const StyledDialog: FC<StyledDialogProps> = ({
 
   return (
     <Dialog
-      closeAfterTransition={false}
+      closeAfterTransition={true}
       fullWidth={true}
       open={open}
-      sx={{
-        '&.MuiDialog-root': {
-          '& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root':
-            {},
-          '& .MuiDialog-paper': {
-            width: rest.fullScreen
-              ? '100%'
-              : {
-                  lg: 'calc(100% - 64px)',
-                  xs: 'calc(100% - 48px)',
-                },
-            //mx: 3,
-          },
-          '& .MuiPaper-root': {
-            transition: 'all .3s',
-            borderRadius: rest.fullScreen ? 0 : 2,
-            maxWidth: rest.fullScreen
-              ? '100%'
-              : {
-                  lg: paperWidth,
-                  xs: '100%',
-                },
-            boxShadow:
-              '0px 0px 2px rgba(17, 52, 227, 0.1), 0px 10px 10px rgba(17, 52, 227, 0.1)',
+      sx={[
+        {
+          '&.MuiDialog-root': {
+            '& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root':
+              {},
+            '& .MuiDialog-paper': {
+              width: rest.fullScreen
+                ? '100%'
+                : {
+                    lg: 'calc(100% - 64px)',
+                    xs: 'calc(100% - 48px)',
+                  },
+              //mx: 3,
+            },
+            '& .MuiPaper-root': {
+              transition: 'all 0.3s ease-in-out',
+              borderRadius: rest.fullScreen ? 0 : 2,
+              width: rest.fullScreen
+                ? '100%'
+                : {
+                    lg: paperWidth,
+                    xs: '100%',
+                  },
+              maxWidth: rest.fullScreen ? '100%' : paperWidth,
+              boxShadow:
+                '0px 0px 2px rgba(17, 52, 227, 0.1), 0px 10px 10px rgba(17, 52, 227, 0.1)',
+            },
           },
         },
-        ...sx,
-      }}
+        ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
+      ]}
       {...rest}
     >
       {header && (
@@ -131,7 +136,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
         </DialogContent>
       )}
       {footer && (
-        <DialogActions sx={{ ...handleSx('dialog_footer') }}>
+        <DialogActions sx={{ ...handleSx('dialog_footer'), ...footerSx }}>
           {footer}
         </DialogActions>
       )}

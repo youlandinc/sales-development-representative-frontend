@@ -1,0 +1,18 @@
+export const REQUEST_TIMEOUT = 100000;
+
+export const AUTO_HIDE_DURATION = 3000;
+
+export const DEFAULT_LOGGED_IN_PATH = '/directories';
+
+export const PREVIEW_IMAGE_URL =
+  'https://urlscan.io/liveshot/?width=1920&height=1080&url=https://';
+
+export const COINS_PER_ROW = 0.5;
+
+export const TermsOfUse = 'https://www.corepass.com/legal/privacy-policy';
+export const PrivacyPolicy =
+  'https://www.corepass.com/legal/terms-and-conditions';
+
+export const BASE_URL = `https://${process.env.NEXT_PUBLIC_BASE_DOMAIN_PREFIX}sales.corepass.com`;
+
+export const URL_CHANGE_EVENT = 'URL_CHANGE_EVENT';

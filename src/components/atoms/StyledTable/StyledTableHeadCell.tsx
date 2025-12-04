@@ -1,5 +1,6 @@
 import {
   FC,
+  KeyboardEvent,
   MouseEvent,
   ReactNode,
   useCallback,
@@ -9,9 +10,11 @@ import {
 } from 'react';
 import { Box, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
-import { TableColumnTypeEnum } from '@/types/Prospect/table';
-import { COLUMN_TYPE_ICONS } from './columnTypeIcons';
-import { StyledTableAiIcon } from './StyledTableAiIcon';
+
+import { StyledTableAiIcon } from './index';
+
+import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
+import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -30,19 +33,6 @@ interface StyledTableHeadCellProps {
   onEditSave?: (newName: string) => void;
   showPinnedRightShadow?: boolean;
 }
-
-//export enum TableColumnTypeEnum {
-//  text = 'TEXT',
-//  number = 'NUMBER',
-//  email = 'EMAIL',
-//  phone = 'PHONE',
-//  currency = 'CURRENCY',
-//  date = 'DATE',
-//  url = 'URL',
-//  img_url = 'IMG_URL',
-//  checkbox = 'CHECKBOX',
-//  select = 'SELECT',
-//}
 
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   header,
@@ -66,12 +56,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
+  const isSelectColumn = header?.column?.id === SYSTEM_COLUMN_SELECT;
 
-  const isSelectColumn = header?.column?.id === '__select';
-
-  const columnMeta = header?.column?.columnDef?.meta as any;
-  const actionKey = columnMeta?.actionKey;
-  const isAiColumn = actionKey === 'use-ai' || actionKey?.includes('find');
+  // Get column meta from columnDef (contains all column configuration)
+  const columnMeta = header?.column?.columnDef?.meta as
+    | TableColumnMeta
+    | undefined;
+  const { actionKey, isAiColumn = false, actionDefinition } = columnMeta || {};
 
   const content = header
     ? flexRender(header.column.columnDef.header, header.getContext())
@@ -103,7 +94,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   }, [tableMeta]);
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
+    (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         handleEditSave();
@@ -116,24 +107,21 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   );
 
   const handleAiIconClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       e.preventDefault();
 
       if (isAiColumn && header) {
         const columnId = header.column.id;
-        tableMeta?.onRunAi?.({
-          fieldId: columnId,
-          isHeader: true,
-        });
+        tableMeta?.openAiRunMenu?.(e.currentTarget as HTMLElement, columnId);
       }
     },
     [isAiColumn, tableMeta, header],
   );
 
-  // 计算背景色：选中 > hover > 默认
+  // Calculate background color: active > hover > default
   const headerBackgroundColor =
-    isActive || (isHovered && !isEditing) ? '#F7F4FD' : '#FFFFFF';
+    isActive || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 
   return (
     <Stack
@@ -155,14 +143,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           isPinned && showPinnedRightShadow && !isSelectColumn
             ? 'none'
             : '0.5px solid #DFDEE6',
-        bgcolor: isActive ? '#F7F4FD' : '#FFFFFF',
+        bgcolor: isActive ? '#F4F5F9' : '#FFFFFF',
         cursor: 'pointer',
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
         '&:hover': {
-          //bgcolor: !isEditing ? '#BBDEFB' : '#F6F6F6',
-          bgcolor: !isEditing ? '#F7F4FD' : '#F6F6F6',
+          bgcolor: !isEditing ? '#F4F5F9' : '#F6F6F6',
         },
         height: '36px',
         justifyContent: 'center',
@@ -225,15 +212,31 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         ) : (
           <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
             {header && !isSelectColumn && (
-              <Icon
-                component={
-                  COLUMN_TYPE_ICONS[
-                    (header.column.columnDef.meta as any)
-                      ?.fieldType as TableColumnTypeEnum
-                  ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
-                }
-                sx={{ width: 16, height: 16 }}
-              />
+              <>
+                {actionDefinition?.logoUrl ? (
+                  <Box
+                    alt={actionDefinition.integrationName || 'integration logo'}
+                    component="img"
+                    src={actionDefinition.logoUrl}
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      flexShrink: 0,
+                      borderRadius: '2px',
+                      objectFit: 'contain',
+                    }}
+                  />
+                ) : (
+                  <Icon
+                    component={
+                      COLUMN_TYPE_ICONS[
+                        columnMeta?.fieldType as TableColumnTypeEnum
+                      ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+                    }
+                    sx={{ width: 16, height: 16 }}
+                  />
+                )}
+              </>
             )}
             {content}
           </Stack>

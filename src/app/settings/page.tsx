@@ -1,16 +1,25 @@
 'use client';
 
-export const fetchCache = 'force-no-store';
+import dynamic from 'next/dynamic';
+import { useEffect } from 'react';
 
 import { Layout } from '@/components/molecules';
-import { Settings } from '@/components/organisms';
 
-const SettingsPage = () => {
+const DynamicSettings = dynamic(
+  () => import('@/components/organisms').then((mod) => mod.Settings),
+  {
+    ssr: false,
+  },
+);
+
+export default function SettingsPage() {
+  useEffect(() => {
+    document.title = 'Settings - Corepass SalesOS';
+  }, []);
+
   return (
     <Layout>
-      <Settings />
+      <DynamicSettings />
     </Layout>
   );
-};
-
-export default SettingsPage;
+}

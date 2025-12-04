@@ -1,5 +1,5 @@
-export * from './Prospect';
-export * from './ProspectDetail';
+export * from './Enrichment';
+export * from './EnrichmentDetail';
 
 export * from './Campaigns';
 
@@ -16,5 +16,4 @@ export * from './ContactsListsPage';
 export * from './ContactsCompaniesPage';
 export * from './ContactsPeoplePage';
 
-export * from './FindPeoplePage';
-export * from './FindCompaniesPage';
+export * from './PricingPlan';

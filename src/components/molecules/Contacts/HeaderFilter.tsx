@@ -286,7 +286,7 @@ export const HeaderFilter: FC<HeaderFilterProps> = ({ headerType }) => {
               </Typography>
             )}
             <Box
-              bgcolor={'#EAE9EF'}
+              bgcolor={'#F0F0F4'}
               height={'1px'}
               my={1.5}
               width={'100%'}

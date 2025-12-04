@@ -1,43 +1,42 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { EmailDomainDetails, HttpError } from '@/types';
-import { _fetchCustomEmailDomains } from '@/request';
 import { useUserStore } from '@/providers';
-import { SDRToast } from '@/components/atoms';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 
 export const useFetchCustomEmailDomain = () => {
-  const { userProfile } = useUserStore((state) => state);
+  const userProfile = useUserStore((state) => state.userProfile);
+  const fetchEmailDomainList = useSettingsStore(
+    (state) => state.fetchEmailDomainList,
+  );
   const { tenantId } = userProfile;
 
   const [loading, setLoading] = useState(false);
-  const [emailDomainList, setEmailDomainList] = useState<EmailDomainDetails[]>(
-    [],
-  );
+  const isFirstRefresh = useRef(true);
 
   const onRefresh = useCallback(async () => {
-    if (loading || !tenantId) {
+    if (!tenantId) {
       return;
     }
-    setLoading(true);
-    try {
-      const { data } = await _fetchCustomEmailDomains(tenantId);
-      setEmailDomainList(data);
-    } catch (err) {
-      const { header, message, variant } = err as HttpError;
-      SDRToast({ message, header, variant });
-    } finally {
-      setLoading(false);
+    if (isFirstRefresh.current) {
+      setLoading(true);
     }
-  }, [loading, tenantId]);
+    try {
+      await fetchEmailDomainList(tenantId);
+    } finally {
+      if (isFirstRefresh.current) {
+        setLoading(false);
+        isFirstRefresh.current = false;
+      }
+    }
+  }, [tenantId, fetchEmailDomainList]);
 
   useEffect(() => {
     tenantId && onRefresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
 
   return {
     loading,
-    emailDomainList,
-    setEmailDomainList,
     onRefresh,
   };
 };

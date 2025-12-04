@@ -39,12 +39,25 @@ export const StyledCheckbox: FC<StyledCheckboxProps> = ({
         control={
           <Checkbox
             checked={checked}
-            checkedIcon={<Icon component={checkedIcon || ICON_CHECKED} />}
+            checkedIcon={
+              <Icon
+                component={checkedIcon || ICON_CHECKED}
+                sx={{ width: 20, height: 20 }}
+              />
+            }
             disableRipple
-            icon={<Icon component={icon || ICON_STATIC} />}
+            icon={
+              <Icon
+                component={icon || ICON_STATIC}
+                sx={{ width: 20, height: 20 }}
+              />
+            }
             indeterminate={indeterminate}
             indeterminateIcon={
-              <Icon component={indeterminateIcon || ICON_INDETERMINATE} />
+              <Icon
+                component={indeterminateIcon || ICON_INDETERMINATE}
+                sx={{ width: 20, height: 20 }}
+              />
             }
             onChange={onChange}
             sx={{ ...sxCheckbox }}
@@ -59,19 +72,19 @@ export const StyledCheckbox: FC<StyledCheckboxProps> = ({
             ml: 0.75,
             wordBreak: 'break-word',
             whiteSpace: 'normal',
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: 400,
             lineHeight: 1.5,
             color: 'text.primary',
           },
           '& .Mui-checked': {
             '& svg > path': {
-              fill: '#6E4EFB !important',
+              fill: '#363440 !important',
             },
           },
           '& .MuiCheckbox-root': {
-            mt: '-11px',
-            mr: '-11px',
+            mt: '-10px',
+            mr: '-10px',
             '& svg > path': {
               fill: '#929292',
             },

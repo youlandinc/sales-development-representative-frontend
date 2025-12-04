@@ -18,7 +18,7 @@ import { EmailDomainData } from '@/types';
 
 import ICON_COPY from '../../assets/icon_email_copy.svg';
 
-const steps = ['Enter email domain', 'Verify ownership', 'Set sender name'];
+const steps = ['Enter domain', 'Verify ownership'];
 
 interface SettingsEmailDomainDialogProps {
   activeStep: number;
@@ -236,19 +236,21 @@ export const SettingsEmailDomainDialog = ({
         return (
           <Stack>
             <Typography color={'#636A7C'} variant={'body2'}>
-              Please enter your custom email domain. For example, if your email
-              is admin@example-domain.com, your custom domain is{' '}
-              <strong>example-domain.com</strong>.
-              <br />
-              <strong>Note:</strong> Email domains from providers like Gmail or
-              Outlook are <strong>not supported</strong>.
+              Enter the domain you send emails from. For example, if your email
+              is admin@corepass.com, this would be{' '}
+              <strong>corepass.com.</strong>
+              <span style={{ display: 'block', height: '1em' }} />
+              We currently support custom business domains for sending. If you
+              use Google Workspace or Microsoft Outlook, connect those accounts
+              through Integrations instead.
             </Typography>
             <StyledTextField
               label={'Email domain'}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder={'e.g. example-domain.com'}
+              onChange={(e) => setDomain(e.target.value.trim())}
+              placeholder={'Email domain (ex: corepass.com)'}
               sx={{
-                my: 3,
+                mt: 1.5,
+                mb: 3,
                 '& label': {
                   color: 'text.secondary',
                 },
@@ -264,30 +266,17 @@ export const SettingsEmailDomainDialog = ({
               color={'#6E4EFB'}
               gap={'10px'}
               sx={{
-                bgcolor: '#F7F4FD',
+                bgcolor: '#F4F5F9',
                 p: 1.5,
                 borderRadius: 1,
               }}
             >
-              <Typography component={'div'} fontSize={12} fontWeight={700}>
-                DNS setup instructions
-              </Typography>
               <Typography component={'div'} fontSize={12}>
-                CNAME (for DKIM verification): Add the CNAME record below to
-                your DNS provider to verify DKIM.
-              </Typography>
-              <Typography component={'div'} fontSize={12}>
-                MX (for MAIL FROM domain): Add the MX record below to your DNS
-                provider. This record routes bounce messages correctly.
-              </Typography>
-              <Typography component={'div'} fontSize={12}>
-                TXT (for SPF authentication): Add the TXT record below to your
-                DNS provider. This record authorizes your domain to send emails
-                through Amazon SES.
-              </Typography>
-              <Typography component={'div'} fontSize={12}>
-                Verification may take up to 72 hours. Please complete the
-                verification within this period.
+                After creating your domain identity with Easy DKIM, you must
+                complete the verification process for DKIM authentication by
+                copying the CNAME record generated below and publishing it with
+                your domain&apos;s DNS provider. Detection of these records may
+                take up to 72 hours.
               </Typography>
             </Stack>
 
@@ -338,10 +327,8 @@ export const SettingsEmailDomainDialog = ({
             id={`account-custom-payment-link-email-button-confirm-${activeStep}`}
             loading={stepButtonLoading}
             onClick={onClickContinue}
-            size={'small'}
             sx={{
               width: '84px',
-              height: '40px !important',
               backgroundColor: '#6E4EFB',
             }}
             variant={'contained'}
@@ -356,10 +343,8 @@ export const SettingsEmailDomainDialog = ({
             id={`account-custom-payment-link-email-button-confirm-${activeStep}`}
             loading={stepButtonLoading}
             onClick={() => onClickVerify(domain)}
-            size={'small'}
             sx={{
               width: '63px',
-              height: '40px !important',
               backgroundColor: '#6E4EFB',
             }}
             variant={'contained'}
@@ -374,10 +359,8 @@ export const SettingsEmailDomainDialog = ({
             id={`account-custom-payment-link-email-button-confirm-${activeStep}`}
             loading={stepButtonLoading}
             onClick={() => onClickSave(domain)}
-            size={'small'}
             sx={{
               width: '58px',
-              height: '40px !important',
               backgroundColor: '#6E4EFB',
             }}
             variant={'contained'}
@@ -411,9 +394,7 @@ export const SettingsEmailDomainDialog = ({
           <StyledButton
             id={`account-custom-payment-link-email-button-cancel-${activeStep}`}
             onClick={onCancelDialog}
-            size={'small'}
             sx={{
-              height: '40px !important',
               color: '#1E1645',
               borderColor: '#DFDEE6 !important',
             }}
@@ -438,7 +419,7 @@ export const SettingsEmailDomainDialog = ({
             lineHeight={1.2}
             variant={'h6'}
           >
-            Add email domain
+            Set up email domain
           </Typography>
 
           <Stepper

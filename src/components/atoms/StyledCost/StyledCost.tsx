@@ -6,10 +6,12 @@ import ICON_COINS from './assets/icon_coins.svg';
 type StyledCostProps = StackProps & {
   count: string;
   textColor?: string;
+  textLineHeight?: number;
 };
 
 export const StyledCost: FC<StyledCostProps> = ({
   count,
+  textLineHeight,
   textColor,
   ...rest
 }) => {
@@ -24,7 +26,11 @@ export const StyledCost: FC<StyledCostProps> = ({
       {...rest}
     >
       <Icon component={ICON_COINS} sx={{ width: 16, height: 16 }} />
-      <Typography color={textColor || '#866BFB'} variant={'body3'}>
+      <Typography
+        color={textColor || 'primary.main'}
+        lineHeight={textLineHeight}
+        variant={'body3'}
+      >
         {count} / row
       </Typography>
     </Stack>

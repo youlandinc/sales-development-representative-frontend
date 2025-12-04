@@ -14,30 +14,33 @@ const nextConfig = {
   },
   experimental: {
     // missingSuspenseWithCSRBailout: false,
+    reactCompiler: {
+      compilationMode: 'infer', // Compiler 自己推导优化
+    },
     staleTimes: {
       dynamic: 0,
       static: 0,
     },
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
   logging: {
     fetches: {
       fullUrl: true,
-      hmrRefresh: true,
+      hmrRefreshes: true,
     },
   },
   async redirects() {
     return [
       {
         source: '/',
-        destination: '/prospect-enrich',
+        destination: '/directories',
         statusCode: 301,
       },
     ];

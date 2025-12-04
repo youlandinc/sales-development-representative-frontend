@@ -1,11 +1,9 @@
-import { FC, forwardRef, useEffect, useState } from 'react';
+import { FC, forwardRef, useState } from 'react';
 import {
   NumberFormatValues,
   NumericFormat,
   NumericFormatProps,
 } from 'react-number-format';
-
-import { UFormatDollar, UFormatPercent, UNotUndefined } from '@/utils';
 
 import { StyledTextField } from '@/components/atoms';
 import { InputBaseProps, SxProps, TextFieldProps } from '@mui/material';
@@ -46,7 +44,7 @@ export const StyledTextFieldNumber: FC<StyledTextFieldNumberProps> = ({
   percentage = false,
   max,
   isAllowed,
-  type,
+  //type,
   ...rest
 }) => {
   const [text, setText] = useState(value ?? 0);

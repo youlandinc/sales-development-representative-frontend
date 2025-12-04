@@ -70,7 +70,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
   store,
   dispatch,
 }) => {
-  const { openProcess } = useDialogStore();
+  const { openProcess, openProcessLoading } = useDialogStore();
 
   const [cardData, setCardData] = useState(mock);
 
@@ -143,7 +143,13 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
             }}
             value={value}
           />
-          <StyledButton onClick={() => openProcess()} size={'medium'}>
+          <StyledButton
+            disabled={openProcessLoading}
+            loading={openProcessLoading}
+            onClick={() => openProcess()}
+            size={'small'}
+            sx={{ width: 190 }}
+          >
             <Icon
               component={ICON_PLUS}
               sx={{ width: 12, height: 12, mr: 0.5 }}

@@ -4,8 +4,11 @@ export * from './Layout';
 
 export * from './Auth';
 
-export * from './Prospect';
-export * from './ProspectDetail';
+export * from './Directories';
+export * from './DirectoriesIndustry';
+
+export * from './Enrichment';
+export * from './EnrichmentDetail';
 
 export * from './Campaigns';
 
@@ -26,7 +29,4 @@ export * from './GridPagination';
 
 export * from './Segments';
 
-export * from './Enrichments';
-
-export * from './FindPeopleCompany/FindPeople';
-export * from './FindPeopleCompany/FindCompanies';
+export * from './PricingPlan';

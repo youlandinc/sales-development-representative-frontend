@@ -1,55 +1,41 @@
 import { FC } from 'react';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers';
 
-type StyledDatePickerProps = DateTimePickerProps & {
+import { TextFieldProps } from '@mui/material';
+import { DatePicker, DatePickerProps } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+
+import { DEFAULT_TEXTFIELD_STYLE } from '../StyledTextField';
+
+type StyledDatePickerProps = DatePickerProps & {
   onClear?: () => void;
   error?: boolean;
+  size?: TextFieldProps['size'];
 };
 
 export const StyledDatePicker: FC<StyledDatePickerProps> = ({
   onClear,
   slotProps,
   error,
+  sx,
+  size = 'medium',
   ...rest
 }) => {
+  const { textField, ...restSlotProps } = slotProps || {};
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <DateTimePicker
+      <DatePicker
         enableAccessibleFieldDOMStructure={false}
         slotProps={{
           textField: {
             error,
-            sx: {
-              '& .MuiInputBase-input': {
-                px: 2,
-                py: 1.5,
-                fontSize: 16,
-                lineHeight: 1.5,
-                height: 'auto',
-              },
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-              },
-              '& .MuiInputLabel-root': {
-                transform: 'translate(16px, 12px) scale(1)',
-              },
-              '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
-                transform: 'translate(14px, -7px) scale(0.75)',
-              },
-              '& .Mui-error .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'error.main',
-              },
-              '& .Mui-focused.MuiInputLabel-root': {
-                transform: 'translate(16px, -7px) scale(0.75)',
-              },
-              '& .Mui-focused': {
-                '& .MuiOutlinedInput-notchedOutline': {
-                  border: '1px solid #6E4EFB !important',
-                },
-              },
-            },
+            size,
+            ...textField,
+            sx: [
+              DEFAULT_TEXTFIELD_STYLE,
+              ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
+            ],
           },
           field: { clearable: true, onClear: () => onClear?.() },
           openPickerIcon: {
@@ -58,7 +44,7 @@ export const StyledDatePicker: FC<StyledDatePickerProps> = ({
               height: 20,
             },
           },
-          ...slotProps,
+          ...restSlotProps,
         }}
         {...rest}
       />

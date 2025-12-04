@@ -247,12 +247,12 @@ export const StyledGrid: FC<StyledGridProps> = ({
               },
             },
             border: 'none',
-            bgcolor: '#F7F4FD',
+            bgcolor: '#F4F5F9',
             pl: 1.5,
             py: 1.25,
           },
           '& .MuiTableCell-root:last-child': {
-            bgcolor: '#F7F4FD',
+            bgcolor: '#F4F5F9',
           },
           '& .MuiTableCell-root:first-of-type': {
             px: rest?.enableSelectAll ? 0 : 1.5,

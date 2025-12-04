@@ -1,5 +1,11 @@
 import { del, get, post, put } from '@/request/request';
-import { BizCodeEnum, UserIntegrationItem } from '@/types';
+import {
+  BizCodeEnum,
+  EmailProfile,
+  EmailProfileRequest,
+  EmailProfileResponse,
+  UserIntegrationItem,
+} from '@/types';
 
 export const _fetchSettingsInfo = async (tenantId: string) => {
   return get(`/sdr/settings/info/${tenantId}`);
@@ -82,4 +88,33 @@ export const _verifyCustomEmailDomain = (params: { domain: string }) => {
 
 export const _deleteCustomEmailDomain = (id: number | string) => {
   return del(`/usercenter/api/customEmail/${id}`);
+};
+
+export const _fetchMailboxes = () => {
+  return get('/sdr/mailbox/list');
+};
+
+// ================== Email Profile APIs ==================
+
+export const _fetchEmailProfiles = () => {
+  return get<EmailProfileResponse>('/sdr/email/profile/list');
+};
+
+export const _createEmailProfile = (data: Omit<EmailProfileRequest, 'id'>) => {
+  return post<EmailProfile>('/sdr/email/profile/info', data);
+};
+
+export const _updateEmailProfile = (data: EmailProfileRequest) => {
+  return put<EmailProfile>('/sdr/email/profile/info', data);
+};
+
+export const _deleteEmailProfile = (id: number) => {
+  return del(`/sdr/email/profile/info/${id}`);
+};
+
+export const _modifyUserInfo = (param: {
+  firstName: string;
+  lastName: string;
+}) => {
+  return post('/usercenter/api/user/modifyUserInfo', param);
 };

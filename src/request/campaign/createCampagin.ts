@@ -1,11 +1,12 @@
 import { del, get, post, put } from '@/request/request';
 import {
   AIModelEnum,
+  CSVInfo,
+  FileInfo,
   ProcessCreateTypeEnum,
   ResponseCampaignCRMLeads,
   ResponseCampaignCRMList,
   ResponseCampaignCRMProvider,
-  ResponseCampaignCSVLeads,
   ResponseCampaignEmail,
   ResponseCampaignInfo,
   ResponseCampaignLeadsInfo,
@@ -173,15 +174,16 @@ export const _updateSelectedLibraryOffer = (params: {
 };
 
 // third step
-export const _saveAndLunchCampaign = (params: {
+export const _saveAndLaunchCampaign = (params: {
   campaignId: string | number;
   dailyLimit: number;
   autopilot: boolean;
   sendNow: boolean;
   scheduleTime: string | null;
-  sender: string;
-  senderName: string;
-  signatureId: string | null;
+  // sender: string;
+  // senderName: string;
+  // signatureId: string | null;
+  emilProfileId: number | null;
 }) => {
   return put('/sdr/campaign/info', params);
 };
@@ -196,8 +198,9 @@ export const _fetchFilterLeads = (params: any) => {
 };
 
 // csv
+/** @deprecated */
 export const _fetchCsvLeads = (files: FormData) => {
-  return post<ResponseCampaignCSVLeads>('/sdr/leads/csv', files, {
+  return post('/sdr/leads/csv', files, {
     headers: { 'content-type': 'multipart/form-data' },
   });
 };
@@ -227,4 +230,19 @@ export const _fetchSavedListLeads = (params: {
     '/sdr/leads/savedList/preview',
     params,
   );
+};
+
+// csv
+export const _uploadCSVFile = (files: FormData) => {
+  return post<FileInfo>('/sdr/fileInfo/upload', files, {
+    headers: { 'content-type': 'multipart/form-data' },
+  });
+};
+
+export const _fetchPreviewCSVData = (params: {
+  delimiter: CSVInfo['delimiter'];
+  hasHeader: CSVInfo['hasHeader'];
+  fileInfo: CSVInfo['fileInfo'];
+}) => {
+  return post<CSVInfo>('/sdr/leads/csv', params);
 };
