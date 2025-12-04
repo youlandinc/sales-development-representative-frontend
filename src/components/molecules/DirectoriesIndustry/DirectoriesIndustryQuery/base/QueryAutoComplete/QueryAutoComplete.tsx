@@ -285,7 +285,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               return (
                 <Box
                   component="li"
-                  key={key}
+                  key={option.label}
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
@@ -303,7 +303,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
             return (
               <Box
                 component="li"
-                key={key}
+                key={option.label}
                 {...rest}
                 sx={{
                   display: 'flex',
