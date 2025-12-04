@@ -179,7 +179,7 @@ export const DialogWorkEmailQuickSetupInputs: FC<{ title?: string }> = ({
           {isMissingConfig && (
             <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
               <Icon component={ICON_VALIDATE} sx={{ width: 18, height: 18 }} />
-              <Typography color={'#6F6C7D'} variant={'body3'}>
+              <Typography color={'error'} variant={'body3'}>
                 Please configure all of the actions
               </Typography>
             </Stack>
