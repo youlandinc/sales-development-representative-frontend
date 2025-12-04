@@ -3,14 +3,12 @@ import {
   Icon,
   IconButton,
   MenuItem,
-  Popover,
   Stack,
   Tooltip,
   Typography,
 } from '@mui/material';
 import Image from 'next/image';
-import type { MouseEvent } from 'react';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { StyledCost, StyledSelect, StyledSwitch } from '@/components/atoms';
@@ -19,7 +17,6 @@ import { DialogWorkEmailCollapseCard } from './index';
 import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
 import { IntegrationActionValidation } from '@/types/enrichment/integrations';
 
-import ICON_GEAR from '@/components/molecules/EnrichmentDetail/assets/dialog/dialogWorkEmail/icon_gear.svg';
 import ICON_DELETE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_delete.svg';
 import ICON_WARNING from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_warning.svg';
 
@@ -31,12 +28,6 @@ const WARNING_ICON_SX = {
   cursor: 'help',
 } as const;
 
-const DELETE_ICON_SX = {
-  width: 20,
-  height: 20,
-  '& path': { fill: '#E26E6E' },
-} as const;
-
 interface ValidationProviderLabelProps {
   option: IntegrationActionValidation;
 }
@@ -44,7 +35,7 @@ interface ValidationProviderLabelProps {
 const ValidationProviderLabel: FC<ValidationProviderLabelProps> = ({
   option,
 }) => (
-  <Stack alignItems="center" flexDirection="row" fontSize={12} gap={0.5}>
+  <Stack alignItems={'center'} flexDirection={'row'} fontSize={12} gap={0.5}>
     <Image alt={option.name} height={18} src={option.logoUrl} width={18} />
     {option.name}
   </Stack>
@@ -65,18 +56,22 @@ const ToggleRow: FC<ToggleRowProps> = ({
   onChange,
   optionalText,
 }) => (
-  <Stack alignItems="center" flexDirection="row" justifyContent="space-between">
-    <Stack alignItems="center" flexDirection="row" gap={0.5}>
-      <Typography fontWeight={600} lineHeight={1.5} variant="body3">
+  <Stack
+    alignItems={'center'}
+    flexDirection={'row'}
+    justifyContent={'space-between'}
+  >
+    <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+      <Typography fontWeight={600} lineHeight={1.5} variant={'body3'}>
         {label}
         {optionalText && (
-          <Box color="text.secondary" component="span">
+          <Box color={'text.secondary'} component={'span'}>
             {' '}
             {optionalText}
           </Box>
         )}
       </Typography>
-      <Tooltip arrow placement="top" title={tooltip}>
+      <Tooltip arrow placement={'top'} title={tooltip}>
         <Icon component={ICON_WARNING} sx={WARNING_ICON_SX} />
       </Tooltip>
     </Stack>
@@ -89,9 +84,6 @@ const ToggleRow: FC<ToggleRowProps> = ({
 );
 
 export const DialogWorkEmailValidation: FC = () => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const isSettingsOpen = Boolean(anchorEl);
-
   const {
     validationOptions,
     selectedValidationOption,
@@ -112,17 +104,8 @@ export const DialogWorkEmailValidation: FC = () => {
     })),
   );
 
-  const onClickToOpenSettings = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const onClickToCloseSettings = () => {
-    setAnchorEl(null);
-  };
-
   const onClickToRemoveProvider = () => {
     setSelectedValidationOption(null);
-    onClickToCloseSettings();
   };
 
   return (
@@ -130,12 +113,12 @@ export const DialogWorkEmailValidation: FC = () => {
       <Stack gap={1.5}>
         {/* Validation provider label */}
         <Typography variant={'body2'}>
-          <Box component="span" fontWeight={600}>
+          <Box component={'span'} fontWeight={600}>
             Validation provider
           </Box>
           <Box
             color={'text.secondary'}
-            component="span"
+            component={'span'}
             fontWeight={400}
             ml={0.5}
           >
@@ -215,68 +198,27 @@ export const DialogWorkEmailValidation: FC = () => {
             />
 
             {/* Settings gear icon */}
-            <IconButton
-              disabled={!selectedValidationOption}
-              onClick={onClickToOpenSettings}
-              sx={{ p: 0 }}
-            >
-              <Icon
-                component={ICON_GEAR}
-                sx={{
-                  width: 18,
-                  height: 18,
-                  '& path': {
-                    fill: !selectedValidationOption ? '#BABCBE' : '#343330',
-                  },
-                  '&:hover': {
-                    opacity: 0.7,
-                  },
-                }}
-              />
-            </IconButton>
-
-            {/* Settings Popover */}
-            <Popover
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              onClose={onClickToCloseSettings}
-              open={isSettingsOpen}
-              slotProps={{
-                paper: {
-                  sx: {
-                    mt: 1,
-                    borderRadius: 2,
-                    py: 1,
-                  },
-                },
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-            >
-              <Stack
-                alignItems="center"
-                flexDirection="row"
-                gap={1}
+            <Tooltip arrow placement={'top'} title={'Remove provider'}>
+              <IconButton
+                disabled={!selectedValidationOption}
                 onClick={onClickToRemoveProvider}
-                p={0.5}
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': {
-                    bgcolor: '#F0F0F4',
-                  },
-                }}
+                sx={{ p: 0 }}
               >
-                <Icon component={ICON_DELETE} sx={DELETE_ICON_SX} />
-                <Typography color="#E26E6E" variant="body2">
-                  Remove provider
-                </Typography>
-              </Stack>
-            </Popover>
+                <Icon
+                  component={ICON_DELETE}
+                  sx={{
+                    width: 18,
+                    height: 18,
+                    '& path': {
+                      fill: !selectedValidationOption ? '#BABCBE' : '#E26E6E',
+                    },
+                    '&:hover': {
+                      opacity: 0.7,
+                    },
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
           </Stack>
 
           {/* Helper text */}
