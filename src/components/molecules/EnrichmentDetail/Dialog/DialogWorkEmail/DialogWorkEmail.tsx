@@ -1,5 +1,6 @@
 import { Drawer, Fade, Stack } from '@mui/material';
 import { FC, useEffect, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import {
   DialogWorkEmailFooter,
@@ -20,7 +21,14 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
     setWorkEmailVisible,
     displayType,
     setWaterfallConfigType,
-  } = useWorkEmailStore((store) => store);
+  } = useWorkEmailStore(
+    useShallow((state) => ({
+      workEmailVisible: state.workEmailVisible,
+      setWorkEmailVisible: state.setWorkEmailVisible,
+      displayType: state.displayType,
+      setWaterfallConfigType: state.setWaterfallConfigType,
+    })),
+  );
 
   const computedContent = useMemo(() => {
     switch (displayType) {
