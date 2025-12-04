@@ -50,13 +50,25 @@ export interface IntegrationAction {
   skipped: boolean;
 }
 
+export interface IntegrationActionValidation {
+  actionKey: string;
+  accountId: string;
+  name: string;
+  logoUrl: string;
+  description: string;
+  score: string;
+  isDefault: boolean;
+}
+
 export interface IntegrationActionMenu {
   actionKey: string;
+  key: string;
   name: string;
   logoUrl: string;
   estimatedScore: string;
   description: string;
   waterfallConfigs: IntegrationAction[];
+  validations: IntegrationActionValidation[] | null;
 }
 
 export enum WaterfallConfigTypeEnum {
@@ -79,11 +91,18 @@ export interface WaterfallConfigsRequestParam
   inputParameters: IInputParameters[];
 }
 
+export interface ValidationActionConfigParam {
+  actionKey: string;
+  safeToSend: boolean;
+  requireValidationSuccess: boolean;
+}
+
 export interface CreateWaterfallConfigRequestParam {
   waterfallFieldName: string;
   waterfallGroupName: string;
   requiredInputsBinding: IInputParameters[];
   waterfallConfigs: WaterfallConfigsRequestParam[];
+  validationActionConfig?: ValidationActionConfigParam;
 }
 
 export enum ActionsChildrenTypeEnum {

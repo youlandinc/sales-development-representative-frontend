@@ -15,6 +15,7 @@ import {
   IntegrationAction,
   IntegrationActionMenu,
   IntegrationActionType,
+  IntegrationActionValidation,
   WaterfallConfigTypeEnum,
 } from '@/types/enrichment';
 
@@ -41,8 +42,12 @@ type WorkEmailStoreState = {
   allIntegrations: IntegrationAction[];
   selectedIntegration: IntegrationAction | null;
   selectedIntegrationToConfig: IntegrationAction | null;
+  validationOptions: IntegrationActionValidation[] | null;
   waterfallConfigType: WaterfallConfigTypeEnum;
   isValidatedInputParams: boolean;
+  selectedValidationOption: string | null;
+  safeToSend: boolean;
+  requireValidationSuccess: boolean;
 };
 
 type WorkEmailStoreActions = {
@@ -64,6 +69,10 @@ type WorkEmailStoreActions = {
   handleEditClick: (columnId: string) => void;
   fetchIntegrations: () => Promise<void>;
   fetchIntegrationMenus: () => Promise<void>;
+  setValidationOptions: (config: IntegrationActionValidation[] | null) => void;
+  setSelectedValidationOption: (option: string | null) => void;
+  setSafeToSend: (safeToSend: boolean) => void;
+  setRequireValidationSuccess: (requireValidationSuccess: boolean) => void;
 };
 
 const initialState: WorkEmailStoreState = {
@@ -81,6 +90,10 @@ const initialState: WorkEmailStoreState = {
   allIntegrations: [],
   selectedIntegration: null,
   selectedIntegrationToConfig: null,
+  validationOptions: null,
+  selectedValidationOption: null,
+  safeToSend: false,
+  requireValidationSuccess: false,
 };
 
 export const useWorkEmailStore = create<
@@ -131,6 +144,33 @@ export const useWorkEmailStore = create<
       setWaterfallDescription: (description: string) =>
         set((state) => {
           state.waterfallDescription = description;
+        }),
+      setValidationOptions: (config: IntegrationActionValidation[] | null) =>
+        set((state) => {
+          state.validationOptions = config;
+          if (config && config?.length > 0) {
+            state.selectedValidationOption =
+              config.find((item) => item.isDefault)?.actionKey || null;
+          } else {
+            state.selectedValidationOption = null;
+          }
+          state.safeToSend = false;
+          state.requireValidationSuccess = false;
+        }),
+      setSelectedValidationOption: (option: string | null) =>
+        set((state) => {
+          state.selectedValidationOption = option;
+          if (!option?.includes('leadmagic')) {
+            state.safeToSend = false;
+          }
+        }),
+      setSafeToSend: (safeToSend: boolean) =>
+        set((state) => {
+          state.safeToSend = safeToSend;
+        }),
+      setRequireValidationSuccess: (requireValidationSuccess: boolean) =>
+        set((state) => {
+          state.requireValidationSuccess = requireValidationSuccess;
         }),
       addIntegrationToDefault: (integration: IntegrationAction) =>
         set((state) => {
@@ -226,6 +266,9 @@ export const useWorkEmailStore = create<
             };
           });
 
+          const validationActionConfig =
+            fieldGroupMap?.[column.groupId]?.validationActionConfig;
+
           const waterfallConfigInField = fieldGroupMap?.[
             column.groupId
           ]?.waterfallConfigs?.map((i) => ({
@@ -248,7 +291,7 @@ export const useWorkEmailStore = create<
 
           //根据actionKey找到integration
           const integration = state.integrationMenus.find(
-            (i) => column && column.actionKey?.includes(i.actionKey || ''),
+            (i) => column && column.actionKey?.includes(i.key || ''),
           );
 
           if (!waterfallConfigInField || !integration) {
@@ -310,6 +353,15 @@ export const useWorkEmailStore = create<
           state.dialogHeaderName = integration.name;
           state.waterfallDescription = integration.description;
           state.groupId = column.groupId;
+          if (integration.validations) {
+            state.validationOptions = integration.validations;
+          }
+          if (validationActionConfig) {
+            state.safeToSend = validationActionConfig.safeToSend;
+            state.requireValidationSuccess =
+              validationActionConfig.requireValidationSuccess;
+            state.selectedValidationOption = validationActionConfig.actionKey;
+          }
         }),
       fetchIntegrations: async () => {
         // TODO: 实现集成列表获取逻辑

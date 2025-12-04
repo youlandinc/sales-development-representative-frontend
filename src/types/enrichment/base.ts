@@ -1,4 +1,8 @@
-import { IntegrationAction, ProspectTableEnum } from '@/types';
+import {
+  IntegrationAction,
+  ProspectTableEnum,
+  ValidationActionConfigParam,
+} from '@/types';
 
 export interface ProspectTableItem {
   tableId: string;
@@ -36,5 +40,6 @@ export interface ColumnFieldGroupMap {
       optional: boolean;
     }[];
     waterfallConfigs: ColumnFieldGroupMapItem[];
+    validationActionConfig: ValidationActionConfigParam | null;
   };
 }

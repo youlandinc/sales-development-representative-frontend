@@ -4,6 +4,7 @@ import {
   useWorkEmailStore,
 } from '@/stores/enrichment';
 import { SyntheticEvent, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import ICON_SUGGESTIONS from '@/components/molecules/EnrichmentDetail/assets/dialog/headerActions/icon_suggestions.svg';
 import ICON_AI from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle.svg';
@@ -11,7 +12,8 @@ import ICON_AI from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_
 import { ActiveTypeEnum } from '@/types';
 
 export const useDialogHeaderActionsHook = () => {
-  const { closeDialog } = useProspectTableStore((store) => store);
+  const closeDialog = useProspectTableStore((store) => store.closeDialog);
+
   const {
     setWorkEmailVisible,
     setActiveType,
@@ -19,9 +21,22 @@ export const useDialogHeaderActionsHook = () => {
     setDialogHeaderName,
     setWaterfallDescription,
     setAllIntegrations,
-  } = useWorkEmailStore((state) => state);
+    setValidationOptions,
+  } = useWorkEmailStore(
+    useShallow((state) => ({
+      setWorkEmailVisible: state.setWorkEmailVisible,
+      setActiveType: state.setActiveType,
+      integrationMenus: state.integrationMenus,
+      setDialogHeaderName: state.setDialogHeaderName,
+      setWaterfallDescription: state.setWaterfallDescription,
+      setAllIntegrations: state.setAllIntegrations,
+      setValidationOptions: state.setValidationOptions,
+    })),
+  );
 
-  const { setWebResearchVisible } = useWebResearchStore((state) => state);
+  const setWebResearchVisible = useWebResearchStore(
+    (state) => state.setWebResearchVisible,
+  );
 
   const [value, setValue] = useState<'Enrichments' | 'Campaign'>('Enrichments');
 
@@ -95,6 +110,7 @@ export const useDialogHeaderActionsHook = () => {
         setWaterfallDescription(item.description);
         setActiveType(ActiveTypeEnum.add);
         setAllIntegrations(item.waterfallConfigs);
+        setValidationOptions(item.validations);
       },
     })),
   };

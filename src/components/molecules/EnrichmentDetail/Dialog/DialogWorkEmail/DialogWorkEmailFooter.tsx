@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { FC, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton, StyledCost } from '@/components/atoms';
 
@@ -31,7 +32,13 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
   const { rowIds } = useProspectTableStore((store) => store);
   const { isMissingConfig } = useComputedInWorkEmailStore();
   const { setWaterfallConfigType, setDisplayType, displayType } =
-    useWorkEmailStore((store) => store);
+    useWorkEmailStore(
+      useShallow((state) => ({
+        setWaterfallConfigType: state.setWaterfallConfigType,
+        setDisplayType: state.setDisplayType,
+        displayType: state.displayType,
+      })),
+    );
   const { requestState } = useWorkEmailRequest(cb);
   const params = useParams();
   const tableId =

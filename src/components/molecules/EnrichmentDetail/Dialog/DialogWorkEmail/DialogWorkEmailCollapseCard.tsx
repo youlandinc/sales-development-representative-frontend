@@ -13,7 +13,7 @@ export const DialogWorkEmailCollapseCard: FC<
     <Stack
       border={'1px solid #DFDEE6'}
       borderRadius={2}
-      gap={visible ? 1 : 0}
+      gap={visible ? 1.5 : 0}
       p={1.5}
       sx={{
         transition: 'all 0.3s ease-in-out',

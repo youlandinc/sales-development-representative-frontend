@@ -62,7 +62,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     setGenerateDescription,
   } = useWebResearchStore((store) => store);
 
-  const { handleEditClick } = useWorkEmailStore((store) => store);
+  const handleEditClick = useWorkEmailStore((store) => store.handleEditClick);
 
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
 

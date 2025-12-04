@@ -9,4 +9,5 @@ export * from './DialogWorkEmailMain';
 export * from './DialogWorkEmailCollapseCard';
 export * from './DialogWorkEmailIntegrationColumnMapping';
 export * from './DialogWorkEmailFooter';
+export * from './DialogWorkEmailValidation';
 export * from './hooks';

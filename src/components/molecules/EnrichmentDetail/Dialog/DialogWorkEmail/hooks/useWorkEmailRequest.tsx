@@ -15,10 +15,30 @@ import { ActiveTypeEnum, HttpError } from '@/types';
 import { CreateWaterfallConfigRequestParam } from '@/types/enrichment';
 
 import { useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 export const useWorkEmailRequest = (cb?: () => void) => {
-  const { setWorkEmailVisible, dialogHeaderName, activeType, groupId } =
-    useWorkEmailStore((store) => store);
+  const {
+    setWorkEmailVisible,
+    dialogHeaderName,
+    activeType,
+    groupId,
+    validationOptions,
+    requireValidationSuccess,
+    safeToSend,
+    selectedValidationOption,
+  } = useWorkEmailStore(
+    useShallow((state) => ({
+      setWorkEmailVisible: state.setWorkEmailVisible,
+      dialogHeaderName: state.dialogHeaderName,
+      activeType: state.activeType,
+      groupId: state.groupId,
+      validationOptions: state.validationOptions,
+      requireValidationSuccess: state.requireValidationSuccess,
+      safeToSend: state.safeToSend,
+      selectedValidationOption: state.selectedValidationOption,
+    })),
+  );
   const { runAi } = useRunAi();
   const { fetchTable, columns } = useProspectTableStore();
   const { waterfallAllInputs, integrationsInWaterfall } =
@@ -44,6 +64,14 @@ export const useWorkEmailRequest = (cb?: () => void) => {
         })),
       };
     }),
+    validationActionConfig:
+      validationOptions && validationOptions.length > 0
+        ? {
+            actionKey: selectedValidationOption || '',
+            safeToSend,
+            requireValidationSuccess,
+          }
+        : undefined,
   };
 
   const [saveOrRunIntegrationState, saveOrRunIntegration] = useAsyncFn(
