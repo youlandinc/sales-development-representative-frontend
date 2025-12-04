@@ -68,6 +68,9 @@ export const StyledCellDetailsObj: FC<StyledCellDetailsObjProps> = ({
                   <Typography
                     color={'text.secondary'}
                     component="p"
+                    sx={{
+                      wordBreak: 'break-word',
+                    }}
                     variant={'body3'}
                   >
                     {v}
