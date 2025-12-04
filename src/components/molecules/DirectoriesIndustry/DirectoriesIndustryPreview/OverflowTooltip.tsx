@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Tooltip, TooltipProps } from '@mui/material';
+import { Box, Tooltip, TooltipProps } from '@mui/material';
 
 export interface OverflowTooltipProps
   extends Omit<TooltipProps, 'title' | 'children'> {
@@ -19,7 +19,7 @@ export const OverflowTooltip: FC<OverflowTooltipProps> = ({
   title,
   ...tooltipProps
 }) => {
-  const textRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
 
   const checkOverflow = useCallback(() => {
@@ -55,17 +55,16 @@ export const OverflowTooltip: FC<OverflowTooltipProps> = ({
   }, [children, checkOverflow]);
 
   const content = (
-    <span
+    <Box
       ref={textRef}
-      style={{
-        display: 'block',
+      sx={{
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
       }}
     >
       {children}
-    </span>
+    </Box>
   );
 
   if (!isOverflowing) {

@@ -51,8 +51,10 @@ export const QueryTab: FC<QueryTabProps> = ({
     return null;
   }
 
-  const currentIndex =
-    tabOptions.findIndex((option: any) => option.value === value) ?? 0;
+  const currentIndex = Math.max(
+    0,
+    tabOptions.findIndex((option: any) => option.value === value),
+  );
 
   return (
     <>

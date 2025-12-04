@@ -37,7 +37,17 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          Previewing {previewCount} of{' '}
+          Previewing{' '}
+          <Box
+            component="span"
+            sx={{
+              filter: loading ? 'blur(4px)' : 'none',
+              transition: 'filter 0.2s ease',
+            }}
+          >
+            {previewCount.toLocaleString()}
+          </Box>{' '}
+          of{' '}
           <Box
             component="span"
             sx={{

@@ -106,7 +106,6 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
       }
 
       if (!itemKey) {
-        //console.warn('Checkbox without key and children:', item.label);
         return null;
       }
 
@@ -126,7 +125,6 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
 
     if (item.actionType === DirectoriesQueryActionTypeEnum.select) {
       if (!itemKey) {
-        //console.warn('Select without key:', item.label);
         return null;
       }
 

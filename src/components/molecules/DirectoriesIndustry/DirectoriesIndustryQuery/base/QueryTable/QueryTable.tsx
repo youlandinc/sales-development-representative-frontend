@@ -28,29 +28,27 @@ export const QueryTable: FC<QueryTableProps> = ({
   >(undefined);
 
   return (
-    <>
-      <QueryTableSelect
-        onDisplayDataChange={(data) => {
-          setSelectedTableName(data.tableName);
-          setSelectedTableSource(data.tableSource);
-        }}
-        onFormDataChange={(data) => {
-          setSelectedTableId(data.tableId);
+    <QueryTableSelect
+      onDisplayDataChange={(data) => {
+        setSelectedTableName(data.tableName);
+        setSelectedTableSource(data.tableSource);
+      }}
+      onFormDataChange={(data) => {
+        setSelectedTableId(data.tableId);
 
-          onFormChange(fieldKey, {
-            tableId: data.tableId,
-            tableFieldId: '',
-            tableViewId: '',
-            keywords: [],
-          });
-        }}
-        placeholder={placeholder}
-        selectedTableId={selectedTableId}
-        selectedTableName={selectedTableName}
-        selectedTableSource={selectedTableSource}
-        title={''}
-        type={type}
-      />
-    </>
+        onFormChange(fieldKey, {
+          tableId: data.tableId,
+          tableFieldId: '',
+          tableViewId: '',
+          keywords: [],
+        });
+      }}
+      placeholder={placeholder}
+      selectedTableId={selectedTableId}
+      selectedTableName={selectedTableName}
+      selectedTableSource={selectedTableSource}
+      title={''}
+      type={type}
+    />
   );
 };

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { QueryAutoComplete, QueryContainer } from './index';
+import { QueryAutoComplete, QueryContainer } from '../index';
 
 interface QueryListTextAreaProps {
   value: string[];

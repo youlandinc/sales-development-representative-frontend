@@ -61,8 +61,7 @@ export const useQueryAutoComplete = ({
     }
     return '';
   });
-  // Pagination states
-  const [page, setPage] = useState(1);
+  const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -93,7 +92,7 @@ export const useQueryAutoComplete = ({
     if (hasStatic && hasDynamic && !inputValue && open) {
       setOptions(staticOptions.map(normalizeOption));
       // Reset pagination when showing static options
-      setPage(1);
+      setPageNumber(1);
       setHasMore(true);
     }
   }, [hasStatic, hasDynamic, inputValue, open, staticOptions]);
@@ -101,7 +100,7 @@ export const useQueryAutoComplete = ({
   // Reset pagination when keyword changes
   useEffect(() => {
     if (hasDynamic) {
-      setPage(1);
+      setPageNumber(1);
       setHasMore(true);
     }
   }, [debouncedInputValue, hasDynamic]);
@@ -157,13 +156,12 @@ export const useQueryAutoComplete = ({
     return () => controller.abort();
   }, [debouncedInputValue, url, open, hasStatic, hasDynamic]);
 
-  // Load next page
   const loadNextPage = useCallback(() => {
     if (!hasDynamic || !hasMore || isLoadingMore || loading) {
       return;
     }
 
-    const nextPage = page + 1;
+    const nextPage = pageNumber + 1;
     const controller = new AbortController();
 
     setIsLoadingMore(true);
@@ -185,7 +183,7 @@ export const useQueryAutoComplete = ({
         }));
 
         setOptions((prev) => [...prev, ...mappedOptions]);
-        setPage(nextPage);
+        setPageNumber(nextPage);
         setHasMore(items.length >= PAGE_SIZE);
       })
       .catch((error: any) => {
@@ -199,9 +197,16 @@ export const useQueryAutoComplete = ({
           setIsLoadingMore(false);
         }
       });
-  }, [hasDynamic, hasMore, isLoadingMore, loading, page, url, inputValue]);
+  }, [
+    hasDynamic,
+    hasMore,
+    isLoadingMore,
+    loading,
+    pageNumber,
+    url,
+    inputValue,
+  ]);
 
-  // Listbox scroll handler
   const onListboxScroll = useCallback(
     (event: UIEvent<HTMLUListElement>) => {
       const listbox = event.currentTarget;
@@ -242,15 +247,12 @@ export const useQueryAutoComplete = ({
   const onCloseToReset = useCallback(() => {
     setOpen(false);
     // Reset pagination when menu closes
-    setPage(1);
+    setPageNumber(1);
     setHasMore(true);
     if (!multiple && value) {
       const selectedOption = options.find((opt) => opt.inputValue === value);
       setInputValue(selectedOption?.label || (value as string));
-    } else if (!multiple) {
-      setInputValue('');
-    }
-    if (multiple) {
+    } else {
       setInputValue('');
     }
   }, [multiple, value, options]);
@@ -274,7 +276,7 @@ export const useQueryAutoComplete = ({
         const val = newValue
           ? optionToValue(newValue as AutoCompleteOption)
           : null;
-        (onFormChange as (v: string | null) => void)(val || null);
+        (onFormChange as (v: string | null) => void)(val);
         setInputValue((newValue as AutoCompleteOption)?.label || '');
       }
     },

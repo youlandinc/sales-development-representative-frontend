@@ -9,8 +9,27 @@ import {
 import {
   HttpError,
   ProspectTableEnum,
+  ProspectTableItem,
   ResponseProspectTableViaSearch,
 } from '@/types';
+
+const findTableItemById = (
+  list: ResponseProspectTableViaSearch,
+  targetId: string,
+): ProspectTableItem | undefined => {
+  for (const item of list) {
+    if (item.tableId === targetId) {
+      return item;
+    }
+    if (item.children) {
+      const found = item.children.find((child) => child.tableId === targetId);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
+};
 
 interface UseTableSelectParams {
   outerTableId?: string;
@@ -96,9 +115,7 @@ export const useTableSelect = (
   // If tableList is loaded and we have outerTableId but no outerTableName or outerTableSource, derive them
   useEffect(() => {
     if (outerTableId && tableList.length > 0) {
-      const tableItem = tableList
-        .flat()
-        .find((item) => item.tableId === outerTableId);
+      const tableItem = findTableItemById(tableList, outerTableId);
       if (tableItem) {
         if (!outerTableName) {
           setOuterTableName(tableItem.tableName);
@@ -143,9 +160,7 @@ export const useTableSelect = (
       return;
     }
 
-    const tableItem = tableList
-      .flat()
-      .find((item) => item.tableId === innerTableId);
+    const tableItem = findTableItemById(tableList, innerTableId);
     const tableName = tableItem?.tableName || '';
     const tableSource = tableItem?.source;
 

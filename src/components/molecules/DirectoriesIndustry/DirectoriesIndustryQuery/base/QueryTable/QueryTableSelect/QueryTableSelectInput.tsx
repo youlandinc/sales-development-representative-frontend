@@ -47,7 +47,7 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
   placeholder = 'Select table',
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const isMenuOpen = Boolean(anchorEl);
 
   const onClickToOpenMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -181,7 +181,7 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
               horizontal: 'left',
             }}
             onClose={onClickToCloseMenu}
-            open={open}
+            open={isMenuOpen}
             slotProps={{
               paper: {
                 sx: {

@@ -1,10 +1,7 @@
 export * from './QueryBreadcrumbs';
 export * from './QueryTab';
 
-export * from './QueryTableSelect';
 export * from './QueryTable';
-export * from './QueryTableWithList';
-export * from './QueryListTextArea';
 export * from './QueryAdditionalDetails';
 
 export * from './QueryTooltip';

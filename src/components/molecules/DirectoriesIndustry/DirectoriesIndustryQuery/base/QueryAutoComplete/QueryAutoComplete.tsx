@@ -21,10 +21,9 @@ import { QUERY_TOOLTIP_SLOT_PROPS, QueryTooltipAccessTitle } from '../index';
 import ICON_ARROW from './assets/icon-arrow.svg';
 import ICON_CLOSE from './assets/icon-close.svg';
 
-// Module-level constants to avoid recreation on each render
 const LOADING_MORE_OPTION: AutoCompleteOption = {
   inputValue: '__loading_more__',
-  label: '', // Not displayed, renderOption uses CircularProgress instead
+  label: '',
 };
 
 const CLEAR_ICON = (
@@ -121,13 +120,13 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
             ? [value as string]
             : [];
         const isAlreadySelected = currentValues.includes(state.inputValue);
-        const existsInOptions = opts.some(
+        const isExistingInOptions = opts.some(
           (opt) =>
             opt.inputValue === state.inputValue ||
             opt.label.toLowerCase() === state.inputValue.toLowerCase(),
         );
 
-        if (!existsInOptions) {
+        if (!isExistingInOptions) {
           filtered.push({
             inputValue: state.inputValue,
             label: isAlreadySelected
@@ -151,8 +150,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     if (!open || loading) {
       return options;
     }
-    const canAddNewValue = freeSolo && isAuth;
-    if (!canAddNewValue && !url && options.length > 0 && inputValue) {
+    if (!(freeSolo && isAuth) && !url && options.length > 0 && inputValue) {
       const filtered = createFilterOptions<AutoCompleteOption>()(options, {
         inputValue,
         getOptionLabel: (opt) => opt.label,
@@ -264,8 +262,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               id={id}
               name={`notaform-${id}`}
               placeholder={
-                (multiple && (!value || (value as string[]).length === 0)) ||
-                (!multiple && !value)
+                !value || (Array.isArray(value) && value.length === 0)
                   ? placeholder
                   : ''
               }

@@ -8,7 +8,7 @@ import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
 import { ProspectTableEnum } from '@/types';
 
 import { QueryTableSelectDialog, QueryTableSelectInput } from './index';
-import { QueryContainer } from '../QueryContainer';
+import { QueryContainer } from '../../QueryContainer';
 
 interface FilterTableSelectProps {
   type: DirectoriesQueryGroupTypeEnum;
