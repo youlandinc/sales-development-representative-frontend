@@ -160,6 +160,9 @@ export const useWorkEmailStore = create<
       setSelectedValidationOption: (option: string | null) =>
         set((state) => {
           state.selectedValidationOption = option;
+          if (!option?.includes('leadmagic')) {
+            state.safeToSend = false;
+          }
         }),
       setSafeToSend: (safeToSend: boolean) =>
         set((state) => {

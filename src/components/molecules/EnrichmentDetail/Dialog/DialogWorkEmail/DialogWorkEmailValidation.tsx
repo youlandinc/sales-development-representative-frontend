@@ -1,6 +1,7 @@
 import {
   Box,
   Icon,
+  IconButton,
   MenuItem,
   Popover,
   Stack,
@@ -82,7 +83,7 @@ const ToggleRow: FC<ToggleRowProps> = ({
     <StyledSwitch
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
-      size="small"
+      size={'small'}
     />
   </Stack>
 );
@@ -214,21 +215,25 @@ export const DialogWorkEmailValidation: FC = () => {
             />
 
             {/* Settings gear icon */}
-            <Tooltip placement="top" title="Settings">
+            <IconButton
+              disabled={!selectedValidationOption}
+              onClick={onClickToOpenSettings}
+              sx={{ p: 0 }}
+            >
               <Icon
                 component={ICON_GEAR}
-                onClick={onClickToOpenSettings}
                 sx={{
                   width: 18,
                   height: 18,
-                  cursor: 'pointer',
-                  color: '#363440',
+                  '& path': {
+                    fill: !selectedValidationOption ? '#BABCBE' : '#343330',
+                  },
                   '&:hover': {
                     opacity: 0.7,
                   },
                 }}
               />
-            </Tooltip>
+            </IconButton>
 
             {/* Settings Popover */}
             <Popover
@@ -244,6 +249,7 @@ export const DialogWorkEmailValidation: FC = () => {
                   sx: {
                     mt: 1,
                     borderRadius: 2,
+                    py: 1,
                   },
                 },
               }}
@@ -254,7 +260,6 @@ export const DialogWorkEmailValidation: FC = () => {
             >
               <Stack
                 alignItems="center"
-                borderRadius={1}
                 flexDirection="row"
                 gap={1}
                 onClick={onClickToRemoveProvider}
@@ -281,18 +286,24 @@ export const DialogWorkEmailValidation: FC = () => {
         </Stack>
 
         {/* Require validation success toggle */}
-        <ToggleRow
-          checked={safeToSend}
-          label='Only mark "Safe to Send" emails as valid?'
-          onChange={setSafeToSend}
-          optionalText="- Optional"
-          tooltip='By default, catch-all emails will be returned as valid. Turn this setting on to mark catch-all emails as invalid. Only "Safe to Send" emails will be marked as valid.'
-        />
+        {selectedValidationOption?.includes('leadmagic') && (
+          <ToggleRow
+            checked={safeToSend}
+            label={'Only mark "Safe to Send" emails as valid?'}
+            onChange={setSafeToSend}
+            optionalText={'- Optional'}
+            tooltip={
+              'By default, catch-all emails will be returned as valid. Turn this setting on to mark catch-all emails as invalid. Only "Safe to Send" emails will be marked as valid.'
+            }
+          />
+        )}
         <ToggleRow
           checked={requireValidationSuccess}
-          label="Require validation success?"
+          label={'Require validation success?'}
           onChange={setRequireValidationSuccess}
-          tooltip="By default, the waterfall will return data even if there is an error with validation."
+          tooltip={
+            'By default, the waterfall will return data even if there is an error with validation.'
+          }
         />
       </Stack>
     </DialogWorkEmailCollapseCard>
