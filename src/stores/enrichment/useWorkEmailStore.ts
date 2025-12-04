@@ -291,7 +291,8 @@ export const useWorkEmailStore = create<
 
           //根据actionKey找到integration
           const integration = state.integrationMenus.find(
-            (i) => column && column.actionKey?.includes(i.key || ''),
+            //TODO replace actionKey with key
+            (i) => column && column.actionKey?.includes(i.actionKey || ''),
           );
 
           if (!waterfallConfigInField || !integration) {

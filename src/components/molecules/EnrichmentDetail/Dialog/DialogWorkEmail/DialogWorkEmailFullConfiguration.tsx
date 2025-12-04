@@ -4,20 +4,21 @@ import { FC } from 'react';
 import {
   DialogWorkEmailQuickSetupInputs,
   DialogWorkEmailSequence,
-  DialogWorkEmailValidation,
+  // DialogWorkEmailValidation,
 } from './index';
 
-import { useWorkEmailStore } from '@/stores/enrichment';
+// import { useWorkEmailStore } from '@/stores/enrichment';
 
 export const DialogWorkEmailFullConfiguration: FC = () => {
-  const validationOptions = useWorkEmailStore(
-    (state) => state.validationOptions,
-  );
+  // const validationOptions = useWorkEmailStore(
+  //   (state) => state.validationOptions,
+  // );
   return (
     <Stack gap={3}>
       <DialogWorkEmailSequence />
       <DialogWorkEmailQuickSetupInputs />
-      {validationOptions && <DialogWorkEmailValidation />}
+      {/* //TODO */}
+      {/* {validationOptions && <DialogWorkEmailValidation />} */}
     </Stack>
   );
 };
