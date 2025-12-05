@@ -16,13 +16,15 @@ interface StyledTinyEditorProps {
   onChange?: (dialogApi: any, details: any) => void;
   value?: string;
   placeholder?: string;
+  showSignatureButton?: boolean;
 }
 
 export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   onChange,
   value,
   placeholder = 'Start typing here...',
-}: StyledTinyEditorProps) => {
+  showSignatureButton = true,
+}) => {
   const { signatures, fetchSignatures } = useSettingsStore(
     useShallow((state) => ({
       signatures: state.signatures,
@@ -31,9 +33,10 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
   );
 
   useEffect(() => {
-    // close();
-    fetchSignatures();
-  }, [fetchSignatures]);
+    if (showSignatureButton) {
+      fetchSignatures();
+    }
+  }, [fetchSignatures, showSignatureButton]);
 
   useEffect(() => {
     const handleFocusIn = (e: FocusEvent) => {
@@ -71,7 +74,7 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           ui_mode: 'split',
           // 添加自定义按钮和菜单
           setup: (editor: any) => {
-            if (signatures.length === 0) {
+            if (signatures.length === 0 || !showSignatureButton) {
               return;
             }
             // 添加自定义按钮
@@ -91,9 +94,9 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
               fetch: (callback: any) => {
                 const menus = signatures.map((item) => ({
                   type: 'menuitem',
-                  text: item.name,
+                  text: item.senderName,
                   onAction: () => {
-                    editor.insertContent(item.content);
+                    editor.insertContent(item.signatureContent);
                   },
                 }));
                 callback(menus);
