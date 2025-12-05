@@ -10,6 +10,7 @@ import { PlanCategoryEnum } from '@/types';
 import { GridColDef } from '@mui/x-data-grid';
 import { CreditUsageToolbar } from './CreditUsageToolbar';
 import { useCreditUsage } from './hooks';
+import { UTypeOf } from '@/utils';
 
 interface Provider {
   companyName: string;
@@ -172,6 +173,12 @@ export const CreditUsage: FC = () => {
         field: 'creditsUsed',
         headerName: 'Records used',
         width: 150,
+        renderCell: ({ value }) => {
+          if (UTypeOf.isNumber(value)) {
+            return value.toLocaleString();
+          }
+          return value;
+        },
       },
     ];
 
@@ -194,6 +201,12 @@ export const CreditUsage: FC = () => {
         field: 'creditsUsed',
         headerName: 'Credits used',
         width: 150,
+        renderCell: ({ value }) => {
+          if (UTypeOf.isNumber(value)) {
+            return value.toLocaleString();
+          }
+          return value;
+        },
       },
     ];
 
@@ -202,6 +215,15 @@ export const CreditUsage: FC = () => {
         field: 'remainingCredits',
         headerName: 'Remaining credits',
         width: 160,
+        renderCell: ({ value }) => {
+          if (value === -1) {
+            return 'Unlimited';
+          }
+          if (UTypeOf.isNumber(value)) {
+            return value.toLocaleString();
+          }
+          return value;
+        },
       },
       {
         field: 'date',
