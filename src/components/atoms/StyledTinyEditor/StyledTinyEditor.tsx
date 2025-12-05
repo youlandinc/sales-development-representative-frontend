@@ -55,13 +55,16 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         '& .tox-promotion': { display: 'none' },
         '& .tox-tinymce': {
           borderWidth: '1px !important',
           borderColor: '#D0CEDA !important',
         },
-      }}
+        '& .tox .tox-edit-area::before': {
+          borderColor: `${theme.palette.text.default} !important`,
+        },
+      })}
     >
       <Editor
         init={{
