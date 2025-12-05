@@ -1,16 +1,17 @@
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Avatar, Box, Stack, Typography } from '@mui/material';
 import { format } from 'date-fns';
-import { FC, useCallback, useMemo, useState } from 'react';
-
-import { CreditUsageGrid } from './CreditUsageGrid';
+import { GridColDef } from '@mui/x-data-grid';
 
 import { StyledButton } from '@/components/atoms';
-import { PlanCategoryEnum } from '@/types';
-import { GridColDef } from '@mui/x-data-grid';
+import { CreditUsageGrid } from './CreditUsageGrid';
 import { CreditUsageToolbar } from './CreditUsageToolbar';
-import { useCreditUsage } from './hooks';
+
 import { UTypeOf } from '@/utils';
+import { PlanCategoryEnum } from '@/types';
+import { useCreditUsage } from './hooks';
+
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 
 interface Provider {
   companyName: string;
@@ -234,7 +235,7 @@ export const CreditUsage: FC = () => {
             return '-';
           }
           try {
-            return format(new Date(value), ' MMMM d, yyyy h:mma');
+            return format(new Date(value), ' MMMM d, yyyy h:mm a');
           } catch {
             return value;
           }
@@ -383,7 +384,8 @@ export const CreditUsage: FC = () => {
             justifyContent="space-between"
           >
             <Typography sx={{ fontSize: 12, color: '#7D7D7D' }}>
-              {data?.data?.content?.length} records
+              {data?.data?.content?.length}{' '}
+              {data?.data?.content?.length === 1 ? 'record' : 'records'}
             </Typography>
             <Stack direction={'row'} gap={1.5}>
               <StyledButton
