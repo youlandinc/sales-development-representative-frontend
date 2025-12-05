@@ -220,7 +220,7 @@ export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
                 <Stack gap={1} key={key} width={'fit-content'}>
                   <Typography variant={'body2'}>{key}</Typography>
                   <Typography color={'text.secondary'} variant={'body3'}>
-                    {value}
+                    {String(value ?? '')}
                   </Typography>
                 </Stack>
               </StyledCellItemContainer>
