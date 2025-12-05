@@ -172,6 +172,7 @@ export const SettingsEmailProfiles: FC = () => {
                   setContent(content);
                 }}
                 placeholder={'Autosize height based on content lines'}
+                showSignatureButton={false}
                 value={content}
               />
             </CommonVerticalLabelContainer>

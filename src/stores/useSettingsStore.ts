@@ -1,24 +1,24 @@
 import { create } from 'zustand';
-import { immer } from 'zustand/middleware/immer';
 import { combine } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
-import { EmailDomainDetails, HttpError, Mailbox } from '@/types';
+import {
+  EmailDomainDetails,
+  EmailProfileResponse,
+  HttpError,
+  Mailbox,
+} from '@/types';
 
 import { SDRToast } from '@/components/atoms';
 
 import {
   _fetchCustomEmailDomains,
-  _fetchEmailSignatures,
+  _fetchEmailProfiles,
   _fetchMailboxes,
 } from '@/request';
 
-interface SignatureInfo {
-  name: string;
-  content: string;
-  id: number;
-}
 export interface SettingsStoreState {
-  signatures: SignatureInfo[];
+  signatures: EmailProfileResponse;
   fetchSignatureLoading: boolean;
   emailDomainList: EmailDomainDetails[];
   mailboxes: Mailbox[];
@@ -47,7 +47,7 @@ export const useSettingsStore = create<SettingsStoreProps>()(
           set((state) => {
             state.fetchSignatureLoading = true;
           });
-          const res = await _fetchEmailSignatures();
+          const res = await _fetchEmailProfiles();
           if (Array.isArray(res.data)) {
             set((state) => {
               state.signatures = res.data;
