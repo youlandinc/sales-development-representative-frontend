@@ -12,8 +12,6 @@ export const ExtensionMention = Mention.extend({
   },
   addAttributes() {
     // 如果父类有 addAttributes 方法，先调用它获取父类的属性
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     const parentAttributes = this?.parent ? this.parent() : {};
     return {
       // 先继承父类的属性
