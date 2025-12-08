@@ -159,7 +159,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
         </Stack>
       </Stack>
 
-      <Stack flexDirection={'row'} gap={3}>
+      {/* <Stack flexDirection={'row'} gap={3}>
         {cardData.map((item, index) => (
           <Stack
             border={'1px solid #DFDEE6'}
@@ -187,7 +187,7 @@ export const CampaignsHeader: FC<CampaignsHeaderProps> = ({
             )}
           </Stack>
         ))}
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 };

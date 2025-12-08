@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import Fuse from 'fuse.js';
 import { FC, useMemo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 import {
@@ -33,7 +34,11 @@ type CellDetailsProps = {
 } & DrawerProps;
 export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
   const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
-    (store) => store,
+    useShallow((state) => ({
+      dialogType: state.dialogType,
+      closeDialog: state.closeDialog,
+      dialogVisible: state.dialogVisible,
+    })),
   );
 
   const [searchText, setSearchText] = useState('');
