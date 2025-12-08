@@ -36,7 +36,6 @@ import { extractPromptText, insertWithPlaceholders } from '@/utils';
 
 import ICON_SPARKLE from './assets/icon_sparkle.svg';
 import ICON_WARNING from './assets/icon_warning.svg';
-// import { useCompletion } from '@ai-sdk/react';
 import ICON_DELETE from './assets/icon_delete.svg';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
