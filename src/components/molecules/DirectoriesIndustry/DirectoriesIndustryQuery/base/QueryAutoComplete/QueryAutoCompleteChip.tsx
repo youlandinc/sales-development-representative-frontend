@@ -5,7 +5,7 @@ import { createUseStyles } from 'react-jss';
 const useStyles = createUseStyles({
   container: {
     height: 22,
-    maxWidth: 270,
+    maxWidth: '100%',
     padding: '0 4px',
     borderRadius: '4px',
     display: 'flex',
@@ -47,7 +47,10 @@ export const QueryAutoCompleteChip: FC<QueryAutoCompleteChipProps> = ({
           <Image alt="" fill sizes="100%" src="/images/icon-close.svg" />
         </div>
       )}
-      <div className={classes.content}>{label}</div>
+      <div className={classes.content}>
+        {label}
+        {label}
+      </div>
     </div>
   );
 };

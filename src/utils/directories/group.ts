@@ -14,8 +14,12 @@ const getValueCount = (value: unknown): number => {
     return value.trim() === '' ? 0 : 1;
   }
 
-  if (UTypeOf.isNumber(value) || UTypeOf.isBoolean(value)) {
+  if (UTypeOf.isNumber(value)) {
     return 1;
+  }
+
+  if (UTypeOf.isBoolean(value)) {
+    return value ? 1 : 0;
   }
 
   if (UTypeOf.isObject(value)) {
