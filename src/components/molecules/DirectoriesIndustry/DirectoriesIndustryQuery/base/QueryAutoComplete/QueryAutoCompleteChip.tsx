@@ -47,10 +47,7 @@ export const QueryAutoCompleteChip: FC<QueryAutoCompleteChipProps> = ({
           <Image alt="" fill sizes="100%" src="/images/icon-close.svg" />
         </div>
       )}
-      <div className={classes.content}>
-        {label}
-        {label}
-      </div>
+      <div className={classes.content}>{label}</div>
     </div>
   );
 };
