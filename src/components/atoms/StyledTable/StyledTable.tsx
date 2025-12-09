@@ -50,17 +50,18 @@ import {
   checkIsEditableColumn,
   SYSTEM_COLUMN_SELECT,
 } from '@/constants/table';
+import { UTypeOf } from '@/utils';
 
-// TODO: Props优化
-// 1. 使用TypeScript严格类型定义替代any[]
-// 2. 拆分复杂的Props为更小的配置对象
-// 3. 考虑使用泛型支持不同的数据类型
-// 4. 合并相关回调函数为统一的事件处理器
+// TODO: Props optimization
+// 1. Use strict TypeScript type definitions instead of any[]
+// 2. Split complex Props into smaller configuration objects
+// 3. Consider using generics to support different data types
+// 4. Merge related callback functions into unified event handlers
 interface StyledTableProps {
-  columns: any[]; // TODO: 定义TableColumn类型
+  columns: any[]; // TODO: Define TableColumn type
   rowIds: string[];
-  data: any[]; // TODO: 使用泛型 <TData>
-  addMenuItems?: { label: string; value: string; icon: any }[]; // TODO: 定义MenuItem类型
+  data: any[]; // TODO: Use generic <TData>
+  addMenuItems?: { label: string; value: string; icon: any }[]; // TODO: Define MenuItem type
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
   onHeaderMenuClick?: ({
     type,
@@ -72,25 +73,25 @@ interface StyledTableProps {
     columnId: string;
     value?: any;
     parentValue?: any;
-  }) => void; // TODO: 简化事件处理类型
-  scrolled?: boolean;
+  }) => void; // TODO: Simplify event handling types
+  isScrolled?: boolean;
   virtualization?: {
     enabled?: boolean;
     rowHeight?: number;
     scrollContainer?: RefObject<HTMLDivElement | null>;
     onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
-  }; // TODO: 提取为独立的VirtualizationConfig类型
+  }; // TODO: Extract as independent VirtualizationConfig type
   onColumnResize?: (fieldId: string, width: number) => void;
   onCellEdit?: (recordId: string, fieldId: string, value: string) => void;
   onAiProcess?: (recordId: string, columnId: string) => void;
   onCellClick: (columnId: string, rowId: string, data: any) => void;
-  aiLoading?: Record<string, Record<string, boolean>>; // TODO: 定义LoadingState类型
+  aiLoading?: Record<string, Record<string, boolean>>; // TODO: Define LoadingState type
   onRunAi?: (params: {
     fieldId: string;
     recordId?: string;
     isHeader?: boolean;
     recordCount?: number;
-  }) => Promise<void>; // TODO: 提取为AiRunParams类型
+  }) => Promise<void>; // TODO: Extract as AiRunParams type
   onAddRows: (count: number) => Promise<void>;
   addRowsFooter?: ReactNode;
 }
@@ -104,7 +105,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   addMenuItems,
   onAddMenuItemClick,
   onHeaderMenuClick,
-  scrolled,
+  isScrolled,
   virtualization,
   onColumnResize,
   onCellEdit,
@@ -120,10 +121,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     useState<ColumnSizingInfoState>({} as ColumnSizingInfoState);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  // TODO: 状态管理优化
-  // 1. 考虑使用useReducer替代多个useState
-  // 2. 提取状态类型定义到独立的types文件
-  // 3. 状态更新逻辑过于分散，需要集中管理
+  // TODO: State management optimization
+  // 1. Consider using useReducer instead of multiple useState
+  // 2. Extract state type definitions to independent types file
+  // 3. State update logic is too scattered, needs centralized management
   const [cellState, setCellState] = useState<{
     recordId: string;
     columnId: string;
@@ -136,9 +137,9 @@ export const StyledTable: FC<StyledTableProps> = ({
     isEditing?: boolean;
     isShowMenu?: boolean;
   } | null>(null);
-  // TODO: 菜单状态优化
-  // 1. 合并三个menu anchor为统一的menuState对象
-  // 2. 减少state数量，提高可维护性
+  // TODO: Menu state optimization
+  // 1. Merge three menu anchors into unified menuState object
+  // 2. Reduce state count, improve maintainability
   const [addMenuAnchor, setAddMenuAnchor] = useState<null | HTMLElement>(null);
   const [headerMenuAnchor, setHeaderMenuAnchor] = useState<null | HTMLElement>(
     null,
@@ -180,8 +181,9 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   const onColumnSizingChange = useCallback(
     (updater: any) => {
-      const newColumnSizing =
-        typeof updater === 'function' ? updater(columnSizing) : updater;
+      const newColumnSizing = UTypeOf.isFunction(updater)
+        ? updater(columnSizing)
+        : updater;
       setColumnSizing(newColumnSizing);
 
       Object.keys(newColumnSizing).forEach((columnId) => {
@@ -219,7 +221,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         return columnHelper.accessor(
           (row: any) => {
             const v = row?.[column.fieldId];
-            if (v && typeof v === 'object' && 'value' in v) {
+            if (v && UTypeOf.isObject(v) && 'value' in v) {
               return (v as any).value ?? '';
             }
             return v ?? '';
@@ -240,9 +242,9 @@ export const StyledTable: FC<StyledTableProps> = ({
 
       return [selectCol, ...rest];
     },
-    // notice: must have rowSelection
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columns, rowSelection],
+    // Note: rowSelection dependency removed - header Checkbox now rendered
+    // directly in StyledTableHeadCell, bypassing TanStack's column caching.
+    [columns],
   );
 
   const tableMeta = useMemo(() => {
@@ -506,10 +508,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     [onHeaderMenuClick, selectedColumnId, table],
   );
 
-  // TODO: 交互逻辑优化
-  // 1. onHeaderClick逻辑过于复杂，多层if-else嵌套
-  // 2. 考虑提取为独立的handler工具函数
-  // 3. 使用状态机模式简化点击状态转换
+  // TODO: Interaction logic optimization
+  // 1. onHeaderClick logic is too complex with nested if-else
+  // 2. Consider extracting as independent handler utility functions
+  // 3. Use state machine pattern to simplify click state transitions
   const onHeaderClick = useCallback(
     (e: MouseEvent, columnId: string) => {
       const headerElement = e.currentTarget as HTMLElement;
@@ -622,10 +624,10 @@ export const StyledTable: FC<StyledTableProps> = ({
     [columnSizingInfo.isResizingColumn, headerState],
   );
 
-  // TODO: 渲染逻辑优化
-  // 1. renderContent函数过长（约300行），需要拆分
-  // 2. 提取Header和Body的渲染为独立组件
-  // 3. 减少重复代码（pinned cells和virtual cells的渲染逻辑相似）
+  // TODO: Rendering logic optimization
+  // 1. renderContent function is too long (~300 lines), needs splitting
+  // 2. Extract Header and Body rendering as independent components
+  // 3. Reduce duplicate code (pinned cells and virtual cells have similar rendering logic)
   const renderContent = useCallback(
     ({
       columnVirtualizer,
@@ -656,7 +658,7 @@ export const StyledTable: FC<StyledTableProps> = ({
             />
           )}
 
-          <StyledTableHead scrolled={scrolled ?? false}>
+          <StyledTableHead isScrolled={isScrolled ?? false}>
             {columnSizingInfo.isResizingColumn && (
               <div
                 style={{
@@ -686,9 +688,10 @@ export const StyledTable: FC<StyledTableProps> = ({
                   if (!header) {
                     return null;
                   }
+                  const isSelectCol = col.id === SYSTEM_COLUMN_SELECT;
                   return (
                     <StyledTableHeadCell
-                      enableResizing={col.id !== SYSTEM_COLUMN_SELECT}
+                      canResize={!isSelectCol}
                       header={header}
                       isActive={
                         headerState?.columnId === header.id &&
@@ -701,14 +704,14 @@ export const StyledTable: FC<StyledTableProps> = ({
                       isPinned
                       key={header.id}
                       onClick={
-                        col.id !== SYSTEM_COLUMN_SELECT
+                        !isSelectCol
                           ? (e) => {
                               onHeaderClick(e, header.id);
                             }
                           : undefined
                       }
                       onContextMenu={
-                        col.id !== SYSTEM_COLUMN_SELECT
+                        !isSelectCol
                           ? (e) => onHeaderRightClick(e, col.id)
                           : undefined
                       }
@@ -718,11 +721,18 @@ export const StyledTable: FC<StyledTableProps> = ({
                           newName,
                         )
                       }
-                      showPinnedRightShadow={
+                      shouldShowPinnedRightShadow={
                         index === leftPinnedColumns.length - 1
                       }
                       stickyLeft={stickyLeftMap[col.id] ?? 0}
                       width={header.getSize()}
+                      // Select column checkbox props (bypass TanStack column caching)
+                      {...(isSelectCol && {
+                        isAllRowsSelected: table.getIsAllPageRowsSelected(),
+                        isSomeRowsSelected: table.getIsSomePageRowsSelected(),
+                        onToggleAllRows:
+                          table.getToggleAllPageRowsSelectedHandler(),
+                      })}
                     />
                   );
                 })}
@@ -778,7 +788,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                 ) : null}
 
                 <StyledTableHeadCell
-                  enableResizing={false}
+                  canResize={false}
                   onClick={(e) => {
                     setHeaderMenuAnchor(null);
                     setAddMenuAnchor(e.currentTarget);
@@ -823,7 +833,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                         isPinned
                         key={cell.id}
                         onCellClick={onCellClick}
-                        showPinnedRightShadow={
+                        shouldShowPinnedRightShadow={
                           index === leftPinnedColumns.length - 1
                         }
                         stickyLeft={stickyLeftMap[col.id] ?? 0}
@@ -884,7 +894,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       columnSizingInfo.isResizingColumn,
       columnSizingInfo.startOffset,
       columnSizingInfo.deltaOffset,
-      scrolled,
+      isScrolled,
       table,
       leftPinnedColumns,
       headerState?.columnId,

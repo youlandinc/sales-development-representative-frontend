@@ -81,6 +81,8 @@ export interface DirectoriesQueryItem {
 
   // ========== API Integration ==========
   url: string | null; // if url exists, fetch options from API
+  requestParams: string[] | null;
+  cascadeKey: string | null;
 
   // ========== Nested Structure ==========
   children: DirectoriesQueryItem[] | null; // sub-components

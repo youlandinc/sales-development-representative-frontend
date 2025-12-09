@@ -8,12 +8,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box, Icon, InputBase, Stack } from '@mui/material';
+import { Box, Checkbox, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
 
 import { StyledTableAiIcon } from './index';
 
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
+import { UTypeOf } from '@/utils';
 import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
 
 interface StyledTableHeadCellProps {
@@ -27,11 +28,15 @@ interface StyledTableHeadCellProps {
   onClick?: (e: MouseEvent<HTMLElement>) => void;
   onDoubleClick?: (e: MouseEvent<HTMLElement>) => void;
   onContextMenu?: (e: MouseEvent<HTMLElement>) => void;
-  enableResizing?: boolean;
+  canResize?: boolean;
   isActive?: boolean;
   isEditing?: boolean;
   onEditSave?: (newName: string) => void;
-  showPinnedRightShadow?: boolean;
+  shouldShowPinnedRightShadow?: boolean;
+  // Select column checkbox props (passed directly to bypass TanStack column caching)
+  isAllRowsSelected?: boolean;
+  isSomeRowsSelected?: boolean;
+  onToggleAllRows?: (event: unknown) => void;
 }
 
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
@@ -45,15 +50,19 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   onClick,
   onDoubleClick,
   onContextMenu,
-  enableResizing,
+  canResize,
   isActive = false,
   isEditing = false,
   onEditSave,
-  showPinnedRightShadow,
+  shouldShowPinnedRightShadow,
+  isAllRowsSelected,
+  isSomeRowsSelected,
+  onToggleAllRows,
 }) => {
   const [localEditValue, setLocalEditValue] = useState<string>('');
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const originalValueRef = useRef<string>('');
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
   const isSelectColumn = header?.column?.id === SYSTEM_COLUMN_SELECT;
@@ -62,15 +71,29 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   const columnMeta = header?.column?.columnDef?.meta as
     | TableColumnMeta
     | undefined;
-  const { actionKey, isAiColumn = false, actionDefinition } = columnMeta || {};
+  const { isAiColumn = false, actionDefinition } = columnMeta || {};
 
-  const content = header
-    ? flexRender(header.column.columnDef.header, header.getContext())
-    : children;
+  // For select column, render Checkbox directly (bypass TanStack column caching)
+  const content =
+    isSelectColumn && onToggleAllRows ? (
+      <Checkbox
+        checked={isAllRowsSelected}
+        indeterminate={isSomeRowsSelected}
+        onChange={onToggleAllRows}
+        onClick={(e) => e.stopPropagation()}
+        size="small"
+        sx={{ p: 0 }}
+      />
+    ) : header ? (
+      flexRender(header.column.columnDef.header, header.getContext())
+    ) : (
+      children
+    );
 
   useEffect(() => {
     if (isEditing) {
-      const initialValue = typeof content === 'string' ? content : '';
+      const initialValue = UTypeOf.isString(content) ? content : '';
+      originalValueRef.current = initialValue;
       setLocalEditValue(initialValue);
       setTimeout(() => {
         if (inputRef.current) {
@@ -79,34 +102,36 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         }
       }, 0);
     }
-  }, [isEditing, content]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing]);
 
-  const handleEditSave = useCallback(() => {
-    if (localEditValue.trim() && localEditValue !== content) {
-      onEditSave?.(localEditValue.trim());
+  const saveEdit = useCallback(() => {
+    const trimmedValue = localEditValue.trim();
+    if (trimmedValue && trimmedValue !== originalValueRef.current) {
+      onEditSave?.(trimmedValue);
     } else {
       tableMeta?.stopHeaderEdit?.();
     }
-  }, [localEditValue, content, onEditSave, tableMeta]);
+  }, [localEditValue, onEditSave, tableMeta]);
 
-  const handleEditCancel = useCallback(() => {
+  const cancelEdit = useCallback(() => {
     tableMeta?.stopHeaderEdit?.();
   }, [tableMeta]);
 
-  const handleKeyDown = useCallback(
+  const onInputKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        handleEditSave();
+        saveEdit();
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        handleEditCancel();
+        cancelEdit();
       }
     },
-    [handleEditSave, handleEditCancel],
+    [saveEdit, cancelEdit],
   );
 
-  const handleAiIconClick = useCallback(
+  const onAiIconClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       e.preventDefault();
@@ -130,8 +155,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={isSelectColumn ? undefined : () => setIsHovered(true)}
+      onMouseLeave={isSelectColumn ? undefined : () => setIsHovered(false)}
       ref={measureRef}
       sx={{
         userSelect: 'none',
@@ -140,7 +165,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         maxWidth: width,
         boxSizing: 'border-box',
         borderRight:
-          isPinned && showPinnedRightShadow && !isSelectColumn
+          isPinned && shouldShowPinnedRightShadow && !isSelectColumn
             ? 'none'
             : '0.5px solid #DFDEE6',
         bgcolor: isActive ? '#F4F5F9' : '#FFFFFF',
@@ -149,7 +174,11 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
         '&:hover': {
-          bgcolor: !isEditing ? '#F4F5F9' : '#F6F6F6',
+          bgcolor: isSelectColumn
+            ? undefined
+            : !isEditing
+              ? '#F4F5F9'
+              : '#F6F6F6',
         },
         height: '36px',
         justifyContent: 'center',
@@ -166,7 +195,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           whiteSpace: 'nowrap',
           minWidth: 0,
           width:
-            isPinned && showPinnedRightShadow && isEditing
+            isPinned && shouldShowPinnedRightShadow && isEditing
               ? 'calc(100% - 3px)'
               : '100%',
           px: 1.5,
@@ -182,7 +211,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             inputProps={{
               ref: inputRef,
             }}
-            onBlur={handleEditSave}
+            onBlur={saveEdit}
             onChange={(e) => setLocalEditValue(e.target.value)}
             onClick={(e) => {
               e.stopPropagation();
@@ -192,7 +221,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               e.stopPropagation();
               e.preventDefault();
             }}
-            onKeyDown={handleKeyDown}
+            onKeyDown={onInputKeyDown}
             onMouseDown={(e) => {
               e.stopPropagation();
             }}
@@ -244,13 +273,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         {!isEditing && isAiColumn && (
           <StyledTableAiIcon
             backgroundColor={headerBackgroundColor}
-            onClick={handleAiIconClick}
+            onClick={onAiIconClick}
           />
         )}
       </Box>
 
       {header &&
-        enableResizing !== false &&
+        canResize !== false &&
         header.column.getCanResize?.() !== false && (
           <Stack
             onMouseDown={(e) => {
@@ -278,7 +307,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               backgroundColor: 'transparent',
               pointerEvents: 'auto',
               borderRight:
-                isPinned && showPinnedRightShadow
+                isPinned && shouldShowPinnedRightShadow
                   ? '3px solid #DFDEE6'
                   : '2px solid transparent',
               transition: 'all 0.2s ease',
@@ -288,7 +317,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               '&:active': {
                 backgroundColor: 'transparent',
                 borderRight:
-                  isPinned && showPinnedRightShadow
+                  isPinned && shouldShowPinnedRightShadow
                     ? '3px solid #DFDEE6'
                     : 'transparent',
               },

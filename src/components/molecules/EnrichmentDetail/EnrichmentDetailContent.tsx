@@ -1,6 +1,8 @@
 import { FC, useState } from 'react';
 import { Stack } from '@mui/material';
 
+import { useShallow } from 'zustand/react/shallow';
+
 import {
   ActiveTypeEnum,
   useProspectTableStore,
@@ -53,16 +55,43 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     updateColumnType,
     updateColumnVisible,
     updateColumnWidth,
-  } = useProspectTableStore((store) => store);
+  } = useProspectTableStore(
+    useShallow((store) => ({
+      addColumn: store.addColumn,
+      closeDialog: store.closeDialog,
+      columns: store.columns,
+      dialogType: store.dialogType,
+      dialogVisible: store.dialogVisible,
+      fieldGroupMap: store.fieldGroupMap,
+      openDialog: store.openDialog,
+      rowIds: store.rowIds,
+      setActiveColumnId: store.setActiveColumnId,
+      setRowIds: store.setRowIds,
+      updateColumnName: store.updateColumnName,
+      updateColumnPin: store.updateColumnPin,
+      updateColumnType: store.updateColumnType,
+      updateColumnVisible: store.updateColumnVisible,
+      updateColumnWidth: store.updateColumnWidth,
+    })),
+  );
 
   const {
     setWebResearchVisible,
     setSchemaJson,
     setPrompt,
     setGenerateDescription,
-  } = useWebResearchStore((store) => store);
+  } = useWebResearchStore(
+    useShallow((store) => ({
+      setWebResearchVisible: store.setWebResearchVisible,
+      setSchemaJson: store.setSchemaJson,
+      setPrompt: store.setPrompt,
+      setGenerateDescription: store.setGenerateDescription,
+    })),
+  );
 
-  const handleEditClick = useWorkEmailStore((store) => store.handleEditClick);
+  const onClickToEditWorkEmail = useWorkEmailStore(
+    (store) => store.handleEditClick,
+  );
 
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
 
@@ -71,7 +100,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     fullData,
     aiLoadingState,
     scrollContainerRef,
-    scrolled,
+    isScrolled,
     onVisibleRangeChange,
     onAiProcess,
     onCellEdit,
@@ -87,8 +116,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
         tableId,
         rowCounts: count,
       });
-
-      console.log('Created rows:', data);
 
       if (data && data.length > 0) {
         // Add new record IDs to the end of the existing rowIds
@@ -113,8 +140,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
       });
 
       if (newColumn) {
-        console.log('Column added:', newColumn);
-
         // If it's an AI column, initialize it
         if (newColumn.actionKey === 'use-ai') {
           await onInitializeAiColumns();
@@ -156,6 +181,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           aiLoading={aiLoadingState}
           columns={columns}
           data={fullData}
+          isScrolled={isScrolled}
           onAddMenuItemClick={(item) => {
             // AI Agent opens configuration dialog
             if (item.value === TableColumnMenuActionEnum.ai_agent) {
@@ -174,7 +200,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           }}
           onAddRows={onClickToAddRows}
           onAiProcess={onAiProcess}
-          onCellClick={(columnId, rowId, data) => {
+          onCellClick={(columnId, _rowId, data) => {
             if (data.original?.[columnId]?.externalContent) {
               setActiveColumnId(columnId);
               setActiveCell(data.original?.[columnId]?.externalContent || {});
@@ -204,7 +230,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                 const column = columns.find((col) => col.fieldId === columnId);
                 // Work Email configuration
                 if (column?.groupId && fieldGroupMap) {
-                  handleEditClick(columnId);
+                  onClickToEditWorkEmail(columnId);
                   return;
                 }
                 // AI column configuration
@@ -224,7 +250,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                   setWebResearchVisible(true, ActiveTypeEnum.edit);
                   return;
                 }
-                //common edit column
+                // common edit column
                 openDialog(TableColumnMenuActionEnum.edit_column);
 
                 break;
@@ -296,7 +322,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           }}
           onRunAi={onRunAi}
           rowIds={rowIds}
-          scrolled={scrolled}
           virtualization={{
             enabled: true,
             rowHeight: ROW_HEIGHT,
