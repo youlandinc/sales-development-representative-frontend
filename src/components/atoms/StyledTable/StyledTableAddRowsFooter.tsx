@@ -25,7 +25,7 @@ export const StyledTableAddRowsFooter: FC<StyledTableAddRowsFooterProps> = ({
   const [isAddingRows, setIsAddingRows] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const open = Boolean(anchorEl);
+  const isOpen = Boolean(anchorEl);
 
   const onClickToOpenPopper = (event: MouseEvent<HTMLElement>) => {
     if (!disabled) {
@@ -79,7 +79,7 @@ export const StyledTableAddRowsFooter: FC<StyledTableAddRowsFooterProps> = ({
 
       <Popper
         anchorEl={anchorEl}
-        open={open}
+        open={isOpen}
         placement="bottom-start"
         sx={{
           zIndex: 100,

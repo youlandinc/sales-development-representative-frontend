@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import useSWR from 'swr';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
 import { useTableWebSocket } from './useTableWebSocket';
@@ -32,7 +33,7 @@ interface UseProspectTableReturn {
   isMetadataLoading: boolean;
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   rowsMapRef: RefObject<Record<string, any>>;
-  scrolled: boolean;
+  isScrolled: boolean;
   setAiLoadingState: Dispatch<
     SetStateAction<Record<string, Record<string, boolean>>>
   >;
@@ -49,10 +50,10 @@ interface UseProspectTableReturn {
   refetchCachedRecords: () => Promise<void>;
 }
 
-// TODO: Hook优化
-// 1. Hook职责过重，承担了太多功能
-// 2. 考虑拆分为多个更小的hooks: useTableData, useAiProcessing, useVirtualization
-// 3. 状态管理可以优化为更清晰的结构
+// TODO: Hook optimization
+// 1. Hook has too many responsibilities
+// 2. Consider splitting into smaller hooks: useTableData, useAiProcessing, useVirtualization
+// 3. State management can be optimized for clearer structure
 export const useProspectTable = ({
   tableId,
 }: UseProspectTableParams): UseProspectTableReturn => {
@@ -64,14 +65,26 @@ export const useProspectTable = ({
     runRecords,
     resetTable,
     updateCellValue,
-  } = useProspectTableStore((store) => store);
+  } = useProspectTableStore(
+    useShallow((store) => ({
+      fetchTable: store.fetchTable,
+      fetchRowIds: store.fetchRowIds,
+      columns: store.columns,
+      rowIds: store.rowIds,
+      runRecords: store.runRecords,
+      resetTable: store.resetTable,
+      updateCellValue: store.updateCellValue,
+    })),
+  );
   const { runAi } = useRunAi();
-  const { fetchIntegrationMenus } = useWorkEmailStore((store) => store);
+  const fetchIntegrationMenus = useWorkEmailStore(
+    (store) => store.fetchIntegrationMenus,
+  );
 
-  // TODO: 状态管理优化
-  // 1. 同时使用ref和state维护rowsMap，容易造成不一致
-  // 2. 过多的useRef可能表明状态设计有问题
-  // 3. 考虑使用zustand或其他状态管理方案
+  // TODO: State management optimization
+  // 1. Using both ref and state to maintain rowsMap can cause inconsistencies
+  // 2. Too many useRefs may indicate state design issues
+  // 3. Consider using zustand or other state management solutions
   // State management
   const rowsMapRef = useRef<Record<string, any>>({});
   const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
@@ -81,7 +94,7 @@ export const useProspectTable = ({
   const isFetchingRef = useRef(false);
   const maxLoadedIndexRef = useRef(-1);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const [scrolled, setScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const lastVisibleRangeRef = useRef<{ start: number; end: number } | null>(
     null,
   );
@@ -97,7 +110,7 @@ export const useProspectTable = ({
     },
   );
 
-  // Compute AI column IDs (包括 dependentFieldId)
+  // Compute AI column IDs (including dependentFieldId)
   const aiColumnIds = useMemo(() => {
     return new Set(columns.filter(checkIsAiColumn).map((col) => col.fieldId));
   }, [columns]);
@@ -198,10 +211,10 @@ export const useProspectTable = ({
     maxLoadedIndexRef,
   });
 
-  // TODO: 数据加载优化
-  // 1. 批量加载逻辑可以提取为独立的hook
-  // 2. 考虑添加错误处理和重试机制
-  // 3. 加载状态管理可以更细粒度
+  // TODO: Data loading optimization
+  // 1. Batch loading logic can be extracted into a separate hook
+  // 2. Consider adding error handling and retry mechanisms
+  // 3. Loading state management can be more fine-grained
   // Fetch batch data
   const fetchBatchData = useCallback(
     async (startIndex: number, endIndex: number) => {
@@ -400,10 +413,10 @@ export const useProspectTable = ({
     [fetchBatchData, total, rowIds],
   );
 
-  // TODO: AI处理逻辑优化
-  // 1. onAiProcess逻辑复杂，包含多个条件判断
-  // 2. 可以拆分为更小的辅助函数
-  // 3. AI loading状态管理可以更清晰
+  // TODO: AI processing logic optimization
+  // 1. onAiProcess logic is complex with multiple conditional checks
+  // 2. Can be split into smaller helper functions
+  // 3. AI loading state management can be clearer
   // Handle AI process
   const onAiProcess = useCallback(
     (recordId: string, columnId: string) => {
@@ -458,12 +471,12 @@ export const useProspectTable = ({
         return;
       }
 
-      // 设置当前列的 loading 状态
+      // Set loading state for current column
       const loadingUpdates: Record<string, boolean> = {
         [columnId]: true,
       };
 
-      // 如果该列有 dependentFieldId，也设置其 loading 状态
+      // If column has dependentFieldId, also set its loading state
       const column = columns.find((col) => col.fieldId === columnId);
       if (column?.dependentFieldId) {
         loadingUpdates[column.dependentFieldId] = true;
@@ -519,7 +532,7 @@ export const useProspectTable = ({
   const handleScroll = useCallback(() => {
     if (scrollContainerRef.current) {
       const scrollTop = scrollContainerRef.current.scrollTop;
-      setScrolled(scrollTop > 0);
+      setIsScrolled(scrollTop > 0);
     }
   }, []);
 
@@ -672,10 +685,10 @@ export const useProspectTable = ({
     setAiLoadingState(newLoadingState);
   }, [tableId, fetchTable, aiColumnIds, rowIds, columns, onUpdateRowData]);
 
-  // TODO: AI运行优化
-  // 1. onRunAi函数包含太多if-else分支
-  // 2. 参数类型可以更明确（使用discriminated union）
-  // 3. 错误处理需要增强
+  // TODO: AI run optimization
+  // 1. onRunAi function contains too many if-else branches
+  // 2. Parameter types can be more explicit (use discriminated union)
+  // 3. Error handling needs enhancement
   const onRunAi = useCallback(
     async (params: {
       fieldId: string;
@@ -763,7 +776,7 @@ export const useProspectTable = ({
     isMetadataLoading,
     scrollContainerRef,
     rowsMapRef,
-    scrolled,
+    isScrolled,
     setAiLoadingState,
     onVisibleRangeChange,
     onAiProcess,
