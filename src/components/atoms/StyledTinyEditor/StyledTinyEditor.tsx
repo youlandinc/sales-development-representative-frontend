@@ -62,7 +62,7 @@ export const StyledTinyEditor: FC<StyledTinyEditorProps> = ({
           borderColor: '#D0CEDA !important',
         },
         '& .tox .tox-edit-area::before': {
-          borderColor: `${theme.palette.text.default} !important`,
+          borderColor: `${theme.palette.text.primary} !important`,
         },
       })}
     >
