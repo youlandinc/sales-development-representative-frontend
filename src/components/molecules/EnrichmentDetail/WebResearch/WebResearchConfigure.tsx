@@ -237,6 +237,11 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         </Typography>
         <PromptEditor
           defaultValue={defaultValue}
+          editorSx={{
+            border: '1px solid #ccc',
+            borderRadius: 2,
+            p: 2,
+          }}
           handleGenerate={handleGenerate}
           minHeight={200}
           onEditorReady={handleEditorReady}

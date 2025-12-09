@@ -1,6 +1,5 @@
 import {
   Box,
-  Drawer,
   Icon,
   Menu,
   MenuItem,
@@ -12,6 +11,7 @@ import {
 } from '@mui/material';
 import { DocumentType } from '@tiptap/core';
 import { FC, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { SDRToast, StyledButton, StyledCost } from '@/components/atoms';
 import {
@@ -34,10 +34,12 @@ import { columnRun, updateWebResearchConfig } from '@/request';
 import { HttpError } from '@/types';
 import { extractPromptText } from '@/utils';
 
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+
 import CloseIcon from '@mui/icons-material/Close';
 import ICON_ARROW from '../assets/dialog/icon_arrow.svg';
 import ICON_ARROW_DOWN from '../assets/dialog/icon_arrow_down.svg';
-import ICON_SPARK from '../assets/dialog/icon_sparkle.svg';
+import ICON_SPARK_BLACK from '../assets/dialog/icon_sparkle_fill.svg';
 
 type DialogWebResearchProps = {
   cb?: () => Promise<void>;
@@ -48,9 +50,16 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   tableId,
   cb,
 }) => {
-  const { columns, rowIds, activeColumnId } = useProspectTableStore(
-    (store) => store,
-  );
+  const { columns, rowIds, activeColumnId, openDialog, closeDialog } =
+    useProspectTableStore(
+      useShallow((state) => ({
+        columns: state.columns,
+        rowIds: state.rowIds,
+        activeColumnId: state.activeColumnId,
+        openDialog: state.openDialog,
+        closeDialog: state.closeDialog,
+      })),
+    );
   const [tab, setTab] = useState<'generate' | 'configure'>('generate');
   const [text, setText] = useState('');
   const [schemaStr, setSchemaStr] = useState('');
@@ -60,8 +69,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   const {
     activeType,
     setPrompt,
-    webResearchVisible,
-    setWebResearchVisible,
     schemaJson,
     setSchemaJson,
     allClear,
@@ -96,10 +103,15 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   );
 
   const handleClose = () => {
-    setWebResearchVisible(false, activeType);
     setTab('generate');
     allClear();
     setAnchorEl(null);
+    closeDialog();
+  };
+
+  const handleBack = () => {
+    handleClose();
+    openDialog(TableColumnMenuActionEnum.actions_overview);
   };
 
   const handleGenerate = async () => {
@@ -261,220 +273,210 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   );
 
   return (
-    <Drawer
-      anchor={'right'}
-      hideBackdrop
-      open={webResearchVisible}
-      sx={{
-        left: 'unset',
-      }}
-    >
-      <Stack gap={4} height={'100%'} justifyContent={'space-between'}>
-        {/* header */}
-        <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>
-          <Icon
-            component={ICON_ARROW}
-            onClick={handleClose}
-            sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
+    <Stack gap={4} height={'100%'} justifyContent={'space-between'}>
+      {/* header */}
+      <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>
+        <Icon
+          component={ICON_ARROW}
+          onClick={handleBack}
+          sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
+        />
+        <Icon
+          component={ICON_SPARK_BLACK}
+          sx={{ width: 20, height: 20, mr: 0.5 }}
+        />
+        <Typography fontWeight={600}>Atlas Intelligence Agent</Typography>
+        <CloseIcon
+          onClick={handleClose}
+          sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
+        />
+      </Stack>
+      {/* content */}
+      <Stack
+        flex={1}
+        maxWidth={500}
+        minHeight={0}
+        overflow={'auto'}
+        px={3}
+        width={500}
+      >
+        <Box display={isLoading ? 'block' : 'none'}>
+          <SculptingPrompt
+            isLoading={isThinking}
+            prompt={text}
+            schemaJsonStr={schemaStr}
           />
-          <Icon
-            component={ICON_SPARK}
-            sx={{ width: 20, height: 20, mr: 0.5 }}
-          />
-          <Typography>Al web researcher</Typography>
-          <CloseIcon
-            onClick={handleClose}
-            sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
-          />
-        </Stack>
-        {/* content */}
-        <Stack
-          flex={1}
-          maxWidth={500}
-          minHeight={0}
-          overflow={'auto'}
-          px={3}
-          width={500}
-        >
-          <Box display={isLoading ? 'block' : 'none'}>
-            <SculptingPrompt
-              isLoading={isThinking}
-              prompt={text}
-              schemaJsonStr={schemaStr}
-            />
-          </Box>
+        </Box>
 
-          <Stack display={isLoading ? 'none' : 'flex'} gap={3}>
-            <Stack gap={4}>
-              <ToggleButtonGroup
-                color={'primary'}
-                exclusive
-                onChange={(e, value) => {
-                  setTab(value);
+        <Stack display={isLoading ? 'none' : 'flex'} gap={3}>
+          <Stack gap={4}>
+            <ToggleButtonGroup
+              color={'primary'}
+              exclusive
+              onChange={(e, value) => {
+                setTab(value);
+              }}
+              translate={'no'}
+              value={tab}
+            >
+              <ToggleButton
+                fullWidth
+                sx={{
+                  fontSize: 14,
+                  textTransform: 'none',
+                  lineHeight: 1.2,
+                  py: 1,
+                  fontWeight: 600,
+                  borderRadius: '8px 0 0 8px',
                 }}
-                translate={'no'}
-                value={tab}
+                value={'generate'}
               >
-                <ToggleButton
-                  fullWidth
-                  sx={{
-                    fontSize: 14,
-                    textTransform: 'none',
-                    lineHeight: 1.2,
-                    py: 1,
-                    fontWeight: 600,
-                    borderRadius: '8px 0 0 8px',
-                  }}
-                  value={'generate'}
-                >
-                  Generate
-                </ToggleButton>
-                <ToggleButton
-                  fullWidth
-                  sx={{
-                    fontSize: 14,
-                    textTransform: 'none',
-                    lineHeight: 1.2,
-                    py: 1,
-                    fontWeight: 600,
-                    borderRadius: '0 8px 8px 0',
-                  }}
-                  value={'configure'}
-                >
-                  Configure
-                </ToggleButton>
-              </ToggleButtonGroup>
+                Overview
+              </ToggleButton>
+              <ToggleButton
+                fullWidth
+                sx={{
+                  fontSize: 14,
+                  textTransform: 'none',
+                  lineHeight: 1.2,
+                  py: 1,
+                  fontWeight: 600,
+                  borderRadius: '0 8px 8px 0',
+                }}
+                value={'configure'}
+              >
+                Configure
+              </ToggleButton>
+            </ToggleButtonGroup>
 
-              <Box
-                display={tab === 'generate' ? 'block' : 'none'}
-                sx={{
-                  transition: 'all .3s',
-                }}
-              >
-                <WebResearchGenerate
-                  handleGeneratePrompt={handleGenerate}
-                  isLoading={isLoading}
-                />
-              </Box>
-              <Box
-                display={tab === 'configure' ? 'block' : 'none'}
-                sx={{
-                  transition: 'all .3s',
-                }}
-              >
-                <WebResearchConfigure handleGenerate={handleGenerate} />
-              </Box>
-            </Stack>
+            <Box
+              display={tab === 'generate' ? 'block' : 'none'}
+              sx={{
+                transition: 'all .3s',
+              }}
+            >
+              <WebResearchGenerate
+                handleGeneratePrompt={handleGenerate}
+                isLoading={isLoading}
+              />
+            </Box>
+            <Box
+              display={tab === 'configure' ? 'block' : 'none'}
+              sx={{
+                transition: 'all .3s',
+              }}
+            >
+              <WebResearchConfigure handleGenerate={handleGenerate} />
+            </Box>
           </Stack>
         </Stack>
-        {/* footer */}
-        <Stack
-          alignItems={'center'}
-          borderTop={' 1px solid   #D0CEDA'}
-          flexDirection={'row'}
-          gap={1}
-          justifyContent={'flex-end'}
-          px={3}
-          py={1.5}
+      </Stack>
+      {/* footer */}
+      <Stack
+        alignItems={'center'}
+        borderTop={' 1px solid   #D0CEDA'}
+        flexDirection={'row'}
+        gap={1}
+        justifyContent={'flex-end'}
+        px={3}
+        py={1.5}
+      >
+        <StyledCost
+          border={'1px solid #D0CEDA'}
+          count={`${COINS_PER_ROW}`}
+          textColor={'text.secondary'}
+        />
+        <StyledButton
+          endIcon={
+            <Icon
+              component={ICON_ARROW_DOWN}
+              sx={{ width: 12, height: 12, '& path': { fill: '#fff' } }}
+            />
+          }
+          loading={
+            state.loading || saveAndRunState.loading || updateState.loading
+          }
+          onClick={(e) => {
+            setAnchorEl(e.currentTarget);
+          }}
+          size={'medium'}
+          sx={{ height: '40px !important', width: 80 }}
+          variant={'contained'}
         >
-          <StyledCost
-            border={'1px solid #D0CEDA'}
-            count={`${COINS_PER_ROW}`}
-            textColor={'text.secondary'}
-          />
-          <StyledButton
-            endIcon={
-              <Icon
-                component={ICON_ARROW_DOWN}
-                sx={{ width: 12, height: 12, '& path': { fill: '#fff' } }}
-              />
-            }
-            loading={
-              state.loading || saveAndRunState.loading || updateState.loading
-            }
-            onClick={(e) => {
-              setAnchorEl(e.currentTarget);
-            }}
-            size={'medium'}
-            sx={{ height: '40px !important', width: 80 }}
-            variant={'contained'}
-          >
-            Save
-          </StyledButton>
-          <Menu
-            anchorEl={anchorEl}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            onClose={() => {
-              setAnchorEl(null);
-            }}
-            open={Boolean(anchorEl)}
-            slotProps={{
-              list: {
-                sx: {
-                  p: 0,
-                  width: 400,
-                  [`& .${menuItemClasses.root}`]: {
-                    justifyContent: 'space-between',
-                  },
+          Save
+        </StyledButton>
+        <Menu
+          anchorEl={anchorEl}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          onClose={() => {
+            setAnchorEl(null);
+          }}
+          open={Boolean(anchorEl)}
+          slotProps={{
+            list: {
+              sx: {
+                p: 0,
+                width: 400,
+                [`& .${menuItemClasses.root}`]: {
+                  justifyContent: 'space-between',
                 },
               },
-            }}
-          >
-            {rowIds.length > 10 && (
-              <MenuItem
-                onClick={() => {
-                  saveAndRun(tableId, 10);
-                }}
-              >
-                <Typography color={'text.secondary'} variant={'body2'}>
-                  Save and run 10 rows
-                </Typography>
-                <StyledCost
-                  border={'1px solid #D0CEDA'}
-                  count={`~${COINS_PER_ROW * 10}`}
-                  textColor={'text.secondary'}
-                />
-              </MenuItem>
-            )}
+            },
+          }}
+        >
+          {rowIds.length > 10 && (
             <MenuItem
               onClick={() => {
-                saveAndRun(tableId, rowIds.length);
+                saveAndRun(tableId, 10);
               }}
             >
               <Typography color={'text.secondary'} variant={'body2'}>
-                Save and run {rowIds.length} rows in this view
+                Save and run 10 rows
               </Typography>
               <StyledCost
                 border={'1px solid #D0CEDA'}
-                count={'~20'}
+                count={`~${COINS_PER_ROW * 10}`}
                 textColor={'text.secondary'}
               />
             </MenuItem>
-            <MenuItem
-              onClick={async () => {
-                try {
-                  if (activeType === ActiveTypeEnum.add) {
-                    await saveDoNotRun(tableId);
-                  }
-                  if (activeType === ActiveTypeEnum.edit) {
-                    await updateAiConfig(tableId);
-                  }
-                  await cb?.();
-                  handleClose();
-                } catch (err) {
-                  const { header, message, variant } = err as HttpError;
-                  SDRToast({ message, header, variant });
+          )}
+          <MenuItem
+            onClick={() => {
+              saveAndRun(tableId, rowIds.length);
+            }}
+          >
+            <Typography color={'text.secondary'} variant={'body2'}>
+              Save and run {rowIds.length} rows in this view
+            </Typography>
+            <StyledCost
+              border={'1px solid #D0CEDA'}
+              count={'~20'}
+              textColor={'text.secondary'}
+            />
+          </MenuItem>
+          <MenuItem
+            onClick={async () => {
+              try {
+                if (activeType === ActiveTypeEnum.add) {
+                  await saveDoNotRun(tableId);
                 }
-              }}
-            >
-              <Typography color={'text.secondary'} variant={'body2'}>
-                Save and don&#39;t run
-              </Typography>
-            </MenuItem>
-          </Menu>
-        </Stack>
+                if (activeType === ActiveTypeEnum.edit) {
+                  await updateAiConfig(tableId);
+                }
+                await cb?.();
+                handleClose();
+              } catch (err) {
+                const { header, message, variant } = err as HttpError;
+                SDRToast({ message, header, variant });
+              }
+            }}
+          >
+            <Typography color={'text.secondary'} variant={'body2'}>
+              Save and don&#39;t run
+            </Typography>
+          </MenuItem>
+        </Menu>
       </Stack>
-      {/* <FieldDescription /> */}
-    </Drawer>
+    </Stack>
   );
 };

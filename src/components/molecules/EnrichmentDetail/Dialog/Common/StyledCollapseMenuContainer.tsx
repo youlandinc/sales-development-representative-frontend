@@ -1,4 +1,4 @@
-import { ElementType, FC, PropsWithChildren } from 'react';
+import { ElementType, FC, PropsWithChildren, ReactNode } from 'react';
 import { Collapse, Icon, Stack, Typography } from '@mui/material';
 
 import { useSwitch } from '@/hooks';
@@ -7,15 +7,16 @@ import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/ic
 
 interface StyledCollapseMenuContainerProps {
   icon?: ElementType;
-  title: string;
+  title: ReactNode;
+  gap?: number;
 }
 export const StyledCollapseMenuContainer: FC<
   PropsWithChildren<StyledCollapseMenuContainerProps>
-> = ({ children, icon, title }) => {
+> = ({ children, icon, title, gap = 1.5 }) => {
   const { visible, toggle } = useSwitch(true);
 
   return (
-    <Stack gap={visible ? 1.5 : 0} sx={{ transition: 'all .3s' }}>
+    <Stack gap={visible ? gap : 0} sx={{ transition: 'all .3s' }}>
       <Stack
         alignItems={'center'}
         flexDirection={'row'}
@@ -33,7 +34,12 @@ export const StyledCollapseMenuContainer: FC<
           justifyContent={'space-between'}
         >
           {icon && <Icon component={icon} sx={{ width: 20, height: 20 }} />}
-          <Typography fontSize={14} lineHeight={1.2}>
+          <Typography
+            component={'div'}
+            fontSize={14}
+            fontWeight={600}
+            lineHeight={1.2}
+          >
             {title}
           </Typography>
         </Stack>

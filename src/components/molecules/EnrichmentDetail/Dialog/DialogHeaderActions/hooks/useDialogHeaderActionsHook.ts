@@ -10,6 +10,7 @@ import ICON_SUGGESTIONS from '@/components/molecules/EnrichmentDetail/assets/dia
 import ICON_AI from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle.svg';
 
 import { ActiveTypeEnum } from '@/types';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 export const useDialogHeaderActionsHook = () => {
   const closeDialog = useProspectTableStore((store) => store.closeDialog);
@@ -37,6 +38,7 @@ export const useDialogHeaderActionsHook = () => {
   const setWebResearchVisible = useWebResearchStore(
     (state) => state.setWebResearchVisible,
   );
+  const openDialog = useProspectTableStore((state) => state.openDialog);
 
   const [value, setValue] = useState<'Enrichments' | 'Campaign'>('Enrichments');
 
@@ -104,8 +106,9 @@ export const useDialogHeaderActionsHook = () => {
     children: integrationMenus.map((item) => ({
       ...item,
       onClick: () => {
-        handleClose();
-        setWorkEmailVisible(true);
+        // handleClose();
+        // setWorkEmailVisible(true);
+        openDialog(TableColumnMenuActionEnum.work_email);
         setDialogHeaderName(item.name);
         setWaterfallDescription(item.description);
         setActiveType(ActiveTypeEnum.add);

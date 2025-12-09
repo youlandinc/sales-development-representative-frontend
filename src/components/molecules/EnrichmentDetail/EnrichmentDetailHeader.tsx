@@ -124,7 +124,7 @@ export const EnrichmentDetailHeader: FC<EnrichmentDetailHeaderProps> = ({
           <StyledButton
             onClick={() => {
               setAiTableInfo({ tableId, mappings: [] });
-              openDialog(TableColumnMenuActionEnum.header_actions);
+              openDialog(TableColumnMenuActionEnum.actions_overview);
             }}
             size={'medium'}
             variant={'contained'}

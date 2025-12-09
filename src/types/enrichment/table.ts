@@ -33,6 +33,9 @@ export enum TableColumnMenuActionEnum {
   insert_column_left = 'INSERT_COLUMN_LEFT',
   insert_column_right = 'INSERT_COLUMN_RIGHT',
   change_column_type = 'CHANGE_COLUMN_TYPE',
+  actions_overview = 'ACTIONS_OVERVIEW',
+  work_email = 'WORK_EMAIL',
+  web_research = 'WEB_RESEARCH',
 }
 
 export enum TableCellConfidenceEnum {

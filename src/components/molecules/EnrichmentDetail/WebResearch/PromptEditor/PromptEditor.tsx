@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Icon, Stack, Typography } from '@mui/material';
+import { Box, Icon, Stack, SxProps, Typography } from '@mui/material';
 import { Content, Editor } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
@@ -25,14 +25,15 @@ import { ExtensionStorage } from './ExtensionStorage';
 //   text?: string;
 //   attrs?: { [key: string]: any };
 // };
-type PromptEditorProps = {
+interface PromptEditorProps {
   defaultValue?: Content;
   placeholder?: string;
   handleGenerate?: () => void;
   isLoading?: boolean;
   minHeight?: number;
   onEditorReady?: (editor: Editor) => void;
-};
+  editorSx?: SxProps;
+}
 export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
   (
     {
@@ -42,6 +43,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
       isLoading,
       minHeight = 150,
       onEditorReady,
+      editorSx,
     },
     ref,
   ) => {
@@ -255,10 +257,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
     return (
       <Stack gap={2}>
         <Stack
-          border={'1px solid #ccc'}
-          borderRadius={2}
           gap={1.25}
-          p={2}
           sx={{
             '& .tiptap p.is-editor-empty::before': {
               content: 'attr(data-placeholder)',
@@ -269,6 +268,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
               fontSize: 12,
               lineHeight: 1.5,
             },
+            ...editorSx,
           }}
         >
           <EditorContent
