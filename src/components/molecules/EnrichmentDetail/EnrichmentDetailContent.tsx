@@ -125,7 +125,20 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     }
   };
 
+  const [temp, setTemp] = useState(false);
+
   return (
+    //<Stack
+    //  flexDirection={'row'}
+    //  height={'calc(100% - 126px)'}
+    //  maxWidth={'100%'}
+    //>
+    //  <Stack flex={1} width={`calc(100% - ${temp ? '500px' : 0})`}>
+    //    <Stack onClick={() => setTemp(!temp)}>123</Stack>
+    //    <Stack>Table</Stack>
+    //  </Stack>
+    //  <Stack bgcolor={'green'} flexShrink={0} width={temp ? 500 : 0}></Stack>
+    //</Stack>
     <Stack
       ref={scrollContainerRef}
       sx={{
