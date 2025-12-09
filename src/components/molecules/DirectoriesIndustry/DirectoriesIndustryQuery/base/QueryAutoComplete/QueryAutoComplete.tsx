@@ -306,21 +306,25 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
             return (
               <Box
                 component="li"
-                key={option.label}
+                key={option.key}
                 {...rest}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 3,
                   width: '100%',
                   fontSize: 14,
+                  gap: 1,
                 }}
               >
-                {option.label}{' '}
-                {option?.remark && (
+                {option.label}
+                {option.remark && (
                   <Typography
-                    sx={{ ml: 'auto', fontSize: 12, color: '#B0ADBD' }}
+                    sx={{
+                      ml: 'auto',
+                      flexShrink: 0,
+                      fontSize: 12,
+                      color: '#B0ADBD',
+                    }}
                   >
                     {option.remark}
                   </Typography>
