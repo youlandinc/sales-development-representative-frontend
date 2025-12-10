@@ -49,7 +49,7 @@ const getCellBackgroundColor = (
   isActive: boolean,
   isSelectColumn: boolean,
   hasActiveInRow: boolean,
-  rowSelected: boolean,
+  isRowSelected: boolean,
   isColumnSelected: boolean,
 ): string => {
   if ((isEditing || isActive) && !isSelectColumn) {
@@ -58,7 +58,7 @@ const getCellBackgroundColor = (
   if (isSelectColumn && hasActiveInRow) {
     return CELL_COLORS.ACTIVE_BG;
   }
-  if (rowSelected || isColumnSelected) {
+  if (isRowSelected || isColumnSelected) {
     return CELL_COLORS.ACTIVE_BG;
   }
   return CELL_COLORS.DEFAULT_BG;
@@ -69,7 +69,7 @@ interface StyledTableBodyCellProps {
   width: number;
   isPinned?: boolean;
   stickyLeft?: number;
-  showPinnedRightShadow?: boolean;
+  shouldShowPinnedRightShadow?: boolean;
   onCellClick: (columnId: string, rowId: string, data: any) => void;
 }
 
@@ -78,7 +78,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   width,
   isPinned = false,
   stickyLeft = 0,
-  showPinnedRightShadow,
+  shouldShowPinnedRightShadow,
   onCellClick,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -106,7 +106,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     ? (tableMeta?.hasActiveInRow?.(recordId) ?? false)
     : false;
 
-  const rowSelected = row?.getIsSelected?.() ?? false;
+  const isRowSelected = row?.getIsSelected?.() ?? false;
 
   const columnMeta = column?.columnDef?.meta as TableColumnMeta | undefined;
   const { fieldType, canEdit = false, isAiColumn = false } = columnMeta || {};
@@ -216,12 +216,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
             height: '100%',
           }}
         >
-          <Box display={rowSelected || isRowHovered ? 'none' : 'block'}>
+          <Box display={isRowSelected || isRowHovered ? 'none' : 'block'}>
             {label}
           </Box>
-          <Box display={rowSelected || isRowHovered ? 'block' : 'none'}>
+          <Box display={isRowSelected || isRowHovered ? 'block' : 'none'}>
             <Checkbox
-              checked={rowSelected}
+              checked={isRowSelected}
               onChange={(e, next) => cell.row.toggleSelected?.(next)}
               onClick={(e) => e.stopPropagation()}
               size={'small'}
@@ -258,7 +258,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     isFinished,
     onStopEdit,
     localEditValue,
-    rowSelected,
+    isRowSelected,
     isRowHovered,
   ]);
 
@@ -305,7 +305,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     isActive,
     isSelectColumn,
     hasActiveInRow,
-    rowSelected,
+    isRowSelected,
     isColumnSelected,
   );
 
@@ -328,11 +328,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         zIndex: isPinned ? 20 : 1,
         bgcolor: cellBackgroundColor,
         borderRight:
-          isPinned && showPinnedRightShadow && !isSelectColumn
+          isPinned && shouldShowPinnedRightShadow && !isSelectColumn
             ? CELL_COLORS.PINNED_BORDER
             : CELL_COLORS.REGULAR_BORDER,
         ...(isPinned &&
-          showPinnedRightShadow &&
+          shouldShowPinnedRightShadow &&
           !isSelectColumn && {
             '&::after': {
               content: '""',

@@ -7,13 +7,16 @@ import { UTypeOf } from '@/utils/UTypeOf';
 
 export type AutoCompleteOption = {
   inputValue: string;
+  key: string;
   label: string;
+  remark?: string | null;
 };
 
 type RawOption = {
-  key?: string;
+  key: string;
   label: string;
   value?: string;
+  remark?: string | null;
 };
 
 interface UseQueryAutoCompleteParams {
@@ -32,11 +35,14 @@ const PAGE_SIZE = 20;
 
 const normalizeOption = (item: RawOption): AutoCompleteOption => ({
   label: item.label,
+  key: item.key,
   inputValue: item.value || item.label,
+  remark: item?.remark,
 });
 
 const valueToOption = (val: string): AutoCompleteOption => ({
   label: val,
+  key: val,
   inputValue: val,
 });
 
@@ -55,6 +61,9 @@ export const useQueryAutoComplete = ({
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<AutoCompleteOption[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Cache selected options to preserve label when option is from API search
+  const selectedOptionsRef = useRef<Map<string, AutoCompleteOption>>(new Map());
   const [inputValue, setInputValue] = useState(() => {
     if (!multiple && value) {
       return UTypeOf.isString(value) ? value : '';
@@ -137,6 +146,8 @@ export const useQueryAutoComplete = ({
         const mappedOptions = items.map((item: any) => ({
           label: item.label || item.name || item.value || String(item),
           inputValue: item.value || item.label || item.name || String(item),
+          key: item.key,
+          remark: item?.remark,
         }));
         setOptions(mappedOptions);
         setHasMore(items.length >= PAGE_SIZE);
@@ -180,6 +191,8 @@ export const useQueryAutoComplete = ({
         const mappedOptions = items.map((item: any) => ({
           label: item.label || item.name || item.value || String(item),
           inputValue: item.value || item.label || item.name || String(item),
+          key: item.key,
+          remark: item?.remark,
         }));
 
         setOptions((prev) => [...prev, ...mappedOptions]);
@@ -221,14 +234,28 @@ export const useQueryAutoComplete = ({
   );
 
   const autocompleteValue = useMemo(() => {
+    const cache = selectedOptionsRef.current;
+
     if (multiple) {
-      return ((value as string[]) ?? []).map(
-        (val) =>
-          options.find((opt) => opt.inputValue === val) || valueToOption(val),
-      );
+      return ((value as string[]) ?? []).map((val) => {
+        // Priority: cache > current options > fallback
+        const cached = cache.get(val);
+        if (cached) {
+          return cached;
+        }
+        return (
+          options.find((opt) => opt.inputValue === val) || valueToOption(val)
+        );
+      });
     }
+
     if (!value) {
       return null;
+    }
+
+    const cached = cache.get(value as string);
+    if (cached) {
+      return cached;
     }
     return (
       options.find((opt) => opt.inputValue === value) ||
@@ -266,18 +293,32 @@ export const useQueryAutoComplete = ({
         return;
       }
 
+      const cache = selectedOptionsRef.current;
+
       if (multiple) {
-        const values = (newValue as AutoCompleteOption[])
-          .map(optionToValue)
-          .filter((v): v is string => !!v);
+        const opts = newValue as AutoCompleteOption[];
+        // Update cache with selected options
+        cache.clear();
+        opts.forEach((opt) => {
+          if (opt.inputValue) {
+            cache.set(opt.inputValue, opt);
+          }
+        });
+
+        const values = opts.map(optionToValue).filter((v): v is string => !!v);
         (onFormChange as (v: string[]) => void)(Array.from(new Set(values)));
         setInputValue('');
       } else {
-        const val = newValue
-          ? optionToValue(newValue as AutoCompleteOption)
-          : null;
+        const opt = newValue as AutoCompleteOption | null;
+        // Update cache with selected option
+        cache.clear();
+        if (opt?.inputValue) {
+          cache.set(opt.inputValue, opt);
+        }
+
+        const val = opt ? optionToValue(opt) : null;
         (onFormChange as (v: string | null) => void)(val);
-        setInputValue((newValue as AutoCompleteOption)?.label || '');
+        setInputValue(opt?.label || '');
       }
     },
     [multiple, isAuth, onFormChange],

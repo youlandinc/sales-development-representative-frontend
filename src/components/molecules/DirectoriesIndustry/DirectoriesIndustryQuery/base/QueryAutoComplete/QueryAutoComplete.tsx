@@ -8,8 +8,8 @@ import {
   FilterOptionsState,
   Icon,
   Tooltip,
+  Typography,
 } from '@mui/material';
-import { Check } from '@mui/icons-material';
 
 import { StyledTextField } from '@/components/atoms';
 import { UTypeOf } from '@/utils/UTypeOf';
@@ -23,6 +23,7 @@ import ICON_CLOSE from './assets/icon-close.svg';
 
 const LOADING_MORE_OPTION: AutoCompleteOption = {
   inputValue: '__loading_more__',
+  key: '__loading_more__',
   label: '',
 };
 
@@ -44,7 +45,7 @@ const LOADING_SPINNER = (
 interface QueryAutoCompletePropsBase {
   placeholder?: string;
   url?: string | null;
-  options?: Array<{ key?: string; label: string; value?: string }>;
+  options?: Array<{ key: string; label: string; value?: string }>;
   freeSolo?: boolean;
   isAuth?: boolean;
   noOptionsText?: string;
@@ -129,6 +130,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
         if (!isExistingInOptions) {
           filtered.push({
             inputValue: state.inputValue,
+            key: state.inputValue,
             label: isAlreadySelected
               ? `Delete ${state.inputValue}`
               : `Add "${state.inputValue}"`,
@@ -186,13 +188,14 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     ) => {
       if (multiple) {
         const normalized = (newValue as (string | AutoCompleteOption)[]).map(
-          (v) => (UTypeOf.isString(v) ? { inputValue: v, label: v } : v),
+          (v) =>
+            UTypeOf.isString(v) ? { inputValue: v, label: v, key: v } : v,
         );
 
         onChangeToUpdateValue(_, normalized);
       } else {
         const normalized = UTypeOf.isString(newValue)
-          ? { inputValue: newValue, label: newValue }
+          ? { inputValue: newValue, label: newValue, key: newValue }
           : (newValue as AutoCompleteOption | null);
 
         onChangeToUpdateValue(_, normalized);
@@ -303,18 +306,29 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
             return (
               <Box
                 component="li"
-                key={option.label}
+                key={option.key}
                 {...rest}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 3,
                   width: '100%',
+                  fontSize: 14,
+                  gap: 1,
                 }}
               >
-                <Box sx={{ fontSize: 14 }}>{option.label}</Box>
-                {rest['aria-selected'] && <Check fontSize="small" />}
+                {option.label}
+                {option.remark && (
+                  <Typography
+                    sx={{
+                      ml: 'auto',
+                      flexShrink: 0,
+                      fontSize: 12,
+                      color: '#B0ADBD',
+                    }}
+                  >
+                    {option.remark}
+                  </Typography>
+                )}
               </Box>
             );
           }}
