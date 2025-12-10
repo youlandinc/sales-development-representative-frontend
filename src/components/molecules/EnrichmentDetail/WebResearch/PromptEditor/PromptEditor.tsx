@@ -33,6 +33,7 @@ interface PromptEditorProps {
   minHeight?: number;
   onEditorReady?: (editor: Editor) => void;
   editorSx?: SxProps;
+  showBtn?: boolean;
 }
 export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
   (
@@ -44,6 +45,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
       minHeight = 150,
       onEditorReady,
       editorSx,
+      showBtn = true,
     },
     ref,
   ) => {
@@ -300,20 +302,22 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
                 to Insert column
               </Typography>
             </Stack>
-            <StyledButton
-              color={'info'}
-              loading={isLoading}
-              onClick={handleGenerate}
-              size={'small'}
-              startIcon={<Icon component={ICON_SPARKLE} />}
-              sx={{
-                width: 100,
-                borderColor: '#D0CEDA !important',
-              }}
-              variant={'outlined'}
-            >
-              Generate
-            </StyledButton>
+            {showBtn && (
+              <StyledButton
+                color={'info'}
+                loading={isLoading}
+                onClick={handleGenerate}
+                size={'small'}
+                startIcon={<Icon component={ICON_SPARKLE} />}
+                sx={{
+                  width: 100,
+                  borderColor: '#D0CEDA !important',
+                }}
+                variant={'outlined'}
+              >
+                Generate
+              </StyledButton>
+            )}
           </Stack>
         </Stack>
         {/* <Button onClick={handleClick} variant={'outlined'}>

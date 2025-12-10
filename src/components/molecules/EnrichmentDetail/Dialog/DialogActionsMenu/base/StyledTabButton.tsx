@@ -34,6 +34,11 @@ export const StyledTabButton: FC<StyledTabButtonProps> = ({
         '&:hover': {
           bgcolor: isActive ? '#F0F0F4' : 'background.active',
         },
+        '& svg': {
+          path: {
+            fill: isActive ? '#363440' : '#6F6C7D',
+          },
+        },
       }}
     >
       <Stack

@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Icon, Stack, Typography } from '@mui/material';
+import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow.svg';
 
 interface StyledActionItemProps {
   icon?: ReactNode;
@@ -28,7 +29,13 @@ export const StyledActionItem: FC<StyledActionItemProps> = ({
         cursor: onClick ? 'pointer' : 'default',
         '&:hover': onClick
           ? {
-              bgcolor: 'background.active',
+              borderColor: 'text.primary',
+              '.arrow': {
+                display: 'block',
+              },
+              '.badges': {
+                display: 'none',
+              },
             }
           : {},
       }}
@@ -45,7 +52,22 @@ export const StyledActionItem: FC<StyledActionItemProps> = ({
               {title}
             </Typography>
           </Stack>
-          {badges}
+          <Stack alignItems={'center'} flexDirection={'row'}>
+            {badges && <Box className={'badges'}>{badges}</Box>}
+            <Icon
+              className={'arrow'}
+              component={ICON_ARROW}
+              sx={{
+                width: 16,
+                height: 16,
+                display: 'none',
+                transform: 'rotate(180deg)',
+                '& path': {
+                  fill: '#343330',
+                },
+              }}
+            />
+          </Stack>
         </Stack>
         <Typography color={'text.secondary'} fontSize={12} lineHeight={1.5}>
           {description}

@@ -18,6 +18,7 @@ import {
   IntegrationActionValidation,
   WaterfallConfigTypeEnum,
 } from '@/types/enrichment';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 // 工具函数：构建selectedOption对象
 const buildSelectedOption = (column: any) =>

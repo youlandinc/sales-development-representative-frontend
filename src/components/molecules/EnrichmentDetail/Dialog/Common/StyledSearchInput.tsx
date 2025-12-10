@@ -1,7 +1,7 @@
-import { FC } from 'react';
-import { Box, InputBase, Stack } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { StyledTextField } from '@/components/atoms';
+import SearchIcon from '@mui/icons-material/Search';
+import { Box, Stack } from '@mui/material';
+import { FC } from 'react';
 
 interface StyledSearchInputProps {
   placeholder?: string;
@@ -16,6 +16,10 @@ export const StyledSearchInput: FC<StyledSearchInputProps> = ({
 }) => {
   return (
     <StyledTextField
+      onChange={(e) => {
+        onChange?.(e.target.value);
+      }}
+      placeholder={placeholder}
       size="small"
       slotProps={{
         input: {
@@ -24,6 +28,7 @@ export const StyledSearchInput: FC<StyledSearchInputProps> = ({
           ),
         },
       }}
+      value={value}
     />
   );
   return (

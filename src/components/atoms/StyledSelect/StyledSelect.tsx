@@ -12,7 +12,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import ClearIcon from '@mui/icons-material/Clear';
+import { Clear } from '@mui/icons-material';
+import ICON_ARROW from './assets/icon_arrow.svg';
 
 export interface StyledSelectProps extends BaseSelectProps {
   validate?: undefined | string[];
@@ -155,6 +156,15 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             fontSize: 16,
             lineHeight: 1.5,
           },
+          //replace icon
+          '& .MuiSelect-icon': {
+            width: 16,
+            height: 16,
+            right: 12,
+          },
+          '& .MuiSelect-iconOpen': {
+            transform: 'rotate(180deg)',
+          },
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
@@ -175,10 +185,11 @@ export const StyledSelect: FC<StyledSelectProps> = ({
               position="end"
               sx={{ mr: 1.75, cursor: 'pointer' }}
             >
-              {clearIcon || <ClearIcon sx={{ fontSize: 20 }} />}
+              {clearIcon || <Clear sx={{ fontSize: 20 }} />}
             </InputAdornment>
           )
         }
+        IconComponent={ICON_ARROW}
         id="styled-select"
         inputProps={{
           MenuProps: {

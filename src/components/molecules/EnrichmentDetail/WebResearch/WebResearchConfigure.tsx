@@ -1,12 +1,9 @@
 import {
   Box,
-  FormControlLabel,
   Icon,
   Menu,
   MenuItem,
   menuItemClasses,
-  Radio,
-  RadioGroup,
   Stack,
   Tooltip,
   Typography,
@@ -17,27 +14,24 @@ import { createEditor } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';
 import { v4 as uuidv4 } from 'uuid';
 
-import {
-  StyledButton,
-  StyledSwitch,
-  StyledTextField,
-} from '@/components/atoms';
-import {
-  CollapseCard,
-  FormulaEditor,
-  OutputsFields,
-  PromptEditor,
-} from './index';
+import { StyledSwitch, StyledTextField } from '@/components/atoms';
 import { useSwitch, useVariableFromStore } from '@/hooks';
 import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 import { useWebResearchStore } from '@/stores/enrichment';
+import {
+  CollapseCard,
+  FormulaEditor,
+  ModelSelect,
+  OutputsFields,
+  PromptEditor,
+} from './index';
+import { MODEL_OPTIONS } from './ModelSelect/modelOptions';
 
-import { extractPromptText, insertWithPlaceholders } from '@/utils';
+import { insertWithPlaceholders } from '@/utils';
 
-import ICON_SPARKLE from './assets/icon_sparkle.svg';
-import ICON_WARNING from './assets/icon_warning.svg';
-import ICON_DELETE from './assets/icon_delete.svg';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import ICON_DELETE from './assets/icon_delete.svg';
+import ICON_WARNING from './assets/icon_warning.svg';
 
 interface WebResearchConfigureProps {
   handleGenerate?: () => void;
@@ -62,6 +56,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { visible, toggle } = useSwitch(true);
+  const [selectedModel, setSelectedModel] = useState('verity_lite');
 
   const onMenuClose = useCallback(() => {
     setAnchorEl(null);
@@ -230,11 +225,15 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   );
 
   return (
-    <Stack gap={4}>
-      <Stack gap={0.5}>
-        <Typography fontWeight={700} variant={'subtitle1'}>
-          Prompt
-        </Typography>
+    <Stack gap={3}>
+      <CollapseCard hasCollapse={false} title={'Model'}>
+        <ModelSelect
+          groups={MODEL_OPTIONS}
+          onChange={setSelectedModel}
+          value={selectedModel}
+        />
+      </CollapseCard>
+      <CollapseCard title={'Agent instructions'}>
         <PromptEditor
           defaultValue={defaultValue}
           editorSx={{
@@ -249,12 +248,14 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
             'E.g., Find the CEO of the company and their Linkedin profile'
           }
           ref={promptEditorRef}
+          showBtn={false}
         />
-      </Stack>
+      </CollapseCard>
+
       {/*outputs*/}
-      <CollapseCard defaultOpen title={'Define outputs'}>
+      <CollapseCard defaultOpen title={'Output fields'}>
         <Stack gap={1.5}>
-          <RadioGroup
+          {/* <RadioGroup
             onChange={(e) => {
               try {
                 schemaJson && JSON.parse(schemaJson);
@@ -325,111 +326,107 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                 </Stack>
               </StyledButton>
             </Stack>
-          </RadioGroup>
-          {outPuts === 'fields' && (
-            <Stack gap={1.5}>
-              {Object.entries(schemaFields).map(([item, config]) => (
-                <OutputsFields
-                  fieldDescription={config?.description || ''}
-                  fieldName={item}
-                  fieldType={config?.type || TableColumnTypeEnum.text}
-                  key={config.id || item}
-                  removeField={handleDeleteField}
-                  saveField={(
-                    fieldName: string,
-                    newName: string,
-                    newDescription: string,
-                    newType: string,
-                    newSelectOptions: any,
-                  ) => {
-                    handleFieldChange(
-                      fieldName,
-                      newName,
-                      newDescription,
-                      newType,
-                      newSelectOptions,
-                    );
-                  }}
-                  selectOptions={[
-                    {
-                      label: 'Text',
-                      value: 'string',
-                      key: 'string',
-                    },
-                  ]}
-                />
-              ))}
-              <StyledButton
-                color={'info'}
-                onClick={handleAddField}
-                size={'medium'}
-                sx={{
-                  color: '#6F6C7D !important',
-                  borderColor: '#E5E5E5 !important',
-                  fontWeight: 400,
+          </RadioGroup> */}
+          {/* {outPuts === 'fields' && ( */}
+          <Stack gap={1.5}>
+            {Object.entries(schemaFields).map(([item, config]) => (
+              <OutputsFields
+                fieldDescription={config?.description || ''}
+                fieldName={item}
+                fieldType={config?.type || TableColumnTypeEnum.text}
+                key={config.id || item}
+                removeField={handleDeleteField}
+                saveField={(
+                  fieldName: string,
+                  newName: string,
+                  newDescription: string,
+                  newType: string,
+                  newSelectOptions: any,
+                ) => {
+                  handleFieldChange(
+                    fieldName,
+                    newName,
+                    newDescription,
+                    newType,
+                    newSelectOptions,
+                  );
                 }}
-                variant={'outlined'}
-              >
-                + Add output
-              </StyledButton>
-              <Menu
-                anchorEl={anchorEl}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                onClose={onMenuClose}
-                open={Boolean(anchorEl)}
-                slotProps={{
-                  list: {
-                    sx: {
-                      p: 1.5,
-                      width: 240,
-                      [`& .${menuItemClasses.root}`]: {
-                        gap: 1,
-                        '&:hover': {
-                          bgcolor: 'unset !important',
-                          cursor: 'unset',
-                        },
+                selectOptions={[
+                  {
+                    label: 'Text',
+                    value: 'string',
+                    key: 'string',
+                  },
+                ]}
+              />
+            ))}
+            <Box
+              color={'text.secondary'}
+              fontSize={12}
+              ml={'auto'}
+              onClick={handleAddField}
+              sx={{ cursor: 'pointer' }}
+            >
+              + Add field
+            </Box>
+            <Menu
+              anchorEl={anchorEl}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              onClose={onMenuClose}
+              open={Boolean(anchorEl)}
+              slotProps={{
+                list: {
+                  sx: {
+                    p: 1.5,
+                    width: 240,
+                    [`& .${menuItemClasses.root}`]: {
+                      gap: 1,
+                      '&:hover': {
+                        bgcolor: 'unset !important',
+                        cursor: 'unset',
                       },
                     },
                   },
-                }}
-              >
-                <MenuItem>
-                  <Stack gap={1.25} width={200}>
-                    <Typography variant={'body3'}>
-                      Output description (helps Al)
-                    </Typography>
-                    <StyledTextField
-                      maxRows={3}
-                      minRows={3}
-                      multiline
-                      sx={{
-                        '& .MuiOutlinedInput-input': {
-                          fontSize: 12,
-                        },
-                      }}
-                    />
+                },
+              }}
+            >
+              <MenuItem>
+                <Stack gap={1.25} width={200}>
+                  <Typography variant={'body3'}>
+                    Output description (helps Al)
+                  </Typography>
+                  <StyledTextField
+                    maxRows={3}
+                    minRows={3}
+                    multiline
+                    sx={{
+                      '& .MuiOutlinedInput-input': {
+                        fontSize: 12,
+                      },
+                    }}
+                  />
 
-                    <Box bgcolor={'#D0CEDA'} height={'1px'}></Box>
-                    <Stack
-                      alignItems={'center'}
-                      flexDirection={'row'}
-                      gap={1}
-                      onClick={onMenuClose}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <Icon
-                        component={ICON_DELETE}
-                        sx={{ width: 20, height: 20 }}
-                      />
-                      <Typography color={'#D75B5B'} variant={'body2'}>
-                        Delete
-                      </Typography>
-                    </Stack>
+                  <Box bgcolor={'#D0CEDA'} height={'1px'}></Box>
+                  <Stack
+                    alignItems={'center'}
+                    flexDirection={'row'}
+                    gap={1}
+                    onClick={onMenuClose}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <Icon
+                      component={ICON_DELETE}
+                      sx={{ width: 20, height: 20 }}
+                    />
+                    <Typography color={'#D75B5B'} variant={'body2'}>
+                      Delete
+                    </Typography>
                   </Stack>
-                </MenuItem>
-              </Menu>
-            </Stack>
-          )}
+                </Stack>
+              </MenuItem>
+            </Menu>
+          </Stack>
+          {/* )} */}
           {/* <Box display={outPuts === 'json' ? 'block' : 'none'}> */}
           {!isLoading && outPuts === 'json' && (
             <FormulaEditor
@@ -444,17 +441,21 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         </Stack>
       </CollapseCard>
       {/*Run settings*/}
-      <CollapseCard defaultOpen title={'Run settings'}>
+      <CollapseCard title={'Run settings'}>
         <Stack gap={1.5}>
           <Stack flexDirection={'row'} justifyContent={'space-between'}>
             <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
-              <Typography variant={'subtitle1'}>Auto-update</Typography>
+              <Typography variant={'body2'}>Auto-update</Typography>
               <Tooltip
+                arrow
                 title={
                   'Disable or enable automatic runs of this column on table updates.'
                 }
               >
-                <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />
+                <Icon
+                  component={ICON_WARNING}
+                  sx={{ width: 12, height: 12, cursor: 'help' }}
+                />
               </Tooltip>
             </Stack>
             <StyledSwitch checked={visible} onChange={toggle} />
