@@ -1,6 +1,6 @@
 import { FC, MouseEvent } from 'react';
-import Image from 'next/image';
 import { createUseStyles } from 'react-jss';
+import { StyledImage } from '@/components/atoms';
 
 const useStyles = createUseStyles({
   container: {
@@ -43,9 +43,11 @@ export const QueryAutoCompleteChip: FC<QueryAutoCompleteChipProps> = ({
   return (
     <div className={classes.container}>
       {onDelete && (
-        <div className={classes.button} onClick={onDelete}>
-          <Image alt="" fill sizes="100%" src="/images/icon-close.svg" />
-        </div>
+        <StyledImage
+          className={classes.button}
+          onClick={onDelete}
+          url={'/images/icon-close.svg'}
+        />
       )}
       <div className={classes.content}>{label}</div>
     </div>

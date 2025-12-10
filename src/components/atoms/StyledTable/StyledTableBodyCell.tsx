@@ -27,6 +27,7 @@ import {
   StyledTableBodyCellIcons,
   useRowHover,
 } from './index';
+import { StyledImage } from '@/components/atoms/StyledImage';
 
 const CELL_CONSTANTS = {
   MIN_WIDTH: 60,
@@ -222,6 +223,24 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
           <Box display={isRowSelected || isRowHovered ? 'block' : 'none'}>
             <Checkbox
               checked={isRowSelected}
+              checkedIcon={
+                <StyledImage
+                  sx={{ width: 20, height: 20, position: 'relative' }}
+                  url={'/images/icon-checkbox-check.svg'}
+                />
+              }
+              icon={
+                <StyledImage
+                  sx={{ width: 20, height: 20, position: 'relative' }}
+                  url={'/images/icon-checkbox-static.svg'}
+                />
+              }
+              indeterminateIcon={
+                <StyledImage
+                  sx={{ width: 20, height: 20, position: 'relative' }}
+                  url={'/images/icon-checkbox-intermediate.svg'}
+                />
+              }
               onChange={(e, next) => cell.row.toggleSelected?.(next)}
               onClick={(e) => e.stopPropagation()}
               size={'small'}

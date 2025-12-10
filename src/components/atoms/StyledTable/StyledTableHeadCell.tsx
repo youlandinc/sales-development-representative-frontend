@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import Image from 'next/image';
 import { Box, Checkbox, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
 
@@ -16,6 +17,7 @@ import { StyledTableAiIcon } from './index';
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
 import { UTypeOf } from '@/utils';
 import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
+import { StyledImage } from '@/components/atoms/StyledImage';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -78,7 +80,25 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
     isSelectColumn && onToggleAllRows ? (
       <Checkbox
         checked={isAllRowsSelected}
+        checkedIcon={
+          <StyledImage
+            sx={{ width: 20, height: 20, position: 'relative' }}
+            url={'/images/icon-checkbox-check.svg'}
+          />
+        }
+        icon={
+          <StyledImage
+            sx={{ width: 20, height: 20, position: 'relative' }}
+            url={'/images/icon-checkbox-static.svg'}
+          />
+        }
         indeterminate={isSomeRowsSelected}
+        indeterminateIcon={
+          <StyledImage
+            sx={{ width: 20, height: 20, position: 'relative' }}
+            url={'/images/icon-checkbox-intermediate.svg'}
+          />
+        }
         onChange={onToggleAllRows}
         onClick={(e) => e.stopPropagation()}
         size="small"
