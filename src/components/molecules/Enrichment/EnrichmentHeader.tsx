@@ -20,8 +20,13 @@ import ICON_NEW_TABLE from './assets/icon_new_table.svg';
 import ICON_DIRECTORY from './assets/icon_directory.svg';
 import ICON_HEADER_SEARCH from './assets/icon_search.svg';
 
+interface EnrichmentHeaderAction {
+  type: 'change';
+  payload: { field: string; value: string };
+}
+
 interface EnrichmentHeaderProps {
-  dispatch: any;
+  dispatch: (action: EnrichmentHeaderAction) => void;
   store: { searchWord: string };
   openDialog: () => void;
 }
@@ -73,7 +78,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const isMenuOpen = Boolean(anchorEl);
   const onMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -84,21 +89,15 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
   return (
     <Stack gap={6}>
       <Stack gap={1.5}>
-        <Typography variant={'h5'}>Quick start</Typography>
-        <Stack flexDirection={'row'} gap={3}>
+        <Typography variant={'h6'}>Quick start</Typography>
+        <Stack flexDirection={'row'} gap={2}>
           {[...sourceOptions, ...tableOptions].map((item, index) => (
             <StyledButton
               color={'info'}
               disabled={item.disabled}
               key={`${item.label}-${index}`}
               onClick={() => item?.onClick()}
-              sx={{
-                fontSize: '14px !important',
-                fontWeight: 400,
-                boxShadow: 'none',
-                borderColor: '#DFDEE6 !important',
-                color: '#1E1645 !important',
-              }}
+              size={'medium'}
               variant={'outlined'}
             >
               <Icon
@@ -118,8 +117,15 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
         </Stack>
       </Stack>
 
-      <Stack flexDirection={'row'} gap={3} justifyContent={'space-between'}>
-        <Typography variant={'h5'}>Enrichment tables</Typography>
+      <Stack
+        alignItems={'flex-end'}
+        flexDirection={'row'}
+        gap={3}
+        justifyContent={'space-between'}
+      >
+        <Typography lineHeight={1} variant={'h6'}>
+          Tables
+        </Typography>
 
         <Stack flexDirection={'row'} gap={1}>
           <StyledTextField
@@ -148,8 +154,8 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
             value={value}
           />
           <StyledButton
-            aria-controls={open ? 'basic-menu' : undefined}
-            aria-expanded={open ? 'true' : undefined}
+            aria-controls={isMenuOpen ? 'basic-menu' : undefined}
+            aria-expanded={isMenuOpen ? 'true' : undefined}
             aria-haspopup="true"
             color={'primary'}
             id="basic-button"
@@ -159,7 +165,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
           >
             <Icon
               component={ICON_NEW_TABLE}
-              sx={{ width: 20, height: 20, mr: 1 }}
+              sx={{ width: 16, height: 16, mr: 0.5 }}
             />
             New table
           </StyledButton>
@@ -172,7 +178,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
             }}
             id="basic-menu"
             onClose={onMenuClose}
-            open={open}
+            open={isMenuOpen}
             slotProps={{
               list: {
                 'aria-labelledby': 'basic-button',
