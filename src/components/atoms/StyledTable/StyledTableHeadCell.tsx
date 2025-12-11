@@ -8,9 +8,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import Image from 'next/image';
 import { Box, Checkbox, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
 import { StyledTableAiIcon } from './index';
 
@@ -31,7 +31,7 @@ interface StyledTableHeadCellProps {
   onDoubleClick?: (e: MouseEvent<HTMLElement>) => void;
   onContextMenu?: (e: MouseEvent<HTMLElement>) => void;
   canResize?: boolean;
-  isActive?: boolean;
+  isFocused?: boolean;
   isEditing?: boolean;
   onEditSave?: (newName: string) => void;
   shouldShowPinnedRightShadow?: boolean;
@@ -39,6 +39,10 @@ interface StyledTableHeadCellProps {
   isAllRowsSelected?: boolean;
   isSomeRowsSelected?: boolean;
   onToggleAllRows?: (event: unknown) => void;
+  // Resize indicator height (table body height)
+  indicatorHeight?: number;
+  // Callback when resize starts
+  onResizeStart?: () => void;
 }
 
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
@@ -53,16 +57,22 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   onDoubleClick,
   onContextMenu,
   canResize,
-  isActive = false,
+  isFocused = false,
   isEditing = false,
   onEditSave,
   shouldShowPinnedRightShadow,
   isAllRowsSelected,
   isSomeRowsSelected,
   onToggleAllRows,
+  indicatorHeight = 500,
+  onResizeStart,
 }) => {
   const [localEditValue, setLocalEditValue] = useState<string>('');
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isResizeHovered, setIsResizeHovered] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragPosition, setDragPosition] = useState<number>(0);
+  const draggableRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const originalValueRef = useRef<string>('');
 
@@ -166,7 +176,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
 
   // Calculate background color: active > hover > default
   const headerBackgroundColor =
-    isActive || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
+    isFocused || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 
   return (
     <Stack
@@ -188,8 +198,18 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           isPinned && shouldShowPinnedRightShadow && !isSelectColumn
             ? 'none'
             : '0.5px solid #DFDEE6',
-        bgcolor: isActive ? '#F4F5F9' : '#FFFFFF',
+        bgcolor: isFocused ? '#F4F5F9' : '#FFFFFF',
         cursor: 'pointer',
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '2px',
+          bgcolor: '#363440',
+          display: isFocused ? 'block' : 'none',
+        },
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
@@ -204,8 +224,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         justifyContent: 'center',
         fontSize: 14,
         lineHeight: '36px',
-        color: 'text.secondary',
-        fontWeight: 600,
+        color: '#363440',
+        fontWeight: 500,
       }}
     >
       <Box
@@ -218,6 +238,9 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             isPinned && shouldShowPinnedRightShadow && isEditing
               ? 'calc(100% - 3px)'
               : '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
           px: 1.5,
           boxShadow: (theme) =>
             isEditing
@@ -247,13 +270,15 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             }}
             sx={{
               fontSize: 14,
-              fontWeight: 600,
+              fontWeight: 500,
               color: 'text.primary',
               width: '100%',
+              height: '100%',
               backgroundColor: 'transparent',
               '& input': {
                 padding: 0,
                 textAlign: 'left',
+                height: '100%',
               },
             }}
             value={localEditValue}
@@ -301,64 +326,73 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       {header &&
         canResize !== false &&
         header.column.getCanResize?.() !== false && (
-          <Stack
-            onMouseDown={(e) => {
-              if (e.button !== 0) {
-                return;
-              }
-              e.stopPropagation();
-              e.preventDefault();
-              const handler = header.getResizeHandler?.();
-              handler?.(e);
-            }}
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              const handler = header.getResizeHandler?.();
-              handler?.(e);
-            }}
+          <Box
+            onMouseEnter={() => setIsResizeHovered(true)}
+            onMouseLeave={() => !isDragging && setIsResizeHovered(false)}
+            onPointerDown={(e) => e.stopPropagation()}
             sx={{
               position: 'absolute',
-              right: 0,
+              right: -6,
               top: 0,
               height: '100%',
-              width: '12px',
+              width: '15px',
               cursor: 'col-resize',
-              zIndex: 4,
-              backgroundColor: 'transparent',
-              pointerEvents: 'auto',
-              borderRight:
-                isPinned && shouldShowPinnedRightShadow
-                  ? '3px solid #DFDEE6'
-                  : '2px solid transparent',
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: 'transparent',
-              },
-              '&:active': {
-                backgroundColor: 'transparent',
-                borderRight:
-                  isPinned && shouldShowPinnedRightShadow
-                    ? '3px solid #DFDEE6'
-                    : 'transparent',
-              },
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                right: '0px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '3px',
-                height: '50%',
-                backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                borderRadius: '1.5px',
-                opacity: 0,
-                transition: 'opacity 0.2s ease',
-              },
-              '&:hover::after': {
-                opacity: 1,
-              },
+              zIndex: 999,
             }}
-          />
+          >
+            <Draggable
+              axis="x"
+              bounds={{ left: -width + 80 }}
+              nodeRef={draggableRef}
+              onDrag={(e: DraggableEvent, data: DraggableData) => {
+                setDragPosition(data.x);
+              }}
+              onStart={() => {
+                setIsDragging(true);
+                setIsResizeHovered(true);
+                onResizeStart?.();
+              }}
+              onStop={(e: DraggableEvent, data: DraggableData) => {
+                setIsDragging(false);
+                setIsResizeHovered(false);
+                setDragPosition(0);
+                // Update column size
+                if (data.x !== 0) {
+                  const newWidth = Math.max(80, width + data.x);
+                  const table = header.getContext().table;
+                  table.setColumnSizing((prev: Record<string, number>) => ({
+                    ...prev,
+                    [header.column.id]: newWidth,
+                  }));
+                }
+              }}
+              position={{ x: dragPosition, y: 0 }}
+            >
+              <Box
+                ref={draggableRef}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  position: 'relative',
+                }}
+              >
+                {/* Resize indicator line - shows on hover and drag */}
+                {(isResizeHovered || isDragging) && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: 0,
+                      marginLeft: '-1px',
+                      width: '3px',
+                      height: indicatorHeight,
+                      bgcolor: '#363440',
+                    }}
+                  />
+                )}
+              </Box>
+            </Draggable>
+          </Box>
         )}
     </Stack>
   );

@@ -131,11 +131,12 @@ export const StyledTable: FC<StyledTableProps> = ({
     isEditing?: boolean;
   } | null>(null);
 
+  // Header state: single focus + multi-select (mutually exclusive)
   const [headerState, setHeaderState] = useState<{
-    columnId: string;
-    isActive?: boolean;
-    isEditing?: boolean;
-    isShowMenu?: boolean;
+    focusedColumnId: string | null;
+    isMenuOpen: boolean;
+    isEditing: boolean;
+    selectedColumnIds: string[];
   } | null>(null);
   // TODO: Menu state optimization
   // 1. Merge three menu anchors into unified menuState object
@@ -273,10 +274,10 @@ export const StyledTable: FC<StyledTableProps> = ({
           case 'active':
             setCellState({ recordId, columnId });
             setHeaderState({
-              columnId,
-              isActive: true,
+              focusedColumnId: columnId,
+              isMenuOpen: false,
               isEditing: false,
-              isShowMenu: false,
+              selectedColumnIds: [],
             });
             break;
           case 'edit':
@@ -287,6 +288,10 @@ export const StyledTable: FC<StyledTableProps> = ({
             break;
         }
       },
+
+      // ===== Header State (via meta) =====
+      headerState,
+      setHeaderState,
 
       // ===== AI Features =====
       hasAiColumn,
@@ -385,6 +390,17 @@ export const StyledTable: FC<StyledTableProps> = ({
     };
   }, [table.getVisibleLeafColumns(), columnSizing]);
 
+  // CSS variables for performant column resizing (TanStack recommended approach)
+  // This allows resize indicator to update smoothly without re-rendering cells
+  const columnSizeVars = useMemo(() => {
+    const headers = table.getFlatHeaders();
+    const colSizes: Record<string, number> = {};
+    for (const header of headers) {
+      colSizes[`--col-${header.column.id}-size`] = header.getSize();
+    }
+    return colSizes;
+  }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
+
   useEffect(() => {
     const initialSizing: ColumnSizingState = {};
     columns.forEach((column) => {
@@ -435,9 +451,10 @@ export const StyledTable: FC<StyledTableProps> = ({
         }
         case TableColumnMenuActionEnum.rename_column: {
           setHeaderState({
-            columnId: selectedColumnId,
-            isActive: false,
+            focusedColumnId: selectedColumnId,
+            isMenuOpen: false,
             isEditing: true,
+            selectedColumnIds: [],
           });
           break;
         }
@@ -454,9 +471,10 @@ export const StyledTable: FC<StyledTableProps> = ({
           });
 
           setHeaderState({
-            columnId: selectedColumnId,
-            isActive: true,
+            focusedColumnId: selectedColumnId,
+            isMenuOpen: false,
             isEditing: false,
+            selectedColumnIds: [],
           });
           break;
         }
@@ -488,15 +506,16 @@ export const StyledTable: FC<StyledTableProps> = ({
             value: item.value,
             parentValue: item.parentValue,
           });
-          // Keep header active for change column type operation
+          // Keep header focused for change column type operation
           // Clear state for insert column operations
           if (
             item.parentValue === TableColumnMenuActionEnum.change_column_type
           ) {
             setHeaderState({
-              columnId: selectedColumnId,
-              isActive: true,
+              focusedColumnId: selectedColumnId,
+              isMenuOpen: false,
               isEditing: false,
+              selectedColumnIds: [],
             });
           } else {
             setHeaderState(null);
@@ -525,43 +544,40 @@ export const StyledTable: FC<StyledTableProps> = ({
 
       if (columnSizingInfo.isResizingColumn) {
         setHeaderState({
-          columnId,
-          isActive: true,
+          focusedColumnId: columnId,
+          isMenuOpen: false,
           isEditing: false,
-          isShowMenu: false,
+          selectedColumnIds: [],
         });
         return;
       }
 
-      const isCurrentlyActive =
-        headerState?.columnId === columnId && headerState?.isActive;
-      const isCurrentlyShowingMenu =
-        headerState?.columnId === columnId && headerState?.isShowMenu;
+      const isFocused = headerState?.focusedColumnId === columnId;
+      const isCurrentlyShowingMenu = isFocused && headerState?.isMenuOpen;
       const hasActiveCellInCurrentColumn =
         cellState?.columnId === columnId && cellState?.recordId;
       const hasActiveCellInOtherColumn =
         cellState?.columnId && cellState?.columnId !== columnId;
 
-      if (
-        isCurrentlyActive &&
-        isCurrentlyShowingMenu &&
-        !headerState?.isEditing
-      ) {
+      // Single click on focused header with menu open → close menu (keep focused)
+      if (isFocused && isCurrentlyShowingMenu && !headerState?.isEditing) {
         setHeaderState({
-          columnId,
-          isActive: true,
-          isEditing: true,
-          isShowMenu: false,
+          focusedColumnId: columnId,
+          isMenuOpen: false,
+          isEditing: false,
+          selectedColumnIds: [],
         });
         setHeaderMenuAnchor(null);
         return;
       }
 
+      // Click on header with active cell in same column → show menu
       if (hasActiveCellInCurrentColumn) {
         setHeaderState({
-          columnId,
-          isActive: true,
-          isShowMenu: true,
+          focusedColumnId: columnId,
+          isMenuOpen: true,
+          isEditing: false,
+          selectedColumnIds: [],
         });
         setAddMenuAnchor(null);
         setHeaderMenuAnchor(e.currentTarget as HTMLElement);
@@ -569,11 +585,13 @@ export const StyledTable: FC<StyledTableProps> = ({
         return;
       }
 
-      if (isCurrentlyActive && !isCurrentlyShowingMenu) {
+      // Click on focused header without menu → show menu
+      if (isFocused && !isCurrentlyShowingMenu) {
         setHeaderState({
-          columnId,
-          isActive: true,
-          isShowMenu: true,
+          focusedColumnId: columnId,
+          isMenuOpen: true,
+          isEditing: false,
+          selectedColumnIds: [],
         });
         setAddMenuAnchor(null);
         setHeaderMenuAnchor(e.currentTarget as HTMLElement);
@@ -581,11 +599,13 @@ export const StyledTable: FC<StyledTableProps> = ({
         return;
       }
 
+      // Click on non-focused header → focus and show menu
       if (!cellState || hasActiveCellInOtherColumn) {
         setHeaderState({
-          columnId,
-          isActive: true,
-          isShowMenu: true,
+          focusedColumnId: columnId,
+          isMenuOpen: true,
+          isEditing: false,
+          selectedColumnIds: [],
         });
         setAddMenuAnchor(null);
         setHeaderMenuAnchor(e.currentTarget as HTMLElement);
@@ -593,18 +613,19 @@ export const StyledTable: FC<StyledTableProps> = ({
         return;
       }
 
+      // Default: focus without menu
       setHeaderState({
-        columnId,
-        isActive: true,
-        isShowMenu: false,
+        focusedColumnId: columnId,
+        isMenuOpen: false,
+        isEditing: false,
+        selectedColumnIds: [],
       });
     },
     [
       columnSizingInfo.isResizingColumn,
-      headerState?.columnId,
-      headerState?.isActive,
+      headerState?.focusedColumnId,
+      headerState?.isMenuOpen,
       headerState?.isEditing,
-      headerState?.isShowMenu,
       cellState?.columnId,
       cellState?.recordId,
     ],
@@ -616,12 +637,33 @@ export const StyledTable: FC<StyledTableProps> = ({
       if (columnSizingInfo.isResizingColumn || headerState?.isEditing) {
         return;
       }
-      setHeaderState({ columnId, isActive: true, isShowMenu: true });
+      setHeaderState({
+        focusedColumnId: columnId,
+        isMenuOpen: true,
+        isEditing: false,
+        selectedColumnIds: [],
+      });
       setAddMenuAnchor(null);
       setHeaderMenuAnchor(e.currentTarget as HTMLElement);
       setSelectedColumnId(columnId);
     },
-    [columnSizingInfo.isResizingColumn, headerState],
+    [columnSizingInfo.isResizingColumn, headerState?.isEditing],
+  );
+
+  const onHeaderDoubleClick = useCallback(
+    (e: MouseEvent, columnId: string) => {
+      if (columnSizingInfo.isResizingColumn) {
+        return;
+      }
+      setHeaderState({
+        focusedColumnId: columnId,
+        isMenuOpen: false,
+        isEditing: true,
+        selectedColumnIds: [],
+      });
+      setHeaderMenuAnchor(null);
+    },
+    [columnSizingInfo.isResizingColumn],
   );
 
   // TODO: Rendering logic optimization
@@ -637,47 +679,11 @@ export const StyledTable: FC<StyledTableProps> = ({
       virtualPaddingLeft,
       virtualPaddingRight,
     }: any) => {
+      const indicatorHeight = rowVirtualizer.getTotalSize() + 37;
+
       return (
         <>
-          {columnSizingInfo.isResizingColumn && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left:
-                  (columnSizingInfo.startOffset ?? 0) +
-                    (columnVirtualizer.scrollOffset ?? 0) || 0,
-                transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
-                height: `${rowVirtualizer.getTotalSize() + 37}px`,
-                width: '2px',
-                backgroundColor: '#1976d2',
-                zIndex: 1000,
-                pointerEvents: 'none',
-                opacity: 0.8,
-              }}
-            />
-          )}
-
           <StyledTableHead isScrolled={isScrolled ?? false}>
-            {columnSizingInfo.isResizingColumn && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left:
-                    (columnSizingInfo.startOffset ?? 0) +
-                      (columnVirtualizer.scrollOffset ?? 0) || 0,
-                  transform: `translateX(${columnSizingInfo.deltaOffset || 0}px)`,
-                  width: '2px',
-                  backgroundColor: '#1976d2',
-                  zIndex: 1001,
-                  pointerEvents: 'none',
-                  opacity: 0.8,
-                }}
-              />
-            )}
-
             {table.getHeaderGroups().map((headerGroup) => (
               <StyledTableHeadRow key={headerGroup.id}>
                 {/* Pinned left headers */}
@@ -693,14 +699,12 @@ export const StyledTable: FC<StyledTableProps> = ({
                     <StyledTableHeadCell
                       canResize={!isSelectCol}
                       header={header}
-                      isActive={
-                        headerState?.columnId === header.id &&
-                        headerState?.isActive
-                      }
+                      indicatorHeight={indicatorHeight}
                       isEditing={
-                        headerState?.columnId === header.id &&
+                        headerState?.focusedColumnId === header.id &&
                         headerState?.isEditing
                       }
+                      isFocused={headerState?.focusedColumnId === header.id}
                       isPinned
                       key={header.id}
                       onClick={
@@ -715,12 +719,21 @@ export const StyledTable: FC<StyledTableProps> = ({
                           ? (e) => onHeaderRightClick(e, col.id)
                           : undefined
                       }
+                      onDoubleClick={
+                        !isSelectCol
+                          ? (e) => onHeaderDoubleClick(e, header.id)
+                          : undefined
+                      }
                       onEditSave={(newName) =>
                         (table.options.meta as any)?.updateHeaderName?.(
                           header.id,
                           newName,
                         )
                       }
+                      onResizeStart={() => {
+                        setHeaderMenuAnchor(null);
+                        setHeaderState(null);
+                      }}
                       shouldShowPinnedRightShadow={
                         index === leftPinnedColumns.length - 1
                       }
@@ -756,14 +769,12 @@ export const StyledTable: FC<StyledTableProps> = ({
                     <StyledTableHeadCell
                       dataIndex={virtualColumn.index}
                       header={header}
-                      isActive={
-                        headerState?.columnId === header.id &&
-                        headerState?.isActive
-                      }
+                      indicatorHeight={indicatorHeight}
                       isEditing={
-                        headerState?.columnId === header.id &&
+                        headerState?.focusedColumnId === header.id &&
                         headerState?.isEditing
                       }
+                      isFocused={headerState?.focusedColumnId === header.id}
                       key={header.id}
                       measureRef={(node) =>
                         columnVirtualizer.measureElement(node)
@@ -772,12 +783,17 @@ export const StyledTable: FC<StyledTableProps> = ({
                         onHeaderClick(e, header.id);
                       }}
                       onContextMenu={(e) => onHeaderRightClick(e, header.id)}
+                      onDoubleClick={(e) => onHeaderDoubleClick(e, header.id)}
                       onEditSave={(newName) =>
                         (table.options.meta as any)?.updateHeaderName?.(
                           header.id,
                           newName,
                         )
                       }
+                      onResizeStart={() => {
+                        setHeaderMenuAnchor(null);
+                        setHeaderState(null);
+                      }}
                       width={header.getSize()}
                     />
                   );
@@ -891,14 +907,10 @@ export const StyledTable: FC<StyledTableProps> = ({
       );
     },
     [
-      columnSizingInfo.isResizingColumn,
-      columnSizingInfo.startOffset,
-      columnSizingInfo.deltaOffset,
       isScrolled,
       table,
       leftPinnedColumns,
-      headerState?.columnId,
-      headerState?.isActive,
+      headerState?.focusedColumnId,
       headerState?.isEditing,
       stickyLeftMap,
       onHeaderClick,
@@ -920,6 +932,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       }}
     >
       <Stack
+        style={columnSizeVars as React.CSSProperties}
         sx={{
           display: 'flex',
           flexDirection: 'column',

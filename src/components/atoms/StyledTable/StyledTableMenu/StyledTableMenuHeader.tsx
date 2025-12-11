@@ -30,10 +30,10 @@ interface StyledTableMenuHeaderProps {
   selectedColumnId: string;
   columnPinning: { left?: string[]; right?: string[] };
   headerState: {
-    columnId: string;
-    isActive?: boolean;
-    isEditing?: boolean;
-    isShowMenu?: boolean;
+    focusedColumnId: string | null;
+    isMenuOpen: boolean;
+    isEditing: boolean;
+    selectedColumnIds: string[];
   } | null;
   onClose: () => void;
   onMenuItemClick: (item: {
@@ -56,7 +56,9 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
     <Popper
       anchorEl={anchorEl}
       open={
-        Boolean(anchorEl) && !headerState?.isEditing && !!headerState?.isActive
+        Boolean(anchorEl) &&
+        !headerState?.isEditing &&
+        (headerState?.isMenuOpen ?? false)
       }
       placement={menuStyles.popper.placement}
       sx={{ zIndex: menuStyles.popper.zIndex }}
