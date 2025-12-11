@@ -511,7 +511,7 @@ export const DialogActionsMenu: FC = () => {
                     )
                   }
                   key={`search-${index}`}
-                  onClick={item.onClick}
+                  onClick={() => onIntegrationItemClick(item)}
                   title={item.name}
                 />
               ))}

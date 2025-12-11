@@ -90,7 +90,9 @@ export const useActionsMenuSearch = (
     if (searchValue.trim() === '') {
       return [];
     }
-    return fuse.search(searchValue).map((result) => result.item);
+    return fuse
+      .search(searchValue)
+      .map((result) => result.item) as unknown as SuggestionItem[];
   }, [fuse, searchValue]);
 
   // 是否有搜索内容
