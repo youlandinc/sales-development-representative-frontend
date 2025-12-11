@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { StyledSelect } from '@/components/atoms';
 
-import ICON_COINS from '../assets/icon_coins.svg';
+import ICON_COINS from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_coins.svg';
 
 export interface ModelOptionItem {
   value: string;
@@ -40,7 +40,7 @@ interface FlatOption extends TOption {
 const MENU_PAPER_SX: SxProps = {
   boxShadow:
     '0px 0px 2px 0px rgba(17, 52, 227, 0.1), 0px 10px 10px 0px rgba(17, 52, 227, 0.1)',
-  maxWidth: 474,
+  maxWidth: 500,
   minWidth: 0,
 };
 
@@ -136,24 +136,49 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     return (
       <Stack
         alignItems={'center'}
-        border={'1px solid #F4F5F9'}
-        borderRadius={2}
         flexDirection={'row'}
         gap={0.5}
-        px={0.5}
-        py={0.25}
+        sx={{
+          '& svg path': {
+            fill: '#6F6C7D',
+          },
+        }}
       >
-        <Icon component={ICON_COINS} sx={{ width: 16, height: 16 }} />
-        <Typography color={'#6F6C7D'} fontSize={12} lineHeight={1}>
-          {option.inputCredits ?? '-'}
-        </Typography>
-        <Typography color={'#6F6C7D'} fontSize={12} lineHeight={1}>
-          /
-        </Typography>
-        <Icon component={ICON_COINS} sx={{ width: 16, height: 16 }} />
-        <Typography color={'#6F6C7D'} fontSize={12} lineHeight={1}>
-          {option.outputCredits ?? '-'}
-        </Typography>
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            gap: 0.5,
+            px: 1,
+            py: '2px',
+            borderRadius: 2,
+            border: '1px solid #F4F5F9',
+            alignItems: 'center',
+          }}
+        >
+          <Icon component={ICON_COINS} sx={{ width: 16, height: 16 }} />
+          <Typography color={'text.secondary'} fontSize={12} lineHeight={1}>
+            {option.inputCredits ?? '-'}
+          </Typography>
+        </Stack>
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            gap: 0.5,
+            px: 1,
+            py: '2px',
+            borderRadius: 2,
+            border: '1px solid #F4F5F9',
+            alignItems: 'center',
+          }}
+        >
+          <Typography color={'text.secondary'} fontSize={12} lineHeight={1}>
+            Web
+          </Typography>
+          <Icon component={ICON_COINS} sx={{ width: 16, height: 16 }} />
+          <Typography color={'text.secondary'} fontSize={12} lineHeight={1}>
+            {option.outputCredits ?? '-'}
+          </Typography>
+        </Stack>
       </Stack>
     );
   }, []);
@@ -191,6 +216,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       return (
         <MenuItem key={option.key} value={option.value}>
           <Stack
+            gap={0.5}
             px={1.5}
             py={1}
             sx={{

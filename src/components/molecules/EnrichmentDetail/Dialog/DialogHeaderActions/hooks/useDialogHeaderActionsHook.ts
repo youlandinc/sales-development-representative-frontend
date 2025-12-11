@@ -112,7 +112,7 @@ export const useDialogHeaderActionsHook = () => {
         setDialogHeaderName(item.name);
         setWaterfallDescription(item.description);
         setActiveType(ActiveTypeEnum.add);
-        setAllIntegrations(item.waterfallConfigs);
+        setAllIntegrations(item.waterfallConfigs || []);
         setValidationOptions(item.validations);
       },
     })),

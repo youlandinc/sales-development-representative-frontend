@@ -14,6 +14,9 @@ import ICON_SPARK_OUTLINE from '../assets/dialog/icon_sparkle_outline.svg';
 import { StyledActionItem, StyledSearchInput } from '../Dialog/Common';
 import { useDialogHeaderActionsHook } from '../Dialog/DialogHeaderActions/hooks';
 import { StyledProviderBadges } from '../Dialog/DialogActionsMenu/base';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { useShallow } from 'zustand/shallow';
+import { ActionsTypeKeyEnum } from '@/types';
 
 interface WebResearchGenerateProps {
   handleGeneratePrompt?: () => void;
@@ -29,7 +32,15 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
   const promptEditorRef = useRef(null);
   const { generateDescription, setGenerateEditorInstance } =
     useWebResearchStore((state) => state);
-  const { ENRICHMENTS_SUGGESTION_MENUS } = useDialogHeaderActionsHook();
+  const { suggestions, suggestionsLoading, enrichments, enrichmentsLoading } =
+    useActionsStore(
+      useShallow((store) => ({
+        suggestions: store.suggestionsList,
+        suggestionsLoading: store.suggestionsLoading,
+        enrichments: store.enrichmentsList,
+        enrichmentsLoading: store.enrichmentsLoading,
+      })),
+    );
   const { filedMapping } = useVariableFromStore();
   const { visible, open, close } = useSwitch(false);
 
@@ -56,29 +67,32 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
         Tasks Atlas recommends based on your current table
       </Typography>
       <Stack gap={1.5}>
-        {ENRICHMENTS_SUGGESTION_MENUS.children.map((item, index) => (
-          <StyledActionItem
-            badges={
-              <StyledProviderBadges
-                providers={item.waterfallConfigs.map(
-                  (config) => config.logoUrl,
-                )}
-              />
-            }
-            description={item.description}
-            icon={
-              <Image
-                alt={'Provider '}
-                height={16}
-                src={item.logoUrl}
-                width={16}
-              />
-            }
-            key={index}
-            onClick={item.onClick}
-            title={item.name}
-          />
-        ))}
+        {suggestions
+          .filter((item) => item.key === ActionsTypeKeyEnum.ai_template)
+          .slice(0, 6)
+          .map((item, index) => (
+            <StyledActionItem
+              badges={
+                <StyledProviderBadges
+                  providers={(item.waterfallConfigs || []).map(
+                    (config) => config.logoUrl,
+                  )}
+                />
+              }
+              description={item.description}
+              icon={
+                <Image
+                  alt={'Provider '}
+                  height={16}
+                  src={item.logoUrl}
+                  width={16}
+                />
+              }
+              key={index}
+              // onClick={item.onClick}
+              title={item.name}
+            />
+          ))}
       </Stack>
       <ClickAwayListener onClickAway={close}>
         <Stack

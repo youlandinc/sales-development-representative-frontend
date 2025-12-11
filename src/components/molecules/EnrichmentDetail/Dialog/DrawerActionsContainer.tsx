@@ -39,7 +39,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
         maxWidth: 500,
         width: dialogVisible ? '100%' : 0,
         height: '100%',
-        transitionDuration: '0.3s',
+        // transitionDuration: '0.3s',
         borderLeft: '1px solid',
         borderColor: 'border.default',
       }}

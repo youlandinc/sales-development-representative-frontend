@@ -1,29 +1,35 @@
 import { Box, Divider, Icon, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import { FC, useMemo, useState } from 'react';
+import { FC, useState } from 'react';
+import { useShallow } from 'zustand/shallow';
 
-import { StyledProviderBadges, StyledTabButton } from './base';
 import { StyledTextField } from '@/components/atoms';
+import { StyledProviderBadges, StyledTabButton } from './base';
 
 import { EXPORTS_MENUS } from './data';
 import { useActionsMenuSearch } from './hooks';
 
 import { StyledActionItem, StyledCollapseMenuContainer } from '../Common';
 
-import { useProspectTableStore } from '@/stores/enrichment';
-
-import { useDialogHeaderActionsHook } from '../DialogHeaderActions/hooks';
+import {
+  ActiveTypeEnum,
+  useProspectTableStore,
+  useWorkEmailStore,
+} from '@/stores/enrichment';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+import { ActionsTypeKeyEnum } from '@/types';
 
 import ICON_ARROW_LINE_RIGHT from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_arrow_line_right.svg';
 import ICON_LIGHTING from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_lighting.svg';
 import ICON_SHARE from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_share.svg';
-import ICON_SUGGESTION from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_suggestions.svg';
+import ICON_SUGGESTION_BLUE from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_suggestions_blue.svg';
 import ICON_TARGET from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_target.svg';
 import ICON_SPARK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle.svg';
-import ICON_SPARK_BLACK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_fill.svg';
-import SearchIcon from '@mui/icons-material/Search';
+import ICON_SPARK_BLACK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_outline.svg';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { Search } from '@mui/icons-material';
+import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 
 type TabType = 'suggestions' | 'enrichments' | 'exports';
 
@@ -31,39 +37,70 @@ export const DialogActionsMenu: FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('suggestions');
   const closeDialog = useProspectTableStore((state) => state.closeDialog);
   const openDialog = useProspectTableStore((state) => state.openDialog);
-
-  const { ENRICHMENTS_SUGGESTION_MENUS } = useDialogHeaderActionsHook();
-
-  const ENRICHMENTS_MOCK = useMemo(
-    () => [
-      {
-        title: 'Contact information',
-        list: ENRICHMENTS_SUGGESTION_MENUS.children,
-      },
-    ],
-    [ENRICHMENTS_SUGGESTION_MENUS.children],
+  const { suggestions, suggestionsLoading, enrichments } = useActionsStore(
+    useShallow((store) => ({
+      suggestions: store.suggestionsList,
+      suggestionsLoading: store.suggestionsLoading,
+      enrichments: store.enrichmentsList,
+    })),
+  );
+  const {
+    setActiveType,
+    setDialogHeaderName,
+    setWaterfallDescription,
+    setAllIntegrations,
+    setValidationOptions,
+  } = useWorkEmailStore(
+    useShallow((state) => ({
+      setActiveType: state.setActiveType,
+      setDialogHeaderName: state.setDialogHeaderName,
+      setWaterfallDescription: state.setWaterfallDescription,
+      setAllIntegrations: state.setAllIntegrations,
+      setValidationOptions: state.setValidationOptions,
+    })),
   );
 
   const { debouncedSetSearch, hasSearchValue, resetSearch, searchResults } =
-    useActionsMenuSearch(ENRICHMENTS_MOCK);
+    useActionsMenuSearch(enrichments);
 
-  const handleTabClick = (tab: TabType) => {
+  const onTabClick = (tab: TabType) => {
     setActiveTab(tab);
   };
 
-  const handleClose = () => {
+  const onClickToClose = () => {
     closeDialog();
     resetSearch();
     setActiveTab('suggestions');
   };
+
+  // const { generatePrompt: generateJson } = useGeneratePrompt(
+  //   setSchemaStr,
+  //   (objStr) => {
+  //     setIsLoading(false);
+  //     setSchemaJson(objStr);
+  //     setTimeout(() => {
+  //       setTab('configure');
+  //     }, 0);
+  //   },
+  // );
+  // const { generatePrompt, isThinking } = useGeneratePrompt(
+  //   setText,
+  //   async (text) => {
+  //     setPrompt(text);
+  //     await generateJson('/sdr/ai/generate', {
+  //       module: 'JSON_SCHEMA_WITH_PROMPT',
+  //       params: {
+  //         prompt: text,
+  //       },
+  //     });
+  //   },
+  // );
 
   return (
     <Stack
       gap={1.5}
       sx={{
         bgcolor: 'white',
-
-        // borderRadius: 2,
         width: '100%',
         height: '100%',
         px: 3,
@@ -80,7 +117,7 @@ export const DialogActionsMenu: FC = () => {
           Actions
         </Typography>
         <Box
-          onClick={handleClose}
+          onClick={onClickToClose}
           sx={{
             border: '1px solid',
             borderColor: 'border.default',
@@ -107,37 +144,35 @@ export const DialogActionsMenu: FC = () => {
           debouncedSetSearch(e.target.value);
         }}
         placeholder={'Search...'}
-        size="small"
+        size={'small'}
         slotProps={{
           input: {
             startAdornment: (
-              <SearchIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+              <Search sx={{ fontSize: 20, color: 'text.secondary' }} />
             ),
           },
         }}
       />
-
-      {/* 如果搜索框中有内容，就只显示搜索结果。如果搜索框没有内容，就显示下面的内容 */}
 
       {hasSearchValue ? (
         <Stack flex={1} gap={1.5} minHeight={0} overflow={'auto'} pb={1.75}>
           {searchResults.length === 0 ? (
             <Typography
               color={'text.secondary'}
-              fontSize={14}
+              fontSize={12}
               textAlign={'center'}
             >
-              No results found
+              No results found.
             </Typography>
           ) : (
-            <Stack gap={1.5}>
+            <Stack flex={1} gap={1.5} minHeight={0} overflow={'auto'}>
               {searchResults.map((item, index) => (
                 <StyledActionItem
                   badges={
                     item.source === 'enrichments' &&
-                    item.waterfallConfigs?.length > 0 ? (
+                    (item.waterfallConfigs?.length ?? 0) > 0 ? (
                       <StyledProviderBadges
-                        providers={item.waterfallConfigs.map(
+                        providers={(item.waterfallConfigs ?? []).map(
                           (config) => config.logoUrl,
                         )}
                       />
@@ -168,7 +203,7 @@ export const DialogActionsMenu: FC = () => {
           )}
         </Stack>
       ) : (
-        <>
+        <Stack flex={1} gap={1.5} minHeight={0}>
           <Stack flexDirection={'row'} gap={1.25}>
             <StyledTabButton
               icon={
@@ -176,7 +211,7 @@ export const DialogActionsMenu: FC = () => {
               }
               isActive={activeTab === 'suggestions'}
               label={'Suggestions'}
-              onClick={() => handleTabClick('suggestions')}
+              onClick={() => onTabClick('suggestions')}
             />
             <StyledTabButton
               icon={
@@ -187,7 +222,7 @@ export const DialogActionsMenu: FC = () => {
               }
               isActive={activeTab === 'enrichments'}
               label={'Enrichments'}
-              onClick={() => handleTabClick('enrichments')}
+              onClick={() => onTabClick('enrichments')}
             />
             <StyledTabButton
               icon={
@@ -195,7 +230,7 @@ export const DialogActionsMenu: FC = () => {
               }
               isActive={activeTab === 'exports'}
               label={'Exports'}
-              onClick={() => handleTabClick('exports')}
+              onClick={() => onTabClick('exports')}
             />
           </Stack>
           <Divider sx={{ borderColor: 'border.default' }} />
@@ -206,146 +241,167 @@ export const DialogActionsMenu: FC = () => {
 
           {/* Content */}
           <Stack flex={1} gap={1.5} minHeight={0} overflow={'auto'} pb={1.75}>
-            {/* Search and Tabs */}
-
-            {/* Content based on active tab */}
-            <Stack flex={1} gap={3} minHeight={0} overflow={'auto'}>
-              {activeTab === 'suggestions' && (
-                <>
-                  {/* Suggestions Section */}
-                  <StyledCollapseMenuContainer
-                    gap={0.5}
-                    icon={ICON_SUGGESTION}
-                    title={'Suggestions'}
-                  >
+            {activeTab === 'suggestions' && (
+              <>
+                {/* Suggestions Section */}
+                <StyledCollapseMenuContainer
+                  gap={1}
+                  icon={ICON_SUGGESTION_BLUE}
+                  title={'Suggestions'}
+                >
+                  <Stack gap={1.5}>
+                    <Typography color={'text.secondary'} variant={'body3'}>
+                      Tasks Atlas recommends based on your current table
+                    </Typography>
                     <Stack gap={1.5}>
-                      <Typography variant={'body3'}>
-                        Based on your current data, we think these enrichments
-                        will be the most useful right now.
-                      </Typography>
-                      <Stack gap={1.5}>
-                        {ENRICHMENTS_SUGGESTION_MENUS.children.map(
-                          (item, index) => (
-                            <StyledActionItem
-                              badges={
-                                <StyledProviderBadges
-                                  providers={item.waterfallConfigs.map(
-                                    (config) => config.logoUrl,
-                                  )}
-                                />
-                              }
-                              description={item.description}
-                              icon={
-                                <Image
-                                  alt={'Provider '}
-                                  height={16}
-                                  src={item.logoUrl}
-                                  width={16}
-                                />
-                              }
-                              key={index + 'a'}
-                              onClick={item.onClick}
-                              title={item.name}
-                            />
-                          ),
-                        )}
-                      </Stack>
-                    </Stack>
-                  </StyledCollapseMenuContainer>
-
-                  {/* Atlas Intelligence Section */}
-                  <StyledCollapseMenuContainer
-                    icon={ICON_SPARK}
-                    title={
-                      <Typography
-                        color={'#6E4EFB'}
-                        fontSize={14}
-                        fontWeight={600}
-                        lineHeight={1.2}
-                      >
-                        Atlas Intelligence
-                      </Typography>
-                    }
-                  >
-                    <StyledActionItem
-                      description={
-                        'Atlas handles custom research, data cleaning, and reasoning from free-form instructions.'
-                      }
-                      icon={
-                        <Icon
-                          component={ICON_SPARK_BLACK}
-                          sx={{ width: 20, height: 20 }}
-                        />
-                      }
-                      onClick={() =>
-                        openDialog(TableColumnMenuActionEnum.web_research)
-                      }
-                      title={'Describe Atlas your task'}
-                    />
-                  </StyledCollapseMenuContainer>
-                </>
-              )}
-
-              {activeTab === 'enrichments' && (
-                <Stack gap={1.5}>
-                  {ENRICHMENTS_MOCK.map((item, index) => (
-                    <StyledCollapseMenuContainer
-                      key={index + 'c'}
-                      title={item.title}
-                    >
-                      <Stack gap={1.5}>
-                        {item.list.map((i, j) => (
-                          <StyledActionItem
-                            badges={
+                      {(suggestionsLoading
+                        ? Array(6).fill(null)
+                        : suggestions.slice(0, 6)
+                      ).map((item, index) => (
+                        <StyledActionItem
+                          badges={
+                            item?.waterfallConfigs?.length && (
                               <StyledProviderBadges
-                                providers={i.waterfallConfigs.map(
-                                  (config) => config.logoUrl,
+                                maxCount={3}
+                                providers={(item?.waterfallConfigs ?? []).map(
+                                  (config: { logoUrl: string }) =>
+                                    config.logoUrl,
                                 )}
                               />
+                            )
+                          }
+                          description={
+                            item?.shortDescription ?? item?.description ?? ''
+                          }
+                          icon={
+                            <Image
+                              alt={'Provider'}
+                              height={16}
+                              src={item?.logoUrl ?? ''}
+                              width={16}
+                            />
+                          }
+                          key={`suggestion-${index}`}
+                          loading={suggestionsLoading}
+                          onClick={() => {
+                            if (item?.key === ActionsTypeKeyEnum.ai_template) {
+                              alert(ActionsTypeKeyEnum.ai_template);
                             }
-                            description={i.description}
-                            icon={
-                              <Image
-                                alt={'Provider '}
-                                height={16}
-                                src={i.logoUrl}
-                                width={16}
-                              />
-                            }
-                            key={j + 'b'}
-                            onClick={i.onClick}
-                            title={i.name}
-                          />
-                        ))}
-                      </Stack>
-                    </StyledCollapseMenuContainer>
-                  ))}
-                </Stack>
-              )}
-
-              {activeTab === 'exports' && (
-                <Stack gap={1.5}>
-                  {EXPORTS_MENUS.map((item, index) => (
-                    <StyledActionItem
-                      description={item.description}
-                      icon={
-                        <Icon
-                          component={item.icon}
-                          sx={{ width: 16, height: 16 }}
+                            openDialog(TableColumnMenuActionEnum.work_email);
+                            setDialogHeaderName(item?.name ?? '');
+                            setWaterfallDescription(item?.description ?? '');
+                            setActiveType(ActiveTypeEnum.add);
+                            setAllIntegrations(item?.waterfallConfigs ?? []);
+                            setValidationOptions(item?.validations ?? null);
+                          }}
+                          title={item?.name ?? ''}
                         />
-                      }
-                      key={index}
-                      onClick={() => {
-                        return;
-                      }}
-                      title={item.title}
-                    />
-                  ))}
-                </Stack>
-              )}
-            </Stack>
+                      ))}
+                    </Stack>
+                  </Stack>
+                </StyledCollapseMenuContainer>
+
+                {/* Atlas Intelligence Section */}
+                <StyledCollapseMenuContainer
+                  icon={ICON_SPARK}
+                  title={
+                    <Typography fontSize={14} fontWeight={600} lineHeight={1.2}>
+                      Atlas Intelligence
+                    </Typography>
+                  }
+                >
+                  <StyledActionItem
+                    description={
+                      'Atlas handles custom research, data cleaning, and reasoning from free-form instructions.'
+                    }
+                    icon={
+                      <Icon
+                        component={ICON_SPARK_BLACK}
+                        sx={{ width: 20, height: 20 }}
+                      />
+                    }
+                    onClick={() =>
+                      openDialog(TableColumnMenuActionEnum.web_research)
+                    }
+                    title={'Describe Atlas your task'}
+                  />
+                </StyledCollapseMenuContainer>
+              </>
+            )}
+
+            {activeTab === 'enrichments' && (
+              <Stack gap={1.5}>
+                {enrichments.map((item, index) => (
+                  <StyledCollapseMenuContainer
+                    key={item?.categoryKey ?? `enrichment-${index}`}
+                    title={item?.categoryName ?? ''}
+                  >
+                    <Stack gap={1.5}>
+                      {(item?.actions ?? []).map((action, actionIndex) => (
+                        <StyledActionItem
+                          badges={
+                            action?.waterfallConfigs?.length && (
+                              <StyledProviderBadges
+                                maxCount={3}
+                                providers={(action?.waterfallConfigs ?? []).map(
+                                  (config: { logoUrl: string }) =>
+                                    config.logoUrl,
+                                )}
+                              />
+                            )
+                          }
+                          description={action?.description ?? ''}
+                          icon={
+                            <Image
+                              alt={'Provider'}
+                              height={16}
+                              src={action?.logoUrl ?? ''}
+                              width={16}
+                            />
+                          }
+                          key={`action-${index}-${actionIndex}`}
+                          onClick={() => {
+                            if (
+                              action?.key === ActionsTypeKeyEnum.ai_template
+                            ) {
+                              alert(ActionsTypeKeyEnum.ai_template);
+                            }
+                            openDialog(TableColumnMenuActionEnum.work_email);
+                            setDialogHeaderName(action?.name ?? '');
+                            setWaterfallDescription(action?.description ?? '');
+                            setActiveType(ActiveTypeEnum.add);
+                            setAllIntegrations(action?.waterfallConfigs ?? []);
+                            setValidationOptions(action?.validations ?? null);
+                          }}
+                          title={action?.name ?? ''}
+                        />
+                      ))}
+                    </Stack>
+                  </StyledCollapseMenuContainer>
+                ))}
+              </Stack>
+            )}
+
+            {activeTab === 'exports' && (
+              <Stack gap={1.5}>
+                {EXPORTS_MENUS.map((item, index) => (
+                  <StyledActionItem
+                    description={item.description}
+                    icon={
+                      <Icon
+                        component={item.icon}
+                        sx={{ width: 16, height: 16 }}
+                      />
+                    }
+                    key={`export-${index}`}
+                    onClick={() => {}}
+                    title={item.title}
+                  />
+                ))}
+              </Stack>
+            )}
           </Stack>
-        </>
+        </Stack>
       )}
     </Stack>
   );

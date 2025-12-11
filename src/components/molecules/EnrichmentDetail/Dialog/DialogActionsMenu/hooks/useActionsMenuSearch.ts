@@ -2,32 +2,21 @@ import { debounce } from '@mui/material';
 import Fuse from 'fuse.js';
 import { useMemo, useState } from 'react';
 
+import { EnrichmentItem } from '@/types/enrichment/drawerActions';
+
 import { EXPORTS_MENUS } from '../data';
 
 export interface SearchItemType {
   name: string;
   description: string;
   logoUrl: string;
-  waterfallConfigs: Array<{ logoUrl: string }>;
-  onClick: () => void;
+  waterfallConfigs: Array<{ logoUrl: string }> | null;
+  onClick?: () => void;
   source: 'enrichments' | 'exports';
   icon?: any;
 }
 
-export interface EnrichmentGroupType {
-  title: string;
-  list: Array<{
-    name: string;
-    description: string;
-    logoUrl: string;
-    waterfallConfigs: Array<{ logoUrl: string }>;
-    onClick: () => void;
-  }>;
-}
-
-export const useActionsMenuSearch = (
-  enrichmentGroups: EnrichmentGroupType[],
-) => {
+export const useActionsMenuSearch = (enrichmentGroups: EnrichmentItem[]) => {
   const [searchValue, setSearchValue] = useState<string>('');
 
   // 防抖设置搜索值
@@ -43,7 +32,7 @@ export const useActionsMenuSearch = (
 
     // 添加 enrichments 数据
     enrichmentGroups.forEach((group) => {
-      group.list.forEach((item) => {
+      group.actions.forEach((item) => {
         items.push({
           ...item,
           source: 'enrichments',

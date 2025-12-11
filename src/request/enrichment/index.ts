@@ -3,3 +3,4 @@ export * from './table';
 
 export * from './integrations';
 export * from './useAi';
+export * from './drawerActions';

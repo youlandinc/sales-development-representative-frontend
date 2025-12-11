@@ -22,7 +22,6 @@ export const StyledCollapseMenuContainer: FC<
         flexDirection={'row'}
         justifyContent={'space-between'}
         onClick={toggle}
-        py={0.5}
         sx={{
           cursor: 'pointer',
         }}

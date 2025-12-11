@@ -73,7 +73,8 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
       ) : (
         <>
           <StyledCost
-            border={'1px solid #D0CEDA'}
+            border={'1px solid #F4F5F9'}
+            borderRadius={2}
             count={`${COINS_PER_ROW}`}
             textColor={'text.secondary'}
           />
@@ -103,12 +104,20 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
       )}
       <Menu
         anchorEl={anchorEl}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
         onClose={() => {
           setAnchorEl(null);
         }}
         open={Boolean(anchorEl)}
         slotProps={{
+          paper: {
+            sx: {
+              transform: 'translateY(-18px) !important',
+            },
+          },
           list: {
             sx: {
               p: 0,
@@ -118,6 +127,10 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
               },
             },
           },
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
         }}
       >
         {rowIds.length > 10 && (
@@ -130,7 +143,13 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
             <Typography color={'text.secondary'} variant={'body2'}>
               Save and run 10 rows
             </Typography>
-            <StyledCost bgcolor={'#EFE9FB'} count={`~${COINS_PER_ROW * 10}`} />
+            <StyledCost
+              bgcolor={'transparent'}
+              border={'1px solid #F4F5F9'}
+              borderRadius={2}
+              count={`${COINS_PER_ROW * 10}`}
+              textColor={'text.secondary'}
+            />
           </MenuItem>
         )}
         <MenuItem
@@ -142,7 +161,13 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
           <Typography color={'text.secondary'} variant={'body2'}>
             Save and run {rowIds.length} rows in this view
           </Typography>
-          <StyledCost bgcolor={'#EFE9FB'} count={'~20'} />
+          <StyledCost
+            bgcolor={'transparent'}
+            border={'1px solid #F4F5F9'}
+            borderRadius={2}
+            count={`~${rowIds.length}`}
+            textColor={'text.secondary'}
+          />
         </MenuItem>
         <MenuItem
           onClick={async () => {

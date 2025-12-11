@@ -4,11 +4,15 @@ import Image from 'next/image';
 
 interface StyledProviderBadgesProps {
   providers: string[];
+  maxCount?: number;
 }
 
 export const StyledProviderBadges: FC<StyledProviderBadgesProps> = ({
   providers,
+  maxCount,
 }) => {
+  const displayProviders = maxCount ? providers.slice(0, maxCount) : providers;
+
   return (
     <Stack
       flexDirection={'row'}
@@ -17,7 +21,7 @@ export const StyledProviderBadges: FC<StyledProviderBadgesProps> = ({
         height: 18,
       }}
     >
-      {providers.map((provider, index) => (
+      {displayProviders.map((provider, index) => (
         <Box
           key={index}
           sx={{
@@ -30,7 +34,7 @@ export const StyledProviderBadges: FC<StyledProviderBadgesProps> = ({
             overflow: 'hidden',
             bgcolor: 'white',
             marginLeft: index > 0 ? '-6px' : 0,
-            zIndex: providers.length - index,
+            zIndex: displayProviders.length - index,
           }}
         >
           <Image

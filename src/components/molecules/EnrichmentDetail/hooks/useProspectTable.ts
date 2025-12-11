@@ -77,9 +77,9 @@ export const useProspectTable = ({
     })),
   );
   const { runAi } = useRunAi();
-  const fetchIntegrationMenus = useWorkEmailStore(
-    (store) => store.fetchIntegrationMenus,
-  );
+  // const fetchIntegrationMenus = useWorkEmailStore(
+  //   (store) => store.fetchIntegrationMenus,
+  // );
 
   // TODO: State management optimization
   // 1. Using both ref and state to maintain rowsMap can cause inconsistencies
@@ -311,13 +311,13 @@ export const useProspectTable = ({
       return;
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
-    fetchIntegrationMenus();
+    // fetchIntegrationMenus();
   }, [
     tableId,
     total,
     fetchBatchData,
     isMetadataLoading,
-    fetchIntegrationMenus,
+    // fetchIntegrationMenus,
   ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)

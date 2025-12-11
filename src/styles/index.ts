@@ -55,4 +55,10 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
     maxHeight: 18,
     fontSize: 12,
   },
+  '&.MuiAutocomplete-option[aria-selected="true"]:not(.Mui-focused)': {
+    bgcolor: 'transparent !important',
+  },
+  '&.Mui-focused': {
+    bgcolor: '#F4F5F9 !important',
+  },
 };

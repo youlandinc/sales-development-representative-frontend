@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react';
-import { Box, Icon, Stack, Typography } from '@mui/material';
+import { Box, Icon, Skeleton, Stack, Typography } from '@mui/material';
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow.svg';
 
 interface StyledActionItemProps {
@@ -8,6 +8,7 @@ interface StyledActionItemProps {
   description: string;
   badges?: ReactNode;
   onClick?: () => void;
+  loading?: boolean;
 }
 
 export const StyledActionItem: FC<StyledActionItemProps> = ({
@@ -16,7 +17,45 @@ export const StyledActionItem: FC<StyledActionItemProps> = ({
   description,
   badges,
   onClick,
+  loading = false,
 }) => {
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          border: '1px solid',
+          borderColor: '#F0F0F4',
+          borderRadius: 2,
+          p: 1.5,
+        }}
+      >
+        <Stack gap={0.5}>
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+          >
+            <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+              <Skeleton
+                height={16}
+                sx={{ borderRadius: 1 }}
+                variant={'rectangular'}
+                width={16}
+              />
+              <Skeleton height={20} variant={'text'} width={120} />
+            </Stack>
+            <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+              <Skeleton height={20} variant={'circular'} width={20} />
+              <Skeleton height={20} variant={'circular'} width={20} />
+              <Skeleton height={20} variant={'circular'} width={20} />
+            </Stack>
+          </Stack>
+          <Skeleton height={18} variant={'text'} width={'80%'} />
+        </Stack>
+      </Box>
+    );
+  }
+
   return (
     <Box
       onClick={onClick}
@@ -24,8 +63,7 @@ export const StyledActionItem: FC<StyledActionItemProps> = ({
         border: '1px solid',
         borderColor: '#F0F0F4',
         borderRadius: 2,
-        px: 1.5,
-        py: 1,
+        p: 1.5,
         cursor: onClick ? 'pointer' : 'default',
         '&:hover': onClick
           ? {

@@ -60,11 +60,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         closeDialog: state.closeDialog,
       })),
     );
-  const [tab, setTab] = useState<'generate' | 'configure'>('generate');
-  const [text, setText] = useState('');
-  const [schemaStr, setSchemaStr] = useState('');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const {
     activeType,
@@ -77,7 +72,26 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     generateEditorInstance,
     tipTapEditorInstance,
     slateEditorInstance,
-  } = useWebResearchStore((state) => state);
+  } = useWebResearchStore(
+    useShallow((state) => ({
+      activeType: state.activeType,
+      setPrompt: state.setPrompt,
+      schemaJson: state.schemaJson,
+      setSchemaJson: state.setSchemaJson,
+      allClear: state.allClear,
+      saveAiConfig: state.saveAiConfig,
+      setGenerateDescription: state.setGenerateDescription,
+      generateEditorInstance: state.generateEditorInstance,
+      tipTapEditorInstance: state.tipTapEditorInstance,
+      slateEditorInstance: state.slateEditorInstance,
+    })),
+  );
+
+  const [tab, setTab] = useState<'generate' | 'configure'>('generate');
+  const [text, setText] = useState('');
+  const [schemaStr, setSchemaStr] = useState('');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { filedMapping } = useVariableFromStore();
   const { generatePrompt: generateJson } = useGeneratePrompt(
     setSchemaStr,
@@ -382,7 +396,8 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         py={1.5}
       >
         <StyledCost
-          border={'1px solid #D0CEDA'}
+          border={'1px solid #F4F5F9'}
+          borderRadius={2}
           count={`${COINS_PER_ROW}`}
           textColor={'text.secondary'}
         />
