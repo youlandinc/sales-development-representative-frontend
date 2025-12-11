@@ -59,7 +59,7 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
   }, []);
 
   return (
-    <Stack flex={1}>
+    <Stack flex={1} minHeight={0}>
       {computedContent}
       <DialogWorkEmailFooter cb={cb} />
     </Stack>

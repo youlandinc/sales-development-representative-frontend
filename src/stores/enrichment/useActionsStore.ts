@@ -46,10 +46,6 @@ export const useActionsStore = create<
             state.suggestionsLoading = false;
             state.suggestionsList = res.data || [];
           });
-          const filteredData = (res.data || []).filter(
-            (item) => item.key !== ActionsTypeKeyEnum.ai_template,
-          );
-          useWorkEmailStore.getState().setIntegrationMenus(filteredData);
         } catch (err) {
           const { message, header, variant } = err as HttpError;
           SDRToast({ message, header, variant });
@@ -68,6 +64,12 @@ export const useActionsStore = create<
             state.enrichmentsLoading = false;
             state.enrichmentsList = res.data || [];
           });
+          const filteredData =
+            (res.data || []).find(
+              (item) =>
+                item.categoryKey === ActionsTypeKeyEnum.contact_information,
+            )?.actions || [];
+          useWorkEmailStore.getState().setIntegrationMenus(filteredData || []);
         } catch (err) {
           const { message, header, variant } = err as HttpError;
           SDRToast({ message, header, variant });

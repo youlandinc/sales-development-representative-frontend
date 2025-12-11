@@ -4,7 +4,7 @@ import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/ic
 
 interface StyledActionItemProps {
   icon?: ReactNode;
-  title: string;
+  title: ReactNode;
   description: string;
   badges?: ReactNode;
   onClick?: () => void;

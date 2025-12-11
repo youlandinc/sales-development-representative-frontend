@@ -60,109 +60,80 @@ export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
   }, [closeDialog]);
 
   return (
-    <Drawer
-      anchor={'right'}
-      hideBackdrop
-      onClose={closeDialog}
-      open={
-        dialogType === TableColumnMenuActionEnum.edit_column &&
-        dialogVisible &&
-        !!column
-      }
-      slotProps={{
-        paper: {
-          sx: {
-            maxWidth: 500,
-            width: '100%',
-          },
-        },
-      }}
-      sx={{
-        left: 'unset',
-      }}
-    >
-      <Stack gap={4} height={'100%'}>
-        {/* header */}
-        <Stack
-          alignItems={'center'}
-          flexDirection={'row'}
-          gap={0.5}
-          pt={3}
-          px={3}
-        >
-          {column?.fieldType && (
-            <Icon
-              component={
-                COLUMN_TYPE_ICONS[column?.fieldType as TableColumnTypeEnum] ||
-                COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
-              }
-              sx={{ width: 20, height: 20 }}
-            />
-          )}
-          <Typography fontWeight={600} lineHeight={1.2}>
-            {column?.fieldName}
-          </Typography>
+    <Stack gap={4} height={'100%'}>
+      {/* header */}
+      <Stack
+        alignItems={'center'}
+        flexDirection={'row'}
+        gap={0.5}
+        pt={3}
+        px={3}
+      >
+        {column?.fieldType && (
           <Icon
-            component={ICON_CLOSE}
-            onClick={closeDialog}
-            sx={{ width: 24, height: 24, ml: 'auto', cursor: 'pointer' }}
+            component={
+              COLUMN_TYPE_ICONS[column?.fieldType as TableColumnTypeEnum] ||
+              COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+            }
+            sx={{ width: 20, height: 20 }}
           />
-        </Stack>
-        <Stack gap={1.5} px={3}>
-          <Stack
-            border={'1px solid #DFDEE6'}
-            borderRadius={2}
-            gap={1.5}
-            p={1.5}
-          >
-            <Stack gap={1}>
-              <Typography variant={'body2'}>Column name</Typography>
-              <StyledTextField
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-              />
-            </Stack>
-            <Stack gap={1}>
-              <Typography variant={'body2'}>Data type</Typography>
-              <CommonSelectFieldType
-                onChange={(e) =>
-                  setValue(e.target.value as TableColumnTypeEnum)
-                }
-                value={value}
-              />
-            </Stack>
+        )}
+        <Typography fontWeight={600} lineHeight={1.2}>
+          {column?.fieldName}
+        </Typography>
+        <Icon
+          component={ICON_CLOSE}
+          onClick={closeDialog}
+          sx={{ width: 24, height: 24, ml: 'auto', cursor: 'pointer' }}
+        />
+      </Stack>
+      <Stack gap={1.5} px={3}>
+        <Stack border={'1px solid #DFDEE6'} borderRadius={2} gap={1.5} p={1.5}>
+          <Stack gap={1}>
+            <Typography variant={'body2'}>Column name</Typography>
+            <StyledTextField
+              onChange={(e) => setName(e.target.value)}
+              value={name}
+            />
+          </Stack>
+          <Stack gap={1}>
+            <Typography variant={'body2'}>Data type</Typography>
+            <CommonSelectFieldType
+              onChange={(e) => setValue(e.target.value as TableColumnTypeEnum)}
+              value={value}
+            />
           </Stack>
         </Stack>
-        <Stack
-          alignItems={'center'}
-          borderTop={' 1px solid   #D0CEDA'}
-          flexDirection={'row'}
-          gap={1}
-          justifyContent={'flex-end'}
-          mt={'auto'}
-          px={3}
-          py={1.5}
-        >
-          <StyledButton
-            color={'info'}
-            onClick={closeDialog}
-            size={'medium'}
-            variant={'outlined'}
-          >
-            Cancel
-          </StyledButton>
-          <StyledButton
-            disabled={name.trim() === ''}
-            loading={state.loading}
-            onClick={updateDescription}
-            size={'medium'}
-            sx={{ width: 65 }}
-            variant={'contained'}
-          >
-            Save
-          </StyledButton>
-        </Stack>
       </Stack>
-    </Drawer>
+      <Stack
+        alignItems={'center'}
+        borderTop={' 1px solid   #D0CEDA'}
+        flexDirection={'row'}
+        gap={1}
+        justifyContent={'flex-end'}
+        mt={'auto'}
+        px={3}
+        py={1.5}
+      >
+        <StyledButton
+          color={'info'}
+          onClick={closeDialog}
+          size={'medium'}
+          variant={'outlined'}
+        >
+          Cancel
+        </StyledButton>
+        <StyledButton
+          disabled={name.trim() === ''}
+          loading={state.loading}
+          onClick={updateDescription}
+          size={'medium'}
+          sx={{ width: 65 }}
+          variant={'contained'}
+        >
+          Save
+        </StyledButton>
+      </Stack>
+    </Stack>
   );
 };

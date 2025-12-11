@@ -18,6 +18,7 @@ import {
   IntegrationActionValidation,
   WaterfallConfigTypeEnum,
 } from '@/types/enrichment';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 // 工具函数：构建selectedOption对象
 const buildSelectedOption = (column: any) =>
@@ -67,7 +68,6 @@ type WorkEmailStoreActions = {
   updateIntegrationsOrder: (integrations: IntegrationAction[]) => void;
   addIntegrationToDefault: (integration: IntegrationAction) => void;
   handleEditClick: (columnId: string) => void;
-  fetchIntegrations: () => Promise<void>;
   setIntegrationMenus: (menus: IntegrationActionMenu[]) => void;
   setValidationOptions: (config: IntegrationActionValidation[] | null) => void;
   setSelectedValidationOption: (option: string | null) => void;
@@ -362,10 +362,10 @@ export const useWorkEmailStore = create<
               validationActionConfig.requireValidationSuccess;
             state.selectedValidationOption = validationActionConfig.actionKey;
           }
+          useProspectTableStore
+            .getState()
+            .openDialog(TableColumnMenuActionEnum.work_email);
         }),
-      fetchIntegrations: async () => {
-        // TODO: 实现集成列表获取逻辑
-      },
       setIntegrationMenus: (menus) => {
         try {
           if (Array.isArray(menus)) {
@@ -379,7 +379,6 @@ export const useWorkEmailStore = create<
                     const column = columns.find(
                       (c) => c.semanticType === p.semanticType,
                     );
-
                     return {
                       ...p,
                       selectedOption: buildSelectedOption(column),

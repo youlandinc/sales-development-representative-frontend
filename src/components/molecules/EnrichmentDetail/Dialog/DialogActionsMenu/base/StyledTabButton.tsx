@@ -30,7 +30,7 @@ export const StyledTabButton: FC<StyledTabButtonProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 0.5,
-        minHeight: 32,
+        height: 32,
         '&:hover': {
           bgcolor: isActive ? '#F0F0F4' : 'background.active',
         },

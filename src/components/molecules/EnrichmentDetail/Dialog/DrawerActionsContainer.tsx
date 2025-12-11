@@ -18,19 +18,18 @@ import { useProspectTable } from '../hooks';
 
 interface DialogActionsContainerProps {
   tableId: string;
+  cellDetails: Record<string, any>;
 }
 
 export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
   tableId,
+  cellDetails,
 }) => {
   const { onInitializeAiColumns } = useProspectTable({ tableId });
 
   // Get dialog state from store - 分别选择避免对象引用导致的无限更新
   const dialogType = useProspectTableStore((state) => state.dialogType);
   const dialogVisible = useProspectTableStore((state) => state.dialogVisible);
-
-  // TODO: Get active cell data from store or props when needed
-  const activeCellData = {};
 
   return (
     <Stack
@@ -63,7 +62,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
           )}
 
           {dialogType === TableColumnMenuActionEnum.cell_detail && (
-            <DialogCellDetails data={activeCellData} />
+            <DialogCellDetails data={cellDetails} />
           )}
           {dialogType === TableColumnMenuActionEnum.work_email && (
             <DialogWorkEmail cb={onInitializeAiColumns} />

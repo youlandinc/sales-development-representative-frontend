@@ -10,4 +10,5 @@ export interface EnrichmentItem {
 
 export enum ActionsTypeKeyEnum {
   ai_template = 'ai-template',
+  contact_information = 'contact_information',
 }

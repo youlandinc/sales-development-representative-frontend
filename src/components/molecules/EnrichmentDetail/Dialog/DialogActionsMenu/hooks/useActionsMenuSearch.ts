@@ -2,9 +2,12 @@ import { debounce } from '@mui/material';
 import Fuse from 'fuse.js';
 import { useMemo, useState } from 'react';
 
-import { EnrichmentItem } from '@/types/enrichment/drawerActions';
+import {
+  EnrichmentItem,
+  SuggestionItem,
+} from '@/types/enrichment/drawerActions';
 
-import { EXPORTS_MENUS } from '../data';
+import { useExport } from '../hooks';
 
 export interface SearchItemType {
   name: string;
@@ -12,12 +15,18 @@ export interface SearchItemType {
   logoUrl: string;
   waterfallConfigs: Array<{ logoUrl: string }> | null;
   onClick?: () => void;
-  source: 'enrichments' | 'exports';
-  icon?: any;
+  source: 'enrichments' | 'suggestions' | 'exports';
+  icon?: React.FC<React.SVGProps<SVGSVGElement>>;
 }
 
-export const useActionsMenuSearch = (enrichmentGroups: EnrichmentItem[]) => {
+export const useActionsMenuSearch = (
+  enrichmentGroups: EnrichmentItem[],
+  suggestionList: SuggestionItem[],
+) => {
   const [searchValue, setSearchValue] = useState<string>('');
+  const [text, setText] = useState('');
+
+  const { EXPORTS_MENUS } = useExport();
 
   // 防抖设置搜索值
   const debouncedSetSearch = useMemo(() => {
@@ -40,6 +49,11 @@ export const useActionsMenuSearch = (enrichmentGroups: EnrichmentItem[]) => {
       });
     });
 
+    // 添加 suggestions 数据
+    suggestionList.forEach((item) => {
+      items.push({ ...item, source: 'suggestions' });
+    });
+
     // 添加 exports 数据
     EXPORTS_MENUS.forEach((item) => {
       items.push({
@@ -53,8 +67,12 @@ export const useActionsMenuSearch = (enrichmentGroups: EnrichmentItem[]) => {
       });
     });
 
-    return items;
-  }, [enrichmentGroups]);
+    // 按 name 去重
+    const uniqueItems = Array.from(
+      new Map(items.map((item) => [item.name, item])).values(),
+    );
+    return uniqueItems;
+  }, [EXPORTS_MENUS, enrichmentGroups, suggestionList]);
 
   // Fuse.js 搜索实例
   const fuse = useMemo(
@@ -81,6 +99,7 @@ export const useActionsMenuSearch = (enrichmentGroups: EnrichmentItem[]) => {
   // 重置搜索
   const resetSearch = () => {
     setSearchValue('');
+    setText('');
   };
 
   return {
@@ -89,5 +108,7 @@ export const useActionsMenuSearch = (enrichmentGroups: EnrichmentItem[]) => {
     searchResults,
     hasSearchValue,
     resetSearch,
+    text,
+    setText,
   };
 };

@@ -1,10 +1,15 @@
 import { create } from 'zustand';
-import { _saveWebResearchConfig } from '@/request';
+import {
+  _saveWebResearchConfig,
+  generatePrompt as generatePromptApi,
+} from '@/request';
 import { HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import { Editor } from '@tiptap/core';
 import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
+
+export type WebResearchTabType = 'generate' | 'configure';
 
 const defaultSchemaJsonStr = `{
     "type": "object",
@@ -34,6 +39,12 @@ type WebResearchStoreProps = {
   generateEditorInstance: Editor | null;
   tipTapEditorInstance: Editor | null;
   slateEditorInstance: ReactEditor | null;
+  // Generate prompt state
+  webResearchTab: WebResearchTabType;
+  generateText: string;
+  generateSchemaStr: string;
+  generateIsLoading: boolean;
+  generateIsThinking: boolean;
 };
 
 type WebResearchActions = {
@@ -54,6 +65,15 @@ type WebResearchActions = {
   setGenerateEditorInstance: (instance: Editor) => void;
   setTipTapEditorInstance: (instance: Editor) => void;
   setSlateEditorInstance: (instance: ReactEditor) => void;
+  // Generate prompt actions
+  setWebResearchTab: (tab: WebResearchTabType) => void;
+  setGenerateText: (text: string) => void;
+  setGenerateSchemaStr: (str: string) => void;
+  runGeneratePrompt: (
+    api: string,
+    params: Record<string, any>,
+  ) => Promise<void>;
+  runGenerateJson: (api: string, params: Record<string, any>) => Promise<void>;
 };
 
 export const useWebResearchStore = create<
@@ -69,6 +89,12 @@ export const useWebResearchStore = create<
   generateEditorInstance: null,
   tipTapEditorInstance: null,
   slateEditorInstance: null,
+  // Generate prompt initial state
+  webResearchTab: 'generate',
+  generateText: '',
+  generateSchemaStr: '',
+  generateIsLoading: false,
+  generateIsThinking: false,
   setPrompt: (prompt: string) => {
     set({ prompt });
   },
@@ -134,5 +160,91 @@ export const useWebResearchStore = create<
   },
   setSlateEditorInstance: (instance: ReactEditor) => {
     set({ slateEditorInstance: instance });
+  },
+  // Generate prompt actions
+  setWebResearchTab: (tab: WebResearchTabType) => {
+    set({ webResearchTab: tab });
+  },
+  setGenerateText: (text: string) => {
+    set({ generateText: text });
+  },
+  setGenerateSchemaStr: (str: string) => {
+    set({ generateSchemaStr: str });
+  },
+  runGeneratePrompt: async (api: string, params: Record<string, any>) => {
+    set({ generateIsLoading: true, generateIsThinking: true });
+    try {
+      const response = await generatePromptApi(api, params);
+      if (response.body) {
+        set({ generateIsThinking: false });
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let fullText = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            set({ generateIsLoading: false });
+            // After prompt generation, trigger JSON schema generation
+            get().setPrompt(fullText);
+            get().runGenerateJson('/sdr/ai/generate', {
+              module: 'JSON_SCHEMA_WITH_PROMPT',
+              params: { prompt: fullText },
+            });
+            break;
+          }
+          buffer += decoder.decode(value, { stream: true });
+          const events = (buffer.split('\n\n') || ['']) as string[];
+          buffer = events.pop() || '';
+          for (const e of events) {
+            const chunk = e.replace(/data:/g, '');
+            fullText += chunk;
+            set({ generateText: fullText });
+          }
+        }
+      }
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+      set({ generateIsLoading: false, generateIsThinking: false });
+    }
+  },
+  runGenerateJson: async (api: string, params: Record<string, any>) => {
+    set({ generateIsLoading: true /*  generateIsThinking: true  */ });
+    try {
+      const response = await generatePromptApi(api, params);
+      if (response.body) {
+        set({ generateIsThinking: false });
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let fullText = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            set({ generateIsLoading: false });
+            get().setSchemaJson(fullText);
+            setTimeout(() => {
+              set({ webResearchTab: 'configure' });
+            }, 0);
+            break;
+          }
+          buffer += decoder.decode(value, { stream: true });
+          const events = (buffer.split('\n\n') || ['']) as string[];
+          buffer = events.pop() || '';
+          for (const e of events) {
+            const chunk = e.replace(/data:/g, '');
+            fullText += chunk;
+            set({ generateSchemaStr: fullText });
+          }
+        }
+      }
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+      set({ generateIsLoading: false, generateIsThinking: false });
+    }
   },
 }));

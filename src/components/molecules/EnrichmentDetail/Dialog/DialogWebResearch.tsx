@@ -20,8 +20,6 @@ import {
   WebResearchGenerate,
 } from '../WebResearch';
 
-import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
-
 import {
   ActiveTypeEnum,
   useProspectTableStore,
@@ -63,61 +61,52 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
 
   const {
     activeType,
-    setPrompt,
     schemaJson,
-    setSchemaJson,
     allClear,
     saveAiConfig,
     setGenerateDescription,
     generateEditorInstance,
     tipTapEditorInstance,
     slateEditorInstance,
+    // Generate prompt state from store
+    webResearchTab,
+    setWebResearchTab,
+    generateText,
+    generateSchemaStr,
+    generateIsLoading,
+    generateIsThinking,
+    runGeneratePrompt,
+    setGenerateText,
+    setGenerateSchemaStr,
   } = useWebResearchStore(
     useShallow((state) => ({
       activeType: state.activeType,
-      setPrompt: state.setPrompt,
       schemaJson: state.schemaJson,
-      setSchemaJson: state.setSchemaJson,
       allClear: state.allClear,
       saveAiConfig: state.saveAiConfig,
       setGenerateDescription: state.setGenerateDescription,
       generateEditorInstance: state.generateEditorInstance,
       tipTapEditorInstance: state.tipTapEditorInstance,
       slateEditorInstance: state.slateEditorInstance,
+      // Generate prompt state from store
+      webResearchTab: state.webResearchTab,
+      setWebResearchTab: state.setWebResearchTab,
+      generateText: state.generateText,
+      generateSchemaStr: state.generateSchemaStr,
+      generateIsLoading: state.generateIsLoading,
+      generateIsThinking: state.generateIsThinking,
+      runGeneratePrompt: state.runGeneratePrompt,
+      setGenerateText: state.setGenerateText,
+      setGenerateSchemaStr: state.setGenerateSchemaStr,
     })),
   );
 
-  const [tab, setTab] = useState<'generate' | 'configure'>('generate');
-  const [text, setText] = useState('');
-  const [schemaStr, setSchemaStr] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
   const { filedMapping } = useVariableFromStore();
-  const { generatePrompt: generateJson } = useGeneratePrompt(
-    setSchemaStr,
-    (objStr) => {
-      setIsLoading(false);
-      setSchemaJson(objStr);
-      setTimeout(() => {
-        setTab('configure');
-      }, 0);
-    },
-  );
-  const { generatePrompt, isThinking } = useGeneratePrompt(
-    setText,
-    async (text) => {
-      setPrompt(text);
-      await generateJson('/sdr/ai/generate', {
-        module: 'JSON_SCHEMA_WITH_PROMPT',
-        params: {
-          prompt: text,
-        },
-      });
-    },
-  );
 
   const handleClose = () => {
-    setTab('generate');
+    setWebResearchTab('generate');
     allClear();
     setAnchorEl(null);
     closeDialog();
@@ -129,16 +118,15 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   };
 
   const handleGenerate = async () => {
-    setText('');
-    setSchemaStr('');
+    setGenerateText('');
+    setGenerateSchemaStr('');
     allClear();
-    setIsLoading(true);
     // Add a small delay to ensure editor is ready
     // await new Promise((resolve) => setTimeout(resolve, 100));
     if (generateEditorInstance) {
       setGenerateDescription(generateEditorInstance.getText());
     }
-    await generatePrompt('/sdr/ai/generate', {
+    await runGeneratePrompt('/sdr/ai/generate', {
       module: 'COLUMN_ENRICHMENT_PROMPT',
       params: {
         userInput: extractPromptText(
@@ -314,24 +302,24 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         px={3}
         width={500}
       >
-        <Box display={isLoading ? 'block' : 'none'}>
+        <Box display={generateIsLoading ? 'block' : 'none'}>
           <SculptingPrompt
-            isLoading={isThinking}
-            prompt={text}
-            schemaJsonStr={schemaStr}
+            isLoading={generateIsThinking}
+            prompt={generateText}
+            schemaJsonStr={generateSchemaStr}
           />
         </Box>
 
-        <Stack display={isLoading ? 'none' : 'flex'} gap={3}>
+        <Stack display={generateIsLoading ? 'none' : 'flex'} gap={3}>
           <Stack gap={4}>
             <ToggleButtonGroup
               color={'primary'}
               exclusive
               onChange={(e, value) => {
-                setTab(value);
+                setWebResearchTab(value);
               }}
               translate={'no'}
-              value={tab}
+              value={webResearchTab}
             >
               <ToggleButton
                 fullWidth
@@ -364,18 +352,18 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
             </ToggleButtonGroup>
 
             <Box
-              display={tab === 'generate' ? 'block' : 'none'}
+              display={webResearchTab === 'generate' ? 'block' : 'none'}
               sx={{
                 transition: 'all .3s',
               }}
             >
               <WebResearchGenerate
                 handleGeneratePrompt={handleGenerate}
-                isLoading={isLoading}
+                isLoading={generateIsLoading}
               />
             </Box>
             <Box
-              display={tab === 'configure' ? 'block' : 'none'}
+              display={webResearchTab === 'configure' ? 'block' : 'none'}
               sx={{
                 transition: 'all .3s',
               }}

@@ -1,5 +1,5 @@
-import { FC, useEffect, useState } from 'react';
 import { Stack } from '@mui/material';
+import { FC, useState } from 'react';
 
 import { useShallow } from 'zustand/react/shallow';
 
@@ -17,13 +17,7 @@ import { StyledButton, StyledTable } from '@/components/atoms';
 import {
   CampaignProcess,
   DialogAllIntegrations,
-  DialogCellDetails,
-  DialogDeleteColumn,
-  DialogEditColumn,
-  DialogEditDescription,
   DialogHeaderActions,
-  DialogWebResearch,
-  DialogWorkEmail,
   DrawerActionsContainer,
 } from '@/components/molecules';
 import {
@@ -34,12 +28,12 @@ import {
 } from './Panel';
 
 import { _createTableRows } from '@/request';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { useDialogStore } from '@/stores/useDialogStore';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
-import { useDialogStore } from '@/stores/useDialogStore';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 interface EnrichmentDetailTableProps {
   tableId: string;
@@ -308,6 +302,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                       schema && setSchemaJson(schema);
                       metaprompt && setGenerateDescription(metaprompt);
                       setWebResearchVisible(true, ActiveTypeEnum.edit);
+                      openDialog(TableColumnMenuActionEnum.web_research);
                       return;
                     }
                     // common edit column
@@ -398,7 +393,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           <DialogAllIntegrations />
         </Stack>
       </Stack>
-      <DrawerActionsContainer tableId={tableId} />
+      <DrawerActionsContainer cellDetails={activeCell} tableId={tableId} />
     </Stack>
   );
 };
