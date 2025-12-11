@@ -85,7 +85,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
       minWidth: 120,
       renderCell: ({ value }) => (
         <Typography component={'span'} variant={'body2'}>
-          {UFormatDate(value, 'MMM dd, yyyy')}
+          {UFormatDate(value, 'MMM d, yyyy')}
         </Typography>
       ),
     },
@@ -132,14 +132,14 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
   const [tableId, setTableId] = useState<string | number>('');
   const [tableName, setTableName] = useState('');
 
-  const [deleting, setDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const {
     open: openDelete,
     close: closeDelete,
     visible: visibleDelete,
   } = useSwitch(false);
 
-  const [renaming, setRenaming] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
   const {
     open: openRename,
     close: closeRename,
@@ -176,7 +176,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     if (!tableId) {
       return;
     }
-    setRenaming(true);
+    setIsRenaming(true);
     try {
       await _renameProspectTable({ tableName: name, tableId });
       setTableId('');
@@ -187,7 +187,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
-      setRenaming(false);
+      setIsRenaming(false);
     }
   };
 
@@ -195,7 +195,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     if (!tableId) {
       return;
     }
-    setDeleting(true);
+    setIsDeleting(true);
     try {
       await _deleteProspectTableItem(tableId);
       setTableId('');
@@ -205,7 +205,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
-      setDeleting(false);
+      setIsDeleting(false);
     }
   };
 
@@ -389,13 +389,13 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
 
       <RenameDialog
         initialName={tableName}
-        loading={renaming}
-        onClose={() => {
+        isLoading={isRenaming}
+        onClickToClose={() => {
           closeRename();
           setTableId('');
           setTableName('');
         }}
-        onSave={(name) => onClickToRename(name)}
+        onClickToSave={(name) => onClickToRename(name)}
         open={visibleRename}
       />
 
@@ -426,8 +426,8 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
             </StyledButton>
             <StyledButton
               color={'error'}
-              disabled={deleting}
-              loading={deleting}
+              disabled={isDeleting}
+              loading={isDeleting}
               onClick={onClickToDelete}
               size={'medium'}
               sx={{ width: 90 }}
@@ -451,10 +451,10 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
 const RenameDialog: FC<{
   open: boolean;
   initialName: string;
-  onClose: () => void;
-  onSave: (name: string) => Promise<void>;
-  loading: boolean;
-}> = ({ open, initialName, onClose, onSave, loading }) => {
+  onClickToClose: () => void;
+  onClickToSave: (name: string) => Promise<void>;
+  isLoading: boolean;
+}> = ({ open, initialName, onClickToClose, onClickToSave, isLoading }) => {
   const [localName, setLocalName] = useState<string>('');
 
   useEffect(() => {
@@ -483,9 +483,7 @@ const RenameDialog: FC<{
         <Stack flexDirection={'row'} gap={3} justifyContent={'flex-end'}>
           <StyledButton
             color={'info'}
-            onClick={() => {
-              onClose();
-            }}
+            onClick={onClickToClose}
             size={'medium'}
             sx={{ width: 90 }}
             variant={'outlined'}
@@ -493,9 +491,9 @@ const RenameDialog: FC<{
             Cancel
           </StyledButton>
           <StyledButton
-            disabled={loading}
-            loading={loading}
-            onClick={async () => await onSave(localName)}
+            disabled={isLoading}
+            loading={isLoading}
+            onClick={async () => await onClickToSave(localName)}
             size={'medium'}
             sx={{ width: 90 }}
           >
@@ -504,9 +502,7 @@ const RenameDialog: FC<{
         </Stack>
       }
       header={'Rename table'}
-      onClose={() => {
-        onClose();
-      }}
+      onClose={onClickToClose}
       open={open}
     />
   );

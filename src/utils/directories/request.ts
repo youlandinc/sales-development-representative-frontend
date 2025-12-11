@@ -1,4 +1,7 @@
-import { DirectoriesBizIdEnum } from '@/types/directories';
+import {
+  DirectoriesBizIdEnum,
+  DirectoriesQueryItem,
+} from '@/types/directories';
 import { UTypeOf } from '@/utils/UTypeOf';
 
 /**
@@ -37,6 +40,146 @@ const isEmptyDirectoriesFieldValue = (value: unknown): boolean => {
     value === '' ||
     (Array.isArray(value) && value.length === 0)
   );
+};
+
+/**
+ * Find a field value in formData, supporting nested structures (L1/L3)
+ * Searches:
+ * 1. Top-level: formData[key]
+ * 2. Nested (L1/L3): formData[tabValue][key] where tabValue is a string value at top level
+ */
+const findFieldValueInFormData = (
+  key: string,
+  formData: Record<string, any>,
+): unknown => {
+  // First, check top-level
+  if (key in formData) {
+    return formData[key];
+  }
+
+  // Then, check nested structure (L1/L3: formData[tabValue][key])
+  for (const topKey of Object.keys(formData)) {
+    const topValue = formData[topKey];
+    // If topValue is a string, it might be a tabKey pointing to tabValue
+    // Check if formData[topValue] exists and contains our key
+    if (typeof topValue === 'string' && formData[topValue]) {
+      const nestedData = formData[topValue];
+      if (
+        typeof nestedData === 'object' &&
+        nestedData !== null &&
+        key in nestedData
+      ) {
+        return nestedData[key];
+      }
+    }
+  }
+
+  return undefined;
+};
+
+/**
+ * Check if a condition is met based on formData
+ * Condition format: "fieldKey=fieldValue"
+ * - Array values: uses includes() for matching
+ * - Scalar values: uses strict equality
+ * - Supports nested formData structures (L1/L3)
+ */
+const isConditionMet = (
+  condition: string,
+  formData: Record<string, any>,
+): boolean => {
+  // Validate condition format
+  if (!condition.includes('=')) {
+    return true; // Invalid format, treat as met
+  }
+
+  const eqIndex = condition.indexOf('=');
+  const conditionKey = condition.slice(0, eqIndex);
+  const conditionValue = condition.slice(eqIndex + 1);
+
+  // Skip invalid condition
+  if (!conditionKey || !conditionValue) {
+    return true; // Invalid format, treat as met
+  }
+
+  const fieldValue = findFieldValueInFormData(conditionKey, formData);
+
+  if (Array.isArray(fieldValue)) {
+    return fieldValue.includes(conditionValue);
+  }
+  return fieldValue === conditionValue;
+};
+
+/**
+ * Recursively collect all field keys from a config tree
+ */
+const collectKeysFromConfig = (
+  config: DirectoriesQueryItem,
+  keys: Set<string>,
+): void => {
+  if (config.key) {
+    keys.add(config.key);
+  }
+  if (config.children) {
+    config.children.forEach((child) => collectKeysFromConfig(child, keys));
+  }
+};
+
+/**
+ * Collect all field keys that should be excluded due to unmet conditions
+ *
+ * Logic: A key is excluded only if ALL configs containing it have unmet conditions.
+ * If ANY config containing the key has its condition met, the key is kept.
+ *
+ * This handles cases where the same key (e.g., 'activityTimframe') exists in
+ * multiple mutually exclusive condition groups (e.g., Venture Capital vs Private Equity).
+ */
+export const collectExcludedKeysByCondition = (
+  configs: DirectoriesQueryItem[],
+  formData: Record<string, any>,
+): Set<string> => {
+  // Guard: return empty set if inputs are invalid
+  if (!Array.isArray(configs) || !formData || typeof formData !== 'object') {
+    return new Set<string>();
+  }
+
+  // Track keys that have at least one condition met
+  const keysWithConditionMet = new Set<string>();
+  // Track keys from configs with conditions (regardless of met/unmet)
+  const keysWithCondition = new Set<string>();
+
+  const traverse = (items: DirectoriesQueryItem[]): void => {
+    items.forEach((config) => {
+      if (config.condition) {
+        // Collect all keys under this conditional config
+        const configKeys = new Set<string>();
+        collectKeysFromConfig(config, configKeys);
+
+        configKeys.forEach((key) => keysWithCondition.add(key));
+
+        if (isConditionMet(config.condition, formData)) {
+          // Condition met, mark these keys as "should keep"
+          configKeys.forEach((key) => keysWithConditionMet.add(key));
+        }
+      }
+
+      if (config.children) {
+        traverse(config.children);
+      }
+    });
+  };
+
+  traverse(configs);
+
+  // Exclude keys that have conditions but none of them are met
+  const excludedKeys = new Set<string>();
+  keysWithCondition.forEach((key) => {
+    if (!keysWithConditionMet.has(key)) {
+      excludedKeys.add(key);
+    }
+  });
+
+  return excludedKeys;
 };
 
 /**
@@ -99,6 +242,10 @@ export const processAdditionalDetails = (additional: any): any => {
  */
 export const buildAdditionalRequestParams = (
   data: DirectoriesFormValues,
+  options?: {
+    configs?: DirectoriesQueryItem[];
+    formData?: Record<string, unknown>;
+  },
 ): Record<string, any> => {
   const {
     bizId,
@@ -140,6 +287,17 @@ export const buildAdditionalRequestParams = (
   } else {
     // L4: Pure flat config, use formValues directly
     mergeNonEmptyDirectoriesFields(requestData, formValues);
+  }
+
+  // Filter out keys that don't meet their condition
+  if (options?.configs && options?.formData) {
+    const excludedKeys = collectExcludedKeysByCondition(
+      options.configs,
+      options.formData,
+    );
+    excludedKeys.forEach((key) => {
+      delete requestData[key];
+    });
   }
 
   return requestData;
@@ -210,6 +368,10 @@ export const buildFinalData = (
  */
 export const buildSearchRequestParams = (
   finalData: any,
+  options?: {
+    configs?: DirectoriesQueryItem[];
+    formData?: Record<string, any>;
+  },
 ): Record<string, any> => {
   if (!finalData || !finalData.query) {
     return {};
@@ -261,6 +423,17 @@ export const buildSearchRequestParams = (
   // Flatten additional details fields
   if (UTypeOf.isObject(additionalDetails)) {
     mergeNonEmptyDirectoriesFields(requestData, additionalDetails);
+  }
+
+  // Filter out keys that don't meet their condition
+  if (options?.configs && options?.formData) {
+    const excludedKeys = collectExcludedKeysByCondition(
+      options.configs,
+      options.formData,
+    );
+    excludedKeys.forEach((key) => {
+      delete requestData[key];
+    });
   }
 
   return requestData;

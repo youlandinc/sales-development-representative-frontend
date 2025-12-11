@@ -8,13 +8,16 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box, Icon, InputBase, Stack } from '@mui/material';
+import { Box, Checkbox, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
 import { StyledTableAiIcon } from './index';
 
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
+import { UTypeOf } from '@/utils';
 import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
+import { StyledImage } from '@/components/atoms/StyledImage';
 
 interface StyledTableHeadCellProps {
   header?: Header<any, unknown>;
@@ -27,11 +30,19 @@ interface StyledTableHeadCellProps {
   onClick?: (e: MouseEvent<HTMLElement>) => void;
   onDoubleClick?: (e: MouseEvent<HTMLElement>) => void;
   onContextMenu?: (e: MouseEvent<HTMLElement>) => void;
-  enableResizing?: boolean;
-  isActive?: boolean;
+  canResize?: boolean;
+  isFocused?: boolean;
   isEditing?: boolean;
   onEditSave?: (newName: string) => void;
-  showPinnedRightShadow?: boolean;
+  shouldShowPinnedRightShadow?: boolean;
+  // Select column checkbox props (passed directly to bypass TanStack column caching)
+  isAllRowsSelected?: boolean;
+  isSomeRowsSelected?: boolean;
+  onToggleAllRows?: (event: unknown) => void;
+  // Resize indicator height (table body height)
+  indicatorHeight?: number;
+  // Callback when resize starts
+  onResizeStart?: () => void;
 }
 
 export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
@@ -45,15 +56,25 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   onClick,
   onDoubleClick,
   onContextMenu,
-  enableResizing,
-  isActive = false,
+  canResize,
+  isFocused = false,
   isEditing = false,
   onEditSave,
-  showPinnedRightShadow,
+  shouldShowPinnedRightShadow,
+  isAllRowsSelected,
+  isSomeRowsSelected,
+  onToggleAllRows,
+  indicatorHeight = 500,
+  onResizeStart,
 }) => {
   const [localEditValue, setLocalEditValue] = useState<string>('');
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isResizeHovered, setIsResizeHovered] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragPosition, setDragPosition] = useState<number>(0);
+  const draggableRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const originalValueRef = useRef<string>('');
 
   const tableMeta = header?.getContext?.()?.table?.options?.meta as any;
   const isSelectColumn = header?.column?.id === SYSTEM_COLUMN_SELECT;
@@ -62,15 +83,47 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   const columnMeta = header?.column?.columnDef?.meta as
     | TableColumnMeta
     | undefined;
-  const { actionKey, isAiColumn = false, actionDefinition } = columnMeta || {};
+  const { isAiColumn = false, actionDefinition } = columnMeta || {};
 
-  const content = header
-    ? flexRender(header.column.columnDef.header, header.getContext())
-    : children;
+  // For select column, render Checkbox directly (bypass TanStack column caching)
+  const content =
+    isSelectColumn && onToggleAllRows ? (
+      <Checkbox
+        checked={isAllRowsSelected}
+        checkedIcon={
+          <StyledImage
+            sx={{ width: 20, height: 20, position: 'relative' }}
+            url={'/images/icon-checkbox-check.svg'}
+          />
+        }
+        icon={
+          <StyledImage
+            sx={{ width: 20, height: 20, position: 'relative' }}
+            url={'/images/icon-checkbox-static.svg'}
+          />
+        }
+        indeterminate={isSomeRowsSelected}
+        indeterminateIcon={
+          <StyledImage
+            sx={{ width: 20, height: 20, position: 'relative' }}
+            url={'/images/icon-checkbox-intermediate.svg'}
+          />
+        }
+        onChange={onToggleAllRows}
+        onClick={(e) => e.stopPropagation()}
+        size="small"
+        sx={{ p: 0 }}
+      />
+    ) : header ? (
+      flexRender(header.column.columnDef.header, header.getContext())
+    ) : (
+      children
+    );
 
   useEffect(() => {
     if (isEditing) {
-      const initialValue = typeof content === 'string' ? content : '';
+      const initialValue = UTypeOf.isString(content) ? content : '';
+      originalValueRef.current = initialValue;
       setLocalEditValue(initialValue);
       setTimeout(() => {
         if (inputRef.current) {
@@ -79,34 +132,36 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         }
       }, 0);
     }
-  }, [isEditing, content]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing]);
 
-  const handleEditSave = useCallback(() => {
-    if (localEditValue.trim() && localEditValue !== content) {
-      onEditSave?.(localEditValue.trim());
+  const saveEdit = useCallback(() => {
+    const trimmedValue = localEditValue.trim();
+    if (trimmedValue && trimmedValue !== originalValueRef.current) {
+      onEditSave?.(trimmedValue);
     } else {
       tableMeta?.stopHeaderEdit?.();
     }
-  }, [localEditValue, content, onEditSave, tableMeta]);
+  }, [localEditValue, onEditSave, tableMeta]);
 
-  const handleEditCancel = useCallback(() => {
+  const cancelEdit = useCallback(() => {
     tableMeta?.stopHeaderEdit?.();
   }, [tableMeta]);
 
-  const handleKeyDown = useCallback(
+  const onInputKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        handleEditSave();
+        saveEdit();
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        handleEditCancel();
+        cancelEdit();
       }
     },
-    [handleEditSave, handleEditCancel],
+    [saveEdit, cancelEdit],
   );
 
-  const handleAiIconClick = useCallback(
+  const onAiIconClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       e.preventDefault();
@@ -121,7 +176,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
 
   // Calculate background color: active > hover > default
   const headerBackgroundColor =
-    isActive || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
+    isFocused || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 
   return (
     <Stack
@@ -130,8 +185,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={isSelectColumn ? undefined : () => setIsHovered(true)}
+      onMouseLeave={isSelectColumn ? undefined : () => setIsHovered(false)}
       ref={measureRef}
       sx={{
         userSelect: 'none',
@@ -140,23 +195,37 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         maxWidth: width,
         boxSizing: 'border-box',
         borderRight:
-          isPinned && showPinnedRightShadow && !isSelectColumn
+          isPinned && shouldShowPinnedRightShadow && !isSelectColumn
             ? 'none'
             : '0.5px solid #DFDEE6',
-        bgcolor: isActive ? '#F4F5F9' : '#FFFFFF',
+        bgcolor: isFocused ? '#F4F5F9' : '#FFFFFF',
         cursor: 'pointer',
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '2px',
+          bgcolor: '#363440',
+          display: isFocused ? 'block' : 'none',
+        },
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 30 : 2,
         '&:hover': {
-          bgcolor: !isEditing ? '#F4F5F9' : '#F6F6F6',
+          bgcolor: isSelectColumn
+            ? undefined
+            : !isEditing
+              ? '#F4F5F9'
+              : '#F6F6F6',
         },
         height: '36px',
         justifyContent: 'center',
         fontSize: 14,
         lineHeight: '36px',
-        color: 'text.secondary',
-        fontWeight: 600,
+        color: '#363440',
+        fontWeight: 500,
       }}
     >
       <Box
@@ -166,9 +235,12 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           whiteSpace: 'nowrap',
           minWidth: 0,
           width:
-            isPinned && showPinnedRightShadow && isEditing
+            isPinned && shouldShowPinnedRightShadow && isEditing
               ? 'calc(100% - 3px)'
               : '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
           px: 1.5,
           boxShadow: (theme) =>
             isEditing
@@ -182,7 +254,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
             inputProps={{
               ref: inputRef,
             }}
-            onBlur={handleEditSave}
+            onBlur={saveEdit}
             onChange={(e) => setLocalEditValue(e.target.value)}
             onClick={(e) => {
               e.stopPropagation();
@@ -192,19 +264,21 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               e.stopPropagation();
               e.preventDefault();
             }}
-            onKeyDown={handleKeyDown}
+            onKeyDown={onInputKeyDown}
             onMouseDown={(e) => {
               e.stopPropagation();
             }}
             sx={{
               fontSize: 14,
-              fontWeight: 600,
+              fontWeight: 500,
               color: 'text.primary',
               width: '100%',
+              height: '100%',
               backgroundColor: 'transparent',
               '& input': {
                 padding: 0,
                 textAlign: 'left',
+                height: '100%',
               },
             }}
             value={localEditValue}
@@ -244,72 +318,81 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         {!isEditing && isAiColumn && (
           <StyledTableAiIcon
             backgroundColor={headerBackgroundColor}
-            onClick={handleAiIconClick}
+            onClick={onAiIconClick}
           />
         )}
       </Box>
 
       {header &&
-        enableResizing !== false &&
+        canResize !== false &&
         header.column.getCanResize?.() !== false && (
-          <Stack
-            onMouseDown={(e) => {
-              if (e.button !== 0) {
-                return;
-              }
-              e.stopPropagation();
-              e.preventDefault();
-              const handler = header.getResizeHandler?.();
-              handler?.(e);
-            }}
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              const handler = header.getResizeHandler?.();
-              handler?.(e);
-            }}
+          <Box
+            onMouseEnter={() => setIsResizeHovered(true)}
+            onMouseLeave={() => !isDragging && setIsResizeHovered(false)}
+            onPointerDown={(e) => e.stopPropagation()}
             sx={{
               position: 'absolute',
-              right: 0,
+              right: -6,
               top: 0,
               height: '100%',
-              width: '12px',
+              width: '15px',
               cursor: 'col-resize',
-              zIndex: 4,
-              backgroundColor: 'transparent',
-              pointerEvents: 'auto',
-              borderRight:
-                isPinned && showPinnedRightShadow
-                  ? '3px solid #DFDEE6'
-                  : '2px solid transparent',
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: 'transparent',
-              },
-              '&:active': {
-                backgroundColor: 'transparent',
-                borderRight:
-                  isPinned && showPinnedRightShadow
-                    ? '3px solid #DFDEE6'
-                    : 'transparent',
-              },
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                right: '0px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '3px',
-                height: '50%',
-                backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                borderRadius: '1.5px',
-                opacity: 0,
-                transition: 'opacity 0.2s ease',
-              },
-              '&:hover::after': {
-                opacity: 1,
-              },
+              zIndex: 999,
             }}
-          />
+          >
+            <Draggable
+              axis="x"
+              bounds={{ left: -width + 80 }}
+              nodeRef={draggableRef}
+              onDrag={(e: DraggableEvent, data: DraggableData) => {
+                setDragPosition(data.x);
+              }}
+              onStart={() => {
+                setIsDragging(true);
+                setIsResizeHovered(true);
+                onResizeStart?.();
+              }}
+              onStop={(e: DraggableEvent, data: DraggableData) => {
+                setIsDragging(false);
+                setIsResizeHovered(false);
+                setDragPosition(0);
+                // Update column size
+                if (data.x !== 0) {
+                  const newWidth = Math.max(80, width + data.x);
+                  const table = header.getContext().table;
+                  table.setColumnSizing((prev: Record<string, number>) => ({
+                    ...prev,
+                    [header.column.id]: newWidth,
+                  }));
+                }
+              }}
+              position={{ x: dragPosition, y: 0 }}
+            >
+              <Box
+                ref={draggableRef}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  position: 'relative',
+                }}
+              >
+                {/* Resize indicator line - shows on hover and drag */}
+                {(isResizeHovered || isDragging) && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: 0,
+                      marginLeft: '-1px',
+                      width: '3px',
+                      height: indicatorHeight,
+                      bgcolor: '#363440',
+                    }}
+                  />
+                )}
+              </Box>
+            </Draggable>
+          </Box>
         )}
     </Stack>
   );

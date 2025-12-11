@@ -34,13 +34,7 @@ export const QueryContainer: FC<QueryContainerProps> = ({
   ...props
 }) => {
   return (
-    <Stack
-      sx={{
-        gap: 1,
-        ...sx,
-      }}
-      {...props}
-    >
+    <Stack sx={{ gap: 1, ...sx }} {...props}>
       <Stack>
         <Stack
           sx={{
@@ -50,51 +44,43 @@ export const QueryContainer: FC<QueryContainerProps> = ({
           }}
         >
           {label && (
-            <Stack
-              sx={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 0.5,
-              }}
+            <Typography
+              component="span"
+              sx={{ fontSize: 12, color: 'text.focus', ...labelSx }}
             >
-              <Typography
-                sx={{ fontSize: 12, color: 'text.focus', ...labelSx }}
-              >
-                {label}
-              </Typography>
+              {label}
               {tooltip && (
                 <Tooltip
                   arrow
-                  placement={'top'}
+                  placement="top"
                   slotProps={QUERY_TOOLTIP_SLOT_PROPS}
                   title={tooltip}
                 >
-                  <Box>
-                    <Icon
-                      component={ICON_INFO}
-                      sx={{ width: 12, height: 12 }}
-                    />
-                  </Box>
+                  <Icon
+                    component={ICON_INFO}
+                    sx={{
+                      width: 12,
+                      height: 12,
+                      ml: 0.5,
+                      verticalAlign: 'middle',
+                    }}
+                  />
                 </Tooltip>
               )}
-            </Stack>
+            </Typography>
           )}
-          {!isAuth && <QueryBadgeAuth />}
+          {!isAuth && (
+            <Box sx={{ flexShrink: 0, ml: 1 }}>
+              <QueryBadgeAuth />
+            </Box>
+          )}
         </Stack>
-
         {description && (
-          <Typography
-            sx={{
-              fontSize: 12,
-              color: '#B0ADBD',
-              mt: 0.5,
-            }}
-          >
+          <Typography sx={{ fontSize: 12, color: '#B0ADBD', mt: 0.5 }}>
             {description}
           </Typography>
         )}
       </Stack>
-
       {children}
     </Stack>
   );

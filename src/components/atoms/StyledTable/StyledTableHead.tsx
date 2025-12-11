@@ -3,12 +3,12 @@ import { Stack } from '@mui/material';
 
 interface StyledTableHeadProps {
   children: ReactNode;
-  scrolled: boolean;
+  isScrolled: boolean;
 }
 
 export const StyledTableHead: FC<StyledTableHeadProps> = ({
   children,
-  scrolled,
+  isScrolled,
 }) => {
   return (
     <Stack
@@ -17,7 +17,7 @@ export const StyledTableHead: FC<StyledTableHeadProps> = ({
         top: 0,
         zIndex: 10,
         bgcolor: '#fff',
-        boxShadow: scrolled ? '0 4px 10px rgba(0,0,0,0.06)' : 'none',
+        boxShadow: isScrolled ? '0 4px 10px rgba(0,0,0,0.06)' : 'none',
         borderBottom: '1px solid #DFDEE6',
         width: '100%',
         '&::before': {

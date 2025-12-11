@@ -31,6 +31,7 @@ export enum DirectoriesQueryGroupTypeEnum {
 
 export enum DirectoriesQueryComponentNameEnum {
   date_range_select = 'DATE_RANGE_SELECT',
+  auto_complete_location = 'AUTO_COMPLETE_LOCATION',
 }
 
 export enum DirectoriesEntityTypeEnum {
@@ -40,8 +41,6 @@ export enum DirectoriesEntityTypeEnum {
 
 export interface DirectoriesQueryItem {
   // ========== Backend Data (not used in frontend yet) ==========
-  componentName: string | null;
-  isDefault: boolean;
   refreshSubsets: boolean;
   sort: number | null; // for sorting items (not implemented yet)
 
@@ -60,11 +59,16 @@ export interface DirectoriesQueryItem {
   isDefaultOpen: boolean; // for collapsible containers
   isGroup: boolean;
 
+  // ========== Component Condition ==========
+  isDefault: boolean;
+  condition: string | null;
+
   // ========== Component Type Identifiers ==========
   // Based on these values, determine which component to render
   actionType: DirectoriesQueryActionTypeEnum | null;
   inputType: DirectoriesQueryInputTypeEnum | null;
   groupType: DirectoriesQueryGroupTypeEnum | null;
+  componentName: DirectoriesQueryComponentNameEnum | null;
 
   // ========== Component Props ==========
   placeholder: string | null; // for input components
@@ -81,6 +85,8 @@ export interface DirectoriesQueryItem {
 
   // ========== API Integration ==========
   url: string | null; // if url exists, fetch options from API
+  requestParams: string[] | null;
+  cascadeKey: string | null;
 
   // ========== Nested Structure ==========
   children: DirectoriesQueryItem[] | null; // sub-components

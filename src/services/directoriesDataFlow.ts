@@ -135,7 +135,17 @@ class DirectoriesDataFlow {
     switchMap((data) => {
       // Capture A's snapshot to ensure correct A-B pairing
       const formValuesKey = JSON.stringify(data);
-      const requestData = buildAdditionalRequestParams(data);
+
+      // Lazy import to avoid circular dependency at module level
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { useDirectoriesStore } = require('@/stores/directories');
+      const { queryConfig, formValues } = useDirectoriesStore.getState();
+
+      // Build request params with condition filtering
+      const requestData = buildAdditionalRequestParams(data, {
+        configs: queryConfig,
+        formData: formValues,
+      });
 
       return from(_fetchDirectoriesAdditionalConfig(requestData)).pipe(
         map(({ data }) => ({
@@ -328,8 +338,16 @@ class DirectoriesDataFlow {
       this.loadingPreviewSubject.next(true);
     }),
     switchMap((finalData) => {
-      // Flatten finalData into flat request payload
-      const requestData = buildSearchRequestParams(finalData);
+      // Lazy import to avoid circular dependency at module level
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { useDirectoriesStore } = require('@/stores/directories');
+      const { queryConfig, formValues } = useDirectoriesStore.getState();
+
+      // Flatten finalData into flat request payload, with condition filtering
+      const requestData = buildSearchRequestParams(finalData, {
+        configs: queryConfig,
+        formData: formValues,
+      });
 
       // Parallel requests for header and body
       return forkJoin({

@@ -42,3 +42,5 @@ export * from './StyledMultiSelect';
 export * from './StyledButtonGroup';
 
 export * from './StyledTab';
+
+export * from './StyledImage';

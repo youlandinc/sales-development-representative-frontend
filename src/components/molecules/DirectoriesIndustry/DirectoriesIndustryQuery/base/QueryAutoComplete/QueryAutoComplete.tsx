@@ -1,4 +1,4 @@
-import { FC, useCallback, useId, useMemo } from 'react';
+import { FC, ReactNode, useCallback, useId, useMemo } from 'react';
 import {
   Autocomplete,
   AutocompleteChangeReason,
@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { StyledTextField } from '@/components/atoms';
+import { StyledImage, StyledTextField } from '@/components/atoms';
 import { UTypeOf } from '@/utils/UTypeOf';
 
 import { AutoCompleteOption, useQueryAutoComplete } from './hooks';
@@ -42,6 +42,27 @@ const LOADING_SPINNER = (
   <CircularProgress size="20px" sx={{ color: '#D0CEDA' }} />
 );
 
+const OPTION_BASE_SX = {
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  fontSize: 14,
+  gap: 1,
+  '&.MuiAutocomplete-option[aria-selected="true"]:not(.Mui-focused)': {
+    bgcolor: 'transparent !important',
+  },
+  '&.Mui-focused': {
+    bgcolor: '#F4F5F9 !important',
+  },
+} as const;
+
+const TICK_ICON_SX = {
+  width: 16,
+  height: 16,
+  position: 'relative',
+  flexShrink: 0,
+} as const;
+
 interface QueryAutoCompletePropsBase {
   placeholder?: string;
   url?: string | null;
@@ -49,6 +70,8 @@ interface QueryAutoCompletePropsBase {
   freeSolo?: boolean;
   isAuth?: boolean;
   noOptionsText?: string;
+  requestParams?: Record<string, string[]>; // Cascade params: { state: ["CA", "NY"] }
+  isShowRemark?: boolean;
 }
 
 interface QueryAutoCompletePropsMultiple extends QueryAutoCompletePropsBase {
@@ -64,8 +87,8 @@ interface QueryAutoCompletePropsSingle extends QueryAutoCompletePropsBase {
 }
 
 export type QueryAutoCompleteProps =
-  | (QueryAutoCompletePropsMultiple & Record<string, any>)
-  | (QueryAutoCompletePropsSingle & Record<string, any>);
+  | (QueryAutoCompletePropsMultiple & Record<string, unknown>)
+  | (QueryAutoCompletePropsSingle & Record<string, unknown>);
 
 export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
   onFormChange,
@@ -77,6 +100,8 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
   freeSolo = true,
   isAuth = true,
   noOptionsText = 'No option',
+  requestParams,
+  isShowRemark = false,
   ...props
 }) => {
   const {
@@ -100,6 +125,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
     multiple,
     freeSolo,
     isAuth,
+    requestParams,
     onFormChange,
   });
 
@@ -226,12 +252,9 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           disableCloseOnSelect={multiple}
           filterOptions={filterOptions}
           freeSolo={freeSolo && isAuth}
-          getOptionDisabled={(option) => {
-            if (!isAuth) {
-              return true;
-            }
-            return option.inputValue === '__loading_more__';
-          }}
+          getOptionDisabled={(option) =>
+            !isAuth || option.inputValue === '__loading_more__'
+          }
           getOptionKey={(option) =>
             UTypeOf.isString(option) ? option : option.inputValue
           }
@@ -303,21 +326,26 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               );
             }
 
+            const isSelected = props['aria-selected'] === true;
+
             return (
               <Box
                 component="li"
                 key={option.key}
                 {...rest}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  width: '100%',
-                  fontSize: 14,
-                  gap: 1,
-                }}
+                sx={OPTION_BASE_SX}
               >
                 {option.label}
-                {option.remark && (
+                {isSelected && (
+                  <StyledImage
+                    sx={{
+                      ...TICK_ICON_SX,
+                      ml: isShowRemark ? 0.25 : 'auto',
+                    }}
+                    url={'/images/icon-tick.svg'}
+                  />
+                )}
+                {isShowRemark && option.remark && (
                   <Typography
                     sx={{
                       ml: 'auto',
@@ -340,7 +368,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
                     index,
                   }) as unknown as {
                     key: number;
-                    onDelete: (event: any) => void;
+                    onDelete: () => void;
                   };
                   return (
                     <QueryAutoCompleteChip
@@ -348,7 +376,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
                       label={item.label || item.inputValue}
                       onDelete={isAuth ? onDelete : undefined}
                     />
-                  );
+                  ) as ReactNode;
                 },
               );
             }

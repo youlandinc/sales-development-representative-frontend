@@ -59,38 +59,52 @@ const DateField: FC<DateFieldProps> = ({
   </Stack>
 );
 
-export interface DateRange {
-  startDate: Date | null;
-  endDate: Date | null;
+export interface QueryDateSelectRangeFormValue {
+  selectType?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface QueryDateSelectRangeProps {
   options?: TOption[];
-  value?: string | null;
-  dateRange?: DateRange | null;
+  formValue?: QueryDateSelectRangeFormValue;
   placeholder?: string;
   isAuth?: boolean;
-  onFormChange?: (value: string | null, dateRange?: DateRange | null) => void;
+  onFormChange?: (value: QueryDateSelectRangeFormValue) => void;
 }
+
+// Helper: parse ISO string to Date
+const parseISOToDate = (isoString?: string): Date | null => {
+  if (!isoString) {
+    return null;
+  }
+  const date = new Date(isoString);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+// Helper: format Date to ISO string
+const formatDateToISO = (date: Date | null): string => {
+  return date ? date.toISOString() : '';
+};
 
 export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   options = [
     { label: 'This year', value: 'this_year', key: 'this_year' },
     { label: 'Custom', value: 'CUSTOM_RANGE', key: 'CUSTOM_RANGE' },
   ],
-  value: externalValue,
-  dateRange: externalDateRange,
+  formValue,
   placeholder,
   isAuth = true,
   onFormChange,
 }) => {
-  const [selectValue, setSelectValue] = useState(externalValue || '');
-  const [startDate, setStartDate] = useState<Date | null>(
-    externalDateRange?.startDate || null,
-  );
-  const [endDate, setEndDate] = useState<Date | null>(
-    externalDateRange?.endDate || null,
-  );
+  // Parse external formValue to internal state
+  const externalSelectType = formValue?.selectType || '';
+  const externalStartDate = parseISOToDate(formValue?.startDate);
+  const externalEndDate = parseISOToDate(formValue?.endDate);
+
+  const [selectValue, setSelectValue] = useState(externalSelectType);
+  const [startDate, setStartDate] = useState<Date | null>(externalStartDate);
+  const [endDate, setEndDate] = useState<Date | null>(externalEndDate);
   const [isPopperOpen, setIsPopperOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -104,17 +118,14 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   }, [options, isAuth]);
 
   useEffect(() => {
-    if (externalValue !== undefined) {
-      setSelectValue(externalValue || '');
-    }
-  }, [externalValue]);
+    setSelectValue(externalSelectType);
+  }, [externalSelectType]);
 
   useEffect(() => {
-    if (externalDateRange !== undefined) {
-      setStartDate(externalDateRange?.startDate || null);
-      setEndDate(externalDateRange?.endDate || null);
-    }
-  }, [externalDateRange]);
+    setStartDate(externalStartDate);
+    setEndDate(externalEndDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formValue?.startDate, formValue?.endDate]);
 
   const onSelectChange = useCallback(
     (newValue: string) => {
@@ -123,7 +134,7 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
         setIsPopperOpen(true);
       } else {
         setIsPopperOpen(false);
-        onFormChange?.(newValue, null);
+        onFormChange?.({ selectType: newValue, startDate: '', endDate: '' });
       }
     },
     [onFormChange],
@@ -136,21 +147,25 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
   }, [selectValue, isPopperOpen]);
 
   const onClickToCancel = useCallback(() => {
-    setStartDate(externalDateRange?.startDate || null);
-    setEndDate(externalDateRange?.endDate || null);
+    setStartDate(externalStartDate);
+    setEndDate(externalEndDate);
     setIsPopperOpen(false);
-    // Restore selectValue to externalValue (previous committed value)
-    setSelectValue(externalValue || '');
-  }, [externalDateRange, externalValue]);
+    // Restore selectValue to externalSelectType (previous committed value)
+    setSelectValue(externalSelectType);
+  }, [externalStartDate, externalEndDate, externalSelectType]);
 
   const onClickToSave = useCallback(() => {
     setIsPopperOpen(false);
     if (!startDate && !endDate) {
       setSelectValue('');
-      onFormChange?.(null, null);
+      onFormChange?.({ selectType: '', startDate: '', endDate: '' });
       return;
     }
-    onFormChange?.('CUSTOM_RANGE', { startDate, endDate });
+    onFormChange?.({
+      selectType: 'CUSTOM_RANGE',
+      startDate: formatDateToISO(startDate),
+      endDate: formatDateToISO(endDate),
+    });
   }, [startDate, endDate, onFormChange]);
 
   const onClickAwayToCancel = useCallback(() => {
@@ -164,7 +179,7 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
     setStartDate(null);
     setEndDate(null);
     setIsPopperOpen(false);
-    onFormChange?.(null, null);
+    onFormChange?.({ selectType: '', startDate: '', endDate: '' });
   }, [onFormChange]);
 
   const formatDateRange = useCallback(

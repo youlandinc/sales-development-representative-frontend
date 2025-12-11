@@ -36,6 +36,8 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
     hasSubmittedSearch,
     previewBody,
     lastSearchParams,
+    queryConfig,
+    formValues,
   } = useDirectoriesStore(
     useShallow((state) => ({
       bizId: state.bizId,
@@ -44,6 +46,8 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
       hasSubmittedSearch: state.hasSubmittedSearch,
       previewBody: state.previewBody,
       lastSearchParams: state.lastSearchParams,
+      queryConfig: state.queryConfig,
+      formValues: state.formValues,
     })),
   );
 
@@ -71,8 +75,13 @@ export const DirectoriesIndustryQueryFooter: FC = () => {
 
   const requestParams = useMemo(
     () =>
-      lastSearchParams ? buildSearchRequestParams(lastSearchParams) : null,
-    [lastSearchParams],
+      lastSearchParams
+        ? buildSearchRequestParams(lastSearchParams, {
+            configs: queryConfig,
+            formData: formValues,
+          })
+        : null,
+    [lastSearchParams, queryConfig, formValues],
   );
 
   const accessRecordCount = Math.min(
