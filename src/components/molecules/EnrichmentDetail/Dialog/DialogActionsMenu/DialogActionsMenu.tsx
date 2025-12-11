@@ -366,7 +366,7 @@ export const DialogActionsMenu: FC = () => {
       allClear();
       openDialog(TableColumnMenuActionEnum.web_research);
       await runGeneratePrompt(
-        'http://54.215.128.193:8093/api/generate/stream',
+        'http://54.215.128.193:8093/ai/search/generate/stream',
         {
           module: 'TASK_MODEL_CHOOSER',
           params: {
