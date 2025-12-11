@@ -11,28 +11,34 @@ import {
   DialogWorkEmailQuickSetup,
 } from './index';
 
-import { useWorkEmailStore } from '@/stores/enrichment';
+import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
 import { WaterfallConfigTypeEnum } from '@/types/enrichment';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 export const DialogWorkEmailMain = () => {
   const {
-    setWorkEmailVisible,
     allIntegrations,
     setWaterfallConfigType,
     waterfallConfigType,
     dialogHeaderName,
     waterfallDescription,
   } = useWorkEmailStore((store) => store);
+  const openDialog = useProspectTableStore((state) => state.openDialog);
+  const closeDialog = useProspectTableStore((state) => state.closeDialog);
 
   const handleClose = () => {
-    setWorkEmailVisible(false);
+    closeDialog();
     setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
+  };
+
+  const handleBack = () => {
+    openDialog(TableColumnMenuActionEnum.actions_overview);
   };
 
   return (
     <Stack flex={1} overflow={'hidden'}>
       <DialogHeader
-        handleBack={handleClose}
+        handleBack={handleBack}
         handleClose={handleClose}
         title={dialogHeaderName}
       />

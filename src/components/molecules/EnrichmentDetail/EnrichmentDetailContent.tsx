@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
 import { Stack } from '@mui/material';
+import { FC, useState } from 'react';
 
 import { useShallow } from 'zustand/react/shallow';
 
@@ -13,20 +13,23 @@ import {
 import { ROW_HEIGHT } from '@/constants/table';
 import { useProspectTable } from './hooks';
 
-import { StyledTable } from '@/components/atoms';
+import { StyledButton, StyledTable } from '@/components/atoms';
 import {
   CampaignProcess,
   DialogAllIntegrations,
-  DialogCellDetails,
-  DialogDeleteColumn,
-  DialogEditColumn,
-  DialogEditDescription,
   DialogHeaderActions,
-  DialogWebResearch,
-  DialogWorkEmail,
+  DrawerActionsContainer,
 } from '@/components/molecules';
+import {
+  HeadColumnsPanel,
+  HeadFilterPanel,
+  HeadRowsPanel,
+  HeadViewPanel,
+} from './Panel';
 
 import { _createTableRows } from '@/request';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { useDialogStore } from '@/stores/useDialogStore';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
@@ -89,8 +92,17 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     })),
   );
 
+  const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
+
   const onClickToEditWorkEmail = useWorkEmailStore(
     (store) => store.handleEditClick,
+  );
+
+  const { fetchSuggestions, fetchEnrichments } = useActionsStore(
+    useShallow((store) => ({
+      fetchSuggestions: store.fetchSuggestions,
+      fetchEnrichments: store.fetchEnrichments,
+    })),
   );
 
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
@@ -150,183 +162,238 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     }
   };
 
+  // useEffect(() => {
+  //   if (tableId) {
+  //     fetchSuggestions(tableId);
+  //   }
+  //   fetchEnrichments();
+  // }, [tableId, fetchSuggestions, fetchEnrichments]);
+
   return (
     <Stack
-      ref={scrollContainerRef}
-      sx={{
-        height: 'calc(100% - 126px)',
-        minHeight: '400px',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'auto',
-        flex: 1,
-      }}
+      borderTop={'1px solid #DFDEE6'}
+      flex={1}
+      flexDirection={'row'}
+      maxWidth={'100%'}
+      overflow={'hidden'}
+      width={'100vw'}
     >
-      {columns.length > 0 && rowIds.length > 0 && (
-        <StyledTable
-          aiLoading={aiLoadingState}
-          columns={columns}
-          data={fullData}
-          isScrolled={isScrolled}
-          onAddMenuItemClick={(item) => {
-            // AI Agent opens configuration dialog
-            if (item.value === TableColumnMenuActionEnum.ai_agent) {
-              setWebResearchVisible(true, ActiveTypeEnum.add);
-              return;
-            }
-
-            // Other column types: add to end (no beforeFieldId or afterFieldId)
-            const validTypes = Object.values(TableColumnTypeEnum);
-            if (validTypes.includes(item.value as TableColumnTypeEnum)) {
-              onClickToAddColumn({
-                fieldType: item.value as TableColumnTypeEnum,
-                // No beforeFieldId or afterFieldId = insert at end
-              });
-            }
-          }}
-          onAddRows={onClickToAddRows}
-          onAiProcess={onAiProcess}
-          onCellClick={(columnId, _rowId, data) => {
-            if (data.original?.[columnId]?.externalContent) {
-              setActiveColumnId(columnId);
-              setActiveCell(data.original?.[columnId]?.externalContent || {});
-              !dialogVisible &&
-                openDialog(TableColumnMenuActionEnum.cell_detail);
-              return;
-            }
-            dialogVisible &&
-              dialogType === TableColumnMenuActionEnum.cell_detail &&
-              closeDialog();
-          }}
-          onCellEdit={onCellEdit}
-          onColumnResize={(fieldId, width) => updateColumnWidth(fieldId, width)}
-          onHeaderMenuClick={async ({
-            type,
-            columnId,
-            value,
-            parentValue,
-          }: any) => {
-            if (!columnId || !columns.find((col) => col.fieldId === columnId)) {
-              return;
-            }
-            setActiveColumnId(columnId);
-
-            switch (type) {
-              case TableColumnMenuActionEnum.edit_column: {
-                const column = columns.find((col) => col.fieldId === columnId);
-                // Work Email configuration
-                if (column?.groupId && fieldGroupMap) {
-                  onClickToEditWorkEmail(columnId);
-                  return;
-                }
-                // AI column configuration
-                if (column && column.actionKey === 'use-ai') {
-                  const schema = column.typeSettings?.inputBinding.find(
-                    (item) => item.name === 'answerSchemaType',
-                  )?.formulaText;
-                  const prompt = column.typeSettings?.inputBinding.find(
-                    (item) => item.name === 'prompt',
-                  )?.formulaText;
-                  const metaprompt = column.typeSettings?.inputBinding.find(
-                    (item) => item.name === 'metaprompt',
-                  )?.formulaText;
-                  prompt && setPrompt(prompt);
-                  schema && setSchemaJson(schema);
-                  metaprompt && setGenerateDescription(metaprompt);
-                  setWebResearchVisible(true, ActiveTypeEnum.edit);
-                  return;
-                }
-                // common edit column
-                openDialog(TableColumnMenuActionEnum.edit_column);
-
-                break;
-              }
-              case TableColumnMenuActionEnum.edit_description: {
-                openDialog(TableColumnMenuActionEnum.edit_description);
-                break;
-              }
-              case TableColumnMenuActionEnum.rename_column: {
-                if (value) {
-                  await updateColumnName(value);
-                }
-                break;
-              }
-              case TableColumnMenuActionEnum.pin: {
-                await updateColumnPin(value);
-                break;
-              }
-              case TableColumnMenuActionEnum.visible: {
-                await updateColumnVisible(columnId, value);
-                break;
-              }
-              case TableColumnMenuActionEnum.delete: {
-                openDialog(TableColumnMenuActionEnum.delete);
-                break;
-              }
-              default: {
-                // Handle change column type (from submenu)
-                if (
-                  parentValue === TableColumnMenuActionEnum.change_column_type
-                ) {
-                  const validTypes = Object.values(TableColumnTypeEnum);
-                  if (validTypes.includes(value as TableColumnTypeEnum)) {
-                    await updateColumnType(value as TableColumnTypeEnum);
-                    // Refetch cached records to get new type-converted values
-                    await refetchCachedRecords();
+      <Stack flex={1} minWidth={0}>
+        <Stack
+          flexDirection={'row'}
+          justifyContent={'space-between'}
+          p={'12px 32px 24px 16px'}
+        >
+          <Stack flexDirection={'row'} gap={1.5} height={32}>
+            <HeadViewPanel />
+            <HeadColumnsPanel />
+            <HeadRowsPanel />
+            <HeadFilterPanel />
+          </Stack>
+          {!dialogVisible && (
+            <Stack flexDirection={'row'}>
+              <StyledButton
+                onClick={() => {
+                  setAiTableInfo({ tableId, mappings: [] });
+                  openDialog(TableColumnMenuActionEnum.actions_overview);
+                  if (tableId) {
+                    fetchSuggestions(tableId);
                   }
+                  fetchEnrichments();
+                }}
+                size={'medium'}
+                variant={'contained'}
+              >
+                Actions
+              </StyledButton>
+            </Stack>
+          )}
+        </Stack>
+        <Stack
+          ref={scrollContainerRef}
+          sx={{
+            // height: 'calc(100% - 126px)',
+            minHeight: '400px',
+            // width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'auto',
+            flex: 1,
+          }}
+        >
+          {columns.length > 0 && rowIds.length > 0 && (
+            <StyledTable
+              aiLoading={aiLoadingState}
+              columns={columns}
+              data={fullData}
+              isScrolled={isScrolled}
+              onAddMenuItemClick={(item) => {
+                // AI Agent opens configuration dialog
+                if (item.value === TableColumnMenuActionEnum.ai_agent) {
+                  setWebResearchVisible(true, ActiveTypeEnum.add);
                   return;
                 }
-                // Handle insert column (from submenu)
+
+                // Other column types: add to end (no beforeFieldId or afterFieldId)
+                const validTypes = Object.values(TableColumnTypeEnum);
+                if (validTypes.includes(item.value as TableColumnTypeEnum)) {
+                  onClickToAddColumn({
+                    fieldType: item.value as TableColumnTypeEnum,
+                    // No beforeFieldId or afterFieldId = insert at end
+                  });
+                }
+              }}
+              onAddRows={onClickToAddRows}
+              onAiProcess={onAiProcess}
+              onCellClick={(columnId, _rowId, data) => {
+                if (data.original?.[columnId]?.externalContent) {
+                  setActiveColumnId(columnId);
+                  setActiveCell(
+                    data.original?.[columnId]?.externalContent || {},
+                  );
+                  !dialogVisible &&
+                    openDialog(TableColumnMenuActionEnum.cell_detail);
+                  return;
+                }
+                dialogVisible &&
+                  dialogType === TableColumnMenuActionEnum.cell_detail &&
+                  closeDialog();
+              }}
+              onCellEdit={onCellEdit}
+              onColumnResize={(fieldId, width) =>
+                updateColumnWidth(fieldId, width)
+              }
+              onHeaderMenuClick={async ({
+                type,
+                columnId,
+                value,
+                parentValue,
+              }: any) => {
                 if (
-                  parentValue ===
-                    TableColumnMenuActionEnum.insert_column_left ||
-                  parentValue === TableColumnMenuActionEnum.insert_column_right
+                  !columnId ||
+                  !columns.find((col) => col.fieldId === columnId)
                 ) {
-                  const validTypes = Object.values(TableColumnTypeEnum);
-                  if (validTypes.includes(value as TableColumnTypeEnum)) {
+                  return;
+                }
+                setActiveColumnId(columnId);
+
+                switch (type) {
+                  case TableColumnMenuActionEnum.edit_column: {
+                    const column = columns.find(
+                      (col) => col.fieldId === columnId,
+                    );
+                    // Work Email configuration
+                    if (column?.groupId && fieldGroupMap) {
+                      onClickToEditWorkEmail(columnId);
+                      return;
+                    }
+                    // AI column configuration
+                    if (column && column.actionKey === 'use-ai') {
+                      const schema = column.typeSettings?.inputBinding.find(
+                        (item) => item.name === 'answerSchemaType',
+                      )?.formulaText;
+                      const prompt = column.typeSettings?.inputBinding.find(
+                        (item) => item.name === 'prompt',
+                      )?.formulaText;
+                      const metaprompt = column.typeSettings?.inputBinding.find(
+                        (item) => item.name === 'metaprompt',
+                      )?.formulaText;
+                      prompt && setPrompt(prompt);
+                      schema && setSchemaJson(schema);
+                      metaprompt && setGenerateDescription(metaprompt);
+                      setWebResearchVisible(true, ActiveTypeEnum.edit);
+                      openDialog(TableColumnMenuActionEnum.web_research);
+                      return;
+                    }
+                    // common edit column
+                    openDialog(TableColumnMenuActionEnum.edit_column);
+
+                    break;
+                  }
+                  case TableColumnMenuActionEnum.edit_description: {
+                    openDialog(TableColumnMenuActionEnum.edit_description);
+                    break;
+                  }
+                  case TableColumnMenuActionEnum.rename_column: {
+                    if (value) {
+                      await updateColumnName(value);
+                    }
+                    break;
+                  }
+                  case TableColumnMenuActionEnum.pin: {
+                    await updateColumnPin(value);
+                    break;
+                  }
+                  case TableColumnMenuActionEnum.visible: {
+                    await updateColumnVisible(columnId, value);
+                    break;
+                  }
+                  case TableColumnMenuActionEnum.delete: {
+                    openDialog(TableColumnMenuActionEnum.delete);
+                    break;
+                  }
+                  default: {
+                    // Handle change column type (from submenu)
                     if (
                       parentValue ===
-                      TableColumnMenuActionEnum.insert_column_left
+                      TableColumnMenuActionEnum.change_column_type
                     ) {
-                      // Insert left: use beforeFieldId with current column's ID
-                      await onClickToAddColumn({
-                        fieldType: value as TableColumnTypeEnum,
-                        beforeFieldId: columnId,
-                      });
-                    } else {
-                      // Insert right: use afterFieldId with current column's ID
-                      await onClickToAddColumn({
-                        fieldType: value as TableColumnTypeEnum,
-                        afterFieldId: columnId,
-                      });
+                      const validTypes = Object.values(TableColumnTypeEnum);
+                      if (validTypes.includes(value as TableColumnTypeEnum)) {
+                        await updateColumnType(value as TableColumnTypeEnum);
+                        // Refetch cached records to get new type-converted values
+                        await refetchCachedRecords();
+                      }
+                      return;
                     }
+                    // Handle insert column (from submenu)
+                    if (
+                      parentValue ===
+                        TableColumnMenuActionEnum.insert_column_left ||
+                      parentValue ===
+                        TableColumnMenuActionEnum.insert_column_right
+                    ) {
+                      const validTypes = Object.values(TableColumnTypeEnum);
+                      if (validTypes.includes(value as TableColumnTypeEnum)) {
+                        if (
+                          parentValue ===
+                          TableColumnMenuActionEnum.insert_column_left
+                        ) {
+                          // Insert left: use beforeFieldId with current column's ID
+                          await onClickToAddColumn({
+                            fieldType: value as TableColumnTypeEnum,
+                            beforeFieldId: columnId,
+                          });
+                        } else {
+                          // Insert right: use afterFieldId with current column's ID
+                          await onClickToAddColumn({
+                            fieldType: value as TableColumnTypeEnum,
+                            afterFieldId: columnId,
+                          });
+                        }
+                      }
+                    }
+                    return;
                   }
                 }
-                return;
-              }
-            }
-          }}
-          onRunAi={onRunAi}
-          rowIds={rowIds}
-          virtualization={{
-            enabled: true,
-            rowHeight: ROW_HEIGHT,
-            scrollContainer: scrollContainerRef,
-            onVisibleRangeChange: onVisibleRangeChange,
-          }}
-        />
-      )}
+              }}
+              onRunAi={onRunAi}
+              rowIds={rowIds}
+              virtualization={{
+                enabled: true,
+                rowHeight: ROW_HEIGHT,
+                scrollContainer: scrollContainerRef,
+                onVisibleRangeChange: onVisibleRangeChange,
+              }}
+            />
+          )}
 
-      <DialogWebResearch cb={onInitializeAiColumns} tableId={tableId} />
-      <DialogEditDescription />
-      <DialogDeleteColumn />
-      <DialogCellDetails data={activeCell} />
-      <CampaignProcess />
-      <DialogHeaderActions />
-      <DialogWorkEmail cb={onInitializeAiColumns} />
-      <DialogAllIntegrations />
-      <DialogEditColumn />
+          <CampaignProcess />
+          <DialogHeaderActions />
+          <DialogAllIntegrations />
+        </Stack>
+      </Stack>
+      <DrawerActionsContainer cellDetails={activeCell} tableId={tableId} />
     </Stack>
   );
 };

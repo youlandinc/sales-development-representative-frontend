@@ -1,4 +1,4 @@
-import { Drawer, Fade, Stack } from '@mui/material';
+import { Fade, Stack } from '@mui/material';
 import { FC, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -16,19 +16,15 @@ interface DialogWorkEmailProps {
 }
 
 export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
-  const {
-    workEmailVisible,
-    setWorkEmailVisible,
-    displayType,
-    setWaterfallConfigType,
-  } = useWorkEmailStore(
-    useShallow((state) => ({
-      workEmailVisible: state.workEmailVisible,
-      setWorkEmailVisible: state.setWorkEmailVisible,
-      displayType: state.displayType,
-      setWaterfallConfigType: state.setWaterfallConfigType,
-    })),
-  );
+  const { setWorkEmailVisible, displayType, setWaterfallConfigType } =
+    useWorkEmailStore(
+      useShallow((state) => ({
+        workEmailVisible: state.workEmailVisible,
+        setWorkEmailVisible: state.setWorkEmailVisible,
+        displayType: state.displayType,
+        setWaterfallConfigType: state.setWaterfallConfigType,
+      })),
+    );
 
   const computedContent = useMemo(() => {
     switch (displayType) {
@@ -63,25 +59,9 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
   }, []);
 
   return (
-    <Drawer
-      anchor={'right'}
-      hideBackdrop
-      onClose={() => setWorkEmailVisible(false)}
-      open={workEmailVisible}
-      slotProps={{
-        paper: {
-          sx: {
-            maxWidth: 500,
-            width: '100%',
-          },
-        },
-      }}
-      sx={{
-        left: 'unset',
-      }}
-    >
+    <Stack flex={1} minHeight={0}>
       {computedContent}
       <DialogWorkEmailFooter cb={cb} />
-    </Drawer>
+    </Stack>
   );
 };

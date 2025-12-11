@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Icon, Stack, Typography } from '@mui/material';
+import { Box, Icon, Stack, SxProps, Typography } from '@mui/material';
 import { Content, Editor } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
@@ -25,14 +25,16 @@ import { ExtensionStorage } from './ExtensionStorage';
 //   text?: string;
 //   attrs?: { [key: string]: any };
 // };
-type PromptEditorProps = {
+interface PromptEditorProps {
   defaultValue?: Content;
   placeholder?: string;
   handleGenerate?: () => void;
   isLoading?: boolean;
   minHeight?: number;
   onEditorReady?: (editor: Editor) => void;
-};
+  editorSx?: SxProps;
+  showBtn?: boolean;
+}
 export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
   (
     {
@@ -42,6 +44,8 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
       isLoading,
       minHeight = 150,
       onEditorReady,
+      editorSx,
+      showBtn = true,
     },
     ref,
   ) => {
@@ -255,10 +259,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
     return (
       <Stack gap={2}>
         <Stack
-          border={'1px solid #ccc'}
-          borderRadius={2}
           gap={1.25}
-          p={2}
           sx={{
             '& .tiptap p.is-editor-empty::before': {
               content: 'attr(data-placeholder)',
@@ -269,6 +270,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
               fontSize: 12,
               lineHeight: 1.5,
             },
+            ...editorSx,
           }}
         >
           <EditorContent
@@ -300,20 +302,22 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
                 to Insert column
               </Typography>
             </Stack>
-            <StyledButton
-              color={'info'}
-              loading={isLoading}
-              onClick={handleGenerate}
-              size={'small'}
-              startIcon={<Icon component={ICON_SPARKLE} />}
-              sx={{
-                width: 100,
-                borderColor: '#D0CEDA !important',
-              }}
-              variant={'outlined'}
-            >
-              Generate
-            </StyledButton>
+            {showBtn && (
+              <StyledButton
+                color={'info'}
+                loading={isLoading}
+                onClick={handleGenerate}
+                size={'small'}
+                startIcon={<Icon component={ICON_SPARKLE} />}
+                sx={{
+                  width: 100,
+                  borderColor: '#D0CEDA !important',
+                }}
+                variant={'outlined'}
+              >
+                Generate
+              </StyledButton>
+            )}
           </Stack>
         </Stack>
         {/* <Button onClick={handleClick} variant={'outlined'}>

@@ -123,9 +123,11 @@ export const DialogHeaderActions = () => {
                             <StyledIntegrationCost
                               cost={item.estimatedScore}
                               integrationCost={
-                                item.waterfallConfigs.length - 1 || 0
+                                (item.waterfallConfigs?.length ?? 1) - 1
                               }
-                              integrationIcon={item.waterfallConfigs[0].logoUrl}
+                              integrationIcon={
+                                item.waterfallConfigs?.[0]?.logoUrl ?? ''
+                              }
                             />
                           }
                         />

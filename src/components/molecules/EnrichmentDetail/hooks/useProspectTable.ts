@@ -21,6 +21,7 @@ import {
   MIN_BATCH_SIZE,
   SYSTEM_COLUMN_SELECT,
 } from '@/constants/table';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 interface UseProspectTableParams {
   tableId: string;
@@ -76,10 +77,17 @@ export const useProspectTable = ({
       updateCellValue: store.updateCellValue,
     })),
   );
-  const { runAi } = useRunAi();
-  const fetchIntegrationMenus = useWorkEmailStore(
-    (store) => store.fetchIntegrationMenus,
+  const { fetchEnrichments, fetchSuggestions } = useActionsStore(
+    useShallow((store) => ({
+      fetchEnrichments: store.fetchEnrichments,
+      fetchSuggestions: store.fetchSuggestions,
+    })),
   );
+
+  const { runAi } = useRunAi();
+  // const fetchIntegrationMenus = useWorkEmailStore(
+  //   (store) => store.fetchIntegrationMenus,
+  // );
 
   // TODO: State management optimization
   // 1. Using both ref and state to maintain rowsMap can cause inconsistencies
@@ -311,13 +319,17 @@ export const useProspectTable = ({
       return;
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
-    fetchIntegrationMenus();
+    // fetchIntegrationMenus();
+    fetchEnrichments();
+    fetchSuggestions(tableId);
   }, [
     tableId,
     total,
     fetchBatchData,
     isMetadataLoading,
-    fetchIntegrationMenus,
+    // fetchIntegrationMenus,
+    fetchEnrichments,
+    fetchSuggestions,
   ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)

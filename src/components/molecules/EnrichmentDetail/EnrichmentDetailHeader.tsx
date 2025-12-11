@@ -96,35 +96,35 @@ export const EnrichmentDetailHeader: FC<EnrichmentDetailHeaderProps> = ({
         </Stack>
       </Stack>
 
-      <Stack flexDirection={'row'} justifyContent={'space-between'}>
+      {/* <Stack flexDirection={'row'} justifyContent={'space-between'}>
         <Stack flexDirection={'row'} gap={1.5} height={32} ml={-1.5}>
           <HeadViewPanel />
           <HeadColumnsPanel />
           <HeadRowsPanel />
-          <HeadFilterPanel />
+          <HeadFilterPanel /> */}
 
-          {/*<Stack*/}
-          {/*  data-toolbar-button*/}
-          {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
-          {/*  sx={{*/}
-          {/*    gap: 0.5,*/}
-          {/*    px: 1.5,*/}
-          {/*    borderRadius: 1,*/}
-          {/*    flexDirection: 'row',*/}
-          {/*    alignItems: 'center',*/}
-          {/*    cursor: 'pointer',*/}
-          {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
-          {/*  }}*/}
-          {/*>*/}
-          {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
-          {/*  <Typography fontSize={14}>Search</Typography>*/}
-          {/*</Stack>*/}
-        </Stack>
+      {/*<Stack*/}
+      {/*  data-toolbar-button*/}
+      {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
+      {/*  sx={{*/}
+      {/*    gap: 0.5,*/}
+      {/*    px: 1.5,*/}
+      {/*    borderRadius: 1,*/}
+      {/*    flexDirection: 'row',*/}
+      {/*    alignItems: 'center',*/}
+      {/*    cursor: 'pointer',*/}
+      {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
+      {/*  <Typography fontSize={14}>Search</Typography>*/}
+      {/*</Stack>*/}
+      {/* </Stack>
         <Stack flexDirection={'row'}>
           <StyledButton
             onClick={() => {
               setAiTableInfo({ tableId, mappings: [] });
-              openDialog(TableColumnMenuActionEnum.header_actions);
+              openDialog(TableColumnMenuActionEnum.actions_overview);
             }}
             size={'medium'}
             variant={'contained'}
@@ -132,7 +132,7 @@ export const EnrichmentDetailHeader: FC<EnrichmentDetailHeaderProps> = ({
             Actions
           </StyledButton>
         </Stack>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 };

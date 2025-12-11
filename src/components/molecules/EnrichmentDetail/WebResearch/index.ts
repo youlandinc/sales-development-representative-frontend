@@ -1,4 +1,5 @@
 export * from './CollapseCard';
+export * from './ModelSelect';
 export * from './OutputsFields';
 export * from './SculptingPrompt';
 export * from './hooks';

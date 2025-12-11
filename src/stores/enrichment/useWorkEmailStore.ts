@@ -18,6 +18,7 @@ import {
   IntegrationActionValidation,
   WaterfallConfigTypeEnum,
 } from '@/types/enrichment';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 // 工具函数：构建selectedOption对象
 const buildSelectedOption = (column: any) =>
@@ -67,8 +68,7 @@ type WorkEmailStoreActions = {
   updateIntegrationsOrder: (integrations: IntegrationAction[]) => void;
   addIntegrationToDefault: (integration: IntegrationAction) => void;
   handleEditClick: (columnId: string) => void;
-  fetchIntegrations: () => Promise<void>;
-  fetchIntegrationMenus: () => Promise<void>;
+  setIntegrationMenus: (menus: IntegrationActionMenu[]) => void;
   setValidationOptions: (config: IntegrationActionValidation[] | null) => void;
   setSelectedValidationOption: (option: string | null) => void;
   setSafeToSend: (safeToSend: boolean) => void;
@@ -362,25 +362,23 @@ export const useWorkEmailStore = create<
               validationActionConfig.requireValidationSuccess;
             state.selectedValidationOption = validationActionConfig.actionKey;
           }
+          useProspectTableStore
+            .getState()
+            .openDialog(TableColumnMenuActionEnum.work_email);
         }),
-      fetchIntegrations: async () => {
-        // TODO: 实现集成列表获取逻辑
-      },
-      fetchIntegrationMenus: async () => {
+      setIntegrationMenus: (menus) => {
         try {
-          const res = await _fetchIntegrationMenus();
-          if (Array.isArray(res.data)) {
+          if (Array.isArray(menus)) {
             set((state) => {
-              state.integrationMenus = res.data.map((item) => ({
+              state.integrationMenus = menus.map((item) => ({
                 ...item,
-                waterfallConfigs: item.waterfallConfigs.map((i) => ({
+                waterfallConfigs: (item.waterfallConfigs || []).map((i) => ({
                   ...i,
                   inputParams: i.inputParams.map((p) => {
                     const columns = useProspectTableStore.getState().columns;
                     const column = columns.find(
                       (c) => c.semanticType === p.semanticType,
                     );
-
                     return {
                       ...p,
                       selectedOption: buildSelectedOption(column),

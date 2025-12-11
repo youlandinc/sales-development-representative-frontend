@@ -67,7 +67,8 @@ export interface IntegrationActionMenu {
   logoUrl: string;
   estimatedScore: string;
   description: string;
-  waterfallConfigs: IntegrationAction[];
+  shortDescription: string | null;
+  waterfallConfigs: IntegrationAction[] | null;
   validations: IntegrationActionValidation[] | null;
 }
 

@@ -1,13 +1,22 @@
 import { useWebResearchStore } from '@/stores/enrichment';
-import { Stack, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Icon, Stack, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
 import { FC, useCallback, useRef } from 'react';
+import Image from 'next/image';
 
 import { PromptEditor } from './PromptEditor';
 
 import { insertWithPlaceholders } from '@/utils';
 
-import { useVariableFromStore } from '@/hooks';
+import { useSwitch, useVariableFromStore } from '@/hooks';
+
+import ICON_SPARK_OUTLINE from '../assets/dialog/icon_sparkle_outline.svg';
+import { StyledActionItem, StyledSearchInput } from '../Dialog/Common';
+import { useDialogHeaderActionsHook } from '../Dialog/DialogHeaderActions/hooks';
+import { StyledProviderBadges } from '../Dialog/DialogActionsMenu/base';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { useShallow } from 'zustand/shallow';
+import { ActionsTypeKeyEnum } from '@/types';
 
 interface WebResearchGenerateProps {
   handleGeneratePrompt?: () => void;
@@ -23,7 +32,17 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
   const promptEditorRef = useRef(null);
   const { generateDescription, setGenerateEditorInstance } =
     useWebResearchStore((state) => state);
+  const { suggestions, suggestionsLoading, enrichments, enrichmentsLoading } =
+    useActionsStore(
+      useShallow((store) => ({
+        suggestions: store.suggestionsList,
+        suggestionsLoading: store.suggestionsLoading,
+        enrichments: store.enrichmentsList,
+        enrichmentsLoading: store.enrichmentsLoading,
+      })),
+    );
   const { filedMapping } = useVariableFromStore();
+  const { visible, open, close } = useSwitch(false);
 
   const handleEditorReady = useCallback(
     (editor: Editor) => {
@@ -39,24 +58,90 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
 
   return (
     <Stack gap={1.5}>
-      <Stack gap={1}>
-        <Typography fontWeight={600}>What would you like Al to do?</Typography>
-        <Typography fontWeight={400} variant={'subtitle2'}>
-          Describe what data you want to research or generate using AI. The
-          system will write an optimized prompt and configure the appropriate
-          settings.
-        </Typography>
-      </Stack>
-      <PromptEditor
-        defaultValue={defaultValue}
-        handleGenerate={handleGeneratePrompt}
-        isLoading={isLoading}
-        onEditorReady={handleEditorReady}
-        placeholder={
-          'E.g., Find the CEO of the company and their Linkedin profile'
-        }
-        ref={promptEditorRef}
+      <StyledSearchInput
+        // onChange={setSearchValue}
+        placeholder={'Search tasks'}
+        // value={searchValue}
       />
+      <Typography variant={'body2'}>
+        Tasks Atlas recommends based on your current table
+      </Typography>
+      <Stack gap={1.5}>
+        {suggestions
+          .filter((item) => item.key === ActionsTypeKeyEnum.ai_template)
+          .slice(0, 6)
+          .map((item, index) => (
+            <StyledActionItem
+              badges={
+                <StyledProviderBadges
+                  providers={(item.waterfallConfigs || []).map(
+                    (config) => config.logoUrl,
+                  )}
+                />
+              }
+              description={item.description}
+              icon={
+                <Image
+                  alt={'Provider '}
+                  height={16}
+                  src={item.logoUrl}
+                  width={16}
+                />
+              }
+              key={index}
+              // onClick={item.onClick}
+              title={item.name}
+            />
+          ))}
+      </Stack>
+      <ClickAwayListener onClickAway={close}>
+        <Stack
+          border={'1px solid'}
+          borderColor={visible ? 'text.primary' : '#F0F0F4'}
+          borderRadius={2}
+          onClick={open}
+          px={1.5}
+          py={1}
+          sx={{
+            cursor: visible ? 'text' : 'pointer',
+            '&:hover': {
+              borderColor: 'text.primary',
+            },
+          }}
+        >
+          <Stack gap={0.5}>
+            <Stack alignItems={'center'} flexDirection={'row'} gap={1}>
+              <Icon
+                component={ICON_SPARK_OUTLINE}
+                sx={{ width: 16, height: 16 }}
+              />
+              <Typography variant={'body2'}>Describe your own task</Typography>
+            </Stack>
+            <Typography
+              color={'text.secondary'}
+              fontWeight={400}
+              variant={'body3'}
+            >
+              {visible
+                ? 'Tell Atlas what you need, and it will generate an optimized prompt with the right settings.'
+                : 'Describe the task, and Atlas will craft an optimized prompt and choose the right settings.'}
+            </Typography>
+          </Stack>
+          {visible && (
+            <Stack position={'relative'} zIndex={1}>
+              <Box bgcolor={'#DFDEE6'} height={'1px'} my={1} />
+              <PromptEditor
+                defaultValue={defaultValue}
+                handleGenerate={handleGeneratePrompt}
+                isLoading={isLoading}
+                onEditorReady={handleEditorReady}
+                placeholder={'e.g. Find the CEO of this company'}
+                ref={promptEditorRef}
+              />
+            </Stack>
+          )}
+        </Stack>
+      </ClickAwayListener>
     </Stack>
   );
 };
