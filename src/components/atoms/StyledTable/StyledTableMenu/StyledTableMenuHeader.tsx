@@ -27,14 +27,14 @@ import {
 interface StyledTableMenuHeaderProps {
   anchorEl: HTMLElement | null;
   columns: any[];
-  selectedColumnId: string;
   columnPinning: { left?: string[]; right?: string[] };
   headerState: {
-    focusedColumnId: string | null;
+    activeColumnId: string | null; // Background color (used as menuColumnId for menu operations)
+    focusedColumnId: string | null; // Bottom line
     isMenuOpen: boolean;
     isEditing: boolean;
-    selectedColumnIds: string[];
-  } | null;
+    selectedColumnIds: string[]; // Multi-select (reserved for future)
+  };
   onClose: () => void;
   onMenuItemClick: (item: {
     label: string;
@@ -46,19 +46,24 @@ interface StyledTableMenuHeaderProps {
 export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
   anchorEl,
   columns,
-  selectedColumnId,
   columnPinning,
   headerState,
   onClose,
   onMenuItemClick,
 }) => {
+  // Use headerState.activeColumnId as the target column for menu operations
+  const menuColumnId = headerState.activeColumnId;
+
+  // Don't render menu if no column is active
+  if (!menuColumnId) {
+    return null;
+  }
+
   return (
     <Popper
       anchorEl={anchorEl}
       open={
-        Boolean(anchorEl) &&
-        !headerState?.isEditing &&
-        (headerState?.isMenuOpen ?? false)
+        Boolean(anchorEl) && !headerState.isEditing && headerState.isMenuOpen
       }
       placement={menuStyles.popper.placement}
       sx={{ zIndex: menuStyles.popper.zIndex }}
@@ -77,9 +82,9 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
           <Stack gap={0}>
             {(() => {
               const selectedColumn = columns.find(
-                (col) => col.fieldId === selectedColumnId,
+                (col) => col.fieldId === menuColumnId,
               );
-              const isPinned = columnPinning!.left!.includes(selectedColumnId);
+              const isPinned = columnPinning!.left!.includes(menuColumnId);
               const currentColumnType = selectedColumn?.fieldType;
 
               return selectedColumn && checkIsAiColumn(selectedColumn)
@@ -89,7 +94,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
               if (item.value !== TableColumnMenuActionEnum.divider) {
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const selectedColumn = columns.find(
-                  (col) => col.fieldId === selectedColumnId,
+                  (col) => col.fieldId === menuColumnId,
                 );
                 const currentColumnType = selectedColumn?.fieldType;
 

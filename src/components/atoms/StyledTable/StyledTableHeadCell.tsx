@@ -31,7 +31,8 @@ interface StyledTableHeadCellProps {
   onDoubleClick?: (e: MouseEvent<HTMLElement>) => void;
   onContextMenu?: (e: MouseEvent<HTMLElement>) => void;
   canResize?: boolean;
-  isFocused?: boolean;
+  isActive?: boolean; // Background color (cleared on click away)
+  isFocused?: boolean; // Bottom line (persists until clicking another header)
   isEditing?: boolean;
   onEditSave?: (newName: string) => void;
   shouldShowPinnedRightShadow?: boolean;
@@ -57,6 +58,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   onDoubleClick,
   onContextMenu,
   canResize,
+  isActive = false,
   isFocused = false,
   isEditing = false,
   onEditSave,
@@ -174,9 +176,13 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
     [isAiColumn, tableMeta, header],
   );
 
-  // Calculate background color: active > hover > default
+  // Visual rules:
+  // - Background color: isActive && !isEditing (cleared on click away)
+  // - Bottom line: isFocused && !isActive && !isEditing (shows only when focused but not active)
+  const shouldShowBackground = isActive && !isEditing;
+  const shouldShowBottomLine = isFocused && !isActive && !isEditing;
   const headerBackgroundColor =
-    isFocused || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
+    shouldShowBackground || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 
   return (
     <Stack
@@ -198,7 +204,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           isPinned && shouldShowPinnedRightShadow && !isSelectColumn
             ? 'none'
             : '0.5px solid #DFDEE6',
-        bgcolor: isFocused ? '#F4F5F9' : '#FFFFFF',
+        bgcolor: shouldShowBackground ? '#F4F5F9' : '#FFFFFF',
         cursor: 'pointer',
         '&::after': {
           content: '""',
@@ -208,7 +214,8 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           right: 0,
           height: '2px',
           bgcolor: '#363440',
-          display: isFocused ? 'block' : 'none',
+          // Show bottom line when focused but not active (e.g., after click away)
+          display: shouldShowBottomLine ? 'block' : 'none',
         },
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',

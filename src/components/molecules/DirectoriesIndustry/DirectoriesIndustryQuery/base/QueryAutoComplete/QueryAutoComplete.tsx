@@ -422,20 +422,29 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           sx={{
             '& .MuiInputBase-root': {
               minHeight: '32px',
-              gap: 0.5,
+              gap: '4px 6px',
             },
             '& .MuiInputBase-input': {
               padding: '0 !important',
-              minHeight: '24px',
+              minHeight: '22px',
               fontSize: '12px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              paddingLeft: '8px !important',
+              pl: '-2px',
             },
             '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
               py: 0.5,
+              pl: 1.75,
+              pr: 1,
             },
+            // When chips are present, reduce left padding
+            '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall:has(.query-autocomplete-chip)':
+              {
+                py: 0.5,
+                pl: 0.75,
+                pr: 1,
+              },
           }}
           value={autocompleteValue}
         />

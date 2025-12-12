@@ -28,6 +28,7 @@ import {
   useRowHover,
 } from './index';
 import { StyledImage } from '@/components/atoms/StyledImage';
+import { StyledTableMenuCellEditor } from './StyledTableMenu/StyledTableMenuCellEditor';
 
 const CELL_CONSTANTS = {
   MIN_WIDTH: 60,
@@ -45,13 +46,49 @@ const CELL_COLORS = {
   REGULAR_BORDER: '0.5px solid #DFDEE6',
 } as const;
 
+const CHECKBOX_ICON_CHECKED = (
+  <StyledImage
+    sx={{ width: 20, height: 20, position: 'relative' }}
+    url="/images/icon-checkbox-check.svg"
+  />
+);
+
+const CHECKBOX_ICON_UNCHECKED = (
+  <StyledImage
+    sx={{ width: 20, height: 20, position: 'relative' }}
+    url="/images/icon-checkbox-static.svg"
+  />
+);
+
+const CHECKBOX_ICON_INDETERMINATE = (
+  <StyledImage
+    sx={{ width: 20, height: 20, position: 'relative' }}
+    url="/images/icon-checkbox-intermediate.svg"
+  />
+);
+
+const AI_LOADING_CONTENT = (
+  <Stack alignItems="center" direction="row" spacing={1}>
+    <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
+    <Box
+      component="span"
+      sx={{
+        fontSize: CELL_CONSTANTS.FONT_SIZE,
+        color: 'text.secondary',
+      }}
+    >
+      Processing...
+    </Box>
+  </Stack>
+);
+
 const getCellBackgroundColor = (
   isEditing: boolean,
   isActive: boolean,
   isSelectColumn: boolean,
   hasActiveInRow: boolean,
   isRowSelected: boolean,
-  isColumnSelected: boolean,
+  isColumnHighlighted: boolean,
 ): string => {
   if ((isEditing || isActive) && !isSelectColumn) {
     return CELL_COLORS.ACTIVE_BG;
@@ -59,7 +96,7 @@ const getCellBackgroundColor = (
   if (isSelectColumn && hasActiveInRow) {
     return CELL_COLORS.ACTIVE_BG;
   }
-  if (isRowSelected || isColumnSelected) {
+  if (isRowSelected || isColumnHighlighted) {
     return CELL_COLORS.ACTIVE_BG;
   }
   return CELL_COLORS.DEFAULT_BG;
@@ -83,7 +120,10 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   onCellClick,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const cellRef = useRef<HTMLDivElement>(null);
   const [localEditValue, setLocalEditValue] = useState<string>('');
+  const [isTruncated, setIsTruncated] = useState(false);
 
   const context = cell?.getContext?.();
   const { table, row, column } = context || {};
@@ -112,8 +152,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   const columnMeta = column?.columnDef?.meta as TableColumnMeta | undefined;
   const { fieldType, canEdit = false, isAiColumn = false } = columnMeta || {};
 
-  const selectedColumnId = tableMeta?.selectedColumnId;
-  const isColumnSelected = selectedColumnId === columnId;
+  // Use headerState.activeColumnId to highlight column when header menu is open
+  const headerActiveColumnId = tableMeta?.headerState?.activeColumnId;
+  const isHeaderMenuOpen = tableMeta?.headerState?.isMenuOpen ?? false;
+  const isColumnHighlighted =
+    headerActiveColumnId === columnId && isHeaderMenuOpen;
 
   const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
 
@@ -147,6 +190,15 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     }
   }, [isEditing]);
 
+  // Detect if text is truncated (has ellipsis)
+  useLayoutEffect(() => {
+    if (textRef.current && !isEditing) {
+      const el = textRef.current;
+      const isTrunc = el.scrollWidth > el.clientWidth;
+      setIsTruncated(isTrunc);
+    }
+  }, [displayValue, width, isEditing]);
+
   useEffect(() => {
     if (
       isAiColumn &&
@@ -171,7 +223,15 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   }, [localEditValue, displayValue, recordId, columnId]);
 
   const content = useMemo<ReactNode>(() => {
-    if (isEditing && cell && !isSelectColumn && isEditableCell) {
+    // If text is truncated and editing, show text (Popper handles editing)
+    // If not truncated and editing, show simple inline input
+    if (
+      isEditing &&
+      cell &&
+      !isSelectColumn &&
+      isEditableCell &&
+      !isTruncated
+    ) {
       return (
         <InputBase
           autoFocus
@@ -223,24 +283,9 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
           <Box display={isRowSelected || isRowHovered ? 'block' : 'none'}>
             <Checkbox
               checked={isRowSelected}
-              checkedIcon={
-                <StyledImage
-                  sx={{ width: 20, height: 20, position: 'relative' }}
-                  url={'/images/icon-checkbox-check.svg'}
-                />
-              }
-              icon={
-                <StyledImage
-                  sx={{ width: 20, height: 20, position: 'relative' }}
-                  url={'/images/icon-checkbox-static.svg'}
-                />
-              }
-              indeterminateIcon={
-                <StyledImage
-                  sx={{ width: 20, height: 20, position: 'relative' }}
-                  url={'/images/icon-checkbox-intermediate.svg'}
-                />
-              }
+              checkedIcon={CHECKBOX_ICON_CHECKED}
+              icon={CHECKBOX_ICON_UNCHECKED}
+              indeterminateIcon={CHECKBOX_ICON_INDETERMINATE}
               onChange={(e, next) => cell.row.toggleSelected?.(next)}
               onClick={(e) => e.stopPropagation()}
               size={'small'}
@@ -250,20 +295,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         </Stack>
       );
     } else if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
-      return (
-        <Stack alignItems="center" direction="row" spacing={1}>
-          <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
-          <Box
-            component="span"
-            sx={{
-              fontSize: CELL_CONSTANTS.FONT_SIZE,
-              color: 'text.secondary',
-            }}
-          >
-            Processing...
-          </Box>
-        </Stack>
-      );
+      return AI_LOADING_CONTENT;
     }
     return displayValue;
   }, [
@@ -279,9 +311,14 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     localEditValue,
     isRowSelected,
     isRowHovered,
+    isTruncated,
   ]);
 
-  const onClickCell = useCallback(
+  // Check if expanded editor should be shown (truncated text in edit mode)
+  const shouldShowExpandedEditor =
+    isEditing && isTruncated && !!cell && !isSelectColumn && isEditableCell;
+
+  const onCellClickInternal = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       onCellClick(columnId, recordId, cell?.row);
@@ -289,22 +326,28 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         tableMeta?.setCellMode?.(recordId, columnId, 'active');
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onCellClick, columnId, recordId, cell?.row, canInteract, isAiColumn],
+    [
+      onCellClick,
+      columnId,
+      recordId,
+      cell?.row,
+      canInteract,
+      isAiColumn,
+      tableMeta,
+    ],
   );
 
-  const onDoubleClickCell = useCallback(
+  const onCellDoubleClickInternal = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       if (canInteract) {
         tableMeta?.setCellMode?.(recordId, columnId, 'edit');
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [canInteract, recordId, columnId],
+    [canInteract, recordId, columnId, tableMeta],
   );
 
-  const onClickAiIcon = useCallback(
+  const onAiIconClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       e.preventDefault();
@@ -315,9 +358,12 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         isHeader: false,
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columnId, recordId, isSelectColumn],
+    [columnId, recordId, isSelectColumn, tableMeta],
   );
+
+  const onExpandedEditorValueChange = useCallback((value: string) => {
+    setLocalEditValue(value);
+  }, []);
 
   const cellBackgroundColor = getCellBackgroundColor(
     isEditing,
@@ -325,7 +371,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
     isSelectColumn,
     hasActiveInRow,
     isRowSelected,
-    isColumnSelected,
+    isColumnHighlighted,
   );
 
   const onMouseEnter = useCallback(() => setIsCellHovered(true), []);
@@ -333,10 +379,11 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
 
   return (
     <Stack
-      onClick={onClickCell}
-      onDoubleClick={onDoubleClickCell}
+      onClick={onCellClickInternal}
+      onDoubleClick={onCellDoubleClickInternal}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      ref={cellRef}
       sx={{
         width,
         minWidth: resolvedMinWidth,
@@ -395,6 +442,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         )}
 
         <Box
+          ref={textRef}
           sx={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -414,11 +462,23 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
           />
         )}
       </Stack>
+
+      {/* Expanded editor Popper for truncated text */}
+      <StyledTableMenuCellEditor
+        anchorEl={cellRef.current}
+        isOpen={shouldShowExpandedEditor}
+        minWidth={width}
+        onCancel={onStopEdit}
+        onChange={onExpandedEditorValueChange}
+        onSave={onStopEdit}
+        value={localEditValue}
+      />
+
       {hasAiColumn &&
         ((isSelectColumn && isRowHovered) || (isAiColumn && isCellHovered)) && (
           <StyledTableAiIcon
             backgroundColor={cellBackgroundColor}
-            onClick={onClickAiIcon}
+            onClick={onAiIconClick}
           />
         )}
     </Stack>
