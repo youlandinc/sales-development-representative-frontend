@@ -13,10 +13,10 @@ import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { createEditor } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useShallow } from 'zustand/shallow';
 
 import { StyledSwitch, StyledTextField } from '@/components/atoms';
 import { useSwitch, useVariableFromStore } from '@/hooks';
-import { useGeneratePrompt } from '@/hooks/useGeneratePrompt';
 import { useWebResearchStore } from '@/stores/enrichment';
 import {
   CollapseCard,
@@ -30,6 +30,7 @@ import { MODEL_OPTIONS } from './ModelSelect/modelOptions';
 import { insertWithPlaceholders } from '@/utils';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import ICON_ARROW from './assets/icon_arrow_left.svg';
 import ICON_DELETE from './assets/icon_delete.svg';
 import ICON_WARNING from './assets/icon_warning.svg';
 
@@ -50,7 +51,17 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     setSchemaJson,
     setTipTapEditorInstance,
     setSlateEditorInstance,
-  } = useWebResearchStore((state) => state);
+    taskContent,
+  } = useWebResearchStore(
+    useShallow((state) => ({
+      prompt: state.prompt,
+      schemaJson: state.schemaJson,
+      setSchemaJson: state.setSchemaJson,
+      setTipTapEditorInstance: state.setTipTapEditorInstance,
+      setSlateEditorInstance: state.setSlateEditorInstance,
+      taskContent: state.taskContent,
+    })),
+  );
   const { filedMapping } = useVariableFromStore();
 
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
@@ -66,13 +77,13 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   const schemaEditorRef = useRef(null);
   const editor = useMemo(() => withReact(createEditor()), []);
 
-  const { generatePrompt: generateJson, isLoading } = useGeneratePrompt(
+  /*   const { generatePrompt: generateJson, isLoading } = useGeneratePrompt(
     undefined,
     (objStr) => {
       setSchemaJson(objStr);
       setOutPuts('fields');
     },
-  );
+  ); */
 
   /*const DEFAULT_PROMOT =
     '#CONTEXT#\nYou are tasked with finding a Java engineer associated with a given company or website, and extracting their professional profile and email address.\n\n#OBJECTIVE#\nIdentify a Java engineer related to {{Enrich Company}}, {{Domain}}, or {{Url}}, and extract their professional profile link (such as LinkedIn) and email address.\n\n#INSTRUCTIONS#\n1. Use the provided {{Enrich Company}}, {{Domain}}, or {{Url}} to search for employees or team members who are Java engineers (titles may include "Java Engineer," "Java Developer," or similar).\n2. Search LinkedIn, company team pages, or other professional directories for profiles matching the criteria.\n3. Extract the profile URL (preferably LinkedIn) and the email address if publicly available.\n4. If multiple Java engineers are found, return the first relevant result.\n5. If no Java engineer or email is found, return "No Java engineer found" or "No email found" as appropriate.\n\n#EXAMPLES#\nInput:\n  Enrich Company: Acme Corp\n  Domain: acmecorp.com\n  Url: https://acmecorp.com\n\nExpected Output:\n  Java Engineer Name: John Doe\n';*/
@@ -226,6 +237,15 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
 
   return (
     <Stack gap={3}>
+      {taskContent && (
+        <Typography color={'text.secondary'} variant={'body3'}>
+          <Icon
+            component={ICON_ARROW}
+            sx={{ width: 12, height: 12, mr: '2px', verticalAlign: 'middle' }}
+          />
+          <strong>Task: </strong> {taskContent}
+        </Typography>
+      )}
       <CollapseCard hasCollapse={false} title={'Model'}>
         <ModelSelect
           groups={MODEL_OPTIONS}
@@ -428,7 +448,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           </Stack>
           {/* )} */}
           {/* <Box display={outPuts === 'json' ? 'block' : 'none'}> */}
-          {!isLoading && outPuts === 'json' && (
+          {outPuts === 'json' && (
             <FormulaEditor
               editor={editor}
               initialValue={schemaJson}

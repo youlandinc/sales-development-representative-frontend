@@ -262,16 +262,13 @@ export const useWebResearchStore = create<
 
         const { suggestedModelType } = parseTaskModelText(fullText);
         set({ suggestedModelType });
-        get().runGeneratePrompt(
-          'https://dev-api.corepass.com/sdr/ai/generate',
-          {
-            module: 'COLUMN_ENRICHMENT_PROMPT',
-            params: {
-              userInput: suggestedModelType,
-              columns: columnsNames,
-            },
+        get().runGeneratePrompt('/sdr/ai/generate', {
+          module: 'COLUMN_ENRICHMENT_PROMPT',
+          params: {
+            userInput: suggestedModelType,
+            columns: columnsNames,
           },
-        );
+        });
       }
     } catch (err) {
       const { header, message, variant } = err as HttpError;
@@ -290,7 +287,7 @@ export const useWebResearchStore = create<
           },
         );
         get().setPrompt(fullText);
-        get().runGenerateJson('https://dev-api.corepass.com/sdr/ai/generate', {
+        get().runGenerateJson('/sdr/ai/generate', {
           module: 'JSON_SCHEMA_WITH_PROMPT',
           params: { prompt: fullText },
         });

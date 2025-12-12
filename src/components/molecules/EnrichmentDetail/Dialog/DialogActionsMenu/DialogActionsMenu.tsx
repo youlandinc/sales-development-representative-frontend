@@ -355,14 +355,11 @@ export const DialogActionsMenu: FC = () => {
       setGenerateSchemaStr('');
       allClear();
       openDialog(TableColumnMenuActionEnum.web_research);
-      await runGenerateAiModel(
-        'http://54.215.128.193:8093/aiResearch/generate/stream',
-        {
-          params: {
-            userInput: templatePrompt,
-          },
+      await runGenerateAiModel('/aiResearch/generate/stream', {
+        params: {
+          userInput: templatePrompt,
         },
-      );
+      });
     },
     [
       allClear,

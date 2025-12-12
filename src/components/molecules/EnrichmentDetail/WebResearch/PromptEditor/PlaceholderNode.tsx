@@ -1,6 +1,7 @@
 import { Icon, Stack, Switch, Tooltip, Typography } from '@mui/material';
 import { NodeViewWrapper } from '@tiptap/react';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
 import { useWebResearchStore } from '@/stores/enrichment';
@@ -10,7 +11,13 @@ import CloseIcon from '@mui/icons-material/Close';
 
 export const PlaceholderNode: FC = (props: any) => {
   const { excludeFields, setExcludeFields, removeExcludeFields } =
-    useWebResearchStore((state) => state);
+    useWebResearchStore(
+      useShallow((state) => ({
+        excludeFields: state.excludeFields,
+        setExcludeFields: state.setExcludeFields,
+        removeExcludeFields: state.removeExcludeFields,
+      })),
+    );
 
   const { node, deleteNode, editor } = props;
   const {
@@ -61,7 +68,7 @@ export const PlaceholderNode: FC = (props: any) => {
   };
 
   return (
-    <NodeViewWrapper as="span" data-placeholder>
+    <NodeViewWrapper as={'span'} data-placeholder>
       <Tooltip title={label}>
         <Stack
           alignItems={'center'}

@@ -2,8 +2,8 @@ import { patch, post } from '../request';
 
 export const generatePrompt = (api: string, param: Record<string, any>) => {
   //TODO
-  // return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${api}`, {
-  return fetch(`${api}`, {
+  return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${api}`, {
+    // return fetch(`${api}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

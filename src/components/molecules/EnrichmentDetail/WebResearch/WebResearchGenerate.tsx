@@ -94,14 +94,11 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
               onClick={async () => {
                 const description =
                   (item.description ?? '') || (item.shortDescription ?? '');
-                await runGenerateAiModel(
-                  'http://54.215.128.193:8093/aiResearch/generate/stream',
-                  {
-                    params: {
-                      userInput: description,
-                    },
+                await runGenerateAiModel('/aiResearch/generate/stream', {
+                  params: {
+                    userInput: description,
                   },
-                );
+                });
               }}
               title={item.name}
             />

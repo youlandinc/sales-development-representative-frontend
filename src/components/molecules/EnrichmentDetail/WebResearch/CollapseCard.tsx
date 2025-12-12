@@ -38,7 +38,7 @@ export const CollapseCard: FC<PropsWithChildren<CollapseCardProps>> = ({
   );
 
   return (
-    <Stack border={'1px solid #ccc'} borderRadius={2} gap={1.5} p={1.5}>
+    <Stack border={'1px solid #F0F0F4'} borderRadius={2} gap={1.5} p={1.5}>
       <Stack
         alignItems={'center'}
         flexDirection={'row'}

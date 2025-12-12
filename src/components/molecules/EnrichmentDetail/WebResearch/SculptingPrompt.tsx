@@ -61,7 +61,7 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
             Suggested instructions
           </Typography>
           <Typography
-            border={'1px solid #E5E5E5'}
+            border={'1px solid #DFDEE6'}
             borderRadius={2}
             p={2}
             sx={INSTRUCTIONS_DEFAULT_STYLE}

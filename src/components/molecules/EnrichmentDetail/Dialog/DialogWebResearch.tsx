@@ -144,18 +144,15 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   };
 
   const test = async () => {
-    await runGenerateAiModel(
-      'http://54.215.128.193:8093/aiResearch/generate/stream',
-      {
-        module: 'TASK_MODEL_CHOOSER',
-        params: {
-          userInput: extractPromptText(
-            (generateEditorInstance?.getJSON() || []) as DocumentType,
-            filedMapping,
-          ),
-        },
+    await runGenerateAiModel('/aiResearch/generate/stream', {
+      module: 'TASK_MODEL_CHOOSER',
+      params: {
+        userInput: extractPromptText(
+          (generateEditorInstance?.getJSON() || []) as DocumentType,
+          filedMapping,
+        ),
       },
-    );
+    });
   };
 
   const [, run] = useAsyncFn(
