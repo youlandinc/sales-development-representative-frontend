@@ -365,16 +365,13 @@ export const DialogActionsMenu: FC = () => {
       setGenerateSchemaStr('');
       allClear();
       openDialog(TableColumnMenuActionEnum.web_research);
-      await runGeneratePrompt(
-        'http://54.215.128.193:8093/ai/search/generate/stream',
-        {
-          module: 'TASK_MODEL_CHOOSER',
-          params: {
-            userInput: templatePrompt,
-            columns: columnNames,
-          },
+      await runGeneratePrompt('/sdr/ai/generate', {
+        module: 'COLUMN_ENRICHMENT_PROMPT',
+        params: {
+          userInput: templatePrompt,
+          columns: columnNames,
         },
-      );
+      });
     },
     [
       allClear,
@@ -514,7 +511,7 @@ export const DialogActionsMenu: FC = () => {
                     )
                   }
                   key={`search-${index}`}
-                  onClick={item.onClick}
+                  onClick={() => onIntegrationItemClick(item)}
                   title={item.name}
                 />
               ))}
