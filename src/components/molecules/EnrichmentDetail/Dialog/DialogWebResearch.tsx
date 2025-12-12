@@ -78,6 +78,9 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     runGeneratePrompt,
     setGenerateText,
     setGenerateSchemaStr,
+    runGenerateAiModel,
+    taskContent,
+    suggestedModelContent,
   } = useWebResearchStore(
     useShallow((state) => ({
       activeType: state.activeType,
@@ -92,10 +95,13 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       webResearchTab: state.webResearchTab,
       setWebResearchTab: state.setWebResearchTab,
       generateText: state.generateText,
+      taskContent: state.taskContent,
+      suggestedModelContent: state.suggestedModelContent,
       generateSchemaStr: state.generateSchemaStr,
       generateIsLoading: state.generateIsLoading,
       generateIsThinking: state.generateIsThinking,
       runGeneratePrompt: state.runGeneratePrompt,
+      runGenerateAiModel: state.runGenerateAiModel,
       setGenerateText: state.setGenerateText,
       setGenerateSchemaStr: state.setGenerateSchemaStr,
     })),
@@ -133,9 +139,23 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           (generateEditorInstance?.getJSON() || []) as DocumentType,
           filedMapping,
         ),
-        columns: columns.map((item) => item.fieldName).join(','),
       },
     });
+  };
+
+  const test = async () => {
+    await runGenerateAiModel(
+      'http://54.215.128.193:8093/aiResearch/generate/stream',
+      {
+        module: 'TASK_MODEL_CHOOSER',
+        params: {
+          userInput: extractPromptText(
+            (generateEditorInstance?.getJSON() || []) as DocumentType,
+            filedMapping,
+          ),
+        },
+      },
+    );
   };
 
   const [, run] = useAsyncFn(
@@ -302,15 +322,17 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         px={3}
         width={500}
       >
-        <Box display={generateIsLoading ? 'block' : 'none'}>
+        <Box display={generateIsThinking ? 'block' : 'none'}>
           <SculptingPrompt
-            isLoading={generateIsThinking}
+            isLoading={generateIsLoading}
             prompt={generateText}
             schemaJsonStr={generateSchemaStr}
+            suggestedModelContent={suggestedModelContent}
+            taskContent={taskContent}
           />
         </Box>
 
-        <Stack display={generateIsLoading ? 'none' : 'flex'} gap={3}>
+        <Stack display={generateIsThinking ? 'none' : 'flex'} gap={3}>
           <Stack gap={4}>
             <ToggleButtonGroup
               color={'primary'}
@@ -358,7 +380,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               }}
             >
               <WebResearchGenerate
-                handleGeneratePrompt={handleGenerate}
+                handleGeneratePrompt={test}
                 isLoading={generateIsLoading}
               />
             </Box>

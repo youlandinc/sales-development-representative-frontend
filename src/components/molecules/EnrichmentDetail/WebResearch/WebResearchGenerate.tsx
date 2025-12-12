@@ -1,22 +1,22 @@
 import { useWebResearchStore } from '@/stores/enrichment';
 import { Box, ClickAwayListener, Icon, Stack, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
-import { FC, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import { FC, useCallback, useRef } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 import { PromptEditor } from './PromptEditor';
+import { StyledActionItem, StyledSearchInput } from '../Dialog/Common';
+import { StyledProviderBadges } from '../Dialog/DialogActionsMenu/base';
 
 import { insertWithPlaceholders } from '@/utils';
 
 import { useSwitch, useVariableFromStore } from '@/hooks';
 
-import ICON_SPARK_OUTLINE from '../assets/dialog/icon_sparkle_outline.svg';
-import { StyledActionItem, StyledSearchInput } from '../Dialog/Common';
-import { useDialogHeaderActionsHook } from '../Dialog/DialogHeaderActions/hooks';
-import { StyledProviderBadges } from '../Dialog/DialogActionsMenu/base';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
-import { useShallow } from 'zustand/shallow';
 import { ActionsTypeKeyEnum } from '@/types';
+
+import ICON_SPARK_OUTLINE from '../assets/dialog/icon_sparkle_outline.svg';
 
 interface WebResearchGenerateProps {
   handleGeneratePrompt?: () => void;
@@ -30,17 +30,19 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
   onPromptEditorReady,
 }) => {
   const promptEditorRef = useRef(null);
-  const { generateDescription, setGenerateEditorInstance } =
-    useWebResearchStore((state) => state);
-  const { suggestions, suggestionsLoading, enrichments, enrichmentsLoading } =
-    useActionsStore(
-      useShallow((store) => ({
-        suggestions: store.suggestionsList,
-        suggestionsLoading: store.suggestionsLoading,
-        enrichments: store.enrichmentsList,
-        enrichmentsLoading: store.enrichmentsLoading,
+  const { generateDescription, setGenerateEditorInstance, runGenerateAiModel } =
+    useWebResearchStore(
+      useShallow((state) => ({
+        generateDescription: state.generateDescription,
+        setGenerateEditorInstance: state.setGenerateEditorInstance,
+        runGenerateAiModel: state.runGenerateAiModel,
       })),
     );
+  const { suggestions } = useActionsStore(
+    useShallow((store) => ({
+      suggestions: store.suggestionsList,
+    })),
+  );
   const { filedMapping } = useVariableFromStore();
   const { visible, open, close } = useSwitch(false);
 
@@ -89,7 +91,18 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
                 />
               }
               key={index}
-              // onClick={item.onClick}
+              onClick={async () => {
+                const description =
+                  (item.description ?? '') || (item.shortDescription ?? '');
+                await runGenerateAiModel(
+                  'http://54.215.128.193:8093/aiResearch/generate/stream',
+                  {
+                    params: {
+                      userInput: description,
+                    },
+                  },
+                );
+              }}
               title={item.name}
             />
           ))}
