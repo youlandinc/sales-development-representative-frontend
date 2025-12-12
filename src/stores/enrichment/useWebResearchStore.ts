@@ -8,6 +8,44 @@ import { SDRToast } from '@/components/atoms';
 import { Editor } from '@tiptap/core';
 import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import { useProspectTableStore } from './useProspectTableStore';
+
+const parseTaskModelText = (fullText: string) => {
+  const taskMatch = fullText.match(/^Task\s+([\s\S]*?)(?=Suggested model|$)/i);
+  const suggestedModelMatch = fullText.match(/Suggested model\s+([\s\S]*?)$/i);
+  const bracketMatch = fullText.match(/\[([^\]]+)\]/);
+
+  return {
+    taskContent: taskMatch?.[1]?.trim() ?? '',
+    suggestedModelContent: suggestedModelMatch?.[1]?.trim() ?? '',
+    suggestedModelType: bracketMatch?.[1]?.trim() ?? '',
+  };
+};
+
+const readStreamToText = async (
+  body: ReadableStream<Uint8Array>,
+  onTextChange: (fullText: string) => void,
+): Promise<string> => {
+  const reader = body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+  let fullText = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) {
+      return fullText;
+    }
+    buffer += decoder.decode(value, { stream: true });
+    const events = (buffer.split('\n\n') || ['']) as string[];
+    buffer = events.pop() || '';
+    for (const e of events) {
+      const chunk = e.replace(/data:/g, '');
+      fullText += chunk;
+      onTextChange(fullText);
+    }
+  }
+};
 
 export type WebResearchTabType = 'generate' | 'configure';
 
@@ -32,6 +70,10 @@ type WebResearchStoreProps = {
   activeType: ActiveTypeEnum;
   prompt: string;
   schemaJson: string;
+  taskModelText: string;
+  taskContent: string;
+  suggestedModelContent: string;
+  suggestedModelType: string;
   webResearchVisible: boolean;
   generateDescription: string;
   excludeFields: string[];
@@ -69,11 +111,16 @@ type WebResearchActions = {
   setWebResearchTab: (tab: WebResearchTabType) => void;
   setGenerateText: (text: string) => void;
   setGenerateSchemaStr: (str: string) => void;
+  setTaskModelText: (text: string) => void;
   runGeneratePrompt: (
     api: string,
     params: Record<string, any>,
   ) => Promise<void>;
   runGenerateJson: (api: string, params: Record<string, any>) => Promise<void>;
+  runGenerateAiModel: (
+    api: string,
+    params: Record<string, any>,
+  ) => Promise<void>;
 };
 
 export const useWebResearchStore = create<
@@ -81,6 +128,10 @@ export const useWebResearchStore = create<
 >()((set, get) => ({
   activeType: ActiveTypeEnum.add,
   prompt: '',
+  taskModelText: '',
+  taskContent: '',
+  suggestedModelContent: '',
+  suggestedModelType: '',
   promptIsEmpty: true,
   generateDescription: '',
   schemaJson: defaultSchemaJsonStr,
@@ -107,6 +158,9 @@ export const useWebResearchStore = create<
       activeType,
     });
   },
+  setTaskModelText: (text: string) => {
+    set({ taskModelText: text });
+  },
   setGenerateDescription: (description: string) => {
     set({
       generateDescription: description,
@@ -117,6 +171,11 @@ export const useWebResearchStore = create<
       prompt: '',
       schemaJson: defaultSchemaJsonStr,
       generateDescription: '',
+      taskModelText: '',
+      taskContent: '',
+      suggestedModelContent: '',
+      generateText: '',
+      generateSchemaStr: '',
     });
   },
   saveAiConfig: async (
@@ -171,38 +230,48 @@ export const useWebResearchStore = create<
   setGenerateSchemaStr: (str: string) => {
     set({ generateSchemaStr: str });
   },
-  runGeneratePrompt: async (api: string, params: Record<string, any>) => {
+  runGenerateAiModel: async (api: string, params: Record<string, any>) => {
+    get().allClear();
     set({ generateIsLoading: true, generateIsThinking: true });
     try {
-      const response = await generatePromptApi(api, params);
+      const columnsNames = useProspectTableStore
+        .getState()
+        .columns.map((item) => item.fieldName)
+        .join(',');
+      const response = await generatePromptApi(api, {
+        module: 'TASK_MODEL_CHOOSER',
+        params: {
+          ...(params?.params || {}),
+          columns: columnsNames,
+        },
+      });
       if (response.body) {
-        set({ generateIsThinking: false });
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder('utf-8');
-        let buffer = '';
-        let fullText = '';
-
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) {
-            set({ generateIsLoading: false });
-            // After prompt generation, trigger JSON schema generation
-            get().setPrompt(fullText);
-            get().runGenerateJson('/sdr/ai/generate', {
-              module: 'JSON_SCHEMA_WITH_PROMPT',
-              params: { prompt: fullText },
+        set({ generateIsLoading: false });
+        const fullText = await readStreamToText(
+          response.body,
+          (nextFullText) => {
+            const { taskContent, suggestedModelContent } =
+              parseTaskModelText(nextFullText);
+            set({
+              taskModelText: nextFullText,
+              taskContent,
+              suggestedModelContent,
             });
-            break;
-          }
-          buffer += decoder.decode(value, { stream: true });
-          const events = (buffer.split('\n\n') || ['']) as string[];
-          buffer = events.pop() || '';
-          for (const e of events) {
-            const chunk = e.replace(/data:/g, '');
-            fullText += chunk;
-            set({ generateText: fullText });
-          }
-        }
+          },
+        );
+
+        const { suggestedModelType } = parseTaskModelText(fullText);
+        set({ suggestedModelType });
+        get().runGeneratePrompt(
+          'https://dev-api.corepass.com/sdr/ai/generate',
+          {
+            module: 'COLUMN_ENRICHMENT_PROMPT',
+            params: {
+              userInput: suggestedModelType,
+              columns: columnsNames,
+            },
+          },
+        );
       }
     } catch (err) {
       const { header, message, variant } = err as HttpError;
@@ -210,41 +279,45 @@ export const useWebResearchStore = create<
       set({ generateIsLoading: false, generateIsThinking: false });
     }
   },
-  runGenerateJson: async (api: string, params: Record<string, any>) => {
-    set({ generateIsLoading: true /*  generateIsThinking: true  */ });
+  runGeneratePrompt: async (api: string, params: Record<string, any>) => {
     try {
       const response = await generatePromptApi(api, params);
       if (response.body) {
-        set({ generateIsThinking: false });
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder('utf-8');
-        let buffer = '';
-        let fullText = '';
-
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) {
-            set({ generateIsLoading: false });
-            get().setSchemaJson(fullText);
-            setTimeout(() => {
-              set({ webResearchTab: 'configure' });
-            }, 0);
-            break;
-          }
-          buffer += decoder.decode(value, { stream: true });
-          const events = (buffer.split('\n\n') || ['']) as string[];
-          buffer = events.pop() || '';
-          for (const e of events) {
-            const chunk = e.replace(/data:/g, '');
-            fullText += chunk;
-            set({ generateSchemaStr: fullText });
-          }
-        }
+        const fullText = await readStreamToText(
+          response.body,
+          (nextFullText) => {
+            set({ generateText: nextFullText });
+          },
+        );
+        get().setPrompt(fullText);
+        get().runGenerateJson('https://dev-api.corepass.com/sdr/ai/generate', {
+          module: 'JSON_SCHEMA_WITH_PROMPT',
+          params: { prompt: fullText },
+        });
       }
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
-      set({ generateIsLoading: false, generateIsThinking: false });
+    }
+  },
+  runGenerateJson: async (api: string, params: Record<string, any>) => {
+    try {
+      const response = await generatePromptApi(api, params);
+      if (response.body) {
+        const fullText = await readStreamToText(
+          response.body,
+          (nextFullText) => {
+            set({ generateSchemaStr: nextFullText });
+          },
+        );
+        get().setSchemaJson(fullText);
+        setTimeout(() => {
+          set({ webResearchTab: 'configure', generateIsThinking: false });
+        }, 1000);
+      }
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
     }
   },
 }));

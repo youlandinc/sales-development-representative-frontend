@@ -5,11 +5,30 @@ interface SculptingPromptProps {
   prompt: string;
   isLoading?: boolean;
   schemaJsonStr: string;
+  taskContent: string;
+  suggestedModelContent: string;
 }
+
+const TITLE_DEFAULT_STYLE = {
+  color: '#A4A4A4',
+  fontSize: 14,
+  lineHeight: 1.2,
+  fontWeight: 600,
+};
+
+const INSTRUCTIONS_DEFAULT_STYLE = {
+  color: 'text.secondary',
+  fontSize: 14,
+  lineHeight: 1.4,
+  whiteSpace: 'pre-wrap',
+};
+
 export const SculptingPrompt: FC<SculptingPromptProps> = ({
   prompt,
   isLoading,
   schemaJsonStr,
+  taskContent,
+  suggestedModelContent,
 }) => {
   if (isLoading) {
     return (
@@ -20,39 +39,47 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
     );
   }
   return (
-    <Stack flex={1} gap={4}>
-      <Typography variant={'body2'}>Sculpting your prompt...</Typography>
+    <Stack flex={1} gap={3}>
+      {/* <Typography variant={'body2'}>Sculpting your prompt...</Typography> */}
       <Stack gap={0.5}>
-        <Typography variant={'body2'}>Suggested use case</Typography>
-        <Typography variant={'body2'}>
-          The user prompt is requesting to find specific information about a
-          person, likely using dynamic fields (placeholders) that will be
-          replaced with actual data. The available columns suggest the task
-          involves searching for or extracting information such as Linkedlin
-          profiles, job titles, or other personal/professional details. This
-          type of task typically requires web browsing or scraping to retrieve
-          up-to-date or structured data about individuals, which aligns with the
-          capabilities of Attunegent. Therefore, Attunegent is the most
-          appropriate use case.
-        </Typography>
+        <Typography sx={TITLE_DEFAULT_STYLE}>Task</Typography>
+        {taskContent && (
+          <Typography sx={INSTRUCTIONS_DEFAULT_STYLE}>{taskContent}</Typography>
+        )}
       </Stack>
-      <Stack gap={0.4}>
-        <Typography variant={'body2'}>Suggested prompt</Typography>
-        <Typography
-          border={'1px solid #E5E5E5'}
-          borderRadius={2}
-          p={2}
-          variant={'body3'}
-        >
-          {prompt}
-        </Typography>
-      </Stack>
-      <Stack gap={0.4}>
-        <Typography variant={'body2'}>Suggested output format </Typography>
-        <Typography p={2} variant={'body3'}>
-          {schemaJsonStr}
-        </Typography>
-      </Stack>
+      {suggestedModelContent && (
+        <Stack gap={0.5}>
+          <Typography sx={TITLE_DEFAULT_STYLE}>Suggested model</Typography>
+          <Typography sx={INSTRUCTIONS_DEFAULT_STYLE}>
+            {suggestedModelContent}
+          </Typography>
+        </Stack>
+      )}
+      {prompt && (
+        <Stack gap={0.5}>
+          <Typography sx={TITLE_DEFAULT_STYLE}>
+            Suggested instructions
+          </Typography>
+          <Typography
+            border={'1px solid #E5E5E5'}
+            borderRadius={2}
+            p={2}
+            sx={INSTRUCTIONS_DEFAULT_STYLE}
+          >
+            {prompt}
+          </Typography>
+        </Stack>
+      )}
+      {schemaJsonStr && (
+        <Stack gap={0.5}>
+          <Typography sx={TITLE_DEFAULT_STYLE}>
+            Suggested output format
+          </Typography>
+          <Typography sx={INSTRUCTIONS_DEFAULT_STYLE}>
+            {schemaJsonStr}
+          </Typography>
+        </Stack>
+      )}
     </Stack>
   );
 };

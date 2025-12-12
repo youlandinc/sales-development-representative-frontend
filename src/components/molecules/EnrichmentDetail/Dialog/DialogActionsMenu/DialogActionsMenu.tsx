@@ -1,12 +1,4 @@
-import {
-  Box,
-  Divider,
-  Fade,
-  Icon,
-  Stack,
-  SxProps,
-  Typography,
-} from '@mui/material';
+import { Box, Divider, Icon, Stack, SxProps, Typography } from '@mui/material';
 import Image from 'next/image';
 import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
@@ -26,18 +18,18 @@ import {
 } from '@/stores/enrichment';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
-import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { ActionsTypeKeyEnum } from '@/types';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 import ICON_ARROW_LINE_RIGHT from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_arrow_line_right.svg';
 import ICON_LIGHTING from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_lighting.svg';
+import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
 import ICON_SHARE from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_share.svg';
 import ICON_SUGGESTION_BLUE from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_suggestions_blue.svg';
 import ICON_TARGET from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_target.svg';
+import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 import ICON_SPARK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle.svg';
 import ICON_SPARK_BLACK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_outline.svg';
-import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
-import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 
 import type {
   EnrichmentItem,
@@ -323,15 +315,19 @@ export const DialogActionsMenu: FC = () => {
     })),
   );
 
-  const { runGeneratePrompt, setGenerateText, setGenerateSchemaStr, allClear } =
-    useWebResearchStore(
-      useShallow((state) => ({
-        runGeneratePrompt: state.runGeneratePrompt,
-        setGenerateText: state.setGenerateText,
-        setGenerateSchemaStr: state.setGenerateSchemaStr,
-        allClear: state.allClear,
-      })),
-    );
+  const {
+    runGenerateAiModel,
+    setGenerateText,
+    setGenerateSchemaStr,
+    allClear,
+  } = useWebResearchStore(
+    useShallow((state) => ({
+      runGenerateAiModel: state.runGenerateAiModel,
+      setGenerateText: state.setGenerateText,
+      setGenerateSchemaStr: state.setGenerateSchemaStr,
+      allClear: state.allClear,
+    })),
+  );
 
   const {
     debouncedSetSearch,
@@ -341,12 +337,6 @@ export const DialogActionsMenu: FC = () => {
     text,
     setText,
   } = useActionsMenuSearch(enrichments, suggestions);
-
-  // Memoized column names
-  const columnNames = useMemo(
-    () => columns.map((item) => item.fieldName).join(','),
-    [columns],
-  );
 
   // Event handlers with useCallback
   const onTabClick = useCallback((tab: TabType) => {
@@ -365,19 +355,19 @@ export const DialogActionsMenu: FC = () => {
       setGenerateSchemaStr('');
       allClear();
       openDialog(TableColumnMenuActionEnum.web_research);
-      await runGeneratePrompt('/sdr/ai/generate', {
-        module: 'COLUMN_ENRICHMENT_PROMPT',
-        params: {
-          userInput: templatePrompt,
-          columns: columnNames,
+      await runGenerateAiModel(
+        'http://54.215.128.193:8093/aiResearch/generate/stream',
+        {
+          params: {
+            userInput: templatePrompt,
+          },
         },
-      });
+      );
     },
     [
       allClear,
-      columnNames,
       openDialog,
-      runGeneratePrompt,
+      runGenerateAiModel,
       setGenerateSchemaStr,
       setGenerateText,
     ],
