@@ -217,13 +217,14 @@ export const useWebResearchStore = create<
     generatePrompt: string,
   ) => {
     try {
-      return await _saveWebResearchConfig(
+      return await _saveWebResearchConfig({
         tableId,
         prompt,
         schema,
-        get().excludeFields.map((item) => [item]),
+        excludeFields: get().excludeFields.map((item) => [item]),
         generatePrompt,
-      );
+        enableWebSearch: get().enableWebSearch,
+      });
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
@@ -337,8 +338,21 @@ export const useWebResearchStore = create<
         );
         const textBeforeJson = extractTextBeforeJson(fullText);
         const jsonContent = extractJsonFromMarkdown(fullText);
-        get().setPrompt(textBeforeJson);
-        get().setSchemaJson(jsonContent);
+
+        set({
+          generateText: textBeforeJson,
+          generateSchemaStr: jsonContent,
+          prompt: textBeforeJson,
+          schemaJson: jsonContent,
+        });
+        console.log('=== DEBUG ===');
+        console.log('textBeforeJson:', textBeforeJson);
+        console.log('jsonContent:', jsonContent);
+        console.log('fullText:', fullText);
+        console.log('=============');
+        setTimeout(() => {
+          set({ webResearchTab: 'configure', generateIsThinking: false });
+        }, 1000);
       }
     } catch (err) {
       const { header, message, variant } = err as HttpError;

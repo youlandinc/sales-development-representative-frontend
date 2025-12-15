@@ -14,12 +14,7 @@ import { ROW_HEIGHT } from '@/constants/table';
 import { useProspectTable } from './hooks';
 
 import { StyledButton, StyledTable } from '@/components/atoms';
-import {
-  CampaignProcess,
-  DialogAllIntegrations,
-  DialogHeaderActions,
-  DrawerActionsContainer,
-} from '@/components/molecules';
+import { DrawerActionsContainer } from '@/components/molecules';
 import {
   HeadColumnsPanel,
   HeadFilterPanel,
@@ -35,6 +30,7 @@ import {
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
 
+import { UTypeOf } from '@/utils/UTypeOf';
 import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
 
 interface EnrichmentDetailTableProps {
@@ -60,6 +56,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     updateColumnType,
     updateColumnVisible,
     updateColumnWidth,
+    drawersType,
   } = useProspectTableStore(
     useShallow((store) => ({
       addColumn: store.addColumn,
@@ -77,6 +74,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
       updateColumnType: store.updateColumnType,
       updateColumnVisible: store.updateColumnVisible,
       updateColumnWidth: store.updateColumnWidth,
+      drawersType: store.drawersType,
     })),
   );
 
@@ -85,12 +83,14 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     setSchemaJson,
     setPrompt,
     setGenerateDescription,
+    setEnableWebSearch,
   } = useWebResearchStore(
     useShallow((store) => ({
       setWebResearchVisible: store.setWebResearchVisible,
       setSchemaJson: store.setSchemaJson,
       setPrompt: store.setPrompt,
       setGenerateDescription: store.setGenerateDescription,
+      setEnableWebSearch: store.setEnableWebSearch,
     })),
   );
 
@@ -170,7 +170,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   //   }
   //   fetchEnrichments();
   // }, [tableId, fetchSuggestions, fetchEnrichments]);
-
   return (
     <Stack
       borderTop={'1px solid #DFDEE6'}
@@ -184,12 +183,12 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
         <Stack
           flexDirection={'row'}
           justifyContent={'space-between'}
-          p={'12px 16px'}
+          p={'12px 24px 12px 16px'}
         >
           <Stack
             alignItems={'center'}
             flexDirection={'row'}
-            gap={1.5}
+            gap={3}
             height={32}
           >
             <HeadViewPanel />
@@ -197,7 +196,10 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
             <HeadRowsPanel />
             <HeadFilterPanel />
           </Stack>
-          {!dialogVisible && (
+          {!(
+            dialogVisible &&
+            (drawersType as string[]).includes(dialogType || '')
+          ) && (
             <Stack flexDirection={'row'}>
               <StyledButton
                 onClick={() => {
@@ -308,9 +310,16 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                       const metaprompt = column.typeSettings?.inputBinding.find(
                         (item) => item.name === 'metaprompt',
                       )?.formulaText;
+                      const enableWebSearch =
+                        column.typeSettings?.inputBinding.find(
+                          (item) => item.name === 'enableWebSearch',
+                        )?.formulaText === 'true';
                       prompt && setPrompt(prompt);
                       schema && setSchemaJson(schema);
                       metaprompt && setGenerateDescription(metaprompt);
+                      UTypeOf.isBoolean(enableWebSearch) &&
+                        setEnableWebSearch(enableWebSearch);
+
                       setWebResearchVisible(true, ActiveTypeEnum.edit);
                       openDialog(TableColumnMenuActionEnum.web_research);
                       return;
@@ -397,10 +406,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               }}
             />
           )}
-
-          <CampaignProcess />
-          <DialogHeaderActions />
-          <DialogAllIntegrations />
         </Stack>
       </Stack>
       <DrawerActionsContainer cellDetails={activeCell} tableId={tableId} />

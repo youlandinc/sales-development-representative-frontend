@@ -10,6 +10,7 @@ import {
   DialogWebResearch,
   DialogWorkEmail,
 } from './index';
+import { CampaignProcess } from '@/components/molecules';
 
 import { useProspectTableStore } from '@/stores/enrichment';
 
@@ -30,10 +31,11 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
   // Get dialog state from store - 分别选择避免对象引用导致的无限更新
   const dialogType = useProspectTableStore((state) => state.dialogType);
   const dialogVisible = useProspectTableStore((state) => state.dialogVisible);
+  const drawersType = useProspectTableStore((state) => state.drawersType);
 
   return (
     <Collapse
-      in={dialogVisible}
+      in={dialogVisible && (drawersType as string[]).includes(dialogType || '')}
       orientation={'horizontal'}
       slotProps={{
         wrapper: {
@@ -59,18 +61,9 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
             {dialogType === TableColumnMenuActionEnum.actions_overview && (
               <DialogActionsMenu />
             )}
-            {dialogType === TableColumnMenuActionEnum.edit_description && (
-              <DialogEditDescription />
-            )}
-
-            {dialogType === TableColumnMenuActionEnum.delete && (
-              <DialogDeleteColumn />
-            )}
-
             {dialogType === TableColumnMenuActionEnum.edit_column && (
               <DialogEditColumn />
             )}
-
             {dialogType === TableColumnMenuActionEnum.cell_detail && (
               <DialogCellDetails data={cellDetails} />
             )}
@@ -82,6 +75,9 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
             )}
           </>
         )}
+        <DialogEditDescription />
+        <DialogDeleteColumn />
+        <CampaignProcess />
       </Stack>
     </Collapse>
   );

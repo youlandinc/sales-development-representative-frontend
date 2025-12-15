@@ -126,7 +126,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         schemaJson?.trim() !== '' &&
         typeof transformToObject(schemaJson) === 'object'
       ) {
-        return transformToObject(schemaJson).properties;
+        return transformToObject(schemaJson)?.properties || {};
       }
       return transformToObject(schemaJson)?.properties || {};
     } catch {

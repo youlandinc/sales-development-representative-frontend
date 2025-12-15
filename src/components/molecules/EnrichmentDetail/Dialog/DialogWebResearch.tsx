@@ -76,10 +76,12 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     runGenerateAiModel,
     taskContent,
     suggestedModelContent,
+    enableWebSearch,
   } = useWebResearchStore(
     useShallow((state) => ({
       activeType: state.activeType,
       schemaJson: state.schemaJson,
+      enableWebSearch: state.enableWebSearch,
       allClear: state.allClear,
       saveAiConfig: state.saveAiConfig,
       setGenerateDescription: state.setGenerateDescription,
@@ -194,6 +196,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               (generateEditorInstance?.getJSON() || []) as DocumentType,
               filedMapping,
             ) || '',
+          enableWebSearch,
         });
       } catch (err) {
         const { header, message, variant } = err as HttpError;
@@ -207,6 +210,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       schemaJson,
       generateEditorInstance,
       activeColumnId,
+      enableWebSearch,
     ],
   );
 
@@ -229,6 +233,8 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
                 (generateEditorInstance?.getJSON() || []) as DocumentType,
                 filedMapping,
               ) || '',
+
+            enableWebSearch: enableWebSearch,
           });
           await run({ tableId, recordCount, fieldId: activeColumnId });
         }
@@ -263,6 +269,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       generateEditorInstance,
       activeType,
       activeColumnId,
+      enableWebSearch,
     ],
   );
 
