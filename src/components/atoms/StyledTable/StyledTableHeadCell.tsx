@@ -36,6 +36,8 @@ interface StyledTableHeadCellProps {
   isEditing?: boolean;
   onEditSave?: (newName: string) => void;
   shouldShowPinnedRightShadow?: boolean;
+  // For non-pinned columns adjacent to pinned columns, extend focus line left
+  isAdjacentToPinnedColumn?: boolean;
   // Select column checkbox props (passed directly to bypass TanStack column caching)
   isAllRowsSelected?: boolean;
   isSomeRowsSelected?: boolean;
@@ -203,21 +205,40 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         minWidth: width < 60 ? 60 : width,
         maxWidth: width,
         boxSizing: 'border-box',
+        overflow: 'visible',
+        // Use pseudo-element for pinned border so it renders outside content box
         borderRight:
           isPinned && shouldShowPinnedRightShadow && !isSelectColumn
-            ? 'none'
+            ? '0.5px solid transparent'
             : '0.5px solid #DFDEE6',
         bgcolor: shouldShowBackground ? '#F4F5F9' : '#FFFFFF',
         cursor: 'pointer',
+        // Pinned column 3px border (pseudo-element, outside content box)
+        '&::before': {
+          content:
+            isPinned && shouldShowPinnedRightShadow && !isSelectColumn
+              ? '""'
+              : 'none',
+          position: 'absolute',
+          top: 0,
+          right: -0.5,
+          width: '3px',
+          height: '100%',
+          bgcolor: '#DFDEE6',
+          zIndex: 30,
+        },
+        // Focus indicator line
         '&::after': {
           content: '""',
           position: 'absolute',
           bottom: 0,
+          // Extend left for non-pinned columns adjacent to pinned columns
           left: 0,
+          // Extend right for pinned columns with border
           right: 0,
           height: '2px',
-          bgcolor: '#363440',
-          // Show bottom line when focused but not active (e.g., after click away)
+          bgcolor: '#6F6C7D',
+          zIndex: 31,
           display: shouldShowBottomLine ? 'block' : 'none',
         },
         position: isPinned ? 'sticky' : 'relative',

@@ -42,8 +42,6 @@ const CELL_COLORS = {
   ACTIVE_BG: '#fff',
   DEFAULT_BG: '#fff',
   BORDER: '#DFDEE6',
-  PINNED_BORDER: '3px solid #DFDEE6',
-  REGULAR_BORDER: '0.5px solid #DFDEE6',
   ACTIVE_BORDER: '#5B76BC',
 } as const;
 
@@ -398,21 +396,23 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? 20 : 1,
         bgcolor: cellBackgroundColor,
+        // Use pseudo-element for pinned border so it renders outside content box
         borderRight:
           isPinned && shouldShowPinnedRightShadow && !isSelectColumn
-            ? CELL_COLORS.PINNED_BORDER
-            : CELL_COLORS.REGULAR_BORDER,
+            ? '0.5px solid transparent'
+            : '0.5px solid #DFDEE6',
+        // Pinned column 3px border (pseudo-element, outside content box)
         ...(isPinned &&
           shouldShowPinnedRightShadow &&
           !isSelectColumn && {
             '&::after': {
               content: '""',
               position: 'absolute',
-              bottom: -1,
-              right: -3,
+              top: 0,
+              right: -0.5,
               width: '3px',
-              height: '1px',
-              backgroundColor: CELL_COLORS.BORDER,
+              height: '100%',
+              bgcolor: '#DFDEE6',
               zIndex: 10,
               pointerEvents: 'none',
             },

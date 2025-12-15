@@ -894,6 +894,11 @@ export const StyledTable: FC<StyledTableProps> = ({
                       header={header}
                       indicatorHeight={indicatorHeight}
                       isActive={headerState.activeColumnId === header.id}
+                      // First non-pinned column adjacent to pinned columns
+                      isAdjacentToPinnedColumn={
+                        leftPinnedColumns.length > 0 &&
+                        virtualColumn.index === 0
+                      }
                       isEditing={
                         headerState.focusedColumnId === header.id &&
                         headerState.isEditing
