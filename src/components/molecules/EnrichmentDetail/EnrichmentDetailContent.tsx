@@ -1,5 +1,5 @@
 import { Icon, Stack } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { useShallow } from 'zustand/react/shallow';
 
@@ -108,6 +108,22 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   );
 
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
+  const [isActionsButtonVisible, setIsActionsButtonVisible] = useState(false);
+
+  // 300ms delay for showing the Actions button
+  const shouldShowButton = !(
+    dialogVisible && (drawersType as string[]).includes(dialogType || '')
+  );
+
+  useEffect(() => {
+    if (shouldShowButton) {
+      const timer = setTimeout(() => {
+        setIsActionsButtonVisible(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    setIsActionsButtonVisible(false);
+  }, [shouldShowButton]);
 
   // Use the new table hook
   const {
@@ -200,11 +216,8 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
             <HeadRowsPanel />
             <HeadFilterPanel />
           </Stack>
-          {!(
-            dialogVisible &&
-            (drawersType as string[]).includes(dialogType || '')
-          ) && (
-            <Stack sx={{ flexDirection: 'row' }}>
+          {isActionsButtonVisible && (
+            <Stack flexDirection={'row'}>
               <StyledButton
                 onClick={() => {
                   setAiTableInfo({ tableId, mappings: [] });
@@ -412,7 +425,11 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           )}
         </Stack>
       </Stack>
-      <DrawerActionsContainer cellDetails={activeCell} tableId={tableId} />
+      <DrawerActionsContainer
+        cellDetails={activeCell}
+        onInitializeAiColumns={onInitializeAiColumns}
+        tableId={tableId}
+      />
     </Stack>
   );
 };

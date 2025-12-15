@@ -15,19 +15,18 @@ import { CampaignProcess } from '@/components/molecules';
 import { useProspectTableStore } from '@/stores/enrichment';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
-import { useProspectTable } from '../hooks';
 
 interface DialogActionsContainerProps {
   tableId: string;
   cellDetails: Record<string, any>;
+  onInitializeAiColumns: () => Promise<void>;
 }
 
 export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
   tableId,
   cellDetails,
+  onInitializeAiColumns,
 }) => {
-  const { onInitializeAiColumns } = useProspectTable({ tableId });
-
   // Get dialog state from store - 分别选择避免对象引用导致的无限更新
   const dialogType = useProspectTableStore((state) => state.dialogType);
   const dialogVisible = useProspectTableStore((state) => state.dialogVisible);
@@ -42,7 +41,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
           sx: { height: '100%' },
         },
       }}
-      sx={{ height: '100% !important' }}
+      sx={{ height: '100% !important', position: 'relative' }}
     >
       <Stack
         gap={2}
