@@ -1,5 +1,5 @@
-import { Stack } from '@mui/material';
-import { FC, useState } from 'react';
+import { Icon, Stack } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 
 import { useShallow } from 'zustand/react/shallow';
 
@@ -14,12 +14,7 @@ import { ROW_HEIGHT } from '@/constants/table';
 import { useProspectTable } from './hooks';
 
 import { StyledButton, StyledTable } from '@/components/atoms';
-import {
-  CampaignProcess,
-  DialogAllIntegrations,
-  DialogHeaderActions,
-  DrawerActionsContainer,
-} from '@/components/molecules';
+import { DrawerActionsContainer } from '@/components/molecules';
 import {
   HeadColumnsPanel,
   HeadFilterPanel,
@@ -34,6 +29,32 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
+
+import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
+
+interface InputBindingItem {
+  name: string;
+  formulaText?: string;
+}
+
+const extractAiConfigFromInputBinding = (inputBinding?: InputBindingItem[]) => {
+  const schema = inputBinding?.find(
+    (item) => item.name === 'answerSchemaType',
+  )?.formulaText;
+  const prompt = inputBinding?.find(
+    (item) => item.name === 'prompt',
+  )?.formulaText;
+  const metaprompt = inputBinding?.find(
+    (item) => item.name === 'metaprompt',
+  )?.formulaText;
+  const enableWebSearch =
+    inputBinding?.find((item) => item.name === 'enableWebSearch')
+      ?.formulaText === 'true';
+  const model =
+    inputBinding?.find((item) => item.name === 'model')?.formulaText || '';
+
+  return { schema, prompt, metaprompt, enableWebSearch, model };
+};
 
 interface EnrichmentDetailTableProps {
   tableId: string;
@@ -58,6 +79,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     updateColumnType,
     updateColumnVisible,
     updateColumnWidth,
+    drawersType,
   } = useProspectTableStore(
     useShallow((store) => ({
       addColumn: store.addColumn,
@@ -75,37 +97,46 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
       updateColumnType: store.updateColumnType,
       updateColumnVisible: store.updateColumnVisible,
       updateColumnWidth: store.updateColumnWidth,
+      drawersType: store.drawersType,
     })),
   );
 
-  const {
-    setWebResearchVisible,
-    setSchemaJson,
-    setPrompt,
-    setGenerateDescription,
-  } = useWebResearchStore(
+  const { setEditParams, setWebResearchVisible } = useWebResearchStore(
     useShallow((store) => ({
+      setEditParams: store.setEditParams,
       setWebResearchVisible: store.setWebResearchVisible,
-      setSchemaJson: store.setSchemaJson,
-      setPrompt: store.setPrompt,
-      setGenerateDescription: store.setGenerateDescription,
     })),
   );
 
   const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
+  const { fetchActionsMenus } = useActionsStore(
+    useShallow((state) => ({
+      fetchActionsMenus: state.fetchActionsMenus,
+    })),
+  );
+
   const onClickToEditWorkEmail = useWorkEmailStore(
     (store) => store.handleEditClick,
   );
 
-  const { fetchSuggestions, fetchEnrichments } = useActionsStore(
-    useShallow((store) => ({
-      fetchSuggestions: store.fetchSuggestions,
-      fetchEnrichments: store.fetchEnrichments,
-    })),
+  const [activeCell, setActiveCell] = useState<Record<string, any>>({});
+  const [isActionsButtonVisible, setIsActionsButtonVisible] = useState(false);
+
+  // 300ms delay for showing the Actions button
+  const shouldShowButton = !(
+    dialogVisible && (drawersType as string[]).includes(dialogType || '')
   );
 
-  const [activeCell, setActiveCell] = useState<Record<string, any>>({});
+  useEffect(() => {
+    if (shouldShowButton) {
+      const timer = setTimeout(() => {
+        setIsActionsButtonVisible(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    setIsActionsButtonVisible(false);
+  }, [shouldShowButton]);
 
   // Use the new table hook
   const {
@@ -168,7 +199,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   //   }
   //   fetchEnrichments();
   // }, [tableId, fetchSuggestions, fetchEnrichments]);
-
   return (
     <Stack
       borderTop={'1px solid #DFDEE6'}
@@ -182,29 +212,33 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
         <Stack
           flexDirection={'row'}
           justifyContent={'space-between'}
-          p={'12px 32px 24px 16px'}
+          p={'12px 24px 12px 16px'}
         >
-          <Stack flexDirection={'row'} gap={1.5} height={32}>
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            gap={3}
+            height={32}
+          >
             <HeadViewPanel />
             <HeadColumnsPanel />
             <HeadRowsPanel />
             <HeadFilterPanel />
           </Stack>
-          {!dialogVisible && (
+          {isActionsButtonVisible && (
             <Stack flexDirection={'row'}>
               <StyledButton
                 onClick={() => {
                   setAiTableInfo({ tableId, mappings: [] });
                   openDialog(TableColumnMenuActionEnum.actions_overview);
-                  if (tableId) {
-                    fetchSuggestions(tableId);
-                  }
-                  fetchEnrichments();
                 }}
-                size={'medium'}
+                size={'small'}
                 variant={'contained'}
               >
-                Actions
+                <Stack alignItems="center" flexDirection="row" gap={0.5}>
+                  Actions
+                  <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
+                </Stack>
               </StyledButton>
             </Stack>
           )}
@@ -289,19 +323,24 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                     }
                     // AI column configuration
                     if (column && column.actionKey === 'use-ai') {
-                      const schema = column.typeSettings?.inputBinding.find(
-                        (item) => item.name === 'answerSchemaType',
-                      )?.formulaText;
-                      const prompt = column.typeSettings?.inputBinding.find(
-                        (item) => item.name === 'prompt',
-                      )?.formulaText;
-                      const metaprompt = column.typeSettings?.inputBinding.find(
-                        (item) => item.name === 'metaprompt',
-                      )?.formulaText;
-                      prompt && setPrompt(prompt);
-                      schema && setSchemaJson(schema);
-                      metaprompt && setGenerateDescription(metaprompt);
-                      setWebResearchVisible(true, ActiveTypeEnum.edit);
+                      const {
+                        schema,
+                        prompt,
+                        metaprompt,
+                        enableWebSearch,
+                        model,
+                      } = extractAiConfigFromInputBinding(
+                        column.typeSettings?.inputBinding,
+                      );
+
+                      setEditParams({
+                        webResearchVisible: true,
+                        schemaJson: schema || '',
+                        prompt: prompt || '',
+                        generateDescription: metaprompt || '',
+                        enableWebSearch,
+                        model,
+                      });
                       openDialog(TableColumnMenuActionEnum.web_research);
                       return;
                     }
@@ -317,6 +356,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                   case TableColumnMenuActionEnum.rename_column: {
                     if (value) {
                       await updateColumnName(value);
+                      fetchActionsMenus(tableId);
                     }
                     break;
                   }
@@ -387,13 +427,13 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               }}
             />
           )}
-
-          <CampaignProcess />
-          <DialogHeaderActions />
-          <DialogAllIntegrations />
         </Stack>
       </Stack>
-      <DrawerActionsContainer cellDetails={activeCell} tableId={tableId} />
+      <DrawerActionsContainer
+        cellDetails={activeCell}
+        onInitializeAiColumns={onInitializeAiColumns}
+        tableId={tableId}
+      />
     </Stack>
   );
 };

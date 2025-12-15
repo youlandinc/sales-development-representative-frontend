@@ -13,7 +13,7 @@ import {
 import { Descendant, Element, Node, NodeEntry, Text } from 'slate';
 import { Editable, ReactEditor, RenderLeafProps, Slate } from 'slate-react';
 
-import { useFormatString } from '../hooks';
+import { usePrevious } from '@/hooks';
 
 import {
   buildExpressionFromNodes,
@@ -79,7 +79,7 @@ interface SlateEditorProps {
   onValueChange?: (value: string) => void;
 }
 
-export const FormulaEditor = forwardRef<ReactEditor, SlateEditorProps>(
+export const StyledSlateEditor = forwardRef<ReactEditor, SlateEditorProps>(
   (
     {
       editor,
@@ -122,14 +122,14 @@ export const FormulaEditor = forwardRef<ReactEditor, SlateEditorProps>(
         : '';
 
     // JSON 转换函数 j1（可能是格式化 JSON）
-    const formattedString = useFormatString(currentString);
+    const previousString = usePrevious(currentString);
 
     // 当 JSON 发生变化时，触发外部 setValue
     useEffect(() => {
-      if (currentString !== formattedString) {
+      if (currentString !== previousString) {
         onValueChange?.(currentString);
       }
-    }, [onValueChange, value, currentString, formattedString]);
+    }, [onValueChange, value, currentString, previousString]);
 
     // JSON 装饰器：用于语法高亮（调用 L8e 前面定义的）
     const decorate = useCallback(([node, path]: NodeEntry) => {
@@ -242,5 +242,3 @@ export const FormulaEditor = forwardRef<ReactEditor, SlateEditorProps>(
     );
   },
 );
-
-FormulaEditor.displayName = 'FormulaEditor';

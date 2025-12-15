@@ -1,18 +1,14 @@
-import { Drawer, Icon, Stack, Typography } from '@mui/material';
+import { Icon, Stack, Typography } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import { CommonSelectFieldType } from '@/components/molecules/Common';
 
 import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
-import { useProspectTableStore } from '@/stores/enrichment';
 import { useAsyncFn } from '@/hooks';
-
-import {
-  TableColumnMenuActionEnum,
-  TableColumnTypeEnum,
-} from '@/types/enrichment/table';
+import { useProspectTableStore } from '@/stores/enrichment';
 
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 
@@ -21,14 +17,8 @@ interface DialogEditColumnProps {
 }
 
 export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
-  const {
-    columns,
-    activeColumnId,
-    dialogType,
-    closeDialog,
-    updateColumnFieldName,
-    dialogVisible,
-  } = useProspectTableStore((store) => store);
+  const { columns, activeColumnId, closeDialog, updateColumnFieldName } =
+    useProspectTableStore((store) => store);
 
   const column = columns.find((col) => col.fieldId === activeColumnId);
 

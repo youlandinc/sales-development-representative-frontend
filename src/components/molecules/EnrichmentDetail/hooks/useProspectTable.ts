@@ -11,7 +11,10 @@ import {
 import useSWR from 'swr';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
+import {
+  useProspectTableStore,
+  useWebResearchStore,
+} from '@/stores/enrichment';
 import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
@@ -77,10 +80,16 @@ export const useProspectTable = ({
       updateCellValue: store.updateCellValue,
     })),
   );
-  const { fetchEnrichments, fetchSuggestions } = useActionsStore(
+
+  const { fetchActionsMenus } = useActionsStore(
     useShallow((store) => ({
-      fetchEnrichments: store.fetchEnrichments,
-      fetchSuggestions: store.fetchSuggestions,
+      fetchActionsMenus: store.fetchActionsMenus,
+    })),
+  );
+
+  const { fetchWebResearchModelList } = useWebResearchStore(
+    useShallow((store) => ({
+      fetchWebResearchModelList: store.fetchWebResearchModelList,
     })),
   );
 
@@ -320,16 +329,16 @@ export const useProspectTable = ({
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
     // fetchIntegrationMenus();
-    fetchEnrichments();
-    fetchSuggestions(tableId);
+    fetchActionsMenus(tableId);
+    fetchWebResearchModelList();
   }, [
     tableId,
     total,
     fetchBatchData,
     isMetadataLoading,
     // fetchIntegrationMenus,
-    fetchEnrichments,
-    fetchSuggestions,
+    fetchActionsMenus,
+    fetchWebResearchModelList,
   ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)

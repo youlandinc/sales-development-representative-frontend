@@ -3,7 +3,7 @@ import { FC, PropsWithChildren, useMemo } from 'react';
 
 import { useSwitch } from '@/hooks';
 
-import ICON_ARROW from './assets/icon_collapse.svg';
+import ICON_ARROW from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_collapse.svg';
 
 interface CollapseCardProps {
   title: string;

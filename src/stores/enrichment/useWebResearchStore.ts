@@ -1,25 +1,49 @@
 import { create } from 'zustand';
+import { Editor } from '@tiptap/core';
+import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
+
+import { SDRToast } from '@/components/atoms';
+
 import {
+  _fetchWebResearchModelList,
   _saveWebResearchConfig,
   generatePrompt as generatePromptApi,
 } from '@/request';
-import { HttpError } from '@/types';
-import { SDRToast } from '@/components/atoms';
-import { Editor } from '@tiptap/core';
-import { ReactEditor } from 'slate-react/dist/plugin/react-editor';
+
+import { HttpError, ModelGroupItem } from '@/types';
+
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 import { useProspectTableStore } from './useProspectTableStore';
+
+import { UTypeOf } from '@/utils/UTypeOf';
 
 const parseTaskModelText = (fullText: string) => {
   const taskMatch = fullText.match(/^Task\s+([\s\S]*?)(?=Suggested model|$)/i);
   const suggestedModelMatch = fullText.match(/Suggested model\s+([\s\S]*?)$/i);
   const bracketMatch = fullText.match(/\[([^\]]+)\]/);
-
+  const enableWebSearchMatch = fullText.match(
+    /Enable web search\s*\[([^\]]+)\]/i,
+  );
+  const enableWebSearchValue = enableWebSearchMatch?.[1]?.trim().toLowerCase();
   return {
     taskContent: taskMatch?.[1]?.trim() ?? '',
     suggestedModelContent: suggestedModelMatch?.[1]?.trim() ?? '',
     suggestedModelType: bracketMatch?.[1]?.trim() ?? '',
+    enableWebSearch: enableWebSearchValue === 'true',
   };
+};
+
+const extractJsonFromMarkdown = (fullText: string): string => {
+  const jsonMatch = fullText.match(/```json\s*([\s\S]*?)(?:```|$)/i);
+  return jsonMatch?.[1]?.trim() ?? '';
+};
+
+const extractTextBeforeJson = (fullText: string): string => {
+  const jsonIndex = fullText.indexOf('```json');
+  if (jsonIndex === -1) {
+    return fullText;
+  }
+  return fullText.slice(0, jsonIndex).trim();
 };
 
 const readStreamToText = async (
@@ -87,6 +111,8 @@ type WebResearchStoreProps = {
   generateSchemaStr: string;
   generateIsLoading: boolean;
   generateIsThinking: boolean;
+  enableWebSearch: boolean;
+  aiModelList: ModelGroupItem[];
 };
 
 type WebResearchActions = {
@@ -112,15 +138,26 @@ type WebResearchActions = {
   setGenerateText: (text: string) => void;
   setGenerateSchemaStr: (str: string) => void;
   setTaskModelText: (text: string) => void;
+  setSuggestedModelType: (model: string) => void;
+  setEnableWebSearch: (enabled: boolean) => void;
+  setEditParams: (param: {
+    webResearchVisible: boolean;
+    schemaJson: string;
+    prompt: string;
+    generateDescription: string;
+    enableWebSearch: boolean;
+    model: string;
+  }) => void;
   runGeneratePrompt: (
     api: string,
     params: Record<string, any>,
   ) => Promise<void>;
-  runGenerateJson: (api: string, params: Record<string, any>) => Promise<void>;
+  // runGenerateJson: (api: string, params: Record<string, any>) => Promise<void>;
   runGenerateAiModel: (
     api: string,
     params: Record<string, any>,
   ) => Promise<void>;
+  fetchWebResearchModelList: () => Promise<void>;
 };
 
 export const useWebResearchStore = create<
@@ -146,6 +183,8 @@ export const useWebResearchStore = create<
   generateSchemaStr: '',
   generateIsLoading: false,
   generateIsThinking: false,
+  enableWebSearch: false,
+  aiModelList: [],
   setPrompt: (prompt: string) => {
     set({ prompt });
   },
@@ -176,6 +215,9 @@ export const useWebResearchStore = create<
       suggestedModelContent: '',
       generateText: '',
       generateSchemaStr: '',
+      enableWebSearch: false,
+      suggestedModelType: '',
+      activeType: ActiveTypeEnum.add,
     });
   },
   saveAiConfig: async (
@@ -185,13 +227,15 @@ export const useWebResearchStore = create<
     generatePrompt: string,
   ) => {
     try {
-      return await _saveWebResearchConfig(
+      return await _saveWebResearchConfig({
         tableId,
         prompt,
         schema,
-        get().excludeFields.map((item) => [item]),
+        excludeFields: get().excludeFields.map((item) => [item]),
         generatePrompt,
-      );
+        enableWebSearch: get().enableWebSearch,
+        model: get().suggestedModelType,
+      });
     } catch (err) {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
@@ -230,6 +274,30 @@ export const useWebResearchStore = create<
   setGenerateSchemaStr: (str: string) => {
     set({ generateSchemaStr: str });
   },
+  setSuggestedModelType: (model: string) => {
+    set({ suggestedModelType: model });
+  },
+  setEnableWebSearch: (enabled: boolean) => {
+    set({ enableWebSearch: enabled });
+  },
+  setEditParams: (param: {
+    webResearchVisible: boolean;
+    schemaJson: string;
+    prompt: string;
+    generateDescription: string;
+    enableWebSearch: boolean;
+    model: string;
+  }) => {
+    set({
+      webResearchVisible: param.webResearchVisible,
+      schemaJson: param.schemaJson,
+      prompt: param.prompt,
+      generateDescription: param.generateDescription,
+      enableWebSearch: param.enableWebSearch,
+      suggestedModelType: param.model,
+      activeType: ActiveTypeEnum.edit,
+    });
+  },
   runGenerateAiModel: async (api: string, params: Record<string, any>) => {
     get().allClear();
     set({ generateIsLoading: true, generateIsThinking: true });
@@ -260,13 +328,19 @@ export const useWebResearchStore = create<
           },
         );
 
-        const { suggestedModelType } = parseTaskModelText(fullText);
-        set({ suggestedModelType });
-        get().runGeneratePrompt('/sdr/ai/generate', {
+        const { suggestedModelType, enableWebSearch } =
+          parseTaskModelText(fullText);
+        set({
+          suggestedModelType,
+          enableWebSearch,
+        });
+
+        get().runGeneratePrompt('/aiResearch/generate/stream', {
           module: 'COLUMN_ENRICHMENT_PROMPT',
           params: {
-            userInput: suggestedModelType,
+            userInput: params?.params?.userInput || '',
             columns: columnsNames,
+            model: suggestedModelType,
           },
         });
       }
@@ -283,34 +357,56 @@ export const useWebResearchStore = create<
         const fullText = await readStreamToText(
           response.body,
           (nextFullText) => {
-            set({ generateText: nextFullText });
+            const textBeforeJson = extractTextBeforeJson(nextFullText);
+            const jsonContent = extractJsonFromMarkdown(nextFullText);
+            set({
+              generateText: textBeforeJson,
+              generateSchemaStr: jsonContent,
+            });
           },
         );
-        get().setPrompt(fullText);
-        get().runGenerateJson('/sdr/ai/generate', {
-          module: 'JSON_SCHEMA_WITH_PROMPT',
-          params: { prompt: fullText },
+        const textBeforeJson = extractTextBeforeJson(fullText);
+        const jsonContent = extractJsonFromMarkdown(fullText);
+
+        set({
+          generateText: textBeforeJson,
+          generateSchemaStr: jsonContent,
+          prompt: textBeforeJson,
+          schemaJson: jsonContent,
         });
+        setTimeout(() => {
+          set({ webResearchTab: 'configure', generateIsThinking: false });
+        }, 1000);
       }
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     }
   },
-  runGenerateJson: async (api: string, params: Record<string, any>) => {
+  // runGenerateJson: async (api: string, params: Record<string, any>) => {
+  //   try {
+  //     const response = await generatePromptApi(api, params);
+  //     if (response.body) {
+  //       const fullText = await readStreamToText(
+  //         response.body,
+  //         (nextFullText) => {
+  //           const jsonContent = extractJsonFromMarkdown(nextFullText);
+  //           set({ generateSchemaStr: jsonContent || nextFullText });
+  //         },
+  //       );
+  //       const jsonContent = extractJsonFromMarkdown(fullText);
+  //       get().setSchemaJson(jsonContent || fullText);
+  //     }
+  //   } catch (err) {
+  //     const { header, message, variant } = err as HttpError;
+  //     SDRToast({ message, header, variant });
+  //   }
+  // },
+  fetchWebResearchModelList: async () => {
     try {
-      const response = await generatePromptApi(api, params);
-      if (response.body) {
-        const fullText = await readStreamToText(
-          response.body,
-          (nextFullText) => {
-            set({ generateSchemaStr: nextFullText });
-          },
-        );
-        get().setSchemaJson(fullText);
-        setTimeout(() => {
-          set({ webResearchTab: 'configure', generateIsThinking: false });
-        }, 1000);
+      const response = await _fetchWebResearchModelList();
+      if (UTypeOf.isArray(response?.data)) {
+        set({ aiModelList: response.data });
       }
     } catch (err) {
       const { header, message, variant } = err as HttpError;

@@ -62,7 +62,7 @@ export const DialogWorkEmailCustomSelect: FC<
               slotProps={{
                 input: {
                   ...params.InputProps,
-                  startAdornment: !value ? null : (
+                  startAdornment: !value?.value ? null : (
                     <Icon
                       component={
                         COLUMN_TYPE_ICONS[

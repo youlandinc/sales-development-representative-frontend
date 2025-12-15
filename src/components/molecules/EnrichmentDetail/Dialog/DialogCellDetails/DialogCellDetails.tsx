@@ -24,12 +24,10 @@ import SearchIcon from '@mui/icons-material/Search';
 type CellDetailsProps = {
   data: Record<string, any>;
 } & DrawerProps;
-export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
-  const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
+export const DialogCellDetails: FC<CellDetailsProps> = ({ data }) => {
+  const { closeDialog } = useProspectTableStore(
     useShallow((state) => ({
-      dialogType: state.dialogType,
       closeDialog: state.closeDialog,
-      dialogVisible: state.dialogVisible,
     })),
   );
 
@@ -142,7 +140,7 @@ export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
           onClick={async () => {
             await navigator.clipboard.writeText(JSON.stringify(data));
             SDRToast({
-              message: 'Copied to Clipboard',
+              message: 'Copied to clipboard',
               header: false,
               variant: 'success' as HttpVariantEnum,
             });

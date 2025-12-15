@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Icon, Stack, SxProps, Typography } from '@mui/material';
-import { Content, Editor } from '@tiptap/core';
+import { Content, Editor, Extendable } from '@tiptap/core';
 import { Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -14,10 +14,7 @@ import {
 
 import { StyledButton } from '@/components/atoms';
 
-import ICON_SPARKLE from '../assets/icon_sparkle.svg';
-import { ExtensionMention } from './ExtensionMention';
-import { ExtensionNode } from './ExtensionNode';
-import { ExtensionStorage } from './ExtensionStorage';
+import ICON_SPARKLE from './assets/icon_sparkle.svg';
 
 // type NodeType = {
 //   type: string;
@@ -34,8 +31,12 @@ interface PromptEditorProps {
   onEditorReady?: (editor: Editor) => void;
   editorSx?: SxProps;
   showBtn?: boolean;
+  extensions?: Extendable[];
 }
-export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
+export const StyledTiptapEditor = forwardRef<
+  ComponentRef<any>,
+  PromptEditorProps
+>(
   (
     {
       defaultValue = null,
@@ -46,6 +47,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
       onEditorReady,
       editorSx,
       showBtn = true,
+      extensions = [],
     },
     ref,
   ) => {
@@ -101,11 +103,7 @@ export const PromptEditor = forwardRef<ComponentRef<any>, PromptEditorProps>(
             },
           },
         }),
-        ExtensionMention,
-        ExtensionNode,
-        ExtensionStorage,
-
-        // VariableTokenNode,
+        ...extensions,
       ],
       content: null,
       // Don't render immediately on the server to avoid SSR issues

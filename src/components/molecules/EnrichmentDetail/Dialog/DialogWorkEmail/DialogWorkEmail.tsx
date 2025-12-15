@@ -7,6 +7,8 @@ import {
   DialogWorkEmailIntegrationAccount,
   DialogWorkEmailMain,
 } from './index';
+import { DialogHeaderActions } from '../DialogHeaderActions';
+import { DialogAllIntegrations } from '../DialogAllIntegrations';
 
 import { useWorkEmailStore } from '@/stores/enrichment';
 import { WaterfallConfigTypeEnum } from '@/types/enrichment';
@@ -62,6 +64,8 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
     <Stack flex={1} minHeight={0}>
       {computedContent}
       <DialogWorkEmailFooter cb={cb} />
+      <DialogHeaderActions />
+      <DialogAllIntegrations />
     </Stack>
   );
 };

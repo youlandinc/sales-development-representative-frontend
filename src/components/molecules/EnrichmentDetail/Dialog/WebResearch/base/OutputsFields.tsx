@@ -17,7 +17,7 @@ import { CommonSelectFieldType } from '@/components/molecules/Common';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
-import ICON_DELETE from './assets/icon_delete.svg';
+import ICON_DELETE from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_delete.svg';
 
 interface SelectOption {
   label: string;

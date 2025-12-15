@@ -1,13 +1,21 @@
 import { FC, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
-
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
 
+import { useProspectTableStore } from '@/stores/enrichment';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
-export const DialogDeleteColumn: FC = () => {
+interface DialogDeleteColumnProps {
+  tableId: string;
+}
+
+export const DialogDeleteColumn: FC<DialogDeleteColumnProps> = ({
+  tableId,
+}) => {
   const {
     dialogVisible,
     dialogType,
@@ -16,6 +24,12 @@ export const DialogDeleteColumn: FC = () => {
     deleteColumn,
     closeDialog,
   } = useProspectTableStore((state) => state);
+
+  const { fetchActionsMenus } = useActionsStore(
+    useShallow((state) => ({
+      fetchActionsMenus: state.fetchActionsMenus,
+    })),
+  );
 
   const [deleting, setDeleting] = useState(false);
 
@@ -53,6 +67,7 @@ export const DialogDeleteColumn: FC = () => {
               setDeleting(true);
               await deleteColumn();
               setDeleting(false);
+              fetchActionsMenus(tableId);
             }}
             size={'medium'}
             sx={{ width: 68 }}

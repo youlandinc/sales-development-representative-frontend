@@ -1,96 +1,64 @@
+import {
+  Icon,
+  Menu,
+  MenuItem,
+  menuItemClasses,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { useParams } from 'next/navigation';
-import { FC } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { FC, ReactNode, useState } from 'react';
 
-import { StyledButton } from '@/components/atoms';
-import { DialogFooter } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
+import { StyledButton, StyledCost } from '@/components/atoms';
 
 import { useProspectTableStore } from '@/stores/enrichment';
-import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
-import { useComputedInWorkEmailStore, useWorkEmailRequest } from './hooks';
 
-import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/enrichment';
+import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';
 
-import { COINS_PER_ROW } from '@/constants';
-
-interface DialogWorkEmailFooterProps {
+interface DialogFooterProps {
   cb?: () => void;
+  coinsPerRow: number;
+  onClickToSaveAndRun10?: (tableId: string, rowCount: number) => void;
+  onClickToSaveAndRunAll?: (tableId: string, rowCount: number) => void;
+  onClickToSaveDoNotRun?: (tableId: string, rowCount: number) => void;
+  loading?: boolean;
+  disabled?: boolean;
+  slot?: ReactNode;
 }
 
-export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
-  cb,
+export const DialogFooter: FC<DialogFooterProps> = ({
+  coinsPerRow,
+  onClickToSaveAndRun10,
+  onClickToSaveAndRunAll,
+  onClickToSaveDoNotRun,
+  loading,
+  disabled,
+  slot,
 }) => {
   const { rowIds } = useProspectTableStore((store) => store);
-  const { isMissingConfig } = useComputedInWorkEmailStore();
-  const { setWaterfallConfigType, setDisplayType, displayType } =
-    useWorkEmailStore(
-      useShallow((state) => ({
-        setWaterfallConfigType: state.setWaterfallConfigType,
-        setDisplayType: state.setDisplayType,
-        displayType: state.displayType,
-      })),
-    );
   const params = useParams();
   const tableId =
     typeof params.tableId === 'string' && params.tableId.trim() !== ''
       ? params.tableId
       : '';
-  const { requestState } = useWorkEmailRequest(tableId, cb);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   return (
-    <DialogFooter
-      coinsPerRow={COINS_PER_ROW}
-      disabled={requestState?.state?.loading || isMissingConfig}
-      loading={requestState?.state?.loading}
-      onClickToSaveAndRun10={() => {
-        requestState?.request?.(tableId, 10);
-      }}
-      onClickToSaveAndRunAll={() => {
-        requestState?.request?.(tableId, rowIds.length);
-      }}
-      onClickToSaveDoNotRun={() => {
-        requestState?.request?.(tableId, rowIds.length, false);
-      }}
-      slot={
-        displayType === DisplayTypeEnum.integration ? (
-          <StyledButton
-            onClick={() => {
-              setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
-              setDisplayType(DisplayTypeEnum.main);
-            }}
-            sx={{ height: '40px !important' }}
-            variant={'contained'}
-          >
-            Save waterfall step
-          </StyledButton>
-        ) : null
-      }
-    />
-  );
-
-  /* return (
     <Stack
-      alignItems={'center'}
-      borderTop={' 1px solid   #D0CEDA'}
-      flexDirection={'row'}
-      gap={1}
-      justifyContent={'flex-end'}
-      mt={'auto'}
-      px={3}
-      py={1.5}
+      sx={{
+        alignItems: 'center',
+        borderTop: '1px solid #D0CEDA',
+        flexDirection: 'row',
+        gap: 1,
+        justifyContent: 'flex-end',
+        mt: 'auto',
+        px: 3,
+        py: 1.5,
+      }}
     >
-      {displayType === DisplayTypeEnum.integration ? (
-        <StyledButton
-          onClick={() => {
-            setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
-            setDisplayType(DisplayTypeEnum.main);
-            onClickToSaveWaterfallStep?.();
-          }}
-          sx={{ height: '40px !important' }}
-          variant={'contained'}
-        >
-          Save waterfall step
-        </StyledButton>
+      {slot ? (
+        slot
       ) : (
         <>
           <StyledCost
@@ -100,7 +68,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
             textColor={'text.secondary'}
           />
           <StyledButton
-            disabled={!tableId || isMissingConfig}
+            disabled={disabled}
             endIcon={
               <Icon
                 component={ICON_ARROW}
@@ -111,7 +79,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
                 }}
               />
             }
-            loading={requestState?.state?.loading}
+            loading={loading}
             onClick={(e) => {
               setAnchorEl(e.currentTarget);
             }}
@@ -123,6 +91,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
           </StyledButton>
         </>
       )}
+
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{
@@ -158,8 +127,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
           <MenuItem
             onClick={() => {
               setAnchorEl(null);
-              requestState?.request?.(tableId, 10);
-              onClickToSaveAndRun10?.();
+              onClickToSaveAndRun10?.(tableId, 10);
             }}
           >
             <Typography color={'text.secondary'} variant={'body2'}>
@@ -169,7 +137,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
               bgcolor={'transparent'}
               border={'1px solid #F4F5F9'}
               borderRadius={2}
-              count={`${coinsPerRow * 10}`}
+              count={`${coinsPerRow}`}
               textColor={'text.secondary'}
             />
           </MenuItem>
@@ -177,8 +145,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
         <MenuItem
           onClick={() => {
             setAnchorEl(null);
-            requestState?.request?.(tableId, rowIds.length);
-            onClickToSaveAndRunAll?.();
+            onClickToSaveAndRunAll?.(tableId, rowIds.length);
           }}
         >
           <Typography color={'text.secondary'} variant={'body2'}>
@@ -195,8 +162,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
         <MenuItem
           onClick={async () => {
             setAnchorEl(null);
-            requestState?.request?.(tableId, rowIds.length, false);
-            onClickToSaveDoNotRun?.();
+            onClickToSaveDoNotRun?.(tableId, rowIds.length);
           }}
         >
           <Typography color={'text.secondary'} variant={'body2'}>
@@ -205,5 +171,5 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
         </MenuItem>
       </Menu>
     </Stack>
-  ); */
+  );
 };

@@ -1,9 +1,13 @@
-export * from './CommandsList';
+// TipTap Extensions
 export * from './ExtensionMention';
 export * from './ExtensionNode';
 export * from './ExtensionStorage';
-export * from './mentionSuggestionOptions';
+
+// UI Components
+export * from './CommandsList';
 export * from './PlaceholderNode';
 export * from './RenderSuggestions';
 export * from './SuggestionList';
-export * from './PromptEditor';
+
+// Utils & Config
+export * from './mentionSuggestionOptions';

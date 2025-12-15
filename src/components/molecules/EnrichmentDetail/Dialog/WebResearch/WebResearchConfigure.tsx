@@ -15,24 +15,31 @@ import { ReactEditor, withReact } from 'slate-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useShallow } from 'zustand/shallow';
 
-import { StyledSwitch, StyledTextField } from '@/components/atoms';
-import { useSwitch, useVariableFromStore } from '@/hooks';
-import { useWebResearchStore } from '@/stores/enrichment';
 import {
-  CollapseCard,
-  FormulaEditor,
-  ModelSelect,
-  OutputsFields,
-  PromptEditor,
-} from './index';
-import { MODEL_OPTIONS } from './ModelSelect/modelOptions';
+  StyledSlateEditor,
+  StyledSwitch,
+  StyledTextField,
+  StyledTiptapEditor,
+} from '@/components/atoms';
+import { CollapseCard, ModelSelect, OutputsFields } from './base';
+
+import { useSwitch, useVariableFromStore } from '@/hooks';
+
+import { useWebResearchStore } from '@/stores/enrichment';
 
 import { insertWithPlaceholders } from '@/utils';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
-import ICON_ARROW from './assets/icon_arrow_left.svg';
-import ICON_DELETE from './assets/icon_delete.svg';
-import ICON_WARNING from './assets/icon_warning.svg';
+
+import {
+  ExtensionMention,
+  ExtensionNode,
+  ExtensionStorage,
+} from './extensions';
+
+import ICON_ARROW from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_arrow_left.svg';
+import ICON_DELETE from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_delete.svg';
+import ICON_WARNING from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_warning.svg';
 
 interface WebResearchConfigureProps {
   handleGenerate?: () => void;
@@ -52,6 +59,9 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     setTipTapEditorInstance,
     setSlateEditorInstance,
     taskContent,
+    enableWebSearch,
+    setEnableWebSearch,
+    setWebResearchTab,
   } = useWebResearchStore(
     useShallow((state) => ({
       prompt: state.prompt,
@@ -60,14 +70,16 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       setTipTapEditorInstance: state.setTipTapEditorInstance,
       setSlateEditorInstance: state.setSlateEditorInstance,
       taskContent: state.taskContent,
+      enableWebSearch: state.enableWebSearch,
+      setEnableWebSearch: state.setEnableWebSearch,
+      setWebResearchTab: state.setWebResearchTab,
     })),
   );
   const { filedMapping } = useVariableFromStore();
 
-  const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
+  const [outPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { visible, toggle } = useSwitch(true);
-  const [selectedModel, setSelectedModel] = useState('verity_lite');
 
   const onMenuClose = useCallback(() => {
     setAnchorEl(null);
@@ -124,7 +136,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         schemaJson?.trim() !== '' &&
         typeof transformToObject(schemaJson) === 'object'
       ) {
-        return transformToObject(schemaJson).properties;
+        return transformToObject(schemaJson)?.properties || {};
       }
       return transformToObject(schemaJson)?.properties || {};
     } catch {
@@ -238,7 +250,16 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   return (
     <Stack gap={3}>
       {taskContent && (
-        <Typography color={'text.secondary'} variant={'body3'}>
+        <Typography
+          color={'text.secondary'}
+          onClick={() => {
+            setWebResearchTab('generate');
+          }}
+          sx={{
+            cursor: 'pointer',
+          }}
+          variant={'body3'}
+        >
           <Icon
             component={ICON_ARROW}
             sx={{ width: 12, height: 12, mr: '2px', verticalAlign: 'middle' }}
@@ -247,20 +268,38 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         </Typography>
       )}
       <CollapseCard hasCollapse={false} title={'Model'}>
-        <ModelSelect
-          groups={MODEL_OPTIONS}
-          onChange={setSelectedModel}
-          value={selectedModel}
-        />
+        <ModelSelect />
+        <Stack
+          alignItems={'center'}
+          flexDirection={'row'}
+          justifyContent={'space-between'}
+        >
+          <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+            <Typography variant={'body2'}>Enable web access</Typography>
+            <Tooltip
+              arrow
+              title={
+                'Enables Atlas to research information online in real time. This may increase usage costs.'
+              }
+            >
+              <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />
+            </Tooltip>
+          </Stack>
+          <StyledSwitch
+            checked={enableWebSearch}
+            onChange={(e) => setEnableWebSearch(e.target.checked)}
+          />
+        </Stack>
       </CollapseCard>
       <CollapseCard title={'Agent instructions'}>
-        <PromptEditor
+        <StyledTiptapEditor
           defaultValue={defaultValue}
           editorSx={{
             border: '1px solid #ccc',
             borderRadius: 2,
             p: 2,
           }}
+          extensions={[ExtensionMention, ExtensionNode, ExtensionStorage]}
           handleGenerate={handleGenerate}
           minHeight={200}
           onEditorReady={handleEditorReady}
@@ -449,7 +488,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
           {/* )} */}
           {/* <Box display={outPuts === 'json' ? 'block' : 'none'}> */}
           {outPuts === 'json' && (
-            <FormulaEditor
+            <StyledSlateEditor
               editor={editor}
               initialValue={schemaJson}
               onEditorReady={handleSchemaEditorReady}
