@@ -172,24 +172,28 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   // }, [tableId, fetchSuggestions, fetchEnrichments]);
   return (
     <Stack
-      borderTop={'1px solid #DFDEE6'}
-      flex={1}
-      flexDirection={'row'}
-      maxWidth={'100%'}
-      overflow={'hidden'}
-      width={'100vw'}
+      sx={{
+        borderTop: '1px solid #DFDEE6',
+        flex: 1,
+        flexDirection: 'row',
+        overflow: 'hidden',
+      }}
     >
-      <Stack flex={1} minWidth={0}>
+      <Stack sx={{ flex: 1, width: 0 }}>
         <Stack
-          flexDirection={'row'}
-          justifyContent={'space-between'}
-          p={'12px 24px 12px 16px'}
+          sx={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            p: '12px 24px 12px 16px',
+          }}
         >
           <Stack
-            alignItems={'center'}
-            flexDirection={'row'}
-            gap={3}
-            height={32}
+            sx={{
+              alignItems: 'center',
+              flexDirection: 'row',
+              gap: 3,
+              height: 32,
+            }}
           >
             <HeadViewPanel />
             <HeadColumnsPanel />
@@ -200,7 +204,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
             dialogVisible &&
             (drawersType as string[]).includes(dialogType || '')
           ) && (
-            <Stack flexDirection={'row'}>
+            <Stack sx={{ flexDirection: 'row' }}>
               <StyledButton
                 onClick={() => {
                   setAiTableInfo({ tableId, mappings: [] });
@@ -213,7 +217,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                 size={'small'}
                 variant={'contained'}
               >
-                <Stack alignItems="center" flexDirection="row" gap={0.5}>
+                <Stack sx={{ alignItems: 'center', flexDirection: 'row', gap: 0.5 }}>
                   Actions
                   <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
                 </Stack>
@@ -224,9 +228,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
         <Stack
           ref={scrollContainerRef}
           sx={{
-            // height: 'calc(100% - 126px)',
             minHeight: '400px',
-            // width: '100%',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'auto',

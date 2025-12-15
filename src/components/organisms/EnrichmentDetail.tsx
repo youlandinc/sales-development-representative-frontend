@@ -20,6 +20,7 @@ export const EnrichmentDetail = () => {
         minHeight: 600,
         display: 'flex',
         flexDirection: 'column',
+        width: '100vw',
       }}
     >
       <EnrichmentDetailHeader tableId={tableId} />
