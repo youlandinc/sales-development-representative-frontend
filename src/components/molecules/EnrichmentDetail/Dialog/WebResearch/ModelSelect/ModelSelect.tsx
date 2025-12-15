@@ -1,29 +1,18 @@
 import { Icon, MenuItem, Stack, SxProps, Typography } from '@mui/material';
-import { FC, useCallback, useMemo } from 'react';
 import Image from 'next/image';
+import { FC, useCallback, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledSelect } from '@/components/atoms';
 
+import { useWebResearchStore } from '@/stores/enrichment';
+
 import ICON_COINS from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_coins.svg';
 
-export interface ModelOptionItem {
-  value: string;
-  label: string;
-  logoUrl: string;
-  description?: string;
-  inputCredits?: number | string;
-  outputCredits?: number | string;
-}
-
-export interface ModelGroupItem {
-  groupLabel: string;
-  options: ModelOptionItem[];
-}
-
 export interface ModelSelectProps {
-  value: string;
-  onChange: (value: string) => void;
-  groups: ModelGroupItem[];
+  // value: string;
+  // onChange: (value: string) => void;
+  // groups: ModelGroupItem[];
   placeholder?: string;
   sx?: SxProps;
   disabled?: boolean;
@@ -40,8 +29,9 @@ interface FlatOption extends TOption {
 const MENU_PAPER_SX: SxProps = {
   boxShadow:
     '0px 0px 2px 0px rgba(17, 52, 227, 0.1), 0px 10px 10px 0px rgba(17, 52, 227, 0.1)',
-  maxWidth: 500,
+  maxWidth: 400,
   minWidth: 0,
+  p: 0,
 };
 
 const MENU_LIST_SX: SxProps = {
@@ -59,18 +49,26 @@ const MENU_LIST_SX: SxProps = {
 };
 
 export const ModelSelect: FC<ModelSelectProps> = ({
-  value,
-  onChange,
-  groups,
+  // value,
+  // onChange,
+  // groups,
   placeholder = 'Select model',
   sx,
   disabled,
 }) => {
+  const { aiModelList, setSuggestedModelType, suggestedModelType } =
+    useWebResearchStore(
+      useShallow((store) => ({
+        aiModelList: store.aiModelList,
+        suggestedModelType: store.suggestedModelType,
+        setSuggestedModelType: store.setSuggestedModelType,
+      })),
+    );
   // 将分组数据扁平化为 options 数组
   const flatOptions = useMemo<FlatOption[]>(() => {
     const result: FlatOption[] = [];
 
-    groups.forEach((group) => {
+    aiModelList.forEach((group) => {
       // 添加分组标题
       result.push({
         key: `header_${group.groupLabel}`,
@@ -84,7 +82,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       group.options.forEach((opt) => {
         result.push({
           key: opt.value,
-          value: opt.value,
+          value: opt.label,
           label: opt.label,
           logoUrl: opt.logoUrl,
           description: opt.description,
@@ -95,7 +93,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     });
 
     return result;
-  }, [groups]);
+  }, [aiModelList]);
 
   // 渲染选中值（带 logo）
   const renderValue = useCallback(
@@ -268,14 +266,14 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     <StyledSelect
       disabled={disabled}
       menuPaperSx={MENU_PAPER_SX}
-      onChange={(e) => onChange(e.target.value as string)}
+      onChange={(e) => setSuggestedModelType(e.target.value as string)}
       options={flatOptions}
       placeholder={placeholder}
       renderOption={renderOption}
       renderValue={renderValue}
       sx={sx}
       sxList={MENU_LIST_SX}
-      value={value}
+      value={suggestedModelType}
     />
   );
 };

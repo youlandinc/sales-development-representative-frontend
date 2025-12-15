@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { Icon, Stack } from '@mui/material';
 import { FC, useState } from 'react';
 
 import { useShallow } from 'zustand/react/shallow';
@@ -34,6 +34,8 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
+
+import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
 
 interface EnrichmentDetailTableProps {
   tableId: string;
@@ -182,9 +184,14 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
         <Stack
           flexDirection={'row'}
           justifyContent={'space-between'}
-          p={'12px 32px 24px 16px'}
+          p={'12px 16px'}
         >
-          <Stack flexDirection={'row'} gap={1.5} height={32}>
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            gap={1.5}
+            height={32}
+          >
             <HeadViewPanel />
             <HeadColumnsPanel />
             <HeadRowsPanel />
@@ -201,10 +208,13 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                   }
                   fetchEnrichments();
                 }}
-                size={'medium'}
+                size={'small'}
                 variant={'contained'}
               >
-                Actions
+                <Stack alignItems="center" flexDirection="row" gap={0.5}>
+                  Actions
+                  <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
+                </Stack>
               </StyledButton>
             </Stack>
           )}

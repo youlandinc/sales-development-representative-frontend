@@ -1,14 +1,22 @@
-import { Box, Divider, Icon, Stack, SxProps, Typography } from '@mui/material';
+import { Divider, Icon, Stack, SxProps, Typography } from '@mui/material';
 import Image from 'next/image';
-import { FC, memo, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import { StyledTextField } from '@/components/atoms';
-import { StyledProviderBadges, StyledTabButton } from './base';
+import {
+  DialogHeader,
+  EnrichmentsContent,
+  ExportsContent,
+  StyledProviderBadges,
+  SuggestionsContent,
+  TabsBar,
+  type TabType,
+} from './base';
+import { StyledActionItem } from '../Common';
 
-import { useActionsMenuSearch, useExport } from './hooks';
-
-import { StyledActionItem, StyledCollapseMenuContainer } from '../Common';
+import { useExport } from './hooks';
+import { useLocalSearch } from '@/hooks';
 
 import {
   ActiveTypeEnum,
@@ -20,29 +28,16 @@ import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import { ActionsTypeKeyEnum } from '@/types';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
-
-import ICON_ARROW_LINE_RIGHT from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_arrow_line_right.svg';
-import ICON_LIGHTING from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_lighting.svg';
-import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
-import ICON_SHARE from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_share.svg';
-import ICON_SUGGESTION_BLUE from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_suggestions_blue.svg';
-import ICON_TARGET from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_target.svg';
-import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
-import ICON_SPARK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle.svg';
-import ICON_SPARK_BLACK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_outline.svg';
-
-import type {
-  EnrichmentItem,
-  SuggestionItem,
-} from '@/types/enrichment/drawerActions';
 import type {
   IntegrationAction,
   IntegrationActionValidation,
 } from '@/types/enrichment/integrations';
+import type { SuggestionItem } from '@/types/enrichment/drawerActions';
+
+import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
+import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 
 // ============ Types ============
-type TabType = 'suggestions' | 'enrichments' | 'exports';
-
 interface ActionItemClickParams {
   name: string;
   description: string;
@@ -60,232 +55,17 @@ const scrollContainerStyles: SxProps = {
   pb: 1.75,
 };
 
-// ============ Sub Components ============
-interface DialogHeaderProps {
-  onClose: () => void;
-}
-interface TabsBarProps {
-  activeTab: TabType;
-  onTabClick: (tab: TabType) => void;
-}
-interface SuggestionsContentProps {
-  suggestions: SuggestionItem[];
-  loading: boolean;
-  onItemClick: (item: SuggestionItem) => void;
-  onAtlasClick: () => void;
-}
-interface EnrichmentsContentProps {
-  enrichments: EnrichmentItem[];
-  onItemClick: (action: SuggestionItem) => void;
-}
-
-const DialogHeader: FC<DialogHeaderProps> = memo(({ onClose }) => (
-  <Stack
-    alignItems={'center'}
-    flexDirection={'row'}
-    justifyContent={'space-between'}
-    pt={3}
-  >
-    <Typography fontSize={16} fontWeight={600} lineHeight={1.2}>
-      Actions
-    </Typography>
-    <Box
-      onClick={onClose}
-      sx={{
-        border: '1px solid',
-        borderColor: 'border.default',
-        borderRadius: 2,
-        p: 0.75,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        '&:hover': {
-          bgcolor: 'background.active',
-        },
-      }}
-    >
-      <Icon component={ICON_ARROW_LINE_RIGHT} sx={{ width: 20, height: 20 }} />
-    </Box>
-  </Stack>
-));
-
-const TabsBar: FC<TabsBarProps> = memo(({ activeTab, onTabClick }) => (
-  <Stack flexDirection={'row'} gap={1.25}>
-    <StyledTabButton
-      icon={<Icon component={ICON_TARGET} sx={{ width: 20, height: 20 }} />}
-      isActive={activeTab === 'suggestions'}
-      label={'Suggestions'}
-      onClick={() => onTabClick('suggestions')}
-    />
-    <StyledTabButton
-      icon={<Icon component={ICON_LIGHTING} sx={{ width: 20, height: 20 }} />}
-      isActive={activeTab === 'enrichments'}
-      label={'Enrichments'}
-      onClick={() => onTabClick('enrichments')}
-    />
-    <StyledTabButton
-      icon={<Icon component={ICON_SHARE} sx={{ width: 20, height: 20 }} />}
-      isActive={activeTab === 'exports'}
-      label={'Exports'}
-      onClick={() => onTabClick('exports')}
-    />
-  </Stack>
-));
-
-const SuggestionsContent: FC<SuggestionsContentProps> = memo(
-  ({ suggestions, loading, onItemClick, onAtlasClick }) => {
-    const displayItems = useMemo(
-      () => (loading ? Array(6).fill(null) : suggestions.slice(0, 6)),
-      [loading, suggestions],
-    );
-
-    return (
-      <>
-        <StyledCollapseMenuContainer
-          gap={1}
-          icon={ICON_SUGGESTION_BLUE}
-          title={'Suggestions'}
-        >
-          <Stack gap={1.5}>
-            <Typography color={'text.secondary'} variant={'body3'}>
-              Tasks Atlas recommends based on your current table
-            </Typography>
-            <Stack gap={1.5}>
-              {displayItems.map((item, index) => (
-                <StyledActionItem
-                  badges={
-                    item?.waterfallConfigs?.length ? (
-                      <StyledProviderBadges
-                        maxCount={3}
-                        providers={(item.waterfallConfigs ?? []).map(
-                          (config: { logoUrl: string }) => config.logoUrl,
-                        )}
-                      />
-                    ) : undefined
-                  }
-                  description={
-                    item?.shortDescription ?? item?.description ?? ''
-                  }
-                  icon={
-                    <Image
-                      alt={'Provider'}
-                      height={16}
-                      src={item?.logoUrl ?? ''}
-                      width={16}
-                    />
-                  }
-                  key={`suggestion-${index}`}
-                  loading={loading}
-                  onClick={() => onItemClick(item)}
-                  title={item?.name ?? ''}
-                />
-              ))}
-            </Stack>
-          </Stack>
-        </StyledCollapseMenuContainer>
-
-        <StyledCollapseMenuContainer
-          icon={ICON_SPARK}
-          title={
-            <Typography fontSize={14} fontWeight={600} lineHeight={1.2}>
-              Atlas Intelligence
-            </Typography>
-          }
-        >
-          <StyledActionItem
-            description={
-              'Atlas handles custom research, data cleaning, and reasoning from free-form instructions.'
-            }
-            icon={
-              <Icon
-                component={ICON_SPARK_BLACK}
-                sx={{ width: 20, height: 20 }}
-              />
-            }
-            onClick={onAtlasClick}
-            title={'Describe Atlas your task'}
-          />
-        </StyledCollapseMenuContainer>
-      </>
-    );
-  },
-);
-
-const EnrichmentsContent: FC<EnrichmentsContentProps> = memo(
-  ({ enrichments, onItemClick }) => (
-    <Stack gap={1.5}>
-      {enrichments.map((item, index) => (
-        <StyledCollapseMenuContainer
-          key={item?.categoryKey ?? `enrichment-${index}`}
-          title={
-            <Typography fontSize={14} fontWeight={500} lineHeight={1.4}>
-              {item?.categoryName ?? ''}
-            </Typography>
-          }
-        >
-          <Stack gap={1.5}>
-            {(item?.actions ?? []).map((action, actionIndex) => (
-              <StyledActionItem
-                badges={
-                  action?.waterfallConfigs?.length ? (
-                    <StyledProviderBadges
-                      maxCount={3}
-                      providers={(action.waterfallConfigs ?? []).map(
-                        (config: { logoUrl: string }) => config.logoUrl,
-                      )}
-                    />
-                  ) : undefined
-                }
-                description={action?.description ?? ''}
-                icon={
-                  <Image
-                    alt={'Provider'}
-                    height={16}
-                    src={action?.logoUrl ?? ''}
-                    width={16}
-                  />
-                }
-                key={`action-${index}-${actionIndex}`}
-                onClick={() => onItemClick(action)}
-                title={action?.name ?? ''}
-              />
-            ))}
-          </Stack>
-        </StyledCollapseMenuContainer>
-      ))}
-    </Stack>
-  ),
-);
-
-const ExportsContent: FC = memo(() => {
-  const { EXPORTS_MENUS } = useExport();
-  return (
-    <Stack gap={1.5}>
-      {EXPORTS_MENUS.map((item, index) => (
-        <StyledActionItem
-          description={item.description}
-          icon={<Icon component={item.icon} sx={{ width: 16, height: 16 }} />}
-          key={`export-${index}`}
-          onClick={item.onClick}
-          title={item.title}
-        />
-      ))}
-    </Stack>
-  );
-});
-
 // ============ Main Component ============
 
 export const DialogActionsMenu: FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('suggestions');
+  const { EXPORTS_MENUS } = useExport();
 
   // Store selectors
-  const { closeDialog, openDialog, columns } = useProspectTableStore(
+  const { closeDialog, openDialog } = useProspectTableStore(
     useShallow((state) => ({
       closeDialog: state.closeDialog,
       openDialog: state.openDialog,
-      columns: state.columns,
     })),
   );
 
@@ -329,6 +109,42 @@ export const DialogActionsMenu: FC = () => {
     })),
   );
 
+  // 扁平化所有可搜索项目
+  const flatSearchItems = useMemo(() => {
+    const items: (SuggestionItem & { icon?: any })[] = [];
+
+    // 添加 enrichments 数据
+    enrichments.forEach((group) => {
+      group.actions.forEach((item) => {
+        items.push(item);
+      });
+    });
+
+    // 添加 suggestions 数据
+    suggestions.forEach((item) => {
+      items.push(item);
+    });
+
+    // 添加 exports 数据
+    EXPORTS_MENUS.forEach((item) => {
+      items.push({
+        actionKey: `export-${item.title}`,
+        key: `export-${item.title}`,
+        name: item.title,
+        description: item.description,
+        logoUrl: '',
+        estimatedScore: '',
+        shortDescription: null,
+        waterfallConfigs: [],
+        validations: null,
+        icon: item.icon,
+      });
+    });
+
+    // 按 name 去重
+    return Array.from(new Map(items.map((item) => [item.name, item])).values());
+  }, [enrichments, suggestions, EXPORTS_MENUS]);
+
   const {
     debouncedSetSearch,
     hasSearchValue,
@@ -336,7 +152,7 @@ export const DialogActionsMenu: FC = () => {
     searchResults,
     text,
     setText,
-  } = useActionsMenuSearch(enrichments, suggestions);
+  } = useLocalSearch<SuggestionItem & { icon?: any }>(flatSearchItems);
 
   // Event handlers with useCallback
   const onTabClick = useCallback((tab: TabType) => {
@@ -394,7 +210,7 @@ export const DialogActionsMenu: FC = () => {
       if (item?.key === ActionsTypeKeyEnum.ai_template) {
         const description =
           (item.description ?? '') || (item.shortDescription ?? '');
-        onClickToAiTemplate(`Name:${item.name}Description:${description}`);
+        onClickToAiTemplate(`Name:${item.name},Description:${description}`);
         return;
       }
       const integration = integrationMenus.find((i) => i.key === item.key);
@@ -488,13 +304,20 @@ export const DialogActionsMenu: FC = () => {
                   }
                   description={item.description}
                   icon={
-                    item.logoUrl && (
+                    item.logoUrl ? (
                       <Image
                         alt={item.logoUrl}
                         height={16}
                         src={item.logoUrl}
                         width={16}
                       />
+                    ) : (
+                      item.icon && (
+                        <Icon
+                          component={item.icon}
+                          sx={{ width: 16, height: 16 }}
+                        />
+                      )
                     )
                   }
                   key={`search-${index}`}

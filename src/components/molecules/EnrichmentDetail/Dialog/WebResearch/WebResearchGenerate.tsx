@@ -2,21 +2,21 @@ import { useWebResearchStore } from '@/stores/enrichment';
 import { Box, ClickAwayListener, Icon, Stack, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
 import Image from 'next/image';
-import { FC, useCallback, useRef } from 'react';
+import { FC, useCallback, useMemo, useRef } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import { PromptEditor } from './PromptEditor';
-import { StyledActionItem, StyledSearchInput } from '../Dialog/Common';
-import { StyledProviderBadges } from '../Dialog/DialogActionsMenu/base';
+import { StyledActionItem, StyledSearchInput } from '../Common';
+import { StyledProviderBadges } from '../DialogActionsMenu/base';
 
 import { insertWithPlaceholders } from '@/utils';
 
-import { useSwitch, useVariableFromStore } from '@/hooks';
+import { useLocalSearch, useSwitch, useVariableFromStore } from '@/hooks';
 
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
-import { ActionsTypeKeyEnum } from '@/types';
 
-import ICON_SPARK_OUTLINE from '../assets/dialog/icon_sparkle_outline.svg';
+import ICON_SPARK_OUTLINE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_outline.svg';
+import { ActionsTypeKeyEnum } from '@/types';
 
 interface WebResearchGenerateProps {
   handleGeneratePrompt?: () => void;
@@ -58,51 +58,85 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
     ? insertWithPlaceholders(generateDescription, filedMapping)
     : null;
 
+  const filteredSuggestions = useMemo(
+    () =>
+      suggestions
+        .filter((item) => item.key === ActionsTypeKeyEnum.ai_template)
+        .slice(0, 6),
+    [suggestions],
+  );
+
+  const {
+    debouncedSetSearch,
+    resetSearch,
+    searchResults,
+    text,
+    setText,
+    hasSearchValue,
+  } = useLocalSearch(filteredSuggestions);
+
+  const onSearchChange = useCallback(
+    (value: string) => {
+      setText(value);
+      debouncedSetSearch(value);
+    },
+    [debouncedSetSearch, setText],
+  );
+
   return (
     <Stack gap={1.5}>
       <StyledSearchInput
-        // onChange={setSearchValue}
-        placeholder={'Search tasks'}
-        // value={searchValue}
+        onChange={onSearchChange}
+        onClear={resetSearch}
+        value={text}
       />
       <Typography variant={'body2'}>
         Tasks Atlas recommends based on your current table
       </Typography>
       <Stack gap={1.5}>
-        {suggestions
-          .filter((item) => item.key === ActionsTypeKeyEnum.ai_template)
-          .slice(0, 6)
-          .map((item, index) => (
-            <StyledActionItem
-              badges={
-                <StyledProviderBadges
-                  providers={(item.waterfallConfigs || []).map(
-                    (config) => config.logoUrl,
-                  )}
-                />
-              }
-              description={item.description}
-              icon={
-                <Image
-                  alt={'Provider '}
-                  height={16}
-                  src={item.logoUrl}
-                  width={16}
-                />
-              }
-              key={index}
-              onClick={async () => {
-                const description =
-                  (item.description ?? '') || (item.shortDescription ?? '');
-                await runGenerateAiModel('/aiResearch/generate/stream', {
-                  params: {
-                    userInput: description,
-                  },
-                });
-              }}
-              title={item.name}
-            />
-          ))}
+        {searchResults.length === 0 && hasSearchValue ? (
+          <Typography
+            color={'text.secondary'}
+            fontSize={12}
+            textAlign={'center'}
+          >
+            No results found.
+          </Typography>
+        ) : (
+          (hasSearchValue ? searchResults : filteredSuggestions).map(
+            (item, index) => (
+              <StyledActionItem
+                badges={
+                  <StyledProviderBadges
+                    providers={(item.waterfallConfigs || []).map(
+                      (config) => config.logoUrl,
+                    )}
+                  />
+                }
+                description={item.description}
+                icon={
+                  <Image
+                    alt={'Provider '}
+                    height={16}
+                    src={item.logoUrl}
+                    width={16}
+                  />
+                }
+                key={index}
+                onClick={async () => {
+                  const description =
+                    (item.description ?? '') || (item.shortDescription ?? '');
+                  await runGenerateAiModel('/aiResearch/generate/stream', {
+                    params: {
+                      userInput: `Name:${item.name},Description:${description}`,
+                    },
+                  });
+                }}
+                title={item.name}
+              />
+            ),
+          )
+        )}
       </Stack>
       <ClickAwayListener onClickAway={close}>
         <Stack

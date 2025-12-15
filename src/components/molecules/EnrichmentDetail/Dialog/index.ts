@@ -9,3 +9,4 @@ export * from './DialogWebResearch';
 export * from './DialogWorkEmail';
 export * from './Common';
 export * from './DrawerActionsContainer';
+export * from './WebResearch';

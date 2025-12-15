@@ -18,7 +18,7 @@ import {
   SculptingPrompt,
   WebResearchConfigure,
   WebResearchGenerate,
-} from '../WebResearch';
+} from './WebResearch';
 
 import {
   ActiveTypeEnum,
@@ -48,10 +48,9 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   tableId,
   cb,
 }) => {
-  const { columns, rowIds, activeColumnId, openDialog, closeDialog } =
+  const { rowIds, activeColumnId, openDialog, closeDialog } =
     useProspectTableStore(
       useShallow((state) => ({
-        columns: state.columns,
         rowIds: state.rowIds,
         activeColumnId: state.activeColumnId,
         openDialog: state.openDialog,
@@ -64,7 +63,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     schemaJson,
     allClear,
     saveAiConfig,
-    setGenerateDescription,
     generateEditorInstance,
     tipTapEditorInstance,
     slateEditorInstance,
@@ -75,9 +73,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     generateSchemaStr,
     generateIsLoading,
     generateIsThinking,
-    runGeneratePrompt,
-    setGenerateText,
-    setGenerateSchemaStr,
     runGenerateAiModel,
     taskContent,
     suggestedModelContent,
@@ -124,26 +119,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   };
 
   const handleGenerate = async () => {
-    setGenerateText('');
-    setGenerateSchemaStr('');
-    allClear();
-    // Add a small delay to ensure editor is ready
-    // await new Promise((resolve) => setTimeout(resolve, 100));
-    if (generateEditorInstance) {
-      setGenerateDescription(generateEditorInstance.getText());
-    }
-    await runGeneratePrompt('/sdr/ai/generate', {
-      module: 'COLUMN_ENRICHMENT_PROMPT',
-      params: {
-        userInput: extractPromptText(
-          (generateEditorInstance?.getJSON() || []) as DocumentType,
-          filedMapping,
-        ),
-      },
-    });
-  };
-
-  const test = async () => {
     await runGenerateAiModel('/aiResearch/generate/stream', {
       module: 'TASK_MODEL_CHOOSER',
       params: {
@@ -334,8 +309,10 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
             <ToggleButtonGroup
               color={'primary'}
               exclusive
-              onChange={(e, value) => {
-                setWebResearchTab(value);
+              onChange={(_, value) => {
+                if (value) {
+                  setWebResearchTab(value);
+                }
               }}
               translate={'no'}
               value={webResearchTab}
@@ -377,7 +354,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               }}
             >
               <WebResearchGenerate
-                handleGeneratePrompt={test}
+                handleGeneratePrompt={handleGenerate}
                 isLoading={generateIsLoading}
               />
             </Box>
@@ -387,7 +364,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
                 transition: 'all .3s',
               }}
             >
-              <WebResearchConfigure handleGenerate={handleGenerate} />
+              <WebResearchConfigure />
             </Box>
           </Stack>
         </Stack>
