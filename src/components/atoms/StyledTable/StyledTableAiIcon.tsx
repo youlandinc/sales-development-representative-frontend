@@ -2,6 +2,7 @@ import { FC, MouseEvent } from 'react';
 import { Box, Icon, Stack } from '@mui/material';
 
 import ICON_RUN_AI from './assets/icon-run-ai.svg';
+import { TABLE_COLORS } from './styles';
 
 interface StyledTableAiIconProps {
   onClick: (e: MouseEvent<HTMLDivElement>) => void;
@@ -10,16 +11,13 @@ interface StyledTableAiIconProps {
 
 export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
   onClick,
-  backgroundColor = '#fff',
+  backgroundColor = TABLE_COLORS.DEFAULT_BG,
 }) => {
   const getGradientBackground = (bgColor: string) => {
-    if (bgColor === '#F4F5F9') {
-      return 'linear-gradient(to right, transparent 0%, rgba(247, 244, 253, 0.8) 30%, rgba(247, 244, 253, 1) 60%)';
+    if (bgColor === TABLE_COLORS.HOVER_BG) {
+      return TABLE_COLORS.AI_GRADIENT_HOVER;
     }
-    if (bgColor === '#FFFFFF' || bgColor === '#fff') {
-      return 'linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 1) 60%)';
-    }
-    return 'linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 1) 60%)';
+    return TABLE_COLORS.AI_GRADIENT_DEFAULT;
   };
 
   return (
@@ -65,10 +63,10 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
           p: 0.5,
           borderRadius: 1,
           cursor: 'pointer',
-          border: '1px solid #DFDEE6',
-          bgcolor: '#ffffff',
+          border: `1px solid ${TABLE_COLORS.BORDER}`,
+          bgcolor: TABLE_COLORS.DEFAULT_BG,
           '&:hover': {
-            bgcolor: '#F4F5F9',
+            bgcolor: TABLE_COLORS.HOVER_BG,
           },
         }}
       >

@@ -3,6 +3,8 @@ import { Stack } from '@mui/material';
 import { Table } from '@tanstack/react-table';
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual';
 
+import { TABLE_Z_INDEX } from './styles';
+
 interface StyledTableContainerProps {
   table: Table<any>;
   rowHeight: number;
@@ -179,8 +181,8 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
           top: 0,
           bottom: 0,
           width: '2px',
-          backgroundColor: '#1976d2',
-          zIndex: 1000,
+          backgroundColor: 'primary.main',
+          zIndex: TABLE_Z_INDEX.RESIZE_INDICATOR,
           pointerEvents: 'none',
         },
         '& [data-column-resizing-indicator]': {
@@ -188,8 +190,8 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
           top: 0,
           bottom: 0,
           width: '2px',
-          backgroundColor: '#1976d2',
-          zIndex: 1000,
+          backgroundColor: 'primary.main',
+          zIndex: TABLE_Z_INDEX.RESIZE_INDICATOR,
           pointerEvents: 'none',
         },
       }}

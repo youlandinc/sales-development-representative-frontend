@@ -29,6 +29,12 @@ import {
   useRowHover,
 } from './index';
 import { StyledImage } from '../StyledImage';
+import {
+  buildPinnedBorderPseudoStyles,
+  buildPinnedBorderRight,
+  TABLE_COLORS,
+  TABLE_Z_INDEX,
+} from './styles';
 
 const CELL_CONSTANTS = {
   MIN_WIDTH: 60,
@@ -39,10 +45,10 @@ const CELL_CONSTANTS = {
 } as const;
 
 const CELL_COLORS = {
-  ACTIVE_BG: '#fff',
-  DEFAULT_BG: '#fff',
-  BORDER: '#DFDEE6',
-  ACTIVE_BORDER: '#5B76BC',
+  ACTIVE_BG: TABLE_COLORS.DEFAULT_BG,
+  DEFAULT_BG: TABLE_COLORS.DEFAULT_BG,
+  BORDER: TABLE_COLORS.BORDER,
+  ACTIVE_BORDER: TABLE_COLORS.ACTIVE_BORDER,
 } as const;
 
 const CHECKBOX_ICON_CHECKED = (
@@ -394,29 +400,20 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         boxSizing: 'border-box',
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
-        zIndex: isPinned ? 20 : 1,
+        zIndex: isPinned ? TABLE_Z_INDEX.PINNED_CELL : TABLE_Z_INDEX.CELL,
         bgcolor: cellBackgroundColor,
-        // Use pseudo-element for pinned border so it renders outside content box
-        borderRight:
-          isPinned && shouldShowPinnedRightShadow && !isSelectColumn
-            ? '0.5px solid transparent'
-            : '0.5px solid #DFDEE6',
+        borderRight: buildPinnedBorderRight(
+          isPinned,
+          !!shouldShowPinnedRightShadow,
+          isSelectColumn,
+        ),
         // Pinned column 3px border (pseudo-element, outside content box)
-        ...(isPinned &&
-          shouldShowPinnedRightShadow &&
-          !isSelectColumn && {
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              right: -0.5,
-              width: '3px',
-              height: '100%',
-              bgcolor: '#DFDEE6',
-              zIndex: 10,
-              pointerEvents: 'none',
-            },
-          }),
+        '&::after': buildPinnedBorderPseudoStyles(
+          isPinned,
+          !!shouldShowPinnedRightShadow,
+          isSelectColumn,
+          10,
+        ),
         height: '100%',
         justifyContent: 'center',
         cursor:
@@ -468,7 +465,6 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
       <StyledTableMenuCellEditor
         anchorEl={cellRef.current}
         isOpen={shouldShowExpandedEditor}
-        minWidth={width}
         onCancel={onStopEdit}
         onChange={onExpandedEditorValueChange}
         onSave={onStopEdit}
