@@ -1,18 +1,17 @@
 import { ChangeEvent, FC, KeyboardEvent, useLayoutEffect, useRef } from 'react';
 import { ClickAwayListener, InputBase, Paper, Popper } from '@mui/material';
+import { TABLE_COLORS } from '@/components/atoms/StyledTable/styles';
 
 const CELL_EDITOR_CONSTANTS = {
   FONT_SIZE: 14,
   LINE_HEIGHT: 1.5,
   Z_INDEX: 1300,
-  MAX_WIDTH: 400,
 } as const;
 
 interface StyledTableMenuCellEditorProps {
   anchorEl: HTMLElement | null;
   isOpen: boolean;
   value: string;
-  minWidth: number;
   onChange: (value: string) => void;
   onSave: () => void; // Save current value and close
   onCancel: () => void; // Discard changes and close
@@ -22,7 +21,6 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
   anchorEl,
   isOpen,
   value,
-  minWidth,
   onChange,
   onSave,
   onCancel,
@@ -62,6 +60,14 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
   return (
     <Popper
       anchorEl={anchorEl}
+      modifiers={[
+        {
+          name: 'offset',
+          options: {
+            offset: [3, -(anchorEl?.offsetHeight ?? 0) + 3],
+          },
+        },
+      ]}
       open={isOpen}
       placement="bottom-start"
       sx={{ zIndex: CELL_EDITOR_CONSTANTS.Z_INDEX }}
@@ -70,11 +76,11 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
         <Paper
           elevation={4}
           sx={{
-            minWidth,
-            maxWidth: CELL_EDITOR_CONSTANTS.MAX_WIDTH,
-            border: '2px solid',
-            borderColor: 'primary.main',
-            borderRadius: '4px',
+            px: 1.5,
+            width: 280,
+            border: `2px solid ${TABLE_COLORS.SELECTION_BORDER}`,
+            outline: `2px solid ${TABLE_COLORS.SELECTION_OUTLINE}`,
+            borderRadius: 0,
           }}
         >
           <InputBase
@@ -88,7 +94,7 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
             sx={{
               width: '100%',
               fontSize: CELL_EDITOR_CONSTANTS.FONT_SIZE,
-              p: 1,
+              py: 0.5,
               '& textarea': {
                 p: 0,
                 m: 0,

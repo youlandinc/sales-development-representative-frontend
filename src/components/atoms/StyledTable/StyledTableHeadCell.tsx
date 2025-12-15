@@ -13,6 +13,13 @@ import { flexRender, Header } from '@tanstack/react-table';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
 import { StyledTableAiIcon } from './index';
+import {
+  buildPinnedBorderPseudoStyles,
+  buildPinnedBorderRight,
+  TABLE_COLORS,
+  TABLE_SIZES,
+  TABLE_Z_INDEX,
+} from './styles';
 
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
 import { UTypeOf } from '@/utils';
@@ -36,8 +43,6 @@ interface StyledTableHeadCellProps {
   isEditing?: boolean;
   onEditSave?: (newName: string) => void;
   shouldShowPinnedRightShadow?: boolean;
-  // For non-pinned columns adjacent to pinned columns, extend focus line left
-  isAdjacentToPinnedColumn?: boolean;
   // Select column checkbox props (passed directly to bypass TanStack column caching)
   isAllRowsSelected?: boolean;
   isSomeRowsSelected?: boolean;
@@ -202,61 +207,57 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
       sx={{
         userSelect: 'none',
         width,
-        minWidth: width < 60 ? 60 : width,
+        minWidth:
+          width < TABLE_SIZES.CELL_MIN_WIDTH
+            ? TABLE_SIZES.CELL_MIN_WIDTH
+            : width,
         maxWidth: width,
         boxSizing: 'border-box',
         overflow: 'visible',
-        // Use pseudo-element for pinned border so it renders outside content box
-        borderRight:
-          isPinned && shouldShowPinnedRightShadow && !isSelectColumn
-            ? '0.5px solid transparent'
-            : '0.5px solid #DFDEE6',
-        bgcolor: shouldShowBackground ? '#F4F5F9' : '#FFFFFF',
+        borderRight: buildPinnedBorderRight(
+          isPinned,
+          !!shouldShowPinnedRightShadow,
+          isSelectColumn,
+        ),
+        bgcolor: shouldShowBackground
+          ? TABLE_COLORS.HOVER_BG
+          : TABLE_COLORS.DEFAULT_BG,
         cursor: 'pointer',
         // Pinned column 3px border (pseudo-element, outside content box)
-        '&::before': {
-          content:
-            isPinned && shouldShowPinnedRightShadow && !isSelectColumn
-              ? '""'
-              : 'none',
-          position: 'absolute',
-          top: 0,
-          right: -0.5,
-          width: '3px',
-          height: '100%',
-          bgcolor: '#DFDEE6',
-          zIndex: 30,
-        },
+        '&::before': buildPinnedBorderPseudoStyles(
+          isPinned,
+          !!shouldShowPinnedRightShadow,
+          isSelectColumn,
+          TABLE_Z_INDEX.HEADER_PINNED,
+        ),
         // Focus indicator line
         '&::after': {
           content: '""',
           position: 'absolute',
           bottom: 0,
-          // Extend left for non-pinned columns adjacent to pinned columns
           left: 0,
-          // Extend right for pinned columns with border
           right: 0,
           height: '2px',
-          bgcolor: '#6F6C7D',
-          zIndex: 31,
+          bgcolor: TABLE_COLORS.SELECTION_BORDER,
+          zIndex: TABLE_Z_INDEX.HEADER_FOCUS_LINE,
           display: shouldShowBottomLine ? 'block' : 'none',
         },
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
-        zIndex: isPinned ? 30 : 2,
+        zIndex: isPinned ? TABLE_Z_INDEX.HEADER_PINNED : TABLE_Z_INDEX.HEADER,
         '&:hover': {
           bgcolor: isSelectColumn
             ? undefined
             : !isEditing
-              ? '#F4F5F9'
-              : '#F6F6F6',
+              ? TABLE_COLORS.HOVER_BG
+              : TABLE_COLORS.EDITING_HOVER_BG,
         },
-        height: '36px',
+        height: TABLE_SIZES.HEADER_HEIGHT,
         justifyContent: 'center',
-        fontSize: 14,
-        lineHeight: '36px',
-        color: '#363440',
-        fontWeight: 500,
+        fontSize: TABLE_SIZES.FONT_SIZE,
+        lineHeight: `${TABLE_SIZES.HEADER_HEIGHT}px`,
+        color: TABLE_COLORS.TEXT_PRIMARY,
+        fontWeight: TABLE_SIZES.FONT_WEIGHT_MEDIUM,
       }}
     >
       <Box
@@ -366,14 +367,14 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
               right: -6,
               top: 0,
               height: '100%',
-              width: '15px',
+              width: TABLE_SIZES.RESIZE_HANDLE_WIDTH,
               cursor: 'col-resize',
-              zIndex: 999,
+              zIndex: TABLE_Z_INDEX.RESIZE_INDICATOR,
             }}
           >
             <Draggable
               axis="x"
-              bounds={{ left: -width + 80 }}
+              bounds={{ left: -width + TABLE_SIZES.MIN_COLUMN_WIDTH }}
               nodeRef={draggableRef}
               onDrag={(e: DraggableEvent, data: DraggableData) => {
                 setDragPosition(data.x);
@@ -389,7 +390,10 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
                 setDragPosition(0);
                 // Update column size
                 if (data.x !== 0) {
-                  const newWidth = Math.max(80, width + data.x);
+                  const newWidth = Math.max(
+                    TABLE_SIZES.MIN_COLUMN_WIDTH,
+                    width + data.x,
+                  );
                   const table = header.getContext().table;
                   table.setColumnSizing((prev: Record<string, number>) => ({
                     ...prev,
@@ -415,9 +419,9 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
                       left: '50%',
                       top: 0,
                       marginLeft: '-1px',
-                      width: '3px',
+                      width: TABLE_SIZES.RESIZE_INDICATOR_WIDTH,
                       height: indicatorHeight,
-                      bgcolor: '#363440',
+                      bgcolor: TABLE_COLORS.TEXT_PRIMARY,
                     }}
                   />
                 )}

@@ -3,6 +3,8 @@ import { createContext, FC, ReactNode, useContext, useState } from 'react';
 import { Stack } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
+import { TABLE_BORDERS, TABLE_COLORS } from './styles';
+
 interface StyledTableBodyRowProps {
   children: ReactNode;
   rowHeight: number;
@@ -47,7 +49,7 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
           height: `${rowHeight}px`,
           alignItems: 'center',
           boxSizing: 'border-box',
-          borderBottom: '1px solid #F0EFF5',
+          borderBottom: TABLE_BORDERS.ROW,
           // No z-index or transform - let pinned cells' z-index work at body level
           bgcolor: (theme) =>
             isSelected
@@ -55,7 +57,9 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
               : 'transparent',
           '&:hover': {
             bgcolor: (theme) =>
-              isSelected ? alpha(theme.palette.primary.main, 0.08) : '#FAFAFA',
+              isSelected
+                ? alpha(theme.palette.primary.main, 0.08)
+                : TABLE_COLORS.HEADER_BG,
           },
         }}
       >
