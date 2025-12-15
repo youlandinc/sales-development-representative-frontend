@@ -37,3 +37,19 @@ export interface SlashSuggestionOptions {
   commandItems?: CommandItem[];
   options?: any;
 }
+
+export interface ModelItem {
+  value: string;
+  label: string;
+  logoUrl: string;
+  description: string;
+  inputCredits: number;
+  outputCredits: number;
+}
+
+export interface ModelGroupItem {
+  groupLabel: string;
+  options: ModelItem[];
+}
+
+export type FetchWebResearchModelListResponse = ModelGroupItem[];

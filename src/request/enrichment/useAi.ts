@@ -1,4 +1,5 @@
-import { patch, post } from '../request';
+import { get, patch, post } from '../request';
+import { FetchWebResearchModelListResponse } from '@/types/enrichment/webResearch';
 
 export const generatePrompt = (api: string, param: Record<string, any>) => {
   //TODO
@@ -27,15 +28,16 @@ export const columnRun = (param: {
   });
 };
 
-export const _saveWebResearchConfig = (
-  tableId: string,
-  prompt: string,
-  schema: string,
-  excludeFields: string[][],
-  generatePrompt: string,
-) => {
+export const _saveWebResearchConfig = (params: {
+  tableId: string;
+  prompt: string;
+  schema: string;
+  excludeFields: string[][];
+  generatePrompt: string;
+  enableWebSearch: boolean;
+}) => {
   return post<string>('/sdr/table/field/add', {
-    tableId,
+    tableId: params.tableId,
     actionKey: 'use-ai',
     fieldType: 'TEXT',
     fieldName: 'Use AI',
@@ -44,21 +46,25 @@ export const _saveWebResearchConfig = (
         //configure prompt
         {
           name: 'prompt',
-          formulaText: prompt,
+          formulaText: params.prompt,
         },
         //configure schema
         {
           name: 'answerSchemaType',
-          formulaText: schema,
+          formulaText: params.schema,
         },
         //generate prompt
         {
           name: 'metaprompt',
-          formulaText: generatePrompt,
+          formulaText: params.generatePrompt,
+        },
+        {
+          name: 'enableWebSearch',
+          formulaText: params.enableWebSearch,
         },
       ],
       optionalPathsInInputs: {
-        prompt: excludeFields,
+        prompt: params.excludeFields,
       },
     },
   });
@@ -70,6 +76,7 @@ export const updateWebResearchConfig = (param: {
   prompt: string;
   schema: string;
   generatePrompt: string;
+  enableWebSearch: boolean;
 }) => {
   return patch('/sdr/table/field/aiField', {
     tableId: param.tableId,
@@ -90,7 +97,15 @@ export const updateWebResearchConfig = (param: {
           name: 'metaprompt',
           formulaText: param.generatePrompt,
         },
+        {
+          name: 'enableWebSearch',
+          formulaText: param.enableWebSearch,
+        },
       ],
     },
   });
+};
+
+export const _fetchWebResearchModelList = () => {
+  return get<FetchWebResearchModelListResponse>('/aiResearch/model/list');
 };

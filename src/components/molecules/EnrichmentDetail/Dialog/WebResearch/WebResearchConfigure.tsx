@@ -25,7 +25,6 @@ import {
   OutputsFields,
   PromptEditor,
 } from './index';
-import { MODEL_OPTIONS } from './ModelSelect/modelOptions';
 
 import { insertWithPlaceholders } from '@/utils';
 
@@ -52,6 +51,8 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     setTipTapEditorInstance,
     setSlateEditorInstance,
     taskContent,
+    enableWebSearch,
+    setEnableWebSearch,
   } = useWebResearchStore(
     useShallow((state) => ({
       prompt: state.prompt,
@@ -60,6 +61,8 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       setTipTapEditorInstance: state.setTipTapEditorInstance,
       setSlateEditorInstance: state.setSlateEditorInstance,
       taskContent: state.taskContent,
+      enableWebSearch: state.enableWebSearch,
+      setEnableWebSearch: state.setEnableWebSearch,
     })),
   );
   const { filedMapping } = useVariableFromStore();
@@ -67,7 +70,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { visible, toggle } = useSwitch(true);
-  const [selectedModel, setSelectedModel] = useState('verity_lite');
 
   const onMenuClose = useCallback(() => {
     setAnchorEl(null);
@@ -124,7 +126,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         schemaJson?.trim() !== '' &&
         typeof transformToObject(schemaJson) === 'object'
       ) {
-        return transformToObject(schemaJson).properties;
+        return transformToObject(schemaJson)?.properties || {};
       }
       return transformToObject(schemaJson)?.properties || {};
     } catch {
@@ -247,11 +249,28 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         </Typography>
       )}
       <CollapseCard hasCollapse={false} title={'Model'}>
-        <ModelSelect
-          groups={MODEL_OPTIONS}
-          onChange={setSelectedModel}
-          value={selectedModel}
-        />
+        <ModelSelect />
+        <Stack
+          alignItems={'center'}
+          flexDirection={'row'}
+          justifyContent={'space-between'}
+        >
+          <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+            <Typography variant={'body2'}>Enable web access</Typography>
+            <Tooltip
+              arrow
+              title={
+                'Enables Atlas to research information online in real time. This may increase usage costs.'
+              }
+            >
+              <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />
+            </Tooltip>
+          </Stack>
+          <StyledSwitch
+            checked={enableWebSearch}
+            onChange={(e) => setEnableWebSearch(e.target.checked)}
+          />
+        </Stack>
       </CollapseCard>
       <CollapseCard title={'Agent instructions'}>
         <PromptEditor

@@ -21,16 +21,18 @@ export const HeadRowsPanel = () => {
         onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={{
           gap: 0.5,
-          px: 1.5,
+          p: 0.5,
           borderRadius: 1,
           flexDirection: 'row',
           alignItems: 'center',
           cursor: 'pointer',
-          '&:hover': { bgcolor: '#EDEDED' },
+          '&:hover': { bgcolor: '#F4F5F9' },
         }}
       >
         <Icon component={ICON_ROW} sx={{ width: 20, height: 20 }} />
-        <Typography fontSize={14}>0/0 rows</Typography>
+        <Typography fontSize={14} lineHeight={1.4}>
+          0/0 rows
+        </Typography>
       </Stack>
 
       <Popper

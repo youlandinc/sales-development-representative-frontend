@@ -1,5 +1,5 @@
 import { CircularProgress, Stack, Typography } from '@mui/material';
-import { FC } from 'react';
+import { FC, useEffect, useRef } from 'react';
 
 interface SculptingPromptProps {
   prompt: string;
@@ -30,6 +30,12 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
   taskContent,
   suggestedModelContent,
 }) => {
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [taskContent, suggestedModelContent, prompt, schemaJsonStr]);
+
   if (isLoading) {
     return (
       <Stack alignItems={'center'} gap={2} justifyContent={'center'}>
@@ -39,8 +45,7 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
     );
   }
   return (
-    <Stack flex={1} gap={3}>
-      {/* <Typography variant={'body2'}>Sculpting your prompt...</Typography> */}
+    <Stack flex={1} gap={3} sx={{ overflowY: 'auto' }}>
       <Stack gap={0.5}>
         <Typography sx={TITLE_DEFAULT_STYLE}>Task</Typography>
         {taskContent && (
@@ -80,6 +85,7 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
           </Typography>
         </Stack>
       )}
+      <div ref={bottomRef} />
     </Stack>
   );
 };
