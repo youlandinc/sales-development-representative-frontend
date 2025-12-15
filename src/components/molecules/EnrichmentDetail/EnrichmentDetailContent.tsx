@@ -217,7 +217,9 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                 size={'small'}
                 variant={'contained'}
               >
-                <Stack sx={{ alignItems: 'center', flexDirection: 'row', gap: 0.5 }}>
+                <Stack
+                  sx={{ alignItems: 'center', flexDirection: 'row', gap: 0.5 }}
+                >
                   Actions
                   <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
                 </Stack>

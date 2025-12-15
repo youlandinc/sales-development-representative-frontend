@@ -12,6 +12,7 @@ interface StyledTableMenuCellEditorProps {
   anchorEl: HTMLElement | null;
   isOpen: boolean;
   value: string;
+  width: number;
   onChange: (value: string) => void;
   onSave: () => void; // Save current value and close
   onCancel: () => void; // Discard changes and close
@@ -21,6 +22,7 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
   anchorEl,
   isOpen,
   value,
+  width,
   onChange,
   onSave,
   onCancel,
@@ -64,7 +66,7 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
         {
           name: 'offset',
           options: {
-            offset: [3, -(anchorEl?.offsetHeight ?? 0) + 3],
+            offset: [0, -(anchorEl?.offsetHeight ?? 0)],
           },
         },
       ]}
@@ -77,7 +79,7 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
           elevation={4}
           sx={{
             px: 1.5,
-            width: 280,
+            width: width + 48,
             border: `2px solid ${TABLE_COLORS.SELECTION_BORDER}`,
             outline: `2px solid ${TABLE_COLORS.SELECTION_OUTLINE}`,
             borderRadius: 0,
@@ -94,7 +96,7 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
             sx={{
               width: '100%',
               fontSize: CELL_EDITOR_CONSTANTS.FONT_SIZE,
-              py: 0.5,
+              py: 1,
               '& textarea': {
                 p: 0,
                 m: 0,

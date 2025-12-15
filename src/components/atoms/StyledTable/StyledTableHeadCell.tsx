@@ -189,8 +189,9 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   //   - Cell selected: isActive=false, isFocused=true → show bottom line
   //   - Header click away: activeColumnId cleared → isActive=false, isFocused=true → show bottom line
   //   - Header active (menu open or closed): isActive=true → no bottom line
-  const shouldShowBackground = isActive && !isEditing;
-  const shouldShowBottomLine = isFocused && !isActive && !isEditing;
+  const shouldShowBackground = isActive || isEditing || isFocused;
+  //const shouldShowBackground = isActive && !isEditing;
+  //const shouldShowBottomLine = isFocused && !isActive && !isEditing;
   const headerBackgroundColor =
     shouldShowBackground || (isHovered && !isEditing) ? '#F4F5F9' : '#FFFFFF';
 
@@ -231,17 +232,17 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           TABLE_Z_INDEX.HEADER_PINNED,
         ),
         // Focus indicator line
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '2px',
-          bgcolor: TABLE_COLORS.SELECTION_BORDER,
-          zIndex: TABLE_Z_INDEX.HEADER_FOCUS_LINE,
-          display: shouldShowBottomLine ? 'block' : 'none',
-        },
+        //'&::after': {
+        //  content: '""',
+        //  position: 'absolute',
+        //  bottom: 0,
+        //  left: 0,
+        //  right: 0,
+        //  height: '2px',
+        //  bgcolor: TABLE_COLORS.SELECTION_BORDER,
+        //  zIndex: TABLE_Z_INDEX.HEADER_FOCUS_LINE,
+        //  display: shouldShowBottomLine ? 'block' : 'none',
+        //},
         position: isPinned ? 'sticky' : 'relative',
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? TABLE_Z_INDEX.HEADER_PINNED : TABLE_Z_INDEX.HEADER,
@@ -256,7 +257,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
         justifyContent: 'center',
         fontSize: TABLE_SIZES.FONT_SIZE,
         lineHeight: `${TABLE_SIZES.HEADER_HEIGHT}px`,
-        color: TABLE_COLORS.TEXT_PRIMARY,
+        color: 'text.primary',
         fontWeight: TABLE_SIZES.FONT_WEIGHT_MEDIUM,
       }}
     >
@@ -421,7 +422,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
                       marginLeft: '-1px',
                       width: TABLE_SIZES.RESIZE_INDICATOR_WIDTH,
                       height: indicatorHeight,
-                      bgcolor: TABLE_COLORS.TEXT_PRIMARY,
+                      bgcolor: TABLE_COLORS.SELECTION_BORDER,
                     }}
                   />
                 )}

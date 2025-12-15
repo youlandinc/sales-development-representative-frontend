@@ -469,6 +469,7 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
         onChange={onExpandedEditorValueChange}
         onSave={onStopEdit}
         value={localEditValue}
+        width={width}
       />
 
       {hasAiColumn &&
