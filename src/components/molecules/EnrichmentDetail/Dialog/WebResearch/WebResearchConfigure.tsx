@@ -67,7 +67,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   );
   const { filedMapping } = useVariableFromStore();
 
-  const [outPuts, setOutPuts] = useState<'fields' | 'json'>('fields');
+  const [outPuts] = useState<'fields' | 'json'>('fields');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { visible, toggle } = useSwitch(true);
 

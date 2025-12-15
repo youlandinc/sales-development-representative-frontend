@@ -6,8 +6,6 @@ import { SDRToast } from '@/components/atoms';
 
 import { useProspectTableStore } from '@/stores/enrichment';
 
-import { _fetchIntegrationMenus } from '@/request/enrichment/integrations';
-
 import { ActiveTypeEnum, HttpError } from '@/types';
 
 import {

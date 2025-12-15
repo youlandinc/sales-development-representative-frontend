@@ -345,11 +345,6 @@ export const useWebResearchStore = create<
           prompt: textBeforeJson,
           schemaJson: jsonContent,
         });
-        console.log('=== DEBUG ===');
-        console.log('textBeforeJson:', textBeforeJson);
-        console.log('jsonContent:', jsonContent);
-        console.log('fullText:', fullText);
-        console.log('=============');
         setTimeout(() => {
           set({ webResearchTab: 'configure', generateIsThinking: false });
         }, 1000);
