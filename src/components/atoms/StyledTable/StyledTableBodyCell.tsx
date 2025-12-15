@@ -25,10 +25,10 @@ import { TableCellFieldData, TableColumnMeta } from '@/types/enrichment/table';
 import {
   StyledTableAiIcon,
   StyledTableBodyCellIcons,
+  StyledTableMenuCellEditor,
   useRowHover,
 } from './index';
-import { StyledImage } from '@/components/atoms/StyledImage';
-import { StyledTableMenuCellEditor } from './StyledTableMenu/StyledTableMenuCellEditor';
+import { StyledImage } from '../StyledImage';
 
 const CELL_CONSTANTS = {
   MIN_WIDTH: 60,
@@ -39,11 +39,12 @@ const CELL_CONSTANTS = {
 } as const;
 
 const CELL_COLORS = {
-  ACTIVE_BG: '#F4F5F9',
+  ACTIVE_BG: '#fff',
   DEFAULT_BG: '#fff',
   BORDER: '#DFDEE6',
   PINNED_BORDER: '3px solid #DFDEE6',
   REGULAR_BORDER: '0.5px solid #DFDEE6',
+  ACTIVE_BORDER: '#5B76BC',
 } as const;
 
 const CHECKBOX_ICON_CHECKED = (
@@ -152,11 +153,15 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
   const columnMeta = column?.columnDef?.meta as TableColumnMeta | undefined;
   const { fieldType, canEdit = false, isAiColumn = false } = columnMeta || {};
 
-  // Use headerState.activeColumnId to highlight column when header menu is open
+  // Use headerState to highlight column when header menu is open or editing
   const headerActiveColumnId = tableMeta?.headerState?.activeColumnId;
+  const headerFocusedColumnId = tableMeta?.headerState?.focusedColumnId;
   const isHeaderMenuOpen = tableMeta?.headerState?.isMenuOpen ?? false;
+  const isHeaderEditing = tableMeta?.headerState?.isEditing ?? false;
+  // Column highlight: menu open OR editing (rename mode)
   const isColumnHighlighted =
-    headerActiveColumnId === columnId && isHeaderMenuOpen;
+    (headerActiveColumnId === columnId && isHeaderMenuOpen) ||
+    (headerFocusedColumnId === columnId && isHeaderEditing);
 
   const isAiLoading = tableMeta?.isAiLoading?.(recordId, columnId) ?? false;
 
@@ -412,10 +417,6 @@ export const StyledTableBodyCell: FC<StyledTableBodyCellProps> = ({
               pointerEvents: 'none',
             },
           }),
-        boxShadow: (theme) =>
-          isActive && !isSelectColumn
-            ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
-            : 'none',
         height: '100%',
         justifyContent: 'center',
         cursor:

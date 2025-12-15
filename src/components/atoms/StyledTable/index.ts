@@ -13,5 +13,6 @@ export * from './StyledTableBodyCellIcons';
 export * from './StyledTableSpacer';
 export * from './StyledTableAiIcon';
 export * from './StyledTableAddRowsFooter';
+export * from './StyledTableSelectionOverlay';
 
 export * from './StyledTableMenu';

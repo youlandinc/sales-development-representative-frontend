@@ -11,7 +11,13 @@ export const StyledTableBody: FC<StyledTableBodyProps> = ({
   totalHeight,
 }) => {
   return (
-    <Stack height={totalHeight} position={'relative'}>
+    <Stack
+      height={totalHeight}
+      sx={{
+        position: 'relative',
+        isolation: 'isolate', // Creates new stacking context like Clay
+      }}
+    >
       {children}
     </Stack>
   );

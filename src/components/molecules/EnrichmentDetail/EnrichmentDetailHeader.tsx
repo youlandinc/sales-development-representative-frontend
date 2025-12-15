@@ -7,17 +7,6 @@ import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
 import { useProspectTableStore } from '@/stores/enrichment';
 
 import ICON_BACK from './assets/head/icon-back.svg';
-//import ICON_SEARCH from './assets/head/icon-search.svg';
-
-import {
-  HeadColumnsPanel,
-  HeadFilterPanel,
-  HeadRowsPanel,
-  HeadViewPanel,
-} from './Panel';
-import { StyledButton } from '@/components/atoms';
-import { useDialogStore } from '@/stores/useDialogStore';
-import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 interface EnrichmentDetailHeaderProps {
   tableId: string;
@@ -29,8 +18,6 @@ export const EnrichmentDetailHeader: FC<EnrichmentDetailHeaderProps> = ({
   const { resetTable, tableName, renameTable } = useProspectTableStore(
     (store) => store,
   );
-  const openDialog = useProspectTableStore((state) => state.openDialog);
-  const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
   const router = useRouter();
 
@@ -54,85 +41,59 @@ export const EnrichmentDetailHeader: FC<EnrichmentDetailHeaderProps> = ({
   }, [tableName]);
 
   return (
-    <Stack gap={3} pb={1.5} pt={3} px={4}>
-      <Stack alignItems={'center'} flexDirection={'row'} height={32}>
-        <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
-          <Icon
-            component={ICON_BACK}
-            onClick={() => {
-              resetTable();
-              router.push('/enrichment');
-            }}
-            sx={{ width: 20, height: 20, mt: 0.25, cursor: 'pointer' }}
-          />
-          <Stack
-            alignItems={'center'}
-            flexDirection={'row'}
-            gap={1}
-            height={'100%'}
-            sx={{
-              cursor: 'pointer',
-            }}
-          >
-            <CommonRenameTextField
-              onChange={onChange}
-              slotProps={{
-                input: {
-                  onBlur: (e) => {
-                    if (e.target.value === '') {
-                      setRename(tableName);
-                    }
-                  },
+    <Stack
+      sx={{
+        alignItems: 'center',
+        height: 54,
+        px: 4,
+        gap: 3,
+        flexDirection: 'row',
+      }}
+    >
+      <Stack
+        sx={{
+          alignItems: 'center',
+          flexDirection: 'row',
+          gap: 1,
+        }}
+      >
+        <Icon
+          component={ICON_BACK}
+          onClick={() => {
+            resetTable();
+            router.push('/enrichment');
+          }}
+          sx={{ width: 20, height: 20, mt: 0.5, cursor: 'pointer' }}
+        />
+        <Stack
+          sx={{
+            alignItem: 'center',
+            cursor: 'pointer',
+            flexDirection: 'row',
+            gap: 1,
+            height: '100%',
+          }}
+        >
+          <CommonRenameTextField
+            onChange={onChange}
+            slotProps={{
+              input: {
+                onBlur: (e) => {
+                  if (e.target.value === '') {
+                    setRename(tableName);
+                  }
                 },
-              }}
-              sx={{ mt: 0.25 }}
-              value={rename}
-            />
-          </Stack>
-        </Stack>
-
-        <Stack ml={'auto'}>
-          <LayoutUserInfo />
+              },
+            }}
+            sx={{ mt: 0.25 }}
+            value={rename}
+          />
         </Stack>
       </Stack>
 
-      {/* <Stack flexDirection={'row'} justifyContent={'space-between'}>
-        <Stack flexDirection={'row'} gap={1.5} height={32} ml={-1.5}>
-          <HeadViewPanel />
-          <HeadColumnsPanel />
-          <HeadRowsPanel />
-          <HeadFilterPanel /> */}
-
-      {/*<Stack*/}
-      {/*  data-toolbar-button*/}
-      {/*  onClick={(e) => handleMenuClick(e, 'search')}*/}
-      {/*  sx={{*/}
-      {/*    gap: 0.5,*/}
-      {/*    px: 1.5,*/}
-      {/*    borderRadius: 1,*/}
-      {/*    flexDirection: 'row',*/}
-      {/*    alignItems: 'center',*/}
-      {/*    cursor: 'pointer',*/}
-      {/*    '&:hover': { bgcolor: '#EDEDED' },*/}
-      {/*  }}*/}
-      {/*>*/}
-      {/*  <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />*/}
-      {/*  <Typography fontSize={14}>Search</Typography>*/}
-      {/*</Stack>*/}
-      {/* </Stack>
-        <Stack flexDirection={'row'}>
-          <StyledButton
-            onClick={() => {
-              setAiTableInfo({ tableId, mappings: [] });
-              openDialog(TableColumnMenuActionEnum.actions_overview);
-            }}
-            size={'medium'}
-            variant={'contained'}
-          >
-            Actions
-          </StyledButton>
-        </Stack>
-      </Stack> */}
+      <Stack ml={'auto'}>
+        <LayoutUserInfo />
+      </Stack>
     </Stack>
   );
 };

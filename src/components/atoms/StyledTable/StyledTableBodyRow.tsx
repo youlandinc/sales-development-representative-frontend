@@ -42,13 +42,13 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
         ref={measureRef}
         sx={{
           position: 'absolute',
-          transform: `translateY(${virtualStart}px)`,
+          top: virtualStart, // Use top instead of transform to avoid creating stacking context
           width: '100%',
           height: `${rowHeight}px`,
           alignItems: 'center',
           boxSizing: 'border-box',
           borderBottom: '1px solid #F0EFF5',
-          zIndex: 1,
+          // No z-index or transform - let pinned cells' z-index work at body level
           bgcolor: (theme) =>
             isSelected
               ? alpha(theme.palette.primary.main, 0.06)

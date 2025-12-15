@@ -11,7 +11,7 @@ import {
 import useSWR from 'swr';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
+import { useProspectTableStore } from '@/stores/enrichment';
 import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
@@ -377,7 +377,7 @@ export const useProspectTable = ({
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [rowIds.length, fetchBatchData]);
+  }, [rowIds.length, fetchBatchData, rowIds]);
 
   // Handle visible range change (for virtualization)
   const onVisibleRangeChange = useCallback(

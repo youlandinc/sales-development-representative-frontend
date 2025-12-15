@@ -36,6 +36,7 @@ import {
   StyledTableMenuAddColumn,
   StyledTableMenuAiRun,
   StyledTableMenuHeader,
+  StyledTableSelectionOverlay,
   StyledTableSpacer,
 } from './index';
 
@@ -434,6 +435,77 @@ export const StyledTable: FC<StyledTableProps> = ({
     return colSizes;
   }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
+  // Calculate selection overlay position based on cellState
+  const selectionOverlayPosition = useMemo(() => {
+    if (!cellState) {
+      return null;
+    }
+
+    const { recordId, columnId } = cellState;
+    const rowIndex = rowIds.indexOf(recordId);
+    if (rowIndex === -1) {
+      return null;
+    }
+
+    // Check if column is pinned
+    const isPinned = leftPinnedColumns.some((col) => col.id === columnId);
+
+    // Calculate left position
+    let left = 0;
+    if (isPinned) {
+      // For pinned columns, use stickyLeftMap
+      left = stickyLeftMap[columnId] ?? 0;
+    } else {
+      // For center columns, calculate offset from pinned width
+      const pinnedWidth = leftPinnedColumns.reduce(
+        (acc, col) => acc + col.getSize(),
+        0,
+      );
+      let centerOffset = 0;
+      for (const col of centerColumns) {
+        if (col.id === columnId) {
+          break;
+        }
+        centerOffset += col.getSize();
+      }
+      left = pinnedWidth + centerOffset;
+    }
+
+    // Calculate top position (overlay inside body, no header offset)
+    const top = rowIndex * rowHeight;
+
+    // Get column width
+    const column = table.getColumn(columnId);
+    const width = column?.getSize() ?? 200;
+
+    // Calculate pinned width for the blocker
+    const pinnedWidth = leftPinnedColumns.reduce(
+      (acc, col) => acc + col.getSize(),
+      0,
+    );
+
+    // Container height - body size only
+    const containerHeight = rowIds.length * rowHeight;
+
+    return {
+      left,
+      top,
+      width,
+      height: rowHeight,
+      isEditing: cellState.isEditing ?? false,
+      pinnedWidth,
+      containerHeight,
+    };
+  }, [
+    cellState,
+    rowIds,
+    leftPinnedColumns,
+    centerColumns,
+    stickyLeftMap,
+    rowHeight,
+    table,
+  ]);
+
   useEffect(() => {
     const initialSizing: ColumnSizingState = {};
     columns.forEach((column) => {
@@ -565,7 +637,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       }
       setHeaderMenuAnchor(null);
     },
-    [onHeaderMenuClick, headerState.activeColumnId, table, HEADER_STATE_RESET],
+    [onHeaderMenuClick, headerState.activeColumnId, table],
   );
 
   // TODO: Interaction logic optimization
@@ -582,6 +654,9 @@ export const StyledTable: FC<StyledTableProps> = ({
       if (clickX > rightEdge - 12) {
         return;
       }
+
+      // Clear cell selection when clicking header
+      setCellState(null);
 
       if (columnSizingInfo.isResizingColumn) {
         setHeaderState({
@@ -670,8 +745,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       headerState.activeColumnId,
       headerState.isMenuOpen,
       headerState.isEditing,
-      cellState?.columnId,
-      cellState?.recordId,
+      cellState,
     ],
   );
 
@@ -699,7 +773,9 @@ export const StyledTable: FC<StyledTableProps> = ({
       if (columnSizingInfo.isResizingColumn) {
         return;
       }
-      // Double click: enter edit mode, clear activeColumnId (no background), keep focusedColumnId
+      // Clear cell selection when double-clicking header
+      setCellState(null);
+      // Double click: enter edit mode, keep focusedColumnId for column highlight
       setHeaderState({
         activeColumnId: null,
         focusedColumnId: columnId,
@@ -870,6 +946,19 @@ export const StyledTable: FC<StyledTableProps> = ({
           </StyledTableHead>
 
           <StyledTableBody totalHeight={rowVirtualizer.getTotalSize()}>
+            {/* Selection overlay - rendered BEFORE rows so cells can cover it */}
+            {selectionOverlayPosition && (
+              <StyledTableSelectionOverlay
+                containerHeight={selectionOverlayPosition.containerHeight}
+                height={selectionOverlayPosition.height}
+                isEditing={selectionOverlayPosition.isEditing}
+                isVisible={true}
+                left={selectionOverlayPosition.left}
+                pinnedWidth={selectionOverlayPosition.pinnedWidth}
+                top={selectionOverlayPosition.top}
+                width={selectionOverlayPosition.width}
+              />
+            )}
             {virtualRows.map((virtualRow: any) => {
               const row = table.getRowModel().rows[virtualRow.index];
               const visibleCells = row.getVisibleCells();
@@ -964,9 +1053,11 @@ export const StyledTable: FC<StyledTableProps> = ({
       stickyLeftMap,
       onHeaderClick,
       onHeaderRightClick,
+      onHeaderDoubleClick,
       centerColumns,
       rowHeight,
       onCellClick,
+      selectionOverlayPosition,
     ],
   );
 
@@ -977,7 +1068,13 @@ export const StyledTable: FC<StyledTableProps> = ({
         setHeaderMenuAnchor(null);
         setAiRunMenuAnchor(null);
         setAiRunColumnId('');
-        // Clear activeColumnId on click away (keep focusedColumnId for bottom line)
+
+        // Cell selected: do nothing (keep all state)
+        if (cellState) {
+          return;
+        }
+
+        // Header selected: clear activeColumnId (no background), keep focusedColumnId (show bottom line)
         setHeaderState((prev) => ({
           ...prev,
           activeColumnId: null,

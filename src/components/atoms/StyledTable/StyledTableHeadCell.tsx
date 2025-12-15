@@ -177,8 +177,11 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
   );
 
   // Visual rules:
-  // - Background color: isActive && !isEditing (cleared on click away)
-  // - Bottom line: isFocused && !isActive && !isEditing (shows only when focused but not active)
+  // - Background color: isActive && !isEditing
+  // - Bottom line: isFocused && !isActive && !isEditing
+  //   - Cell selected: isActive=false, isFocused=true → show bottom line
+  //   - Header click away: activeColumnId cleared → isActive=false, isFocused=true → show bottom line
+  //   - Header active (menu open or closed): isActive=true → no bottom line
   const shouldShowBackground = isActive && !isEditing;
   const shouldShowBottomLine = isFocused && !isActive && !isEditing;
   const headerBackgroundColor =
