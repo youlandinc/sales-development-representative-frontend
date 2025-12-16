@@ -4,7 +4,6 @@ export * from './DialogCellDetails';
 export * from './DialogDeleteColumn';
 export * from './DialogEditColumn';
 export * from './DialogEditDescription';
-export * from './DialogHeaderActions';
 export * from './WebResearch';
 export * from './DialogWorkEmail';
 export * from './Common';
