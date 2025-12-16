@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { Box } from '@mui/material';
 
-import { TABLE_COLORS, TABLE_Z_INDEX } from './styles';
+import { TABLE_COLORS, TABLE_Z_INDEX } from '../styles';
 
-interface StyledTableSelectionOverlayProps {
+interface CommonOverlayProps {
   left: number;
   top: number;
   width: number;
@@ -14,9 +14,7 @@ interface StyledTableSelectionOverlayProps {
   pinnedWidth: number;
 }
 
-export const StyledTableSelectionOverlay: FC<
-  StyledTableSelectionOverlayProps
-> = ({
+export const CommonOverlay: FC<CommonOverlayProps> = ({
   left,
   top,
   width,

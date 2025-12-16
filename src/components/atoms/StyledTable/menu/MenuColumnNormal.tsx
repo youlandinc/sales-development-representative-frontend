@@ -10,7 +10,7 @@ import {
   Stack,
 } from '@mui/material';
 
-import { createPaperStyle, menuStyles } from './StyledTableMenu.styles';
+import { MENU_STYLES } from '../styles/menu';
 
 import ICON_ARROW from '../assets/icon-arrow.svg';
 
@@ -24,7 +24,7 @@ import {
   getNormalColumnMenuActions,
 } from '@/constants/table';
 
-interface StyledTableMenuHeaderProps {
+interface MenuColumnNormalProps {
   anchorEl: HTMLElement | null;
   columns: any[];
   columnPinning: { left?: string[]; right?: string[] };
@@ -43,7 +43,7 @@ interface StyledTableMenuHeaderProps {
   }) => void;
 }
 
-export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
+export const MenuColumnNormal: FC<MenuColumnNormalProps> = ({
   anchorEl,
   columns,
   columnPinning,
@@ -65,8 +65,8 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
       open={
         Boolean(anchorEl) && !headerState.isEditing && headerState.isMenuOpen
       }
-      placement={menuStyles.popper.placement}
-      sx={{ zIndex: menuStyles.popper.zIndex }}
+      placement={MENU_STYLES.popper.placement}
+      sx={{ zIndex: MENU_STYLES.popper.zIndex }}
     >
       <ClickAwayListener
         onClickAway={(event) => {
@@ -78,7 +78,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
           }
         }}
       >
-        <Paper sx={createPaperStyle('medium')}>
+        <Paper sx={MENU_STYLES.paperMedium}>
           <Stack gap={0}>
             {(() => {
               const selectedColumn = columns.find(
@@ -103,27 +103,27 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                     component={'div'}
                     key={item.label}
                     onClick={() => !hasSubmenu && onMenuItemClick(item)}
-                    sx={menuStyles.menuItemWithSubmenu}
+                    sx={MENU_STYLES.menuItemWithSubmenu}
                   >
                     {item.icon && (
-                      <Icon component={item.icon} sx={menuStyles.icon} />
+                      <Icon component={item.icon} sx={MENU_STYLES.icon} />
                     )}
                     {item.label}
                     {hasSubmenu && (
                       <>
                         <Icon
                           component={ICON_ARROW}
-                          sx={menuStyles.submenuIcon}
+                          sx={MENU_STYLES.submenuIcon}
                         />
                         <Paper
                           className="submenu-container"
-                          sx={menuStyles.submenuPaper}
+                          sx={MENU_STYLES.submenuPaper}
                         >
                           <Stack gap={0}>
                             {/* Show title for change column type submenu */}
                             {item.value ===
                               TableColumnMenuActionEnum.change_column_type && (
-                              <Box sx={menuStyles.submenuTitle}>
+                              <Box sx={MENU_STYLES.submenuTitle}>
                                 Change column type
                               </Box>
                             )}
@@ -154,7 +154,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                                       });
                                     }}
                                     sx={[
-                                      menuStyles.menuItemWithSubmenu,
+                                      MENU_STYLES.menuItemWithSubmenu,
                                       isCurrentType && {
                                         opacity: 0.5,
                                         pointerEvents: 'auto',
@@ -164,7 +164,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                                     {subItem.icon && (
                                       <Icon
                                         component={subItem.icon}
-                                        sx={menuStyles.icon}
+                                        sx={MENU_STYLES.icon}
                                       />
                                     )}
                                     {subItem.label}
@@ -174,7 +174,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                               return (
                                 <Divider
                                   key={subItem.label + subIndex}
-                                  sx={menuStyles.divider}
+                                  sx={MENU_STYLES.divider}
                                 />
                               );
                             })}
@@ -186,7 +186,7 @@ export const StyledTableMenuHeader: FC<StyledTableMenuHeaderProps> = ({
                 );
               }
               return (
-                <Divider key={item.label + index} sx={menuStyles.divider} />
+                <Divider key={item.label + index} sx={MENU_STYLES.divider} />
               );
             })}
           </Stack>

@@ -12,14 +12,14 @@ import { Box, Checkbox, Icon, InputBase, Stack } from '@mui/material';
 import { flexRender, Header } from '@tanstack/react-table';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
-import { StyledTableAiIcon } from './index';
+import { CommonAiIcon } from '../common';
 import {
   buildPinnedBorderPseudoStyles,
   buildPinnedBorderRight,
   TABLE_COLORS,
   TABLE_SIZES,
   TABLE_Z_INDEX,
-} from './styles';
+} from '../styles';
 
 import { COLUMN_TYPE_ICONS, SYSTEM_COLUMN_SELECT } from '@/constants/table';
 import { UTypeOf } from '@/utils';
@@ -53,7 +53,7 @@ interface StyledTableHeadCellProps {
   onResizeStart?: () => void;
 }
 
-export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
+export const HeadCell: FC<StyledTableHeadCellProps> = ({
   header,
   children,
   width,
@@ -349,7 +349,7 @@ export const StyledTableHeadCell: FC<StyledTableHeadCellProps> = ({
           </Stack>
         )}
         {!isEditing && isAiColumn && (
-          <StyledTableAiIcon
+          <CommonAiIcon
             backgroundColor={headerBackgroundColor}
             onClick={onAiIconClick}
           />

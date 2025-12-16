@@ -1,4 +1,11 @@
-import { ChangeEvent, FC, KeyboardEvent, useLayoutEffect, useRef } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  KeyboardEvent,
+  memo,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import { ClickAwayListener, InputBase, Paper, Popper } from '@mui/material';
 import { TABLE_COLORS } from '@/components/atoms/StyledTable/styles';
 
@@ -8,7 +15,7 @@ const CELL_EDITOR_CONSTANTS = {
   Z_INDEX: 1300,
 } as const;
 
-interface StyledTableMenuCellEditorProps {
+interface BodyCellEditorExpandedProps {
   anchorEl: HTMLElement | null;
   isOpen: boolean;
   value: string;
@@ -18,7 +25,7 @@ interface StyledTableMenuCellEditorProps {
   onCancel: () => void; // Discard changes and close
 }
 
-export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
+const BodyCellEditorExpandedComponent: FC<BodyCellEditorExpandedProps> = ({
   anchorEl,
   isOpen,
   value,
@@ -111,3 +118,5 @@ export const StyledTableMenuCellEditor: FC<StyledTableMenuCellEditorProps> = ({
     </Popper>
   );
 };
+
+export const BodyCellEditorExpanded = memo(BodyCellEditorExpandedComponent);

@@ -1,4 +1,5 @@
 import {
+  CSSProperties,
   FC,
   MouseEvent,
   ReactNode,
@@ -24,21 +25,15 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import {
-  StyledTableAddRowsFooter,
-  StyledTableBody,
-  StyledTableBodyCell,
-  StyledTableBodyRow,
-  StyledTableContainer,
-  StyledTableHead,
-  StyledTableHeadCell,
-  StyledTableHeadRow,
-  StyledTableMenuAddColumn,
-  StyledTableMenuAiRun,
-  StyledTableMenuHeader,
-  StyledTableSelectionOverlay,
-  StyledTableSpacer,
-} from './index';
+import { StyledTableContainer } from './StyledTableContainer';
+import { StyledTableHead, StyledTableHeadRow } from './StyledTableHead';
+import { StyledTableBody, StyledTableBodyRow } from './StyledTableBody';
+import { StyledTableFooter } from './StyledTableFooter';
+
+import { HeadCell } from './head';
+import { BodyCell } from './body';
+import { MenuColumnAi, MenuColumnInsert, MenuColumnNormal } from './menu';
+import { CommonOverlay, CommonSpacer } from './common';
 
 import ICON_TYPE_ADD from './assets/icon-type-add.svg';
 
@@ -53,46 +48,64 @@ import {
 } from '@/constants/table';
 import { UTypeOf } from '@/utils';
 
-// TODO: Props optimization
-// 1. Use strict TypeScript type definitions instead of any[]
-// 2. Split complex Props into smaller configuration objects
-// 3. Consider using generics to support different data types
-// 4. Merge related callback functions into unified event handlers
+// ============================================
+// Type Definitions
+// ============================================
+
+interface MenuItem {
+  label: string;
+  value: string;
+  icon: any;
+}
+
+interface HeaderMenuClickParams {
+  type: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
+  columnId: string;
+  value?: any;
+  parentValue?: any;
+}
+
+interface VirtualizationConfig {
+  enabled?: boolean;
+  rowHeight?: number;
+  scrollContainer?: RefObject<HTMLDivElement | null>;
+  onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
+}
+
+type AiLoadingState = Record<string, Record<string, boolean>>;
+
+interface AiRunParams {
+  fieldId: string;
+  recordId?: string;
+  isHeader?: boolean;
+  recordCount?: number;
+}
+
+interface CellState {
+  recordId: string;
+  columnId: string;
+  isEditing?: boolean;
+}
+
+// ============================================
+// Props Interface
+// ============================================
+
 interface StyledTableProps {
-  columns: any[]; // TODO: Define TableColumn type
+  columns: any[];
   rowIds: string[];
-  data: any[]; // TODO: Use generic <TData>
-  addMenuItems?: { label: string; value: string; icon: any }[]; // TODO: Define MenuItem type
+  data: any[];
+  addMenuItems?: MenuItem[];
   onAddMenuItemClick?: (item: { label: string; value: string }) => void;
-  onHeaderMenuClick?: ({
-    type,
-    columnId,
-    value,
-    parentValue,
-  }: {
-    type: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
-    columnId: string;
-    value?: any;
-    parentValue?: any;
-  }) => void; // TODO: Simplify event handling types
+  onHeaderMenuClick?: (params: HeaderMenuClickParams) => void;
   isScrolled?: boolean;
-  virtualization?: {
-    enabled?: boolean;
-    rowHeight?: number;
-    scrollContainer?: RefObject<HTMLDivElement | null>;
-    onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
-  }; // TODO: Extract as independent VirtualizationConfig type
+  virtualization?: VirtualizationConfig;
   onColumnResize?: (fieldId: string, width: number) => void;
   onCellEdit?: (recordId: string, fieldId: string, value: string) => void;
   onAiProcess?: (recordId: string, columnId: string) => void;
   onCellClick: (columnId: string, rowId: string, data: any) => void;
-  aiLoading?: Record<string, Record<string, boolean>>; // TODO: Define LoadingState type
-  onRunAi?: (params: {
-    fieldId: string;
-    recordId?: string;
-    isHeader?: boolean;
-    recordCount?: number;
-  }) => Promise<void>; // TODO: Extract as AiRunParams type
+  aiLoading?: AiLoadingState;
+  onRunAi?: (params: AiRunParams) => Promise<void>;
   onAddRows: (count: number) => Promise<void>;
   addRowsFooter?: ReactNode;
 }
@@ -162,15 +175,8 @@ export const StyledTable: FC<StyledTableProps> = ({
     useState<ColumnSizingInfoState>({} as ColumnSizingInfoState);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  // TODO: State management optimization
-  // 1. Consider using useReducer instead of multiple useState
-  // 2. Extract state type definitions to independent types file
-  // 3. State update logic is too scattered, needs centralized management
-  const [cellState, setCellState] = useState<{
-    recordId: string;
-    columnId: string;
-    isEditing?: boolean;
-  } | null>(null);
+  // TODO: Consider merging menu anchors into unified menuState
+  const [cellState, setCellState] = useState<CellState | null>(null);
 
   const [headerState, setHeaderState] =
     useState<HeaderState>(HEADER_STATE_RESET);
@@ -266,6 +272,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           {
             id: column.fieldId,
             header: column.fieldName,
+            cell: (info) => info, // Return context for flexRender
             meta: {
               fieldType: column.fieldType,
               actionKey: column.actionKey,
@@ -280,54 +287,59 @@ export const StyledTable: FC<StyledTableProps> = ({
       return [selectCol, ...rest];
     },
     // Note: rowSelection dependency removed - header Checkbox now rendered
-    // directly in StyledTableHeadCell, bypassing TanStack's column caching.
+    // directly in HeadCell, bypassing TanStack's column caching.
     [columns],
   );
 
-  const tableMeta = useMemo(() => {
-    const stopHeaderEdit = () => {
-      setHeaderState((prev) => ({ ...prev, isEditing: false }));
-    };
+  // Stable callbacks - these don't depend on cellState/headerState
+  // so tableMeta reference stays stable when cell/header state changes
+  const setCellMode = useCallback(
+    (recordId: string, columnId: string, mode: 'active' | 'edit' | 'clear') => {
+      switch (mode) {
+        case 'active':
+          setCellState({ recordId, columnId });
+          setHeaderState({
+            activeColumnId: null,
+            focusedColumnId: columnId,
+            isMenuOpen: false,
+            isEditing: false,
+            selectedColumnIds: [],
+          });
+          break;
+        case 'edit':
+          setCellState({ recordId, columnId, isEditing: true });
+          break;
+        case 'clear':
+          setCellState(null);
+          break;
+      }
+    },
+    [],
+  );
 
-    return {
+  const stopHeaderEdit = useCallback(() => {
+    setHeaderState((prev) => ({ ...prev, isEditing: false }));
+  }, []);
+
+  const openAiRunMenu = useCallback(
+    (anchorEl: HTMLElement, columnId: string) => {
+      setAddMenuAnchor(null);
+      setHeaderMenuAnchor(null);
+      setAiRunMenuAnchor(anchorEl);
+      setAiRunColumnId(columnId);
+    },
+    [],
+  );
+
+  const tableMeta = useMemo(
+    () => ({
       // ===== Data Update =====
       onCellEdit,
 
-      // ===== Cell State Management =====
-      isEditing: (recordId: string, columnId: string) =>
-        cellState?.recordId === recordId &&
-        cellState?.columnId === columnId &&
-        cellState?.isEditing === true,
-      isActive: (recordId: string, columnId: string) =>
-        cellState?.recordId === recordId && cellState?.columnId === columnId,
-      hasActiveInRow: (recordId: string) => cellState?.recordId === recordId,
-      setCellMode: (
-        recordId: string,
-        columnId: string,
-        mode: 'active' | 'edit' | 'clear',
-      ) => {
-        switch (mode) {
-          case 'active':
-            setCellState({ recordId, columnId });
-            setHeaderState({
-              activeColumnId: null,
-              focusedColumnId: columnId,
-              isMenuOpen: false,
-              isEditing: false,
-              selectedColumnIds: [],
-            });
-            break;
-          case 'edit':
-            setCellState({ recordId, columnId, isEditing: true });
-            break;
-          case 'clear':
-            setCellState(null);
-            break;
-        }
-      },
+      // ===== Cell State Management (stable callbacks) =====
+      setCellMode,
 
-      // ===== Header State (via meta) =====
-      headerState,
+      // ===== Header State =====
       setHeaderState,
 
       // ===== AI Features =====
@@ -336,12 +348,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         Boolean(aiLoading?.[recordId]?.[columnId]),
       onAiProcess,
       onRunAi,
-      openAiRunMenu: (anchorEl: HTMLElement, columnId: string) => {
-        setAddMenuAnchor(null);
-        setHeaderMenuAnchor(null);
-        setAiRunMenuAnchor(anchorEl);
-        setAiRunColumnId(columnId);
-      },
+      openAiRunMenu,
 
       // ===== Header Editing =====
       stopHeaderEdit,
@@ -353,17 +360,19 @@ export const StyledTable: FC<StyledTableProps> = ({
           value: newName,
         });
       },
-    };
-  }, [
-    onCellEdit,
-    cellState,
-    headerState,
-    hasAiColumn,
-    aiLoading,
-    onAiProcess,
-    onRunAi,
-    onHeaderMenuClick,
-  ]);
+    }),
+    [
+      onCellEdit,
+      setCellMode,
+      hasAiColumn,
+      aiLoading,
+      onAiProcess,
+      onRunAi,
+      openAiRunMenu,
+      stopHeaderEdit,
+      onHeaderMenuClick,
+    ],
+  );
 
   const table = useReactTable({
     data: data,
@@ -402,12 +411,14 @@ export const StyledTable: FC<StyledTableProps> = ({
     }
   }, [columnSizingInfo.isResizingColumn, headerState.isEditing]);
 
+  // Get visible columns once per render (stable reference from TanStack)
+  const visibleLeafColumns = table.getVisibleLeafColumns();
+
   const { leftPinnedColumns, centerColumns, stickyLeftMap } = useMemo(() => {
-    const visibleColumns = table.getVisibleLeafColumns();
-    const leftPinned = visibleColumns.filter(
+    const leftPinned = visibleLeafColumns.filter(
       (col) => col.getIsPinned() === 'left',
     );
-    const center = visibleColumns.filter((col) => !col.getIsPinned());
+    const center = visibleLeafColumns.filter((col) => !col.getIsPinned());
 
     const map: Record<string, number> = {};
     let acc = 0;
@@ -422,7 +433,9 @@ export const StyledTable: FC<StyledTableProps> = ({
       centerColumns: center,
       stickyLeftMap: map,
     };
-  }, [table.getVisibleLeafColumns(), columnSizing]);
+    // Depend on column count + pinning/sizing state, not method call result
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleLeafColumns.length, columnPinning, columnSizing]);
 
   // CSS variables for performant column resizing (TanStack recommended approach)
   // This allows resize indicator to update smoothly without re-rendering cells
@@ -433,6 +446,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       colSizes[`--col-${header.column.id}-size`] = header.getSize();
     }
     return colSizes;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
   // Calculate selection overlay position based on cellState
@@ -790,8 +804,8 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   // TODO: Rendering logic optimization
   // 1. renderContent function is too long (~300 lines), needs splitting
-  // 2. Extract Header and Body rendering as independent components
-  // 3. Reduce duplicate code (pinned cells and virtual cells have similar rendering logic)
+  // 2. Reduce duplicate code (pinned cells and virtual cells have similar rendering logic)
+  // Note: BodyCell has been extracted as independent component with memo optimization
   const renderContent = useCallback(
     ({
       columnVirtualizer,
@@ -818,7 +832,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   }
                   const isSelectCol = col.id === SYSTEM_COLUMN_SELECT;
                   return (
-                    <StyledTableHeadCell
+                    <HeadCell
                       canResize={!isSelectCol}
                       header={header}
                       indicatorHeight={indicatorHeight}
@@ -874,7 +888,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                 })}
 
                 {virtualPaddingLeft ? (
-                  <StyledTableSpacer width={virtualPaddingLeft} />
+                  <CommonSpacer width={virtualPaddingLeft} />
                 ) : null}
 
                 {virtualColumns.map((virtualColumn: any) => {
@@ -889,7 +903,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                     return null;
                   }
                   return (
-                    <StyledTableHeadCell
+                    <HeadCell
                       dataIndex={virtualColumn.index}
                       header={header}
                       indicatorHeight={indicatorHeight}
@@ -924,10 +938,10 @@ export const StyledTable: FC<StyledTableProps> = ({
                 })}
 
                 {virtualPaddingRight ? (
-                  <StyledTableSpacer borderRight width={virtualPaddingRight} />
+                  <CommonSpacer borderRight width={virtualPaddingRight} />
                 ) : null}
 
-                <StyledTableHeadCell
+                <HeadCell
                   canResize={false}
                   onClick={(e) => {
                     setHeaderMenuAnchor(null);
@@ -940,7 +954,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                     sx={{ width: 16, height: 16 }}
                   />
                   Add column
-                </StyledTableHeadCell>
+                </HeadCell>
               </StyledTableHeadRow>
             ))}
           </StyledTableHead>
@@ -948,7 +962,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           <StyledTableBody totalHeight={rowVirtualizer.getTotalSize()}>
             {/* Selection overlay - rendered BEFORE rows so cells can cover it */}
             {selectionOverlayPosition && (
-              <StyledTableSelectionOverlay
+              <CommonOverlay
                 containerHeight={selectionOverlayPosition.containerHeight}
                 height={selectionOverlayPosition.height}
                 isEditing={selectionOverlayPosition.isEditing}
@@ -973,7 +987,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   virtualStart={virtualRow.start}
                 >
                   {/* Pinned left cells */}
-                  {leftPinnedColumns.map((col, index) => {
+                  {leftPinnedColumns.map((col) => {
                     const cell = visibleCells.find(
                       (c) => c.column.id === col.id,
                     );
@@ -981,23 +995,20 @@ export const StyledTable: FC<StyledTableProps> = ({
                       return null;
                     }
                     return (
-                      <StyledTableBodyCell
-                        cell={cell}
-                        isPinned
+                      <BodyCell
+                        cellContext={cell.getContext()}
+                        cellState={cellState}
+                        headerState={headerState}
+                        isRowSelected={row.getIsSelected?.() ?? false}
                         key={cell.id}
                         onCellClick={onCellClick}
-                        shouldShowPinnedRightShadow={
-                          index === leftPinnedColumns.length - 1
-                        }
-                        stickyLeft={stickyLeftMap[col.id] ?? 0}
-                        width={cell.column.getSize()}
                       />
                     );
                   })}
 
                   {/* Left padding spacer */}
                   {virtualPaddingLeft ? (
-                    <StyledTableSpacer width={virtualPaddingLeft} />
+                    <CommonSpacer width={virtualPaddingLeft} />
                   ) : null}
 
                   {/* Virtual cells */}
@@ -1013,25 +1024,24 @@ export const StyledTable: FC<StyledTableProps> = ({
                       return null;
                     }
                     return (
-                      <StyledTableBodyCell
-                        cell={cell}
+                      <BodyCell
+                        cellContext={cell.getContext()}
+                        cellState={cellState}
+                        headerState={headerState}
+                        isRowSelected={row.getIsSelected?.() ?? false}
                         key={cell.id}
                         onCellClick={onCellClick}
-                        width={cell.column.getSize()}
                       />
                     );
                   })}
 
                   {/* Right padding spacer */}
                   {virtualPaddingRight ? (
-                    <StyledTableSpacer
-                      borderRight
-                      width={virtualPaddingRight}
-                    />
+                    <CommonSpacer borderRight width={virtualPaddingRight} />
                   ) : null}
 
                   {/* Add-column trailing spacer to align with header and draw right edge */}
-                  <StyledTableSpacer
+                  <CommonSpacer
                     bgcolor="background.paper"
                     borderRight
                     width={140}
@@ -1043,6 +1053,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         </>
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       isScrolled,
       table,
@@ -1050,6 +1061,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       headerState.activeColumnId,
       headerState.focusedColumnId,
       headerState.isEditing,
+      headerState.isMenuOpen,
       stickyLeftMap,
       onHeaderClick,
       onHeaderRightClick,
@@ -1083,7 +1095,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       }}
     >
       <Stack
-        style={columnSizeVars as React.CSSProperties}
+        style={columnSizeVars as CSSProperties}
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -1100,16 +1112,16 @@ export const StyledTable: FC<StyledTableProps> = ({
           table={table}
         />
 
-        {addRowsFooter ?? <StyledTableAddRowsFooter onAddRows={onAddRows} />}
+        {addRowsFooter ?? <StyledTableFooter onAddRows={onAddRows} />}
 
-        <StyledTableMenuAddColumn
+        <MenuColumnInsert
           anchorEl={addMenuAnchor}
           menuItems={addMenuItems}
           onClose={() => setAddMenuAnchor(null)}
           onMenuItemClick={onAddMenuClick}
         />
 
-        <StyledTableMenuHeader
+        <MenuColumnNormal
           anchorEl={headerMenuAnchor}
           columnPinning={columnPinning}
           columns={columns}
@@ -1121,7 +1133,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           onMenuItemClick={onHeaderMenuItemClick}
         />
 
-        <StyledTableMenuAiRun
+        <MenuColumnAi
           anchorEl={aiRunMenuAnchor}
           columnId={aiRunColumnId}
           onClose={() => {

@@ -1,4 +1,4 @@
-import { TABLE_BORDERS, TABLE_COLORS } from './tableColors';
+import { TABLE_BORDERS, TABLE_COLORS } from './colors';
 
 // Border configuration for pinned columns
 export const buildPinnedBorderRight = (

@@ -7,13 +7,9 @@ import {
   Stack,
 } from '@mui/material';
 
-import {
-  createMenuItemStyle,
-  createPaperStyle,
-  menuStyles,
-} from './StyledTableMenu.styles';
+import { MENU_STYLES } from '../styles/menu';
 
-interface StyledTableMenuAiRunProps {
+interface MenuColumnAiProps {
   anchorEl: HTMLElement | null;
   columnId: string;
   rowIds: string[];
@@ -26,7 +22,7 @@ interface StyledTableMenuAiRunProps {
   }) => Promise<void>;
 }
 
-export const StyledTableMenuAiRun: FC<StyledTableMenuAiRunProps> = ({
+export const MenuColumnAi: FC<MenuColumnAiProps> = ({
   anchorEl,
   columnId,
   rowIds,
@@ -37,11 +33,11 @@ export const StyledTableMenuAiRun: FC<StyledTableMenuAiRunProps> = ({
     <Popper
       anchorEl={anchorEl}
       open={Boolean(anchorEl)}
-      placement={menuStyles.popper.placement}
-      sx={{ zIndex: menuStyles.popper.zIndex }}
+      placement={MENU_STYLES.popper.placement}
+      sx={{ zIndex: MENU_STYLES.popper.zIndex }}
     >
       <ClickAwayListener onClickAway={onClose}>
-        <Paper sx={createPaperStyle('large')}>
+        <Paper sx={MENU_STYLES.paperLarge}>
           <Stack gap={0}>
             {rowIds.length > 10 ? (
               <>
@@ -54,7 +50,7 @@ export const StyledTableMenuAiRun: FC<StyledTableMenuAiRunProps> = ({
                     });
                     onClose();
                   }}
-                  sx={createMenuItemStyle('comfortable')}
+                  sx={MENU_STYLES.menuItemComfortable}
                 >
                   Run first 10 rows
                 </MenuItem>
@@ -66,7 +62,7 @@ export const StyledTableMenuAiRun: FC<StyledTableMenuAiRunProps> = ({
                     });
                     onClose();
                   }}
-                  sx={createMenuItemStyle('comfortable')}
+                  sx={MENU_STYLES.menuItemComfortable}
                 >
                   Run all rows that haven&#39;t run or have errors
                 </MenuItem>
@@ -81,7 +77,7 @@ export const StyledTableMenuAiRun: FC<StyledTableMenuAiRunProps> = ({
                   });
                   onClose();
                 }}
-                sx={createMenuItemStyle('comfortable')}
+                sx={MENU_STYLES.menuItemComfortable}
               >
                 Run {rowIds.length} {rowIds.length === 1 ? 'row' : 'rows'}
               </MenuItem>

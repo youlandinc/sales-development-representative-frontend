@@ -3,6 +3,10 @@ import { Stack } from '@mui/material';
 
 import { TABLE_BORDERS, TABLE_COLORS, TABLE_Z_INDEX } from './styles';
 
+// ============================================================================
+// StyledTableHead
+// ============================================================================
+
 interface StyledTableHeadProps {
   children: ReactNode;
   isScrolled: boolean;
@@ -22,6 +26,7 @@ export const StyledTableHead: FC<StyledTableHeadProps> = ({
         boxShadow: isScrolled
           ? `0 4px 10px ${TABLE_COLORS.SCROLL_SHADOW}`
           : 'none',
+        borderTop: TABLE_BORDERS.HEADER,
         borderBottom: TABLE_BORDERS.HEADER,
         width: '100%',
         '&::before': {
@@ -34,6 +39,30 @@ export const StyledTableHead: FC<StyledTableHeadProps> = ({
           bgcolor: 'inherit',
           zIndex: -1,
         },
+      }}
+    >
+      {children}
+    </Stack>
+  );
+};
+
+// ============================================================================
+// StyledTableHeadRow
+// ============================================================================
+
+interface StyledTableHeadRowProps {
+  children: ReactNode;
+}
+
+export const StyledTableHeadRow: FC<StyledTableHeadRowProps> = ({
+  children,
+}) => {
+  return (
+    <Stack
+      direction="row"
+      sx={{
+        alignItems: 'center',
+        width: '100%',
       }}
     >
       {children}

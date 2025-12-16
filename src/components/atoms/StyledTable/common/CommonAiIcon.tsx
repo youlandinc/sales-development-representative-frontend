@@ -1,15 +1,15 @@
-import { FC, MouseEvent } from 'react';
+import { FC, memo, MouseEvent } from 'react';
 import { Box, Icon, Stack } from '@mui/material';
 
-import ICON_RUN_AI from './assets/icon-run-ai.svg';
-import { TABLE_COLORS } from './styles';
+import ICON_RUN_AI from '../assets/icon-run-ai.svg';
+import { TABLE_COLORS } from '../styles';
 
-interface StyledTableAiIconProps {
+interface CommonAiIconProps {
   onClick: (e: MouseEvent<HTMLDivElement>) => void;
   backgroundColor?: string;
 }
 
-export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
+const CommonAiIconComponent: FC<CommonAiIconProps> = ({
   onClick,
   backgroundColor = TABLE_COLORS.DEFAULT_BG,
 }) => {
@@ -75,3 +75,5 @@ export const StyledTableAiIcon: FC<StyledTableAiIconProps> = ({
     </Box>
   );
 };
+
+export const CommonAiIcon = memo(CommonAiIconComponent);

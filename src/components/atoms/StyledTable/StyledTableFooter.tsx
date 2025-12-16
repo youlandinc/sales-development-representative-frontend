@@ -16,7 +16,7 @@ interface StyledTableAddRowsFooterProps {
   disabled?: boolean;
 }
 
-export const StyledTableAddRowsFooter: FC<StyledTableAddRowsFooterProps> = ({
+export const StyledTableFooter: FC<StyledTableAddRowsFooterProps> = ({
   defaultRowCount = 10,
   onAddRows,
   disabled = false,
