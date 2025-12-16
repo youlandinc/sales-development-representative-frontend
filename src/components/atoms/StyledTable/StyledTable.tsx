@@ -10,6 +10,21 @@ import {
   useState,
 } from 'react';
 import { Checkbox, ClickAwayListener, Icon, Stack } from '@mui/material';
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  Modifier,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+} from '@dnd-kit/sortable';
 
 import type {
   ColumnOrderState,
@@ -30,7 +45,7 @@ import { StyledTableHead, StyledTableHeadRow } from './StyledTableHead';
 import { StyledTableBody, StyledTableBodyRow } from './StyledTableBody';
 import { StyledTableFooter } from './StyledTableFooter';
 
-import { HeadCell } from './head';
+import { HeadCell, SortableHeadCell } from './head';
 import { BodyCell } from './body';
 import { MenuColumnAi, MenuColumnInsert, MenuColumnNormal } from './menu';
 import { CommonOverlay, CommonSpacer } from './common';
@@ -204,10 +219,92 @@ export const StyledTable: FC<StyledTableProps> = ({
     [columns],
   );
 
+  // DnD sensors for column reordering
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor),
+  );
+
+  // Sortable column IDs - pinned (exclude select) and center separately
+  const { sortablePinnedIds, sortableCenterIds } = useMemo(() => {
+    const pinned = columns
+      .filter((col) => col.pin && col.fieldId !== SYSTEM_COLUMN_SELECT)
+      .map((col) => col.fieldId);
+    const center = columns
+      .filter((col) => !col.pin && col.fieldId !== SYSTEM_COLUMN_SELECT)
+      .map((col) => col.fieldId);
+    return { sortablePinnedIds: pinned, sortableCenterIds: center };
+  }, [columns]);
+
+  // Handle column drag end - works for both pinned and center columns
+  const onColumnDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) {
+        return;
+      }
+
+      const activeId = active.id as string;
+      const overId = over.id as string;
+
+      // Check if dragging in pinned area or center area
+      const isInPinned = sortablePinnedIds.includes(activeId);
+      const isInCenter = sortableCenterIds.includes(activeId);
+
+      if (isInPinned) {
+        // Reorder within pinned columns
+        const oldIndex = sortablePinnedIds.indexOf(activeId);
+        const newIndex = sortablePinnedIds.indexOf(overId);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const reorderedPinned = arrayMove(
+            sortablePinnedIds,
+            oldIndex,
+            newIndex,
+          );
+          const newOrder = [
+            SYSTEM_COLUMN_SELECT,
+            ...reorderedPinned,
+            ...sortableCenterIds,
+          ];
+          setColumnOrder(newOrder);
+        }
+      } else if (isInCenter) {
+        // Reorder within center columns
+        const oldIndex = sortableCenterIds.indexOf(activeId);
+        const newIndex = sortableCenterIds.indexOf(overId);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const reorderedCenter = arrayMove(
+            sortableCenterIds,
+            oldIndex,
+            newIndex,
+          );
+          const newOrder = [
+            SYSTEM_COLUMN_SELECT,
+            ...sortablePinnedIds,
+            ...reorderedCenter,
+          ];
+          setColumnOrder(newOrder);
+        }
+      }
+    },
+    [sortablePinnedIds, sortableCenterIds],
+  );
+
   useEffect(() => {
     const pinnedColumns = columns
       .filter((col) => col.pin)
       .map((col) => col.fieldId);
+    const centerColumns = columns
+      .filter((col) => !col.pin && col.fieldId !== SYSTEM_COLUMN_SELECT)
+      .map((col) => col.fieldId);
+
+    // Sync column order: select first, then pinned, then center
+    setColumnOrder([SYSTEM_COLUMN_SELECT, ...pinnedColumns, ...centerColumns]);
+
     setColumnPinning({
       left: [SYSTEM_COLUMN_SELECT].concat(pinnedColumns),
     });
@@ -414,28 +511,68 @@ export const StyledTable: FC<StyledTableProps> = ({
   // Get visible columns once per render (stable reference from TanStack)
   const visibleLeafColumns = table.getVisibleLeafColumns();
 
-  const { leftPinnedColumns, centerColumns, stickyLeftMap } = useMemo(() => {
-    const leftPinned = visibleLeafColumns.filter(
-      (col) => col.getIsPinned() === 'left',
+  const { leftPinnedColumns, centerColumns, stickyLeftMap, pinnedTotalWidth } =
+    useMemo(() => {
+      const leftPinned = visibleLeafColumns.filter(
+        (col) => col.getIsPinned() === 'left',
+      );
+      const center = visibleLeafColumns.filter((col) => !col.getIsPinned());
+
+      const map: Record<string, number> = {};
+      let acc = 0;
+      for (let i = 0; i < leftPinned.length; i++) {
+        const col = leftPinned[i];
+        map[col.id] = acc;
+        acc += col.getSize();
+      }
+
+      return {
+        leftPinnedColumns: leftPinned,
+        centerColumns: center,
+        stickyLeftMap: map,
+        pinnedTotalWidth: acc,
+      };
+      // Depend on column count + pinning/sizing state, not method call result
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visibleLeafColumns.length, columnPinning, columnSizing]);
+
+  // Get select column width for pinned drag boundary
+  const selectColumnWidth = useMemo(() => {
+    const selectCol = leftPinnedColumns.find(
+      (col) => col.id === SYSTEM_COLUMN_SELECT,
     );
-    const center = visibleLeafColumns.filter((col) => !col.getIsPinned());
+    return selectCol?.getSize() ?? 100;
+  }, [leftPinnedColumns]);
 
-    const map: Record<string, number> = {};
-    let acc = 0;
-    for (let i = 0; i < leftPinned.length; i++) {
-      const col = leftPinned[i];
-      map[col.id] = acc;
-      acc += col.getSize();
-    }
+  // Custom modifier: restrict drag to horizontal axis and prevent going past boundaries
+  const dragModifiers = useMemo<Modifier[]>(() => {
+    return [
+      ({ transform, draggingNodeRect, scrollableAncestorRects, active }) => {
+        const containerRect = scrollableAncestorRects[0];
+        if (!draggingNodeRect || !containerRect || !active) {
+          return { ...transform, y: 0 };
+        }
 
-    return {
-      leftPinnedColumns: leftPinned,
-      centerColumns: center,
-      stickyLeftMap: map,
-    };
-    // Depend on column count + pinning/sizing state, not method call result
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleLeafColumns.length, columnPinning, columnSizing]);
+        const activeId = active.id as string;
+        const isPinnedColumn = sortablePinnedIds.includes(activeId);
+
+        let minX: number;
+        if (isPinnedColumn) {
+          // Pinned columns: cannot go left of select column
+          minX = selectColumnWidth - draggingNodeRect.left + containerRect.left;
+        } else {
+          // Center columns: cannot go left of pinned area
+          minX = pinnedTotalWidth - draggingNodeRect.left + containerRect.left;
+        }
+
+        return {
+          ...transform,
+          x: Math.max(transform.x, minX),
+          y: 0, // Restrict to horizontal axis
+        };
+      },
+    ];
+  }, [pinnedTotalWidth, selectColumnWidth, sortablePinnedIds]);
 
   // CSS variables for performant column resizing (TanStack recommended approach)
   // This allows resize indicator to update smoothly without re-rendering cells
@@ -819,145 +956,155 @@ export const StyledTable: FC<StyledTableProps> = ({
 
       return (
         <>
-          <StyledTableHead isScrolled={isScrolled ?? false}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <StyledTableHeadRow key={headerGroup.id}>
-                {/* Pinned left headers */}
-                {leftPinnedColumns.map((col, index) => {
-                  const header = headerGroup.headers.find(
-                    (h) => h.id === col.id,
-                  );
-                  if (!header) {
-                    return null;
-                  }
-                  const isSelectCol = col.id === SYSTEM_COLUMN_SELECT;
-                  return (
-                    <HeadCell
-                      canResize={!isSelectCol}
-                      header={header}
-                      indicatorHeight={indicatorHeight}
-                      isActive={headerState.activeColumnId === header.id}
-                      isEditing={
-                        headerState.focusedColumnId === header.id &&
-                        headerState.isEditing
+          <DndContext
+            collisionDetection={closestCenter}
+            modifiers={dragModifiers}
+            onDragEnd={onColumnDragEnd}
+            sensors={sensors}
+          >
+            <StyledTableHead isScrolled={isScrolled ?? false}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <StyledTableHeadRow key={headerGroup.id}>
+                  {/* Pinned left headers - wrapped in SortableContext */}
+                  <SortableContext
+                    items={sortablePinnedIds}
+                    strategy={horizontalListSortingStrategy}
+                  >
+                    {leftPinnedColumns.map((col, index) => {
+                      const header = headerGroup.headers.find(
+                        (h) => h.id === col.id,
+                      );
+                      if (!header) {
+                        return null;
                       }
-                      isFocused={headerState.focusedColumnId === header.id}
-                      isPinned
-                      key={header.id}
-                      onClick={
-                        !isSelectCol
-                          ? (e) => {
-                              onHeaderClick(e, header.id);
+                      const isSelectCol = col.id === SYSTEM_COLUMN_SELECT;
+
+                      // Select column is not sortable
+                      if (isSelectCol) {
+                        return (
+                          <HeadCell
+                            headerContext={header.getContext()}
+                            headerState={headerState}
+                            indicatorHeight={indicatorHeight}
+                            isPinned
+                            key={header.id}
+                            shouldShowPinnedRightShadow={
+                              index === leftPinnedColumns.length - 1
                             }
-                          : undefined
+                            stickyLeft={stickyLeftMap[col.id] ?? 0}
+                          />
+                        );
                       }
-                      onContextMenu={
-                        !isSelectCol
-                          ? (e) => onHeaderRightClick(e, col.id)
-                          : undefined
+
+                      // Pinned columns (non-select) are sortable
+                      return (
+                        <SortableHeadCell
+                          headerContext={header.getContext()}
+                          headerState={headerState}
+                          indicatorHeight={indicatorHeight}
+                          isPinned
+                          key={header.id}
+                          onClick={(e) => onHeaderClick(e, header.id)}
+                          onContextMenu={(e) => onHeaderRightClick(e, col.id)}
+                          onDoubleClick={(e) =>
+                            onHeaderDoubleClick(e, header.id)
+                          }
+                          onEditSave={(newName) =>
+                            (table.options.meta as any)?.updateHeaderName?.(
+                              header.id,
+                              newName,
+                            )
+                          }
+                          onResizeStart={() => {
+                            setHeaderMenuAnchor(null);
+                            setHeaderState(HEADER_STATE_RESET);
+                          }}
+                          shouldShowPinnedRightShadow={
+                            index === leftPinnedColumns.length - 1
+                          }
+                          sortableId={header.id}
+                          stickyLeft={stickyLeftMap[col.id] ?? 0}
+                        />
+                      );
+                    })}
+                  </SortableContext>
+
+                  {virtualPaddingLeft ? (
+                    <CommonSpacer width={virtualPaddingLeft} />
+                  ) : null}
+
+                  {/* Center columns - wrapped in SortableContext */}
+                  <SortableContext
+                    items={sortableCenterIds}
+                    strategy={horizontalListSortingStrategy}
+                  >
+                    {virtualColumns.map((virtualColumn: any) => {
+                      const col = centerColumns[virtualColumn.index];
+                      if (!col) {
+                        return null;
                       }
-                      onDoubleClick={
-                        !isSelectCol
-                          ? (e) => onHeaderDoubleClick(e, header.id)
-                          : undefined
+                      const header = headerGroup.headers.find(
+                        (h) => h.id === col.id,
+                      );
+                      if (!header) {
+                        return null;
                       }
-                      onEditSave={(newName) =>
-                        (table.options.meta as any)?.updateHeaderName?.(
-                          header.id,
-                          newName,
-                        )
-                      }
-                      onResizeStart={() => {
-                        setHeaderMenuAnchor(null);
-                        setHeaderState(HEADER_STATE_RESET);
-                      }}
-                      shouldShowPinnedRightShadow={
-                        index === leftPinnedColumns.length - 1
-                      }
-                      stickyLeft={stickyLeftMap[col.id] ?? 0}
-                      width={header.getSize()}
-                      // Select column checkbox props (bypass TanStack column caching)
-                      {...(isSelectCol && {
-                        isAllRowsSelected: table.getIsAllPageRowsSelected(),
-                        isSomeRowsSelected: table.getIsSomePageRowsSelected(),
-                        onToggleAllRows:
-                          table.getToggleAllPageRowsSelectedHandler(),
-                      })}
+                      return (
+                        <SortableHeadCell
+                          dataIndex={virtualColumn.index}
+                          headerContext={header.getContext()}
+                          headerState={headerState}
+                          indicatorHeight={indicatorHeight}
+                          key={header.id}
+                          measureRef={(node) =>
+                            columnVirtualizer.measureElement(node)
+                          }
+                          onClick={(e) => {
+                            onHeaderClick(e, header.id);
+                          }}
+                          onContextMenu={(e) =>
+                            onHeaderRightClick(e, header.id)
+                          }
+                          onDoubleClick={(e) =>
+                            onHeaderDoubleClick(e, header.id)
+                          }
+                          onEditSave={(newName) =>
+                            (table.options.meta as any)?.updateHeaderName?.(
+                              header.id,
+                              newName,
+                            )
+                          }
+                          onResizeStart={() => {
+                            setHeaderMenuAnchor(null);
+                            setHeaderState(HEADER_STATE_RESET);
+                          }}
+                          sortableId={header.id}
+                        />
+                      );
+                    })}
+                  </SortableContext>
+
+                  {virtualPaddingRight ? (
+                    <CommonSpacer borderRight width={virtualPaddingRight} />
+                  ) : null}
+
+                  <HeadCell
+                    onClick={(e) => {
+                      setHeaderMenuAnchor(null);
+                      setAddMenuAnchor(e.currentTarget);
+                    }}
+                    width={140}
+                  >
+                    <Icon
+                      component={ICON_TYPE_ADD}
+                      sx={{ width: 16, height: 16 }}
                     />
-                  );
-                })}
-
-                {virtualPaddingLeft ? (
-                  <CommonSpacer width={virtualPaddingLeft} />
-                ) : null}
-
-                {virtualColumns.map((virtualColumn: any) => {
-                  const col = centerColumns[virtualColumn.index];
-                  if (!col) {
-                    return null;
-                  }
-                  const header = headerGroup.headers.find(
-                    (h) => h.id === col.id,
-                  );
-                  if (!header) {
-                    return null;
-                  }
-                  return (
-                    <HeadCell
-                      dataIndex={virtualColumn.index}
-                      header={header}
-                      indicatorHeight={indicatorHeight}
-                      isActive={headerState.activeColumnId === header.id}
-                      isEditing={
-                        headerState.focusedColumnId === header.id &&
-                        headerState.isEditing
-                      }
-                      isFocused={headerState.focusedColumnId === header.id}
-                      key={header.id}
-                      measureRef={(node) =>
-                        columnVirtualizer.measureElement(node)
-                      }
-                      onClick={(e) => {
-                        onHeaderClick(e, header.id);
-                      }}
-                      onContextMenu={(e) => onHeaderRightClick(e, header.id)}
-                      onDoubleClick={(e) => onHeaderDoubleClick(e, header.id)}
-                      onEditSave={(newName) =>
-                        (table.options.meta as any)?.updateHeaderName?.(
-                          header.id,
-                          newName,
-                        )
-                      }
-                      onResizeStart={() => {
-                        setHeaderMenuAnchor(null);
-                        setHeaderState(HEADER_STATE_RESET);
-                      }}
-                      width={header.getSize()}
-                    />
-                  );
-                })}
-
-                {virtualPaddingRight ? (
-                  <CommonSpacer borderRight width={virtualPaddingRight} />
-                ) : null}
-
-                <HeadCell
-                  canResize={false}
-                  onClick={(e) => {
-                    setHeaderMenuAnchor(null);
-                    setAddMenuAnchor(e.currentTarget);
-                  }}
-                  width={140}
-                >
-                  <Icon
-                    component={ICON_TYPE_ADD}
-                    sx={{ width: 16, height: 16 }}
-                  />
-                  Add column
-                </HeadCell>
-              </StyledTableHeadRow>
-            ))}
-          </StyledTableHead>
+                    Add column
+                  </HeadCell>
+                </StyledTableHeadRow>
+              ))}
+            </StyledTableHead>
+          </DndContext>
 
           <StyledTableBody totalHeight={rowVirtualizer.getTotalSize()}>
             {/* Selection overlay - rendered BEFORE rows so cells can cover it */}
@@ -987,7 +1134,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   virtualStart={virtualRow.start}
                 >
                   {/* Pinned left cells */}
-                  {leftPinnedColumns.map((col) => {
+                  {leftPinnedColumns.map((col, index) => {
                     const cell = visibleCells.find(
                       (c) => c.column.id === col.id,
                     );
@@ -999,9 +1146,14 @@ export const StyledTable: FC<StyledTableProps> = ({
                         cellContext={cell.getContext()}
                         cellState={cellState}
                         headerState={headerState}
+                        isPinned
                         isRowSelected={row.getIsSelected?.() ?? false}
                         key={cell.id}
                         onCellClick={onCellClick}
+                        shouldShowPinnedRightShadow={
+                          index === leftPinnedColumns.length - 1
+                        }
+                        stickyLeft={stickyLeftMap[col.id] ?? 0}
                       />
                     );
                   })}
@@ -1028,9 +1180,12 @@ export const StyledTable: FC<StyledTableProps> = ({
                         cellContext={cell.getContext()}
                         cellState={cellState}
                         headerState={headerState}
+                        isPinned={false}
                         isRowSelected={row.getIsSelected?.() ?? false}
                         key={cell.id}
                         onCellClick={onCellClick}
+                        shouldShowPinnedRightShadow={false}
+                        stickyLeft={0}
                       />
                     );
                   })}
@@ -1058,10 +1213,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       isScrolled,
       table,
       leftPinnedColumns,
-      headerState.activeColumnId,
-      headerState.focusedColumnId,
-      headerState.isEditing,
-      headerState.isMenuOpen,
+      headerState,
       stickyLeftMap,
       onHeaderClick,
       onHeaderRightClick,
@@ -1070,6 +1222,9 @@ export const StyledTable: FC<StyledTableProps> = ({
       rowHeight,
       onCellClick,
       selectionOverlayPosition,
+      dragModifiers,
+      sortablePinnedIds,
+      sortableCenterIds,
     ],
   );
 

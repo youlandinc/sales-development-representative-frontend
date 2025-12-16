@@ -14,6 +14,7 @@ export const TABLE_Z_INDEX = {
 
   // Header layers
   HEAD_STICKY: 10,
+  HEADER_DRAGGING: 28,
   HEADER_PINNED: 30,
   HEADER_FOCUS_LINE: 31,
 

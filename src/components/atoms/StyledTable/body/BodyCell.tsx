@@ -5,7 +5,6 @@ import {
   startTransition,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -99,6 +98,10 @@ export interface BodyCellProps {
   headerState: HeaderState;
   // Row selection state - needed to trigger re-render on select all
   isRowSelected: boolean;
+  // Pinned column layout - passed from parent for proper memo comparison
+  isPinned: boolean;
+  stickyLeft: number;
+  shouldShowPinnedRightShadow: boolean;
   // Callback
   onCellClick: (columnId: string, rowId: string, data: any) => void;
 }
@@ -108,6 +111,9 @@ const BodyCellComponent: FC<BodyCellProps> = ({
   cellState,
   headerState,
   isRowSelected,
+  isPinned,
+  stickyLeft,
+  shouldShowPinnedRightShadow,
   onCellClick,
 }) => {
   // ========== 1. Context Data Extraction ==========
@@ -130,19 +136,6 @@ const BodyCellComponent: FC<BodyCellProps> = ({
   const [isCellHovered, setIsCellHovered] = useState(false);
 
   const width = column.getSize();
-  const isPinned = column.getIsPinned() === 'left';
-  const { stickyLeft, shouldShowPinnedRightShadow } = useMemo(() => {
-    if (!isPinned) {
-      return { stickyLeft: 0, shouldShowPinnedRightShadow: false };
-    }
-    const leftPinnedColumns = table.getLeftLeafColumns();
-    const colIndex = leftPinnedColumns.findIndex((c: any) => c.id === columnId);
-    const left = leftPinnedColumns
-      .slice(0, colIndex)
-      .reduce((acc: number, c: any) => acc + c.getSize(), 0);
-    const showShadow = colIndex === leftPinnedColumns.length - 1;
-    return { stickyLeft: left, shouldShowPinnedRightShadow: showShadow };
-  }, [isPinned, table, columnId]);
 
   const { isRowHovered } = useRowHover();
 
@@ -399,6 +392,15 @@ const bodyCellAreEqual = (
 
   // Check if cell id changed
   if (prev.cellContext.cell.id !== next.cellContext.cell.id) {
+    return false;
+  }
+
+  // Check pinned layout props (passed from parent)
+  if (
+    prev.isPinned !== next.isPinned ||
+    prev.stickyLeft !== next.stickyLeft ||
+    prev.shouldShowPinnedRightShadow !== next.shouldShowPinnedRightShadow
+  ) {
     return false;
   }
 
