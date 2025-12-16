@@ -9,23 +9,19 @@ import {
   Stack,
 } from '@mui/material';
 
-import {
-  createMenuItemStyle,
-  createPaperStyle,
-  menuStyles,
-} from './StyledTableMenu.styles';
+import { MENU_STYLES } from '../styles/menu';
 
 import { getAddColumnMenuActions } from '@/constants/table';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
-interface StyledTableMenuAddColumnProps {
+interface MenuColumnInsertProps {
   anchorEl: HTMLElement | null;
   menuItems?: { label: string; value: string; icon: any }[];
   onClose: () => void;
   onMenuItemClick: (item: { label: string; value: string }) => void;
 }
 
-export const StyledTableMenuAddColumn: FC<StyledTableMenuAddColumnProps> = ({
+export const MenuColumnInsert: FC<MenuColumnInsertProps> = ({
   anchorEl,
   menuItems,
   onClose,
@@ -37,11 +33,11 @@ export const StyledTableMenuAddColumn: FC<StyledTableMenuAddColumnProps> = ({
     <Popper
       anchorEl={anchorEl}
       open={Boolean(anchorEl)}
-      placement={menuStyles.popper.placement}
-      sx={{ zIndex: menuStyles.popper.zIndex }}
+      placement={MENU_STYLES.popper.placement}
+      sx={{ zIndex: MENU_STYLES.popper.zIndex }}
     >
       <ClickAwayListener onClickAway={onClose}>
-        <Paper sx={createPaperStyle('small')}>
+        <Paper sx={MENU_STYLES.paperSmall}>
           <Stack gap={0}>
             {menuItems_.map((item, index) => {
               if (item.value !== TableColumnMenuActionEnum.divider) {
@@ -49,20 +45,20 @@ export const StyledTableMenuAddColumn: FC<StyledTableMenuAddColumnProps> = ({
                   <MenuItem
                     key={item.value || item.label}
                     onClick={() => onMenuItemClick(item)}
-                    sx={createMenuItemStyle('compact', {
-                      alignItems: 'center',
-                      gap: 1,
-                    })}
+                    sx={[
+                      MENU_STYLES.menuItemCompact,
+                      { alignItems: 'center', gap: 1 },
+                    ]}
                   >
                     {item.icon && (
-                      <Icon component={item.icon} sx={menuStyles.icon} />
+                      <Icon component={item.icon} sx={MENU_STYLES.icon} />
                     )}
                     {item.label}
                   </MenuItem>
                 );
               }
               return (
-                <Divider key={item.label + index} sx={menuStyles.divider} />
+                <Divider key={item.label + index} sx={MENU_STYLES.divider} />
               );
             })}
           </Stack>

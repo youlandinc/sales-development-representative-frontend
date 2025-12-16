@@ -1,15 +1,15 @@
 import { FC } from 'react';
 import { Stack } from '@mui/material';
 
-import { TABLE_BORDERS } from './styles';
+import { TABLE_BORDERS } from '../styles';
 
-interface StyledTableSpacerProps {
+interface CommonSpacerProps {
   width: number;
   borderRight?: boolean;
   bgcolor?: string;
 }
 
-export const StyledTableSpacer: FC<StyledTableSpacerProps> = ({
+export const CommonSpacer: FC<CommonSpacerProps> = ({
   width,
   borderRight = false,
   bgcolor,

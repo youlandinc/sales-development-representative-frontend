@@ -29,13 +29,14 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
 }) => {
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // Get visible columns once per render (stable reference from TanStack)
+  const visibleLeafColumns = table.getVisibleLeafColumns();
+
   const centerColumns = useMemo(
-    () => {
-      const visible = table.getVisibleLeafColumns();
-      return visible.filter((col) => !col.getIsPinned());
-    },
+    () => visibleLeafColumns.filter((col) => !col.getIsPinned()),
+    // Depend on column count + pinning state changes, not method call
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [table.getVisibleLeafColumns()],
+    [visibleLeafColumns.length, table.getState().columnPinning],
   );
 
   const columnVirtualizer = useVirtualizer({
@@ -44,7 +45,7 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     getScrollElement: () =>
       scrollContainer?.current ?? tableContainerRef.current,
     horizontal: true,
-    overscan: 3,
+    overscan: 5,
   });
 
   const rows = table.getRowModel().rows;
@@ -55,7 +56,7 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     getScrollElement: () => {
       return scrollContainer?.current ?? tableContainerRef.current;
     },
-    overscan: 5,
+    overscan: 8,
     initialRect: {
       width: 0,
       height: 0,
@@ -63,31 +64,28 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
     enabled: true,
   });
 
-  const virtualData = useMemo(
-    () => {
-      const virtualColumns = columnVirtualizer.getVirtualItems();
-      const virtualRows = rowVirtualizer.getVirtualItems();
+  // Get virtual items once per render
+  const virtualColumns = columnVirtualizer.getVirtualItems();
+  const virtualRows = rowVirtualizer.getVirtualItems();
 
-      let virtualPaddingLeft: number | undefined;
-      let virtualPaddingRight: number | undefined;
+  const virtualData = useMemo(() => {
+    let virtualPaddingLeft: number | undefined;
+    let virtualPaddingRight: number | undefined;
 
-      if (columnVirtualizer && virtualColumns?.length) {
-        virtualPaddingLeft = virtualColumns[0]?.start ?? 0;
-        virtualPaddingRight =
-          columnVirtualizer.getTotalSize() -
-          (virtualColumns[virtualColumns.length - 1]?.end ?? 0);
-      }
+    if (virtualColumns?.length) {
+      virtualPaddingLeft = virtualColumns[0]?.start ?? 0;
+      virtualPaddingRight =
+        columnVirtualizer.getTotalSize() -
+        (virtualColumns[virtualColumns.length - 1]?.end ?? 0);
+    }
 
-      return {
-        virtualColumns,
-        virtualRows,
-        virtualPaddingLeft,
-        virtualPaddingRight,
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columnVirtualizer.getVirtualItems(), rowVirtualizer.getVirtualItems()],
-  );
+    return {
+      virtualColumns,
+      virtualRows,
+      virtualPaddingLeft,
+      virtualPaddingRight,
+    };
+  }, [virtualColumns, virtualRows, columnVirtualizer]);
 
   // Track last range to avoid redundant calls
   const lastRangeRef = useRef<{ start: number; end: number } | null>(null);

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { Box, Tooltip } from '@mui/material';
 
 import { COLUMN_TYPE_LABELS } from '@/constants/table';
@@ -13,14 +13,14 @@ const CONFIDENCE_URL = {
   [TableCellConfidenceEnum.high]: '/images/icon-confidence-high.svg',
 } as const;
 
-interface StyledTableBodyCellIconsProps {
+interface BodyCellIconsProps {
   imagePreview?: string;
   confidence?: TableCellConfidenceEnum;
   isValidate?: boolean;
-  fieldType?: string;
+  fieldType?: TableColumnTypeEnum;
 }
 
-export const StyledTableBodyCellIcons: FC<StyledTableBodyCellIconsProps> = ({
+const BodyCellIconsComponent: FC<BodyCellIconsProps> = ({
   imagePreview,
   confidence,
   isValidate,
@@ -68,7 +68,7 @@ export const StyledTableBodyCellIcons: FC<StyledTableBodyCellIconsProps> = ({
           arrow
           placement="top"
           title={`Whoops! This value could not be converted to this column's data type (${
-            COLUMN_TYPE_LABELS[fieldType as TableColumnTypeEnum] || fieldType
+            COLUMN_TYPE_LABELS[fieldType] || fieldType
           })`}
         >
           <Box
@@ -87,3 +87,5 @@ export const StyledTableBodyCellIcons: FC<StyledTableBodyCellIconsProps> = ({
     </>
   );
 };
+
+export const BodyCellIcons = memo(BodyCellIconsComponent);
