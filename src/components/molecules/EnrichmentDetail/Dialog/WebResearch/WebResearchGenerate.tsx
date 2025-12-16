@@ -23,13 +23,13 @@ import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 import ICON_SPARK_OUTLINE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_outline.svg';
 
 interface WebResearchGenerateProps {
-  handleGeneratePrompt?: () => void;
+  onClickToGeneratePrompt?: () => void;
   isLoading?: boolean;
   onPromptEditorReady?: (editor: Editor) => void;
 }
 
 export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
-  handleGeneratePrompt,
+  onClickToGeneratePrompt,
   isLoading,
   onPromptEditorReady,
 }) => {
@@ -42,15 +42,11 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
         runGenerateAiModel: state.runGenerateAiModel,
       })),
     );
-  const { suggestions } = useActionsStore(
-    useShallow((store) => ({
-      suggestions: store.suggestionsList,
-    })),
-  );
+  const suggestions = useActionsStore((store) => store.suggestionsList);
   const { filedMapping } = useVariableFromStore();
   const { visible, open, close } = useSwitch(false);
 
-  const handleEditorReady = useCallback(
+  const onEditorReady = useCallback(
     (editor: Editor) => {
       setGenerateEditorInstance(editor);
       onPromptEditorReady?.(editor);
@@ -181,9 +177,9 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
               <StyledTiptapEditor
                 defaultValue={defaultValue}
                 extensions={[ExtensionMention, ExtensionNode, ExtensionStorage]}
-                handleGenerate={handleGeneratePrompt}
                 isLoading={isLoading}
-                onEditorReady={handleEditorReady}
+                onClickToGenerate={onClickToGeneratePrompt}
+                onEditorReady={onEditorReady}
                 placeholder={'e.g. Find the CEO of this company'}
                 ref={promptEditorRef}
               />

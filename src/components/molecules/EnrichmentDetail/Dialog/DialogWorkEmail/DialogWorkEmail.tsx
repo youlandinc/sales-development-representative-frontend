@@ -2,13 +2,12 @@ import { Fade, Stack } from '@mui/material';
 import { FC, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
+import { DialogAllIntegrations } from '../DialogAllIntegrations';
 import {
   DialogWorkEmailFooter,
   DialogWorkEmailIntegrationAccount,
   DialogWorkEmailMain,
 } from './index';
-import { DialogHeaderActions } from '../DialogHeaderActions';
-import { DialogAllIntegrations } from '../DialogAllIntegrations';
 
 import { useWorkEmailStore } from '@/stores/enrichment';
 import { WaterfallConfigTypeEnum } from '@/types/enrichment';
@@ -64,7 +63,6 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
     <Stack flex={1} minHeight={0}>
       {computedContent}
       <DialogWorkEmailFooter cb={cb} />
-      <DialogHeaderActions />
       <DialogAllIntegrations />
     </Stack>
   );

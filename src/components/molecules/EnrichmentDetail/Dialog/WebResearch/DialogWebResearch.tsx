@@ -56,11 +56,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       })),
     );
 
-  const { fetchActionsMenus } = useActionsStore(
-    useShallow((state) => ({
-      fetchActionsMenus: state.fetchActionsMenus,
-    })),
-  );
+  const fetchActionsMenus = useActionsStore((state) => state.fetchActionsMenus);
 
   const {
     activeType,
@@ -112,18 +108,18 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
 
   const { filedMapping } = useVariableFromStore();
 
-  const handleClose = () => {
+  const onClickToClose = () => {
     setWebResearchTab('generate');
     allClear();
     closeDialog();
   };
 
-  const handleBack = () => {
-    handleClose();
+  const onClickToBack = () => {
+    onClickToClose();
     openDialog(TableColumnMenuActionEnum.actions_overview);
   };
 
-  const handleGenerate = async () => {
+  const onClickToGenerate = async () => {
     await runGenerateAiModel('/aiResearch/generate/stream', {
       module: 'TASK_MODEL_CHOOSER',
       params: {
@@ -265,7 +261,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           await run({ tableId, fieldId: res.data, recordCount });
         }
         await cb?.();
-        handleClose();
+        onClickToClose();
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -292,7 +288,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3}>
         <Icon
           component={ICON_ARROW}
-          onClick={handleBack}
+          onClick={onClickToBack}
           sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
         />
         <Icon
@@ -301,7 +297,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         />
         <Typography fontWeight={600}>Atlas Intelligence Agent</Typography>
         <CloseIcon
-          onClick={handleClose}
+          onClick={onClickToClose}
           sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
         />
       </Stack>
@@ -374,8 +370,8 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               }}
             >
               <WebResearchGenerate
-                handleGeneratePrompt={handleGenerate}
                 isLoading={generateIsLoading}
+                onClickToGeneratePrompt={onClickToGenerate}
               />
             </Box>
             <Box
@@ -410,7 +406,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               await updateAiConfig(tableId);
             }
             await cb?.();
-            handleClose();
+            onClickToClose();
           } catch (err) {
             const { header, message, variant } = err as HttpError;
             SDRToast({ message, header, variant });

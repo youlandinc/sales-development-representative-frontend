@@ -42,15 +42,15 @@ import ICON_DELETE from '@/components/molecules/EnrichmentDetail/Dialog/WebResea
 import ICON_WARNING from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_warning.svg';
 
 interface WebResearchConfigureProps {
-  handleGenerate?: () => void;
+  onClickToGenerate?: () => void;
   onPromptEditorReady?: (editor: Editor) => void;
   onSchemaEditorReady?: (editor: ReactEditor) => void;
 }
 
 export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
-  handleGenerate,
+  onClickToGenerate,
   onPromptEditorReady,
-  onSchemaEditorReady,
+  onSchemaEditorReady: onSchemaEditorReadyProp,
 }) => {
   const {
     prompt,
@@ -103,7 +103,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     ? insertWithPlaceholders(prompt, filedMapping)
     : null;
 
-  const handleEditorReady = useCallback((editor: Editor) => {
+  const onEditorReady = useCallback((editor: Editor) => {
     if (editor) {
       setTipTapEditorInstance(editor);
       onPromptEditorReady?.(editor);
@@ -111,10 +111,10 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSchemaEditorReady = useCallback((editor: ReactEditor) => {
+  const onSlateEditorReady = useCallback((editor: ReactEditor) => {
     if (editor) {
       setSlateEditorInstance(editor);
-      onSchemaEditorReady?.(editor);
+      onSchemaEditorReadyProp?.(editor);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -180,7 +180,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     [setSchemaJson],
   );
 
-  const handleFieldChange = useCallback(
+  const onFieldChange = useCallback(
     (
       fieldName: string,
       newName: string,
@@ -220,7 +220,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     [fieldsMapping, updateSchema],
   );
 
-  const handleAddField = useCallback(() => {
+  const onClickToAddField = useCallback(() => {
     // 获取已有字段数量
     let fieldIndex = Object.keys(fieldsMapping).length;
     let newFieldName;
@@ -238,7 +238,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
     updateSchema(newProperties);
   }, [fieldsMapping, updateSchema]);
 
-  const handleDeleteField = useCallback(
+  const onClickToDeleteField = useCallback(
     (fieldName: string) => {
       const result = { ...fieldsMapping };
       delete result[fieldName];
@@ -300,9 +300,9 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
             p: 2,
           }}
           extensions={[ExtensionMention, ExtensionNode, ExtensionStorage]}
-          handleGenerate={handleGenerate}
           minHeight={200}
-          onEditorReady={handleEditorReady}
+          onClickToGenerate={onClickToGenerate}
+          onEditorReady={onEditorReady}
           placeholder={
             'E.g., Find the CEO of the company and their Linkedin profile'
           }
@@ -394,7 +394,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                 fieldName={item}
                 fieldType={config?.type || TableColumnTypeEnum.text}
                 key={config.id || item}
-                removeField={handleDeleteField}
+                removeField={onClickToDeleteField}
                 saveField={(
                   fieldName: string,
                   newName: string,
@@ -402,7 +402,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
                   newType: string,
                   newSelectOptions: any,
                 ) => {
-                  handleFieldChange(
+                  onFieldChange(
                     fieldName,
                     newName,
                     newDescription,
@@ -423,7 +423,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
               color={'text.secondary'}
               fontSize={12}
               ml={'auto'}
-              onClick={handleAddField}
+              onClick={onClickToAddField}
               sx={{ cursor: 'pointer' }}
             >
               + Add field
@@ -491,7 +491,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
             <StyledSlateEditor
               editor={editor}
               initialValue={schemaJson}
-              onEditorReady={handleSchemaEditorReady}
+              onEditorReady={onSlateEditorReady}
               onValueChange={setSchemaJson}
               ref={schemaEditorRef}
             />
