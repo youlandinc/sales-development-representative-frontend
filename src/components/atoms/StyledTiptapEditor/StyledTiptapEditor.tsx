@@ -25,7 +25,7 @@ import ICON_SPARKLE from './assets/icon_sparkle.svg';
 interface PromptEditorProps {
   defaultValue?: Content;
   placeholder?: string;
-  handleGenerate?: () => void;
+  onClickToGenerate?: () => void;
   isLoading?: boolean;
   minHeight?: number;
   onEditorReady?: (editor: Editor) => void;
@@ -41,7 +41,7 @@ export const StyledTiptapEditor = forwardRef<
     {
       defaultValue = null,
       placeholder = '',
-      handleGenerate,
+      onClickToGenerate,
       isLoading,
       minHeight = 150,
       onEditorReady,
@@ -304,7 +304,7 @@ export const StyledTiptapEditor = forwardRef<
               <StyledButton
                 color={'info'}
                 loading={isLoading}
-                onClick={handleGenerate}
+                onClick={onClickToGenerate}
                 size={'small'}
                 startIcon={<Icon component={ICON_SPARKLE} />}
                 sx={{
