@@ -35,6 +35,7 @@ export const _saveWebResearchConfig = (params: {
   excludeFields: string[][];
   generatePrompt: string;
   enableWebSearch: boolean;
+  model: string;
 }) => {
   return post<string>('/sdr/table/field/add', {
     tableId: params.tableId,
@@ -62,6 +63,10 @@ export const _saveWebResearchConfig = (params: {
           name: 'enableWebSearch',
           formulaText: params.enableWebSearch,
         },
+        {
+          name: 'model',
+          formulaText: params.model,
+        },
       ],
       optionalPathsInInputs: {
         prompt: params.excludeFields,
@@ -77,6 +82,7 @@ export const updateWebResearchConfig = (param: {
   schema: string;
   generatePrompt: string;
   enableWebSearch: boolean;
+  model: string;
 }) => {
   return patch('/sdr/table/field/aiField', {
     tableId: param.tableId,
@@ -100,6 +106,10 @@ export const updateWebResearchConfig = (param: {
         {
           name: 'enableWebSearch',
           formulaText: param.enableWebSearch,
+        },
+        {
+          name: 'model',
+          formulaText: param.model,
         },
       ],
     },

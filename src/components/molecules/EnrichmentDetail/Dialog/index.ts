@@ -5,7 +5,7 @@ export * from './DialogDeleteColumn';
 export * from './DialogEditColumn';
 export * from './DialogEditDescription';
 export * from './DialogHeaderActions';
-export * from './DialogWebResearch';
+export * from './WebResearch';
 export * from './DialogWorkEmail';
 export * from './Common';
 export * from './DrawerActionsContainer';

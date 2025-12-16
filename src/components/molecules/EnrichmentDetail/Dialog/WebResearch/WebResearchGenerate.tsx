@@ -5,18 +5,22 @@ import Image from 'next/image';
 import { FC, useCallback, useMemo, useRef } from 'react';
 import { useShallow } from 'zustand/shallow';
 
-import { PromptEditor } from './PromptEditor';
+import {
+  ExtensionMention,
+  ExtensionNode,
+  ExtensionStorage,
+} from './extensions';
 import { StyledActionItem, StyledSearchInput } from '../Common';
 import { StyledProviderBadges } from '../DialogActionsMenu/base';
+import { StyledTiptapEditor } from '@/components/atoms';
 
+import { ActionsTypeKeyEnum } from '@/types';
 import { insertWithPlaceholders } from '@/utils';
 
 import { useLocalSearch, useSwitch, useVariableFromStore } from '@/hooks';
-
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import ICON_SPARK_OUTLINE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_outline.svg';
-import { ActionsTypeKeyEnum } from '@/types';
 
 interface WebResearchGenerateProps {
   handleGeneratePrompt?: () => void;
@@ -174,8 +178,9 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
           {visible && (
             <Stack position={'relative'} zIndex={1}>
               <Box bgcolor={'#DFDEE6'} height={'1px'} my={1} />
-              <PromptEditor
+              <StyledTiptapEditor
                 defaultValue={defaultValue}
+                extensions={[ExtensionMention, ExtensionNode, ExtensionStorage]}
                 handleGenerate={handleGeneratePrompt}
                 isLoading={isLoading}
                 onEditorReady={handleEditorReady}

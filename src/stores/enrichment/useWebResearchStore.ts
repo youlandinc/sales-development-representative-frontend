@@ -140,6 +140,14 @@ type WebResearchActions = {
   setTaskModelText: (text: string) => void;
   setSuggestedModelType: (model: string) => void;
   setEnableWebSearch: (enabled: boolean) => void;
+  setEditParams: (param: {
+    webResearchVisible: boolean;
+    schemaJson: string;
+    prompt: string;
+    generateDescription: string;
+    enableWebSearch: boolean;
+    model: string;
+  }) => void;
   runGeneratePrompt: (
     api: string,
     params: Record<string, any>,
@@ -208,6 +216,8 @@ export const useWebResearchStore = create<
       generateText: '',
       generateSchemaStr: '',
       enableWebSearch: false,
+      suggestedModelType: '',
+      activeType: ActiveTypeEnum.add,
     });
   },
   saveAiConfig: async (
@@ -224,6 +234,7 @@ export const useWebResearchStore = create<
         excludeFields: get().excludeFields.map((item) => [item]),
         generatePrompt,
         enableWebSearch: get().enableWebSearch,
+        model: get().suggestedModelType,
       });
     } catch (err) {
       const { message, header, variant } = err as HttpError;
@@ -268,6 +279,24 @@ export const useWebResearchStore = create<
   },
   setEnableWebSearch: (enabled: boolean) => {
     set({ enableWebSearch: enabled });
+  },
+  setEditParams: (param: {
+    webResearchVisible: boolean;
+    schemaJson: string;
+    prompt: string;
+    generateDescription: string;
+    enableWebSearch: boolean;
+    model: string;
+  }) => {
+    set({
+      webResearchVisible: param.webResearchVisible,
+      schemaJson: param.schemaJson,
+      prompt: param.prompt,
+      generateDescription: param.generateDescription,
+      enableWebSearch: param.enableWebSearch,
+      suggestedModelType: param.model,
+      activeType: ActiveTypeEnum.edit,
+    });
   },
   runGenerateAiModel: async (api: string, params: Record<string, any>) => {
     get().allClear();

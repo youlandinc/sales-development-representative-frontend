@@ -1,9 +1,15 @@
-export * from './CollapseCard';
-export * from './ModelSelect';
-export * from './OutputsFields';
-export * from './SculptingPrompt';
-export * from './hooks';
-export * from './FormulaEditor';
-export * from './PromptEditor';
+// Main Views
 export * from './WebResearchConfigure';
 export * from './WebResearchGenerate';
+
+// UI Components
+export * from './base/CollapseCard';
+export * from './base/ModelSelect';
+export * from './base/OutputsFields';
+export * from './base/SculptingPrompt';
+
+// Editors
+export * from './extensions';
+
+// Dialog
+export * from './DialogWebResearch';

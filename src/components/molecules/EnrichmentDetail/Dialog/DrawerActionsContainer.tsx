@@ -75,7 +75,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
           </>
         )}
         <DialogEditDescription />
-        <DialogDeleteColumn />
+        <DialogDeleteColumn tableId={tableId} />
         <CampaignProcess />
       </Stack>
     </Collapse>

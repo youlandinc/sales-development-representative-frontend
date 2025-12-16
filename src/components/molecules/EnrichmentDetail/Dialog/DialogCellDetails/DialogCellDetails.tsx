@@ -140,7 +140,7 @@ export const DialogCellDetails: FC<CellDetailsProps> = ({ data }) => {
           onClick={async () => {
             await navigator.clipboard.writeText(JSON.stringify(data));
             SDRToast({
-              message: 'Copied to Clipboard',
+              message: 'Copied to clipboard',
               header: false,
               variant: 'success' as HttpVariantEnum,
             });

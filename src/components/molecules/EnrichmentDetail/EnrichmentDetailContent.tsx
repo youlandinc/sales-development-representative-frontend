@@ -30,8 +30,31 @@ import {
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
 
-import { UTypeOf } from '@/utils/UTypeOf';
 import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
+
+interface InputBindingItem {
+  name: string;
+  formulaText?: string;
+}
+
+const extractAiConfigFromInputBinding = (inputBinding?: InputBindingItem[]) => {
+  const schema = inputBinding?.find(
+    (item) => item.name === 'answerSchemaType',
+  )?.formulaText;
+  const prompt = inputBinding?.find(
+    (item) => item.name === 'prompt',
+  )?.formulaText;
+  const metaprompt = inputBinding?.find(
+    (item) => item.name === 'metaprompt',
+  )?.formulaText;
+  const enableWebSearch =
+    inputBinding?.find((item) => item.name === 'enableWebSearch')
+      ?.formulaText === 'true';
+  const model =
+    inputBinding?.find((item) => item.name === 'model')?.formulaText || '';
+
+  return { schema, prompt, metaprompt, enableWebSearch, model };
+};
 
 interface EnrichmentDetailTableProps {
   tableId: string;
@@ -78,33 +101,23 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     })),
   );
 
-  const {
-    setWebResearchVisible,
-    setSchemaJson,
-    setPrompt,
-    setGenerateDescription,
-    setEnableWebSearch,
-  } = useWebResearchStore(
+  const { setEditParams, setWebResearchVisible } = useWebResearchStore(
     useShallow((store) => ({
+      setEditParams: store.setEditParams,
       setWebResearchVisible: store.setWebResearchVisible,
-      setSchemaJson: store.setSchemaJson,
-      setPrompt: store.setPrompt,
-      setGenerateDescription: store.setGenerateDescription,
-      setEnableWebSearch: store.setEnableWebSearch,
     })),
   );
 
   const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
-  const onClickToEditWorkEmail = useWorkEmailStore(
-    (store) => store.handleEditClick,
+  const { fetchActionsMenus } = useActionsStore(
+    useShallow((state) => ({
+      fetchActionsMenus: state.fetchActionsMenus,
+    })),
   );
 
-  const { fetchSuggestions, fetchEnrichments } = useActionsStore(
-    useShallow((store) => ({
-      fetchSuggestions: store.fetchSuggestions,
-      fetchEnrichments: store.fetchEnrichments,
-    })),
+  const onClickToEditWorkEmail = useWorkEmailStore(
+    (store) => store.handleEditClick,
   );
 
   const [activeCell, setActiveCell] = useState<Record<string, any>>({});
@@ -222,10 +235,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                 onClick={() => {
                   setAiTableInfo({ tableId, mappings: [] });
                   openDialog(TableColumnMenuActionEnum.actions_overview);
-                  if (tableId) {
-                    fetchSuggestions(tableId);
-                  }
-                  fetchEnrichments();
                 }}
                 size={'small'}
                 variant={'contained'}
@@ -318,26 +327,24 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                     }
                     // AI column configuration
                     if (column && column.actionKey === 'use-ai') {
-                      const schema = column.typeSettings?.inputBinding.find(
-                        (item) => item.name === 'answerSchemaType',
-                      )?.formulaText;
-                      const prompt = column.typeSettings?.inputBinding.find(
-                        (item) => item.name === 'prompt',
-                      )?.formulaText;
-                      const metaprompt = column.typeSettings?.inputBinding.find(
-                        (item) => item.name === 'metaprompt',
-                      )?.formulaText;
-                      const enableWebSearch =
-                        column.typeSettings?.inputBinding.find(
-                          (item) => item.name === 'enableWebSearch',
-                        )?.formulaText === 'true';
-                      prompt && setPrompt(prompt);
-                      schema && setSchemaJson(schema);
-                      metaprompt && setGenerateDescription(metaprompt);
-                      UTypeOf.isBoolean(enableWebSearch) &&
-                        setEnableWebSearch(enableWebSearch);
+                      const {
+                        schema,
+                        prompt,
+                        metaprompt,
+                        enableWebSearch,
+                        model,
+                      } = extractAiConfigFromInputBinding(
+                        column.typeSettings?.inputBinding,
+                      );
 
-                      setWebResearchVisible(true, ActiveTypeEnum.edit);
+                      setEditParams({
+                        webResearchVisible: true,
+                        schemaJson: schema || '',
+                        prompt: prompt || '',
+                        generateDescription: metaprompt || '',
+                        enableWebSearch,
+                        model,
+                      });
                       openDialog(TableColumnMenuActionEnum.web_research);
                       return;
                     }
@@ -353,6 +360,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                   case TableColumnMenuActionEnum.rename_column: {
                     if (value) {
                       await updateColumnName(value);
+                      fetchActionsMenus(tableId);
                     }
                     break;
                   }

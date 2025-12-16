@@ -1,24 +1,21 @@
 import {
   Box,
   Icon,
-  Menu,
-  MenuItem,
-  menuItemClasses,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import { DocumentType } from '@tiptap/core';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { SDRToast, StyledButton, StyledCost } from '@/components/atoms';
+import { SDRToast } from '@/components/atoms';
 import {
   SculptingPrompt,
   WebResearchConfigure,
   WebResearchGenerate,
-} from './WebResearch';
+} from './index';
 
 import {
   ActiveTypeEnum,
@@ -34,10 +31,11 @@ import { extractPromptText } from '@/utils';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
+import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow.svg';
+import ICON_SPARK_BLACK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_fill.svg';
 import CloseIcon from '@mui/icons-material/Close';
-import ICON_ARROW from '../assets/dialog/icon_arrow.svg';
-import ICON_ARROW_DOWN from '../assets/dialog/icon_arrow_down.svg';
-import ICON_SPARK_BLACK from '../assets/dialog/icon_sparkle_fill.svg';
+import { DialogFooter } from '../Common';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 type DialogWebResearchProps = {
   cb?: () => Promise<void>;
@@ -58,6 +56,12 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       })),
     );
 
+  const { fetchActionsMenus } = useActionsStore(
+    useShallow((state) => ({
+      fetchActionsMenus: state.fetchActionsMenus,
+    })),
+  );
+
   const {
     activeType,
     schemaJson,
@@ -77,6 +81,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     taskContent,
     suggestedModelContent,
     enableWebSearch,
+    suggestedModelType,
   } = useWebResearchStore(
     useShallow((state) => ({
       activeType: state.activeType,
@@ -101,17 +106,15 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       runGenerateAiModel: state.runGenerateAiModel,
       setGenerateText: state.setGenerateText,
       setGenerateSchemaStr: state.setGenerateSchemaStr,
+      suggestedModelType: state.suggestedModelType,
     })),
   );
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const { filedMapping } = useVariableFromStore();
 
   const handleClose = () => {
     setWebResearchTab('generate');
     allClear();
-    setAnchorEl(null);
     closeDialog();
   };
 
@@ -152,7 +155,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   const [state, saveDoNotRun] = useAsyncFn(
     async (tableId: string) => {
       try {
-        setAnchorEl(null);
         await saveAiConfig(
           tableId,
           extractPromptText(
@@ -165,6 +167,8 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
             filedMapping,
           ) || '',
         );
+        await cb?.();
+        fetchActionsMenus(tableId);
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -176,12 +180,12 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       slateEditorInstance,
       schemaJson,
       generateEditorInstance,
+      tableId,
     ],
   );
   const [updateState, updateAiConfig] = useAsyncFn(
     async (tableId: string) => {
       try {
-        setAnchorEl(null);
         await updateWebResearchConfig({
           tableId,
           fieldId: activeColumnId,
@@ -197,7 +201,11 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               filedMapping,
             ) || '',
           enableWebSearch,
+          model: suggestedModelType,
         });
+
+        fetchActionsMenus(tableId);
+        await cb?.();
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -211,13 +219,14 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       generateEditorInstance,
       activeColumnId,
       enableWebSearch,
+      suggestedModelType,
+      tableId,
     ],
   );
 
   const [saveAndRunState, saveAndRun] = useAsyncFn(
     async (tableId: string, recordCount: number) => {
       try {
-        setAnchorEl(null);
         if (activeType === ActiveTypeEnum.edit) {
           await updateWebResearchConfig({
             tableId,
@@ -235,7 +244,9 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               ) || '',
 
             enableWebSearch: enableWebSearch,
+            model: suggestedModelType,
           });
+          fetchActionsMenus(tableId);
           await run({ tableId, recordCount, fieldId: activeColumnId });
         }
         if (activeType === ActiveTypeEnum.add) {
@@ -270,6 +281,8 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       activeType,
       activeColumnId,
       enableWebSearch,
+      suggestedModelType,
+      tableId,
     ],
   );
 
@@ -377,7 +390,34 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         </Stack>
       </Stack>
       {/* footer */}
-      <Stack
+      <DialogFooter
+        coinsPerRow={COINS_PER_ROW}
+        loading={
+          state.loading || saveAndRunState.loading || updateState.loading
+        }
+        onClickToSaveAndRun10={() => {
+          saveAndRun(tableId, 10);
+        }}
+        onClickToSaveAndRunAll={() => {
+          saveAndRun(tableId, rowIds.length);
+        }}
+        onClickToSaveDoNotRun={async () => {
+          try {
+            if (activeType === ActiveTypeEnum.add) {
+              await saveDoNotRun(tableId);
+            }
+            if (activeType === ActiveTypeEnum.edit) {
+              await updateAiConfig(tableId);
+            }
+            await cb?.();
+            handleClose();
+          } catch (err) {
+            const { header, message, variant } = err as HttpError;
+            SDRToast({ message, header, variant });
+          }
+        }}
+      />
+      {/*    <Stack
         alignItems={'center'}
         borderTop={' 1px solid   #D0CEDA'}
         flexDirection={'row'}
@@ -482,7 +522,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
             </Typography>
           </MenuItem>
         </Menu>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 };

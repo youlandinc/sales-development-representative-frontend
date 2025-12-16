@@ -16,10 +16,10 @@ import { CreateWaterfallConfigRequestParam } from '@/types/enrichment';
 
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
-export const useWorkEmailRequest = (cb?: () => void) => {
+export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
   const {
-    setWorkEmailVisible,
     dialogHeaderName,
     activeType,
     groupId,
@@ -29,7 +29,6 @@ export const useWorkEmailRequest = (cb?: () => void) => {
     selectedValidationOption,
   } = useWorkEmailStore(
     useShallow((state) => ({
-      setWorkEmailVisible: state.setWorkEmailVisible,
       dialogHeaderName: state.dialogHeaderName,
       activeType: state.activeType,
       groupId: state.groupId,
@@ -40,9 +39,25 @@ export const useWorkEmailRequest = (cb?: () => void) => {
     })),
   );
   const { runAi } = useRunAi();
-  const { fetchTable, columns } = useProspectTableStore();
+
+  const { closeDialog, columns, fetchTable } = useProspectTableStore(
+    useShallow((state) => ({
+      rowIds: state.rowIds,
+      activeColumnId: state.activeColumnId,
+      openDialog: state.openDialog,
+      closeDialog: state.closeDialog,
+      columns: state.columns,
+      fetchTable: state.fetchTable,
+    })),
+  );
   const { waterfallAllInputs, integrationsInWaterfall } =
     useComputedInWorkEmailStore();
+
+  const { fetchActionsMenus } = useActionsStore(
+    useShallow((state) => ({
+      fetchActionsMenus: state.fetchActionsMenus,
+    })),
+  );
 
   //request
   const integrationSaveTypeParam = dialogHeaderName;
@@ -83,8 +98,8 @@ export const useWorkEmailRequest = (cb?: () => void) => {
         const fieldIdsWithGroupId = fields
           .filter((f) => f.groupId === groupId)
           ?.map((f) => f.fieldId);
-        setWorkEmailVisible(false);
-
+        closeDialog();
+        fetchActionsMenus(tableId);
         if (isRunAi) {
           await runAi({
             tableId: tableId,
@@ -99,7 +114,7 @@ export const useWorkEmailRequest = (cb?: () => void) => {
         SDRToast({ message, header, variant });
       }
     },
-    [requestParams],
+    [requestParams, tableId],
   );
 
   const [updateIntegrationState, updateIntegration] = useAsyncFn(
@@ -110,8 +125,8 @@ export const useWorkEmailRequest = (cb?: () => void) => {
       try {
         await _editIntegrationConfig(groupId, requestParams);
         await fetchTable(tableId);
-        setWorkEmailVisible(false);
-
+        closeDialog();
+        fetchActionsMenus(tableId);
         if (isRunAi) {
           const fieldIdsWithGroupId = columns
             .filter((f) => f.groupId === groupId)
@@ -129,7 +144,7 @@ export const useWorkEmailRequest = (cb?: () => void) => {
         SDRToast({ message, header, variant });
       }
     },
-    [columns, requestParams, groupId],
+    [columns, requestParams, groupId, tableId],
   );
 
   const requestState = useMemo(() => {

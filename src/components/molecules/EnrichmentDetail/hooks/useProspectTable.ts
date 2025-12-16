@@ -81,10 +81,9 @@ export const useProspectTable = ({
     })),
   );
 
-  const { fetchEnrichments, fetchSuggestions } = useActionsStore(
+  const { fetchActionsMenus } = useActionsStore(
     useShallow((store) => ({
-      fetchEnrichments: store.fetchEnrichments,
-      fetchSuggestions: store.fetchSuggestions,
+      fetchActionsMenus: store.fetchActionsMenus,
     })),
   );
 
@@ -330,8 +329,7 @@ export const useProspectTable = ({
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
     // fetchIntegrationMenus();
-    fetchEnrichments();
-    fetchSuggestions(tableId);
+    fetchActionsMenus(tableId);
     fetchWebResearchModelList();
   }, [
     tableId,
@@ -339,8 +337,7 @@ export const useProspectTable = ({
     fetchBatchData,
     isMetadataLoading,
     // fetchIntegrationMenus,
-    fetchEnrichments,
-    fetchSuggestions,
+    fetchActionsMenus,
     fetchWebResearchModelList,
   ]);
 

@@ -40,7 +40,7 @@ export const StyledCellItemContainer: FC<
           onClick={async () => {
             await navigator.clipboard.writeText(copyContent || '');
             SDRToast({
-              message: 'Copied to Clipboard',
+              message: 'Copied to clipboard',
               header: false,
               variant: 'success' as HttpVariantEnum,
             });
