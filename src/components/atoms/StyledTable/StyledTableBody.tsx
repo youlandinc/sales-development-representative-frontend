@@ -87,7 +87,7 @@ export const StyledTableBodyRow: FC<StyledTableBodyRowProps> = ({
           height: `${rowHeight}px`,
           alignItems: 'center',
           boxSizing: 'border-box',
-          borderBottom: TABLE_BORDERS.ROW,
+          // borderBottom moved to each cell (like Clay)
           bgcolor: (theme) =>
             isSelected
               ? alpha(theme.palette.primary.main, 0.06)

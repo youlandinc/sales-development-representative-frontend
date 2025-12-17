@@ -27,7 +27,7 @@ export const StyledTableHead: FC<StyledTableHeadProps> = ({
           ? `0 4px 10px ${TABLE_COLORS.SCROLL_SHADOW}`
           : 'none',
         borderTop: TABLE_BORDERS.HEADER,
-        borderBottom: TABLE_BORDERS.HEADER,
+        // borderBottom moved to each HeadCell (like body cells)
         width: '100%',
         '&::before': {
           content: '""',

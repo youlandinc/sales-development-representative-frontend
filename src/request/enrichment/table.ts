@@ -86,3 +86,15 @@ export const _createTableColumn = (params: {
   // API v2 returns the created column directly
   return post<TableColumnProps>('/sdr/table/field/v2', params);
 };
+
+export const _exportTableData = (tableId: string) => {
+  return post('/sdr/table', {
+    params: {
+      tableId,
+    },
+  });
+};
+
+export const _createBlankTable = () => {
+  return;
+};

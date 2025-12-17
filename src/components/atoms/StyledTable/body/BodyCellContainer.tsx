@@ -4,6 +4,7 @@ import { Stack } from '@mui/material';
 import {
   buildPinnedBorderPseudoStyles,
   buildPinnedBorderRight,
+  TABLE_BORDERS,
   TABLE_COLORS,
   TABLE_Z_INDEX,
 } from '../styles';
@@ -103,11 +104,15 @@ const BodyCellContainerComponent: FC<BodyCellContainerProps> = ({
         left: isPinned ? stickyLeft : 'auto',
         zIndex: isPinned ? TABLE_Z_INDEX.PINNED_CELL : TABLE_Z_INDEX.CELL,
         bgcolor: backgroundColor,
-        borderRight: buildPinnedBorderRight(
-          isPinned,
-          shouldShowPinnedRightShadow,
-          isSelectColumn,
-        ),
+        // Each cell has borderBottom and borderRight (like Clay)
+        borderBottom: TABLE_BORDERS.ROW,
+        borderRight: isPinned
+          ? buildPinnedBorderRight(
+              isPinned,
+              shouldShowPinnedRightShadow,
+              isSelectColumn,
+            )
+          : TABLE_BORDERS.ROW,
         '&::after': buildPinnedBorderPseudoStyles(
           isPinned,
           shouldShowPinnedRightShadow,

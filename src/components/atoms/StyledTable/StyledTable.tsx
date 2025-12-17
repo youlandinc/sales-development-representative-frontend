@@ -639,8 +639,8 @@ export const StyledTable: FC<StyledTableProps> = ({
     const containerHeight = rowIds.length * rowHeight;
 
     return {
-      left,
-      top,
+      left: left - 0.5,
+      top: top - 0.5,
       width,
       height: rowHeight,
       isEditing: cellState.isEditing ?? false,
@@ -986,7 +986,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                             headerContext={header.getContext()}
                             headerState={headerState}
                             indicatorHeight={indicatorHeight}
-                            isPinned
                             key={header.id}
                             shouldShowPinnedRightShadow={
                               index === leftPinnedColumns.length - 1
@@ -1002,18 +1001,11 @@ export const StyledTable: FC<StyledTableProps> = ({
                           headerContext={header.getContext()}
                           headerState={headerState}
                           indicatorHeight={indicatorHeight}
-                          isPinned
                           key={header.id}
                           onClick={(e) => onHeaderClick(e, header.id)}
                           onContextMenu={(e) => onHeaderRightClick(e, col.id)}
                           onDoubleClick={(e) =>
                             onHeaderDoubleClick(e, header.id)
-                          }
-                          onEditSave={(newName) =>
-                            (table.options.meta as any)?.updateHeaderName?.(
-                              header.id,
-                              newName,
-                            )
                           }
                           onResizeStart={() => {
                             setHeaderMenuAnchor(null);
@@ -1068,12 +1060,6 @@ export const StyledTable: FC<StyledTableProps> = ({
                           onDoubleClick={(e) =>
                             onHeaderDoubleClick(e, header.id)
                           }
-                          onEditSave={(newName) =>
-                            (table.options.meta as any)?.updateHeaderName?.(
-                              header.id,
-                              newName,
-                            )
-                          }
                           onResizeStart={() => {
                             setHeaderMenuAnchor(null);
                             setHeaderState(HEADER_STATE_RESET);
@@ -1107,19 +1093,6 @@ export const StyledTable: FC<StyledTableProps> = ({
           </DndContext>
 
           <StyledTableBody totalHeight={rowVirtualizer.getTotalSize()}>
-            {/* Selection overlay - rendered BEFORE rows so cells can cover it */}
-            {selectionOverlayPosition && (
-              <CommonOverlay
-                containerHeight={selectionOverlayPosition.containerHeight}
-                height={selectionOverlayPosition.height}
-                isEditing={selectionOverlayPosition.isEditing}
-                isVisible={true}
-                left={selectionOverlayPosition.left}
-                pinnedWidth={selectionOverlayPosition.pinnedWidth}
-                top={selectionOverlayPosition.top}
-                width={selectionOverlayPosition.width}
-              />
-            )}
             {virtualRows.map((virtualRow: any) => {
               const row = table.getRowModel().rows[virtualRow.index];
               const visibleCells = row.getVisibleCells();
@@ -1204,6 +1177,20 @@ export const StyledTable: FC<StyledTableProps> = ({
                 </StyledTableBodyRow>
               );
             })}
+
+            {/* Selection overlay - rendered AFTER rows (Clay approach) */}
+            {selectionOverlayPosition && (
+              <CommonOverlay
+                containerHeight={selectionOverlayPosition.containerHeight}
+                height={selectionOverlayPosition.height}
+                isEditing={selectionOverlayPosition.isEditing}
+                isVisible={true}
+                left={selectionOverlayPosition.left}
+                pinnedWidth={selectionOverlayPosition.pinnedWidth}
+                top={selectionOverlayPosition.top}
+                width={selectionOverlayPosition.width}
+              />
+            )}
           </StyledTableBody>
         </>
       );
