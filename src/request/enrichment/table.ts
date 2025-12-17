@@ -88,7 +88,7 @@ export const _createTableColumn = (params: {
 };
 
 export const _exportTableData = (tableId: string) => {
-  return post('/sdr/table', {
+  return post('/sdr/table/data/export', {
     params: {
       tableId,
     },
@@ -96,5 +96,5 @@ export const _exportTableData = (tableId: string) => {
 };
 
 export const _createBlankTable = () => {
-  return;
+  return post('/sdr/table');
 };
