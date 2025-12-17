@@ -42,6 +42,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
       alignItems={'flex-end'}
       direction={'row'}
       justifyContent={'space-between'}
+      pb={3}
     >
       <CommonVerticalLabelContainer
         hasIcon={false}

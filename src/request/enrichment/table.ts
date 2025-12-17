@@ -88,9 +88,11 @@ export const _createTableColumn = (params: {
 };
 
 export const _exportTableData = (tableId: string) => {
-  return post('/sdr/table/data/export', {
-    params: {
-      tableId,
+  return get('/sdr/table/data/export', {
+    params: { tableId },
+    responseType: 'blob',
+    headers: {
+      Accept: 'text/csv',
     },
   });
 };

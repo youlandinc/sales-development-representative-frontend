@@ -70,7 +70,7 @@ export const useCreditUsage = () => {
               ? undefined
               : queryConditions.dateType,
           page,
-          size: 10,
+          size: 20,
         }
       : null,
     async (param) => {

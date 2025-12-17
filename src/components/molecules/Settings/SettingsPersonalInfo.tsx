@@ -76,7 +76,7 @@ export const SettingsPersonalInfo: FC = () => {
   };
 
   return (
-    <Stack gap={3}>
+    <Stack gap={3} maxWidth={900}>
       <Stack border={'1px solid #DFDEE6'} borderRadius={4} gap={3} p={3}>
         <Stack
           flexDirection={'row'}

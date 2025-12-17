@@ -56,8 +56,11 @@ const scrollContainerStyles: SxProps = {
 };
 
 // ============ Main Component ============
+interface DialogActionsMenuProps {
+  tableId: string;
+}
 
-export const DialogActionsMenu: FC = () => {
+export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
   const [activeTab, setActiveTab] = useState<TabType>('suggestions');
   const { EXPORTS_MENUS } = useExport();
 
@@ -351,7 +354,7 @@ export const DialogActionsMenu: FC = () => {
               />
             )}
 
-            {activeTab === 'exports' && <ExportsContent />}
+            {activeTab === 'exports' && <ExportsContent tableId={tableId} />}
           </Stack>
         </Stack>
       )}
