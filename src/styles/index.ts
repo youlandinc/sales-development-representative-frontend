@@ -3,8 +3,8 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
     py: 0,
   },
   '& .MuiAutocomplete-endAdornment': {
-    top: 5,
-    transform: 'none',
+    top: '47%',
+    // transform: 'none',
   },
   '& .MuiOutlinedInput-root .MuiAutocomplete-input': {
     paddingTop: '8px',
@@ -60,5 +60,9 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
   },
   '&.Mui-focused': {
     bgcolor: '#F4F5F9 !important',
+  },
+  '& .MuiSvgIcon-fontSizeSmall': {
+    width: 14,
+    height: 14,
   },
 };

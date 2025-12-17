@@ -162,14 +162,15 @@ export const DialogActionsMenu: FC = () => {
   const onClickToClose = useCallback(() => {
     closeDialog();
     resetSearch();
+    allClear();
     setActiveTab('suggestions');
-  }, [closeDialog, resetSearch]);
+  }, [closeDialog, resetSearch, allClear]);
 
   const onClickToAiTemplate = useCallback(
     async (templatePrompt: string) => {
       setGenerateText('');
       setGenerateSchemaStr('');
-      allClear();
+      // allClear();
       openDialog(TableColumnMenuActionEnum.web_research);
       await runGenerateAiModel('/aiResearch/generate/stream', {
         params: {
@@ -178,7 +179,7 @@ export const DialogActionsMenu: FC = () => {
       });
     },
     [
-      allClear,
+      // allClear,
       openDialog,
       runGenerateAiModel,
       setGenerateSchemaStr,

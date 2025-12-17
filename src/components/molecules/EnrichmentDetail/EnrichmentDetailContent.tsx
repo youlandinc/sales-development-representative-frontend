@@ -52,8 +52,18 @@ const extractAiConfigFromInputBinding = (inputBinding?: InputBindingItem[]) => {
       ?.formulaText === 'true';
   const model =
     inputBinding?.find((item) => item.name === 'model')?.formulaText || '';
+  const taskDescription =
+    inputBinding?.find((item) => item.name === 'taskDescription')
+      ?.formulaText || '';
 
-  return { schema, prompt, metaprompt, enableWebSearch, model };
+  return {
+    schema,
+    prompt,
+    metaprompt,
+    enableWebSearch,
+    model,
+    taskDescription,
+  };
 };
 
 interface EnrichmentDetailTableProps {
@@ -101,12 +111,14 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     })),
   );
 
-  const { setEditParams, setWebResearchVisible } = useWebResearchStore(
-    useShallow((store) => ({
-      setEditParams: store.setEditParams,
-      setWebResearchVisible: store.setWebResearchVisible,
-    })),
-  );
+  const { setEditParams, setWebResearchVisible, allClear } =
+    useWebResearchStore(
+      useShallow((store) => ({
+        setEditParams: store.setEditParams,
+        setWebResearchVisible: store.setWebResearchVisible,
+        allClear: store.allClear,
+      })),
+    );
 
   const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
@@ -234,6 +246,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               <StyledButton
                 onClick={() => {
                   setAiTableInfo({ tableId, mappings: [] });
+                  setWebResearchVisible(true, ActiveTypeEnum.add);
                   openDialog(TableColumnMenuActionEnum.actions_overview);
                 }}
                 size={'small'}
@@ -333,10 +346,11 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                         metaprompt,
                         enableWebSearch,
                         model,
+                        taskDescription,
                       } = extractAiConfigFromInputBinding(
                         column.typeSettings?.inputBinding,
                       );
-
+                      allClear();
                       setEditParams({
                         webResearchVisible: true,
                         schemaJson: schema || '',
@@ -344,6 +358,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                         generateDescription: metaprompt || '',
                         enableWebSearch,
                         model,
+                        taskDescription,
                       });
                       openDialog(TableColumnMenuActionEnum.web_research);
                       return;

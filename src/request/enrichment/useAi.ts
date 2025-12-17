@@ -36,6 +36,7 @@ export const _saveWebResearchConfig = (params: {
   generatePrompt: string;
   enableWebSearch: boolean;
   model: string;
+  taskDescription: string;
 }) => {
   return post<string>('/sdr/table/field/add', {
     tableId: params.tableId,
@@ -67,6 +68,10 @@ export const _saveWebResearchConfig = (params: {
           name: 'model',
           formulaText: params.model,
         },
+        {
+          name: 'taskDescription',
+          formulaText: params.taskDescription,
+        },
       ],
       optionalPathsInInputs: {
         prompt: params.excludeFields,
@@ -75,7 +80,7 @@ export const _saveWebResearchConfig = (params: {
   });
 };
 
-export const updateWebResearchConfig = (param: {
+export const _updateWebResearchConfig = (params: {
   tableId: string;
   fieldId: string;
   prompt: string;
@@ -83,33 +88,38 @@ export const updateWebResearchConfig = (param: {
   generatePrompt: string;
   enableWebSearch: boolean;
   model: string;
+  taskDescription: string;
 }) => {
   return patch('/sdr/table/field/aiField', {
-    tableId: param.tableId,
-    fieldId: param.fieldId,
+    tableId: params.tableId,
+    fieldId: params.fieldId,
     typeSettings: {
       inputBinding: [
         {
           name: 'prompt',
-          formulaText: param.prompt,
+          formulaText: params.prompt,
         },
         //configure schema
         {
           name: 'answerSchemaType',
-          formulaText: param.schema,
+          formulaText: params.schema,
         },
         //generate prompt
         {
           name: 'metaprompt',
-          formulaText: param.generatePrompt,
+          formulaText: params.generatePrompt,
         },
         {
           name: 'enableWebSearch',
-          formulaText: param.enableWebSearch,
+          formulaText: params.enableWebSearch,
         },
         {
           name: 'model',
-          formulaText: param.model,
+          formulaText: params.model,
+        },
+        {
+          name: 'taskDescription',
+          formulaText: params.taskDescription,
         },
       ],
     },

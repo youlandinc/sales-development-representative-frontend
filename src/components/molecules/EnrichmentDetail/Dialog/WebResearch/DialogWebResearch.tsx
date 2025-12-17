@@ -25,7 +25,7 @@ import {
 
 import { COINS_PER_ROW } from '@/constants';
 import { useAsyncFn, useVariableFromStore } from '@/hooks';
-import { columnRun, updateWebResearchConfig } from '@/request';
+import { _updateWebResearchConfig, columnRun } from '@/request';
 import { HttpError } from '@/types';
 import { extractPromptText } from '@/utils';
 
@@ -33,9 +33,9 @@ import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow.svg';
 import ICON_SPARK_BLACK from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_fill.svg';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 import CloseIcon from '@mui/icons-material/Close';
 import { DialogFooter } from '../Common';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 type DialogWebResearchProps = {
   cb?: () => Promise<void>;
@@ -78,6 +78,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     suggestedModelContent,
     enableWebSearch,
     suggestedModelType,
+    updateAiConfig,
   } = useWebResearchStore(
     useShallow((state) => ({
       activeType: state.activeType,
@@ -85,6 +86,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       enableWebSearch: state.enableWebSearch,
       allClear: state.allClear,
       saveAiConfig: state.saveAiConfig,
+      updateAiConfig: state.updateAiConfig,
       setGenerateDescription: state.setGenerateDescription,
       generateEditorInstance: state.generateEditorInstance,
       tipTapEditorInstance: state.tipTapEditorInstance,
@@ -115,7 +117,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   };
 
   const onClickToBack = () => {
-    onClickToClose();
+    setWebResearchTab('generate');
     openDialog(TableColumnMenuActionEnum.actions_overview);
   };
 
@@ -165,6 +167,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         );
         await cb?.();
         fetchActionsMenus(tableId);
+        allClear();
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -179,12 +182,11 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       tableId,
     ],
   );
-  const [updateState, updateAiConfig] = useAsyncFn(
+  const [updateState, updateConfig] = useAsyncFn(
     async (tableId: string) => {
       try {
-        await updateWebResearchConfig({
+        await updateAiConfig({
           tableId,
-          fieldId: activeColumnId,
           prompt:
             extractPromptText(
               (tipTapEditorInstance?.getJSON() || []) as DocumentType,
@@ -196,8 +198,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               (generateEditorInstance?.getJSON() || []) as DocumentType,
               filedMapping,
             ) || '',
-          enableWebSearch,
-          model: suggestedModelType,
         });
 
         fetchActionsMenus(tableId);
@@ -224,24 +224,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     async (tableId: string, recordCount: number) => {
       try {
         if (activeType === ActiveTypeEnum.edit) {
-          await updateWebResearchConfig({
-            tableId,
-            fieldId: activeColumnId,
-            prompt:
-              extractPromptText(
-                (tipTapEditorInstance?.getJSON() || []) as DocumentType,
-                filedMapping,
-              ) || '',
-            schema: schemaJson,
-            generatePrompt:
-              extractPromptText(
-                (generateEditorInstance?.getJSON() || []) as DocumentType,
-                filedMapping,
-              ) || '',
-
-            enableWebSearch: enableWebSearch,
-            model: suggestedModelType,
-          });
+          await updateConfig(tableId);
           fetchActionsMenus(tableId);
           await run({ tableId, recordCount, fieldId: activeColumnId });
         }
@@ -260,8 +243,9 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           );
           await run({ tableId, fieldId: res.data, recordCount });
         }
-        await cb?.();
         onClickToClose();
+        allClear();
+        await cb?.();
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -403,7 +387,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
               await saveDoNotRun(tableId);
             }
             if (activeType === ActiveTypeEnum.edit) {
-              await updateAiConfig(tableId);
+              await updateConfig(tableId);
             }
             await cb?.();
             onClickToClose();
