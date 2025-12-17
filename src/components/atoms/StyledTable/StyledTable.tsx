@@ -1171,6 +1171,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                   {/* Add-column trailing spacer to align with header and draw right edge */}
                   <CommonSpacer
                     bgcolor="background.paper"
+                    borderBottom
                     borderRight
                     width={140}
                   />
