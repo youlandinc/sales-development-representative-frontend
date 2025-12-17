@@ -7,6 +7,7 @@ import { SDRToast } from '@/components/atoms';
 import {
   _fetchWebResearchModelList,
   _saveWebResearchConfig,
+  _updateWebResearchConfig,
   generatePrompt as generatePromptApi,
 } from '@/request';
 
@@ -127,6 +128,12 @@ type WebResearchActions = {
     schema: string,
     generatePrompt: string,
   ) => Promise<any>;
+  updateAiConfig: (params: {
+    tableId: string;
+    prompt: string;
+    schema: string;
+    generatePrompt: string;
+  }) => Promise<any>;
   setExcludeFields: (fields: string) => void;
   removeExcludeFields: (fields: string) => void;
   setPromptIsEmpty: (bool: boolean) => void;
@@ -147,6 +154,7 @@ type WebResearchActions = {
     generateDescription: string;
     enableWebSearch: boolean;
     model: string;
+    taskDescription: string;
   }) => void;
   runGeneratePrompt: (
     api: string,
@@ -235,6 +243,31 @@ export const useWebResearchStore = create<
         generatePrompt,
         enableWebSearch: get().enableWebSearch,
         model: get().suggestedModelType,
+        taskDescription: get().taskContent,
+      });
+    } catch (err) {
+      const { message, header, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+      return Promise.reject(err);
+    }
+  },
+  updateAiConfig: async (params: {
+    tableId: string;
+    prompt: string;
+    schema: string;
+    generatePrompt: string;
+  }) => {
+    try {
+      const { activeColumnId } = useProspectTableStore.getState();
+      return await _updateWebResearchConfig({
+        tableId: params.tableId,
+        fieldId: activeColumnId,
+        prompt: params.prompt,
+        schema: params.schema,
+        generatePrompt: params.generatePrompt,
+        enableWebSearch: get().enableWebSearch,
+        model: get().suggestedModelType,
+        taskDescription: get().taskContent,
       });
     } catch (err) {
       const { message, header, variant } = err as HttpError;
@@ -287,6 +320,7 @@ export const useWebResearchStore = create<
     generateDescription: string;
     enableWebSearch: boolean;
     model: string;
+    taskDescription: string;
   }) => {
     set({
       webResearchVisible: param.webResearchVisible,
@@ -296,10 +330,10 @@ export const useWebResearchStore = create<
       enableWebSearch: param.enableWebSearch,
       suggestedModelType: param.model,
       activeType: ActiveTypeEnum.edit,
+      taskContent: param.taskDescription,
     });
   },
   runGenerateAiModel: async (api: string, params: Record<string, any>) => {
-    get().allClear();
     set({ generateIsLoading: true, generateIsThinking: true });
     try {
       const columnsNames = useProspectTableStore

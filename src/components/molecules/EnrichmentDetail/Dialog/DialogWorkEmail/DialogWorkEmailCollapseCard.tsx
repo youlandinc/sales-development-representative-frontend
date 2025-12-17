@@ -32,7 +32,7 @@ export const DialogWorkEmailCollapseCard: FC<
           sx={{
             width: 16,
             height: 16,
-            transform: visible ? 'rotate(180deg)' : 'rotate(0deg)',
+            transform: visible ? 'rotate(0deg)' : 'rotate(-90deg)',
             transition: 'transform 0.3s ease-in-out',
           }}
         />
