@@ -328,7 +328,6 @@ export const useProspectTable = ({
       return;
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
-    // fetchIntegrationMenus();
     fetchActionsMenus(tableId);
     fetchWebResearchModelList();
   }, [
@@ -336,7 +335,6 @@ export const useProspectTable = ({
     total,
     fetchBatchData,
     isMetadataLoading,
-    // fetchIntegrationMenus,
     fetchActionsMenus,
     fetchWebResearchModelList,
   ]);

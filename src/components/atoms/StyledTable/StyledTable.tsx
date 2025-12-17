@@ -51,6 +51,7 @@ import { MenuColumnAi, MenuColumnInsert, MenuColumnNormal } from './menu';
 import { CommonOverlay, CommonSpacer } from './common';
 
 import ICON_TYPE_ADD from './assets/icon-type-add.svg';
+import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
 
 import {
   TableColumnMenuActionEnum,
@@ -644,6 +645,7 @@ export const StyledTable: FC<StyledTableProps> = ({
       width,
       height: rowHeight,
       isEditing: cellState.isEditing ?? false,
+      isPinned,
       pinnedWidth,
       containerHeight,
     };
@@ -1079,13 +1081,21 @@ export const StyledTable: FC<StyledTableProps> = ({
                       setHeaderMenuAnchor(null);
                       setAddMenuAnchor(e.currentTarget);
                     }}
-                    width={140}
+                    width={196}
                   >
                     <Icon
                       component={ICON_TYPE_ADD}
-                      sx={{ width: 16, height: 16 }}
+                      sx={{ width: 16, height: 16, mr: 1 }}
                     />
                     Add column
+                    <Icon
+                      component={ICON_ARROW_DOWN}
+                      sx={{
+                        width: 16,
+                        height: 16,
+                        ml: 'auto',
+                      }}
+                    />
                   </HeadCell>
                 </StyledTableHeadRow>
               ))}
@@ -1173,7 +1183,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                     bgcolor="background.paper"
                     borderBottom
                     borderRight
-                    width={140}
+                    width={196}
                   />
                 </StyledTableBodyRow>
               );
@@ -1185,6 +1195,7 @@ export const StyledTable: FC<StyledTableProps> = ({
                 containerHeight={selectionOverlayPosition.containerHeight}
                 height={selectionOverlayPosition.height}
                 isEditing={selectionOverlayPosition.isEditing}
+                isPinned={selectionOverlayPosition.isPinned}
                 isVisible={true}
                 left={selectionOverlayPosition.left}
                 pinnedWidth={selectionOverlayPosition.pinnedWidth}
@@ -1243,7 +1254,6 @@ export const StyledTable: FC<StyledTableProps> = ({
           display: 'flex',
           flexDirection: 'column',
           width: 'fit-content',
-          minWidth: '100%',
           minHeight: 0,
           position: 'relative',
         }}

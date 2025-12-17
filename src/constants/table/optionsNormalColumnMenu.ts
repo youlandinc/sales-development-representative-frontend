@@ -33,13 +33,13 @@ export const getNormalColumnMenuActions = (
   },
   {
     label: 'Insert 1 column left',
-    icon: '',
+    icon: COLUMN_MENU_ICONS.INSERT_LEFT,
     value: TableColumnMenuActionEnum.insert_column_left,
     submenu: getAddColumnMenuActions(),
   },
   {
     label: 'Insert 1 column right',
-    icon: '',
+    icon: COLUMN_MENU_ICONS.INSERT_RIGHT,
     value: TableColumnMenuActionEnum.insert_column_right,
     submenu: getAddColumnMenuActions(),
   },

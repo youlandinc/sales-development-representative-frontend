@@ -89,12 +89,11 @@ export const MENU_STYLES = {
   },
 
   submenuTitle: {
-    px: 2,
-    py: 1,
-    fontSize: 12,
-    fontWeight: TABLE_SIZES.FONT_WEIGHT_MEDIUM + 100,
+    px: 1,
+    pb: 1,
+    pt: 1.5,
+    fontSize: 14,
     color: 'text.secondary',
-    letterSpacing: '0.5px',
     cursor: 'default',
   },
 } as const;

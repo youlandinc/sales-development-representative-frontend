@@ -10,6 +10,7 @@ interface CommonOverlayProps {
   height: number;
   isVisible: boolean;
   isEditing?: boolean;
+  isPinned: boolean;
   containerHeight: number;
   pinnedWidth: number;
 }
@@ -21,14 +22,13 @@ export const CommonOverlay: FC<CommonOverlayProps> = ({
   height,
   isVisible,
   isEditing = false,
+  isPinned,
   containerHeight,
   pinnedWidth,
 }) => {
   if (!isVisible) {
     return null;
   }
-
-  const isInPinnedArea = left < pinnedWidth;
 
   const selectionBorderStyles = {
     position: 'absolute' as const,
@@ -46,7 +46,7 @@ export const CommonOverlay: FC<CommonOverlayProps> = ({
   };
 
   // Pinned area: wrap in sticky container so overlay follows pinned columns on horizontal scroll
-  if (isInPinnedArea) {
+  if (isPinned) {
     return (
       <Box
         id="grid-overlay-container"
@@ -77,29 +77,16 @@ export const CommonOverlay: FC<CommonOverlayProps> = ({
     );
   }
 
-  // Non-pinned area: container starts at pinnedWidth with overflow:hidden
-  // This ensures border cannot bleed into pinned area
+  // Non-pinned area: direct absolute positioning
+  // Use clipPath to prevent overlay from bleeding into pinned area
   return (
     <Box
-      id="grid-overlay-container"
+      id="grid-selection-overlay"
       sx={{
-        position: 'absolute',
-        left: pinnedWidth,
-        top: 0,
-        width: `calc(100% - ${pinnedWidth}px)`,
-        height: containerHeight,
-        pointerEvents: 'none',
-        zIndex: TABLE_Z_INDEX.CELL,
-        overflow: 'hidden',
+        ...selectionBorderStyles,
+        zIndex: TABLE_Z_INDEX.OVERLAY_NON_PINNED,
+        clipPath: `inset(0 0 0 ${Math.max(0, pinnedWidth - left)}px)`,
       }}
-    >
-      <Box
-        id="grid-selection-overlay"
-        sx={{
-          ...selectionBorderStyles,
-          left: left - pinnedWidth,
-        }}
-      />
-    </Box>
+    />
   );
 };
