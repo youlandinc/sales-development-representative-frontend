@@ -50,8 +50,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
       >
         <StyledSelect
           menuPaperSx={{
-            px: 3,
-            py: 2,
+            py: 1.5,
           }}
           onChange={(e) => {
             onChange?.({
@@ -67,7 +66,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
                   sx={{
                     pt: index === 0 ? '0 !important' : '8px !important',
                     pb: '8px !important',
-                    px: '0 !important',
+                    px: '12px !important',
                     lineHeight: 1.5,
                     color: 'text.secondary',
                   }}
@@ -80,9 +79,8 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
               <MenuItem
                 key={option.key}
                 sx={{
-                  px: 1.5,
+                  px: '20px !important',
                   py: '8px !important',
-                  borderRadius: 2,
                   gap: 1.25,
                 }}
                 value={option.value}
@@ -131,8 +129,7 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
 
       <StyledSelect
         menuPaperSx={{
-          px: 3,
-          py: 2,
+          p: 0,
         }}
         onChange={(e) => {
           const v = e.target.value;
@@ -173,7 +170,6 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
               sx={{
                 px: 1.5,
                 py: '8px !important',
-                borderRadius: 2,
               }}
               value={option.value}
             >
@@ -194,7 +190,6 @@ export const CreditUsageToolbar: FC<CreditUsageToolbarProps> = ({
             py: '8px',
             px: 1.5,
             lineHeight: 1.5,
-            borderRadius: 2,
           },
           '& .MuiMenuItem-root:hover': {
             bgcolor: '#F4F5F9 !important',

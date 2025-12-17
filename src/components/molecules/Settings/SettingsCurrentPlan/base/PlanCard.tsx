@@ -115,8 +115,7 @@ export const PlanCard: FC<PlanCardProps> = ({
       sx={{
         bgcolor: '#F4F5F9',
         borderRadius: 2,
-        p: 3,
-        px: 2,
+        p: 2,
         width: '100%',
       }}
     >
