@@ -9,7 +9,7 @@ import {
 import { Stack } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
-import { TABLE_BORDERS, TABLE_COLORS } from './styles';
+import { TABLE_COLORS } from './styles';
 
 // ============================================================================
 // StyledTableBody
