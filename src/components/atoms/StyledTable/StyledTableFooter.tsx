@@ -1,6 +1,5 @@
 import { FC, MouseEvent, useState } from 'react';
 import {
-  Box,
   ClickAwayListener,
   Paper,
   Popper,
@@ -58,24 +57,31 @@ export const StyledTableFooter: FC<StyledTableAddRowsFooterProps> = ({
       px={2}
       py={1.5}
       sx={{
+        position: 'sticky',
+        top: 0,
+        left: 0,
+        zIndex: 10,
+        width: 'fit-content',
         bgcolor: 'background.paper',
       }}
     >
-      {/* Trigger button */}
-      <Box
+      {/* Trigger button - only the text is clickable */}
+      <Typography
+        component="span"
+        fontSize={14}
+        fontWeight={500}
         onClick={onClickToOpenPopper}
         sx={{
           cursor: disabled ? 'not-allowed' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
           opacity: disabled ? 0.5 : 1,
+          width: 'fit-content',
+          '&:hover': {
+            color: disabled ? 'inherit' : 'primary.main',
+          },
         }}
       >
-        <Typography fontSize={14} fontWeight={500}>
-          + Add rows
-        </Typography>
-      </Box>
+        + Add rows
+      </Typography>
 
       <Popper
         anchorEl={anchorEl}
@@ -119,7 +125,7 @@ export const StyledTableFooter: FC<StyledTableAddRowsFooterProps> = ({
                   thousandSeparator={false}
                   value={addRowCount}
                 />
-                <Typography color="text.secondary" fontSize={16}>
+                <Typography color="text.secondary" fontSize={14}>
                   more rows at the bottom
                 </Typography>
               </Stack>

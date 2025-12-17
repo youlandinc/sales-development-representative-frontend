@@ -1242,7 +1242,8 @@ export const StyledTable: FC<StyledTableProps> = ({
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
+          width: 'fit-content',
+          minWidth: '100%',
           minHeight: 0,
           position: 'relative',
         }}
@@ -1255,6 +1256,7 @@ export const StyledTable: FC<StyledTableProps> = ({
           table={table}
         />
 
+        {/* Footer outside StyledTableContainer for correct sticky left */}
         {addRowsFooter ?? <StyledTableFooter onAddRows={onAddRows} />}
 
         <MenuColumnInsert
