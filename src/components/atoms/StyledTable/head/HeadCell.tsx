@@ -20,6 +20,7 @@ import { HeadCellResizeHandle } from './HeadCellResizeHandle';
 import {
   buildPinnedBorderPseudoStyles,
   buildPinnedBorderRight,
+  TABLE_BORDERS,
   TABLE_COLORS,
   TABLE_SIZES,
   TABLE_Z_INDEX,
@@ -48,7 +49,6 @@ interface TableHeadCellProps {
   // Width override (for add column button)
   width?: number;
   // Pinned column layout
-  isPinned?: boolean;
   stickyLeft?: number;
   shouldShowPinnedRightShadow?: boolean;
   // Virtualization
@@ -58,7 +58,6 @@ interface TableHeadCellProps {
   onClick?: (e: MouseEvent<HTMLElement>) => void;
   onDoubleClick?: (e: MouseEvent<HTMLElement>) => void;
   onContextMenu?: (e: MouseEvent<HTMLElement>) => void;
-  onEditSave?: (newName: string) => void;
   onResizeStart?: () => void;
   // Resize indicator height (table body height)
   indicatorHeight?: number;
@@ -76,14 +75,12 @@ export const HeadCell = forwardRef<HTMLDivElement, TableHeadCellProps>(
       headerState,
       children,
       width: widthOverride,
-      isPinned = false,
       stickyLeft = 0,
       measureRef,
       dataIndex,
       onClick,
       onDoubleClick,
       onContextMenu,
-      onEditSave,
       shouldShowPinnedRightShadow,
       indicatorHeight = 500,
       onResizeStart,
@@ -109,7 +106,8 @@ export const HeadCell = forwardRef<HTMLDivElement, TableHeadCellProps>(
     // Width from header or override (for add column button)
     const width = widthOverride ?? headerContext?.header?.getSize() ?? 140;
 
-    // Get from table directly instead of props
+    // Get from table/column directly instead of props
+    const isPinned = column?.getIsPinned() === 'left';
     const canResize = column?.getCanResize?.() !== false;
     const isAllRowsSelected = table?.getIsAllPageRowsSelected?.();
     const isSomeRowsSelected = table?.getIsSomePageRowsSelected?.();
@@ -161,11 +159,11 @@ export const HeadCell = forwardRef<HTMLDivElement, TableHeadCellProps>(
     const saveEdit = useCallback(() => {
       const trimmedValue = localEditValue.trim();
       if (trimmedValue && trimmedValue !== originalValueRef.current) {
-        onEditSave?.(trimmedValue);
+        tableMeta?.updateHeaderName?.(columnId, trimmedValue);
       } else {
         tableMeta?.stopHeaderEdit?.();
       }
-    }, [localEditValue, onEditSave, tableMeta]);
+    }, [localEditValue, tableMeta, columnId]);
 
     const cancelEdit = useCallback(() => {
       tableMeta?.stopHeaderEdit?.();
@@ -238,11 +236,15 @@ export const HeadCell = forwardRef<HTMLDivElement, TableHeadCellProps>(
           maxWidth: width,
           boxSizing: 'border-box',
           overflow: 'visible',
-          borderRight: buildPinnedBorderRight(
-            isPinned,
-            !!shouldShowPinnedRightShadow,
-            isSelectColumn,
-          ),
+          // Each cell has borderBottom and borderRight (like body cells)
+          borderBottom: TABLE_BORDERS.HEADER,
+          borderRight: isPinned
+            ? buildPinnedBorderRight(
+                isPinned,
+                !!shouldShowPinnedRightShadow,
+                isSelectColumn,
+              )
+            : TABLE_BORDERS.HEADER,
           bgcolor: shouldShowBackground
             ? TABLE_COLORS.HOVER_BG
             : TABLE_COLORS.DEFAULT_BG,

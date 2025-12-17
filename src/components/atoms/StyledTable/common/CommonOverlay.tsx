@@ -30,85 +30,76 @@ export const CommonOverlay: FC<CommonOverlayProps> = ({
 
   const isInPinnedArea = left < pinnedWidth;
 
-  const overlayZIndex = isInPinnedArea
-    ? TABLE_Z_INDEX.OVERLAY_PINNED
-    : TABLE_Z_INDEX.OVERLAY_NON_PINNED;
+  const selectionBorderStyles = {
+    position: 'absolute' as const,
+    left,
+    top,
+    width,
+    height,
+    border: `2px solid ${TABLE_COLORS.SELECTION_BORDER}`,
+    pointerEvents: 'none' as const,
+    boxSizing: 'border-box' as const,
+    ...(isEditing && {
+      outline: `2px solid ${TABLE_COLORS.SELECTION_OUTLINE}`,
+      outlineOffset: 0,
+    }),
+  };
 
-  return (
-    <>
-      {!isInPinnedArea && (
+  // Pinned area: wrap in sticky container so overlay follows pinned columns on horizontal scroll
+  if (isInPinnedArea) {
+    return (
+      <Box
+        id="grid-overlay-container"
+        sx={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: '100%',
+          height: containerHeight,
+          pointerEvents: 'none',
+          zIndex: TABLE_Z_INDEX.OVERLAY_PINNED,
+        }}
+      >
         <Box
-          id="grid-pinned-blocker"
+          id="grid-selection-overlay-sticky"
           sx={{
             position: 'sticky',
             left: 0,
             top: 0,
             width: pinnedWidth,
-            height: containerHeight,
-            zIndex: TABLE_Z_INDEX.OVERLAY_BLOCKER,
+            height: '100%',
             pointerEvents: 'none',
-            background: `repeating-linear-gradient(
-              to bottom,
-              ${TABLE_COLORS.DEFAULT_BG} 0px,
-              ${TABLE_COLORS.DEFAULT_BG} ${height - 1}px,
-              ${TABLE_COLORS.ROW_BORDER} ${height - 1}px,
-              ${TABLE_COLORS.ROW_BORDER} ${height}px
-            )`,
-          }}
-        />
-      )}
-
-      {isInPinnedArea ? (
-        <Box
-          id="grid-selection-overlay-sticky-container"
-          sx={{
-            position: 'sticky',
-            left: 0,
-            top: 0,
-            width: pinnedWidth,
-            height: containerHeight,
-            pointerEvents: 'none',
-            zIndex: overlayZIndex,
           }}
         >
-          <Box
-            id="grid-selection-overlay"
-            sx={{
-              position: 'absolute',
-              left,
-              top,
-              width: width,
-              height: height,
-              border: `2px solid ${TABLE_COLORS.SELECTION_BORDER}`,
-              pointerEvents: 'none',
-              boxSizing: 'border-box',
-              ...(isEditing && {
-                outline: `2px solid ${TABLE_COLORS.SELECTION_OUTLINE}`,
-                outlineOffset: 0,
-              }),
-            }}
-          />
+          <Box id="grid-selection-overlay" sx={selectionBorderStyles} />
         </Box>
-      ) : (
-        <Box
-          id="grid-selection-overlay"
-          sx={{
-            position: 'absolute',
-            left,
-            top,
-            width: width,
-            height: height,
-            border: `2px solid ${TABLE_COLORS.SELECTION_BORDER}`,
-            pointerEvents: 'none',
-            boxSizing: 'border-box',
-            zIndex: overlayZIndex,
-            ...(isEditing && {
-              outline: `2px solid ${TABLE_COLORS.SELECTION_OUTLINE}`,
-              outlineOffset: 0,
-            }),
-          }}
-        />
-      )}
-    </>
+      </Box>
+    );
+  }
+
+  // Non-pinned area: container starts at pinnedWidth with overflow:hidden
+  // This ensures border cannot bleed into pinned area
+  return (
+    <Box
+      id="grid-overlay-container"
+      sx={{
+        position: 'absolute',
+        left: pinnedWidth,
+        top: 0,
+        width: `calc(100% - ${pinnedWidth}px)`,
+        height: containerHeight,
+        pointerEvents: 'none',
+        zIndex: TABLE_Z_INDEX.CELL,
+        overflow: 'hidden',
+      }}
+    >
+      <Box
+        id="grid-selection-overlay"
+        sx={{
+          ...selectionBorderStyles,
+          left: left - pinnedWidth,
+        }}
+      />
+    </Box>
   );
 };

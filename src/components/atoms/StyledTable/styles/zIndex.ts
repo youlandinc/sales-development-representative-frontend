@@ -9,14 +9,14 @@ export const TABLE_Z_INDEX = {
   // Selection overlay layers
   OVERLAY_NON_PINNED: 10,
   OVERLAY_BLOCKER: 15,
-  PINNED_CELL: 20,
-  OVERLAY_PINNED: 25,
+  PINNED_CELL: 50, // High z-index like Clay's z-50 to ensure pinned cells cover overlay
+  OVERLAY_PINNED: 55,
 
   // Header layers
   HEAD_STICKY: 10,
-  HEADER_DRAGGING: 28,
-  HEADER_PINNED: 30,
-  HEADER_FOCUS_LINE: 31,
+  HEADER_DRAGGING: 58,
+  HEADER_PINNED: 60,
+  HEADER_FOCUS_LINE: 61,
 
   // Menu & Popper
   POPPER: 1300,

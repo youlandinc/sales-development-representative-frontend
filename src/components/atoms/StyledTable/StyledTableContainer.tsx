@@ -174,6 +174,7 @@ export const StyledTableContainer: FC<StyledTableContainerProps> = ({
         position: 'relative',
         width: 'fit-content',
         flexDirection: 'column',
+        paddingRight: '40px', // Right padding like Clay
         '& .column-resize-indicator': {
           position: 'absolute',
           top: 0,
