@@ -58,7 +58,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
         {dialogVisible && (
           <>
             {dialogType === TableColumnMenuActionEnum.actions_overview && (
-              <DialogActionsMenu />
+              <DialogActionsMenu tableId={tableId} />
             )}
             {dialogType === TableColumnMenuActionEnum.edit_column && (
               <DialogEditColumn />
