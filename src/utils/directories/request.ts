@@ -21,8 +21,11 @@ export type DirectoriesFormValues = {
   // L1/L3: Dynamic key from TAB config (e.g., 'entityType')
   tabKey?: string;
   tabValue?: string;
+  // Additional details config existence
+  // When false, this bizId doesn't have ADDITIONAL_DETAILS, skip B layer entirely
+  hasAdditionalConfig?: boolean;
   // Additional details authorization
-  // When false, B (additional details) changes are ignored
+  // When false, user doesn't have permission for additional details
   additionalIsAuth?: boolean;
 };
 
@@ -341,9 +344,11 @@ export const buildFinalData = (
     }
   } else if (hasTab && tabKey) {
     // L3: Tab-based flat config, only include tab's data
-    query[tabKey] = resolvedTabValue;
     const tabData = formValues[resolvedTabValue] || {};
     Object.assign(query, tabData);
+    // Set tabKey after Object.assign to prevent tabData from overwriting it
+    // (some configs have tabKey in tabData with null value)
+    query[tabKey] = resolvedTabValue;
   } else {
     // L4: Pure flat config, include all formValues
     Object.assign(query, formValues);

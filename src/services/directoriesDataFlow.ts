@@ -106,6 +106,11 @@ class DirectoriesDataFlow {
    */
   private additionalFromA$ = this.formValuesDebounced$.pipe(
     filter((values) => {
+      // Skip if no ADDITIONAL_DETAILS config in this bizId
+      if (values.hasAdditionalConfig === false) {
+        return false;
+      }
+
       if (!values.bizId || Object.keys(values.formValues).length === 0) {
         return false;
       }
@@ -276,8 +281,13 @@ class DirectoriesDataFlow {
         }
       }
 
-      // When additionalIsAuth=false, ignore B changes - only use A
-      if (formData.additionalIsAuth === false) {
+      // Skip waiting for B layer in these cases:
+      // 1. No ADDITIONAL_DETAILS config → B won't request at all
+      // 2. Has config but isAuth=false → B requests in parallel, but C doesn't wait
+      if (
+        formData.hasAdditionalConfig === false ||
+        formData.additionalIsAuth === false
+      ) {
         return of(buildFinalData(formData, []));
       }
 
