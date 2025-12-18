@@ -69,7 +69,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
             {dialogType === TableColumnMenuActionEnum.work_email && (
               <DialogWorkEmail cb={onInitializeAiColumns} />
             )}
-            {dialogType === TableColumnMenuActionEnum.web_research && (
+            {dialogType === TableColumnMenuActionEnum.ai_agent && (
               <DialogWebResearch cb={onInitializeAiColumns} tableId={tableId} />
             )}
           </>

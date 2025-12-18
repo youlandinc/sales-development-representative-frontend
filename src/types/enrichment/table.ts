@@ -35,7 +35,6 @@ export enum TableColumnMenuActionEnum {
   change_column_type = 'CHANGE_COLUMN_TYPE',
   actions_overview = 'ACTIONS_OVERVIEW',
   work_email = 'WORK_EMAIL',
-  web_research = 'WEB_RESEARCH',
 }
 
 export enum TableCellConfidenceEnum {

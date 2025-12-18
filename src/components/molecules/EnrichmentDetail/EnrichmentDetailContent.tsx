@@ -281,6 +281,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               onAddMenuItemClick={(item) => {
                 // AI Agent opens configuration dialog
                 if (item.value === TableColumnMenuActionEnum.ai_agent) {
+                  openDialog(TableColumnMenuActionEnum.ai_agent);
                   setWebResearchVisible(true, ActiveTypeEnum.add);
                   return;
                 }
@@ -360,7 +361,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                         model,
                         taskDescription,
                       });
-                      openDialog(TableColumnMenuActionEnum.web_research);
+                      openDialog(TableColumnMenuActionEnum.ai_agent);
                       return;
                     }
                     // common edit column
