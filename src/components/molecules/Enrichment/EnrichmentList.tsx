@@ -55,27 +55,23 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
             flexDirection={'row'}
             gap={1}
             height={'100%'}
+            overflow={'hidden'}
           >
-            <Typography component={'span'} variant={'body2'}>
+            <Typography
+              component={'span'}
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+              variant={'body2'}
+            >
               {row.tableName}
             </Typography>
           </Stack>
         );
       },
     },
-    /*     {
-      headerName: 'Contacts',
-      field: 'contacts',
-      sortable: false,
-      align: 'left',
-      headerAlign: 'left',
-      minWidth: 120,
-      renderCell: ({ value }) => (
-        <Typography component={'span'} variant={'body2'}>
-          {UFormatNumber(value)}
-        </Typography>
-      ),
-    }, */
     {
       headerName: 'Last modified',
       field: 'updatedAt',
@@ -310,7 +306,6 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
             },
           },
           '.MuiDataGrid-cell': {
-            overflow: 'unset !important',
             position: 'relative',
             '&:focus': {
               outline: 0,
