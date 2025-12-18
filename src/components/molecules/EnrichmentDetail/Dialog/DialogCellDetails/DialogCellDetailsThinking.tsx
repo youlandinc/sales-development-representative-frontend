@@ -342,7 +342,8 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                           >
                             <Typography
                               color={'text.secondary'}
-                              variant={'body3'}
+                              lineHeight={1.4}
+                              variant={'body2'}
                             >
                               Source:
                             </Typography>
