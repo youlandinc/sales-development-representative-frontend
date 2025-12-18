@@ -372,6 +372,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       {/* footer */}
       <DialogFooter
         coinsPerRow={COINS_PER_ROW}
+        disabled={generateIsThinking}
         loading={
           state.loading || saveAndRunState.loading || updateState.loading
         }
