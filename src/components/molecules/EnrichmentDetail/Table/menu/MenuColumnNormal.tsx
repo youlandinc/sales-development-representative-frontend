@@ -18,10 +18,7 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
-import {
-  getAiColumnMenuActions,
-  getNormalColumnMenuActions,
-} from '../config';
+import { getAiColumnMenuActions, getNormalColumnMenuActions } from '../config';
 import { checkIsAiColumn } from '../utils';
 
 interface MenuColumnNormalProps {
