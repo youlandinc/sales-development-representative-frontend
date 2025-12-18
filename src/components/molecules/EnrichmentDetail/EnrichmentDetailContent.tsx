@@ -30,8 +30,10 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
+import { ActiveCellParams } from '@/types';
 
 import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
+import { UTypeOf } from '@/utils';
 
 interface InputBindingItem {
   name: string;
@@ -133,7 +135,10 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     (store) => store.handleEditClick,
   );
 
-  const [activeCell, setActiveCell] = useState<Record<string, any>>({});
+  const [activeCell, setActiveCell] = useState<ActiveCellParams>({
+    columnId: '',
+    rowId: '',
+  });
   const [isActionsButtonVisible, setIsActionsButtonVisible] = useState(false);
 
   // 300ms delay for showing the Actions button
@@ -309,18 +314,33 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               onAddRows={onClickToAddRows}
               onAiProcess={onAiProcess}
               onCellClick={(columnId, _rowId, data) => {
-                if (data.original?.[columnId]?.externalContent) {
+                const cell = data.original?.[columnId];
+                const actionKey = columns.find(
+                  (col) => col.fieldId === columnId,
+                )?.actionKey;
+                const hasContent =
+                  cell &&
+                  cell?.isFinished !== null &&
+                  UTypeOf.isString(actionKey);
+
+                if (hasContent) {
                   setActiveColumnId(columnId);
-                  setActiveCell(
-                    data.original?.[columnId]?.externalContent || {},
-                  );
-                  !dialogVisible &&
+                  setActiveCell({
+                    columnId,
+                    rowId: _rowId,
+                  });
+                  if (!dialogVisible) {
                     openDialog(TableColumnMenuActionEnum.cell_detail);
+                  }
                   return;
                 }
-                dialogVisible &&
-                  dialogType === TableColumnMenuActionEnum.cell_detail &&
+
+                if (
+                  dialogVisible &&
+                  dialogType === TableColumnMenuActionEnum.cell_detail
+                ) {
                   closeDialog();
+                }
               }}
               onCellEdit={onCellEdit}
               onColumnResize={(fieldId, width) =>
