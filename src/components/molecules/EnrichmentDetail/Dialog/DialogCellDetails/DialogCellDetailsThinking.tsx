@@ -66,27 +66,27 @@ const phaseVisualMap: Record<
   TableCellDetailPhaseEnum,
   { label: string; icon: typeof ICON_THINKING }
 > = {
-  [TableCellDetailPhaseEnum.Thinking]: {
+  [TableCellDetailPhaseEnum.thinking]: {
     label: 'Thinking',
     icon: ICON_THINKING,
   },
-  [TableCellDetailPhaseEnum.Searching]: {
+  [TableCellDetailPhaseEnum.searching]: {
     label: 'Searching',
     icon: ICON_SEARCH,
   },
-  [TableCellDetailPhaseEnum.Verifying]: {
+  [TableCellDetailPhaseEnum.verifying]: {
     label: 'Verifying',
     icon: ICON_CHECK,
   },
-  [TableCellDetailPhaseEnum.ReSearching]: {
+  [TableCellDetailPhaseEnum.re_searching]: {
     label: 'Re-Searching',
     icon: ICON_SEARCH,
   },
-  [TableCellDetailPhaseEnum.Standardizing]: {
+  [TableCellDetailPhaseEnum.standardizing]: {
     label: 'Standardizing',
     icon: ICON_FORK,
   },
-  [TableCellDetailPhaseEnum.Populating]: {
+  [TableCellDetailPhaseEnum.populating]: {
     label: 'Populating',
     icon: ICON_TRAY,
   },
@@ -285,10 +285,10 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
               {state?.value?.data?.logs?.map((log, index) => {
                 const phase =
                   (log.phase as TableCellDetailPhaseEnum) ||
-                  TableCellDetailPhaseEnum.Thinking;
+                  TableCellDetailPhaseEnum.thinking;
                 const phaseVisual =
                   phaseVisualMap[phase] ||
-                  phaseVisualMap[TableCellDetailPhaseEnum.Thinking];
+                  phaseVisualMap[TableCellDetailPhaseEnum.thinking];
                 const ordinal = formatAttemptOrdinal(log.attemptNo);
                 const showLine =
                   index < (state?.value?.data?.logs?.length || 0) - 1;
@@ -320,7 +320,7 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                         >
                           {phaseVisual.label}
                           {ordinal &&
-                          log.phase !== TableCellDetailPhaseEnum.Thinking
+                          log.phase !== TableCellDetailPhaseEnum.thinking
                             ? ` (${ordinal})`
                             : ''}
                         </Typography>
