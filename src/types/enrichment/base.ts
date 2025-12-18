@@ -3,6 +3,10 @@ import {
   ProspectTableEnum,
   ValidationActionConfigParam,
 } from '@/types';
+import {
+  TableCellDetailPhaseEnum,
+  TableCellDetailValidateStatusEnum,
+} from '@/types/enum';
 
 export interface ProspectTableItem {
   tableId: string;
@@ -42,4 +46,29 @@ export interface ColumnFieldGroupMap {
     waterfallConfigs: ColumnFieldGroupMapItem[];
     validationActionConfig: ValidationActionConfigParam | null;
   };
+}
+
+export interface CellDetailSource {
+  sourceUrl?: string;
+  sourceName?: string;
+}
+
+export interface CellDetailLog {
+  phase: TableCellDetailPhaseEnum;
+  attemptNo: number;
+  sources: CellDetailSource[] | null;
+  content: string;
+}
+
+export interface CellDetailResponse {
+  status: TableCellDetailValidateStatusEnum | null;
+  attemptNo: number | null;
+  content: string | null;
+  validateSummary: string | null;
+  logs: CellDetailLog[];
+}
+
+export interface ActiveCellParams {
+  columnId: string;
+  rowId: string;
 }
