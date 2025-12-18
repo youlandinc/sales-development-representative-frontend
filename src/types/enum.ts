@@ -139,12 +139,12 @@ export enum SettingTabEnum {
 }
 
 export enum TableCellDetailPhaseEnum {
-  Thinking = 'THINKING',
-  Searching = 'SEARCHING',
-  Verifying = 'VERIFYING',
-  ReSearching = 'RE_SEARCHING',
-  Standardizing = 'STANDARDIZING',
-  Populating = 'POPULATING',
+  thinking = 'THINKING',
+  searching = 'SEARCHING',
+  verifying = 'VERIFYING',
+  re_searching = 'RE_SEARCHING',
+  standardizing = 'STANDARDIZING',
+  populating = 'POPULATING',
 }
 
 export enum TableCellDetailValidateStatusEnum {
