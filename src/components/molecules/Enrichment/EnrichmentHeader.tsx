@@ -20,6 +20,7 @@ import {
 import { useRouter } from 'nextjs-toploader/app';
 
 import { _createBlankTable } from '@/request';
+import { HttpError } from '@/types';
 
 import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 
@@ -119,10 +120,10 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
   };
 
   return (
-    <Stack gap={6}>
-      <Stack gap={1.5}>
+    <Stack sx={{ gap: 6 }}>
+      <Stack sx={{ gap: 1.5 }}>
         <Typography variant={'h6'}>Quick start</Typography>
-        <Stack flexDirection={'row'} gap={2}>
+        <Stack sx={{ flexDirection: 'row', gap: 2 }}>
           {[...sourceOptions, ...tableOptions].map((item, index) => (
             <StyledButton
               color={'info'}
@@ -150,16 +151,18 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
       </Stack>
 
       <Stack
-        alignItems={'flex-end'}
-        flexDirection={'row'}
-        gap={3}
-        justifyContent={'space-between'}
+        sx={{
+          alignItems: 'flex-end',
+          flexDirection: 'row',
+          gap: 3,
+          justifyContent: 'space-between',
+        }}
       >
-        <Typography lineHeight={1} variant={'h6'}>
+        <Typography sx={{ lineHeight: 1 }} variant={'h6'}>
           Tables
         </Typography>
 
-        <Stack flexDirection={'row'} gap={1}>
+        <Stack sx={{ flexDirection: 'row', gap: 1 }}>
           <StyledTextField
             label=""
             onChange={onSearchInputChange}
@@ -263,7 +266,13 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
                 {item.label}
               </MenuItem>
             ))}
-            <Divider flexItem sx={{ my: 0.5 }} />
+            <Divider
+              flexItem
+              sx={{
+                marginTop: '4px !important',
+                marginBottom: '4px !important',
+              }}
+            />
             <Typography variant={'h7'}>Tables</Typography>
             {tableOptions.map((item, index) => (
               <MenuItem
