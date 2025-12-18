@@ -1,15 +1,3 @@
-## Third-party Software
-
-This project includes the CKEditor library for rich text editing functionality. CKEditor is licensed under the GNU
-Lesser General Public License Version 2.1 or later (LGPL).
-
-CKEditor is included as an independent module and has not been modified.
-
-## License Information
-
-- CKEditor License: [LGPL v2.1 or later](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
-- CKEditor Website: [https://ckeditor.com/](https://ckeditor.com/)
-
 ## Getting Started
 
 First, run the development server:
