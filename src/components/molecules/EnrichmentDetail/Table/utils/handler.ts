@@ -1,5 +1,5 @@
 import { TableColumnProps } from '@/types/enrichment/table';
-import { NON_EDITABLE_ACTION_KEYS, SYSTEM_COLUMN_SELECT } from './index';
+import { NON_EDITABLE_ACTION_KEYS, SYSTEM_COLUMN_SELECT } from '../config';
 
 /**
  * Check if a column is an AI column

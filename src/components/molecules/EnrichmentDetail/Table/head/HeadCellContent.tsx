@@ -3,7 +3,7 @@ import { Box, Icon, Stack } from '@mui/material';
 
 import { CommonAiIcon } from '../common';
 
-import { COLUMN_TYPE_ICONS } from '@/constants/table';
+import { COLUMN_TYPE_ICONS } from '../config';
 import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
 
 interface HeadCellContentProps {

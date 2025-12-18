@@ -11,7 +11,7 @@ import {
 import { Box, CircularProgress, Stack } from '@mui/material';
 import { CellContext } from '@tanstack/react-table';
 
-import { SYSTEM_COLUMN_SELECT } from '@/constants/table';
+import { SYSTEM_COLUMN_SELECT } from '../config';
 import { TableCellFieldData, TableColumnMeta } from '@/types/enrichment/table';
 
 import { CommonAiIcon } from '../common';

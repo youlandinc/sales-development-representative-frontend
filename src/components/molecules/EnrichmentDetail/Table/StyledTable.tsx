@@ -57,11 +57,8 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
-import {
-  checkIsAiColumn,
-  checkIsEditableColumn,
-  SYSTEM_COLUMN_SELECT,
-} from '@/constants/table';
+import { SYSTEM_COLUMN_SELECT } from './config';
+import { checkIsAiColumn, checkIsEditableColumn } from './utils';
 import { UTypeOf } from '@/utils';
 
 // ============================================

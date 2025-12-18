@@ -3,5 +3,3 @@ export * from './common';
 export * from './auth';
 
 export * from './options';
-
-export * from './table';

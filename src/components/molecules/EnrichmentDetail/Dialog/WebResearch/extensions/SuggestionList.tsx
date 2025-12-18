@@ -18,7 +18,7 @@ import {
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
 import { useProspectTableStore } from '@/stores/enrichment';
-import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
+import { COLUMN_TYPE_ICONS } from '../../../Table/config';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 export type SuggestionListRef = {

@@ -19,11 +19,8 @@ import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
-import {
-  checkIsAiColumn,
-  MIN_BATCH_SIZE,
-  SYSTEM_COLUMN_SELECT,
-} from '@/constants/table';
+import { MIN_BATCH_SIZE, SYSTEM_COLUMN_SELECT } from '../Table/config';
+import { checkIsAiColumn } from '../Table/utils';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 interface UseProspectTableParams {

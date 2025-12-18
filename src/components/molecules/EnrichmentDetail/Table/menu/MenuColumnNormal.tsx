@@ -19,10 +19,10 @@ import {
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
 import {
-  checkIsAiColumn,
   getAiColumnMenuActions,
   getNormalColumnMenuActions,
-} from '@/constants/table';
+} from '../config';
+import { checkIsAiColumn } from '../utils';
 
 interface MenuColumnNormalProps {
   anchorEl: HTMLElement | null;

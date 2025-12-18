@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { Box, Checkbox, Stack } from '@mui/material';
 
-import { StyledImage } from '../../StyledImage';
+import { StyledImage } from '@/components/atoms';
 
 const CHECKBOX_ICON_CHECKED = (
   <StyledImage

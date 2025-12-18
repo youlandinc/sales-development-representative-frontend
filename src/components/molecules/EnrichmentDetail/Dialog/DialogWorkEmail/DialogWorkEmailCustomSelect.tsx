@@ -13,7 +13,7 @@ import { useProspectTableStore } from '@/stores/enrichment';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
-import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
+import { COLUMN_TYPE_ICONS } from '../../Table/config';
 import { DEFAULT_AUTOCOMPLETE_SX } from '@/styles';
 
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';

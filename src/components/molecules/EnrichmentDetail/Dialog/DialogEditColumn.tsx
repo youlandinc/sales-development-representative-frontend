@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from 'react';
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import { CommonSelectFieldType } from '@/components/molecules/Common';
 
-import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
+import { COLUMN_TYPE_ICONS } from '../Table/config';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 import { useAsyncFn } from '@/hooks';

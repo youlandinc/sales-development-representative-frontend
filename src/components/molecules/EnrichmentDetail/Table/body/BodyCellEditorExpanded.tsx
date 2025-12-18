@@ -7,7 +7,7 @@ import {
   useRef,
 } from 'react';
 import { ClickAwayListener, InputBase, Paper, Popper } from '@mui/material';
-import { TABLE_COLORS } from '@/components/atoms/StyledTable/styles';
+import { TABLE_COLORS } from '../styles';
 
 const CELL_EDITOR_CONSTANTS = {
   FONT_SIZE: 14,

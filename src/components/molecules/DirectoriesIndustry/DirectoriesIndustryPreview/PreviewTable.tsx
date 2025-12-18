@@ -21,7 +21,7 @@ import {
 } from '@/types/directories';
 
 import { OverflowTooltip } from './OverflowTooltip';
-import { COLUMN_TYPE_ICONS } from '@/constants';
+import { COLUMN_TYPE_ICONS } from '@/components/molecules/EnrichmentDetail/Table/config';
 import { UFormatDate, UFormatDollar, UFormatNumber } from '@/utils';
 
 import ICON_LOCK from './assets/icon-lock.svg';

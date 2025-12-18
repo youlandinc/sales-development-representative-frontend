@@ -27,8 +27,6 @@ export * from './StyledShadowContent';
 
 export * from './StyledGrid';
 
-export * from './StyledTable';
-
 export * from './StyledTextFieldSearch';
 
 export * from './StyledCost';

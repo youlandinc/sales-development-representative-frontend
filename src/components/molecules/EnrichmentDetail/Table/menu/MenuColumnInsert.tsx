@@ -11,7 +11,7 @@ import {
 
 import { MENU_STYLES } from '../styles/menu';
 
-import { getAddColumnMenuActions } from '@/constants/table';
+import { getAddColumnMenuActions } from '../config';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 interface MenuColumnInsertProps {

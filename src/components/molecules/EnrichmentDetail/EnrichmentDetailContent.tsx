@@ -1,5 +1,5 @@
-import { Icon, Stack } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
+import { Icon, Stack } from '@mui/material';
 
 import { useShallow } from 'zustand/react/shallow';
 
@@ -10,17 +10,18 @@ import {
   useWorkEmailStore,
 } from '@/stores/enrichment';
 
-import { ROW_HEIGHT } from '@/constants/table';
 import { useProspectTable } from './hooks';
 
-import { StyledButton, StyledLoading, StyledTable } from '@/components/atoms';
-import { DrawerActionsContainer } from '@/components/molecules';
+import { ROW_HEIGHT } from './Table/config';
 import {
   HeadColumnsPanel,
   HeadFilterPanel,
   HeadRowsPanel,
   HeadViewPanel,
 } from './Panel';
+import { StyledTable } from './Table';
+import { StyledButton, StyledLoading } from '@/components/atoms';
+import { DrawerActionsContainer } from '@/components/molecules';
 
 import { _createTableRows } from '@/request';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';

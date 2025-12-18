@@ -26,7 +26,7 @@ import {
   TABLE_Z_INDEX,
 } from '../styles';
 
-import { SYSTEM_COLUMN_SELECT } from '@/constants/table';
+import { SYSTEM_COLUMN_SELECT } from '../config';
 import { UTypeOf } from '@/utils';
 import { TableColumnMeta } from '@/types/enrichment/table';
 

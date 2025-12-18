@@ -3,7 +3,7 @@ import { NodeViewWrapper } from '@tiptap/react';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 
-import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
+import { COLUMN_TYPE_ICONS } from '../../../Table/config';
 import { useWebResearchStore } from '@/stores/enrichment';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
