@@ -3,7 +3,7 @@ import { FC } from 'react';
 
 import {
   DialogActionsMenu,
-  DialogCellDetails,
+  DialogCellDetailsThinking,
   DialogDeleteColumn,
   DialogEditColumn,
   DialogEditDescription,
@@ -15,10 +15,11 @@ import { CampaignProcess } from '@/components/molecules';
 import { useProspectTableStore } from '@/stores/enrichment';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+import { ActiveCellParams } from '@/types';
 
 interface DialogActionsContainerProps {
   tableId: string;
-  cellDetails: Record<string, any>;
+  cellDetails: ActiveCellParams;
   onInitializeAiColumns: () => Promise<void>;
 }
 
@@ -64,12 +65,12 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
               <DialogEditColumn />
             )}
             {dialogType === TableColumnMenuActionEnum.cell_detail && (
-              <DialogCellDetails data={cellDetails} />
+              <DialogCellDetailsThinking cellDetails={cellDetails} />
             )}
             {dialogType === TableColumnMenuActionEnum.work_email && (
               <DialogWorkEmail cb={onInitializeAiColumns} />
             )}
-            {dialogType === TableColumnMenuActionEnum.web_research && (
+            {dialogType === TableColumnMenuActionEnum.ai_agent && (
               <DialogWebResearch cb={onInitializeAiColumns} tableId={tableId} />
             )}
           </>
