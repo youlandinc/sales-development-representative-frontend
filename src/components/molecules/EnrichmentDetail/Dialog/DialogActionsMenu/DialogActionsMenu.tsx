@@ -174,7 +174,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
       setGenerateText('');
       setGenerateSchemaStr('');
       // allClear();
-      openDialog(TableColumnMenuActionEnum.web_research);
+      openDialog(TableColumnMenuActionEnum.ai_agent);
       await runGenerateAiModel('/aiResearch/generate/stream', {
         params: {
           userInput: templatePrompt,
@@ -229,7 +229,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
   );
 
   const onAtlasClick = useCallback(() => {
-    openDialog(TableColumnMenuActionEnum.web_research);
+    openDialog(TableColumnMenuActionEnum.ai_agent);
   }, [openDialog]);
 
   const onSearchChange = useCallback(

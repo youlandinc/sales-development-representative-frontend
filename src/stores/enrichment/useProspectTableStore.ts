@@ -132,7 +132,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       TableColumnMenuActionEnum.edit_column,
       TableColumnMenuActionEnum.cell_detail,
       TableColumnMenuActionEnum.work_email,
-      TableColumnMenuActionEnum.web_research,
+      TableColumnMenuActionEnum.ai_agent,
     ],
     rowIds: [],
     runRecords: null,
