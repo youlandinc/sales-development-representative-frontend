@@ -56,6 +56,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   loadOptions,
   renderOption,
   onOpen,
+  IconComponent,
   ...rest
   //sxHelperText,
 }) => {
@@ -156,15 +157,6 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             fontSize: 16,
             lineHeight: 1.5,
           },
-          //replace icon
-          '& .MuiSelect-icon': {
-            width: 16,
-            height: 16,
-            right: 12,
-          },
-          '& .MuiSelect-iconOpen': {
-            transform: 'rotate(180deg)',
-          },
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
@@ -182,14 +174,14 @@ export const StyledSelect: FC<StyledSelectProps> = ({
               onClick={() => {
                 onClear?.();
               }}
-              position="end"
+              position={'end'}
               sx={{ mr: 1.75, cursor: 'pointer' }}
             >
               {clearIcon || <Clear sx={{ fontSize: 20 }} />}
             </InputAdornment>
           )
         }
-        IconComponent={ICON_ARROW}
+        IconComponent={IconComponent || ICON_ARROW}
         id="styled-select"
         inputProps={{
           MenuProps: {
