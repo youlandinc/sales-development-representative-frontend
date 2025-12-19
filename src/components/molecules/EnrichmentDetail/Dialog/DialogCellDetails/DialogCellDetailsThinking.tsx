@@ -204,7 +204,7 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
 
   return (
     <Fade in>
-      <Stack height={'100%'} overflow={'auto'}>
+      <Stack height={'100%'}>
         {/* header */}
         {header}
         <Stack

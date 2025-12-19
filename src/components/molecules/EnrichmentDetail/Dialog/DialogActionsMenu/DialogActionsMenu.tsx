@@ -36,6 +36,7 @@ import type { SuggestionItem } from '@/types/enrichment/drawerActions';
 
 import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
+import { DialogExportInProgress } from './base/DialogExportInProgress';
 
 // ============ Types ============
 interface ActionItemClickParams {
@@ -62,7 +63,7 @@ interface DialogActionsMenuProps {
 
 export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
   const [activeTab, setActiveTab] = useState<TabType>('suggestions');
-  const { EXPORTS_MENUS } = useExport();
+  const { EXPORTS_MENUS, visible, close } = useExport();
 
   // Store selectors
   const { closeDialog, openDialog } = useProspectTableStore(
@@ -114,7 +115,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
 
   // 扁平化所有可搜索项目
   const flatSearchItems = useMemo(() => {
-    const items: (SuggestionItem & { icon?: any })[] = [];
+    const items: (SuggestionItem & { icon?: any; onClick?: () => void })[] = [];
 
     // 添加 enrichments 数据
     enrichments.forEach((group) => {
@@ -141,9 +142,9 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
         waterfallConfigs: [],
         validations: null,
         icon: item.icon,
+        onClick: item.onClick,
       });
     });
-
     // 按 name 去重
     return Array.from(new Map(items.map((item) => [item.name, item])).values());
   }, [enrichments, suggestions, EXPORTS_MENUS]);
@@ -155,7 +156,9 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
     searchResults,
     text,
     setText,
-  } = useLocalSearch<SuggestionItem & { icon?: any }>(flatSearchItems);
+  } = useLocalSearch<SuggestionItem & { icon?: any; onClick?: () => void }>(
+    flatSearchItems,
+  );
 
   // Event handlers with useCallback
   const onTabClick = useCallback((tab: TabType) => {
@@ -190,7 +193,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
     ],
   );
 
-  const onClickToActionItem = useCallback(
+  const onWorkEmailItemClick = useCallback(
     (params: ActionItemClickParams) => {
       openDialog(TableColumnMenuActionEnum.work_email);
       setDialogHeaderName(params.name);
@@ -209,7 +212,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
     ],
   );
 
-  const onIntegrationItemClick = useCallback(
+  const onItemClick = useCallback(
     (item: SuggestionItem) => {
       if (item?.key === ActionsTypeKeyEnum.ai_template) {
         const description =
@@ -218,14 +221,14 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
         return;
       }
       const integration = integrationMenus.find((i) => i.key === item.key);
-      onClickToActionItem({
+      onWorkEmailItemClick({
         name: integration?.name ?? '',
         description: integration?.description ?? '',
         waterfallConfigs: integration?.waterfallConfigs ?? null,
         validations: integration?.validations ?? null,
       });
     },
-    [onClickToActionItem, onClickToAiTemplate, integrationMenus],
+    [onWorkEmailItemClick, onClickToAiTemplate, integrationMenus],
   );
 
   const onAtlasClick = useCallback(() => {
@@ -325,7 +328,9 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
                     )
                   }
                   key={`search-${index}`}
-                  onClick={() => onIntegrationItemClick(item)}
+                  onClick={() =>
+                    item?.onClick ? item?.onClick() : onItemClick(item)
+                  }
                   title={item.name}
                 />
               ))}
@@ -342,7 +347,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
               <SuggestionsContent
                 loading={suggestionsLoading}
                 onAtlasClick={onAtlasClick}
-                onItemClick={onIntegrationItemClick}
+                onItemClick={onItemClick}
                 suggestions={suggestions}
               />
             )}
@@ -350,7 +355,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
             {activeTab === 'enrichments' && (
               <EnrichmentsContent
                 enrichments={enrichments}
-                onItemClick={onIntegrationItemClick}
+                onItemClick={onItemClick}
               />
             )}
 
@@ -358,6 +363,11 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
           </Stack>
         </Stack>
       )}
+      <DialogExportInProgress
+        onClose={close}
+        open={visible}
+        tableId={tableId}
+      />
     </Stack>
   );
 };
