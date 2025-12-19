@@ -5,6 +5,7 @@ import {
   Box,
   CircularProgress,
   createFilterOptions,
+  Divider,
   FilterOptionsState,
   Icon,
   Tooltip,
@@ -304,7 +305,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               }}
             />
           )}
-          renderOption={(props, option) => {
+          renderOption={(props, option, state) => {
             const { key, ...rest } = props;
 
             if (option.inputValue === '__loading_more__') {
@@ -328,36 +329,49 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
 
             const isSelected = props['aria-selected'] === true;
 
+            const prevOption =
+              state.index > 0 ? displayOptions[state.index - 1] : null;
+            const isRemarkChanged =
+              isShowRemark &&
+              prevOption &&
+              prevOption.inputValue !== '__loading_more__' &&
+              option.remark !== prevOption.remark;
+
             return (
-              <Box
-                component="li"
-                key={option.key}
-                {...rest}
-                sx={OPTION_BASE_SX}
-              >
-                {option.label}
-                {isSelected && (
-                  <StyledImage
-                    sx={{
-                      ...TICK_ICON_SX,
-                      ml: isShowRemark ? 0.25 : 'auto',
-                    }}
-                    url={'/images/icon-tick.svg'}
-                  />
+              <>
+                {isRemarkChanged && (
+                  <Divider sx={{ mx: 2, borderColor: '#F0F0F4' }} />
                 )}
-                {isShowRemark && option.remark && (
-                  <Typography
-                    sx={{
-                      ml: 'auto',
-                      flexShrink: 0,
-                      fontSize: 12,
-                      color: '#B0ADBD',
-                    }}
-                  >
-                    {option.remark}
-                  </Typography>
-                )}
-              </Box>
+                <Box
+                  component="li"
+                  key={option.key}
+                  {...rest}
+                  sx={OPTION_BASE_SX}
+                >
+                  {option.label}
+                  {isSelected && (
+                    <StyledImage
+                      sx={{
+                        ...TICK_ICON_SX,
+                        ml: isShowRemark ? 0.25 : 'auto',
+                      }}
+                      url={'/images/icon-tick.svg'}
+                    />
+                  )}
+                  {isShowRemark && option.remark && (
+                    <Typography
+                      sx={{
+                        ml: 'auto',
+                        flexShrink: 0,
+                        fontSize: 12,
+                        color: '#B0ADBD',
+                      }}
+                    >
+                      {option.remark}
+                    </Typography>
+                  )}
+                </Box>
+              </>
             );
           }}
           renderValue={(renderValueItems, getItemProps) => {
