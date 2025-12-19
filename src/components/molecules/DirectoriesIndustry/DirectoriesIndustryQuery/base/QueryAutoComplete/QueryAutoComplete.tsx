@@ -329,19 +329,19 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
 
             const isSelected = props['aria-selected'] === true;
 
-            const prevOption =
-              state.index > 0 ? displayOptions[state.index - 1] : null;
-            const isRemarkChanged =
+            const nextOption =
+              state.index < displayOptions.length - 1
+                ? displayOptions[state.index + 1]
+                : null;
+            const isLastInRegionGroup =
               isShowRemark &&
-              prevOption &&
-              prevOption.inputValue !== '__loading_more__' &&
-              option.remark !== prevOption.remark;
+              option.remark === 'region' &&
+              nextOption &&
+              nextOption.inputValue !== '__loading_more__' &&
+              nextOption.remark !== 'region';
 
             return (
               <>
-                {isRemarkChanged && (
-                  <Divider sx={{ mx: 2, borderColor: '#F0F0F4' }} />
-                )}
                 <Box
                   component="li"
                   key={option.key}
@@ -371,6 +371,9 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
                     </Typography>
                   )}
                 </Box>
+                {isLastInRegionGroup && (
+                  <Divider sx={{ mx: 2, borderColor: '#F0F0F4' }} />
+                )}
               </>
             );
           }}
