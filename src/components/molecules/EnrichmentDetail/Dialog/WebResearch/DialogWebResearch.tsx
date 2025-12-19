@@ -25,7 +25,7 @@ import {
 
 import { COINS_PER_ROW } from '@/constants';
 import { useAsyncFn, useVariableFromStore } from '@/hooks';
-import { _updateWebResearchConfig, columnRun } from '@/request';
+import { columnRun } from '@/request';
 import { HttpError } from '@/types';
 import { extractPromptText } from '@/utils';
 

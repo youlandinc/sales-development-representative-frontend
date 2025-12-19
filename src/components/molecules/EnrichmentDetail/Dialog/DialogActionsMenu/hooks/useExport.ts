@@ -4,6 +4,7 @@ import ICON_CAMPAIGN from '@/components/molecules/EnrichmentDetail/assets/dialog
 import { useDialogStore } from '@/stores/useDialogStore';
 import { useShallow } from 'zustand/shallow';
 import { ProcessCreateTypeEnum } from '@/types';
+import { useSwitch } from '@/hooks';
 
 export const useExport = () => {
   const { openProcess, setCampaignType } = useDialogStore(
@@ -13,13 +14,15 @@ export const useExport = () => {
     })),
   );
 
+  const { visible, open, close } = useSwitch();
+
   const EXPORTS_MENUS = [
     {
       icon: ICON_CSV,
       title: 'Download CSV',
       description:
         'Provide a short summary of what the company does, who it serves, and what products/services it offers.',
-      onClick: async () => {},
+      onClick: open,
     },
     {
       icon: ICON_CAMPAIGN,
@@ -41,5 +44,8 @@ export const useExport = () => {
 
   return {
     EXPORTS_MENUS,
+    visible,
+    open,
+    close,
   };
 };
