@@ -333,12 +333,15 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               state.index < displayOptions.length - 1
                 ? displayOptions[state.index + 1]
                 : null;
+            const isRegion = option.remark?.toLowerCase() === 'region';
+            const nextIsRegion = nextOption?.remark?.toLowerCase() === 'region';
             const isLastInRegionGroup =
+              !inputValue &&
               isShowRemark &&
-              option.remark === 'region' &&
+              isRegion &&
               nextOption &&
               nextOption.inputValue !== '__loading_more__' &&
-              nextOption.remark !== 'region';
+              !nextIsRegion;
 
             return (
               <>
