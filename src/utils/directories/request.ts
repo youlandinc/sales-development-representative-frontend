@@ -223,13 +223,24 @@ export const processAdditionalDetails = (additional: any): any => {
     const checkbox = additional.checkbox as Record<string, boolean>;
     const values = additional.values as Record<string, any>;
 
-    const additionalFieldsKeys = Object.entries(checkbox)
-      .filter(([, value]) => value === true)
+    console.log(checkbox, values);
+
+    const checkedKeys = Object.entries(checkbox)
+      .filter(([, isChecked]) => isChecked)
       .map(([key]) => key);
 
+    // Only include values for checked fields (unchecked fields are excluded from request
+    // but preserved in local store for re-enabling later)
+    const filteredValues: Record<string, any> = {};
+    checkedKeys.forEach((key) => {
+      if (key in values) {
+        filteredValues[key] = values[key];
+      }
+    });
+
     return {
-      additionalFields: additionalFieldsKeys,
-      ...values,
+      additionalFields: checkedKeys,
+      ...filteredValues,
     };
   }
 
