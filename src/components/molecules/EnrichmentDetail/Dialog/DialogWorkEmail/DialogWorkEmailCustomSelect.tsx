@@ -76,6 +76,7 @@ export const DialogWorkEmailCustomSelect: FC<
               {...params}
               fullWidth
               placeholder={'Start typing or select a column'}
+              size={'small'}
               slotProps={{
                 input: {
                   ...params.InputProps,

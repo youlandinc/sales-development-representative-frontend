@@ -2,13 +2,13 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
   '& .MuiInputBase-root': {
     py: 0,
   },
-  '& .MuiAutocomplete-endAdornment': {
-    top: '47%',
-    // transform: 'none',
-  },
   '& .MuiOutlinedInput-root .MuiAutocomplete-input': {
     paddingTop: '8px',
     paddingBottom: '8px',
+  },
+  '& .MuiAutocomplete-endAdornment': {
+    display: 'inline-flex',
+    alignItems: 'center',
   },
   //small
   '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
@@ -19,10 +19,10 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
     paddingTop: '6px',
     paddingBottom: '6px',
   },
-  '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-endAdornment':
-    {
-      top: 2,
-    },
+  // '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-endAdornment':
+  //   {
+  //     top: 2,
+  //   },
   '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-tag': {
     maxHeight: 18,
     fontSize: 12,
@@ -32,9 +32,9 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
     paddingTop: '12px',
     paddingBottom: '12px',
   },
-  '& .MuiInputBase-sizeLarge .MuiAutocomplete-endAdornment': {
-    top: 9,
-  },
+  // '& .MuiInputBase-sizeLarge .MuiAutocomplete-endAdornment': {
+  //   top: 9,
+  // },
   '& .MuiInputBase-sizeLarge .MuiAutocomplete-tag': {
     maxHeight: 28,
     fontSize: 12,
@@ -60,9 +60,5 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
   },
   '&.Mui-focused': {
     bgcolor: '#F4F5F9 !important',
-  },
-  '& .MuiSvgIcon-fontSizeSmall': {
-    width: 14,
-    height: 14,
   },
 };
