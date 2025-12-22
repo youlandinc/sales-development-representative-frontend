@@ -71,7 +71,9 @@ export const useCascadeOptions = ({
   const [childOptions, setChildOptions] = useState<CascadeOption[]>([]);
   const [isLoadingParent, setIsLoadingParent] = useState(false);
   const [isLoadingChildren, setIsLoadingChildren] = useState(false);
-  const [childrenByParent, setChildrenByParent] = useState<Map<string, CascadeOption[]>>(new Map());
+  const [childrenByParent, setChildrenByParent] = useState<
+    Map<string, CascadeOption[]>
+  >(new Map());
 
   const parentAbortRef = useRef<AbortController | null>(null);
   const childAbortRef = useRef<AbortController | null>(null);
