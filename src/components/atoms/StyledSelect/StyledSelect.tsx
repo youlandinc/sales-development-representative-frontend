@@ -181,7 +181,10 @@ export const StyledSelect: FC<StyledSelectProps> = ({
             </InputAdornment>
           )
         }
-        IconComponent={IconComponent || ICON_ARROW}
+        IconComponent={
+          IconComponent ||
+          ((props) => <ICON_ARROW style={{ marginRight: '2px' }} {...props} />)
+        }
         id="styled-select"
         inputProps={{
           MenuProps: {

@@ -327,6 +327,9 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                         <Typography
                           color={'text.secondary'}
                           lineHeight={1.4}
+                          sx={{
+                            whiteSpace: 'pre-wrap',
+                          }}
                           variant={'body2'}
                         >
                           {log.content}

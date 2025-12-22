@@ -8,10 +8,24 @@ import {
 import { FC } from 'react';
 
 import { StyledTextField } from '@/components/atoms';
+
 import CheckIcon from './assets/icon_checked.svg';
-import ICON_CLOSE from './assets/icon-close.svg';
+import ICON_CLOSE from './assets/icon_close.svg';
 import ICON_STATIC from './assets/icon_static.svg';
+
+import ICON_ARROW from './assets/icon_arrow_down.svg';
+
 import { DEFAULT_AUTOCOMPLETE_SX } from '@/styles';
+
+const POPUP_ICON = (
+  <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
+);
+const CLEAR_ICON = (
+  <Icon
+    component={ICON_CLOSE}
+    sx={{ width: 14, height: 14, cursor: 'pointer' }}
+  />
+);
 
 export const StyledMultiSelect: FC<
   Omit<AutocompleteProps<any, true, false, false>, 'renderInput'> & {
@@ -20,6 +34,7 @@ export const StyledMultiSelect: FC<
 > = ({ placeholder, value, onChange, options, ...props }) => {
   return (
     <Autocomplete
+      clearIcon={CLEAR_ICON}
       disableCloseOnSelect
       isOptionEqualToValue={(option, value) => option.value === value.value}
       multiple
@@ -27,6 +42,7 @@ export const StyledMultiSelect: FC<
         onChange?.(_, newValue, reason);
       }}
       options={options}
+      popupIcon={POPUP_ICON}
       renderInput={(params) => (
         <StyledTextField
           {...params}
