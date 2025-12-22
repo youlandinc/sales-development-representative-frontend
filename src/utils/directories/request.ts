@@ -223,8 +223,6 @@ export const processAdditionalDetails = (additional: any): any => {
     const checkbox = additional.checkbox as Record<string, boolean>;
     const values = additional.values as Record<string, any>;
 
-    console.log(checkbox, values);
-
     const checkedKeys = Object.entries(checkbox)
       .filter(([, isChecked]) => isChecked)
       .map(([key]) => key);

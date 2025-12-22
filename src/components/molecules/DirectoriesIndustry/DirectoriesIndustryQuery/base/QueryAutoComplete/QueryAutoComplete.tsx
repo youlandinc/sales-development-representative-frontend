@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useId, useMemo } from 'react';
+import { FC, Fragment, ReactNode, useCallback, useId, useMemo } from 'react';
 import {
   Autocomplete,
   AutocompleteChangeReason,
@@ -344,13 +344,8 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               !nextIsRegion;
 
             return (
-              <>
-                <Box
-                  component="li"
-                  key={option.key}
-                  {...rest}
-                  sx={OPTION_BASE_SX}
-                >
+              <Fragment key={key}>
+                <Box component="li" {...rest} sx={OPTION_BASE_SX}>
                   {option.label}
                   {isSelected && (
                     <StyledImage
@@ -377,7 +372,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
                 {isLastInRegionGroup && (
                   <Divider sx={{ mx: 2, borderColor: '#F0F0F4' }} />
                 )}
-              </>
+              </Fragment>
             );
           }}
           renderValue={(renderValueItems, getItemProps) => {
@@ -458,12 +453,12 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               pl: 1.75,
               pr: 1,
             },
-            // When chips are present, reduce left padding
+            // When chips are present, reduce left padding and reserve space for endAdornment icons
             '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall:has(.query-autocomplete-chip)':
               {
                 py: 0.5,
                 pl: 0.75,
-                pr: 1,
+                pr: freeSolo ? 3.25 : 5.5,
               },
           }}
           value={autocompleteValue}
