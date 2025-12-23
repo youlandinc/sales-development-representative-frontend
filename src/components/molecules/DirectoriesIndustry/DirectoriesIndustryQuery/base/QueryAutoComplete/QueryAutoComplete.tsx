@@ -1,10 +1,11 @@
-import { FC, ReactNode, useCallback, useId, useMemo } from 'react';
+import { FC, Fragment, ReactNode, useCallback, useId, useMemo } from 'react';
 import {
   Autocomplete,
   AutocompleteChangeReason,
   Box,
   CircularProgress,
   createFilterOptions,
+  Divider,
   FilterOptionsState,
   Icon,
   Tooltip,
@@ -304,7 +305,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               }}
             />
           )}
-          renderOption={(props, option) => {
+          renderOption={(props, option, state) => {
             const { key, ...rest } = props;
 
             if (option.inputValue === '__loading_more__') {
@@ -328,36 +329,50 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
 
             const isSelected = props['aria-selected'] === true;
 
+            const nextOption =
+              state.index < displayOptions.length - 1
+                ? displayOptions[state.index + 1]
+                : null;
+            const isRegion = option.remark?.toLowerCase() === 'region';
+            const nextIsRegion = nextOption?.remark?.toLowerCase() === 'region';
+            const isLastInRegionGroup =
+              !inputValue &&
+              isShowRemark &&
+              isRegion &&
+              nextOption &&
+              nextOption.inputValue !== '__loading_more__' &&
+              !nextIsRegion;
+
             return (
-              <Box
-                component="li"
-                key={option.key}
-                {...rest}
-                sx={OPTION_BASE_SX}
-              >
-                {option.label}
-                {isSelected && (
-                  <StyledImage
-                    sx={{
-                      ...TICK_ICON_SX,
-                      ml: isShowRemark ? 0.25 : 'auto',
-                    }}
-                    url={'/images/icon-tick.svg'}
-                  />
+              <Fragment key={key}>
+                <Box component="li" {...rest} sx={OPTION_BASE_SX}>
+                  {option.label}
+                  {isSelected && (
+                    <StyledImage
+                      sx={{
+                        ...TICK_ICON_SX,
+                        ml: isShowRemark ? 0.25 : 'auto',
+                      }}
+                      url={'/images/icon-tick.svg'}
+                    />
+                  )}
+                  {isShowRemark && option.remark && (
+                    <Typography
+                      sx={{
+                        ml: 'auto',
+                        flexShrink: 0,
+                        fontSize: 12,
+                        color: '#B0ADBD',
+                      }}
+                    >
+                      {option.remark}
+                    </Typography>
+                  )}
+                </Box>
+                {isLastInRegionGroup && (
+                  <Divider sx={{ mx: 2, borderColor: '#F0F0F4' }} />
                 )}
-                {isShowRemark && option.remark && (
-                  <Typography
-                    sx={{
-                      ml: 'auto',
-                      flexShrink: 0,
-                      fontSize: 12,
-                      color: '#B0ADBD',
-                    }}
-                  >
-                    {option.remark}
-                  </Typography>
-                )}
-              </Box>
+              </Fragment>
             );
           }}
           renderValue={(renderValueItems, getItemProps) => {
@@ -422,20 +437,29 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           sx={{
             '& .MuiInputBase-root': {
               minHeight: '32px',
-              gap: 0.5,
+              gap: '4px 6px',
             },
             '& .MuiInputBase-input': {
               padding: '0 !important',
-              minHeight: '24px',
+              minHeight: '22px',
               fontSize: '12px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              paddingLeft: '8px !important',
+              pl: '-2px',
             },
             '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
               py: 0.5,
+              pl: 1.75,
+              pr: 1,
             },
+            // When chips are present, reduce left padding and reserve space for endAdornment icons
+            '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall:has(.query-autocomplete-chip)':
+              {
+                py: 0.5,
+                pl: 0.75,
+                pr: freeSolo ? 3.25 : 5.5,
+              },
           }}
           value={autocompleteValue}
         />

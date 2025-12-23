@@ -21,8 +21,11 @@ export type DirectoriesFormValues = {
   // L1/L3: Dynamic key from TAB config (e.g., 'entityType')
   tabKey?: string;
   tabValue?: string;
+  // Additional details config existence
+  // When false, this bizId doesn't have ADDITIONAL_DETAILS, skip B layer entirely
+  hasAdditionalConfig?: boolean;
   // Additional details authorization
-  // When false, B (additional details) changes are ignored
+  // When false, user doesn't have permission for additional details
   additionalIsAuth?: boolean;
 };
 
@@ -220,13 +223,22 @@ export const processAdditionalDetails = (additional: any): any => {
     const checkbox = additional.checkbox as Record<string, boolean>;
     const values = additional.values as Record<string, any>;
 
-    const additionalFieldsKeys = Object.entries(checkbox)
-      .filter(([, value]) => value === true)
+    const checkedKeys = Object.entries(checkbox)
+      .filter(([, isChecked]) => isChecked)
       .map(([key]) => key);
 
+    // Only include values for checked fields (unchecked fields are excluded from request
+    // but preserved in local store for re-enabling later)
+    const filteredValues: Record<string, any> = {};
+    checkedKeys.forEach((key) => {
+      if (key in values) {
+        filteredValues[key] = values[key];
+      }
+    });
+
     return {
-      additionalFields: additionalFieldsKeys,
-      ...values,
+      additionalFields: checkedKeys,
+      ...filteredValues,
     };
   }
 
@@ -341,9 +353,11 @@ export const buildFinalData = (
     }
   } else if (hasTab && tabKey) {
     // L3: Tab-based flat config, only include tab's data
-    query[tabKey] = resolvedTabValue;
     const tabData = formValues[resolvedTabValue] || {};
     Object.assign(query, tabData);
+    // Set tabKey after Object.assign to prevent tabData from overwriting it
+    // (some configs have tabKey in tabData with null value)
+    query[tabKey] = resolvedTabValue;
   } else {
     // L4: Pure flat config, include all formValues
     Object.assign(query, formValues);

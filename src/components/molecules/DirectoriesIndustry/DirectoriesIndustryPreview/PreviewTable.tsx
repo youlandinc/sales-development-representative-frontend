@@ -3,7 +3,6 @@ import { useShallow } from 'zustand/react/shallow';
 import {
   Box,
   Icon,
-  Skeleton,
   Stack,
   Table,
   TableBody,
@@ -20,33 +19,11 @@ import {
   DirectoriesQueryTableHeaderItem,
 } from '@/types/directories';
 
-import { OverflowTooltip } from './OverflowTooltip';
-import { COLUMN_TYPE_ICONS } from '@/constants';
-import { UFormatDate, UFormatDollar, UFormatNumber } from '@/utils';
+import { PreviewHeaderCell } from './PreviewHeaderCell';
+import { PreviewBodyCell } from './PreviewBodyCell';
 
 import ICON_LOCK from './assets/icon-lock.svg';
 import ICON_NO_RESULT from './assets/icon-no-result.svg';
-import ICON_REDIRECT_URL from './assets/icon-redirect-url.svg';
-
-const formatCellValue = (
-  value: unknown,
-  columnType: TableColumnTypeEnum,
-): string => {
-  if (value == null || value === '') {
-    return '-';
-  }
-
-  switch (columnType) {
-    case TableColumnTypeEnum.number:
-      return UFormatNumber(value as string | number);
-    case TableColumnTypeEnum.currency:
-      return UFormatDollar(value as string | number);
-    case TableColumnTypeEnum.date:
-      return UFormatDate(value as string | Date);
-    default:
-      return String(value);
-  }
-};
 
 const FALLBACK_SKELETON_COLUMNS: DirectoriesQueryTableHeaderItem[] = [
   {
@@ -68,25 +45,6 @@ const FALLBACK_SKELETON_COLUMNS: DirectoriesQueryTableHeaderItem[] = [
     isAuth: true,
   })),
 ];
-
-const FIXED_WIDTHS = [
-  '65%',
-  '80%',
-  '45%',
-  '70%',
-  '55%',
-  '75%',
-  '60%',
-  '85%',
-  '50%',
-  '72%',
-];
-const STABLE_HEADER_WIDTHS = FIXED_WIDTHS;
-const STABLE_BODY_WIDTHS = Array.from({ length: 20 }, (_, rowIndex) =>
-  FIXED_WIDTHS.map(
-    (_, colIndex) => FIXED_WIDTHS[(rowIndex + colIndex) % FIXED_WIDTHS.length],
-  ),
-);
 
 const SKELETON_ROW_COUNT = 5;
 
@@ -211,7 +169,7 @@ export const PreviewTable: FC = () => {
                       borderTop: '1px solid #F0F0F4',
                       borderRight: '1px solid #F0F0F4',
                       fontSize: 14,
-                      fontWeight: 600,
+                      fontWeight: 500,
                       color: 'primary.main',
                       whiteSpace: 'nowrap',
                       width: head.width ? `${head.width}px` : 'auto',
@@ -219,36 +177,11 @@ export const PreviewTable: FC = () => {
                       ...(index === 0 && { textAlign: 'center' }),
                     }}
                   >
-                    {isLoading ? (
-                      <Skeleton
-                        animation="wave"
-                        width={
-                          STABLE_HEADER_WIDTHS[
-                            index % STABLE_HEADER_WIDTHS.length
-                          ]
-                        }
-                      />
-                    ) : (
-                      <Stack
-                        sx={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: 0.5,
-                        }}
-                      >
-                        {index > 0 && (
-                          <Icon
-                            component={
-                              COLUMN_TYPE_ICONS[
-                                head.columnType as TableColumnTypeEnum
-                              ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
-                            }
-                            sx={{ width: 16, height: 16 }}
-                          />
-                        )}
-                        <OverflowTooltip>{head.columnName}</OverflowTooltip>
-                      </Stack>
-                    )}
+                    <PreviewHeaderCell
+                      head={head}
+                      index={index}
+                      isLoading={isLoading}
+                    />
                   </TableCell>
                 ),
               )}
@@ -264,115 +197,31 @@ export const PreviewTable: FC = () => {
             ).map((row, rowIndex) => (
               <TableRow key={rowIndex}>
                 {(isLoading ? skeletonColumns : reducedHeader).map(
-                  (head, colIndex) => {
-                    const isLocked = !head.isAuth && !isLoading;
-
-                    return (
-                      <TableCell
-                        key={`${rowIndex}-${colIndex}`}
-                        sx={{
-                          py: 0,
-                          px: 1.5,
-                          borderRight: '1px solid #F0F0F4',
-                          borderBottom: '1px solid #F0F0F4',
-                          fontSize: 14,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          maxWidth: 300,
-                          ...(colIndex === 0 && { textAlign: 'center' }),
-                        }}
-                      >
-                        {isLoading ? (
-                          <Skeleton
-                            animation="wave"
-                            width={
-                              STABLE_BODY_WIDTHS[
-                                rowIndex % STABLE_BODY_WIDTHS.length
-                              ]?.[colIndex % STABLE_BODY_WIDTHS[0].length]
-                            }
-                          />
-                        ) : isLocked ? (
-                          <Box
-                            sx={{
-                              filter: 'blur(4px)',
-                              opacity: 0.7,
-                              userSelect: 'none',
-                              pointerEvents: 'none',
-                            }}
-                          >
-                            {row?.[head.columnKey as keyof typeof row] ||
-                              'LOCKED INFORMATION'}
-                          </Box>
-                        ) : colIndex === 0 ? (
-                          rowIndex + 1
-                        ) : head.columnType === TableColumnTypeEnum.url ? (
-                          row?.[head.columnKey as keyof typeof row] ? (
-                            <Box
-                              onClick={() => {
-                                const url =
-                                  row?.[head.columnKey as keyof typeof row];
-                                if (!url) {
-                                  return;
-                                }
-                                const finalUrl =
-                                  url.startsWith('http://') ||
-                                  url.startsWith('https://')
-                                    ? url
-                                    : `https://${url}`;
-                                window.open(finalUrl, '_blank');
-                              }}
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                width: 'fit-content',
-                              }}
-                            >
-                              <Icon
-                                component={ICON_REDIRECT_URL}
-                                sx={{
-                                  width: 16,
-                                  height: 16,
-                                  flexShrink: 0,
-                                  cursor: 'pointer',
-                                  '& path': {
-                                    fill: 'rgba(111, 108, 125, .8)',
-                                  },
-                                }}
-                              />
-                              <Typography
-                                sx={{
-                                  flex: 1,
-                                  color: 'rgba(111, 108, 125, .8)',
-                                  minWidth: 0,
-                                  fontSize: 14,
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  textDecoration: 'underline',
-                                  cursor: 'pointer',
-                                  textDecorationColor:
-                                    'rgba(111, 108, 125, .5)',
-                                  textUnderlineOffset: '2px',
-                                }}
-                              >
-                                {row?.[head.columnKey as keyof typeof row]}
-                              </Typography>
-                            </Box>
-                          ) : (
-                            '-'
-                          )
-                        ) : (
-                          <OverflowTooltip>
-                            {formatCellValue(
-                              row?.[head.columnKey as keyof typeof row],
-                              head.columnType,
-                            )}
-                          </OverflowTooltip>
-                        )}
-                      </TableCell>
-                    );
-                  },
+                  (head, colIndex) => (
+                    <TableCell
+                      key={`${rowIndex}-${colIndex}`}
+                      sx={{
+                        py: 0,
+                        px: 1.5,
+                        borderRight: '1px solid #F0F0F4',
+                        borderBottom: '1px solid #F0F0F4',
+                        fontSize: 14,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: 300,
+                        ...(colIndex === 0 && { textAlign: 'center' }),
+                      }}
+                    >
+                      <PreviewBodyCell
+                        colIndex={colIndex}
+                        head={head}
+                        isLoading={isLoading}
+                        row={row}
+                        rowIndex={rowIndex}
+                      />
+                    </TableCell>
+                  ),
                 )}
               </TableRow>
             ))}

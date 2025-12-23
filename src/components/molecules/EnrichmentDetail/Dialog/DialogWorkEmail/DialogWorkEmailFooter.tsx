@@ -1,18 +1,9 @@
-import {
-  Icon,
-  Menu,
-  MenuItem,
-  menuItemClasses,
-  Stack,
-  Typography,
-} from '@mui/material';
 import { useParams } from 'next/navigation';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { StyledButton, StyledCost } from '@/components/atoms';
-
-import { COINS_PER_ROW } from '@/constants';
+import { StyledButton } from '@/components/atoms';
+import { DialogFooter } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
 
 import { useProspectTableStore } from '@/stores/enrichment';
 import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
@@ -20,7 +11,7 @@ import { useComputedInWorkEmailStore, useWorkEmailRequest } from './hooks';
 
 import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/enrichment';
 
-import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';
+import { COINS_PER_ROW } from '@/constants';
 
 interface DialogWorkEmailFooterProps {
   cb?: () => void;
@@ -39,16 +30,45 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
         displayType: state.displayType,
       })),
     );
-  const { requestState } = useWorkEmailRequest(cb);
   const params = useParams();
   const tableId =
     typeof params.tableId === 'string' && params.tableId.trim() !== ''
       ? params.tableId
       : '';
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { requestState } = useWorkEmailRequest(tableId, cb);
 
   return (
+    <DialogFooter
+      coinsPerRow={COINS_PER_ROW}
+      disabled={requestState?.state?.loading || isMissingConfig}
+      loading={requestState?.state?.loading}
+      onClickToSaveAndRun10={() => {
+        requestState?.request?.(tableId, 10);
+      }}
+      onClickToSaveAndRunAll={() => {
+        requestState?.request?.(tableId, rowIds.length);
+      }}
+      onClickToSaveDoNotRun={() => {
+        requestState?.request?.(tableId, rowIds.length, false);
+      }}
+      slot={
+        displayType === DisplayTypeEnum.integration ? (
+          <StyledButton
+            onClick={() => {
+              setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
+              setDisplayType(DisplayTypeEnum.main);
+            }}
+            sx={{ height: '40px !important' }}
+            variant={'contained'}
+          >
+            Save waterfall step
+          </StyledButton>
+        ) : null
+      }
+    />
+  );
+
+  /* return (
     <Stack
       alignItems={'center'}
       borderTop={' 1px solid   #D0CEDA'}
@@ -64,6 +84,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
           onClick={() => {
             setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
             setDisplayType(DisplayTypeEnum.main);
+            onClickToSaveWaterfallStep?.();
           }}
           sx={{ height: '40px !important' }}
           variant={'contained'}
@@ -73,8 +94,9 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
       ) : (
         <>
           <StyledCost
-            border={'1px solid #D0CEDA'}
-            count={`${COINS_PER_ROW}`}
+            border={'1px solid #F4F5F9'}
+            borderRadius={2}
+            count={`${coinsPerRow}`}
             textColor={'text.secondary'}
           />
           <StyledButton
@@ -103,12 +125,20 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
       )}
       <Menu
         anchorEl={anchorEl}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
         onClose={() => {
           setAnchorEl(null);
         }}
         open={Boolean(anchorEl)}
         slotProps={{
+          paper: {
+            sx: {
+              transform: 'translateY(-18px) !important',
+            },
+          },
           list: {
             sx: {
               p: 0,
@@ -119,35 +149,54 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
             },
           },
         }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
       >
         {rowIds.length > 10 && (
           <MenuItem
             onClick={() => {
               setAnchorEl(null);
               requestState?.request?.(tableId, 10);
+              onClickToSaveAndRun10?.();
             }}
           >
             <Typography color={'text.secondary'} variant={'body2'}>
               Save and run 10 rows
             </Typography>
-            <StyledCost bgcolor={'#EFE9FB'} count={`~${COINS_PER_ROW * 10}`} />
+            <StyledCost
+              bgcolor={'transparent'}
+              border={'1px solid #F4F5F9'}
+              borderRadius={2}
+              count={`${coinsPerRow * 10}`}
+              textColor={'text.secondary'}
+            />
           </MenuItem>
         )}
         <MenuItem
           onClick={() => {
             setAnchorEl(null);
             requestState?.request?.(tableId, rowIds.length);
+            onClickToSaveAndRunAll?.();
           }}
         >
           <Typography color={'text.secondary'} variant={'body2'}>
             Save and run {rowIds.length} rows in this view
           </Typography>
-          <StyledCost bgcolor={'#EFE9FB'} count={'~20'} />
+          <StyledCost
+            bgcolor={'transparent'}
+            border={'1px solid #F4F5F9'}
+            borderRadius={2}
+            count={`~${rowIds.length}`}
+            textColor={'text.secondary'}
+          />
         </MenuItem>
         <MenuItem
           onClick={async () => {
             setAnchorEl(null);
             requestState?.request?.(tableId, rowIds.length, false);
+            onClickToSaveDoNotRun?.();
           }}
         >
           <Typography color={'text.secondary'} variant={'body2'}>
@@ -156,5 +205,5 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
         </MenuItem>
       </Menu>
     </Stack>
-  );
+  ); */
 };

@@ -86,3 +86,17 @@ export const _createTableColumn = (params: {
   // API v2 returns the created column directly
   return post<TableColumnProps>('/sdr/table/field/v2', params);
 };
+
+export const _exportTableData = (tableId: string) => {
+  return get('/sdr/table/data/export', {
+    params: { tableId },
+    responseType: 'blob',
+    headers: {
+      Accept: 'text/csv',
+    },
+  });
+};
+
+export const _createBlankTable = () => {
+  return post('/sdr/table');
+};

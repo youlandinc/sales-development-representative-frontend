@@ -2,8 +2,10 @@ import { FC } from 'react';
 
 import { StyledSelect, StyledSelectProps } from '@/components/atoms';
 
-import { getAddColumnMenuActions } from '@/constants';
-import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
+import {
+  COLUMN_TYPE_ICONS,
+  getAddColumnMenuActions,
+} from '@/components/molecules/EnrichmentDetail/Table/config';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 import { Icon, Stack, Typography } from '@mui/material';

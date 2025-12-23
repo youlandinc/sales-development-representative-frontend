@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 import { SDRToast } from '@/components/atoms';
 
@@ -25,43 +26,49 @@ export interface SelectedPlan {
 export const useCurrentPlan = () => {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SelectedPlan | null>(null);
-  const planList = useCurrentPlanStore((state) => state.planList);
-  const fetchCurrentPlan = useCurrentPlanStore(
-    (state) => state.fetchCurrentPlan,
+  const { planList, fetchCurrentPlan, isLoading } = useCurrentPlanStore(
+    useShallow((state) => ({
+      planList: state.planList,
+      fetchCurrentPlan: state.fetchCurrentPlan,
+      isLoading: state.isLoading,
+    })),
   );
-  const isLoading = useCurrentPlanStore((state) => state.isLoading);
 
-  const plans: PlanCardProps[] = planList
-    .filter((plan) => plan.status !== PlanStatusEnum.created)
-    .map((plan) => {
-      const style = computedPlanBadgeStyle(plan.planType);
-      const isPremium = PREMIUM_PLAN_TYPES.includes(
-        plan.planType as (typeof PREMIUM_PLAN_TYPES)[number],
-      );
-      const isFullAccess = FULL_ACCESS_PLAN_TYPES.includes(
-        plan.planType as (typeof FULL_ACCESS_PLAN_TYPES)[number],
-      );
+  const plans: PlanCardProps[] = useMemo(
+    () =>
+      planList
+        .filter((plan) => plan.status !== PlanStatusEnum.created)
+        .map((plan) => {
+          const style = computedPlanBadgeStyle(plan.planType);
+          const isPremium = PREMIUM_PLAN_TYPES.includes(
+            plan.planType as (typeof PREMIUM_PLAN_TYPES)[number],
+          );
+          const isFullAccess = FULL_ACCESS_PLAN_TYPES.includes(
+            plan.planType as (typeof FULL_ACCESS_PLAN_TYPES)[number],
+          );
 
-      return {
-        planName: plan.categoryName,
-        // category: plan.category,
-        planBadge: {
-          label: plan.planName,
-          bgColor: style.bgColor,
-          textColor: style.textColor,
-          gradient: isPremium,
-        },
-        fullAccess: isFullAccess,
-        unit: plan.creditType,
-        renewalDate: plan.planEndTime,
-        refreshDays: plan.remainingDays,
-        totalValue: plan.totalCredits,
-        // currentValue: plan.totalCredits - plan.usedCredits, // 剩余额度
-        currentValue: plan.remainingCredits, // 剩余额度
-        status: plan.status,
-        planType: plan.planType,
-      };
-    });
+          return {
+            planName: plan.categoryName,
+            // category: plan.category,
+            planBadge: {
+              label: plan.planName,
+              bgColor: style.bgColor,
+              textColor: style.textColor,
+              gradient: isPremium,
+            },
+            fullAccess: isFullAccess,
+            unit: plan.creditType,
+            renewalDate: plan.planEndTime,
+            refreshDays: plan.remainingDays,
+            totalValue: plan.totalCredits,
+            // currentValue: plan.totalCredits - plan.usedCredits, // 剩余额度
+            currentValue: plan.remainingCredits, // 剩余额度
+            status: plan.status,
+            planType: plan.planType,
+          };
+        }),
+    [planList],
+  );
 
   const [cancelState, onClickToConfirmCancellation] = useAsyncFn(async () => {
     if (!selectedPlan) {
@@ -76,7 +83,7 @@ export const useCurrentPlan = () => {
       const { message, header, variant } = e as HttpError;
       SDRToast({ message, header, variant });
     }
-  }, [selectedPlan]);
+  }, [selectedPlan, fetchCurrentPlan]);
 
   const onClickToCancelPlan = useCallback(
     (planName: string, planType: PlanTypeEnum, renewalDate?: string) => {

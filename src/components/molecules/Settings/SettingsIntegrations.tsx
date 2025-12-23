@@ -77,7 +77,13 @@ export const SettingsIntegrations: FC = () => {
   );
 
   return (
-    <Stack border={'1px solid #DFDEE6'} borderRadius={4} gap={3} p={3}>
+    <Stack
+      border={'1px solid #DFDEE6'}
+      borderRadius={4}
+      gap={3}
+      maxWidth={900}
+      p={3}
+    >
       <Stack gap={'4px'}>
         <Typography
           component={'div'}
@@ -111,7 +117,7 @@ export const SettingsIntegrations: FC = () => {
           <Stack
             alignItems={'center'}
             border={'1px solid #DFDEE6'}
-            borderRadius={1}
+            borderRadius={2}
             flexDirection={'row'}
             justifyContent={'space-between'}
             key={`${integration.provider}-${index}`}
@@ -119,7 +125,7 @@ export const SettingsIntegrations: FC = () => {
             sx={{
               backgroundColor: integration.connected ? '#fff' : '#F4F5F9',
             }}
-            width={438}
+            width={'calc(50% - 12px)'}
           >
             <Stack alignItems={'center'} flexDirection={'row'} gap={1.5}>
               <Stack border={'1px solid #DFDEE6'} borderRadius={'50%'} p={0.5}>

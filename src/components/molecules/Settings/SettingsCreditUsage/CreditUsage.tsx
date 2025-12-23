@@ -1,17 +1,17 @@
-import { FC, useCallback, useMemo, useState } from 'react';
-import { Avatar, Box, Stack, Typography } from '@mui/material';
-import { format } from 'date-fns';
+import { Avatar, Box, Icon, Stack, Typography } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
+import { format } from 'date-fns';
+import { FC, useCallback, useMemo, useState } from 'react';
 
-import { StyledButton } from '@/components/atoms';
-import { CreditUsageGrid } from './CreditUsageGrid';
-import { CreditUsageToolbar } from './CreditUsageToolbar';
+import { CreditUsageGrid, CreditUsageToolbar } from './index';
 
-import { UTypeOf } from '@/utils';
 import { PlanCategoryEnum } from '@/types';
+import { UTypeOf } from '@/utils';
 import { useCreditUsage } from './hooks';
 
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import ICON_LEFT from './assets/icon_arrow_left.svg';
+import ICON_RIGHT from './assets/icon_arrow_right.svg';
 
 interface Provider {
   companyName: string;
@@ -174,6 +174,7 @@ export const CreditUsage: FC = () => {
         field: 'creditsUsed',
         headerName: 'Records used',
         width: 150,
+        align: 'center',
         renderCell: ({ value }) => {
           if (UTypeOf.isNumber(value)) {
             return value.toLocaleString();
@@ -202,6 +203,7 @@ export const CreditUsage: FC = () => {
         field: 'creditsUsed',
         headerName: 'Credits used',
         width: 150,
+        align: 'center',
         renderCell: ({ value }) => {
           if (UTypeOf.isNumber(value)) {
             return value.toLocaleString();
@@ -216,6 +218,7 @@ export const CreditUsage: FC = () => {
         field: 'remainingCredits',
         headerName: 'Remaining credits',
         width: 160,
+        align: 'center',
         renderCell: ({ value }) => {
           if (value === -1) {
             return 'Unlimited';
@@ -320,11 +323,13 @@ export const CreditUsage: FC = () => {
                       key={colIndex}
                       minWidth={col.minWidth}
                       px={3}
+                      textAlign={col.align || 'left'}
                       width={col.width}
                     >
                       <Typography
-                        color={TEXT_SECONDARY_COLOR}
                         sx={{ fontSize: 12 }}
+                        textAlign={col.align || 'left'}
+                        width={'100%'}
                       >
                         {provider.creditsUsed}
                       </Typography>
@@ -351,18 +356,20 @@ export const CreditUsage: FC = () => {
   );
 
   return (
-    <Box
+    <Stack
       sx={{
         bgcolor: 'white',
-        border: '1px solid #E5E5E5',
         borderRadius: 4,
         p: 3,
+        height: '100%',
+        border: '1px solid #E5E5E5',
+        maxWidth: 1100,
       }}
     >
       <Stack
         sx={{
-          gap: 3,
-          maxWidth: 1100,
+          flex: 1,
+          minHeight: 0,
         }}
       >
         <CreditUsageToolbar
@@ -370,45 +377,57 @@ export const CreditUsage: FC = () => {
           usageTypeList={usageType}
           value={queryConditions}
         />
-        <Stack gap={1.5}>
-          <CreditUsageGrid
-            columns={columns}
-            expandedRows={expandedRows}
-            isLoading={isLoading}
-            list={data?.data?.content || []}
-            renderDetail={renderDetail}
-          />
-          <Stack
-            alignItems="center"
-            direction="row"
-            justifyContent="space-between"
-          >
-            <Typography sx={{ fontSize: 12, color: '#7D7D7D' }}>
-              {data?.data?.content?.length}{' '}
-              {data?.data?.content?.length === 1 ? 'record' : 'records'}
-            </Typography>
-            <Stack direction={'row'} gap={1.5}>
-              <StyledButton
-                disabled={page === 0}
-                onClick={() => setPage((p) => p - 1)}
-                size={'small'}
-                variant={'outlined'}
-              >
-                Previous
-              </StyledButton>
-              <StyledButton
-                color={'info'}
-                disabled={page >= totalPages - 1}
-                onClick={() => setPage((p) => p + 1)}
-                size={'small'}
-                variant={'outlined'}
-              >
-                Next
-              </StyledButton>
-            </Stack>
+        <CreditUsageGrid
+          columns={columns}
+          expandedRows={expandedRows}
+          isLoading={isLoading}
+          list={data?.data?.content || []}
+          renderDetail={renderDetail}
+        />
+        <Stack
+          sx={{
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            mt: 'auto',
+            borderTop: '1px solid rgb(223, 222, 230)',
+            pt: 1.5,
+          }}
+        >
+          <Typography sx={{ fontSize: 12, color: '#7D7D7D' }}>
+            {data?.data?.page.totalElements}{' '}
+            {data?.data?.page.totalElements === 1 ? 'record' : 'records'}
+          </Typography>
+          <Stack direction={'row'} gap={1.5}>
+            <Icon
+              component={ICON_LEFT}
+              onClick={page === 0 ? undefined : () => setPage((p) => p - 1)}
+              sx={{
+                width: 20,
+                height: 20,
+                '& path': {
+                  fill: page === 0 ? '#D0CEDA' : '#363440',
+                },
+                cursor: page === 0 ? 'not-allowed' : 'pointer',
+              }}
+            />
+            <Icon
+              component={ICON_RIGHT}
+              onClick={
+                page >= totalPages - 1 ? undefined : () => setPage((p) => p + 1)
+              }
+              sx={{
+                width: 20,
+                height: 20,
+                '& path': {
+                  fill: page >= totalPages - 1 ? '#D0CEDA' : '#363440',
+                },
+                cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer',
+              }}
+            />
           </Stack>
         </Stack>
       </Stack>
-    </Box>
+    </Stack>
   );
 };

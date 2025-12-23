@@ -12,7 +12,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import ClearIcon from '@mui/icons-material/Clear';
+import { Clear } from '@mui/icons-material';
+import ICON_ARROW from './assets/icon_arrow.svg';
 
 export interface StyledSelectProps extends BaseSelectProps {
   validate?: undefined | string[];
@@ -55,6 +56,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
   loadOptions,
   renderOption,
   onOpen,
+  IconComponent,
   ...rest
   //sxHelperText,
 }) => {
@@ -172,12 +174,16 @@ export const StyledSelect: FC<StyledSelectProps> = ({
               onClick={() => {
                 onClear?.();
               }}
-              position="end"
+              position={'end'}
               sx={{ mr: 1.75, cursor: 'pointer' }}
             >
-              {clearIcon || <ClearIcon sx={{ fontSize: 20 }} />}
+              {clearIcon || <Clear sx={{ fontSize: 20 }} />}
             </InputAdornment>
           )
+        }
+        IconComponent={
+          IconComponent ||
+          ((props) => <ICON_ARROW style={{ marginRight: '2px' }} {...props} />)
         }
         id="styled-select"
         inputProps={{

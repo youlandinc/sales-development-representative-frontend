@@ -6,6 +6,7 @@ export {
   getAdditionalIsAuth,
   getButtonGroupKey,
   getTabKey,
+  hasAdditionalConfig,
   hasButtonGroup,
   hasTab,
 } from './config';

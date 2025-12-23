@@ -1,11 +1,4 @@
-import {
-  debounce,
-  Drawer,
-  DrawerProps,
-  Icon,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { debounce, DrawerProps, Icon, Stack, Typography } from '@mui/material';
 import Fuse from 'fuse.js';
 import { FC, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -20,7 +13,6 @@ import { StyledCellDetailsObj } from './StyledCellDetailsObj';
 import { useProspectTableStore } from '@/stores/enrichment';
 
 import { HttpVariantEnum } from '@/types';
-import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 import { UTypeOf } from '@/utils';
 
@@ -32,12 +24,10 @@ import SearchIcon from '@mui/icons-material/Search';
 type CellDetailsProps = {
   data: Record<string, any>;
 } & DrawerProps;
-export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
-  const { dialogType, closeDialog, dialogVisible } = useProspectTableStore(
+export const DialogCellDetails: FC<CellDetailsProps> = ({ data }) => {
+  const { closeDialog } = useProspectTableStore(
     useShallow((state) => ({
-      dialogType: state.dialogType,
       closeDialog: state.closeDialog,
-      dialogVisible: state.dialogVisible,
     })),
   );
 
@@ -131,110 +121,95 @@ export const DialogCellDetails: FC<CellDetailsProps> = ({ data, ...rest }) => {
   };
 
   return (
-    <Drawer
-      anchor={'right'}
-      hideBackdrop
-      open={
-        dialogVisible && dialogType === TableColumnMenuActionEnum.cell_detail
-      }
-      sx={{
-        left: 'unset',
-      }}
-      {...rest}
-    >
-      <Stack height={'100%'} justifyContent={'space-between'}>
-        {/* header */}
-        <Stack
-          alignItems={'center'}
-          flexDirection={'row'}
-          px={3}
-          py={2}
-          width={500}
+    <Stack height={'100%'} justifyContent={'space-between'}>
+      {/* header */}
+      <Stack
+        alignItems={'center'}
+        flexDirection={'row'}
+        px={3}
+        py={2}
+        width={500}
+      >
+        <Icon component={ICON_SPARK} sx={{ width: 20, height: 20, mr: 0.5 }} />
+        <Typography fontWeight={600} mr={1}>
+          Cell details
+        </Typography>
+        <StyledButton
+          color={'info'}
+          endIcon={<ContentCopy sx={{ width: 12, height: 12 }} />}
+          onClick={async () => {
+            await navigator.clipboard.writeText(JSON.stringify(data));
+            SDRToast({
+              message: 'Copied to clipboard',
+              header: false,
+              variant: 'success' as HttpVariantEnum,
+            });
+          }}
+          size={'small'}
+          variant={'outlined'}
         >
-          <Icon
-            component={ICON_SPARK}
-            sx={{ width: 20, height: 20, mr: 0.5 }}
-          />
-          <Typography fontWeight={600} mr={1}>
-            Cell details
-          </Typography>
-          <StyledButton
-            color={'info'}
-            endIcon={<ContentCopy sx={{ width: 12, height: 12 }} />}
-            onClick={async () => {
-              await navigator.clipboard.writeText(JSON.stringify(data));
-              SDRToast({
-                message: 'Copied to Clipboard',
-                header: false,
-                variant: 'success' as HttpVariantEnum,
-              });
-            }}
-            size={'small'}
-            variant={'outlined'}
-          >
-            Copy JSON
-          </StyledButton>
-          <CloseIcon
-            onClick={handleClose}
-            sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
-          />
-        </Stack>
-        {/* content */}
-        <Stack flex={1} gap={1.5} maxWidth={500} px={3} py={1} width={500}>
-          <StyledTextField
-            onChange={(e) => {
-              debouncedSetSearch(e.target.value);
-            }}
-            placeholder={'Search'}
-            slotProps={{
-              input: {
-                startAdornment: <SearchIcon sx={{ color: 'text.secondary' }} />,
-              },
-            }}
-            sx={{
-              bgcolor: '#FFF',
-            }}
-            variant={'outlined'}
-          />
-          {filteredEntries.map(({ key, value }) => {
-            if (Array.isArray(value)) {
-              return (
-                <StyledCellDetailsArray
-                  key={key}
-                  title={key}
-                  value={value as string[]}
-                />
-              );
-            }
-            if (UTypeOf.isObject(value)) {
-              return (
-                <StyledCellDetailsObj
-                  key={key}
-                  title={key}
-                  value={value as Record<string, any>}
-                />
-              );
-            }
-            return (
-              <StyledCellItemContainer copyContent={value} key={key}>
-                <Stack gap={1} key={key} width={'fit-content'}>
-                  <Typography variant={'body2'}>{key}</Typography>
-                  <Typography color={'text.secondary'} variant={'body3'}>
-                    {String(value ?? '')}
-                  </Typography>
-                </Stack>
-              </StyledCellItemContainer>
-            );
-          })}
-        </Stack>
-        {/* footer */}
-        <Stack
-          alignItems={'center'}
-          flexDirection={'row'}
-          height={48}
-          px={3}
-        ></Stack>
+          Copy JSON
+        </StyledButton>
+        <CloseIcon
+          onClick={handleClose}
+          sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
+        />
       </Stack>
-    </Drawer>
+      {/* content */}
+      <Stack flex={1} gap={1.5} maxWidth={500} px={3} py={1} width={500}>
+        <StyledTextField
+          onChange={(e) => {
+            debouncedSetSearch(e.target.value);
+          }}
+          placeholder={'Search'}
+          slotProps={{
+            input: {
+              startAdornment: <SearchIcon sx={{ color: 'text.secondary' }} />,
+            },
+          }}
+          sx={{
+            bgcolor: '#FFF',
+          }}
+          variant={'outlined'}
+        />
+        {filteredEntries.map(({ key, value }) => {
+          if (Array.isArray(value)) {
+            return (
+              <StyledCellDetailsArray
+                key={key}
+                title={key}
+                value={value as string[]}
+              />
+            );
+          }
+          if (UTypeOf.isObject(value)) {
+            return (
+              <StyledCellDetailsObj
+                key={key}
+                title={key}
+                value={value as Record<string, any>}
+              />
+            );
+          }
+          return (
+            <StyledCellItemContainer copyContent={value} key={key}>
+              <Stack gap={1} key={key} width={'fit-content'}>
+                <Typography variant={'body2'}>{key}</Typography>
+                <Typography color={'text.secondary'} variant={'body3'}>
+                  {String(value ?? '')}
+                </Typography>
+              </Stack>
+            </StyledCellItemContainer>
+          );
+        })}
+      </Stack>
+      {/* footer */}
+      <Stack
+        alignItems={'center'}
+        flexDirection={'row'}
+        height={48}
+        px={3}
+      ></Stack>
+    </Stack>
   );
 };

@@ -11,16 +11,17 @@ import {
 import useSWR from 'swr';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
+import {
+  useProspectTableStore,
+  useWebResearchStore,
+} from '@/stores/enrichment';
 import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
 import { _fetchTableRowData } from '@/request';
-import {
-  checkIsAiColumn,
-  MIN_BATCH_SIZE,
-  SYSTEM_COLUMN_SELECT,
-} from '@/constants/table';
+import { MIN_BATCH_SIZE, SYSTEM_COLUMN_SELECT } from '../Table/config';
+import { checkIsAiColumn } from '../Table/utils';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 interface UseProspectTableParams {
   tableId: string;
@@ -76,10 +77,23 @@ export const useProspectTable = ({
       updateCellValue: store.updateCellValue,
     })),
   );
-  const { runAi } = useRunAi();
-  const fetchIntegrationMenus = useWorkEmailStore(
-    (store) => store.fetchIntegrationMenus,
+
+  const { fetchActionsMenus } = useActionsStore(
+    useShallow((store) => ({
+      fetchActionsMenus: store.fetchActionsMenus,
+    })),
   );
+
+  const { fetchWebResearchModelList } = useWebResearchStore(
+    useShallow((store) => ({
+      fetchWebResearchModelList: store.fetchWebResearchModelList,
+    })),
+  );
+
+  const { runAi } = useRunAi();
+  // const fetchIntegrationMenus = useWorkEmailStore(
+  //   (store) => store.fetchIntegrationMenus,
+  // );
 
   // TODO: State management optimization
   // 1. Using both ref and state to maintain rowsMap can cause inconsistencies
@@ -311,13 +325,15 @@ export const useProspectTable = ({
       return;
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
-    fetchIntegrationMenus();
+    fetchActionsMenus(tableId);
+    fetchWebResearchModelList();
   }, [
     tableId,
     total,
     fetchBatchData,
     isMetadataLoading,
-    fetchIntegrationMenus,
+    fetchActionsMenus,
+    fetchWebResearchModelList,
   ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)
@@ -365,7 +381,7 @@ export const useProspectTable = ({
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [rowIds.length, fetchBatchData]);
+  }, [rowIds.length, fetchBatchData, rowIds]);
 
   // Handle visible range change (for virtualization)
   const onVisibleRangeChange = useCallback(

@@ -7,12 +7,27 @@ import {
 } from '@mui/material';
 import { FC, ReactNode } from 'react';
 
+import { StyledTextField } from '@/components/atoms';
+
 import { useProspectTableStore } from '@/stores/enrichment';
 
-import { StyledTextField } from '@/components/atoms';
-import { COLUMN_TYPE_ICONS } from '@/constants/table/iconsColumnType';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
+
+import { COLUMN_TYPE_ICONS } from '../../Table/config';
 import { DEFAULT_AUTOCOMPLETE_SX } from '@/styles';
+
+import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';
+import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close_thin.svg';
+
+const POPUP_ICON = (
+  <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
+);
+const CLEAR_ICON = (
+  <Icon
+    component={ICON_CLOSE}
+    sx={{ width: 14, height: 14, cursor: 'pointer' }}
+  />
+);
 
 export const DialogWorkEmailCustomSelect: FC<
   { title?: string | ReactNode; required?: boolean } & Pick<
@@ -48,21 +63,24 @@ export const DialogWorkEmailCustomSelect: FC<
         </Typography>
       )}
       <Autocomplete
+        clearIcon={CLEAR_ICON}
         fullWidth
         getOptionLabel={(option) => option.label}
         isOptionEqualToValue={(option, value) => option.value === value.value}
         onChange={onChange}
         options={options}
+        popupIcon={POPUP_ICON}
         renderInput={(params) => {
           return (
             <StyledTextField
               {...params}
               fullWidth
               placeholder={'Start typing or select a column'}
+              size={'small'}
               slotProps={{
                 input: {
                   ...params.InputProps,
-                  startAdornment: !value ? null : (
+                  startAdornment: !value?.value ? null : (
                     <Icon
                       component={
                         COLUMN_TYPE_ICONS[

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { Icon, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useRouter } from 'nextjs-toploader/app';
@@ -39,89 +39,6 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
 }) => {
   const router = useRouter();
 
-  const columns: GridColDef<ProspectTableItem>[] = [
-    {
-      headerName: 'Name',
-      field: 'tableName',
-      sortable: false,
-      align: 'left',
-      headerAlign: 'left',
-      flex: 1,
-      minWidth: 780,
-      renderCell: ({ row }) => {
-        return (
-          <Stack
-            alignItems={'center'}
-            flexDirection={'row'}
-            gap={1}
-            height={'100%'}
-          >
-            <Typography component={'span'} variant={'body2'}>
-              {row.tableName}
-            </Typography>
-          </Stack>
-        );
-      },
-    },
-    /*     {
-      headerName: 'Contacts',
-      field: 'contacts',
-      sortable: false,
-      align: 'left',
-      headerAlign: 'left',
-      minWidth: 120,
-      renderCell: ({ value }) => (
-        <Typography component={'span'} variant={'body2'}>
-          {UFormatNumber(value)}
-        </Typography>
-      ),
-    }, */
-    {
-      headerName: 'Last modified',
-      field: 'updatedAt',
-      sortable: false,
-      align: 'left',
-      headerAlign: 'left',
-      minWidth: 120,
-      renderCell: ({ value }) => (
-        <Typography component={'span'} variant={'body2'}>
-          {UFormatDate(value, 'MMM d, yyyy')}
-        </Typography>
-      ),
-    },
-    {
-      headerName: '',
-      field: '',
-      sortable: false,
-      align: 'center',
-      headerAlign: 'center',
-      minWidth: 80,
-      renderCell: ({ row }) => {
-        return (
-          <Stack
-            alignItems={'center'}
-            height={'100%'}
-            justifyContent={'center'}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-          >
-            <Icon
-              component={ICON_TABLE_ACTION}
-              onClick={(e: any) => {
-                setAnchorEl(e.currentTarget);
-                setTableId(row.tableId);
-                setTableName(row.tableName);
-              }}
-              sx={{ cursor: 'pointer' }}
-            />
-          </Stack>
-        );
-      },
-    },
-  ];
-
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -131,6 +48,92 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [tableId, setTableId] = useState<string | number>('');
   const [tableName, setTableName] = useState('');
+
+  const columns: GridColDef<ProspectTableItem>[] = useMemo(
+    () => [
+      {
+        headerName: 'Name',
+        field: 'tableName',
+        sortable: false,
+        align: 'left',
+        headerAlign: 'left',
+        flex: 1,
+        minWidth: 780,
+        renderCell: ({ row }) => {
+          return (
+            <Stack
+              sx={{
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: 1,
+                height: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              <Typography
+                component={'span'}
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                variant={'body2'}
+              >
+                {row.tableName}
+              </Typography>
+            </Stack>
+          );
+        },
+      },
+      {
+        headerName: 'Last modified',
+        field: 'updatedAt',
+        sortable: false,
+        align: 'left',
+        headerAlign: 'left',
+        minWidth: 120,
+        renderCell: ({ value }) => (
+          <Typography component={'span'} variant={'body2'}>
+            {UFormatDate(value, 'MMM d, yyyy')}
+          </Typography>
+        ),
+      },
+      {
+        headerName: '',
+        field: '',
+        sortable: false,
+        align: 'center',
+        headerAlign: 'center',
+        minWidth: 80,
+        renderCell: ({ row }) => {
+          return (
+            <Stack
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              sx={{
+                alignItems: 'center',
+                height: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon
+                component={ICON_TABLE_ACTION}
+                onClick={(e: MouseEvent) => {
+                  setAnchorEl(e.currentTarget as HTMLElement);
+                  setTableId(row.tableId);
+                  setTableName(row.tableName);
+                }}
+                sx={{ cursor: 'pointer' }}
+              />
+            </Stack>
+          );
+        },
+      },
+    ],
+    [],
+  );
 
   const [isDeleting, setIsDeleting] = useState(false);
   const {
@@ -172,7 +175,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     },
   );
 
-  const onClickToRename = async (name: string) => {
+  const onTableRenameSubmit = async (name: string) => {
     if (!tableId) {
       return;
     }
@@ -191,7 +194,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     }
   };
 
-  const onClickToDelete = async () => {
+  const onTableDeleteConfirm = async () => {
     if (!tableId) {
       return;
     }
@@ -210,7 +213,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
   };
 
   return (
-    <Stack flex={1} flexDirection={'column'} overflow={'auto'}>
+    <Stack sx={{ flex: 1, flexDirection: 'column', overflow: 'auto' }}>
       <DataGrid
         columnHeaderHeight={40}
         columns={columns}
@@ -244,11 +247,13 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
           pagination: CommonPagination,
           noRowsOverlay: () => (
             <Stack
-              alignItems={'center'}
-              height={'100%'}
-              justifyContent={'center'}
-              minHeight={480}
-              width={'100%'}
+              sx={{
+                alignItems: 'center',
+                height: '100%',
+                justifyContent: 'center',
+                minHeight: 480,
+                width: '100%',
+              }}
             >
               <Icon
                 component={ICON_NO_RESULT}
@@ -257,15 +262,17 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
                   height: 240,
                 }}
               />
-              <Typography color={'text.secondary'} mt={1.5} variant={'body2'}>
+              <Typography
+                sx={{ color: 'text.secondary', mt: 1.5 }}
+                variant={'body2'}
+              >
                 {store.searchWord
                   ? `No results found for ${store.searchWord}`
                   : "You don't have any table yet."}
               </Typography>
               <Typography
-                color={'#6E4EFB'}
                 onClick={() => openDialog()}
-                sx={{ cursor: 'pointer' }}
+                sx={{ color: '#6E4EFB', cursor: 'pointer' }}
                 variant={'body2'}
               >
                 Create new table
@@ -297,9 +304,6 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
           '.MuiDataGrid-columnHeaders': {
             borderBottom: '1px solid #DFDEE6',
           },
-          '& .MuiDataGrid-cell': {
-            border: 0,
-          },
           '.MuiDataGrid-columnSeparator': {
             visibility: 'hidden',
           },
@@ -310,7 +314,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
             },
           },
           '.MuiDataGrid-cell': {
-            overflow: 'unset !important',
+            border: 0,
             position: 'relative',
             '&:focus': {
               outline: 0,
@@ -369,7 +373,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
           sx={{ alignItems: 'center' }}
         >
           <Icon component={ICON_TABLE_RENAME} sx={{ mr: 1 }} />
-          <Typography pb={0.5} variant={'body3'}>
+          <Typography sx={{ pb: 0.5 }} variant={'body3'}>
             Rename
           </Typography>
         </MenuItem>
@@ -381,7 +385,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
           sx={{ alignItems: 'center' }}
         >
           <Icon component={ICON_TABLE_DELETE} sx={{ mr: 1 }} />
-          <Typography pb={0.5} variant={'body3'}>
+          <Typography sx={{ pb: 0.5 }} variant={'body3'}>
             Delete
           </Typography>
         </MenuItem>
@@ -395,23 +399,23 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
           setTableId('');
           setTableName('');
         }}
-        onClickToSave={(name) => onClickToRename(name)}
+        onClickToSave={(name) => onTableRenameSubmit(name)}
         open={visibleRename}
       />
 
       <StyledDialog
         content={
           <Typography
-            color={'text.secondary'}
-            pb={3}
-            pt={1.5}
+            sx={{ color: 'text.secondary', pb: 3, pt: 1.5 }}
             variant={'body2'}
           >
             Are you sure you want to delete this workbook?
           </Typography>
         }
         footer={
-          <Stack flexDirection={'row'} gap={3} justifyContent={'flex-end'}>
+          <Stack
+            sx={{ flexDirection: 'row', gap: 3, justifyContent: 'flex-end' }}
+          >
             <StyledButton
               color={'info'}
               onClick={() => {
@@ -428,7 +432,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
               color={'error'}
               disabled={isDeleting}
               loading={isDeleting}
-              onClick={onClickToDelete}
+              onClick={onTableDeleteConfirm}
               size={'medium'}
               sx={{ width: 90 }}
             >
@@ -464,7 +468,7 @@ const RenameDialog: FC<{
   return (
     <StyledDialog
       content={
-        <Stack py={3}>
+        <Stack sx={{ py: 3 }}>
           <StyledTextField
             autoFocus
             label={'Table name'}
@@ -480,7 +484,9 @@ const RenameDialog: FC<{
         </Stack>
       }
       footer={
-        <Stack flexDirection={'row'} gap={3} justifyContent={'flex-end'}>
+        <Stack
+          sx={{ flexDirection: 'row', gap: 3, justifyContent: 'flex-end' }}
+        >
           <StyledButton
             color={'info'}
             onClick={onClickToClose}

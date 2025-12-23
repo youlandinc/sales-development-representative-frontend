@@ -11,6 +11,7 @@ import {
   getAdditionalIsAuth,
   getButtonGroupKey,
   getTabKey,
+  hasAdditionalConfig,
 } from '@/utils/directories';
 import {
   DirectoriesBizIdEnum,
@@ -144,6 +145,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           ? formValues?.[resolvedTabKey] || ''
           : undefined,
         formValues: formValues || {},
+        hasAdditionalConfig: hasAdditionalConfig(queryConfig),
         additionalIsAuth: getAdditionalIsAuth(queryConfig),
       });
     },
@@ -230,6 +232,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           tabKey: tabKey || undefined,
           tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
+          hasAdditionalConfig: hasAdditionalConfig(queryConfig),
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
       } else {
@@ -241,6 +244,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           tabKey: tabKey || undefined,
           tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
+          hasAdditionalConfig: hasAdditionalConfig(queryConfig),
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
       }
@@ -321,6 +325,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           tabKey: tabKey || undefined,
           tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
+          hasAdditionalConfig: hasAdditionalConfig(queryConfig),
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
       } else {
@@ -331,6 +336,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
           tabKey: tabKey || undefined,
           tabValue: tabKey ? updatedFormValues[tabKey] || '' : undefined,
           formValues: updatedFormValues,
+          hasAdditionalConfig: hasAdditionalConfig(queryConfig),
           additionalIsAuth: getAdditionalIsAuth(queryConfig),
         });
       }
@@ -391,6 +397,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
               ? currentFormValues?.[resolvedTabKey] || ''
               : undefined,
             formValues: currentFormValues || {},
+            hasAdditionalConfig: hasAdditionalConfig(queryConfig),
             additionalIsAuth: getAdditionalIsAuth(queryConfig),
           });
         } else {
@@ -418,6 +425,7 @@ export const useDirectoriesStore = create<DirectoriesStoreProps>()(
               ? currentFormValues?.[resolvedTabKey] || ''
               : undefined,
             formValues: currentFormValues || {},
+            hasAdditionalConfig: hasAdditionalConfig(queryConfig),
             additionalIsAuth: getAdditionalIsAuth(queryConfig),
           });
         }

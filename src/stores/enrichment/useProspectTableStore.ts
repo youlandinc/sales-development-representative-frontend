@@ -64,6 +64,7 @@ export type ProspectTableState = {
   // dialog
   dialogVisible: boolean;
   dialogType: TableColumnMenuActionEnum | null;
+  drawersType: TableColumnMenuActionEnum[];
 
   rowIds: string[];
   runRecords: {
@@ -126,6 +127,13 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
     activeColumnId: '',
     dialogVisible: false,
     dialogType: null,
+    drawersType: [
+      TableColumnMenuActionEnum.actions_overview,
+      TableColumnMenuActionEnum.edit_column,
+      TableColumnMenuActionEnum.cell_detail,
+      TableColumnMenuActionEnum.work_email,
+      TableColumnMenuActionEnum.ai_agent,
+    ],
     rowIds: [],
     runRecords: null,
     fieldGroupMap: null,

@@ -1,4 +1,12 @@
 import {
+  ChangeEvent,
+  FC,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
+import {
   Box,
   debounce,
   Divider,
@@ -9,10 +17,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { ChangeEvent, FC, MouseEvent, useMemo, useState } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { StyledButton, StyledTextField } from '@/components/atoms';
+import { _createBlankTable } from '@/request';
+import { HttpError } from '@/types';
+
+import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
 
 import ICON_BLANK_TABLE from './assets/icon_blank_table.svg';
 import ICON_IMPORT_CSV from './assets/icon_import_csv.svg';
@@ -37,32 +47,55 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
   openDialog,
 }) => {
   const [value, setValue] = useState(store.searchWord);
+  const [isCreating, setIsCreating] = useState(false);
 
   const router = useRouter();
 
-  const sourceOptions = [
-    {
-      label: 'Search directories',
-      icon: ICON_DIRECTORY,
-      disabled: false,
-      onClick: () => router.push('/directories'),
-    },
-    {
-      label: 'Import from CSV',
-      icon: ICON_IMPORT_CSV,
-      disabled: false,
-      onClick: openDialog,
-    },
-  ];
+  const onClickToCreateBlankTable = useCallback(async () => {
+    if (isCreating) {
+      return;
+    }
+    setIsCreating(true);
+    try {
+      const { data } = await _createBlankTable();
+      router.push(`/enrichment/${data}`);
+    } catch (err) {
+      const { header, message, variant } = err as HttpError;
+      SDRToast({ message, header, variant });
+    } finally {
+      setIsCreating(false);
+    }
+  }, [isCreating, router]);
 
-  const tableOptions = [
-    {
-      label: 'Blank table',
-      icon: ICON_BLANK_TABLE,
-      disabled: true,
-      onClick: () => void 0,
-    },
-  ];
+  const sourceOptions = useMemo(
+    () => [
+      {
+        label: 'Search directories',
+        icon: ICON_DIRECTORY,
+        disabled: false,
+        onClick: () => router.push('/directories'),
+      },
+      {
+        label: 'Import from CSV',
+        icon: ICON_IMPORT_CSV,
+        disabled: false,
+        onClick: openDialog,
+      },
+    ],
+    [openDialog, router],
+  );
+
+  const tableOptions = useMemo(
+    () => [
+      {
+        label: 'Blank table',
+        icon: ICON_BLANK_TABLE,
+        disabled: isCreating,
+        onClick: onClickToCreateBlankTable,
+      },
+    ],
+    [isCreating, onClickToCreateBlankTable],
+  );
 
   const debounceSearchWord = useMemo(
     () =>
@@ -72,7 +105,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
     [dispatch],
   );
 
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     debounceSearchWord(e.target.value);
   };
@@ -87,10 +120,10 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
   };
 
   return (
-    <Stack gap={6}>
-      <Stack gap={1.5}>
+    <Stack sx={{ gap: 6 }}>
+      <Stack sx={{ gap: 1.5 }}>
         <Typography variant={'h6'}>Quick start</Typography>
-        <Stack flexDirection={'row'} gap={2}>
+        <Stack sx={{ flexDirection: 'row', gap: 2 }}>
           {[...sourceOptions, ...tableOptions].map((item, index) => (
             <StyledButton
               color={'info'}
@@ -118,19 +151,21 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
       </Stack>
 
       <Stack
-        alignItems={'flex-end'}
-        flexDirection={'row'}
-        gap={3}
-        justifyContent={'space-between'}
+        sx={{
+          alignItems: 'flex-end',
+          flexDirection: 'row',
+          gap: 3,
+          justifyContent: 'space-between',
+        }}
       >
-        <Typography lineHeight={1} variant={'h6'}>
+        <Typography sx={{ lineHeight: 1 }} variant={'h6'}>
           Tables
         </Typography>
 
-        <Stack flexDirection={'row'} gap={1}>
+        <Stack sx={{ flexDirection: 'row', gap: 1 }}>
           <StyledTextField
             label=""
-            onChange={onChange}
+            onChange={onSearchInputChange}
             size={'small'}
             slotProps={{
               input: {
@@ -185,7 +220,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
                 sx: {
                   p: 0,
                   width: 260,
-                  gap: 1,
+                  gap: 0.5,
                   display: 'flex',
                   flexDirection: 'column',
                 },
@@ -213,7 +248,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
                 sx={{
                   fontSize: 14,
                   lineHeight: 1,
-                  p: 0.5,
+                  p: 0.25,
                   borderRadius: 1,
                   alignItems: 'center',
                 }}
@@ -231,12 +266,22 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
                 {item.label}
               </MenuItem>
             ))}
-            <Divider />
+            <Divider
+              flexItem
+              sx={{
+                marginTop: '4px !important',
+                marginBottom: '4px !important',
+              }}
+            />
             <Typography variant={'h7'}>Tables</Typography>
             {tableOptions.map((item, index) => (
               <MenuItem
                 disabled={item.disabled}
                 key={`${item.label}-${index}`}
+                onClick={async () => {
+                  await item?.onClick();
+                  onMenuClose();
+                }}
                 sx={{
                   fontSize: 14,
                   lineHeight: 1,
@@ -248,7 +293,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
                 <Box
                   sx={{
                     bgcolor: '#F0F0F4',
-                    p: 0.5,
+                    p: 0.25,
                     mr: 1,
                     borderRadius: 1,
                   }}

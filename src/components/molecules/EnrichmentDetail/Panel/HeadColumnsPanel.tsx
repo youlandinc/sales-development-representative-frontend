@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 
 import { useProspectTableStore } from '@/stores/enrichment';
-import { COLUMN_TYPE_ICONS } from '@/constants/table';
+import { COLUMN_TYPE_ICONS } from '../Table/config';
 
 import ICON_COLUMN from '../assets/head/icon-column.svg';
 import ICON_COLUMN_HIDE from '../assets/table/icon-column-hide.svg';
@@ -33,16 +33,16 @@ export const HeadColumnsPanel = () => {
         onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={{
           gap: 0.5,
-          px: 1.5,
+          p: 0.5,
           borderRadius: 1,
           flexDirection: 'row',
           alignItems: 'center',
           cursor: 'pointer',
-          '&:hover': { bgcolor: '#EDEDED' },
+          '&:hover': { bgcolor: '#F4F5F9' },
         }}
       >
         <Icon component={ICON_COLUMN} sx={{ width: 20, height: 20 }} />
-        <Typography fontSize={14}>
+        <Typography fontSize={14} lineHeight={1.4}>
           {columnsVisible}/{columns.length} columns
         </Typography>
       </Stack>

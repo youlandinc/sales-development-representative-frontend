@@ -9,7 +9,6 @@ import {
 export const EnrichmentDetail = () => {
   const params = useParams();
   const tableId = typeof params.tableId === 'string' ? params.tableId : '';
-
   return (
     <Stack
       sx={{
@@ -17,6 +16,7 @@ export const EnrichmentDetail = () => {
         minHeight: 600,
         display: 'flex',
         flexDirection: 'column',
+        width: '100vw',
       }}
     >
       <EnrichmentDetailHeader tableId={tableId} />

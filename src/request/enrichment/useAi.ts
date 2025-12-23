@@ -1,26 +1,16 @@
-import { patch, post } from '../request';
+import { get, patch, post } from '../request';
+import { FetchWebResearchModelListResponse } from '@/types/enrichment/webResearch';
 
 export const generatePrompt = (api: string, param: Record<string, any>) => {
+  //TODO
   return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${api}`, {
+    // return fetch(`${api}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(param),
-  }); /*  return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/sdr/ai/generate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      module: 'COLUMN_ENRICHMENT_PROMPT',
-      params: {
-        useInput: "help me to find user's email and phone number",
-        columns:
-          'First Name,Last Name,Full Name,Job Title, Location,Company Name,LinkedIn Profile,University',
-      },
-    }),
-  });*/
+  });
 };
 
 export const columnRun = (param: {
@@ -38,15 +28,18 @@ export const columnRun = (param: {
   });
 };
 
-export const _saveWebResearchConfig = (
-  tableId: string,
-  prompt: string,
-  schema: string,
-  excludeFields: string[][],
-  generatePrompt: string,
-) => {
+export const _saveWebResearchConfig = (params: {
+  tableId: string;
+  prompt: string;
+  schema: string;
+  excludeFields: string[][];
+  generatePrompt: string;
+  enableWebSearch: boolean;
+  model: string;
+  taskDescription: string;
+}) => {
   return post<string>('/sdr/table/field/add', {
-    tableId,
+    tableId: params.tableId,
     actionKey: 'use-ai',
     fieldType: 'TEXT',
     fieldName: 'Use AI',
@@ -55,53 +48,84 @@ export const _saveWebResearchConfig = (
         //configure prompt
         {
           name: 'prompt',
-          formulaText: prompt,
+          formulaText: params.prompt,
         },
         //configure schema
         {
           name: 'answerSchemaType',
-          formulaText: schema,
+          formulaText: params.schema,
         },
         //generate prompt
         {
           name: 'metaprompt',
-          formulaText: generatePrompt,
+          formulaText: params.generatePrompt,
+        },
+        {
+          name: 'enableWebSearch',
+          formulaText: params.enableWebSearch,
+        },
+        {
+          name: 'model',
+          formulaText: params.model,
+        },
+        {
+          name: 'taskDescription',
+          formulaText: params.taskDescription,
         },
       ],
       optionalPathsInInputs: {
-        prompt: excludeFields,
+        prompt: params.excludeFields,
       },
     },
   });
 };
 
-export const updateWebResearchConfig = (param: {
+export const _updateWebResearchConfig = (params: {
   tableId: string;
   fieldId: string;
   prompt: string;
   schema: string;
   generatePrompt: string;
+  enableWebSearch: boolean;
+  model: string;
+  taskDescription: string;
 }) => {
   return patch('/sdr/table/field/aiField', {
-    tableId: param.tableId,
-    fieldId: param.fieldId,
+    tableId: params.tableId,
+    fieldId: params.fieldId,
     typeSettings: {
       inputBinding: [
         {
           name: 'prompt',
-          formulaText: param.prompt,
+          formulaText: params.prompt,
         },
         //configure schema
         {
           name: 'answerSchemaType',
-          formulaText: param.schema,
+          formulaText: params.schema,
         },
         //generate prompt
         {
           name: 'metaprompt',
-          formulaText: param.generatePrompt,
+          formulaText: params.generatePrompt,
+        },
+        {
+          name: 'enableWebSearch',
+          formulaText: params.enableWebSearch,
+        },
+        {
+          name: 'model',
+          formulaText: params.model,
+        },
+        {
+          name: 'taskDescription',
+          formulaText: params.taskDescription,
         },
       ],
     },
   });
+};
+
+export const _fetchWebResearchModelList = () => {
+  return get<FetchWebResearchModelListResponse>('/aiResearch/model/list');
 };

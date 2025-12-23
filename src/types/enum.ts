@@ -137,3 +137,19 @@ export enum SettingTabEnum {
   Plan = 'plan',
   Usage = 'usage',
 }
+
+export enum TableCellDetailPhaseEnum {
+  thinking = 'THINKING',
+  searching = 'SEARCHING',
+  verifying = 'VERIFYING',
+  re_searching = 'RE_SEARCHING',
+  standardizing = 'STANDARDIZING',
+  populating = 'POPULATING',
+}
+
+export enum TableCellDetailValidateStatusEnum {
+  verified = 'VERIFIED',
+  potentialIssue = 'POTENTIAL_ISSUE',
+  notValidated = 'NOT_VALIDATED',
+  notFound = 'NOT_FOUND',
+}

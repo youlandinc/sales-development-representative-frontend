@@ -1,29 +1,29 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { Stack, SxProps } from '@mui/material';
 
-interface StyledCustomButtonGroup {
+interface StyledCustomButtonGroupProps {
   value: any;
-  options: Option[];
+  options: { label: ReactNode; value: any }[];
   sx?: SxProps;
   onChange: (value: any) => void;
 }
 
-export const StyledCustomButtonGroup: FC<StyledCustomButtonGroup> = ({
+export const StyledCustomButtonGroup: FC<StyledCustomButtonGroupProps> = ({
   value,
   options,
   onChange,
   sx,
 }) => {
   return (
-    <Stack flexDirection={'row'} gap={1.5} sx={sx}>
+    <Stack sx={{ flexDirection: 'row', gap: 1.5, ...sx }}>
       {options.map((option, index) => (
         <Stack
-          border={'1px solid #DFDEE6'}
-          borderRadius={2}
-          key={`${option.label}-${index}`}
+          key={`${index}`}
           onClick={() => onChange(option.value)}
-          p={1.5}
           sx={{
+            border: '1px solid #DFDEE6',
+            borderRadius: 2,
+            p: 1.5,
             cursor: 'pointer',
             outline:
               option.value === value

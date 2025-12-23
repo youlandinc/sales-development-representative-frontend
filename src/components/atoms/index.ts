@@ -27,13 +27,9 @@ export * from './StyledShadowContent';
 
 export * from './StyledGrid';
 
-export * from './StyledTable';
-
 export * from './StyledTextFieldSearch';
 
 export * from './StyledCost';
-
-export * from './StyledTinyEditor';
 
 export * from './StyledRadioGroup';
 
@@ -44,3 +40,8 @@ export * from './StyledButtonGroup';
 export * from './StyledTab';
 
 export * from './StyledImage';
+
+//Editor
+export * from './StyledTinyEditor';
+export * from './StyledSlateEditor';
+export * from './StyledTiptapEditor';

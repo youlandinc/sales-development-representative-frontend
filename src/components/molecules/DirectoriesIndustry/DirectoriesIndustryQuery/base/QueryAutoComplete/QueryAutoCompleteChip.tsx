@@ -6,7 +6,7 @@ const useStyles = createUseStyles({
   container: {
     height: 22,
     maxWidth: '100%',
-    padding: '0 4px',
+    padding: '0 6px 0 4px',
     borderRadius: '4px',
     display: 'flex',
     flexDirection: 'row',
@@ -22,6 +22,7 @@ const useStyles = createUseStyles({
   },
   content: {
     fontSize: 12,
+    lineHeight: 1,
     flex: 1,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -41,7 +42,7 @@ export const QueryAutoCompleteChip: FC<QueryAutoCompleteChipProps> = ({
   const classes = useStyles();
 
   return (
-    <div className={classes.container}>
+    <div className={`${classes.container} query-autocomplete-chip`}>
       {onDelete && (
         <StyledImage
           className={classes.button}

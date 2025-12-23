@@ -38,7 +38,7 @@ export const PlanList: FC<PlanListProps> = ({
   }
 
   return (
-    <Stack gap={1.5}>
+    <Stack gap={'20px'}>
       {plans.map((plan, index) => (
         <PlanCard
           key={plan.planBadge.label + index}
