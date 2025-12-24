@@ -35,7 +35,7 @@ export const PlansRouteButton = () => {
         onClick={onClickToViewPlans}
         sx={{
           cursor: 'pointer',
-          p: 0.5,
+          p: '6px',
           borderRadius: 2,
           '&:hover': {
             bgcolor: '#F4F5F9',
