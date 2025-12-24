@@ -33,8 +33,8 @@ import {
 
 export interface QueryCascadeSelectProps {
   url: string | null;
-  value?: string[];
-  onFormChange: (newValue: string[]) => void;
+  value?: number[];
+  onFormChange: (newValue: number[]) => void;
   requestParams?: Record<string, string[]>;
   placeholder?: string;
 }
@@ -66,9 +66,9 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
   }, [isOpen, fetchOptions]);
 
   const {
-    valueSet,
-    expandedValues,
-    getAllDescendantValues,
+    idSet,
+    expandedIds,
+    getAllDescendantIds,
     onToggleOption,
     onChangeWithAggregate,
   } = useCascadeSelection({ value, getChildren, onFormChange });
@@ -142,28 +142,26 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
       const rootOptions = getChildren(null);
       const matchedRoot = rootOptions.find((opt) => opt.label === label);
       if (matchedRoot) {
-        // Remove all descendant values from expandedValues
-        const descendants = getAllDescendantValues(matchedRoot.id);
+        // Remove all descendant ids from expandedIds
+        const descendants = getAllDescendantIds(matchedRoot.id);
         const toRemove = new Set(descendants);
-        const newExpandedValues = expandedValues.filter(
-          (v) => !toRemove.has(v),
-        );
-        onChangeWithAggregate(newExpandedValues);
+        const newExpandedIds = expandedIds.filter((id) => !toRemove.has(id));
+        onChangeWithAggregate(newExpandedIds);
       } else {
         const matchedOption = flatOptions.find((opt) => opt.label === label);
         if (matchedOption) {
-          const newExpandedValues = expandedValues.filter(
-            (v) => v !== matchedOption.value,
+          const newExpandedIds = expandedIds.filter(
+            (id) => id !== matchedOption.id,
           );
-          onChangeWithAggregate(newExpandedValues);
+          onChangeWithAggregate(newExpandedIds);
         }
       }
     },
     [
       getChildren,
-      getAllDescendantValues,
+      getAllDescendantIds,
       flatOptions,
-      expandedValues,
+      expandedIds,
       onChangeWithAggregate,
     ],
   );
@@ -174,22 +172,22 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
     }
 
     const result: string[] = [];
-    const processedValues = new Set<string>();
+    const processedIds = new Set<number>();
 
     const rootOptions = getChildren(null);
     rootOptions.forEach((root) => {
-      const descendants = getAllDescendantValues(root.id);
-      if (descendants.length > 0 && descendants.every((v) => valueSet.has(v))) {
+      const descendants = getAllDescendantIds(root.id);
+      if (descendants.length > 0 && descendants.every((id) => idSet.has(id))) {
         result.push(root.label);
-        // Mark both parent value and descendants as processed
-        processedValues.add(root.value);
-        descendants.forEach((v) => processedValues.add(v));
+        // Mark both parent id and descendants as processed
+        processedIds.add(root.id);
+        descendants.forEach((id) => processedIds.add(id));
       }
     });
 
-    value.forEach((v) => {
-      if (!processedValues.has(v)) {
-        const option = flatOptions.find((opt) => opt.value === v);
+    value.forEach((id) => {
+      if (!processedIds.has(id)) {
+        const option = flatOptions.find((opt) => opt.id === id);
         if (option) {
           result.push(option.label);
         }
@@ -197,7 +195,7 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
     });
 
     return result;
-  }, [value, valueSet, getChildren, getAllDescendantValues, flatOptions]);
+  }, [value, idSet, getChildren, getAllDescendantIds, flatOptions]);
 
   return (
     <>
@@ -315,21 +313,20 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
           <Box
             sx={{
               display: 'flex',
-              borderRadius: 2,
               overflow: 'hidden',
-              bgcolor: 'background.default',
-              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
-              border: '1px solid',
-              borderColor: 'border.default',
+              borderRadius: 2,
+              boxShadow: '0px 0px 6px 0px rgba(54, 52, 64, 0.14)',
+              border: '1px solid #E9E9EF',
+              bgcolor: '#fff',
             }}
           >
             {isLoading ? (
               <Box
                 sx={{
-                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  display: 'flex',
                   height: 56,
+                  justifyContent: 'center',
                   width: triggerRef.current?.offsetWidth,
                 }}
               >
@@ -338,12 +335,12 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
             ) : columns.length === 0 ? (
               <Box
                 sx={{
-                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 14,
                   color: 'action.disabled',
+                  display: 'flex',
+                  fontSize: 14,
                   height: 56,
+                  justifyContent: 'center',
                   width: triggerRef.current?.offsetWidth,
                 }}
               >
@@ -373,14 +370,14 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
                       const children = getChildren(option.id);
                       const hasChildren = children.length > 0;
                       const isLeaf = !hasChildren;
-                      const isChecked = valueSet.has(option.value);
+                      const isChecked = idSet.has(option.id);
                       const isParentActive = activePath.includes(option.id);
 
                       const descendants = hasChildren
-                        ? getAllDescendantValues(option.id)
+                        ? getAllDescendantIds(option.id)
                         : [];
-                      const selectedChildCount = descendants.filter((v) =>
-                        valueSet.has(v),
+                      const selectedChildCount = descendants.filter((id) =>
+                        idSet.has(id),
                       ).length;
                       const isAllChildrenSelected =
                         descendants.length > 0 &&
@@ -388,10 +385,10 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
 
                       return (
                         <Box
-                          key={option.value}
+                          key={option.id}
                           onClick={() => {
                             if (isInSearchMode || isLeaf) {
-                              onToggleOption(option.value);
+                              onToggleOption(option.id);
                             } else {
                               onParentOptionClick(option.id, columnIndex);
                             }
@@ -430,21 +427,21 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               if (isLeaf) {
-                                onToggleOption(option.value);
+                                onToggleOption(option.id);
                               } else if (isAllChildrenSelected) {
                                 // Deselect all descendants
                                 onChangeWithAggregate(
-                                  expandedValues.filter(
-                                    (v) => !descendants.includes(v),
+                                  expandedIds.filter(
+                                    (id) => !descendants.includes(id),
                                   ),
                                 );
                               } else {
                                 // Select all descendants
-                                const otherValues = expandedValues.filter(
-                                  (v) => !descendants.includes(v),
+                                const otherIds = expandedIds.filter(
+                                  (id) => !descendants.includes(id),
                                 );
                                 onChangeWithAggregate([
-                                  ...otherValues,
+                                  ...otherIds,
                                   ...descendants,
                                 ]);
                               }

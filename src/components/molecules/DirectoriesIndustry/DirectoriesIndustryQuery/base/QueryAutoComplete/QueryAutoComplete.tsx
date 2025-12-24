@@ -391,8 +391,9 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               sx: {
                 my: 0.5,
                 borderRadius: 2,
-                boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
-                border: '1px solid #E0E0E0',
+                boxShadow: '0px 0px 6px 0px rgba(54, 52, 64, 0.14)',
+                border: '1px solid #E9E9EF',
+                bgcolor: '#fff',
                 '& .MuiAutocomplete-noOptions,& .MuiAutocomplete-loading': {
                   height: 56,
                   display: 'flex',
@@ -425,6 +426,12 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
             '& .MuiInputBase-root': {
               minHeight: '32px',
               gap: '4px 6px',
+              '&:hover': {
+                bgcolor: 'background.active',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'border.default',
+                },
+              },
             },
             '& .MuiInputBase-input': {
               padding: '0 !important',

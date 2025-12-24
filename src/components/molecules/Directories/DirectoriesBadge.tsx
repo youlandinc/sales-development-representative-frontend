@@ -37,7 +37,7 @@ export const DirectoriesBadge: FC<DirectoriesBadgeProps> = ({
         />
       )}
       <Typography sx={{ color: config.color, fontSize: 12 }}>
-        {planName}
+        {planName} plan
       </Typography>
     </Box>
   );

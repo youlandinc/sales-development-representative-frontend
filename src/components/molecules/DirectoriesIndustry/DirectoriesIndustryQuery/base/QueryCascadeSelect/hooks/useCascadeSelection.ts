@@ -3,9 +3,9 @@ import { useCallback, useMemo } from 'react';
 import { CascadeOption } from './useCascadeOptions';
 
 interface UseCascadeSelectionParams {
-  value: string[];
+  value: number[];
   getChildren: (parentId: number | null) => CascadeOption[];
-  onFormChange: (newValue: string[]) => void;
+  onFormChange: (newValue: number[]) => void;
 }
 
 export const useCascadeSelection = ({
@@ -13,14 +13,14 @@ export const useCascadeSelection = ({
   getChildren,
   onFormChange,
 }: UseCascadeSelectionParams) => {
-  // Get all descendant leaf values for a parent
-  const getAllDescendantValues = useCallback(
-    (parentId: number): string[] => {
-      const result: string[] = [];
+  // Get all descendant ids for a parent
+  const getAllDescendantIds = useCallback(
+    (parentId: number): number[] => {
+      const result: number[] = [];
       const collectDescendants = (pid: number) => {
         const children = getChildren(pid);
         children.forEach((child) => {
-          result.push(child.value);
+          result.push(child.id);
           collectDescendants(child.id);
         });
       };
@@ -30,91 +30,91 @@ export const useCascadeSelection = ({
     [getChildren],
   );
 
-  // Expand external value: if parent value exists, expand to all descendants
+  // Expand external value: if parent id exists, expand to all descendants
   // This is the "internal" representation used for UI display
-  const expandedValues = useMemo(() => {
-    const result: string[] = [];
+  const expandedIds = useMemo(() => {
+    const result: number[] = [];
     const rootOptions = getChildren(null);
 
-    value.forEach((v) => {
-      // Check if this value is a parent (root level)
-      const matchedRoot = rootOptions.find((root) => root.value === v);
+    value.forEach((id) => {
+      // Check if this id is a parent (root level)
+      const matchedRoot = rootOptions.find((root) => root.id === id);
       if (matchedRoot) {
         // Expand parent to all descendants
-        const descendants = getAllDescendantValues(matchedRoot.id);
+        const descendants = getAllDescendantIds(matchedRoot.id);
         result.push(...descendants);
       } else {
-        // Keep leaf value as is
-        result.push(v);
+        // Keep leaf id as is
+        result.push(id);
       }
     });
 
     return result;
-  }, [value, getChildren, getAllDescendantValues]);
+  }, [value, getChildren, getAllDescendantIds]);
 
-  // Set for quick lookup of expanded values
-  const valueSet = useMemo(() => new Set(expandedValues), [expandedValues]);
+  // Set for quick lookup of expanded ids
+  const idSet = useMemo(() => new Set(expandedIds), [expandedIds]);
 
-  // Aggregate values: collapse all selected children to parent value
-  const aggregateValues = useCallback(
-    (rawValues: string[]): string[] => {
-      const rawSet = new Set(rawValues);
-      const result: string[] = [];
-      const processedValues = new Set<string>();
+  // Aggregate ids: collapse all selected children to parent id
+  const aggregateIds = useCallback(
+    (rawIds: number[]): number[] => {
+      const rawSet = new Set(rawIds);
+      const result: number[] = [];
+      const processedIds = new Set<number>();
 
       const rootOptions = getChildren(null);
       rootOptions.forEach((root) => {
-        const descendants = getAllDescendantValues(root.id);
+        const descendants = getAllDescendantIds(root.id);
         if (descendants.length > 0) {
-          const isAllDescendantsSelected = descendants.every((v) =>
-            rawSet.has(v),
+          const isAllDescendantsSelected = descendants.every((id) =>
+            rawSet.has(id),
           );
           if (isAllDescendantsSelected) {
-            result.push(root.value);
-            descendants.forEach((v) => processedValues.add(v));
+            result.push(root.id);
+            descendants.forEach((id) => processedIds.add(id));
           }
         }
       });
 
-      rawValues.forEach((v) => {
-        if (!processedValues.has(v)) {
-          result.push(v);
+      rawIds.forEach((id) => {
+        if (!processedIds.has(id)) {
+          result.push(id);
         }
       });
 
       return result;
     },
-    [getChildren, getAllDescendantValues],
+    [getChildren, getAllDescendantIds],
   );
 
-  // Toggle option using expanded values, then aggregate before calling onFormChange
+  // Toggle option using expanded ids, then aggregate before calling onFormChange
   const onToggleOption = useCallback(
-    (optionValue: string) => {
-      let newExpandedValues: string[];
-      if (valueSet.has(optionValue)) {
-        newExpandedValues = expandedValues.filter((v) => v !== optionValue);
+    (optionId: number) => {
+      let newExpandedIds: number[];
+      if (idSet.has(optionId)) {
+        newExpandedIds = expandedIds.filter((id) => id !== optionId);
       } else {
-        newExpandedValues = [...expandedValues, optionValue];
+        newExpandedIds = [...expandedIds, optionId];
       }
-      const aggregated = aggregateValues(newExpandedValues);
+      const aggregated = aggregateIds(newExpandedIds);
       onFormChange(aggregated);
     },
-    [valueSet, expandedValues, aggregateValues, onFormChange],
+    [idSet, expandedIds, aggregateIds, onFormChange],
   );
 
   // Change with aggregate: for parent checkbox toggle
   const onChangeWithAggregate = useCallback(
-    (newExpandedValues: string[]) => {
-      const aggregated = aggregateValues(newExpandedValues);
+    (newExpandedIds: number[]) => {
+      const aggregated = aggregateIds(newExpandedIds);
       onFormChange(aggregated);
     },
-    [aggregateValues, onFormChange],
+    [aggregateIds, onFormChange],
   );
 
   return {
-    valueSet,
-    expandedValues,
-    getAllDescendantValues,
+    idSet,
+    expandedIds,
+    getAllDescendantIds,
     onToggleOption,
     onChangeWithAggregate,
   };
