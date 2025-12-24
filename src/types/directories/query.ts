@@ -32,6 +32,7 @@ export enum DirectoriesQueryGroupTypeEnum {
 export enum DirectoriesQueryComponentNameEnum {
   date_range_select = 'DATE_RANGE_SELECT',
   auto_complete_location = 'AUTO_COMPLETE_LOCATION',
+  cascade_select = 'CASCADE_SELECT',
 }
 
 export enum DirectoriesEntityTypeEnum {

@@ -4,300 +4,129 @@ import {
   MouseEvent,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { Box, CircularProgress, Icon, Popover, Stack } from '@mui/material';
-import CheckIcon from '@mui/icons-material/Check';
+import {
+  Box,
+  Checkbox,
+  ClickAwayListener,
+  InputBase,
+  Popper,
+  Stack,
+} from '@mui/material';
 
-import { CascadeOption, useCascadeOptions } from './useCascadeOptions';
+import { QueryAutoCompleteChip } from '../QueryAutoComplete';
 
-import ICON_ARROW from '../assets/icon-arrow.svg';
-import ICON_CLOSE from '../assets/icon-close.svg';
+import { CascadeOption, useCascadeOptions, useCascadeSelection } from './hooks';
+import {
+  ARROW_ICON,
+  buildPopupIcon,
+  CHECKBOX_CHECKED_ICON,
+  CHECKBOX_INDETERMINATE_ICON,
+  CHECKBOX_UNCHECKED_ICON,
+  CLEAR_ICON,
+  LOADING_SPINNER,
+} from './QueryCascadeSelectIcons';
 
 export interface QueryCascadeSelectProps {
-  parentUrl?: string;
-  childUrlTemplate?: string;
+  url: string | null;
   value?: string[];
   onFormChange: (newValue: string[]) => void;
   requestParams?: Record<string, string[]>;
   placeholder?: string;
-  mockParentOptions?: CascadeOption[];
-  mockChildrenByParent?: Record<string, CascadeOption[]>;
 }
 
-const CLEAR_ICON = (
-  <Icon
-    component={ICON_CLOSE}
-    sx={{ width: 14, height: 14, cursor: 'pointer' }}
-  />
-);
-
-const POPUP_ICON = (
-  <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
-);
-
-const LOADING_SPINNER = (
-  <CircularProgress size="20px" sx={{ color: '#D0CEDA' }} />
-);
-
-const POPOVER_SX = {
-  display: 'flex',
-  bgcolor: 'white',
-  borderRadius: 2,
-  boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
-  overflow: 'hidden',
-} as const;
-
-const COLUMN_SX = {
-  minWidth: 200,
-  maxWidth: 280,
-  maxHeight: 300,
-  overflow: 'auto',
-  borderRight: '1px solid #F0F0F4',
-  '&:last-child': {
-    borderRight: 'none',
-  },
-} as const;
-
-const OPTION_SX = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  px: 1.5,
-  py: 1,
-  fontSize: 14,
-  color: '#363440',
-  cursor: 'pointer',
-  '&:hover': {
-    bgcolor: '#F4F5F9',
-  },
-} as const;
-
-const OPTION_ACTIVE_SX = {
-  ...OPTION_SX,
-  bgcolor: '#F4F5F9',
-} as const;
-
-const TICK_ICON_SX = {
-  width: 16,
-  height: 16,
-  flexShrink: 0,
-} as const;
-
-const LOADING_SX = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  py: 3,
-  minWidth: 200,
-} as const;
-
 export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
-  parentUrl,
-  childUrlTemplate,
+  url,
   value = [],
   onFormChange,
   requestParams,
   placeholder = 'Please select',
-  mockParentOptions,
-  mockChildrenByParent,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [activeParent, setActiveParent] = useState<CascadeOption | null>(null);
+  const [activePath, setActivePath] = useState<number[]>([]);
   const triggerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
 
-  const {
-    parentOptions,
-    childOptions,
-    isLoadingParent,
-    isLoadingChildren,
-    childrenByParent,
-    fetchParentOptions,
-    fetchChildOptions,
-  } = useCascadeOptions({
-    requestParams,
-    mockParentOptions,
-    mockChildrenByParent,
-  });
+  const { flatOptions, isLoading, fetchOptions, getChildren, getPathLabels } =
+    useCascadeOptions({
+      url,
+      requestParams,
+    });
 
   useEffect(() => {
     if (isOpen) {
-      fetchParentOptions(parentUrl);
+      fetchOptions();
     }
-  }, [isOpen, parentUrl, fetchParentOptions]);
+  }, [isOpen, fetchOptions]);
 
-  const getChildrenForParent = useCallback(
-    (parentKey: string): CascadeOption[] => {
-      if (mockChildrenByParent) {
-        return mockChildrenByParent[parentKey] || [];
-      }
-      return childrenByParent.get(parentKey) || [];
-    },
-    [mockChildrenByParent, childrenByParent],
-  );
+  const {
+    valueSet,
+    expandedValues,
+    getAllDescendantValues,
+    onToggleOption,
+    onChangeWithAggregate,
+  } = useCascadeSelection({ value, getChildren, onFormChange });
 
-  const filteredParentOptions = useMemo(() => {
+  const searchResults = useMemo(() => {
     if (!searchText.trim()) {
-      return parentOptions;
+      return null;
     }
     const lowerSearch = searchText.toLowerCase();
-    return parentOptions.filter(
-      (opt: CascadeOption) =>
-        opt.label.toLowerCase().includes(lowerSearch) ||
-        getChildrenForParent(opt.key).some((child: CascadeOption) =>
-          child.label.toLowerCase().includes(lowerSearch),
-        ),
-    );
-  }, [parentOptions, searchText, getChildrenForParent]);
-
-  const filteredChildOptions = useMemo(() => {
-    if (!activeParent) {
-      return [];
-    }
-    const children = getChildrenForParent(activeParent.key);
-    if (!searchText.trim()) {
-      return children;
-    }
-    const lowerSearch = searchText.toLowerCase();
-    return children.filter((opt: CascadeOption) =>
+    return flatOptions.filter((opt) =>
       opt.label.toLowerCase().includes(lowerSearch),
     );
-  }, [activeParent, searchText, getChildrenForParent]);
+  }, [searchText, flatOptions]);
 
-  const selectedLabels = useMemo(() => {
-    const labels: string[] = [];
-    value.forEach((v) => {
-      const [parentKey, childKey] = v.split('::');
-      const parent = parentOptions.find((p) => p.key === parentKey);
-      const children = childrenByParent.get(parentKey);
-      const child = children?.find((c) => c.key === childKey);
-      if (parent && child) {
-        labels.push(`${parent.label} / ${child.label}`);
-      } else if (child) {
-        labels.push(child.label);
+  const columns = useMemo(() => {
+    if (searchResults) {
+      return searchResults.length > 0 ? [searchResults] : [];
+    }
+    const cols: CascadeOption[][] = [];
+    const rootOptions = getChildren(null);
+    if (rootOptions.length > 0) {
+      cols.push(rootOptions);
+    }
+    activePath.forEach((parentId) => {
+      const children = getChildren(parentId);
+      if (children.length > 0) {
+        cols.push(children);
       }
     });
-    return labels;
-  }, [value, parentOptions, childrenByParent]);
-
-  const getSelectedChildrenForParent = useCallback(
-    (parentKey: string) => value.filter((v) => v.startsWith(`${parentKey}::`)),
-    [value],
-  );
-
-  const isParentFullySelected = useCallback(
-    (parentKey: string) => {
-      const children = childrenByParent.get(parentKey);
-      if (!children || children.length === 0) {
-        return false;
-      }
-      return children.every((child: CascadeOption) =>
-        value.includes(`${parentKey}::${child.key}`),
-      );
-    },
-    [childrenByParent, value],
-  );
-
-  const isParentPartiallySelected = useCallback(
-    (parentKey: string) => {
-      const selected = getSelectedChildrenForParent(parentKey);
-      const children = childrenByParent.get(parentKey);
-      return (
-        selected.length > 0 && children && selected.length < children.length
-      );
-    },
-    [getSelectedChildrenForParent, childrenByParent],
-  );
+    return cols;
+  }, [activePath, getChildren, searchResults]);
 
   const onTriggerClick = useCallback(() => {
     setIsOpen(true);
+    inputRef.current?.focus();
   }, []);
 
   const onPopoverClose = useCallback(() => {
     setIsOpen(false);
-    setActiveParent(null);
     setSearchText('');
+    setActivePath([]);
   }, []);
 
-  const onSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-  }, []);
-
-  const onParentItemClick = useCallback(
-    (option: CascadeOption) => {
-      if (activeParent?.key === option.key) {
-        return;
-      }
-      setActiveParent(option);
-
-      if (mockChildrenByParent) {
-        fetchChildOptions(option.key);
-      } else if (childUrlTemplate) {
-        const childUrl = childUrlTemplate.replace('{parentKey}', option.key);
-        fetchChildOptions(childUrl, option.key);
+  const onSearchChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setSearchText(e.target.value);
+      if (!isOpen) {
+        setIsOpen(true);
       }
     },
-    [
-      activeParent?.key,
-      childUrlTemplate,
-      fetchChildOptions,
-      mockChildrenByParent,
-    ],
+    [isOpen],
   );
 
-  const onParentCheckClick = useCallback(
-    (e: MouseEvent, option: CascadeOption) => {
-      e.stopPropagation();
-      const children = getChildrenForParent(option.key);
-      if (children.length === 0) {
-        return;
-      }
-
-      const isFullySelected = children.every((child: CascadeOption) =>
-        value.includes(`${option.key}::${child.key}`),
-      );
-      if (isFullySelected) {
-        onFormChange(value.filter((v) => !v.startsWith(`${option.key}::`)));
-      } else {
-        const otherSelections = value.filter(
-          (v) => !v.startsWith(`${option.key}::`),
-        );
-        const allChildSelections = children.map(
-          (child: CascadeOption) => `${option.key}::${child.key}`,
-        );
-        onFormChange([...otherSelections, ...allChildSelections]);
-      }
+  const onParentOptionClick = useCallback(
+    (optionId: number, columnIndex: number) => {
+      setActivePath((prev) => [...prev.slice(0, columnIndex), optionId]);
     },
-    [getChildrenForParent, value, onFormChange],
-  );
-
-  const onChildSelect = useCallback(
-    (childKey: string) => {
-      if (!activeParent) {
-        return;
-      }
-      const compositeKey = `${activeParent.key}::${childKey}`;
-      const isSelected = value.includes(compositeKey);
-      if (isSelected) {
-        onFormChange(value.filter((v) => v !== compositeKey));
-      } else {
-        onFormChange([...value, compositeKey]);
-      }
-    },
-    [activeParent, value, onFormChange],
-  );
-
-  const isChildSelected = useCallback(
-    (childKey: string) => {
-      if (!activeParent) {
-        return false;
-      }
-      return value.includes(`${activeParent.key}::${childKey}`);
-    },
-    [activeParent, value],
+    [],
   );
 
   const onClearClick = useCallback(
@@ -308,177 +137,341 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
     [onFormChange],
   );
 
+  const onChipDelete = useCallback(
+    (label: string) => {
+      const rootOptions = getChildren(null);
+      const matchedRoot = rootOptions.find((opt) => opt.label === label);
+      if (matchedRoot) {
+        // Remove all descendant values from expandedValues
+        const descendants = getAllDescendantValues(matchedRoot.id);
+        const toRemove = new Set(descendants);
+        const newExpandedValues = expandedValues.filter(
+          (v) => !toRemove.has(v),
+        );
+        onChangeWithAggregate(newExpandedValues);
+      } else {
+        const matchedOption = flatOptions.find((opt) => opt.label === label);
+        if (matchedOption) {
+          const newExpandedValues = expandedValues.filter(
+            (v) => v !== matchedOption.value,
+          );
+          onChangeWithAggregate(newExpandedValues);
+        }
+      }
+    },
+    [
+      getChildren,
+      getAllDescendantValues,
+      flatOptions,
+      expandedValues,
+      onChangeWithAggregate,
+    ],
+  );
+
+  const displayLabels = useMemo(() => {
+    if (value.length === 0) {
+      return [];
+    }
+
+    const result: string[] = [];
+    const processedValues = new Set<string>();
+
+    const rootOptions = getChildren(null);
+    rootOptions.forEach((root) => {
+      const descendants = getAllDescendantValues(root.id);
+      if (descendants.length > 0 && descendants.every((v) => valueSet.has(v))) {
+        result.push(root.label);
+        // Mark both parent value and descendants as processed
+        processedValues.add(root.value);
+        descendants.forEach((v) => processedValues.add(v));
+      }
+    });
+
+    value.forEach((v) => {
+      if (!processedValues.has(v)) {
+        const option = flatOptions.find((opt) => opt.value === v);
+        if (option) {
+          result.push(option.label);
+        }
+      }
+    });
+
+    return result;
+  }, [value, valueSet, getChildren, getAllDescendantValues, flatOptions]);
+
   return (
     <>
       <Box
+        onClick={onTriggerClick}
         ref={triggerRef}
         sx={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          height: 36,
-          px: 1.5,
-          bgcolor: 'white',
+          flexWrap: 'wrap',
+          gap: 0.5,
+          minHeight: 32,
+          py: 0.5,
+          pl: value.length > 0 ? 0.75 : 1.25,
+          pr: value.length > 0 ? 5 : 3.5,
+          bgcolor: 'background.default',
           border: '1px solid',
-          borderColor: isOpen ? '#5B76BC' : '#DFDEE6',
-          borderRadius: 1,
+          borderColor: isOpen ? 'border.hover' : 'border.default',
+          borderRadius: 2,
+          cursor: 'text',
           '&:hover': {
-            borderColor: '#5B76BC',
+            bgcolor: 'background.active',
+            borderColor: 'border.default',
+            '& .clear-icon': {
+              display: 'flex',
+            },
           },
         }}
       >
-        <Box
-          component="input"
+        {displayLabels.map((label, index) => (
+          <QueryAutoCompleteChip
+            key={`${label}-${index}`}
+            label={label}
+            onDelete={(e) => {
+              e.stopPropagation();
+              onChipDelete(label);
+            }}
+          />
+        ))}
+        <InputBase
+          id={inputId}
+          inputProps={{
+            'aria-autocomplete': 'none',
+            autoComplete: 'new-password',
+            'data-form-type': 'other',
+            'data-lpignore': 'true',
+          }}
+          inputRef={inputRef}
+          name={`notaform-${inputId}`}
           onChange={onSearchChange}
-          onClick={onTriggerClick}
-          placeholder={
-            value.length > 0 ? `${value.length} selected` : placeholder
-          }
+          placeholder={displayLabels.length === 0 ? placeholder : ''}
           sx={{
             flex: 1,
-            border: 'none',
-            outline: 'none',
-            bgcolor: 'transparent',
-            fontSize: 14,
-            color: '#363440',
-            '&::placeholder': {
-              color: value.length > 0 ? '#363440' : '#B0ADBD',
+            minWidth: 30,
+            fontSize: 12,
+            lineHeight: 20 / 12,
+            '& .MuiInputBase-input': {
+              p: 0,
+              height: 20,
+              pl: 0.5,
+              '&::placeholder': {
+                color: 'text.secondary',
+                opacity: 0.5,
+              },
             },
           }}
           value={searchText}
         />
-        <Stack alignItems="center" direction="row" spacing={0.5}>
-          {value.length > 0 && <Box onClick={onClearClick}>{CLEAR_ICON}</Box>}
-          {POPUP_ICON}
+        <Stack
+          alignItems="center"
+          direction="row"
+          spacing={0.5}
+          sx={{
+            position: 'absolute',
+            right: 9,
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}
+        >
+          {value.length > 0 && (
+            <Box
+              className="clear-icon"
+              onClick={onClearClick}
+              sx={{ display: isOpen ? 'flex' : 'none' }}
+            >
+              {CLEAR_ICON}
+            </Box>
+          )}
+          {buildPopupIcon(isOpen)}
         </Stack>
       </Box>
 
-      <Popover
+      <Popper
         anchorEl={triggerRef.current}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        disableAutoFocus
-        disableEnforceFocus
-        disableRestoreFocus
-        onClose={(event, reason) => {
-          if (reason === 'backdropClick' && event) {
-            const mouseEvent = event as globalThis.MouseEvent;
-            const target = mouseEvent.target as Node;
-            if (triggerRef.current?.contains(target)) {
+        modifiers={[
+          {
+            name: 'offset',
+            options: {
+              offset: [0, 4],
+            },
+          },
+        ]}
+        open={isOpen}
+        placement={'bottom-start'}
+      >
+        <ClickAwayListener
+          onClickAway={(event) => {
+            if (triggerRef.current?.contains(event.target as Node)) {
               return;
             }
-          }
-          onPopoverClose();
-        }}
-        open={isOpen}
-        slotProps={{
-          paper: { sx: { ...POPOVER_SX, mt: 0.5 } },
-        }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-      >
-        <Box sx={COLUMN_SX}>
-          {isLoadingParent ? (
-            <Box sx={LOADING_SX}>{LOADING_SPINNER}</Box>
-          ) : (
-            filteredParentOptions.map((option: CascadeOption) => {
-              const isActive = activeParent?.key === option.key;
-              const children = getChildrenForParent(option.key);
-              const hasChildren = children.length > 0;
-              const isFullySelected =
-                hasChildren &&
-                children.every((child: CascadeOption) =>
-                  value.includes(`${option.key}::${child.key}`),
-                );
-              const isPartiallySelected =
-                hasChildren &&
-                !isFullySelected &&
-                children.some((child: CascadeOption) =>
-                  value.includes(`${option.key}::${child.key}`),
-                );
-
-              return (
-                <Box
-                  key={option.key}
-                  onClick={() => onParentItemClick(option)}
-                  sx={isActive ? OPTION_ACTIVE_SX : OPTION_SX}
-                >
-                  <Stack
-                    alignItems="center"
-                    direction="row"
-                    flex={1}
-                    spacing={0.5}
-                  >
-                    {hasChildren && (
-                      <Box
-                        onClick={(e) => onParentCheckClick(e, option)}
-                        sx={{
-                          width: 16,
-                          height: 16,
-                          border: '1px solid',
-                          borderColor:
-                            isFullySelected || isPartiallySelected
-                              ? '#5B76BC'
-                              : '#DFDEE6',
-                          borderRadius: 0.5,
-                          bgcolor: isFullySelected ? '#5B76BC' : 'transparent',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {isFullySelected && (
-                          <CheckIcon
-                            sx={{ width: 12, height: 12, color: 'white' }}
-                          />
-                        )}
-                        {isPartiallySelected && (
-                          <Box
-                            sx={{
-                              width: 8,
-                              height: 2,
-                              bgcolor: '#5B76BC',
-                              borderRadius: 0.25,
-                            }}
-                          />
-                        )}
-                      </Box>
-                    )}
-                    <span>{option.label}</span>
-                  </Stack>
-                  <Box
-                    component="img"
-                    src={ICON_ARROW}
-                    sx={{ width: 16, height: 16, transform: 'rotate(-90deg)' }}
-                  />
-                </Box>
-              );
-            })
-          )}
-        </Box>
-
-        {activeParent && (
-          <Box sx={COLUMN_SX}>
-            {isLoadingChildren ? (
-              <Box sx={LOADING_SX}>{LOADING_SPINNER}</Box>
+            onPopoverClose();
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              borderRadius: 2,
+              overflow: 'hidden',
+              bgcolor: 'background.default',
+              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
+              border: '1px solid',
+              borderColor: 'border.default',
+            }}
+          >
+            {isLoading ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: 56,
+                  width: triggerRef.current?.offsetWidth,
+                }}
+              >
+                {LOADING_SPINNER}
+              </Box>
+            ) : columns.length === 0 ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 14,
+                  color: 'action.disabled',
+                  height: 56,
+                  width: triggerRef.current?.offsetWidth,
+                }}
+              >
+                No options
+              </Box>
             ) : (
-              filteredChildOptions.map((child: CascadeOption) => {
-                const isSelected = isChildSelected(child.key);
+              columns.map((columnOptions, columnIndex) => {
+                const isInSearchMode = !!searchResults;
+
                 return (
                   <Box
-                    key={child.key}
-                    onClick={() => onChildSelect(child.key)}
-                    sx={OPTION_SX}
+                    key={columnIndex}
+                    sx={{
+                      maxHeight: 300,
+                      overflow: 'auto',
+                      borderRight: '1px solid',
+                      borderColor: 'border.default',
+                      '&:last-child': {
+                        borderRight: 'none',
+                      },
+                      ...(isInSearchMode && {
+                        width: triggerRef.current?.offsetWidth,
+                      }),
+                    }}
                   >
-                    <span>{child.label}</span>
-                    {isSelected && (
-                      <CheckIcon sx={{ ...TICK_ICON_SX, color: '#5B76BC' }} />
-                    )}
+                    {columnOptions.map((option) => {
+                      const children = getChildren(option.id);
+                      const hasChildren = children.length > 0;
+                      const isLeaf = !hasChildren;
+                      const isChecked = valueSet.has(option.value);
+                      const isParentActive = activePath.includes(option.id);
+
+                      const descendants = hasChildren
+                        ? getAllDescendantValues(option.id)
+                        : [];
+                      const selectedChildCount = descendants.filter((v) =>
+                        valueSet.has(v),
+                      ).length;
+                      const isAllChildrenSelected =
+                        descendants.length > 0 &&
+                        selectedChildCount === descendants.length;
+
+                      return (
+                        <Box
+                          key={option.value}
+                          onClick={() => {
+                            if (isInSearchMode || isLeaf) {
+                              onToggleOption(option.value);
+                            } else {
+                              onParentOptionClick(option.id, columnIndex);
+                            }
+                          }}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: 1,
+                            py: 1,
+                            px: 2,
+                            fontSize: 14,
+                            color: 'text.primary',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              bgcolor: 'background.active',
+                            },
+                            ...(isParentActive && {
+                              bgcolor: 'background.active',
+                            }),
+                            width:
+                              isLeaf && !isInSearchMode
+                                ? 300
+                                : triggerRef?.current?.offsetWidth,
+                          }}
+                        >
+                          <Checkbox
+                            checked={isLeaf ? isChecked : isAllChildrenSelected}
+                            checkedIcon={CHECKBOX_CHECKED_ICON}
+                            icon={CHECKBOX_UNCHECKED_ICON}
+                            indeterminate={
+                              !isLeaf &&
+                              selectedChildCount > 0 &&
+                              !isAllChildrenSelected
+                            }
+                            indeterminateIcon={CHECKBOX_INDETERMINATE_ICON}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isLeaf) {
+                                onToggleOption(option.value);
+                              } else if (isAllChildrenSelected) {
+                                // Deselect all descendants
+                                onChangeWithAggregate(
+                                  expandedValues.filter(
+                                    (v) => !descendants.includes(v),
+                                  ),
+                                );
+                              } else {
+                                // Select all descendants
+                                const otherValues = expandedValues.filter(
+                                  (v) => !descendants.includes(v),
+                                );
+                                onChangeWithAggregate([
+                                  ...otherValues,
+                                  ...descendants,
+                                ]);
+                              }
+                            }}
+                            size="small"
+                            sx={{ p: 0 }}
+                          />
+                          <span
+                            style={{
+                              flex: 1,
+                            }}
+                          >
+                            {isInSearchMode
+                              ? getPathLabels(option.value).join(' / ')
+                              : option.label}
+                          </span>
+                          {!isInSearchMode && hasChildren && ARROW_ICON}
+                        </Box>
+                      );
+                    })}
                   </Box>
                 );
               })
             )}
           </Box>
-        )}
-      </Popover>
+        </ClickAwayListener>
+      </Popper>
     </>
   );
 };

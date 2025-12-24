@@ -262,18 +262,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           getOptionLabel={onGetOptionLabel}
           isOptionEqualToValue={onIsOptionEqualToValue}
           loading={loading}
-          loadingText={
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                py: 1,
-              }}
-            >
-              {LOADING_SPINNER}
-            </Box>
-          }
+          loadingText={LOADING_SPINNER}
           multiple={multiple}
           noOptionsText={noOptionsText}
           onChange={onChangeToHandleSelection}
@@ -400,21 +389,19 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           slotProps={{
             paper: {
               sx: {
-                mt: 0.5,
+                my: 0.5,
                 borderRadius: 2,
                 boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.08)',
                 border: '1px solid #E0E0E0',
-                '& .MuiAutocomplete-noOptions': {
+                '& .MuiAutocomplete-noOptions,& .MuiAutocomplete-loading': {
+                  height: 56,
+                  display: 'flex',
                   fontSize: 14,
                   color: 'text.secondary',
-                  py: 2,
-                  px: 2,
+                  alignItems: 'center',
                 },
                 '& .MuiAutocomplete-loading': {
-                  fontSize: 14,
-                  color: 'text.secondary',
-                  py: 2,
-                  px: 2,
+                  justifyContent: 'center',
                 },
               },
             },

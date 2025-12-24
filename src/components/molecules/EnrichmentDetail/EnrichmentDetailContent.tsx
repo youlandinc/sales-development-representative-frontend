@@ -184,6 +184,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
         setRowIds([...rowIds, ...data]);
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to create rows:', error);
     }
   };
@@ -208,6 +209,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
         }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to add column:', error);
     }
   };

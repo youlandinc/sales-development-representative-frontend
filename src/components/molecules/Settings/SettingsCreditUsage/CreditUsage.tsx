@@ -162,7 +162,7 @@ export const CreditUsage: FC = () => {
     const DIRECTORY_COLUMNS: GridColDef[] = [
       {
         field: 'directory',
-        headerName: 'Directory',
+        headerName: 'Director',
         width: 150,
       },
       {
