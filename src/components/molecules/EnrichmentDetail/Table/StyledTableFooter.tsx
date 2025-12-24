@@ -46,6 +46,7 @@ export const StyledTableFooter: FC<StyledTableAddRowsFooterProps> = ({
       await onAddRows(addRowCount);
       onClickAwayToClosePopper(); // Close popper after adding rows
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to add rows:', error);
     } finally {
       setIsAddingRows(false);

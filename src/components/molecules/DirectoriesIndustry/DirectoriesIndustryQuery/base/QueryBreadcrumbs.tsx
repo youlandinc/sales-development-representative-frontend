@@ -46,7 +46,7 @@ export const QueryBreadcrumbs: FC<QueryBreadcrumbsProps> = ({ current }) => {
             color: 'text.focus',
           }}
         >
-          Directory
+          Directories
         </Typography>
       </Stack>
       /

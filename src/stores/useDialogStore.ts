@@ -296,6 +296,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
         set({ visibleProcess: true, activeStep: CampaignStepEnum.prepare });
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
     } finally {
       set({ openProcessLoading: false });

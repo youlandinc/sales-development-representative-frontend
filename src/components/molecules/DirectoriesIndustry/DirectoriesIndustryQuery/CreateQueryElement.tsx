@@ -15,6 +15,7 @@ import { StyledButtonGroup, StyledTextFieldNumber } from '@/components/atoms';
 import {
   QueryAdditionalDetails,
   QueryAutoComplete,
+  QueryCascadeSelect,
   QueryCheckbox,
   QueryCollapse,
   QueryContainer,
@@ -302,6 +303,29 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         }
       }
 
+      if (
+        config.componentName ===
+        DirectoriesQueryComponentNameEnum.cascade_select
+      ) {
+        return (
+          <QueryContainer
+            description={config.description}
+            isAuth={containerIsAuth}
+            label={config.label}
+            tooltip={config.tooltip}
+          >
+            <QueryCascadeSelect
+              onFormChange={(newValue) =>
+                onFormChange?.(config.key, newValue, groupPath)
+              }
+              placeholder={config.placeholder || ''}
+              requestParams={selectRequestParams}
+              url={config.url}
+              value={formData[config.key!] ?? []}
+            />
+          </QueryContainer>
+        );
+      }
       return (
         <QueryContainer
           description={config.description}
