@@ -27,6 +27,7 @@ export const VerticalProviderTabs = ({
         flexShrink: 0,
       }}
       value={activeValue}
+      variant={'scrollable'}
     >
       {providers.map((provider) => (
         <Tab
