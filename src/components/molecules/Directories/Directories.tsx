@@ -94,10 +94,11 @@ export const Directories: FC = () => {
                   setClickedBizId(bizId);
                   const success = await initializeDataFlow(bizId);
 
+                  setClickedBizId(null);
+
                   if (success) {
                     return router.push(`/directories/${SLUG_MAP[bizId]}`);
                   }
-                  setClickedBizId(null);
                 }
                 router.push(`${PLANS_ROUTE}?bizId=${bizId}`);
               }}
