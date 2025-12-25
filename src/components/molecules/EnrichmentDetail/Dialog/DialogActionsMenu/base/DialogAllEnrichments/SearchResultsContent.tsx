@@ -37,7 +37,7 @@ export const SearchResultsContent: FC<SearchResultsContentProps> = ({
         justifyContent={'space-between'}
         mb={1.5}
       >
-        <Typography variant={'subtitle1'} sx={{ fontWeight: 600 }}>
+        <Typography sx={{ fontWeight: 600 }} variant={'subtitle1'}>
           {'搜索结果'}
         </Typography>
         <Typography
