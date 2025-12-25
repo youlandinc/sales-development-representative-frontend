@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom';
 
 import { useWebSocket } from '@/hooks';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { WebSocketTypeEnum } from '@/types';
 
@@ -24,7 +24,7 @@ export const useTableWebSocket = ({
   setAiLoadingState,
   maxLoadedIndexRef,
 }: UseTableWebSocketParams) => {
-  const { setRowIds } = useProspectTableStore((store) => store);
+  const { setRowIds } = useEnrichmentTableStore((store) => store);
   const { messages, connected } = useWebSocket();
   const rowIdsRef = useRef<string[]>([]);
   const pendingRowIdsRef = useRef<string[]>([]);

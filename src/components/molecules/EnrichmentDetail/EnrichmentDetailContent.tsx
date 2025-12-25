@@ -5,12 +5,12 @@ import { useShallow } from 'zustand/react/shallow';
 
 import {
   ActiveTypeEnum,
-  useProspectTableStore,
+  useEnrichmentTableStore,
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
 
-import { useProspectTable } from './hooks';
+import { useEnrichmentTable } from './hooks';
 
 import { ROW_HEIGHT } from './Table/config';
 import {
@@ -93,7 +93,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     updateColumnVisible,
     updateColumnWidth,
     drawersType,
-  } = useProspectTableStore(
+  } = useEnrichmentTableStore(
     useShallow((store) => ({
       addColumn: store.addColumn,
       closeDialog: store.closeDialog,
@@ -168,8 +168,9 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     onCellEdit,
     onInitializeAiColumns,
     onRunAi,
+    onColumnSort,
     refetchCachedRecords,
-  } = useProspectTable({ tableId });
+  } = useEnrichmentTable({ tableId });
 
   // Add rows callback
   const onClickToAddRows = async (count: number) => {
@@ -348,6 +349,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               onColumnResize={(fieldId, width) =>
                 updateColumnWidth(fieldId, width)
               }
+              onColumnSort={onColumnSort}
               onHeaderMenuClick={async ({
                 type,
                 columnId,
@@ -472,6 +474,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               }}
               onRunAi={onRunAi}
               rowIds={rowIds}
+              tableId={tableId}
               virtualization={{
                 enabled: true,
                 rowHeight: ROW_HEIGHT,

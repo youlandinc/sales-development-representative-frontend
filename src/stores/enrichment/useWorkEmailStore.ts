@@ -4,7 +4,7 @@ import { combine } from 'zustand/middleware';
 
 import { SDRToast } from '@/components/atoms';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { ActiveTypeEnum, HttpError } from '@/types';
 
@@ -244,7 +244,7 @@ export const useWorkEmailStore = create<
         }),
       handleEditClick: (columnId: string) =>
         set((state) => {
-          const { columns, fieldGroupMap } = useProspectTableStore.getState();
+          const { columns, fieldGroupMap } = useEnrichmentTableStore.getState();
           const column = columns.find((col) => col.fieldId === columnId);
 
           if (!column?.groupId || !fieldGroupMap) {
@@ -360,7 +360,7 @@ export const useWorkEmailStore = create<
               validationActionConfig.requireValidationSuccess;
             state.selectedValidationOption = validationActionConfig.actionKey;
           }
-          useProspectTableStore
+          useEnrichmentTableStore
             .getState()
             .openDialog(TableColumnMenuActionEnum.work_email);
         }),
@@ -373,7 +373,7 @@ export const useWorkEmailStore = create<
                 waterfallConfigs: (item.waterfallConfigs || []).map((i) => ({
                   ...i,
                   inputParams: i.inputParams.map((p) => {
-                    const columns = useProspectTableStore.getState().columns;
+                    const columns = useEnrichmentTableStore.getState().columns;
                     const column = columns.find(
                       (c) => c.semanticType === p.semanticType,
                     );

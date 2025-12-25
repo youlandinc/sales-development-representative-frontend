@@ -10,7 +10,7 @@ import { Icon, Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
 import { useSwitch } from '@/hooks';
-import { PROSPECT_CSV_TYPE_OPTIONS } from '@/constants';
+import { ENRICHMENT_CSV_TYPE_OPTIONS } from '@/constants';
 
 import {
   SDRToast,
@@ -24,8 +24,8 @@ import {
   StyledCustomButtonGroup,
 } from '@/components/molecules';
 
-import { _createProspectTableViaCsv } from '@/request';
-import { HttpVariantEnum, ProspectDelimiterEnum } from '@/types';
+import { _createEnrichmentTableViaCsv } from '@/request';
+import { EnrichmentDelimiterEnum, HttpVariantEnum } from '@/types';
 
 import ICON_UPLOAD from './assets/icon_upload.svg';
 import ICON_CLOSE from './assets/icon_close.svg';
@@ -65,8 +65,8 @@ export const Enrichment: FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
-  const [delimiter, setDelimiter] = useState<ProspectDelimiterEnum>(
-    ProspectDelimiterEnum.comma,
+  const [delimiter, setDelimiter] = useState<EnrichmentDelimiterEnum>(
+    EnrichmentDelimiterEnum.comma,
   );
   const [hasHeader, setHasHeader] = useState(true);
   //const [tableId, setTableId] = useState<string>('');
@@ -149,7 +149,7 @@ export const Enrichment: FC = () => {
 
   const resetDialog = (isClose = true) => {
     resetCSVFile();
-    setDelimiter(ProspectDelimiterEnum.comma);
+    setDelimiter(EnrichmentDelimiterEnum.comma);
     setHasHeader(true);
     setIsDragging(false);
     isClose && close();
@@ -171,7 +171,7 @@ export const Enrichment: FC = () => {
 
     setCreating(true);
     try {
-      const { data } = await _createProspectTableViaCsv(formData);
+      const { data } = await _createEnrichmentTableViaCsv(formData);
       router.push(`/enrichment/${data}`);
     } catch (err) {
       const { header, message, variant } = err as HttpError;
@@ -283,7 +283,7 @@ export const Enrichment: FC = () => {
                 <Typography fontWeight={600}>Delimiter</Typography>
                 <StyledCustomButtonGroup
                   onChange={(value) => setDelimiter(value)}
-                  options={PROSPECT_CSV_TYPE_OPTIONS}
+                  options={ENRICHMENT_CSV_TYPE_OPTIONS}
                   value={delimiter}
                 />
               </Stack>

@@ -105,6 +105,7 @@ interface CellState {
 // ============================================
 
 interface StyledTableProps {
+  tableId?: string;
   columns: any[];
   rowIds: string[];
   data: any[];
@@ -119,6 +120,12 @@ interface StyledTableProps {
   onCellClick: (columnId: string, rowId: string, data: any) => void;
   aiLoading?: AiLoadingState;
   onRunAi?: (params: AiRunParams) => Promise<void>;
+  onColumnSort?: (params: {
+    tableId: string;
+    currentFieldId: string;
+    beforeFieldId?: string;
+    afterFieldId?: string;
+  }) => Promise<void>;
   onAddRows: (count: number) => Promise<void>;
   addRowsFooter?: ReactNode;
 }
@@ -166,6 +173,7 @@ const HEADER_STATE_RESET: HeaderState = {
 };
 
 export const StyledTable: FC<StyledTableProps> = ({
+  tableId,
   columns,
   rowIds,
   data,
@@ -180,6 +188,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   aiLoading,
   onCellClick,
   onRunAi,
+  onColumnSort,
   onAddRows,
   addRowsFooter,
 }) => {
@@ -240,7 +249,7 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   // Handle column drag end - works for both pinned and center columns
   const onColumnDragEnd = useCallback(
-    (event: DragEndEvent) => {
+    async (event: DragEndEvent) => {
       const { active, over } = event;
       if (!over || active.id === over.id) {
         return;
@@ -253,6 +262,9 @@ export const StyledTable: FC<StyledTableProps> = ({
       const isInPinned = sortablePinnedIds.includes(activeId);
       const isInCenter = sortableCenterIds.includes(activeId);
 
+      let beforeFieldId: string | undefined;
+      let afterFieldId: string | undefined;
+
       if (isInPinned) {
         // Reorder within pinned columns
         const oldIndex = sortablePinnedIds.indexOf(activeId);
@@ -263,12 +275,37 @@ export const StyledTable: FC<StyledTableProps> = ({
             oldIndex,
             newIndex,
           );
+
+          // Determine before/after based on drag direction
+          if (oldIndex < newIndex) {
+            // Dragging right: insert after overId
+            afterFieldId = overId;
+          } else {
+            // Dragging left: insert before overId
+            beforeFieldId = overId;
+          }
+
           const newOrder = [
             SYSTEM_COLUMN_SELECT,
             ...reorderedPinned,
             ...sortableCenterIds,
           ];
           setColumnOrder(newOrder);
+
+          // Call API to update column sort
+          if (tableId && onColumnSort) {
+            try {
+              await onColumnSort({
+                tableId,
+                currentFieldId: activeId,
+                beforeFieldId,
+                afterFieldId,
+              });
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error('Failed to update column sort:', error);
+            }
+          }
         }
       } else if (isInCenter) {
         // Reorder within center columns
@@ -280,16 +317,41 @@ export const StyledTable: FC<StyledTableProps> = ({
             oldIndex,
             newIndex,
           );
+
+          // Determine before/after based on drag direction
+          if (oldIndex < newIndex) {
+            // Dragging right: insert after overId
+            afterFieldId = overId;
+          } else {
+            // Dragging left: insert before overId
+            beforeFieldId = overId;
+          }
+
           const newOrder = [
             SYSTEM_COLUMN_SELECT,
             ...sortablePinnedIds,
             ...reorderedCenter,
           ];
           setColumnOrder(newOrder);
+
+          // Call API to update column sort
+          if (tableId && onColumnSort) {
+            try {
+              await onColumnSort({
+                tableId,
+                currentFieldId: activeId,
+                beforeFieldId,
+                afterFieldId,
+              });
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error('Failed to update column sort:', error);
+            }
+          }
         }
       }
     },
-    [sortablePinnedIds, sortableCenterIds],
+    [sortablePinnedIds, sortableCenterIds, tableId, onColumnSort],
   );
 
   useEffect(() => {

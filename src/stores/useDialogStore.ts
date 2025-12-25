@@ -7,10 +7,10 @@ import {
   CampaignStepEnum,
   CRMInfo,
   CSVInfo,
+  EnrichmentDelimiterEnum,
   HttpError,
   ProcessCreateChatEnum,
   ProcessCreateTypeEnum,
-  ProspectDelimiterEnum,
   ResponseCampaignChatRecord,
   ResponseCampaignFilterFormData,
   ResponseCampaignLaunchInfo,
@@ -27,7 +27,7 @@ import {
   _createCampaign,
   _fetchCrmProviderList,
   _fetchEmailProfiles,
-  _fetchProspectTableData,
+  _fetchEnrichmentTableData,
   _fetchSegmentOptions,
   _renameCampaign,
   _updateCampaignProcessSnapshot,
@@ -181,7 +181,7 @@ const InitialState: DialogStoreState = {
       originalFileName: '',
       fileName: '',
     },
-    delimiter: ProspectDelimiterEnum.comma,
+    delimiter: EnrichmentDelimiterEnum.comma,
     hasHeader: true,
     counts: 0,
     invalidCounts: 0,
@@ -630,7 +630,7 @@ export const useDialogStore = create<DialogStoreProps>()((set, get, store) => ({
   fetchEnrichmentTableData: async () => {
     set({ fetchEnrichmentTableLoading: true });
     try {
-      const { data } = await _fetchProspectTableData({
+      const { data } = await _fetchEnrichmentTableData({
         size: 1000,
         page: 0,
       });

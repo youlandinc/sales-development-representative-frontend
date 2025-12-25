@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 import { StyledRadioGroup } from '@/components/atoms';
 import { QueryListTextArea, QueryTableSelect } from './index';
 
-import { ProspectTableEnum } from '@/types';
+import { EnrichmentTableEnum } from '@/types';
 import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
 
 enum CompaniesRadioEnum {
@@ -48,7 +48,7 @@ export const QueryTableWithList: FC<QueryTableWithListProps> = ({
   );
   const [selectedTableName, setSelectedTableName] = useState<string>('');
   const [selectedTableSource, setSelectedTableSource] = useState<
-    ProspectTableEnum | undefined
+    EnrichmentTableEnum | undefined
   >(undefined);
 
   const [keywords, setKeywords] = useState<string[]>(value?.keywords || []);

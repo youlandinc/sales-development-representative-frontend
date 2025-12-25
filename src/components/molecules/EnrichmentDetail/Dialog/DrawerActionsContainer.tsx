@@ -12,7 +12,7 @@ import {
 } from './index';
 import { CampaignProcess } from '@/components/molecules';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { ActiveCellParams } from '@/types';
@@ -29,9 +29,9 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
   onInitializeAiColumns,
 }) => {
   // Get dialog state from store - 分别选择避免对象引用导致的无限更新
-  const dialogType = useProspectTableStore((state) => state.dialogType);
-  const dialogVisible = useProspectTableStore((state) => state.dialogVisible);
-  const drawersType = useProspectTableStore((state) => state.drawersType);
+  const dialogType = useEnrichmentTableStore((state) => state.dialogType);
+  const dialogVisible = useEnrichmentTableStore((state) => state.dialogVisible);
+  const drawersType = useEnrichmentTableStore((state) => state.drawersType);
 
   return (
     <Collapse

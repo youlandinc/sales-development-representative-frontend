@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { COLUMN_TYPE_ICONS } from '../Table/config';
 
 import ICON_COLUMN from '../assets/head/icon-column.svg';
@@ -17,7 +17,7 @@ import ICON_COLUMN_HIDE from '../assets/table/icon-column-hide.svg';
 import ICON_COLUMN_VISIBLE from '../assets/table/icon-column-visible.svg';
 
 export const HeadColumnsPanel = () => {
-  const { columns, updateColumnVisible } = useProspectTableStore(
+  const { columns, updateColumnVisible } = useEnrichmentTableStore(
     (store) => store,
   );
 

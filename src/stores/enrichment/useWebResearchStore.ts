@@ -14,7 +14,7 @@ import {
 import { HttpError, ModelGroupItem } from '@/types';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
-import { useProspectTableStore } from './useProspectTableStore';
+import { useEnrichmentTableStore } from './useEnrichmentTableStore';
 
 import { UTypeOf } from '@/utils/UTypeOf';
 
@@ -258,7 +258,7 @@ export const useWebResearchStore = create<
     generatePrompt: string;
   }) => {
     try {
-      const { activeColumnId } = useProspectTableStore.getState();
+      const { activeColumnId } = useEnrichmentTableStore.getState();
       return await _updateWebResearchConfig({
         tableId: params.tableId,
         fieldId: activeColumnId,
@@ -336,7 +336,7 @@ export const useWebResearchStore = create<
   runGenerateAiModel: async (api: string, params: Record<string, any>) => {
     set({ generateIsLoading: true, generateIsThinking: true });
     try {
-      const columnsNames = useProspectTableStore
+      const columnsNames = useEnrichmentTableStore
         .getState()
         .columns.map((item) => item.fieldName)
         .join(',');

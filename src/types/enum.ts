@@ -38,7 +38,7 @@ export enum FilterOperationEnum {
   not_ends_with = 'NOT_ENDS_WITH',
 }
 
-export enum ProspectDelimiterEnum {
+export enum EnrichmentDelimiterEnum {
   comma = 'COMMA',
   semicolon = 'SEMICOLON',
   tab = 'TAB',
@@ -95,7 +95,7 @@ export enum BizCodeEnum {
   signature = 'SIGNATURE',
 }
 
-export enum ProspectTableEnum {
+export enum EnrichmentTableEnum {
   find_people = 'FIND_PEOPLE',
   find_companies = 'FIND_COMPANIES',
   from_csv = 'FROM_CSV',

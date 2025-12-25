@@ -1,2 +1,2 @@
-export * from './useProspectTable';
+export * from './useEnrichmentTable';
 export * from './useTableWebSocket';

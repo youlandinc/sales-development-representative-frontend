@@ -12,22 +12,22 @@ import useSWR from 'swr';
 import { useShallow } from 'zustand/react/shallow';
 
 import {
-  useProspectTableStore,
+  useEnrichmentTableStore,
   useWebResearchStore,
 } from '@/stores/enrichment';
 import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
-import { _fetchTableRowData } from '@/request';
+import { _fetchTableRowData, _updateTableColumnSort } from '@/request';
 import { MIN_BATCH_SIZE, SYSTEM_COLUMN_SELECT } from '../Table/config';
 import { checkIsAiColumn } from '../Table/utils';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
-interface UseProspectTableParams {
+interface useEnrichmentTableParams {
   tableId: string;
 }
 
-interface UseProspectTableReturn {
+interface UseEnrichmentTableReturn {
   fullData: any[];
   aiLoadingState: Record<string, Record<string, boolean>>;
   aiColumnIds: Set<string>;
@@ -48,6 +48,12 @@ interface UseProspectTableReturn {
     recordId?: string;
     isHeader?: boolean;
   }) => Promise<void>;
+  onColumnSort: (params: {
+    tableId: string;
+    currentFieldId: string;
+    beforeFieldId?: string;
+    afterFieldId?: string;
+  }) => Promise<void>;
   refetchCachedRecords: () => Promise<void>;
 }
 
@@ -55,9 +61,9 @@ interface UseProspectTableReturn {
 // 1. Hook has too many responsibilities
 // 2. Consider splitting into smaller hooks: useTableData, useAiProcessing, useVirtualization
 // 3. State management can be optimized for clearer structure
-export const useProspectTable = ({
+export const useEnrichmentTable = ({
   tableId,
-}: UseProspectTableParams): UseProspectTableReturn => {
+}: useEnrichmentTableParams): UseEnrichmentTableReturn => {
   const {
     fetchTable,
     fetchRowIds,
@@ -66,7 +72,7 @@ export const useProspectTable = ({
     runRecords,
     resetTable,
     updateCellValue,
-  } = useProspectTableStore(
+  } = useEnrichmentTableStore(
     useShallow((store) => ({
       fetchTable: store.fetchTable,
       fetchRowIds: store.fetchRowIds,
@@ -785,6 +791,24 @@ export const useProspectTable = ({
     [tableId, rowIds, columns, runAi, onUpdateRowData, onInitializeAiColumns],
   );
 
+  // Handle column sort via API
+  const onColumnSort = useCallback(
+    async (params: {
+      tableId: string;
+      currentFieldId: string;
+      beforeFieldId?: string;
+      afterFieldId?: string;
+    }) => {
+      try {
+        await _updateTableColumnSort(params);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to update column sort:', error);
+      }
+    },
+    [],
+  );
+
   return {
     fullData,
     aiLoadingState,
@@ -800,6 +824,7 @@ export const useProspectTable = ({
     onUpdateRowData,
     onInitializeAiColumns,
     onRunAi,
+    onColumnSort,
     refetchCachedRecords,
   };
 };

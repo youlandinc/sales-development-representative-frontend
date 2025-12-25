@@ -9,7 +9,7 @@ import { FC, ReactNode } from 'react';
 
 import { StyledTextField } from '@/components/atoms';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
@@ -35,7 +35,7 @@ export const DialogWorkEmailCustomSelect: FC<
     'value' | 'onChange'
   >
 > = ({ title, onChange, value, required }) => {
-  const { columns } = useProspectTableStore((store) => store);
+  const { columns } = useEnrichmentTableStore((store) => store);
 
   const options: TOption[] = columns.map((item) => ({
     label: item.fieldName,

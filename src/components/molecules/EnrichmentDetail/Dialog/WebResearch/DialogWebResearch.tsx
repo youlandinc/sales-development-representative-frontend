@@ -19,7 +19,7 @@ import {
 
 import {
   ActiveTypeEnum,
-  useProspectTableStore,
+  useEnrichmentTableStore,
   useWebResearchStore,
 } from '@/stores/enrichment';
 
@@ -47,7 +47,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   cb,
 }) => {
   const { rowIds, activeColumnId, openDialog, closeDialog } =
-    useProspectTableStore(
+    useEnrichmentTableStore(
       useShallow((state) => ({
         rowIds: state.rowIds,
         activeColumnId: state.activeColumnId,

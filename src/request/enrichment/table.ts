@@ -1,4 +1,4 @@
-import { del, get, patch, post } from '@/request/request';
+import { del, get, patch, post, put } from '@/request/request';
 import { ColumnFieldGroupMap } from '@/types';
 import {
   TableCellProps,
@@ -85,6 +85,15 @@ export const _createTableColumn = (params: {
 }) => {
   // API v2 returns the created column directly
   return post<TableColumnProps>('/sdr/table/field/v2', params);
+};
+
+export const _updateTableColumnSort = (params: {
+  tableId: string;
+  currentFieldId: string;
+  beforeFieldId?: string;
+  afterFieldId?: string;
+}) => {
+  return put('/sdr/table/field/reorder', params);
 };
 
 export const _exportTableData = (tableId: string) => {

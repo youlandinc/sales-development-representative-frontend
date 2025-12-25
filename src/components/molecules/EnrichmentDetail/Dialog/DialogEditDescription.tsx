@@ -11,7 +11,7 @@ import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 import { useAsyncFn } from '@/hooks';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import ICON_CLOSE from '../assets/dialog/icon_close.svg';
 
@@ -27,7 +27,7 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
     closeDialog,
     updateColumnDescription,
     dialogVisible,
-  } = useProspectTableStore((store) => store);
+  } = useEnrichmentTableStore((store) => store);
 
   const column = columns.find((col) => col.fieldId === activeColumnId);
 
