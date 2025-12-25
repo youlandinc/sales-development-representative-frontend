@@ -108,7 +108,7 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
   );
 
   return (
-    <>
+    <Stack flexDirection={'row'} gap={1.5} overflow={'hidden'} pb={3}>
       {/* 垂直标签栏 */}
       <VerticalProviderTabs
         activeValue={currentVerticalValue}
@@ -117,12 +117,10 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
       />
 
       {/* 选中动作的配置列表 */}
-      <Stack flex={1} gap={1.5}>
-        <ConfigActionsList
-          configs={selectedAction?.waterfallConfigs || []}
-          onItemClick={handleConfigItemClick}
-        />
-      </Stack>
-    </>
+      <ConfigActionsList
+        configs={selectedAction?.waterfallConfigs || []}
+        onItemClick={handleConfigItemClick}
+      />
+    </Stack>
   );
 };

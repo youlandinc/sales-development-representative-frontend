@@ -275,7 +275,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
         {/* 2. Actions标签内容 - 只在非搜索状态且是Actions标签时显示 */}
         {!hasSearchValue &&
           dialogAllEnrichmentsTabKey === EnrichmentCategoryEnum.actions && (
-            <Stack sx={{ gap: 1.5, flex: 1, minHeight: 0, overflow: 'auto' }}>
+            <Stack sx={{ gap: 1.5, height: 550, overflow: 'auto' }}>
               {dialogAllEnrichmentsData
                 .find(
                   (item) => item.categoryKey === EnrichmentCategoryEnum.actions,
@@ -317,30 +317,20 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
         {/* 3. 垂直标签内容 - 只在非搜索状态且不是Actions标签时显示 */}
         {!hasSearchValue &&
           dialogAllEnrichmentsTabKey !== EnrichmentCategoryEnum.actions && (
-            <Stack
-              flex={1}
-              flexDirection={'row'}
-              gap={1.5}
-              minHeight={0}
-              overflow={'auto'}
-              pb={3}
-            >
-              {/* 提取当前显示的动作数据 */}
-              <VerticalTabsContent
-                dialogAllEnrichmentsData={dialogAllEnrichmentsData}
-                dialogAllEnrichmentsTabKey={dialogAllEnrichmentsTabKey}
-                getActionTabValue={getActionTabValue}
-                integrationsTabKey={integrationsTabKey}
-                onClickToAiTemplate={onClickToAiTemplate}
-                openDialog={openDialog}
-                setDialogAllEnrichmentsVisible={setDialogAllEnrichmentsVisible}
-                setDisplayType={setDisplayType}
-                setIntegrationsTabKey={setIntegrationsTabKey}
-                setSelectedIntegrationToConfig={setSelectedIntegrationToConfig}
-                setTaskTabKey={setTaskTabKey}
-                taskTabKey={taskTabKey}
-              />
-            </Stack>
+            <VerticalTabsContent
+              dialogAllEnrichmentsData={dialogAllEnrichmentsData}
+              dialogAllEnrichmentsTabKey={dialogAllEnrichmentsTabKey}
+              getActionTabValue={getActionTabValue}
+              integrationsTabKey={integrationsTabKey}
+              onClickToAiTemplate={onClickToAiTemplate}
+              openDialog={openDialog}
+              setDialogAllEnrichmentsVisible={setDialogAllEnrichmentsVisible}
+              setDisplayType={setDisplayType}
+              setIntegrationsTabKey={setIntegrationsTabKey}
+              setSelectedIntegrationToConfig={setSelectedIntegrationToConfig}
+              setTaskTabKey={setTaskTabKey}
+              taskTabKey={taskTabKey}
+            />
           )}
       </Stack>
     );

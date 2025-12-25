@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { FC } from 'react';
+import { Stack } from '@mui/material';
 
 import { StyledActionItem } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
 
@@ -26,27 +27,36 @@ export const ConfigActionsList: FC<ConfigActionsListProps> = ({
     return null;
   }
   return (
-    <>
-      {configs.map((config, configIndex) => {
-        return (
-          <StyledActionItem
-            description={config?.description ?? ''}
-            icon={
-              config?.logoUrl ? (
-                <Image
-                  alt={'Provider'}
-                  height={16}
-                  src={config?.logoUrl}
-                  width={16}
-                />
-              ) : undefined
-            }
-            key={`config${config?.name}-${configIndex}`}
-            onClick={() => onItemClick(config)}
-            title={config?.name ?? ''}
-          />
-        );
-      })}
-    </>
+    <Stack overflow={'auto'} width={'100%'}>
+      <Stack
+        sx={{
+          gap: 1.5,
+          height: 550,
+          overflow: 'auto',
+          width: '100%',
+        }}
+      >
+        {configs.map((config, configIndex) => {
+          return (
+            <StyledActionItem
+              description={config?.description ?? ''}
+              icon={
+                config?.logoUrl ? (
+                  <Image
+                    alt={'Provider'}
+                    height={16}
+                    src={config?.logoUrl}
+                    width={16}
+                  />
+                ) : undefined
+              }
+              key={`config${config?.name}-${configIndex}`}
+              onClick={() => onItemClick(config)}
+              title={config?.name ?? ''}
+            />
+          );
+        })}
+      </Stack>
+    </Stack>
   );
 };

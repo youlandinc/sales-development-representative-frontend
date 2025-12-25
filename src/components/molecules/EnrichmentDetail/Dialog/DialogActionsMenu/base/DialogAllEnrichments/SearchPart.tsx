@@ -62,7 +62,7 @@ export const SearchPart: FC<SearchPartProps> = ({
       <Stack
         alignItems={'center'}
         justifyContent={'center'}
-        sx={{ height: '50vh' }}
+        sx={{ height: '623.8px' }}
       >
         <Typography sx={{ color: '#6F6C7D' }} variant={'body2'}>
           {'未找到匹配的结果'}
@@ -72,7 +72,9 @@ export const SearchPart: FC<SearchPartProps> = ({
   }
 
   return (
-    <Stack spacing={1.5} width={'100%'}>
+    <Stack
+      sx={{ gap: 1.5, width: '100%', overflow: 'auto', height: '623.8px' }}
+    >
       {searchResults.map((result, index) => {
         // 处理动作类型的搜索结果
         if (isActionItem(result)) {
