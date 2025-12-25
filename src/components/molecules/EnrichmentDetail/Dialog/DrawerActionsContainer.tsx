@@ -1,5 +1,6 @@
 import { Collapse, Stack } from '@mui/material';
 import { FC } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 import {
   DialogActionsMenu,
@@ -16,6 +17,8 @@ import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { ActiveCellParams } from '@/types';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { DialogAllEnrichments } from './DialogActionsMenu/base';
 
 interface DialogActionsContainerProps {
   tableId: string;
@@ -32,6 +35,13 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
   const dialogType = useEnrichmentTableStore((state) => state.dialogType);
   const dialogVisible = useEnrichmentTableStore((state) => state.dialogVisible);
   const drawersType = useEnrichmentTableStore((state) => state.drawersType);
+  const { setDialogAllEnrichmentsVisible, dialogAllEnrichmentsVisible } =
+    useActionsStore(
+      useShallow((store) => ({
+        setDialogAllEnrichmentsVisible: store.setDialogAllEnrichmentsVisible,
+        dialogAllEnrichmentsVisible: store.dialogAllEnrichmentsVisible,
+      })),
+    );
 
   return (
     <Collapse
@@ -78,6 +88,12 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
         <DialogEditDescription />
         <DialogDeleteColumn tableId={tableId} />
         <CampaignProcess />
+        <DialogAllEnrichments
+          onClose={() => {
+            setDialogAllEnrichmentsVisible(false);
+          }}
+          open={dialogAllEnrichmentsVisible}
+        />
       </Stack>
     </Collapse>
   );

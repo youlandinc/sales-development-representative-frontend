@@ -84,9 +84,10 @@ export const useEnrichmentTable = ({
     })),
   );
 
-  const { fetchActionsMenus } = useActionsStore(
+  const { fetchActionsMenus, fetchDialogAllEnrichments } = useActionsStore(
     useShallow((store) => ({
       fetchActionsMenus: store.fetchActionsMenus,
+      fetchDialogAllEnrichments: store.fetchDialogAllEnrichments,
     })),
   );
 
@@ -333,6 +334,7 @@ export const useEnrichmentTable = ({
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
     fetchActionsMenus(tableId);
     fetchWebResearchModelList();
+    fetchDialogAllEnrichments();
   }, [
     tableId,
     total,
@@ -340,6 +342,7 @@ export const useEnrichmentTable = ({
     isMetadataLoading,
     fetchActionsMenus,
     fetchWebResearchModelList,
+    fetchDialogAllEnrichments,
   ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)

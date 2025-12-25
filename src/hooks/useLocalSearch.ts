@@ -7,7 +7,10 @@ export interface SearchItemType {
   description: string;
 }
 
-export const useLocalSearch = <T extends SearchItemType>(items: T[]) => {
+export const useLocalSearch = <T extends SearchItemType>(
+  items: T[],
+  options?: { preserveOriginalOrder?: boolean },
+) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [text, setText] = useState('');
 
@@ -34,8 +37,18 @@ export const useLocalSearch = <T extends SearchItemType>(items: T[]) => {
     if (searchValue.trim() === '') {
       return [] as T[];
     }
-    return fuse.search(searchValue).map((result) => result.item);
-  }, [fuse, searchValue]);
+
+    const fuseResults = fuse.search(searchValue);
+
+    // 如果需要保持原始顺序，则按照原始数组的顺序重新排序
+    if (options?.preserveOriginalOrder) {
+      const matchedItems = new Set(fuseResults.map((result) => result.item));
+      return items.filter((item) => matchedItems.has(item));
+    }
+
+    // 默认按照相关度排序
+    return fuseResults.map((result) => result.item);
+  }, [fuse, searchValue, items, options?.preserveOriginalOrder]);
 
   // 是否有搜索内容
   const hasSearchValue = searchValue.trim() !== '';
@@ -46,6 +59,11 @@ export const useLocalSearch = <T extends SearchItemType>(items: T[]) => {
     setText('');
   };
 
+  const onTextChange = (value: string) => {
+    setText(value);
+    debouncedSetSearch(value);
+  };
+
   return {
     searchValue,
     debouncedSetSearch,
@@ -54,5 +72,6 @@ export const useLocalSearch = <T extends SearchItemType>(items: T[]) => {
     resetSearch,
     text,
     setText,
+    onTextChange,
   };
 };
