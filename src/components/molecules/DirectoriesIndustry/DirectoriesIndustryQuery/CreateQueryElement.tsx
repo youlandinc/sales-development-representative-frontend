@@ -112,6 +112,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           isAuth={config.isAuth}
           label={config.label}
           labelSx={{ fontWeight: 600, fontSize: 14 }}
+          showTips={config.showTips}
         >
           <StyledButtonGroup
             onChange={(event, newValue) => {
@@ -174,6 +175,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           isAuth={config.isAuth}
           onClearFilters={onFiltersReset}
           title={config.label}
+          tooltip={config.tooltip}
         >
           {config.children && config.children.length > 0
             ? config.children.map((child: DirectoriesQueryItem) => (
@@ -200,6 +202,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           isAuth={config.isAuth}
           onClearFilters={onFiltersReset}
           title={config.label}
+          tooltip={config.tooltip}
         >
           <QueryTableWithList
             fieldKey={config.key!}
@@ -229,6 +232,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           isAuth={config.isAuth}
           onClearFilters={onFiltersReset}
           title={config.label}
+          tooltip={config.tooltip}
         >
           <QueryTable
             fieldKey={config.key!}
@@ -258,7 +262,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           isAuth={config.isAuth}
           onClearFilters={onFiltersReset}
           title={config.label}
-          tooltip="These are additional data fields found based on the current filters above. Select fields you want to display or use for additional filtering."
+          tooltip={config.tooltip}
         >
           <QueryAdditionalDetails isAuth={config.isAuth} />
         </QueryCollapse>
@@ -369,6 +373,14 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
               }
               placeholder={config.placeholder || ''}
               size={'small'}
+              sx={{
+                '& .MuiInputBase-root:hover': {
+                  bgcolor: 'background.active',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'border.default',
+                  },
+                },
+              }}
               value={formData[config.key!] ?? ''}
             />
           </QueryContainer>

@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { Stack } from '@mui/material';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useDirectoriesStore } from '@/stores/directories';
-import { useShallow } from 'zustand/react/shallow';
 
 import { PreviewSummary, PreviewTable } from './index';
 

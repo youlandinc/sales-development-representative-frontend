@@ -59,6 +59,7 @@ export interface DirectoriesQueryItem {
   tooltip: string | null;
   isDefaultOpen: boolean; // for collapsible containers
   isGroup: boolean;
+  showTips: boolean | null;
 
   // ========== Component Condition ==========
   isDefault: boolean;

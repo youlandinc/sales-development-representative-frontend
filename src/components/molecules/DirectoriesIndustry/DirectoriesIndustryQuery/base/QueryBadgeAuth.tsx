@@ -5,10 +5,7 @@ import { useDirectoriesStore } from '@/stores/directories';
 import { DIRECTORIES_BADGE_AUTH } from '@/constants/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
 
-import {
-  QUERY_TOOLTIP_SLOT_PROPS,
-  QueryTooltipAccessTitle,
-} from './QueryTooltip';
+import { QUERY_TOOLTIP_SLOT_PROPS, QueryTooltipAccessTitle } from './index';
 
 import ICON_LOCK from './assets/icon-lock.svg';
 

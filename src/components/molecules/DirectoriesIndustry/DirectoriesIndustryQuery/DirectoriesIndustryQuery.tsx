@@ -120,8 +120,6 @@ export const DirectoriesIndustryQuery: FC = () => {
       >
         <QueryBreadcrumbs current={TITLE_MAP[industrySlug] || 'Directory'} />
 
-        {/*<QueryDateSelectRange />*/}
-
         {buttonGroupConfig && buttonGroupKey && (
           <CreateQueryElement
             config={buttonGroupConfig}

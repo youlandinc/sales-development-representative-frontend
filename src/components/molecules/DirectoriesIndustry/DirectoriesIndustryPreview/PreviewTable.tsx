@@ -147,7 +147,7 @@ export const PreviewTable: FC = () => {
   }
 
   return (
-    <Box sx={{ position: 'relative', overflowX: 'auto', width: '100%' }}>
+    <Box sx={{ position: 'relative', width: '100%' }}>
       <Box sx={{ width: 'fit-content' }}>
         <Table
           sx={{

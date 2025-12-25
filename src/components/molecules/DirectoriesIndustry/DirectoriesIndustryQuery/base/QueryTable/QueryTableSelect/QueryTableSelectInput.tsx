@@ -72,12 +72,17 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
           gap: 0.5,
           height: 32,
           borderRadius: 2,
-          border: '1px solid #DFDEE6',
+          border: '1px solid',
+          borderColor: 'border.default',
           flexDirection: 'row',
           alignItems: 'center',
           flex: 1,
           minWidth: 0,
           overflow: 'hidden',
+          '&:hover': {
+            bgcolor: 'background.active',
+            borderColor: 'border.default',
+          },
         }}
       >
         {selectedTableName && selectedTableSource && (

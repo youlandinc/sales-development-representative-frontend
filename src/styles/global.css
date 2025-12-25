@@ -17,3 +17,46 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
   box-shadow: inset 0 0 20px 20px rgba(255, 255, 255, 0.1);
 }
+
+/* Global scrollbar styles */
+:root {
+  --scrollbar-thumb-color: #e9e9ef;
+  --scrollbar-thumb-color-hover: #d9d9e0;
+  --scrollbar-thumb-color-active: #c9c9d0;
+  --scrollbar-track-color: transparent;
+  --scrollbar-width: thin;
+  --scrollbar-size: 6px;
+}
+
+/* Modern browsers with `scrollbar-*` support (Firefox, future Chrome) */
+@supports (scrollbar-width: auto) {
+  * {
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+    scrollbar-width: var(--scrollbar-width);
+  }
+}
+
+/* Legacy browsers with `::-webkit-scrollbar-*` support (Chrome, Safari, Edge) */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-color);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-color);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-color-hover);
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--scrollbar-thumb-color-active);
+  }
+}

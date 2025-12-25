@@ -1,8 +1,7 @@
 import { FC, MouseEvent, ReactNode, useState } from 'react';
 import { Box, Collapse, Icon, Stack, Tooltip, Typography } from '@mui/material';
 
-import { QueryBadgeAuth } from './index';
-import { QUERY_TOOLTIP_SLOT_PROPS } from './QueryTooltip';
+import { QUERY_TOOLTIP_SLOT_PROPS, QueryBadgeAuth } from './index';
 
 import ICON_INFO from './assets/icon-info.svg';
 

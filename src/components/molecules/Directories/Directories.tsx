@@ -69,8 +69,8 @@ export const Directories: FC = () => {
             Directories
           </Typography>
           <Typography fontSize={14}>
-            Your gateway to verified intelligence across capital markets, real
-            estate, and global industries
+            Search and export verified contacts and firms across capital
+            markets, real estate and global industries
           </Typography>
         </Stack>
 

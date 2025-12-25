@@ -9,8 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { QueryBadgeAuth } from './QueryBadgeAuth';
-import { QUERY_TOOLTIP_SLOT_PROPS } from './QueryTooltip';
+import { QUERY_TOOLTIP_SLOT_PROPS, QueryBadgeAuth, QueryTips } from './index';
 
 import ICON_INFO from './assets/icon-info.svg';
 
@@ -21,6 +20,7 @@ interface QueryContainerProps extends StackProps {
   tooltip?: string | null;
   children: ReactNode;
   isAuth?: boolean;
+  showTips?: boolean | null;
 }
 
 export const QueryContainer: FC<QueryContainerProps> = ({
@@ -31,6 +31,7 @@ export const QueryContainer: FC<QueryContainerProps> = ({
   sx,
   labelSx,
   isAuth = true,
+  showTips,
   ...props
 }) => {
   return (
@@ -67,6 +68,7 @@ export const QueryContainer: FC<QueryContainerProps> = ({
                   />
                 </Tooltip>
               )}
+              {showTips && <QueryTips />}
             </Typography>
           )}
           {!isAuth && (
