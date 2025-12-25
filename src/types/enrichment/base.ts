@@ -1,6 +1,6 @@
 import {
+  EnrichmentTableEnum,
   IntegrationAction,
-  ProspectTableEnum,
   ValidationActionConfigParam,
 } from '@/types';
 import {
@@ -8,20 +8,20 @@ import {
   TableCellDetailValidateStatusEnum,
 } from '@/types/enum';
 
-export interface ProspectTableItem {
+export interface EnrichmentTableItem {
   tableId: string;
   tableName: string;
   createdAt: string | null;
   updatedAt: string | null;
   contacts: number;
-  source: ProspectTableEnum;
-  children: ProspectTableItem[] | null;
+  source: EnrichmentTableEnum;
+  children: EnrichmentTableItem[] | null;
 }
 
-export type ResponseProspectTableViaSearch = ProspectTableItem[];
+export type ResponseEnrichmentTableViaSearch = EnrichmentTableItem[];
 
-export interface ResponseProspectTable {
-  content: ProspectTableItem[];
+export interface ResponseEnrichmentTable {
+  content: EnrichmentTableItem[];
   page: {
     size: number;
     totalElements: number;

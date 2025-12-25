@@ -20,7 +20,7 @@ import { useLocalSearch } from '@/hooks';
 
 import {
   ActiveTypeEnum,
-  useProspectTableStore,
+  useEnrichmentTableStore,
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
@@ -66,7 +66,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
   const { EXPORTS_MENUS, visible, close } = useExport();
 
   // Store selectors
-  const { closeDialog, openDialog } = useProspectTableStore(
+  const { closeDialog, openDialog } = useEnrichmentTableStore(
     useShallow((state) => ({
       closeDialog: state.closeDialog,
       openDialog: state.openDialog,

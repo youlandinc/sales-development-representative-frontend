@@ -1,4 +1,4 @@
-import { FilterOperationEnum, ProspectDelimiterEnum } from '@/types';
+import { EnrichmentDelimiterEnum, FilterOperationEnum } from '@/types';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 import { ReactNode } from 'react';
 
@@ -64,26 +64,26 @@ export const FILTER_OPERATIONS: TOption[] = [
   },
 ];
 
-export const PROSPECT_CSV_TYPE_OPTIONS = [
+export const ENRICHMENT_CSV_TYPE_OPTIONS = [
   {
     label: 'Comma',
-    value: ProspectDelimiterEnum.comma,
-    key: ProspectDelimiterEnum.comma,
+    value: EnrichmentDelimiterEnum.comma,
+    key: EnrichmentDelimiterEnum.comma,
   },
   {
     label: 'Semicolon',
-    value: ProspectDelimiterEnum.semicolon,
-    key: ProspectDelimiterEnum.semicolon,
+    value: EnrichmentDelimiterEnum.semicolon,
+    key: EnrichmentDelimiterEnum.semicolon,
   },
   {
     label: 'Tab',
-    value: ProspectDelimiterEnum.tab,
-    key: ProspectDelimiterEnum.tab,
+    value: EnrichmentDelimiterEnum.tab,
+    key: EnrichmentDelimiterEnum.tab,
   },
   {
     label: 'Pipe',
-    value: ProspectDelimiterEnum.pipe,
-    key: ProspectDelimiterEnum.pipe,
+    value: EnrichmentDelimiterEnum.pipe,
+    key: EnrichmentDelimiterEnum.pipe,
   },
 ];
 

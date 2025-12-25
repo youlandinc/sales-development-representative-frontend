@@ -1,7 +1,7 @@
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 export const useVariableFromStore = () => {
-  const { columns } = useProspectTableStore((store) => store);
+  const { columns } = useEnrichmentTableStore((store) => store);
   const filedMapping = columns.reduce(
     (pre, cur) => {
       pre[cur.fieldName] = cur.fieldId;

@@ -11,7 +11,7 @@ import { FC, ReactNode, useState } from 'react';
 
 import { StyledButton, StyledCost } from '@/components/atoms';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';
 
@@ -35,7 +35,7 @@ export const DialogFooter: FC<DialogFooterProps> = ({
   disabled,
   slot,
 }) => {
-  const { rowIds } = useProspectTableStore((store) => store);
+  const { rowIds } = useEnrichmentTableStore((store) => store);
   const params = useParams();
   const tableId =
     typeof params.tableId === 'string' && params.tableId.trim() !== ''

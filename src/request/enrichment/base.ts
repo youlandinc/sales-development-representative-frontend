@@ -1,22 +1,25 @@
 import { del, get, post, put } from '@/request/request';
-import { CellDetailResponse, ResponseProspectTable } from '@/types/enrichment';
+import {
+  CellDetailResponse,
+  ResponseEnrichmentTable,
+} from '@/types/enrichment';
 
-export const _fetchProspectTableData = (params: {
+export const _fetchEnrichmentTableData = (params: {
   size: number;
   page: number;
   searchWord?: string;
 }) => {
-  return post<ResponseProspectTable>('/sdr/table/list', params);
+  return post<ResponseEnrichmentTable>('/sdr/table/list', params);
 };
 
-export const _renameProspectTable = (params: {
+export const _renameEnrichmentTable = (params: {
   tableName: string;
   tableId: string | number;
 }) => {
   return put('/sdr/table', params);
 };
 
-export const _deleteProspectTableItem = (tableId: string | number) => {
+export const _deleteEnrichmentTableItem = (tableId: string | number) => {
   return del('/sdr/table', {
     params: {
       tableId,
@@ -24,7 +27,7 @@ export const _deleteProspectTableItem = (tableId: string | number) => {
   });
 };
 
-export const _createProspectTableViaCsv = (params: FormData) => {
+export const _createEnrichmentTableViaCsv = (params: FormData) => {
   return post('/sdr/table/csv', params, {
     headers: { 'content-type': 'multipart/form-data' },
   });

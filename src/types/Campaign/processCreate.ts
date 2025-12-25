@@ -1,6 +1,6 @@
 import {
   CampaignStatusEnum,
-  ProspectDelimiterEnum,
+  EnrichmentDelimiterEnum,
   UserIntegrationEnum,
 } from '@/types';
 
@@ -199,7 +199,7 @@ export interface FileInfo {
 
 export interface CSVInfo {
   fileInfo: FileInfo;
-  delimiter: ProspectDelimiterEnum;
+  delimiter: EnrichmentDelimiterEnum;
   hasHeader: boolean;
   counts: number;
   validCounts: number;

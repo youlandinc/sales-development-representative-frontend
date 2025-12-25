@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { ProspectTableEnum } from '@/types';
+import { EnrichmentTableEnum } from '@/types';
 
 import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
 import { QueryTableSelect, QueryTableWithListValue } from './index';
@@ -24,7 +24,7 @@ export const QueryTable: FC<QueryTableProps> = ({
   );
   const [selectedTableName, setSelectedTableName] = useState<string>('');
   const [selectedTableSource, setSelectedTableSource] = useState<
-    ProspectTableEnum | undefined
+    EnrichmentTableEnum | undefined
   >(undefined);
 
   return (

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Box, Collapse, Icon, Stack, Typography } from '@mui/material';
-import { ResponseProspectTableViaSearch } from '@/types';
+import { ResponseEnrichmentTableViaSearch } from '@/types';
 
 import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
 import ICON_FOLDER from './assets/icon-folder.svg';
@@ -9,7 +9,7 @@ import ICON_TICK from './assets/icon-tick.svg';
 import ICON_TABLE_NORMAL from './assets/icon-table-normal.svg';
 
 interface FilterTableSelectItemProps {
-  item: ResponseProspectTableViaSearch[0];
+  item: ResponseEnrichmentTableViaSearch[0];
   isExpanded: boolean;
   selectedTableId: string;
   onToggleExpand: (tableId: string) => void;

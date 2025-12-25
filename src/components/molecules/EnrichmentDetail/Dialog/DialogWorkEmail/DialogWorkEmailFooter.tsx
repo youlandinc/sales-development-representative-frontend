@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { StyledButton } from '@/components/atoms';
 import { DialogFooter } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
 import { useComputedInWorkEmailStore, useWorkEmailRequest } from './hooks';
 
@@ -20,7 +20,7 @@ interface DialogWorkEmailFooterProps {
 export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
   cb,
 }) => {
-  const { rowIds } = useProspectTableStore((store) => store);
+  const { rowIds } = useEnrichmentTableStore((store) => store);
   const { isMissingConfig } = useComputedInWorkEmailStore();
   const { setWaterfallConfigType, setDisplayType, displayType } =
     useWorkEmailStore(

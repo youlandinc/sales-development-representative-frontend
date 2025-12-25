@@ -13,7 +13,7 @@ import { useShallow } from 'zustand/shallow';
 import { SDRToast } from '@/components/atoms';
 
 import { useAsyncFn } from '@/hooks';
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { _fetchCellDetails } from '@/request/enrichment/base';
 
@@ -111,7 +111,7 @@ const formatAttemptOrdinal = (attemptNo?: number) => {
 export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
   cellDetails,
 }) => {
-  const { closeDialog, dialogType, dialogVisible } = useProspectTableStore(
+  const { closeDialog, dialogType, dialogVisible } = useEnrichmentTableStore(
     useShallow((store) => ({
       closeDialog: store.closeDialog,
       dialogType: store.dialogType,

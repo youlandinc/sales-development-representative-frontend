@@ -7,11 +7,11 @@ import useSWR from 'swr';
 import { useSwitch } from '@/hooks';
 import { UFormatDate } from '@/utils';
 
-import { HttpError, ProspectTableItem } from '@/types';
+import { EnrichmentTableItem, HttpError } from '@/types';
 import {
-  _deleteProspectTableItem,
-  _fetchProspectTableData,
-  _renameProspectTable,
+  _deleteEnrichmentTableItem,
+  _fetchEnrichmentTableData,
+  _renameEnrichmentTable,
 } from '@/request';
 
 import {
@@ -49,7 +49,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
   const [tableId, setTableId] = useState<string | number>('');
   const [tableName, setTableName] = useState('');
 
-  const columns: GridColDef<ProspectTableItem>[] = useMemo(
+  const columns: GridColDef<EnrichmentTableItem>[] = useMemo(
     () => [
       {
         headerName: 'Name',
@@ -157,7 +157,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     },
     async ({ page, size, searchWord }) => {
       try {
-        const { data } = await _fetchProspectTableData({
+        const { data } = await _fetchEnrichmentTableData({
           size,
           page,
           searchWord,
@@ -181,7 +181,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     }
     setIsRenaming(true);
     try {
-      await _renameProspectTable({ tableName: name, tableId });
+      await _renameEnrichmentTable({ tableName: name, tableId });
       setTableId('');
       setTableName('');
       closeRename();
@@ -200,7 +200,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     }
     setIsDeleting(true);
     try {
-      await _deleteProspectTableItem(tableId);
+      await _deleteEnrichmentTableItem(tableId);
       setTableId('');
       closeDelete();
       await mutate();

@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { debounce, Fade, Icon, Stack, Typography } from '@mui/material';
 
-import { PROSPECT_CSV_TYPE_OPTIONS } from '@/constants';
+import { ENRICHMENT_CSV_TYPE_OPTIONS } from '@/constants';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import {
@@ -252,7 +252,7 @@ export const DataSourceCSV: FC = () => {
                   fileInfo: localFormData.fileInfo,
                 });
               }}
-              options={PROSPECT_CSV_TYPE_OPTIONS}
+              options={ENRICHMENT_CSV_TYPE_OPTIONS}
               value={localFormData.delimiter}
             />
           </Stack>

@@ -5,7 +5,7 @@ import { useSwitch } from '@/hooks';
 import { useTableSelect } from './hooks';
 
 import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
-import { ProspectTableEnum } from '@/types';
+import { EnrichmentTableEnum } from '@/types';
 
 import { QueryTableSelectDialog, QueryTableSelectInput } from './index';
 import { QueryContainer } from '../../QueryContainer';
@@ -14,14 +14,14 @@ interface FilterTableSelectProps {
   type: DirectoriesQueryGroupTypeEnum;
   selectedTableId?: string;
   selectedTableName?: string;
-  selectedTableSource?: ProspectTableEnum;
+  selectedTableSource?: EnrichmentTableEnum;
   isLoading?: boolean;
   // Data synced to formValues (tableId and keywords)
   onFormDataChange?: (data: { tableId: string; keywords: string[] }) => void;
   // Data used for UI display only (tableName and tableSource)
   onDisplayDataChange?: (data: {
     tableName: string;
-    tableSource?: ProspectTableEnum;
+    tableSource?: EnrichmentTableEnum;
   }) => void;
   title?: string;
   placeholder?: string;

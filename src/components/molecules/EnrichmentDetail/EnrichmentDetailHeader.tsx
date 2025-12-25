@@ -4,7 +4,7 @@ import { useRouter } from 'nextjs-toploader/app';
 
 import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import ICON_BACK from './assets/head/icon-back.svg';
 
@@ -15,7 +15,7 @@ interface EnrichmentDetailHeaderProps {
 export const EnrichmentDetailHeader: FC<EnrichmentDetailHeaderProps> = ({
   tableId,
 }) => {
-  const { resetTable, tableName, renameTable } = useProspectTableStore(
+  const { resetTable, tableName, renameTable } = useEnrichmentTableStore(
     (store) => store,
   );
 

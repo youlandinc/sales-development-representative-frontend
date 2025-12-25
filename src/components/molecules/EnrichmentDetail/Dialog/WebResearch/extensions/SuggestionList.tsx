@@ -17,7 +17,7 @@ import {
 
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { COLUMN_TYPE_ICONS } from '../../../Table/config';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
@@ -48,7 +48,7 @@ export const SuggestionList = forwardRef<
   SuggestionListRef,
   SuggestionListProps
 >((props, ref) => {
-  const { columns } = useProspectTableStore((store) => store);
+  const { columns } = useEnrichmentTableStore((store) => store);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectItem = useCallback(

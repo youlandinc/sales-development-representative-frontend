@@ -3,7 +3,7 @@ import { SDRToast } from '@/components/atoms';
 import { useAsyncFn } from '@/hooks';
 import { useWorkEmailStore } from '@/stores/enrichment';
 import { useRunAi } from '@/hooks/useRunAi';
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useComputedInWorkEmailStore } from './useComputedInWorkEmailStore';
 
 import {
@@ -40,7 +40,7 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
   );
   const { runAi } = useRunAi();
 
-  const { closeDialog, columns, fetchTable } = useProspectTableStore(
+  const { closeDialog, columns, fetchTable } = useEnrichmentTableStore(
     useShallow((state) => ({
       rowIds: state.rowIds,
       activeColumnId: state.activeColumnId,

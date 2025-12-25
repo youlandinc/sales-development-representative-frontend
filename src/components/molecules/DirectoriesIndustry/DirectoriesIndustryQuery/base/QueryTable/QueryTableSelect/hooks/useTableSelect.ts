@@ -3,20 +3,20 @@ import { useEffect, useState } from 'react';
 import { SDRToast } from '@/components/atoms';
 import { DirectoriesQueryGroupTypeEnum } from '@/types/directories';
 import {
-  _fetchAllProspectTable,
+  _fetchAllEnrichmentTable,
   _fetchCompanyNameViaTableId,
 } from '@/request/directories';
 import {
+  EnrichmentTableEnum,
+  EnrichmentTableItem,
   HttpError,
-  ProspectTableEnum,
-  ProspectTableItem,
-  ResponseProspectTableViaSearch,
+  ResponseEnrichmentTableViaSearch,
 } from '@/types';
 
 const findTableItemById = (
-  list: ResponseProspectTableViaSearch,
+  list: ResponseEnrichmentTableViaSearch,
   targetId: string,
-): ProspectTableItem | undefined => {
+): EnrichmentTableItem | undefined => {
   for (const item of list) {
     if (item.tableId === targetId) {
       return item;
@@ -34,7 +34,7 @@ const findTableItemById = (
 interface UseTableSelectParams {
   outerTableId?: string;
   outerTableName?: string;
-  outerTableSource?: ProspectTableEnum;
+  outerTableSource?: EnrichmentTableEnum;
   type?: DirectoriesQueryGroupTypeEnum;
 }
 
@@ -46,9 +46,9 @@ interface UseTableSelectReturn {
   innerTableId: string;
   outerTableId: string;
   outerTableName: string;
-  outerTableSource: ProspectTableEnum | undefined;
+  outerTableSource: EnrichmentTableEnum | undefined;
   expandedIds: Set<string>;
-  tableList: ResponseProspectTableViaSearch;
+  tableList: ResponseEnrichmentTableViaSearch;
 
   // Actions
   toggleExpand: (tableId: string) => void;
@@ -80,10 +80,10 @@ export const useTableSelect = (
     externalOuterTableName || '',
   );
   const [outerTableSource, setOuterTableSource] = useState<
-    ProspectTableEnum | undefined
+    EnrichmentTableEnum | undefined
   >(externalOuterTableSource);
 
-  const [tableList, setTableList] = useState<ResponseProspectTableViaSearch>(
+  const [tableList, setTableList] = useState<ResponseEnrichmentTableViaSearch>(
     [],
   );
 
@@ -142,7 +142,7 @@ export const useTableSelect = (
   const fetchTableList = async () => {
     setFetchingTable(true);
     try {
-      const { data } = await _fetchAllProspectTable();
+      const { data } = await _fetchAllEnrichmentTable();
       setTableList(data);
     } catch (err) {
       const { message, header, variant } = err as HttpError;

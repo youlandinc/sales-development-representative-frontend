@@ -7,7 +7,7 @@ import {
   DirectoriesQueryTableBodyApiResponse,
   DirectoriesQueryTableHeaderApiResponse,
 } from '@/types/directories';
-import { ResponseProspectTableViaSearch } from '@/types';
+import { ResponseEnrichmentTableViaSearch } from '@/types';
 import { CreditTypeEnum } from '@/types/pricingPlan';
 
 export const _fetchDirectoriesConfig = (params: {
@@ -34,8 +34,8 @@ export const _fetchPreviewBody = (params: any) => {
   return post<DirectoriesQueryTableBodyApiResponse>('/sdr/search', params);
 };
 
-export const _fetchAllProspectTable = () => {
-  return post<ResponseProspectTableViaSearch>('/sdr/table/all', {
+export const _fetchAllEnrichmentTable = () => {
+  return post<ResponseEnrichmentTableViaSearch>('/sdr/table/all', {
     params: { size: 1000, page: 0 },
   });
 };

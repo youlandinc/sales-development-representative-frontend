@@ -17,11 +17,11 @@ export default function DirectoriesIndustryPage() {
   const industrySlug = params.industry as string;
   const bizId = getDirectoriesBizId(industrySlug);
 
-  const { initializeDataFlow, syncFromRxJS, reset } = useDirectoriesStore(
+  const { syncFromRxJS, reset, initializeDataFlow } = useDirectoriesStore(
     useShallow((state) => ({
-      initializeDataFlow: state.initializeDataFlow,
       syncFromRxJS: state.syncFromRxJS,
       reset: state.reset,
+      initializeDataFlow: state.initializeDataFlow,
     })),
   );
 

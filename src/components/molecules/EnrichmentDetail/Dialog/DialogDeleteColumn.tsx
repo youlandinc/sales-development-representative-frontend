@@ -4,7 +4,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
@@ -23,7 +23,7 @@ export const DialogDeleteColumn: FC<DialogDeleteColumnProps> = ({
     activeColumnId,
     deleteColumn,
     closeDialog,
-  } = useProspectTableStore((state) => state);
+  } = useEnrichmentTableStore((state) => state);
 
   const { fetchActionsMenus } = useActionsStore(
     useShallow((state) => ({

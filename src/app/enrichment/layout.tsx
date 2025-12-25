@@ -1,6 +1,6 @@
 import { WSProvider } from '@/providers';
 
-export default function ProspectEnrichLayout({
+export default function EnrichLayout({
   children,
 }: {
   children: React.ReactNode;

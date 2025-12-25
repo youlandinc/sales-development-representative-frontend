@@ -8,7 +8,7 @@ import { COLUMN_TYPE_ICONS } from '../Table/config';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 import { useAsyncFn } from '@/hooks';
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 
@@ -18,7 +18,7 @@ interface DialogEditColumnProps {
 
 export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
   const { columns, activeColumnId, closeDialog, updateColumnFieldName } =
-    useProspectTableStore((store) => store);
+    useEnrichmentTableStore((store) => store);
 
   const column = columns.find((col) => col.fieldId === activeColumnId);
 

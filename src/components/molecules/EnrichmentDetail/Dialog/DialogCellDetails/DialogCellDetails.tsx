@@ -10,7 +10,7 @@ import {
 } from '@/components/molecules';
 import { StyledCellDetailsObj } from './StyledCellDetailsObj';
 
-import { useProspectTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { HttpVariantEnum } from '@/types';
 
@@ -25,7 +25,7 @@ type CellDetailsProps = {
   data: Record<string, any>;
 } & DrawerProps;
 export const DialogCellDetails: FC<CellDetailsProps> = ({ data }) => {
-  const { closeDialog } = useProspectTableStore(
+  const { closeDialog } = useEnrichmentTableStore(
     useShallow((state) => ({
       closeDialog: state.closeDialog,
     })),

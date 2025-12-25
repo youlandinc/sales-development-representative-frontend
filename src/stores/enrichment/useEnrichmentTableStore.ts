@@ -13,7 +13,7 @@ import {
   _deleteTableColumn,
   _fetchTable,
   _fetchTableRowIds,
-  _renameProspectTable,
+  _renameEnrichmentTable,
   _updateTableCellValue,
   _updateTableColumnConfig,
 } from '@/request';
@@ -47,7 +47,7 @@ type GetActiveColumnResult = {
 };
 
 const getActiveColumn = (
-  get: () => ProspectTableStoreProps,
+  get: () => EnrichmentTableStoreProps,
 ): GetActiveColumnResult => {
   const { activeColumnId, columns } = get();
   return {
@@ -57,7 +57,7 @@ const getActiveColumn = (
   };
 };
 
-export type ProspectTableState = {
+export type EnrichmentTableState = {
   tableName: string;
   columns: TableColumnProps[];
   activeColumnId: string;
@@ -74,7 +74,7 @@ export type ProspectTableState = {
   fieldGroupMap: ColumnFieldGroupMap | null;
 };
 
-export type ProspectTableActions = {
+export type EnrichmentTableActions = {
   fetchTable: (tableId: string) => Promise<{
     runRecords: {
       [key: string]: { recordIds: string[]; isAll: boolean };
@@ -85,7 +85,7 @@ export type ProspectTableActions = {
   setRowIds: (rowIds: string[]) => void;
   // helper
   setActiveColumnId: (columnId: string) => void;
-  openDialog: (type: ProspectTableState['dialogType']) => void;
+  openDialog: (type: EnrichmentTableState['dialogType']) => void;
   closeDialog: () => void;
   // table
   renameTable: (tableId: string, name: string) => Promise<void>;
@@ -118,9 +118,10 @@ export type ProspectTableActions = {
   resetTable: () => void;
 };
 
-export type ProspectTableStoreProps = ProspectTableState & ProspectTableActions;
+export type EnrichmentTableStoreProps = EnrichmentTableState &
+  EnrichmentTableActions;
 
-export const useProspectTableStore = create<ProspectTableStoreProps>()(
+export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
   (set, get) => ({
     tableName: '',
     columns: [],
@@ -156,7 +157,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         });
         return { runRecords: result, fields };
       } catch (err) {
-        handleApiError<ProspectTableState>(err);
+        handleApiError<EnrichmentTableState>(err);
         return { runRecords: result, fields: [] };
       }
     },
@@ -168,7 +169,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         const { data } = await _fetchTableRowIds(tableId);
         set({ rowIds: data });
       } catch (err) {
-        handleApiError<ProspectTableState>(err);
+        handleApiError<EnrichmentTableState>(err);
       }
     },
     setRowIds: (rowIds) => {
@@ -181,9 +182,9 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       const tableName = get().tableName;
 
       try {
-        await _renameProspectTable({ tableName: name, tableId });
+        await _renameEnrichmentTable({ tableName: name, tableId });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { tableName }, set);
+        handleApiError<EnrichmentTableState>(err, { tableName }, set);
       }
     },
     setActiveColumnId: (columnId) => {
@@ -209,7 +210,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       try {
         await _updateTableColumnConfig({ fieldId, width });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     updateColumnName: async (newName) => {
@@ -228,7 +229,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       try {
         await _updateTableColumnConfig({ fieldId, fieldName: trimmedName });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     updateColumnVisible: async (fieldId, visible) => {
@@ -245,7 +246,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       try {
         await _updateTableColumnConfig({ fieldId, visible });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     updateColumnPin: async (pin) => {
@@ -265,7 +266,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       try {
         await _updateTableColumnConfig({ fieldId, pin });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     updateColumnDescription: async (description) => {
@@ -291,7 +292,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
           description: trimmedDescription,
         });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     updateColumnType: async (fieldType) => {
@@ -319,7 +320,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
           fieldType,
         });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     updateColumnFieldName: async (params) => {
@@ -346,7 +347,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
           fieldType: params.fieldType,
         });
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     deleteColumn: async () => {
@@ -364,7 +365,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       try {
         await _deleteTableColumn(fieldId);
       } catch (err) {
-        handleApiError<ProspectTableState>(err, { columns }, set);
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     addColumn: async (params) => {
@@ -417,7 +418,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
         set({ columns: newColumns });
         return newColumn;
       } catch (err) {
-        handleApiError<ProspectTableState>(err);
+        handleApiError<EnrichmentTableState>(err);
         return null;
       }
     },
@@ -426,7 +427,7 @@ export const useProspectTableStore = create<ProspectTableStoreProps>()(
       try {
         return await _updateTableCellValue(data);
       } catch (err) {
-        handleApiError<ProspectTableState>(err);
+        handleApiError<EnrichmentTableState>(err);
         throw err;
       }
     },

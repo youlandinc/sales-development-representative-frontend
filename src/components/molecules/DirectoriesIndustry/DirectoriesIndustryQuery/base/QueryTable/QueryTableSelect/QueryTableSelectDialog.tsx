@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
 import { StyledButton, StyledDialog, StyledLoading } from '@/components/atoms';
-import { ResponseProspectTableViaSearch } from '@/types';
+import { ResponseEnrichmentTableViaSearch } from '@/types';
 import { QueryTableSelectItem } from './index';
 
 import ICON_CLOSE from './assets/icon-close.svg';
@@ -13,7 +13,7 @@ interface QueryTableSelectDialogProps {
   fetchingKeywords: boolean;
   selectedTableId: string;
   expandedIds: Set<string>;
-  tableList: ResponseProspectTableViaSearch;
+  tableList: ResponseEnrichmentTableViaSearch;
   onClose: () => void;
   onToggleExpand: (tableId: string) => void;
   onSelectTable: (tableId: string) => void;

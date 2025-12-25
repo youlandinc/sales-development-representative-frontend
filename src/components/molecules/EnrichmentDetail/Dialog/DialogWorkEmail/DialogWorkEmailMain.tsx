@@ -11,7 +11,10 @@ import {
   DialogWorkEmailQuickSetup,
 } from './index';
 
-import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
+import {
+  useEnrichmentTableStore,
+  useWorkEmailStore,
+} from '@/stores/enrichment';
 import { WaterfallConfigTypeEnum } from '@/types/enrichment';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
@@ -23,8 +26,8 @@ export const DialogWorkEmailMain = () => {
     dialogHeaderName,
     waterfallDescription,
   } = useWorkEmailStore((store) => store);
-  const openDialog = useProspectTableStore((state) => state.openDialog);
-  const closeDialog = useProspectTableStore((state) => state.closeDialog);
+  const openDialog = useEnrichmentTableStore((state) => state.openDialog);
+  const closeDialog = useEnrichmentTableStore((state) => state.closeDialog);
 
   const handleClose = () => {
     closeDialog();
