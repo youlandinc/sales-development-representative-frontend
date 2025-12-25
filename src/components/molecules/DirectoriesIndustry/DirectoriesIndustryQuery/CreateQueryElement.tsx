@@ -112,6 +112,7 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
           isAuth={config.isAuth}
           label={config.label}
           labelSx={{ fontWeight: 600, fontSize: 14 }}
+          showTips={config.showTips}
         >
           <StyledButtonGroup
             onChange={(event, newValue) => {

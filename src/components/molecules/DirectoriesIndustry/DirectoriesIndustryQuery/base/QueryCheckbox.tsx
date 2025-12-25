@@ -9,12 +9,27 @@ import {
   Typography,
 } from '@mui/material';
 
+import { StyledImage } from '@/components/atoms';
 import { QUERY_TOOLTIP_SLOT_PROPS } from './index';
 
 import ICON_INFO from './assets/icon-info.svg';
-import ICON_STATIC from '@/components/atoms/StyledCheckbox/assets/icon_static.svg';
-import ICON_CHECKED from '@/components/atoms/StyledCheckbox/assets/icon_checked.svg';
-import ICON_INDETERMINATE from '@/components/atoms/StyledCheckbox/assets/icon_intermediate.svg';
+
+const CHECKBOX_ICON_SX = { width: 20, height: 20, position: 'relative' };
+
+const CHECKBOX_CHECKED_ICON = (
+  <StyledImage sx={CHECKBOX_ICON_SX} url="/images/icon-checkbox-check.svg" />
+);
+
+const CHECKBOX_UNCHECKED_ICON = (
+  <StyledImage sx={CHECKBOX_ICON_SX} url="/images/icon-checkbox-static.svg" />
+);
+
+const CHECKBOX_INDETERMINATE_ICON = (
+  <StyledImage
+    sx={CHECKBOX_ICON_SX}
+    url="/images/icon-checkbox-intermediate.svg"
+  />
+);
 
 interface QueryCheckboxProps {
   value?: boolean;
@@ -42,19 +57,10 @@ export const QueryCheckbox: FC<QueryCheckboxProps> = ({
           control={
             <Checkbox
               checked={value}
-              checkedIcon={
-                <Icon component={ICON_CHECKED} sx={{ width: 20, height: 20 }} />
-              }
-              icon={
-                <Icon component={ICON_STATIC} sx={{ width: 20, height: 20 }} />
-              }
+              checkedIcon={CHECKBOX_CHECKED_ICON}
+              icon={CHECKBOX_UNCHECKED_ICON}
               indeterminate={indeterminate}
-              indeterminateIcon={
-                <Icon
-                  component={ICON_INDETERMINATE}
-                  sx={{ width: 20, height: 20 }}
-                />
-              }
+              indeterminateIcon={CHECKBOX_INDETERMINATE_ICON}
               onChange={(_, checked) => onFormChange(checked)}
               sx={{ width: 20, height: 20, padding: 0 }}
             />

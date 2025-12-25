@@ -5,6 +5,7 @@ export * from './QueryTable';
 export * from './QueryAdditionalDetails';
 
 export * from './QueryTooltip';
+export * from './QueryTips';
 export * from './QueryBadgeAuth';
 export * from './QueryCollapse';
 export * from './QueryContainer';
