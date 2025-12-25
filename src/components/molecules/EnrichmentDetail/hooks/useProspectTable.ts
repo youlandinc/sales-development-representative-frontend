@@ -81,9 +81,10 @@ export const useProspectTable = ({
     })),
   );
 
-  const { fetchActionsMenus } = useActionsStore(
+  const { fetchActionsMenus, fetchDialogAllEnrichments } = useActionsStore(
     useShallow((store) => ({
       fetchActionsMenus: store.fetchActionsMenus,
+      fetchDialogAllEnrichments: store.fetchDialogAllEnrichments,
     })),
   );
 
@@ -331,6 +332,7 @@ export const useProspectTable = ({
     // fetchIntegrationMenus();
     fetchActionsMenus(tableId);
     fetchWebResearchModelList();
+    fetchDialogAllEnrichments();
   }, [
     tableId,
     total,
@@ -339,6 +341,7 @@ export const useProspectTable = ({
     // fetchIntegrationMenus,
     fetchActionsMenus,
     fetchWebResearchModelList,
+    fetchDialogAllEnrichments,
   ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)

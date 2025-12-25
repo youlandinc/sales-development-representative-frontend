@@ -18,6 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Icon, Stack, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
 import { FC } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 import { StyledButton, StyledCost, StyledSwitch } from '@/components/atoms';
 import { DialogWorkEmailCollapseCard } from './index';
@@ -44,7 +45,14 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
     setAllIntegrations,
     allIntegrations,
     setSelectedIntegrationToConfig,
-  } = useWorkEmailStore();
+  } = useWorkEmailStore(
+    useShallow((state) => ({
+      setDisplayType: state.setDisplayType,
+      setAllIntegrations: state.setAllIntegrations,
+      allIntegrations: state.allIntegrations,
+      setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
+    })),
+  );
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id,
@@ -102,7 +110,11 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
           </Stack>
           <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
             {integrationInfo.isMissingRequired ? (
-              <Tooltip arrow placement="top" title={'Missing required inputs'}>
+              <Tooltip
+                arrow
+                placement={'top'}
+                title={'Missing required inputs'}
+              >
                 <Icon
                   component={ICON_VALIDATE}
                   sx={{ width: 18, height: 18 }}
@@ -132,7 +144,7 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
           checked={!integrationInfo.skipped}
           onChange={(e) => {
             setAllIntegrations(
-              allIntegrations.map((i) =>
+              allIntegrations.map((i: IntegrationAction) =>
                 i.actionKey === integrationInfo.actionKey
                   ? { ...i, skipped: !e.target.checked }
                   : i,
@@ -144,7 +156,7 @@ const DragItem: FC<DragItemProps> = ({ id, integrationInfo }) => {
           component={ICON_DELETE}
           onClick={() => {
             setAllIntegrations(
-              allIntegrations.map((i) =>
+              allIntegrations.map((i: IntegrationAction) =>
                 i.actionKey === integrationInfo.actionKey
                   ? { ...i, isDefault: false }
                   : i,
@@ -163,7 +175,13 @@ export const DialogWorkEmailSequence: FC = () => {
     setDialogIntegrationsVisible,
     allIntegrations,
     updateIntegrationsOrder,
-  } = useWorkEmailStore();
+  } = useWorkEmailStore(
+    useShallow((state) => ({
+      setDialogIntegrationsVisible: state.setDialogIntegrationsVisible,
+      allIntegrations: state.allIntegrations,
+      updateIntegrationsOrder: state.updateIntegrationsOrder,
+    })),
+  );
   const { integrationsInWaterfall } = useComputedInWorkEmailStore();
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -241,7 +259,7 @@ export const DialogWorkEmailSequence: FC = () => {
             component={ICON_PLUS}
             sx={{ width: 18, height: 18, '& path': { fill: 'currentColor' } }}
           />{' '}
-          Add action
+          {'Add action'}
         </StyledButton>
       </Stack>
     </DialogWorkEmailCollapseCard>

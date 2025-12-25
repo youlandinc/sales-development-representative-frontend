@@ -5,3 +5,4 @@ export * from './TabsBar';
 export * from './SuggestionsContent';
 export * from './EnrichmentsContent';
 export * from './ExportsContent';
+export * from './DialogAllEnrichments';
