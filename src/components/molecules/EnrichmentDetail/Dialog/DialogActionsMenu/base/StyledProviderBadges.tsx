@@ -40,6 +40,7 @@ export const StyledProviderBadges: FC<StyledProviderBadgesProps> = ({
           <Image
             alt={`Provider ${index + 1}`}
             fill
+            sizes={'18px'}
             src={provider}
             style={{ objectFit: 'cover' }}
           />

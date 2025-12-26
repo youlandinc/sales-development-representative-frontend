@@ -4,6 +4,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import { StyledTextField } from '@/components/atoms';
+import { StyledActionItem } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
 import {
   DialogHeader,
   EnrichmentsContent,
@@ -13,38 +14,23 @@ import {
   TabsBar,
   type TabType,
 } from './base';
-import { StyledActionItem } from '../Common';
 
-import { useExport } from './hooks';
 import { useLocalSearch } from '@/hooks';
+import { useDialogActionsMenu, useExport } from './hooks';
 
 import {
   ActiveTypeEnum,
   useEnrichmentTableStore,
   useWebResearchStore,
-  useWorkEmailStore,
 } from '@/stores/enrichment';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
-import { ActionsTypeKeyEnum } from '@/types';
-import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
-import type {
-  IntegrationAction,
-  IntegrationActionValidation,
-} from '@/types/enrichment/integrations';
 import type { SuggestionItem } from '@/types/enrichment/drawerActions';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 import { DialogExportInProgress } from './base/DialogExportInProgress';
-
-// ============ Types ============
-interface ActionItemClickParams {
-  name: string;
-  description: string;
-  waterfallConfigs: IntegrationAction[] | null;
-  validations: IntegrationActionValidation[] | null;
-}
 
 // ============ Styles ============
 
@@ -81,37 +67,13 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
     })),
   );
 
-  const {
-    setActiveType,
-    setDialogHeaderName,
-    setWaterfallDescription,
-    setAllIntegrations,
-    setValidationOptions,
-    integrationMenus,
-  } = useWorkEmailStore(
+  const { allClear } = useWebResearchStore(
     useShallow((state) => ({
-      setActiveType: state.setActiveType,
-      setDialogHeaderName: state.setDialogHeaderName,
-      setWaterfallDescription: state.setWaterfallDescription,
-      setAllIntegrations: state.setAllIntegrations,
-      setValidationOptions: state.setValidationOptions,
-      integrationMenus: state.integrationMenus,
-    })),
-  );
-
-  const {
-    runGenerateAiModel,
-    setGenerateText,
-    setGenerateSchemaStr,
-    allClear,
-  } = useWebResearchStore(
-    useShallow((state) => ({
-      runGenerateAiModel: state.runGenerateAiModel,
-      setGenerateText: state.setGenerateText,
-      setGenerateSchemaStr: state.setGenerateSchemaStr,
       allClear: state.allClear,
     })),
   );
+
+  const { onItemClick } = useDialogActionsMenu();
 
   // 扁平化所有可搜索项目
   const flatSearchItems = useMemo(() => {
@@ -145,8 +107,12 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
         onClick: item.onClick,
       });
     });
-    // 按 name 去重
-    return Array.from(new Map(items.map((item) => [item.name, item])).values());
+    // 按 name 去重，过滤掉空项
+    return Array.from(
+      new Map(
+        items.filter((item) => Boolean(item)).map((item) => [item.name, item]),
+      ).values(),
+    );
   }, [enrichments, suggestions, EXPORTS_MENUS]);
 
   const {
@@ -172,65 +138,6 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
     setActiveTab('suggestions');
   }, [closeDialog, resetSearch, allClear]);
 
-  const onClickToAiTemplate = useCallback(
-    async (templatePrompt: string) => {
-      setGenerateText('');
-      setGenerateSchemaStr('');
-      // allClear();
-      openDialog(TableColumnMenuActionEnum.ai_agent);
-      await runGenerateAiModel('/aiResearch/generate/stream', {
-        params: {
-          userInput: templatePrompt,
-        },
-      });
-    },
-    [
-      // allClear,
-      openDialog,
-      runGenerateAiModel,
-      setGenerateSchemaStr,
-      setGenerateText,
-    ],
-  );
-
-  const onWorkEmailItemClick = useCallback(
-    (params: ActionItemClickParams) => {
-      openDialog(TableColumnMenuActionEnum.work_email);
-      setDialogHeaderName(params.name);
-      setWaterfallDescription(params.description);
-      setActiveType(ActiveTypeEnum.add);
-      setAllIntegrations(params.waterfallConfigs ?? []);
-      setValidationOptions(params.validations);
-    },
-    [
-      openDialog,
-      setActiveType,
-      setAllIntegrations,
-      setDialogHeaderName,
-      setValidationOptions,
-      setWaterfallDescription,
-    ],
-  );
-
-  const onItemClick = useCallback(
-    (item: SuggestionItem) => {
-      if (item?.key === ActionsTypeKeyEnum.ai_template) {
-        const description =
-          (item.description ?? '') || (item.shortDescription ?? '');
-        onClickToAiTemplate(`Name:${item.name},Description:${description}`);
-        return;
-      }
-      const integration = integrationMenus.find((i) => i.key === item.key);
-      onWorkEmailItemClick({
-        name: integration?.name ?? '',
-        description: integration?.description ?? '',
-        waterfallConfigs: integration?.waterfallConfigs ?? null,
-        validations: integration?.validations ?? null,
-      });
-    },
-    [onWorkEmailItemClick, onClickToAiTemplate, integrationMenus],
-  );
-
   const onAtlasClick = useCallback(() => {
     openDialog(TableColumnMenuActionEnum.ai_agent);
   }, [openDialog]);
@@ -246,7 +153,9 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
 
   // Search input adornment (memoized to prevent re-renders)
   const searchAdornment = useMemo(
-    () => <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20 }} />,
+    () => (
+      <Icon component={ICON_SEARCH} sx={{ width: 20, height: 20, mr: '4px' }} />
+    ),
     [],
   );
   const clearEndAdornment = useMemo(
@@ -303,6 +212,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
                   badges={
                     (item.waterfallConfigs?.length ?? 0) > 0 ? (
                       <StyledProviderBadges
+                        maxCount={3}
                         providers={(item.waterfallConfigs ?? []).map(
                           (config) => config.logoUrl,
                         )}

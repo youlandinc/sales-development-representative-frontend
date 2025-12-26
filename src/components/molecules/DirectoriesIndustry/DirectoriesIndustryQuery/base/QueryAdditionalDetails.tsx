@@ -7,10 +7,11 @@ import { UTypeOf } from '@/utils/UTypeOf';
 import { useDirectoriesStore } from '@/stores/directories';
 import {
   DirectoriesQueryActionTypeEnum,
+  DirectoriesQueryComponentNameEnum,
   DirectoriesQueryItem,
 } from '@/types/directories';
 
-import { QueryAutoComplete, QueryCheckbox } from './index';
+import { QueryAutoComplete, QueryCascadeSelect, QueryCheckbox } from './index';
 
 interface QueryAdditionalDetailsProps {
   isAuth: boolean;
@@ -126,6 +127,25 @@ export const QueryAdditionalDetails: FC<QueryAdditionalDetailsProps> = ({
     if (item.actionType === DirectoriesQueryActionTypeEnum.select) {
       if (!itemKey) {
         return null;
+      }
+
+      if (
+        item.componentName === DirectoriesQueryComponentNameEnum.cascade_select
+      ) {
+        const rawValue = values[itemKey];
+        const safeValue = Array.isArray(rawValue) ? rawValue : [];
+        return (
+          <Stack key={itemKey} sx={isLast ? { mb: 1 } : undefined}>
+            <QueryCascadeSelect
+              onFormChange={(newValue: number[]) => {
+                updateAdditionalSelection(itemKey, newValue, item);
+              }}
+              placeholder={item.placeholder ?? undefined}
+              url={item.url ?? null}
+              value={safeValue}
+            />
+          </Stack>
+        );
       }
 
       const rawValue = values[itemKey];

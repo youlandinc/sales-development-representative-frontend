@@ -199,25 +199,27 @@ export const DialogWorkEmailValidation: FC = () => {
 
             {/* Settings gear icon */}
             <Tooltip arrow placement={'top'} title={'Remove provider'}>
-              <IconButton
-                disabled={!selectedValidationOption}
-                onClick={onClickToRemoveProvider}
-                sx={{ p: 0 }}
-              >
-                <Icon
-                  component={ICON_DELETE}
-                  sx={{
-                    width: 18,
-                    height: 18,
-                    '& path': {
-                      fill: !selectedValidationOption ? '#BABCBE' : '#E26E6E',
-                    },
-                    '&:hover': {
-                      opacity: 0.7,
-                    },
-                  }}
-                />
-              </IconButton>
+              <Box>
+                <IconButton
+                  disabled={!selectedValidationOption}
+                  onClick={onClickToRemoveProvider}
+                  sx={{ p: 0 }}
+                >
+                  <Icon
+                    component={ICON_DELETE}
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      '& path': {
+                        fill: !selectedValidationOption ? '#BABCBE' : '#E26E6E',
+                      },
+                      '&:hover': {
+                        opacity: 0.7,
+                      },
+                    }}
+                  />
+                </IconButton>
+              </Box>
             </Tooltip>
           </Stack>
 

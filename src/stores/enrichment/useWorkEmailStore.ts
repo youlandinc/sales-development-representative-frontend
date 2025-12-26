@@ -373,7 +373,7 @@ export const useWorkEmailStore = create<
                 ...item,
                 waterfallConfigs: (item.waterfallConfigs || []).map((i) => ({
                   ...i,
-                  inputParams: i.inputParams.map((p) => {
+                  inputParams: (i.inputParams || []).map((p) => {
                     const columns = useEnrichmentTableStore.getState().columns;
                     const column = columns.find(
                       (c) => c.semanticType === p.semanticType,

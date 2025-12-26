@@ -1,5 +1,4 @@
 import { get, patch, post } from '../request';
-import { FetchWebResearchModelListResponse } from '@/types/enrichment/webResearch';
 
 export const generatePrompt = (api: string, param: Record<string, any>) => {
   //TODO
@@ -124,8 +123,4 @@ export const _updateWebResearchConfig = (params: {
       ],
     },
   });
-};
-
-export const _fetchWebResearchModelList = () => {
-  return get<FetchWebResearchModelListResponse>('/aiResearch/model/list');
 };

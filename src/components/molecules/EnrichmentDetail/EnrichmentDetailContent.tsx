@@ -77,6 +77,8 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   tableId,
 }) => {
   const {
+    drawersType,
+    // ======
     addColumn,
     closeDialog,
     columns,
@@ -92,9 +94,11 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     updateColumnType,
     updateColumnVisible,
     updateColumnWidth,
-    drawersType,
+    updateColumnOrder,
   } = useEnrichmentTableStore(
     useShallow((store) => ({
+      drawersType: store.drawersType,
+
       addColumn: store.addColumn,
       closeDialog: store.closeDialog,
       columns: store.columns,
@@ -110,7 +114,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
       updateColumnType: store.updateColumnType,
       updateColumnVisible: store.updateColumnVisible,
       updateColumnWidth: store.updateColumnWidth,
-      drawersType: store.drawersType,
+      updateColumnOrder: store.updateColumnOrder,
     })),
   );
 
@@ -168,7 +172,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     onCellEdit,
     onInitializeAiColumns,
     onRunAi,
-    onColumnSort,
     refetchCachedRecords,
   } = useEnrichmentTable({ tableId });
 
@@ -349,7 +352,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               onColumnResize={(fieldId, width) =>
                 updateColumnWidth(fieldId, width)
               }
-              onColumnSort={onColumnSort}
+              onColumnSort={updateColumnOrder}
               onHeaderMenuClick={async ({
                 type,
                 columnId,

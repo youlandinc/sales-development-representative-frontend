@@ -21,7 +21,6 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   horizontalListSortingStrategy,
   SortableContext,
 } from '@dnd-kit/sortable';
@@ -255,115 +254,41 @@ export const StyledTable: FC<StyledTableProps> = ({
         return;
       }
 
-      const activeId = active.id as string;
-      const overId = over.id as string;
+      const currentFieldId = String(active.id);
+      const overFieldId = String(over.id);
 
-      // Check if dragging in pinned area or center area
-      const isInPinned = sortablePinnedIds.includes(activeId);
-      const isInCenter = sortableCenterIds.includes(activeId);
+      const activeIndex = active.data.current?.sortable.index as number;
+      const overIndex = over.data.current?.sortable.index as number;
+
+      if (activeIndex === -1 || overIndex === -1) {
+        return;
+      }
 
       let beforeFieldId: string | undefined;
       let afterFieldId: string | undefined;
 
-      if (isInPinned) {
-        // Reorder within pinned columns
-        const oldIndex = sortablePinnedIds.indexOf(activeId);
-        const newIndex = sortablePinnedIds.indexOf(overId);
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const reorderedPinned = arrayMove(
-            sortablePinnedIds,
-            oldIndex,
-            newIndex,
-          );
+      if (activeIndex < overIndex) {
+        afterFieldId = overFieldId;
+      } else {
+        beforeFieldId = overFieldId;
+      }
 
-          // Determine before/after based on drag direction
-          if (oldIndex < newIndex) {
-            // Dragging right: insert after overId
-            afterFieldId = overId;
-          } else {
-            // Dragging left: insert before overId
-            beforeFieldId = overId;
-          }
-
-          const newOrder = [
-            SYSTEM_COLUMN_SELECT,
-            ...reorderedPinned,
-            ...sortableCenterIds,
-          ];
-          setColumnOrder(newOrder);
-
-          // Call API to update column sort
-          if (tableId && onColumnSort) {
-            try {
-              await onColumnSort({
-                tableId,
-                currentFieldId: activeId,
-                beforeFieldId,
-                afterFieldId,
-              });
-            } catch (error) {
-              // eslint-disable-next-line no-console
-              console.error('Failed to update column sort:', error);
-            }
-          }
-        }
-      } else if (isInCenter) {
-        // Reorder within center columns
-        const oldIndex = sortableCenterIds.indexOf(activeId);
-        const newIndex = sortableCenterIds.indexOf(overId);
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const reorderedCenter = arrayMove(
-            sortableCenterIds,
-            oldIndex,
-            newIndex,
-          );
-
-          // Determine before/after based on drag direction
-          if (oldIndex < newIndex) {
-            // Dragging right: insert after overId
-            afterFieldId = overId;
-          } else {
-            // Dragging left: insert before overId
-            beforeFieldId = overId;
-          }
-
-          const newOrder = [
-            SYSTEM_COLUMN_SELECT,
-            ...sortablePinnedIds,
-            ...reorderedCenter,
-          ];
-          setColumnOrder(newOrder);
-
-          // Call API to update column sort
-          if (tableId && onColumnSort) {
-            try {
-              await onColumnSort({
-                tableId,
-                currentFieldId: activeId,
-                beforeFieldId,
-                afterFieldId,
-              });
-            } catch (error) {
-              // eslint-disable-next-line no-console
-              console.error('Failed to update column sort:', error);
-            }
-          }
-        }
+      if (tableId && onColumnSort) {
+        await onColumnSort({
+          tableId,
+          currentFieldId,
+          beforeFieldId,
+          afterFieldId,
+        });
       }
     },
-    [sortablePinnedIds, sortableCenterIds, tableId, onColumnSort],
+    [tableId, onColumnSort],
   );
 
   useEffect(() => {
     const pinnedColumns = columns
       .filter((col) => col.pin)
       .map((col) => col.fieldId);
-    const centerColumns = columns
-      .filter((col) => !col.pin && col.fieldId !== SYSTEM_COLUMN_SELECT)
-      .map((col) => col.fieldId);
-
-    // Sync column order: select first, then pinned, then center
-    setColumnOrder([SYSTEM_COLUMN_SELECT, ...pinnedColumns, ...centerColumns]);
 
     setColumnPinning({
       left: [SYSTEM_COLUMN_SELECT].concat(pinnedColumns),

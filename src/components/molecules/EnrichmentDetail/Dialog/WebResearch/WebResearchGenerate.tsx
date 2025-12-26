@@ -42,7 +42,12 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
         runGenerateAiModel: state.runGenerateAiModel,
       })),
     );
-  const suggestions = useActionsStore((store) => store.suggestionsList);
+  const { suggestions, setDialogAllEnrichmentsVisible } = useActionsStore(
+    useShallow((store) => ({
+      suggestions: store.suggestionsList,
+      setDialogAllEnrichmentsVisible: store.setDialogAllEnrichmentsVisible,
+    })),
+  );
   const { filedMapping } = useVariableFromStore();
   const { visible, open, close } = useSwitch(false);
 
@@ -137,6 +142,16 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
             ),
           )
         )}
+        <Typography
+          onClick={() => {
+            setDialogAllEnrichmentsVisible(true);
+          }}
+          sx={{ color: '#5878D2', cursor: 'pointer' }}
+          variant={'body2'}
+        >
+          View more tasks
+        </Typography>
+        <Box sx={{ width: '100%', height: '1px', bgcolor: '#F0F0F4' }} />
       </Stack>
       <ClickAwayListener onClickAway={close}>
         <Stack

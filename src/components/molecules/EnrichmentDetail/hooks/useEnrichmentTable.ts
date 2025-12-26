@@ -18,7 +18,7 @@ import {
 import { useTableWebSocket } from './useTableWebSocket';
 import { useRunAi } from '@/hooks';
 
-import { _fetchTableRowData, _updateTableColumnSort } from '@/request';
+import { _fetchTableRowData } from '@/request';
 import { MIN_BATCH_SIZE, SYSTEM_COLUMN_SELECT } from '../Table/config';
 import { checkIsAiColumn } from '../Table/utils';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
@@ -47,12 +47,6 @@ interface UseEnrichmentTableReturn {
     fieldId: string;
     recordId?: string;
     isHeader?: boolean;
-  }) => Promise<void>;
-  onColumnSort: (params: {
-    tableId: string;
-    currentFieldId: string;
-    beforeFieldId?: string;
-    afterFieldId?: string;
   }) => Promise<void>;
   refetchCachedRecords: () => Promise<void>;
 }
@@ -84,9 +78,10 @@ export const useEnrichmentTable = ({
     })),
   );
 
-  const { fetchActionsMenus } = useActionsStore(
+  const { fetchActionsMenus, fetchDialogAllEnrichments } = useActionsStore(
     useShallow((store) => ({
       fetchActionsMenus: store.fetchActionsMenus,
+      fetchDialogAllEnrichments: store.fetchDialogAllEnrichments,
     })),
   );
 
@@ -333,6 +328,7 @@ export const useEnrichmentTable = ({
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
     fetchActionsMenus(tableId);
     fetchWebResearchModelList();
+    fetchDialogAllEnrichments();
   }, [
     tableId,
     total,
@@ -340,6 +336,7 @@ export const useEnrichmentTable = ({
     isMetadataLoading,
     fetchActionsMenus,
     fetchWebResearchModelList,
+    fetchDialogAllEnrichments,
   ]);
 
   // Re-check visible range when rowIds update (for dynamic rowIds from WebSocket)
@@ -791,24 +788,6 @@ export const useEnrichmentTable = ({
     [tableId, rowIds, columns, runAi, onUpdateRowData, onInitializeAiColumns],
   );
 
-  // Handle column sort via API
-  const onColumnSort = useCallback(
-    async (params: {
-      tableId: string;
-      currentFieldId: string;
-      beforeFieldId?: string;
-      afterFieldId?: string;
-    }) => {
-      try {
-        await _updateTableColumnSort(params);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to update column sort:', error);
-      }
-    },
-    [],
-  );
-
   return {
     fullData,
     aiLoadingState,
@@ -824,7 +803,6 @@ export const useEnrichmentTable = ({
     onUpdateRowData,
     onInitializeAiColumns,
     onRunAi,
-    onColumnSort,
     refetchCachedRecords,
   };
 };

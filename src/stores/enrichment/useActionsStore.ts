@@ -6,31 +6,46 @@ import { SDRToast } from '@/components/atoms';
 
 import {
   ActionsTypeKeyEnum,
+  DialogAllEnrichmentsResponse,
+  EnrichmentCategoryEnum,
   EnrichmentItem,
   SuggestionItem,
 } from '@/types/enrichment/drawerActions';
-import { _fetchActionCategory, _fetchActionSuggestions } from '@/request';
+import {
+  _fetchActionCategory,
+  _fetchActionSuggestions,
+  _fetchAllEnrichmentsData,
+} from '@/request';
 import { useWorkEmailStore } from './useWorkEmailStore';
-
-interface ActionsStoreActions {
-  fetchSuggestions: (tableId: string) => Promise<void>;
-  fetchEnrichments: () => Promise<void>;
-  fetchActionsMenus: (tableId: string) => void;
-}
 
 interface ActionsStoreStates {
   suggestionsLoading: boolean;
   suggestionsList: SuggestionItem[];
   enrichmentsLoading: boolean;
   enrichmentsList: EnrichmentItem[];
+  dialogAllEnrichmentsVisible: boolean;
+  dialogAllEnrichmentsData: DialogAllEnrichmentsResponse[];
+  dialogAllEnrichmentsTabKey: EnrichmentCategoryEnum;
 }
 
 const initialState: ActionsStoreStates = {
+  dialogAllEnrichmentsVisible: false,
   suggestionsLoading: false,
   suggestionsList: [],
   enrichmentsLoading: false,
   enrichmentsList: [],
+  dialogAllEnrichmentsData: [],
+  dialogAllEnrichmentsTabKey: EnrichmentCategoryEnum.actions,
 };
+
+interface ActionsStoreActions {
+  fetchSuggestions: (tableId: string) => Promise<void>;
+  fetchEnrichments: () => Promise<void>;
+  fetchActionsMenus: (tableId: string) => void;
+  setDialogAllEnrichmentsVisible: (visible: boolean) => void;
+  fetchDialogAllEnrichments: () => Promise<void>;
+  setDialogAllEnrichmentsTabKey: (key: EnrichmentCategoryEnum) => void;
+}
 
 type ActionsStore = ActionsStoreStates & ActionsStoreActions;
 
@@ -39,6 +54,12 @@ export const useActionsStore = create<ActionsStore>()(
     combine(initialState, (set, _get) => {
       const get = _get as () => ActionsStore;
       return {
+        setDialogAllEnrichmentsTabKey: (key: EnrichmentCategoryEnum) => {
+          set((state) => {
+            state.dialogAllEnrichmentsTabKey = key;
+          });
+        },
+
         fetchSuggestions: async (tableId: string) => {
           set((state) => {
             state.suggestionsLoading = true;
@@ -86,6 +107,22 @@ export const useActionsStore = create<ActionsStore>()(
         fetchActionsMenus: (tableId: string) => {
           get().fetchEnrichments();
           get().fetchSuggestions(tableId);
+        },
+        fetchDialogAllEnrichments: async () => {
+          try {
+            const res = await _fetchAllEnrichmentsData();
+            set((state) => {
+              state.dialogAllEnrichmentsData = res.data || [];
+            });
+          } catch (err) {
+            const { message, header, variant } = err as HttpError;
+            SDRToast({ message, header, variant });
+          }
+        },
+        setDialogAllEnrichmentsVisible: (visible: boolean) => {
+          set((state) => {
+            state.dialogAllEnrichmentsVisible = visible;
+          });
         },
       };
     }),
