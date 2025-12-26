@@ -301,6 +301,7 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
         ]}
         open={isOpen}
         placement={'bottom-start'}
+        sx={{ zIndex: 1300 }}
       >
         <ClickAwayListener
           onClickAway={(event) => {

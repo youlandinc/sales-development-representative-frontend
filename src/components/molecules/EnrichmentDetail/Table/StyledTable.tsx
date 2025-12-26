@@ -257,16 +257,17 @@ export const StyledTable: FC<StyledTableProps> = ({
       const currentFieldId = String(active.id);
       const overFieldId = String(over.id);
 
+      const activeIndex = active.data.current?.sortable.index as number;
       const overIndex = over.data.current?.sortable.index as number;
 
-      if (overIndex === -1) {
+      if (activeIndex === -1 || overIndex === -1) {
         return;
       }
 
       let beforeFieldId: string | undefined;
       let afterFieldId: string | undefined;
 
-      if (overIndex === 0) {
+      if (activeIndex < overIndex) {
         afterFieldId = overFieldId;
       } else {
         beforeFieldId = overFieldId;

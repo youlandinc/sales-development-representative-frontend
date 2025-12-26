@@ -424,25 +424,14 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       }
     },
     updateColumnOrder: async (params) => {
-      const originalParams = params;
-
       const { currentFieldId, beforeFieldId, afterFieldId } = params;
-      const targetFieldId = beforeFieldId ?? afterFieldId;
-
-      if (!targetFieldId || targetFieldId === currentFieldId) {
-        return;
-      }
 
       const columns = get().columns;
-
       const currentIndex = columns.findIndex(
         (col) => col.fieldId === currentFieldId,
       );
-      const targetIndex = columns.findIndex(
-        (col) => col.fieldId === targetFieldId,
-      );
 
-      if (currentIndex === -1 || targetIndex === -1) {
+      if (currentIndex === -1) {
         return;
       }
 
@@ -451,20 +440,26 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         (col) => col.fieldId !== currentFieldId,
       );
 
-      const targetIndexWithout = withoutCurrent.findIndex(
-        (col) => col.fieldId === targetFieldId,
-      );
-      if (targetIndexWithout === -1) {
+      let insertIndex: number;
+
+      if (beforeFieldId) {
+        insertIndex = withoutCurrent.findIndex(
+          (col) => col.fieldId === beforeFieldId,
+        );
+        if (insertIndex === -1) {
+          return;
+        }
+      } else if (afterFieldId) {
+        const afterIndex = withoutCurrent.findIndex(
+          (col) => col.fieldId === afterFieldId,
+        );
+        if (afterIndex === -1) {
+          return;
+        }
+        insertIndex = afterIndex + 1;
+      } else {
         return;
       }
-
-      // ✅ 核心：方向决定插入位置
-      // 往右拖（currentIndex < targetIndex）=> 插到 target 后面
-      // 往左拖（currentIndex > targetIndex）=> 插到 target 前面
-      const insertIndex =
-        currentIndex < targetIndex
-          ? targetIndexWithout + 1
-          : targetIndexWithout;
 
       const newColumns: TableColumnProps[] = [
         ...withoutCurrent.slice(0, insertIndex),
@@ -476,7 +471,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       set({ columns: newColumns });
 
       try {
-        await _updateTableColumnSort(originalParams);
+        await _updateTableColumnSort(params);
       } catch (err) {
         set({ columns: oldColumns });
         handleApiError(err, { columns: oldColumns }, set);
