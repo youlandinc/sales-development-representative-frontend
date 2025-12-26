@@ -16,6 +16,7 @@ import {
   _renameEnrichmentTable,
   _updateTableCellValue,
   _updateTableColumnConfig,
+  _updateTableColumnSort,
 } from '@/request';
 import { UNotUndefined } from '@/utils';
 
@@ -101,6 +102,12 @@ export type EnrichmentTableActions = {
     fieldType: TableColumnTypeEnum;
   }) => Promise<void>;
   deleteColumn: () => Promise<void>;
+  updateColumnOrder: (params: {
+    tableId: string;
+    currentFieldId: string;
+    beforeFieldId?: string;
+    afterFieldId?: string;
+  }) => Promise<void>;
   addColumn: (params: {
     tableId: string;
     fieldType: TableColumnTypeEnum;
@@ -375,13 +382,11 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
           return null;
         }
 
-        // Insert the new column at the correct position
         const columns = get().columns;
         const { beforeFieldId, afterFieldId } = params;
 
         let newColumns: TableColumnProps[];
         if (beforeFieldId) {
-          // Insert before specified column
           const index = columns.findIndex(
             (col) => col.fieldId === beforeFieldId,
           );
@@ -392,11 +397,9 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
               ...columns.slice(index),
             ];
           } else {
-            // Fallback: insert at end if not found
             newColumns = [...columns, newColumn];
           }
         } else if (afterFieldId) {
-          // Insert after specified column
           const index = columns.findIndex(
             (col) => col.fieldId === afterFieldId,
           );
@@ -407,11 +410,9 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
               ...columns.slice(index + 1),
             ];
           } else {
-            // Fallback: insert at end if not found
             newColumns = [...columns, newColumn];
           }
         } else {
-          // Insert at end
           newColumns = [...columns, newColumn];
         }
 
@@ -420,6 +421,66 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       } catch (err) {
         handleApiError<EnrichmentTableState>(err);
         return null;
+      }
+    },
+    updateColumnOrder: async (params) => {
+      const originalParams = params;
+
+      const { currentFieldId, beforeFieldId, afterFieldId } = params;
+      const targetFieldId = beforeFieldId ?? afterFieldId;
+
+      if (!targetFieldId || targetFieldId === currentFieldId) {
+        return;
+      }
+
+      const columns = get().columns;
+
+      const currentIndex = columns.findIndex(
+        (col) => col.fieldId === currentFieldId,
+      );
+      const targetIndex = columns.findIndex(
+        (col) => col.fieldId === targetFieldId,
+      );
+
+      if (currentIndex === -1 || targetIndex === -1) {
+        return;
+      }
+
+      const currentColumn = columns[currentIndex];
+      const withoutCurrent = columns.filter(
+        (col) => col.fieldId !== currentFieldId,
+      );
+
+      const targetIndexWithout = withoutCurrent.findIndex(
+        (col) => col.fieldId === targetFieldId,
+      );
+      if (targetIndexWithout === -1) {
+        return;
+      }
+
+      // ✅ 核心：方向决定插入位置
+      // 往右拖（currentIndex < targetIndex）=> 插到 target 后面
+      // 往左拖（currentIndex > targetIndex）=> 插到 target 前面
+      const insertIndex =
+        currentIndex < targetIndex
+          ? targetIndexWithout + 1
+          : targetIndexWithout;
+
+      const newColumns: TableColumnProps[] = [
+        ...withoutCurrent.slice(0, insertIndex),
+        currentColumn,
+        ...withoutCurrent.slice(insertIndex),
+      ];
+
+      const oldColumns = columns;
+      set({ columns: newColumns });
+
+      try {
+        await _updateTableColumnSort(originalParams);
+      } catch (err) {
+        set({ columns: oldColumns });
+        handleApiError(err, { columns: oldColumns }, set);
+        throw err;
       }
     },
     // table cell

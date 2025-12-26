@@ -69,7 +69,7 @@ export const CategoryBrowseContent: FC<CategoryBrowseContentProps> = ({
         <Stack sx={{ gap: 1.5 }}>
           {dialogAllEnrichmentsData
             .find((item) => item.categoryKey === EnrichmentCategoryEnum.actions)
-            ?.actions?.map((provider, providerIndex) => (
+            ?.actions?.map((provider: any, providerIndex: any) => (
               <StyledActionItem
                 badges={
                   provider?.waterfallConfigs?.length ? (
@@ -124,7 +124,7 @@ export const CategoryBrowseContent: FC<CategoryBrowseContentProps> = ({
                 : undefined;
 
             // 找到当前选中的action
-            const selectedAction = currentActions.find((action) => {
+            const selectedAction = currentActions.find((action: any) => {
               const tabValue = getActionTabValue(action);
               return (
                 (dialogAllEnrichmentsTabKey ===
