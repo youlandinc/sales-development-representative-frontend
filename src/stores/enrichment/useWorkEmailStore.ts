@@ -125,6 +125,22 @@ export const useWorkEmailStore = create<
         }),
       setSelectedIntegrationToConfig: (integration: IntegrationAction | null) =>
         set((state) => {
+          if (integration) {
+            state.selectedIntegrationToConfig = {
+              ...integration,
+              inputParams: integration.inputParams.map((p) => {
+                const columns = useProspectTableStore.getState().columns;
+                const column = columns.find(
+                  (c) => c.semanticType === p.semanticType,
+                );
+                return {
+                  ...p,
+                  selectedOption: buildSelectedOption(column),
+                };
+              }),
+            };
+            return;
+          }
           state.selectedIntegrationToConfig = integration;
         }),
       setWaterfallConfigType: (type: WaterfallConfigTypeEnum) =>

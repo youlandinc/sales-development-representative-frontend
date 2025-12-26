@@ -11,35 +11,62 @@ import {
   DialogWorkEmailQuickSetup,
 } from './index';
 
-import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
-import { WaterfallConfigTypeEnum } from '@/types/enrichment';
-import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+import { FC } from 'react';
+import { useShallow } from 'zustand/shallow';
 
-export const DialogWorkEmailMain = () => {
+import { useProspectTableStore, useWorkEmailStore } from '@/stores/enrichment';
+import { SourceOfOpenEnum, WaterfallConfigTypeEnum } from '@/types/enrichment';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+
+export const DialogWorkEmailMain: FC = () => {
   const {
     allIntegrations,
     setWaterfallConfigType,
     waterfallConfigType,
     dialogHeaderName,
     waterfallDescription,
-  } = useWorkEmailStore((store) => store);
-  const openDialog = useProspectTableStore((state) => state.openDialog);
-  const closeDialog = useProspectTableStore((state) => state.closeDialog);
+  } = useWorkEmailStore(
+    useShallow((store) => ({
+      allIntegrations: store.allIntegrations,
+      setWaterfallConfigType: store.setWaterfallConfigType,
+      waterfallConfigType: store.waterfallConfigType,
+      dialogHeaderName: store.dialogHeaderName,
+      waterfallDescription: store.waterfallDescription,
+    })),
+  );
+  const { openDialog, closeDialog } = useProspectTableStore(
+    useShallow((state) => ({
+      openDialog: state.openDialog,
+      closeDialog: state.closeDialog,
+    })),
+  );
+  const { sourceOfOpen, setDialogAllEnrichmentsVisible } = useActionsStore(
+    useShallow((state) => ({
+      sourceOfOpen: state.sourceOfOpen,
+      setDialogAllEnrichmentsVisible: state.setDialogAllEnrichmentsVisible,
+    })),
+  );
 
-  const handleClose = () => {
+  const onClickToClose = () => {
     closeDialog();
     setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
   };
 
-  const handleBack = () => {
-    openDialog(TableColumnMenuActionEnum.actions_overview);
+  const onClickToBack = () => {
+    if (sourceOfOpen === SourceOfOpenEnum.dialog) {
+      closeDialog();
+      setDialogAllEnrichmentsVisible(true);
+    } else {
+      openDialog(TableColumnMenuActionEnum.actions_overview);
+    }
   };
 
   return (
     <Stack flex={1} overflow={'hidden'}>
       <DialogHeader
-        handleBack={handleBack}
-        handleClose={handleClose}
+        handleBack={onClickToBack}
+        handleClose={onClickToClose}
         title={dialogHeaderName}
       />
       <Stack flex={1} gap={4} minHeight={0} overflow={'auto'} p={3}>

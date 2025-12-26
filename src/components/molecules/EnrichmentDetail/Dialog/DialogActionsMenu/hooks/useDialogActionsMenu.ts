@@ -10,9 +10,11 @@ import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
 
 import {
   ActionsTypeKeyEnum,
+  SourceOfOpenEnum,
   SuggestionItem,
 } from '@/types/enrichment/drawerActions';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 export const useDialogActionsMenu = () => {
   // Store selectors
@@ -48,6 +50,8 @@ export const useDialogActionsMenu = () => {
         setGenerateSchemaStr: state.setGenerateSchemaStr,
       })),
     );
+
+  const setSourceOfOpen = useActionsStore((store) => store.setSourceOfOpen);
 
   const onClickToAiTemplate = useCallback(
     async (templatePrompt: string) => {
@@ -100,8 +104,9 @@ export const useDialogActionsMenu = () => {
         return;
       }
       onWorkEmailItemClick(item.key);
+      setSourceOfOpen(SourceOfOpenEnum.drawer);
     },
-    [onWorkEmailItemClick, onClickToAiTemplate],
+    [onWorkEmailItemClick, onClickToAiTemplate, setSourceOfOpen],
   );
   return { onItemClick, onWorkEmailItemClick, onClickToAiTemplate };
 };

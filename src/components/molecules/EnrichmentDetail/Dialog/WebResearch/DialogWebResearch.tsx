@@ -26,7 +26,7 @@ import {
 import { COINS_PER_ROW } from '@/constants';
 import { useAsyncFn, useVariableFromStore } from '@/hooks';
 import { columnRun } from '@/request';
-import { HttpError } from '@/types';
+import { HttpError, SourceOfOpenEnum } from '@/types';
 import { extractPromptText } from '@/utils';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
@@ -108,6 +108,13 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     })),
   );
 
+  const { sourceOfOpen, setDialogAllEnrichmentsVisible } = useActionsStore(
+    useShallow((state) => ({
+      sourceOfOpen: state.sourceOfOpen,
+      setDialogAllEnrichmentsVisible: state.setDialogAllEnrichmentsVisible,
+    })),
+  );
+
   const { filedMapping } = useVariableFromStore();
 
   const onClickToClose = () => {
@@ -117,6 +124,12 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   };
 
   const onClickToBack = () => {
+    if (sourceOfOpen === SourceOfOpenEnum.dialog) {
+      closeDialog();
+      setDialogAllEnrichmentsVisible(true);
+      setWebResearchTab('generate');
+      return;
+    }
     setWebResearchTab('generate');
     openDialog(TableColumnMenuActionEnum.actions_overview);
   };

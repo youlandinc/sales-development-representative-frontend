@@ -29,7 +29,7 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
-import { ActiveCellParams } from '@/types';
+import { ActiveCellParams, SourceOfOpenEnum } from '@/types';
 
 import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
 import { UTypeOf } from '@/utils';
@@ -124,15 +124,23 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
 
   const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
-  const { fetchActionsMenus } = useActionsStore(
+  const { fetchActionsMenus, setSourceOfOpen } = useActionsStore(
     useShallow((state) => ({
       fetchActionsMenus: state.fetchActionsMenus,
+      setSourceOfOpen: state.setSourceOfOpen,
     })),
   );
 
   const onClickToEditWorkEmail = useWorkEmailStore(
     (store) => store.handleEditClick,
   );
+
+  const onClickActions = () => {
+    setAiTableInfo({ tableId, mappings: [] });
+    setWebResearchVisible(true, ActiveTypeEnum.add);
+    openDialog(TableColumnMenuActionEnum.actions_overview);
+    setSourceOfOpen(SourceOfOpenEnum.drawer);
+  };
 
   const [activeCell, setActiveCell] = useState<ActiveCellParams>({
     columnId: '',
@@ -249,11 +257,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           {isActionsButtonVisible && (
             <Stack flexDirection={'row'}>
               <StyledButton
-                onClick={() => {
-                  setAiTableInfo({ tableId, mappings: [] });
-                  setWebResearchVisible(true, ActiveTypeEnum.add);
-                  openDialog(TableColumnMenuActionEnum.actions_overview);
-                }}
+                onClick={onClickActions}
                 size={'small'}
                 variant={'contained'}
               >

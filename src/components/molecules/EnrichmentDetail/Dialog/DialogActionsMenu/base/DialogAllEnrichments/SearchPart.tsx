@@ -4,7 +4,10 @@ import Image from 'next/image';
 import { StyledActionItem } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
 import { StyledProviderBadges } from '../StyledProviderBadges';
 import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
-import { DisplayTypeEnum } from '@/types/enrichment/integrations';
+import {
+  DisplayTypeEnum,
+  IntegrationAction,
+} from '@/types/enrichment/integrations';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { ConfigItem } from './index';
 
@@ -42,7 +45,7 @@ interface SearchPartProps {
   setDialogAllEnrichmentsVisible: (visible: boolean) => void;
   openDialog: (action: TableColumnMenuActionEnum) => void;
   setDisplayType: (type: DisplayTypeEnum) => void;
-  setSelectedIntegrationToConfig: (config: any) => void;
+  setSelectedIntegrationToConfig: (config: IntegrationAction) => void;
 }
 
 /**
