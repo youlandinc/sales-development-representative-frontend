@@ -1,11 +1,22 @@
-import { FC, SyntheticEvent, useCallback } from 'react';
 import { Stack } from '@mui/material';
+import { FC, SyntheticEvent, useCallback } from 'react';
+import { useShallow } from 'zustand/shallow';
 
+import { useDialogActionsMenu } from '@/components/molecules/EnrichmentDetail/Dialog/DialogActionsMenu/hooks';
 import { ConfigActionsList } from './ConfigActionsList';
 import { VerticalProviderTabs } from './VerticalProviderTabs';
-import { Provider } from './index';
+import { Provider } from './ProviderTabLabel';
+
+import {
+  useEnrichmentTableStore,
+  useWorkEmailStore,
+} from '@/stores/enrichment';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
-import { DisplayTypeEnum } from '@/types/enrichment/integrations';
+import {
+  DisplayTypeEnum,
+  IntegrationAction,
+} from '@/types/enrichment/integrations';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 interface VerticalTabsContentProps {
@@ -16,11 +27,6 @@ interface VerticalTabsContentProps {
   setIntegrationsTabKey: (value: string) => void;
   setTaskTabKey: (value: string) => void;
   getActionTabValue: (action: { name: string }) => string;
-  onClickToAiTemplate: (template: string) => void;
-  setDialogAllEnrichmentsVisible: (visible: boolean) => void;
-  openDialog: (action: TableColumnMenuActionEnum) => void;
-  setDisplayType: (type: DisplayTypeEnum) => void;
-  setSelectedIntegrationToConfig: (config: any) => void;
 }
 
 /**
@@ -35,12 +41,28 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
   setIntegrationsTabKey,
   setTaskTabKey,
   getActionTabValue,
-  onClickToAiTemplate,
-  setDialogAllEnrichmentsVisible,
-  openDialog,
-  setDisplayType,
-  setSelectedIntegrationToConfig,
 }) => {
+  const { onClickToAiTemplate } = useDialogActionsMenu();
+
+  const { setDialogAllEnrichmentsVisible } = useActionsStore(
+    useShallow((store) => ({
+      dialogAllEnrichmentsData: store.dialogAllEnrichmentsData,
+      dialogAllEnrichmentsTabKey: store.dialogAllEnrichmentsTabKey,
+      setDialogAllEnrichmentsTabKey: store.setDialogAllEnrichmentsTabKey,
+      setDialogAllEnrichmentsVisible: store.setDialogAllEnrichmentsVisible,
+    })),
+  );
+  const { setDisplayType, setSelectedIntegrationToConfig } = useWorkEmailStore(
+    useShallow((state) => ({
+      setDisplayType: state.setDisplayType,
+      setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
+    })),
+  );
+  const { openDialog } = useEnrichmentTableStore(
+    useShallow((state) => ({
+      openDialog: state.openDialog,
+    })),
+  );
   // 获取当前类别的动作数组
   const currentActions =
     dialogAllEnrichmentsData.find(
@@ -83,7 +105,7 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
 
   // 处理配置项点击
   const handleConfigItemClick = useCallback(
-    (config: any) => {
+    (config: IntegrationAction) => {
       if (
         dialogAllEnrichmentsTabKey === EnrichmentCategoryEnum.atlas_task_library
       ) {
@@ -99,11 +121,11 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
     },
     [
       dialogAllEnrichmentsTabKey,
-      onClickToAiTemplate,
-      setDialogAllEnrichmentsVisible,
       openDialog,
       setDisplayType,
       setSelectedIntegrationToConfig,
+      setDialogAllEnrichmentsVisible,
+      onClickToAiTemplate,
     ],
   );
 

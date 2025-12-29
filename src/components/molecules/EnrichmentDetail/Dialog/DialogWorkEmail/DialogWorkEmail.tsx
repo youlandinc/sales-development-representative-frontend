@@ -33,7 +33,7 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
         return (
           <Fade in>
             <Stack flex={1} overflow={'hidden'}>
-              <DialogWorkEmailMain />
+              <DialogWorkEmailMain cb={cb} />
             </Stack>
           </Fade>
         );
@@ -41,14 +41,14 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
         return (
           <Fade in>
             <Stack flex={1} overflow={'hidden'}>
-              <DialogWorkEmailIntegrationAccount />
+              <DialogWorkEmailIntegrationAccount cb={cb} />
             </Stack>
           </Fade>
         );
       default:
         return null;
     }
-  }, [displayType]);
+  }, [displayType, cb]);
 
   useEffect(() => {
     setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
@@ -62,7 +62,7 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
   return (
     <Stack flex={1} minHeight={0}>
       {computedContent}
-      <DialogWorkEmailFooter cb={cb} />
+      {/* <DialogWorkEmailFooter cb={cb} /> */}
       <DialogAllIntegrations />
     </Stack>
   );

@@ -32,3 +32,8 @@ export interface DialogAllEnrichmentsResponse {
   categoryKey: EnrichmentCategoryEnum;
   actions: DialogAllEnrichmentsAction[];
 }
+
+export enum SourceOfOpenEnum {
+  dialog = 'dialog',
+  drawer = 'drawer',
+}

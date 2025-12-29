@@ -1,4 +1,4 @@
-import { get, post, put } from '../request';
+import { get, patch, post, put } from '../request';
 import {
   CreateWaterfallConfigRequestParam,
   IntegrationAction,
@@ -26,4 +26,42 @@ export const _editIntegrationConfig = (
 
 export const _fetchIntegrationMenus = () => {
   return get<IntegrationActionMenu[]>('/sdr/action/list');
+};
+
+export const _saveIntegrationConfig = (params: {
+  tableId: string;
+  actionKey: string;
+  inputBinding: {
+    name: string;
+    formulaText: string;
+  }[];
+}) => {
+  return post<string>('/sdr/table/field/add', {
+    tableId: params.tableId,
+    actionKey: params.actionKey,
+    fieldType: 'TEXT',
+    typeSettings: {
+      inputBinding: params.inputBinding,
+    },
+  });
+};
+
+export const _updateIntegrationConfig = (params: {
+  tableId: string;
+  actionKey: string;
+  fieldName: string;
+  fieldId: string;
+}) => {
+  return patch('/sdr/table/field/aiField', {
+    tableId: params.tableId,
+    actionKey: params.actionKey,
+    typeSettings: {
+      inputBinding: [
+        {
+          name: params.fieldName,
+          formulaText: params.fieldId,
+        },
+      ],
+    },
+  });
 };

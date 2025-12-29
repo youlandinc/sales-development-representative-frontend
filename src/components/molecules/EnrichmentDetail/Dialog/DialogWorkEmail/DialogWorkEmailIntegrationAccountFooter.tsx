@@ -7,7 +7,11 @@ import { DialogFooter } from '@/components/molecules/EnrichmentDetail/Dialog/Com
 
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
-import { useComputedInWorkEmailStore, useWorkEmailRequest } from './hooks';
+import {
+  useComputedInWorkEmailStore,
+  useIntegrationAccountRequest,
+  useWorkEmailRequest,
+} from './hooks';
 
 import {
   DisplayTypeEnum,
@@ -18,25 +22,23 @@ import {
 import { COINS_PER_ROW } from '@/constants';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
-interface DialogWorkEmailFooterProps {
+interface DialogWorkEmailIntegrationAccountFooterProps {
   cb?: () => void;
 }
 
-export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
-  cb,
-}) => {
-  const { rowIds } = useEnrichmentTableStore((store) => store);
+export const DialogWorkEmailIntegrationAccountFooter: FC<
+  DialogWorkEmailIntegrationAccountFooterProps
+> = ({ cb }) => {
+  const rowIds = useEnrichmentTableStore((store) => store.rowIds);
   const { isMissingConfig } = useComputedInWorkEmailStore();
   const {
     setWaterfallConfigType,
     setDisplayType,
-    displayType,
     selectedIntegrationToConfig,
   } = useWorkEmailStore(
     useShallow((state) => ({
       setWaterfallConfigType: state.setWaterfallConfigType,
       setDisplayType: state.setDisplayType,
-      displayType: state.displayType,
       selectedIntegrationToConfig: state.selectedIntegrationToConfig,
     })),
   );
@@ -47,11 +49,34 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
       ? params.tableId
       : '';
   const { requestState } = useWorkEmailRequest(tableId, cb);
+  const { saveOrRunIntegrationAccount } = useIntegrationAccountRequest(cb);
 
   const isDisabled =
     sourceOfOpen === SourceOfOpenEnum.dialog
       ? selectedIntegrationToConfig?.inputParams?.some((p) => !p.selectedOption)
       : isMissingConfig;
+
+  const handleAction = (recordCount: number, shouldRun = true) => {
+    if (sourceOfOpen === SourceOfOpenEnum.dialog) {
+      if (selectedIntegrationToConfig) {
+        saveOrRunIntegrationAccount(
+          {
+            tableId,
+            actionKey: selectedIntegrationToConfig.actionKey,
+            inputBinding:
+              selectedIntegrationToConfig?.inputParams?.map((param) => ({
+                name: param.semanticType,
+                formulaText: param.selectedOption?.value || '',
+              })) || [],
+          },
+          shouldRun,
+          recordCount,
+        );
+      }
+    } else {
+      requestState?.request?.(tableId, recordCount, shouldRun);
+    }
+  };
 
   return (
     <DialogFooter
@@ -59,16 +84,15 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
       disabled={requestState?.state?.loading || isDisabled}
       loading={requestState?.state?.loading}
       onClickToSaveAndRun10={() => {
-        requestState?.request?.(tableId, 10);
+        handleAction(10);
       }}
       onClickToSaveAndRunAll={() => {
-        requestState?.request?.(tableId, rowIds.length);
+        handleAction(rowIds.length);
       }}
       onClickToSaveDoNotRun={() => {
-        requestState?.request?.(tableId, rowIds.length, false);
+        handleAction(rowIds.length, false);
       }}
       slot={
-        displayType === DisplayTypeEnum.integration &&
         sourceOfOpen !== SourceOfOpenEnum.dialog ? (
           <StyledButton
             onClick={() => {

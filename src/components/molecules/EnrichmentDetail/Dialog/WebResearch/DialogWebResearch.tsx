@@ -26,7 +26,7 @@ import {
 import { COINS_PER_ROW } from '@/constants';
 import { useAsyncFn, useVariableFromStore } from '@/hooks';
 import { columnRun } from '@/request';
-import { HttpError } from '@/types';
+import { HttpError, SourceOfOpenEnum } from '@/types';
 import { extractPromptText } from '@/utils';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
@@ -108,6 +108,13 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     })),
   );
 
+  const { sourceOfOpen, setDialogAllEnrichmentsVisible } = useActionsStore(
+    useShallow((state) => ({
+      sourceOfOpen: state.sourceOfOpen,
+      setDialogAllEnrichmentsVisible: state.setDialogAllEnrichmentsVisible,
+    })),
+  );
+
   const { filedMapping } = useVariableFromStore();
 
   const onClickToClose = () => {
@@ -117,6 +124,12 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
   };
 
   const onClickToBack = () => {
+    if (sourceOfOpen === SourceOfOpenEnum.dialog) {
+      closeDialog();
+      setDialogAllEnrichmentsVisible(true);
+      setWebResearchTab('generate');
+      return;
+    }
     setWebResearchTab('generate');
     openDialog(TableColumnMenuActionEnum.actions_overview);
   };
@@ -225,7 +238,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       try {
         if (activeType === ActiveTypeEnum.edit) {
           await updateConfig(tableId);
-          fetchActionsMenus(tableId);
           await run({ tableId, recordCount, fieldId: activeColumnId });
         }
         if (activeType === ActiveTypeEnum.add) {
@@ -246,6 +258,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         onClickToClose();
         allClear();
         await cb?.();
+        fetchActionsMenus(tableId);
       } catch (err) {
         const { header, message, variant } = err as HttpError;
         SDRToast({ message, header, variant });
@@ -398,112 +411,6 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           }
         }}
       />
-      {/*    <Stack
-        alignItems={'center'}
-        borderTop={' 1px solid   #D0CEDA'}
-        flexDirection={'row'}
-        gap={1}
-        justifyContent={'flex-end'}
-        px={3}
-        py={1.5}
-      >
-        <StyledCost
-          border={'1px solid #F4F5F9'}
-          borderRadius={2}
-          count={`${COINS_PER_ROW}`}
-          textColor={'text.secondary'}
-        />
-        <StyledButton
-          endIcon={
-            <Icon
-              component={ICON_ARROW_DOWN}
-              sx={{ width: 12, height: 12, '& path': { fill: '#fff' } }}
-            />
-          }
-          loading={
-            state.loading || saveAndRunState.loading || updateState.loading
-          }
-          onClick={(e) => {
-            setAnchorEl(e.currentTarget);
-          }}
-          size={'medium'}
-          sx={{ height: '40px !important', width: 80 }}
-          variant={'contained'}
-        >
-          Save
-        </StyledButton>
-        <Menu
-          anchorEl={anchorEl}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          onClose={() => {
-            setAnchorEl(null);
-          }}
-          open={Boolean(anchorEl)}
-          slotProps={{
-            list: {
-              sx: {
-                p: 0,
-                width: 400,
-                [`& .${menuItemClasses.root}`]: {
-                  justifyContent: 'space-between',
-                },
-              },
-            },
-          }}
-        >
-          {rowIds.length > 10 && (
-            <MenuItem
-              onClick={() => {
-                saveAndRun(tableId, 10);
-              }}
-            >
-              <Typography color={'text.secondary'} variant={'body2'}>
-                Save and run 10 rows
-              </Typography>
-              <StyledCost
-                border={'1px solid #D0CEDA'}
-                count={`~${COINS_PER_ROW * 10}`}
-                textColor={'text.secondary'}
-              />
-            </MenuItem>
-          )}
-          <MenuItem
-            onClick={() => {
-              saveAndRun(tableId, rowIds.length);
-            }}
-          >
-            <Typography color={'text.secondary'} variant={'body2'}>
-              Save and run {rowIds.length} rows in this view
-            </Typography>
-            <StyledCost
-              border={'1px solid #D0CEDA'}
-              count={'~20'}
-              textColor={'text.secondary'}
-            />
-          </MenuItem>
-          <MenuItem
-            onClick={async () => {
-              try {
-                if (activeType === ActiveTypeEnum.add) {
-                  await saveDoNotRun(tableId);
-                }
-                if (activeType === ActiveTypeEnum.edit) {
-                  await updateAiConfig(tableId);
-                }
-                await cb?.();
-                handleClose();
-              } catch (err) {
-                const { header, message, variant } = err as HttpError;
-                SDRToast({ message, header, variant });
-              }
-            }}
-          >
-            <Typography color={'text.secondary'} variant={'body2'}>
-              Save and don&#39;t run
-            </Typography>
-          </MenuItem>
-        </Menu>
-      </Stack> */}
     </Stack>
   );
 };

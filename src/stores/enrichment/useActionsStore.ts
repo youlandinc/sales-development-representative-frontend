@@ -9,6 +9,7 @@ import {
   DialogAllEnrichmentsResponse,
   EnrichmentCategoryEnum,
   EnrichmentItem,
+  SourceOfOpenEnum,
   SuggestionItem,
 } from '@/types/enrichment/drawerActions';
 import {
@@ -26,6 +27,7 @@ interface ActionsStoreStates {
   dialogAllEnrichmentsVisible: boolean;
   dialogAllEnrichmentsData: DialogAllEnrichmentsResponse[];
   dialogAllEnrichmentsTabKey: EnrichmentCategoryEnum;
+  sourceOfOpen: SourceOfOpenEnum;
 }
 
 const initialState: ActionsStoreStates = {
@@ -36,6 +38,7 @@ const initialState: ActionsStoreStates = {
   enrichmentsList: [],
   dialogAllEnrichmentsData: [],
   dialogAllEnrichmentsTabKey: EnrichmentCategoryEnum.actions,
+  sourceOfOpen: SourceOfOpenEnum.drawer,
 };
 
 interface ActionsStoreActions {
@@ -45,6 +48,7 @@ interface ActionsStoreActions {
   setDialogAllEnrichmentsVisible: (visible: boolean) => void;
   fetchDialogAllEnrichments: () => Promise<void>;
   setDialogAllEnrichmentsTabKey: (key: EnrichmentCategoryEnum) => void;
+  setSourceOfOpen: (source: SourceOfOpenEnum) => void;
 }
 
 type ActionsStore = ActionsStoreStates & ActionsStoreActions;
@@ -122,6 +126,12 @@ export const useActionsStore = create<ActionsStore>()(
         setDialogAllEnrichmentsVisible: (visible: boolean) => {
           set((state) => {
             state.dialogAllEnrichmentsVisible = visible;
+          });
+        },
+
+        setSourceOfOpen: (source: SourceOfOpenEnum) => {
+          set((state) => {
+            state.sourceOfOpen = source;
           });
         },
       };

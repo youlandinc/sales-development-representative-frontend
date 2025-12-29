@@ -1,28 +1,63 @@
 import { Icon, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledSelect } from '@/components/atoms';
 import { DialogHeader } from '../Common';
 import {
   DialogWorkEmailCollapseCard,
+  DialogWorkEmailIntegrationAccountFooter,
   DialogWorkEmailIntegrationColumnMapping,
 } from './index';
 
-import { DisplayTypeEnum } from '@/types/enrichment';
+import { DisplayTypeEnum, SourceOfOpenEnum } from '@/types/enrichment';
 
-import { useWorkEmailStore } from '@/stores/enrichment';
+import {
+  useActionsStore,
+  useEnrichmentTableStore,
+  useWorkEmailStore,
+} from '@/stores/enrichment';
 
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';
+import { FC } from 'react';
 
-export const DialogWorkEmailIntegrationAccount = () => {
-  const { selectedIntegrationToConfig, setDisplayType, setWorkEmailVisible } =
-    useWorkEmailStore((store) => store);
+interface DialogWorkEmailIntegrationAccountProps {
+  cb?: () => void;
+}
+
+export const DialogWorkEmailIntegrationAccount: FC<
+  DialogWorkEmailIntegrationAccountProps
+> = ({ cb }) => {
+  const { selectedIntegrationToConfig, setDisplayType } = useWorkEmailStore(
+    useShallow((store) => ({
+      selectedIntegrationToConfig: store.selectedIntegrationToConfig,
+      setDisplayType: store.setDisplayType,
+    })),
+  );
+  const closeDialog = useEnrichmentTableStore((state) => state.closeDialog);
+  const { sourceOfOpen, setDialogAllEnrichmentsVisible } = useActionsStore(
+    useShallow((store) => ({
+      sourceOfOpen: store.sourceOfOpen,
+      setDialogAllEnrichmentsVisible: store.setDialogAllEnrichmentsVisible,
+    })),
+  );
+
+  const onClickBack = () => {
+    if (sourceOfOpen === SourceOfOpenEnum.dialog) {
+      setDialogAllEnrichmentsVisible(true);
+      closeDialog();
+    } else {
+      setDisplayType(DisplayTypeEnum.main);
+    }
+  };
 
   return (
     <Stack flex={1} overflow={'hidden'}>
       <DialogHeader
-        handleBack={() => setDisplayType(DisplayTypeEnum.main)}
-        handleClose={() => setWorkEmailVisible(false)}
+        handleBack={onClickBack}
+        handleClose={() => {
+          closeDialog();
+        }}
         title={selectedIntegrationToConfig?.name}
       />
       <Stack flex={1} gap={3} minHeight={0} overflow={'auto'} p={3}>
@@ -69,7 +104,10 @@ export const DialogWorkEmailIntegrationAccount = () => {
         </Typography>
         <DialogWorkEmailCollapseCard title={'Account'}>
           <Stack gap={1.5}>
-            <Typography variant={'body3'}>Select LeadMagic account</Typography>
+            <Typography variant={'body3'}>
+              Select {selectedIntegrationToConfig?.integrationName || ''}{' '}
+              account
+            </Typography>
             <StyledSelect
               options={[
                 {
@@ -84,6 +122,7 @@ export const DialogWorkEmailIntegrationAccount = () => {
         </DialogWorkEmailCollapseCard>
         <DialogWorkEmailIntegrationColumnMapping />
       </Stack>
+      <DialogWorkEmailIntegrationAccountFooter cb={cb} />
     </Stack>
   );
 };
