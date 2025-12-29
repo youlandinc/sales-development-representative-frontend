@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+
 import { SDRToast } from '@/components/atoms';
 
 import { useAsyncFn } from '@/hooks';
@@ -14,8 +17,6 @@ import {
 import { ActiveTypeEnum, HttpError } from '@/types';
 import { CreateWaterfallConfigRequestParam } from '@/types/enrichment';
 
-import { useMemo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {

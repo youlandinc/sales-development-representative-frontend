@@ -8,20 +8,16 @@ import {
 } from './index';
 
 import { useWorkEmailStore } from '@/stores/enrichment';
+import { IntegrationAction } from '@/types';
 
 export const DialogWorkEmailIntegrationColumnMapping: FC = () => {
-  const {
-    selectedIntegrationToConfig,
-    allIntegrations,
-    setSelectedIntegrationToConfig,
-  } = useWorkEmailStore(
-    useShallow((state) => ({
-      selectedIntegrationToConfig: state.selectedIntegrationToConfig,
-      setAllIntegrations: state.setAllIntegrations,
-      allIntegrations: state.allIntegrations,
-      setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
-    })),
-  );
+  const { selectedIntegrationToConfig, setSelectedIntegrationToConfig } =
+    useWorkEmailStore(
+      useShallow((state) => ({
+        selectedIntegrationToConfig: state.selectedIntegrationToConfig,
+        setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
+      })),
+    );
   return (
     <DialogWorkEmailCollapseCard title={'Column mapping'}>
       <Stack gap={2}>
@@ -45,8 +41,7 @@ export const DialogWorkEmailIntegrationColumnMapping: FC = () => {
                   }
                   return p;
                 }),
-              } as any;
-              console.log(updatedIntegration);
+              } as IntegrationAction;
               setSelectedIntegrationToConfig(updatedIntegration);
             }}
             required={i.isRequired}

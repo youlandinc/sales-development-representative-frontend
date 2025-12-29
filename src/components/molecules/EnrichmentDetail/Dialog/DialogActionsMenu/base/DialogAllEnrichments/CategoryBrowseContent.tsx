@@ -4,8 +4,14 @@ import Image from 'next/image';
 
 import { StyledActionItem } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
 import { StyledProviderBadges } from '../StyledProviderBadges';
-import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
-import { DisplayTypeEnum } from '@/types/enrichment/integrations';
+import {
+  DialogAllEnrichmentsResponse,
+  EnrichmentCategoryEnum,
+} from '@/types/enrichment/drawerActions';
+import {
+  DisplayTypeEnum,
+  IntegrationAction,
+} from '@/types/enrichment/integrations';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { MainCategoryTabs } from './MainCategoryTabs';
 import { ConfigActionsList } from './ConfigActionsList';
@@ -13,7 +19,7 @@ import { VerticalProviderTabs } from './VerticalProviderTabs';
 import { Provider } from './index';
 
 interface CategoryBrowseContentProps {
-  dialogAllEnrichmentsData: any[];
+  dialogAllEnrichmentsData: DialogAllEnrichmentsResponse[];
   dialogAllEnrichmentsTabKey: EnrichmentCategoryEnum;
   integrationsTabKey: string;
   taskTabKey: string;
@@ -25,7 +31,7 @@ interface CategoryBrowseContentProps {
   setDialogAllEnrichmentsVisible: (visible: boolean) => void;
   openDialog: (action: TableColumnMenuActionEnum) => void;
   setDisplayType: (type: DisplayTypeEnum) => void;
-  setSelectedIntegrationToConfig: (config: any) => void;
+  setSelectedIntegrationToConfig: (config: IntegrationAction) => void;
 }
 
 /**

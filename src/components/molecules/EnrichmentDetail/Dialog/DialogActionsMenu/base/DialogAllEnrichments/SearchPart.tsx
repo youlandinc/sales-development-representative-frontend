@@ -144,7 +144,9 @@ export const SearchPart: FC<SearchPartProps> = ({
               openDialog(TableColumnMenuActionEnum.work_email);
               setDisplayType(DisplayTypeEnum.integration);
               // 使用类型断言处理类型兼容性问题
-              setSelectedIntegrationToConfig(result as unknown as ConfigItem);
+              setSelectedIntegrationToConfig(
+                result as unknown as IntegrationAction,
+              );
               setDialogAllEnrichmentsVisible(false);
             }}
             title={result?.name ?? ''}

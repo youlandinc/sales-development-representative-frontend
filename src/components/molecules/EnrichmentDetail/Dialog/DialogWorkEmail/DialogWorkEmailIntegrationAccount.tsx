@@ -6,6 +6,7 @@ import { StyledSelect } from '@/components/atoms';
 import { DialogHeader } from '../Common';
 import {
   DialogWorkEmailCollapseCard,
+  DialogWorkEmailIntegrationAccountFooter,
   DialogWorkEmailIntegrationColumnMapping,
 } from './index';
 
@@ -18,8 +19,15 @@ import {
 } from '@/stores/enrichment';
 
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';
+import { FC } from 'react';
 
-export const DialogWorkEmailIntegrationAccount = () => {
+interface DialogWorkEmailIntegrationAccountProps {
+  cb?: () => void;
+}
+
+export const DialogWorkEmailIntegrationAccount: FC<
+  DialogWorkEmailIntegrationAccountProps
+> = ({ cb }) => {
   const { selectedIntegrationToConfig, setDisplayType } = useWorkEmailStore(
     useShallow((store) => ({
       selectedIntegrationToConfig: store.selectedIntegrationToConfig,
@@ -114,6 +122,7 @@ export const DialogWorkEmailIntegrationAccount = () => {
         </DialogWorkEmailCollapseCard>
         <DialogWorkEmailIntegrationColumnMapping />
       </Stack>
+      <DialogWorkEmailIntegrationAccountFooter cb={cb} />
     </Stack>
   );
 };

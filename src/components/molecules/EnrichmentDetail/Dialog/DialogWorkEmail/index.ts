@@ -5,6 +5,7 @@ export * from './DialogWorkEmailCustomSelect';
 export * from './DialogWorkEmailSequence';
 export * from './DialogWorkEmailQuickSetupInputs';
 export * from './DialogWorkEmailIntegrationAccount';
+export * from './DialogWorkEmailIntegrationAccountFooter';
 export * from './DialogWorkEmailMain';
 export * from './DialogWorkEmailCollapseCard';
 export * from './DialogWorkEmailIntegrationColumnMapping';

@@ -7,6 +7,7 @@ import {
 
 import { DialogHeader } from '../Common';
 import {
+  DialogWorkEmailFooter,
   DialogWorkEmailFullConfiguration,
   DialogWorkEmailQuickSetup,
 } from './index';
@@ -19,7 +20,11 @@ import { SourceOfOpenEnum, WaterfallConfigTypeEnum } from '@/types/enrichment';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
-export const DialogWorkEmailMain: FC = () => {
+interface DialogWorkEmailMainProps {
+  cb?: () => void;
+}
+
+export const DialogWorkEmailMain: FC<DialogWorkEmailMainProps> = ({ cb }) => {
   const {
     allIntegrations,
     setWaterfallConfigType,
@@ -134,6 +139,7 @@ export const DialogWorkEmailMain: FC = () => {
           )}
         </Stack>
       </Stack>
+      <DialogWorkEmailFooter cb={cb} />
     </Stack>
   );
 };

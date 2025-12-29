@@ -135,7 +135,9 @@ export const useWorkEmailStore = create<
                 );
                 return {
                   ...p,
-                  selectedOption: buildSelectedOption(column),
+                  selectedOption: p.selectedOption
+                    ? p.selectedOption
+                    : buildSelectedOption(column),
                 };
               }),
             };
