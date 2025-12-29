@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { Icon, Stack } from '@mui/material';
-
 import { useShallow } from 'zustand/react/shallow';
+
+import { UTypeOf } from '@/utils';
+import { useEnrichmentTable } from './hooks';
 
 import {
   ActiveTypeEnum,
@@ -9,31 +11,30 @@ import {
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
-
-import { useEnrichmentTable } from './hooks';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { useDialogStore } from '@/stores/useDialogStore';
 
 import { ROW_HEIGHT } from './Table/config';
+
+import { StyledButton, StyledLoading } from '@/components/atoms';
+import { DrawerActionsContainer } from '@/components/molecules';
+import { StyledTable } from './Table';
 import {
   HeadColumnsPanel,
   HeadFilterPanel,
-  HeadRowsPanel,
+  //HeadRowsPanel,
   HeadViewPanel,
 } from './Panel';
-import { StyledTable } from './Table';
-import { StyledButton, StyledLoading } from '@/components/atoms';
-import { DrawerActionsContainer } from '@/components/molecules';
 
-import { _createTableRows } from '@/request';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
-import { useDialogStore } from '@/stores/useDialogStore';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
 import { ActiveCellParams, SourceOfOpenEnum } from '@/types';
 
+import { _createTableRows } from '@/request';
+
 import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
-import { UTypeOf } from '@/utils';
 
 interface InputBindingItem {
   name: string;
@@ -259,7 +260,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           >
             <HeadViewPanel />
             <HeadColumnsPanel />
-            <HeadRowsPanel />
+            {/*<HeadRowsPanel />*/}
             <HeadFilterPanel />
           </Stack>
           {isActionsButtonVisible && (

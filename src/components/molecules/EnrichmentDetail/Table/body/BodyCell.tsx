@@ -12,7 +12,11 @@ import { Box, CircularProgress, Stack } from '@mui/material';
 import { CellContext } from '@tanstack/react-table';
 
 import { SYSTEM_COLUMN_SELECT } from '../config';
-import { TableCellFieldData, TableColumnMeta } from '@/types/enrichment/table';
+import {
+  TableCellFieldData,
+  TableColumnMeta,
+  TableColumnTypeEnum,
+} from '@/types/enrichment/table';
 
 import { CommonAiIcon } from '../common';
 import { useRowHover } from '../StyledTableBody';
@@ -274,6 +278,20 @@ const BodyCellComponent: FC<BodyCellProps> = ({
       );
     }
 
+    if (fieldType === TableColumnTypeEnum.url) {
+      return (
+        <Box
+          sx={{
+            textDecoration: 'underline',
+            textDecorationColor: 'rgba(111, 108, 125, .5)',
+            textUnderlineOffset: '2px',
+            color: 'rgb(111 108 125 / 80%)',
+          }}
+        >
+          {displayValue}
+        </Box>
+      );
+    }
     return displayValue;
   };
 
@@ -422,3 +440,4 @@ const bodyCellAreEqual = (
 };
 
 export const BodyCell = memo(BodyCellComponent, bodyCellAreEqual);
+//export const BodyCell = BodyCellComponent;
