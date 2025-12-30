@@ -31,16 +31,6 @@ export const _fetchTableRowData = (params: {
   });
 };
 
-export const _updateTableColumnConfig = (
-  params: Partial<UpdateTableColumnConfigParams>,
-) => {
-  return patch('/sdr/table/field', params);
-};
-
-export const _deleteTableColumn = (fieldId: string) => {
-  return del(`/sdr/table/field/${fieldId}`);
-};
-
 export const _updateTableCellValue = (params: {
   tableId: string;
   recordId: string;
@@ -61,6 +51,33 @@ export const _createTableRows = (params: {
     tableId: params.tableId,
     rowCounts: params.rowCounts,
   });
+};
+
+export const _exportTableData = (tableId: string) => {
+  return get('/sdr/table/data/export', {
+    params: { tableId },
+    responseType: 'blob',
+    headers: {
+      Accept: 'text/csv',
+    },
+  });
+};
+
+export const _createBlankTable = () => {
+  return post('/sdr/table');
+};
+
+// columns
+export const _updateTableColumn = (
+  params: Partial<UpdateTableColumnConfigParams>,
+) => {
+  return patch('/sdr/table/field', params);
+};
+
+export const _updateTableColumns = (
+  params: Partial<UpdateTableColumnConfigParams>[],
+) => {
+  return patch('/sdr/table/field/batch', params);
 };
 
 export const _createTableColumn = (params: {
@@ -87,25 +104,15 @@ export const _createTableColumn = (params: {
   return post<TableColumnProps>('/sdr/table/field/v2', params);
 };
 
-export const _updateTableColumnSort = (params: {
+export const _deleteTableColumn = (fieldId: string) => {
+  return del(`/sdr/table/field/${fieldId}`);
+};
+
+export const _reorderTableColumn = (params: {
   tableId: string;
   currentFieldId: string;
   beforeFieldId?: string;
   afterFieldId?: string;
 }) => {
   return put('/sdr/table/field/reorder', params);
-};
-
-export const _exportTableData = (tableId: string) => {
-  return get('/sdr/table/data/export', {
-    params: { tableId },
-    responseType: 'blob',
-    headers: {
-      Accept: 'text/csv',
-    },
-  });
-};
-
-export const _createBlankTable = () => {
-  return post('/sdr/table');
 };

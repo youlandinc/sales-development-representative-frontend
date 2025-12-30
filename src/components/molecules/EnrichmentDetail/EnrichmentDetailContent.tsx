@@ -80,6 +80,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   const {
     drawersType,
     // ======
+    activeColumnId,
     addColumn,
     closeDialog,
     columns,
@@ -100,6 +101,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     useShallow((store) => ({
       drawersType: store.drawersType,
 
+      activeColumnId: store.activeColumnId,
       addColumn: store.addColumn,
       closeDialog: store.closeDialog,
       columns: store.columns,
@@ -259,7 +261,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
             }}
           >
             <HeadViewPanel />
-            <HeadColumnsPanel />
+            <HeadColumnsPanel tableId={tableId} />
             {/*<HeadRowsPanel />*/}
             <HeadFilterPanel />
           </Stack>
@@ -304,6 +306,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               aiLoading={aiLoadingState}
               columns={columns}
               data={fullData}
+              externalActiveColumnId={activeColumnId}
               isScrolled={isScrolled}
               onAddMenuItemClick={(item) => {
                 // AI Agent opens configuration dialog

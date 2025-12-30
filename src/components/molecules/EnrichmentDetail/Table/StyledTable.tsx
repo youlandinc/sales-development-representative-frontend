@@ -127,6 +127,7 @@ interface StyledTableProps {
   }) => Promise<void>;
   onAddRows: (count: number) => Promise<void>;
   addRowsFooter?: ReactNode;
+  externalActiveColumnId?: string | null;
 }
 
 const columnHelper = createColumnHelper<any>();
@@ -190,6 +191,7 @@ export const StyledTable: FC<StyledTableProps> = ({
   onColumnSort,
   onAddRows,
   addRowsFooter,
+  externalActiveColumnId,
 }) => {
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnSizingInfo, setColumnSizingInfo] =
@@ -201,6 +203,22 @@ export const StyledTable: FC<StyledTableProps> = ({
 
   const [headerState, setHeaderState] =
     useState<HeaderState>(HEADER_STATE_RESET);
+
+  // Sync external activeColumnId with headerState
+  useEffect(() => {
+    if (
+      externalActiveColumnId &&
+      externalActiveColumnId !== headerState.activeColumnId
+    ) {
+      setHeaderState((prev) => ({
+        ...prev,
+        activeColumnId: externalActiveColumnId,
+        focusedColumnId: externalActiveColumnId,
+        isMenuOpen: false,
+        isEditing: false,
+      }));
+    }
+  }, [externalActiveColumnId]);
   // TODO: Menu state optimization
   // 1. Merge three menu anchors into unified menuState object
   // 2. Reduce state count, improve maintainability
