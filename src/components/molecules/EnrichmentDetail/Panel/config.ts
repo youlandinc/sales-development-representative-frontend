@@ -9,8 +9,9 @@ export const PAPPER_CONFIG = {
 };
 
 export const PAPPER_STACK_CONTAINER_SX = {
-  minWidth: 300,
+  width: 300,
   maxHeight: 500,
+  overflowX: 'hidden',
 };
 
 export const STACK_CONTAINER_SX = {
