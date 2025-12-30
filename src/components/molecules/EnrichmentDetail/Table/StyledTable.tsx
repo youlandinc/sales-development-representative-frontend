@@ -57,7 +57,11 @@ import {
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
 import { SYSTEM_COLUMN_SELECT } from './config';
-import { checkIsAiColumn, checkIsEditableColumn } from './utils';
+import {
+  buildColumnSortParams,
+  checkIsAiColumn,
+  checkIsEditableColumn,
+} from './utils';
 import { UTypeOf } from '@/utils';
 
 // ============================================
@@ -267,38 +271,11 @@ export const StyledTable: FC<StyledTableProps> = ({
   // Handle column drag end - works for both pinned and center columns
   const onColumnDragEnd = useCallback(
     async (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) {
+      const params = buildColumnSortParams(event);
+      if (!params || !tableId || !onColumnSort) {
         return;
       }
-
-      const currentFieldId = String(active.id);
-      const overFieldId = String(over.id);
-
-      const activeIndex = active.data.current?.sortable.index as number;
-      const overIndex = over.data.current?.sortable.index as number;
-
-      if (activeIndex === -1 || overIndex === -1) {
-        return;
-      }
-
-      let beforeFieldId: string | undefined;
-      let afterFieldId: string | undefined;
-
-      if (activeIndex < overIndex) {
-        afterFieldId = overFieldId;
-      } else {
-        beforeFieldId = overFieldId;
-      }
-
-      if (tableId && onColumnSort) {
-        await onColumnSort({
-          tableId,
-          currentFieldId,
-          beforeFieldId,
-          afterFieldId,
-        });
-      }
+      await onColumnSort({ tableId, ...params });
     },
     [tableId, onColumnSort],
   );

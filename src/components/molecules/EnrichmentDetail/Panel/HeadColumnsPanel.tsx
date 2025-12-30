@@ -20,7 +20,6 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
@@ -30,6 +29,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useShallow } from 'zustand/react/shallow';
 
 import { COLUMN_TYPE_ICONS } from '../Table/config';
+import { buildColumnSortParams } from '../Table/utils/handler';
 import {
   PAPPER_CONFIG,
   PAPPER_STACK_CONTAINER_SX,
@@ -267,36 +267,13 @@ export const HeadColumnsPanel: FC<HeadColumnsPanelProps> = ({ tableId }) => {
 
   const onColumnSortEnd = useCallback(
     async (event: DragEndEvent) => {
-      const { active, over } = event;
-
-      if (!over || active.id === over.id) {
+      const params = buildColumnSortParams(event);
+      if (!params) {
         return;
       }
-
-      const oldIndex = columns.findIndex((col) => col.fieldId === active.id);
-      const newIndex = columns.findIndex((col) => col.fieldId === over.id);
-
-      if (oldIndex === -1 || newIndex === -1) {
-        return;
-      }
-
-      const currentFieldId = active.id as string;
-      const newColumns = arrayMove(columns, oldIndex, newIndex);
-      const targetIndex = newColumns.findIndex(
-        (col) => col.fieldId === currentFieldId,
-      );
-
-      const beforeFieldId = newColumns[targetIndex + 1]?.fieldId;
-      const afterFieldId = newColumns[targetIndex - 1]?.fieldId;
-
-      await updateColumnOrder({
-        tableId,
-        currentFieldId,
-        beforeFieldId,
-        afterFieldId,
-      });
+      await updateColumnOrder({ tableId, ...params });
     },
-    [columns, tableId, updateColumnOrder],
+    [tableId, updateColumnOrder],
   );
 
   const onPanelClose = useCallback(() => {
