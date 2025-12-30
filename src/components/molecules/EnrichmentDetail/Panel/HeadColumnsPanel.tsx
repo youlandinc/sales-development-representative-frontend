@@ -133,8 +133,8 @@ const SortableColumnItem: FC<SortableColumnItemProps> = ({
         onClick={() => onVisibilityToggle(column.fieldId, !column.visible)}
         sx={{
           ml: 'auto',
-          width: 12,
-          height: 12,
+          width: 14,
+          height: 14,
           flexShrink: 0,
           display: !column.visible ? 'block' : 'none',
           cursor: 'pointer',
@@ -172,6 +172,12 @@ const SortableColumnSection: FC<SortableColumnSectionProps> = ({
 
   return (
     <DndContext
+      autoScroll={{
+        threshold: {
+          x: 0,
+          y: 0.2,
+        },
+      }}
       collisionDetection={closestCenter}
       onDragEnd={onDragEnd}
       sensors={sensors}
