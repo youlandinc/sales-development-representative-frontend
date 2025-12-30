@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { Icon, Stack, Typography } from '@mui/material';
 import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
@@ -8,6 +8,8 @@ import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+
+import ICON_CLOSE_THIN from '../assets/dialog/icon_close_thin.svg';
 
 interface DialogDeleteColumnProps {
   tableId: string;
@@ -36,9 +38,16 @@ export const DialogDeleteColumn: FC<DialogDeleteColumnProps> = ({
   return (
     <StyledDialog
       content={
-        <Typography color={'text.secondary'} fontSize={14} my={1.5}>
+        <Typography
+          sx={{
+            mt: 1.5,
+            mb: 3,
+            fontSize: 14,
+            color: 'text.secondary',
+          }}
+        >
           Are you sure you want to delete{' '}
-          <Typography component={'span'} fontWeight={600}>
+          <Typography component={'span'} sx={{ fontSize: 14, fontWeight: 600 }}>
             {columns.find((item) => item.fieldId === activeColumnId)
               ?.fieldName || 'this column'}
           </Typography>
@@ -46,7 +55,12 @@ export const DialogDeleteColumn: FC<DialogDeleteColumnProps> = ({
         </Typography>
       }
       footer={
-        <Stack flexDirection={'row'} gap={3}>
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            gap: 1.5,
+          }}
+        >
           <StyledButton
             color={'info'}
             onClick={() => closeDialog()}
@@ -76,7 +90,23 @@ export const DialogDeleteColumn: FC<DialogDeleteColumnProps> = ({
           </StyledButton>
         </Stack>
       }
-      header={'Confirm delete column'}
+      header={
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <Typography sx={{ fontSize: 18, fontWeight: 600 }}>
+            Confirm delete column
+          </Typography>
+          <Icon
+            component={ICON_CLOSE_THIN}
+            onClick={() => closeDialog()}
+            sx={{ height: 24, width: 24, ml: 'auto', cursor: 'pointer' }}
+          />
+        </Stack>
+      }
       onClose={() => closeDialog()}
       open={dialogVisible && dialogType === TableColumnMenuActionEnum.delete}
     />
