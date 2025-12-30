@@ -322,12 +322,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
               dialogAllEnrichmentsTabKey={dialogAllEnrichmentsTabKey}
               getActionTabValue={getActionTabValue}
               integrationsTabKey={integrationsTabKey}
-              onClickToAiTemplate={onClickToAiTemplate}
-              openDialog={openDialog}
-              setDialogAllEnrichmentsVisible={setDialogAllEnrichmentsVisible}
-              setDisplayType={setDisplayType}
               setIntegrationsTabKey={setIntegrationsTabKey}
-              setSelectedIntegrationToConfig={setSelectedIntegrationToConfig}
               setTaskTabKey={setTaskTabKey}
               taskTabKey={taskTabKey}
             />

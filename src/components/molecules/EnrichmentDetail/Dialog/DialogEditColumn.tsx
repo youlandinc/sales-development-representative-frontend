@@ -17,7 +17,7 @@ interface DialogEditColumnProps {
 }
 
 export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
-  const { columns, activeColumnId, closeDialog, updateColumnFieldName } =
+  const { columns, activeColumnId, closeDialog, updateColumnNameAndType } =
     useEnrichmentTableStore((store) => store);
 
   const column = columns.find((col) => col.fieldId === activeColumnId);
@@ -26,7 +26,7 @@ export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
   const [name, setName] = useState('');
 
   const [state, updateDescription] = useAsyncFn(async () => {
-    await updateColumnFieldName({
+    await updateColumnNameAndType({
       fieldName: name,
       fieldType: value,
     });

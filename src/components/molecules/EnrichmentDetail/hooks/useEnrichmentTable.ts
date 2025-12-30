@@ -215,7 +215,7 @@ export const useEnrichmentTable = ({
     if (columns.length > 0) {
       addColumnsToRows();
     }
-  }, [columns.length, addColumnsToRows]);
+  }, [columns?.length, addColumnsToRows]);
 
   // WebSocket integration for real-time updates
   useTableWebSocket({

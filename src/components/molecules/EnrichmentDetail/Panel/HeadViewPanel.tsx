@@ -9,6 +9,12 @@ import {
   Typography,
 } from '@mui/material';
 
+import {
+  PAPPER_CONFIG,
+  PAPPER_STACK_CONTAINER_SX,
+  STACK_CONTAINER_SX,
+} from './config';
+
 import ICON_VIEW from '../assets/head/icon-view.svg';
 
 export const HeadViewPanel = () => {
@@ -18,18 +24,15 @@ export const HeadViewPanel = () => {
     <>
       <Stack
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{
-          gap: 0.5,
-          p: 0.5,
-          borderRadius: 1,
-          flexDirection: 'row',
-          alignItems: 'center',
-          cursor: 'pointer',
-          '&:hover': { bgcolor: '#F4F5F9' },
-        }}
+        sx={STACK_CONTAINER_SX}
       >
         <Icon component={ICON_VIEW} sx={{ width: 20, height: 20 }} />
-        <Typography fontSize={14} lineHeight={1.4}>
+        <Typography
+          sx={{
+            fontSize: 14,
+            lineHeight: 1.4,
+          }}
+        >
           Default view
         </Typography>
       </Stack>
@@ -43,21 +46,18 @@ export const HeadViewPanel = () => {
       >
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} timeout={300}>
-            <Paper
-              sx={{
-                borderRadius: 2,
-                boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
-                minWidth: 260,
-              }}
-            >
+            <Paper {...PAPPER_CONFIG}>
               <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
                 <Stack
-                  alignItems={'center'}
-                  color={'text.secondary'}
-                  fontSize={14}
-                  gap={0}
-                  height={200}
-                  justifyContent={'center'}
+                  sx={{
+                    ...PAPPER_STACK_CONTAINER_SX,
+                    color: 'text.secondary',
+                    fontSize: 14,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 0,
+                    height: 200,
+                  }}
                 >
                   No content available
                 </Stack>

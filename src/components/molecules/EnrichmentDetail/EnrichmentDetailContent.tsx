@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { Icon, Stack } from '@mui/material';
-
 import { useShallow } from 'zustand/react/shallow';
+
+import { UTypeOf } from '@/utils';
+import { useEnrichmentTable } from './hooks';
 
 import {
   ActiveTypeEnum,
@@ -9,31 +11,30 @@ import {
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
-
-import { useEnrichmentTable } from './hooks';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { useDialogStore } from '@/stores/useDialogStore';
 
 import { ROW_HEIGHT } from './Table/config';
+
+import { StyledButton, StyledLoading } from '@/components/atoms';
+import { DrawerActionsContainer } from '@/components/molecules';
+import { StyledTable } from './Table';
 import {
   HeadColumnsPanel,
   HeadFilterPanel,
-  HeadRowsPanel,
+  //HeadRowsPanel,
   HeadViewPanel,
 } from './Panel';
-import { StyledTable } from './Table';
-import { StyledButton, StyledLoading } from '@/components/atoms';
-import { DrawerActionsContainer } from '@/components/molecules';
 
-import { _createTableRows } from '@/request';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
-import { useDialogStore } from '@/stores/useDialogStore';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
-import { ActiveCellParams } from '@/types';
+import { ActiveCellParams, SourceOfOpenEnum } from '@/types';
+
+import { _createTableRows } from '@/request';
 
 import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
-import { UTypeOf } from '@/utils';
 
 interface InputBindingItem {
   name: string;
@@ -79,6 +80,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   const {
     drawersType,
     // ======
+    activeColumnId,
     addColumn,
     closeDialog,
     columns,
@@ -99,6 +101,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     useShallow((store) => ({
       drawersType: store.drawersType,
 
+      activeColumnId: store.activeColumnId,
       addColumn: store.addColumn,
       closeDialog: store.closeDialog,
       columns: store.columns,
@@ -129,15 +132,23 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
 
   const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
-  const { fetchActionsMenus } = useActionsStore(
+  const { fetchActionsMenus, setSourceOfOpen } = useActionsStore(
     useShallow((state) => ({
       fetchActionsMenus: state.fetchActionsMenus,
+      setSourceOfOpen: state.setSourceOfOpen,
     })),
   );
 
   const onClickToEditWorkEmail = useWorkEmailStore(
     (store) => store.handleEditClick,
   );
+
+  const onClickActions = () => {
+    setAiTableInfo({ tableId, mappings: [] });
+    setWebResearchVisible(true, ActiveTypeEnum.add);
+    openDialog(TableColumnMenuActionEnum.actions_overview);
+    setSourceOfOpen(SourceOfOpenEnum.drawer);
+  };
 
   const [activeCell, setActiveCell] = useState<ActiveCellParams>({
     columnId: '',
@@ -250,18 +261,14 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
             }}
           >
             <HeadViewPanel />
-            <HeadColumnsPanel />
-            <HeadRowsPanel />
+            <HeadColumnsPanel tableId={tableId} />
+            {/*<HeadRowsPanel />*/}
             <HeadFilterPanel />
           </Stack>
           {isActionsButtonVisible && (
             <Stack flexDirection={'row'}>
               <StyledButton
-                onClick={() => {
-                  setAiTableInfo({ tableId, mappings: [] });
-                  setWebResearchVisible(true, ActiveTypeEnum.add);
-                  openDialog(TableColumnMenuActionEnum.actions_overview);
-                }}
+                onClick={onClickActions}
                 size={'small'}
                 variant={'contained'}
               >
@@ -299,6 +306,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               aiLoading={aiLoadingState}
               columns={columns}
               data={fullData}
+              externalActiveColumnId={activeColumnId}
               isScrolled={isScrolled}
               onAddMenuItemClick={(item) => {
                 // AI Agent opens configuration dialog

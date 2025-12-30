@@ -47,7 +47,9 @@ const BodyCellContentComponent: FC<BodyCellContentProps> = ({
     }
   }, [displayValue, width, isEditing, onTruncatedChange]);
 
-  const shouldShowPrefixIcons = !isEditing && (imagePreview || confidence);
+  const shouldShowPrefixIcons =
+    !isEditing &&
+    (imagePreview || confidence || fieldType === TableColumnTypeEnum.url);
   const shouldShowSuffixIcons = !isEditing && !isValidate && fieldType;
 
   return (
@@ -60,7 +62,12 @@ const BodyCellContentComponent: FC<BodyCellContentProps> = ({
     >
       {/* Prefix icons: Image Preview & Confidence Indicator */}
       {shouldShowPrefixIcons && (
-        <BodyCellIcons confidence={confidence} imagePreview={imagePreview} />
+        <BodyCellIcons
+          confidence={confidence}
+          fieldType={fieldType}
+          imagePreview={imagePreview}
+          value={displayValue}
+        />
       )}
 
       <Box

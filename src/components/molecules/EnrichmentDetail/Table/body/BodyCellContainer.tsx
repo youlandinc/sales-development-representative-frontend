@@ -1,4 +1,4 @@
-import { FC, memo, MouseEvent, ReactNode, useCallback } from 'react';
+import { FC, memo, MouseEvent, ReactNode, RefObject, useCallback } from 'react';
 import { Stack } from '@mui/material';
 
 import {
@@ -47,7 +47,7 @@ export interface BodyCellContainerProps {
   isSelectColumn?: boolean;
   backgroundColor: string;
   cursor?: 'pointer' | 'not-allowed' | 'default';
-  cellRef?: React.RefObject<HTMLDivElement | null>;
+  cellRef?: RefObject<HTMLDivElement | null>;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   onDoubleClick?: (e: MouseEvent<HTMLDivElement>) => void;
   onMouseEnter?: () => void;

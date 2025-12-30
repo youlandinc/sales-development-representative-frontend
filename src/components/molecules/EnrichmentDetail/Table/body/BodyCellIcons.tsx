@@ -1,6 +1,8 @@
 import { FC, memo } from 'react';
 import { Box, Tooltip } from '@mui/material';
 
+import { StyledImage } from '@/components/atoms';
+
 import { COLUMN_TYPE_LABELS } from '../config';
 import {
   TableCellConfidenceEnum,
@@ -18,6 +20,7 @@ interface BodyCellIconsProps {
   confidence?: TableCellConfidenceEnum;
   isValidate?: boolean;
   fieldType?: TableColumnTypeEnum;
+  value?: any;
 }
 
 const BodyCellIconsComponent: FC<BodyCellIconsProps> = ({
@@ -25,9 +28,37 @@ const BodyCellIconsComponent: FC<BodyCellIconsProps> = ({
   confidence,
   isValidate,
   fieldType,
+  value,
 }) => {
+  const urlHref =
+    value?.startsWith('http://') || value?.startsWith('https://')
+      ? value
+      : `https://${value}`;
+
   return (
     <>
+      {fieldType === TableColumnTypeEnum.url && value && (
+        <Box
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            window.open(urlHref, '_blank');
+          }}
+        >
+          <StyledImage
+            sx={{
+              position: 'relative',
+              marginRight: 0.5,
+              width: 16,
+              height: 16,
+              flexShrink: 0,
+              borderRadius: 2,
+              cursor: 'pointer',
+            }}
+            url="/images/table/icon-cell-url.svg"
+          />
+        </Box>
+      )}
       {/* Image Preview - Prefix (left of text) */}
       {imagePreview && (
         <Box

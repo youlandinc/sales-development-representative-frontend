@@ -14,11 +14,12 @@ import {
   _fetchTable,
   _fetchTableRowIds,
   _renameEnrichmentTable,
+  _reorderTableColumn,
   _updateTableCellValue,
-  _updateTableColumnConfig,
-  _updateTableColumnSort,
+  _updateTableColumn,
+  _updateTableColumns,
 } from '@/request';
-import { UNotUndefined } from '@/utils';
+import { UTypeOf } from '@/utils';
 
 const handleApiError = <T extends Record<string, any>>(
   err: unknown,
@@ -91,23 +92,7 @@ export type EnrichmentTableActions = {
   // table
   renameTable: (tableId: string, name: string) => Promise<void>;
   // table header
-  updateColumnWidth: (fieldId: string, width: number) => Promise<void>;
-  updateColumnName: (newName: string) => Promise<void>;
-  updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
-  updateColumnPin: (pin: boolean) => Promise<void>;
-  updateColumnDescription: (description: string) => Promise<void>;
-  updateColumnType: (fieldType: TableColumnTypeEnum) => Promise<void>;
-  updateColumnFieldName: (params: {
-    fieldName: string;
-    fieldType: TableColumnTypeEnum;
-  }) => Promise<void>;
-  deleteColumn: () => Promise<void>;
-  updateColumnOrder: (params: {
-    tableId: string;
-    currentFieldId: string;
-    beforeFieldId?: string;
-    afterFieldId?: string;
-  }) => Promise<void>;
+  // Single operation
   addColumn: (params: {
     tableId: string;
     fieldType: TableColumnTypeEnum;
@@ -115,6 +100,27 @@ export type EnrichmentTableActions = {
     afterFieldId?: string;
     fieldName?: string;
   }) => Promise<TableColumnProps | null>;
+  updateColumnOrder: (params: {
+    tableId: string;
+    currentFieldId: string;
+    beforeFieldId?: string;
+    afterFieldId?: string;
+  }) => Promise<void>;
+  updateColumnName: (newName: string) => Promise<void>;
+  updateColumnNameAndType: (params: {
+    fieldName: string;
+    fieldType: TableColumnTypeEnum;
+  }) => Promise<void>;
+  updateColumnPin: (pin: boolean) => Promise<void>;
+  updateColumnWidth: (fieldId: string, width: number) => Promise<void>;
+  // Multiple operation
+  updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
+  updateColumnsVisible: (
+    updates: { fieldId: string; visible: boolean }[],
+  ) => Promise<void>;
+  updateColumnDescription: (description: string) => Promise<void>;
+  updateColumnType: (fieldType: TableColumnTypeEnum) => Promise<void>;
+  deleteColumn: () => Promise<void>;
   // table cell
   updateCellValue: (data: {
     tableId: string;
@@ -215,7 +221,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       set({ columns: updatedColumns });
 
       try {
-        await _updateTableColumnConfig({ fieldId, width });
+        await _updateTableColumn({ fieldId, width });
       } catch (err) {
         handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
@@ -234,13 +240,13 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       set({ columns: updatedColumns });
 
       try {
-        await _updateTableColumnConfig({ fieldId, fieldName: trimmedName });
+        await _updateTableColumn({ fieldId, fieldName: trimmedName });
       } catch (err) {
         handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
     updateColumnVisible: async (fieldId, visible) => {
-      if (!fieldId || !UNotUndefined(visible)) {
+      if (!fieldId || UTypeOf.isUndefined(visible)) {
         return;
       }
       const columns = get().columns;
@@ -251,7 +257,27 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       set({ columns: updatedColumns });
 
       try {
-        await _updateTableColumnConfig({ fieldId, visible });
+        await _updateTableColumn({ fieldId, visible });
+      } catch (err) {
+        handleApiError<EnrichmentTableState>(err, { columns }, set);
+      }
+    },
+    updateColumnsVisible: async (updates) => {
+      if (!updates.length) {
+        return;
+      }
+      const columns = get().columns;
+      const updateMap = new Map(updates.map((u) => [u.fieldId, u.visible]));
+      const updatedColumns = columns.map((col) =>
+        updateMap.has(col.fieldId)
+          ? { ...col, visible: updateMap.get(col.fieldId)! }
+          : col,
+      );
+
+      set({ columns: updatedColumns });
+
+      try {
+        await _updateTableColumns(updates);
       } catch (err) {
         handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
@@ -259,7 +285,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
     updateColumnPin: async (pin) => {
       const { fieldId, columns, column } = getActiveColumn(get);
 
-      if (!fieldId || !column || !UNotUndefined(pin)) {
+      if (!fieldId || !column || UTypeOf.isUndefined(pin)) {
         return;
       }
 
@@ -271,7 +297,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       });
 
       try {
-        await _updateTableColumnConfig({ fieldId, pin });
+        await _updateTableColumn({ fieldId, pin });
       } catch (err) {
         handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
@@ -280,7 +306,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       const { fieldId, columns, column } = getActiveColumn(get);
 
       const trimmedDescription = description.trim();
-      if (!fieldId || !column || !UNotUndefined(trimmedDescription)) {
+      if (!fieldId || !column || UTypeOf.isUndefined(trimmedDescription)) {
         return;
       }
 
@@ -294,7 +320,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       });
 
       try {
-        await _updateTableColumnConfig({
+        await _updateTableColumn({
           fieldId,
           description: trimmedDescription,
         });
@@ -305,7 +331,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
     updateColumnType: async (fieldType) => {
       const { fieldId, columns, column } = getActiveColumn(get);
 
-      if (!fieldId || !column || !UNotUndefined(fieldType)) {
+      if (!fieldId || !column || !fieldType) {
         return;
       }
 
@@ -322,7 +348,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       });
 
       try {
-        await _updateTableColumnConfig({
+        await _updateTableColumn({
           fieldId,
           fieldType,
         });
@@ -330,7 +356,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         handleApiError<EnrichmentTableState>(err, { columns }, set);
       }
     },
-    updateColumnFieldName: async (params) => {
+    updateColumnNameAndType: async (params) => {
       const { fieldId, columns, column } = getActiveColumn(get);
 
       const trimmedFieldName = params.fieldName.trim();
@@ -348,7 +374,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       });
 
       try {
-        await _updateTableColumnConfig({
+        await _updateTableColumn({
           fieldId,
           fieldName: trimmedFieldName,
           fieldType: params.fieldType,
@@ -471,7 +497,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       set({ columns: newColumns });
 
       try {
-        await _updateTableColumnSort(params);
+        await _reorderTableColumn(params);
       } catch (err) {
         set({ columns: oldColumns });
         handleApiError(err, { columns: oldColumns }, set);

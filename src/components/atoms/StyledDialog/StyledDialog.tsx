@@ -105,7 +105,7 @@ export const StyledDialog: FC<StyledDialogProps> = ({
             },
             '& .MuiPaper-root': {
               transition: 'all 0.3s ease-in-out',
-              borderRadius: rest.fullScreen ? 0 : 2,
+              borderRadius: rest.fullScreen ? 0 : 4,
               width: rest.fullScreen
                 ? '100%'
                 : {
