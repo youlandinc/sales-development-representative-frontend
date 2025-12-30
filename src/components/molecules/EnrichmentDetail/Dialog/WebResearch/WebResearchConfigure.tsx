@@ -500,7 +500,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         </Stack>
       </CollapseCard>
       {/*Run settings*/}
-      <CollapseCard title={'Run settings'}>
+      {/* <CollapseCard title={'Run settings'}>
         <Stack gap={1.5}>
           <Stack flexDirection={'row'} justifyContent={'space-between'}>
             <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
@@ -518,16 +518,16 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
               </Tooltip>
             </Stack>
             <StyledSwitch checked={visible} onChange={toggle} />
-          </Stack>
-          {/*<Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>*/}
-          {/*  <Typography variant={'subtitle1'}>Only run if</Typography>*/}
-          {/*  <Tooltip title={'Only run if this formula resolves to true.'}>*/}
-          {/*    <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />*/}
-          {/*  </Tooltip>*/}
-          {/*</Stack>*/}
-          {/*<FormulaEditor initialValue={{}} style={{ padding: '4px' }} />*/}
-        </Stack>
-      </CollapseCard>
+          </Stack> */}
+      {/*<Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>*/}
+      {/*  <Typography variant={'subtitle1'}>Only run if</Typography>*/}
+      {/*  <Tooltip title={'Only run if this formula resolves to true.'}>*/}
+      {/*    <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />*/}
+      {/*  </Tooltip>*/}
+      {/*</Stack>*/}
+      {/*<FormulaEditor initialValue={{}} style={{ padding: '4px' }} />*/}
+      {/* </Stack>
+      </CollapseCard> */}
     </Stack>
   );
 };

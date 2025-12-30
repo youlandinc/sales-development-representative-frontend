@@ -1,5 +1,56 @@
+import { DragEndEvent } from '@dnd-kit/core';
+
 import { TableColumnProps } from '@/types/enrichment/table';
 import { NON_EDITABLE_ACTION_KEYS, SYSTEM_COLUMN_SELECT } from '../config';
+
+export interface ColumnSortParams {
+  tableId: string;
+  currentFieldId: string;
+  beforeFieldId?: string;
+  afterFieldId?: string;
+}
+
+/**
+ * Build column sort params from DragEndEvent
+ * Used by both HeadColumnsPanel and StyledTable
+ *
+ * @param event - DragEndEvent from dnd-kit
+ * @returns ColumnSortParams or null if invalid
+ */
+export const buildColumnSortParams = (
+  event: DragEndEvent,
+): Omit<ColumnSortParams, 'tableId'> | null => {
+  const { active, over } = event;
+
+  if (!over || active.id === over.id) {
+    return null;
+  }
+
+  const currentFieldId = String(active.id);
+  const overFieldId = String(over.id);
+
+  const activeIndex = active.data.current?.sortable.index as number;
+  const overIndex = over.data.current?.sortable.index as number;
+
+  if (activeIndex === -1 || overIndex === -1) {
+    return null;
+  }
+
+  let beforeFieldId: string | undefined;
+  let afterFieldId: string | undefined;
+
+  if (activeIndex < overIndex) {
+    afterFieldId = overFieldId;
+  } else {
+    beforeFieldId = overFieldId;
+  }
+
+  return {
+    currentFieldId,
+    beforeFieldId,
+    afterFieldId,
+  };
+};
 
 /**
  * Check if a column is an AI column
