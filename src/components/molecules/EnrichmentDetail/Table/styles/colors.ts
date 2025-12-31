@@ -7,8 +7,8 @@ export const TABLE_COLORS = {
   ROW_BORDER: '#F0EFF5',
 
   // Selection & Focus
-  SELECTION_BORDER: '#B0ADBD',
-  SELECTION_OUTLINE: '#D0CEDA',
+  SELECTION_BORDER: '#6F6C7D',
+  SELECTION_OUTLINE: '#6F6C7D',
   ACTIVE_BORDER: '#5B76BC',
 
   // Backgrounds

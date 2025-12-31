@@ -29,3 +29,15 @@ export enum TableFilterConditionType {
   is_not_running = 'IS_NOT_RUNNING',
   is_stale = 'IS_STALE',
 }
+
+export interface TableFilterItem {
+  fieldId: string;
+  conditionType: TableFilterConditionType;
+  values: string | string[];
+}
+
+export interface TableFilterGroupItem {
+  filters: TableFilterItem[];
+}
+
+export type TableFilterRequestParams = TableFilterGroupItem[];

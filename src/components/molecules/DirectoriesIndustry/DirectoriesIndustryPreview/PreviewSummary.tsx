@@ -45,7 +45,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
               transition: 'filter 0.2s ease',
             }}
           >
-            {previewCount.toLocaleString()}
+            {previewCount?.toLocaleString()}
           </Box>{' '}
           of{' '}
           <Box
@@ -55,7 +55,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
               transition: 'filter 0.2s ease',
             }}
           >
-            {totalCount.toLocaleString()}
+            {totalCount?.toLocaleString()}
           </Box>{' '}
           {totalCount === 1 ? 'record' : 'records'}.{' '}
           <Box
@@ -65,7 +65,7 @@ export const PreviewSummary: FC<PreviewSummaryProps> = ({
               transition: 'filter 0.2s ease',
             }}
           >
-            {importCount.toLocaleString()}
+            {importCount?.toLocaleString()}
           </Box>{' '}
           will be imported.
         </Typography>

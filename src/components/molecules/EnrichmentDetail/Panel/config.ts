@@ -1,15 +1,16 @@
-export const PAPPER_CONFIG = {
-  sx: {
-    transformOrigin: 'left top',
-    mt: 1,
-    borderRadius: 2,
-    border: '1px solid #E9E9EF',
-    boxShadow: ' 0 1px 4px 0 rgba(50, 43, 83, 0.16)',
-  },
+export const PAPPER_SX = {
+  transformOrigin: 'left top',
+  mt: 1,
+  mx: 3,
+  borderRadius: 2,
+  border: '1px solid #E9E9EF',
+  boxShadow: '0 1px 4px 0 rgba(50, 43, 83, 0.16)',
 };
 
 export const PAPPER_STACK_CONTAINER_SX = {
-  width: 300,
+  width: 'fit-content',
+  maxWidth: 760,
+  minWidth: 300,
   maxHeight: 500,
   overflowX: 'hidden',
 };

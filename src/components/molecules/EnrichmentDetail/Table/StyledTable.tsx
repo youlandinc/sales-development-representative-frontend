@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Checkbox, ClickAwayListener, Icon, Stack } from '@mui/material';
@@ -49,9 +50,6 @@ import { BodyCell } from './body';
 import { MenuColumnAi, MenuColumnInsert, MenuColumnNormal } from './menu';
 import { CommonOverlay, CommonSpacer } from './common';
 
-import ICON_TYPE_ADD from './assets/icon-type-add.svg';
-import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
-
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
@@ -63,6 +61,9 @@ import {
   checkIsEditableColumn,
 } from './utils';
 import { UTypeOf } from '@/utils';
+
+import ICON_TYPE_ADD from './assets/icon-type-add.svg';
+import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
 
 // ============================================
 // Type Definitions
@@ -208,21 +209,26 @@ export const StyledTable: FC<StyledTableProps> = ({
   const [headerState, setHeaderState] =
     useState<HeaderState>(HEADER_STATE_RESET);
 
-  // Sync external activeColumnId with headerState
+  // Sync external activeColumnId to headerState ONLY when external value changes
+  // Pattern from React docs: store prevProps to compare
+  const prevExternalActiveColumnIdRef = useRef(externalActiveColumnId);
   useEffect(() => {
-    if (
-      externalActiveColumnId &&
-      externalActiveColumnId !== headerState.activeColumnId
-    ) {
-      setHeaderState((prev) => ({
-        ...prev,
-        activeColumnId: externalActiveColumnId,
-        focusedColumnId: externalActiveColumnId,
-        isMenuOpen: false,
-        isEditing: false,
-      }));
+    // Only sync if external value actually changed (not internal state change)
+    if (externalActiveColumnId !== prevExternalActiveColumnIdRef.current) {
+      prevExternalActiveColumnIdRef.current = externalActiveColumnId;
+      // When external changes, update headerState
+      if (externalActiveColumnId) {
+        setHeaderState((prev) => ({
+          ...prev,
+          activeColumnId: externalActiveColumnId,
+          focusedColumnId: externalActiveColumnId,
+          isMenuOpen: false,
+          isEditing: false,
+        }));
+      }
     }
   }, [externalActiveColumnId]);
+
   // TODO: Menu state optimization
   // 1. Merge three menu anchors into unified menuState object
   // 2. Reduce state count, improve maintainability
@@ -849,28 +855,16 @@ export const StyledTable: FC<StyledTableProps> = ({
         return;
       }
 
-      // Click on non-active header → activate and show menu
-      if (!cellState || hasActiveCellInOtherColumn) {
-        setHeaderState({
-          activeColumnId: columnId,
-          focusedColumnId: columnId,
-          isMenuOpen: true,
-          isEditing: false,
-          selectedColumnIds: [],
-        });
-        setAddMenuAnchor(null);
-        setHeaderMenuAnchor(e.currentTarget as HTMLElement);
-        return;
-      }
-
-      // Default: activate without menu
+      // Default: click on non-active header → activate and show menu
       setHeaderState({
         activeColumnId: columnId,
         focusedColumnId: columnId,
-        isMenuOpen: false,
+        isMenuOpen: true,
         isEditing: false,
         selectedColumnIds: [],
       });
+      setAddMenuAnchor(null);
+      setHeaderMenuAnchor(e.currentTarget as HTMLElement);
     },
     [
       columnSizingInfo.isResizingColumn,

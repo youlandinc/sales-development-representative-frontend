@@ -72,3 +72,8 @@ export interface ActiveCellParams {
   columnId: string;
   rowId: string;
 }
+
+export interface RunRecordItem {
+  recordIds: string[];
+  isAll: boolean;
+}
