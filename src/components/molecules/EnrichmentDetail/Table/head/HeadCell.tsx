@@ -288,10 +288,9 @@ export const HeadCell = forwardRef<HTMLDivElement, TableHeadCellProps>(
             display: 'flex',
             alignItems: 'center',
             px: 1.5,
-            boxShadow: (theme) =>
-              isEditing
-                ? `inset 0 0 0 .5px ${theme.palette.primary.main}`
-                : 'none',
+            boxShadow: isEditing
+              ? `inset 0 0 0 2px ${TABLE_COLORS.SELECTION_BORDER}`
+              : 'none',
             position: 'relative',
           }}
         >

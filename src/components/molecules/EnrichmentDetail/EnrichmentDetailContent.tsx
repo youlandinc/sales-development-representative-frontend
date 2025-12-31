@@ -177,7 +177,8 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     aiLoadingState,
     scrollContainerRef,
     isScrolled,
-    isMetadataLoading,
+    isTableLoading,
+    isRowIdsLoading,
     onVisibleRangeChange,
     onAiProcess,
     onCellEdit,
@@ -245,43 +246,52 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
       }}
     >
       <Stack sx={{ flex: 1, width: 0 }}>
-        <Stack
-          sx={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            p: '12px 24px 12px 16px',
-          }}
-        >
+        {!isTableLoading && columns.length > 0 && (
           <Stack
             sx={{
-              alignItems: 'center',
               flexDirection: 'row',
-              gap: 3,
-              height: 32,
+              justifyContent: 'space-between',
+              p: '12px 24px 12px 16px',
             }}
           >
-            <HeadViewPanel />
-            <HeadColumnsPanel tableId={tableId} />
-            {/*<HeadRowsPanel />*/}
-            <HeadFilterPanel />
-          </Stack>
-          {isActionsButtonVisible && (
-            <Stack flexDirection={'row'}>
-              <StyledButton
-                onClick={onClickActions}
-                size={'small'}
-                variant={'contained'}
-              >
-                <Stack
-                  sx={{ alignItems: 'center', flexDirection: 'row', gap: 0.5 }}
-                >
-                  Actions
-                  <Icon component={ICON_ARROW} sx={{ width: 16, height: 16 }} />
-                </Stack>
-              </StyledButton>
+            <Stack
+              sx={{
+                alignItems: 'center',
+                flexDirection: 'row',
+                gap: 3,
+                height: 32,
+              }}
+            >
+              <HeadViewPanel tableId={tableId} />
+              <HeadColumnsPanel tableId={tableId} />
+              {/*<HeadRowsPanel />*/}
+              <HeadFilterPanel />
             </Stack>
-          )}
-        </Stack>
+            {isActionsButtonVisible && (
+              <Stack flexDirection={'row'}>
+                <StyledButton
+                  onClick={onClickActions}
+                  size={'small'}
+                  variant={'contained'}
+                >
+                  <Stack
+                    sx={{
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      gap: 0.5,
+                    }}
+                  >
+                    Actions
+                    <Icon
+                      component={ICON_ARROW}
+                      sx={{ width: 16, height: 16 }}
+                    />
+                  </Stack>
+                </StyledButton>
+              </Stack>
+            )}
+          </Stack>
+        )}
         <Stack
           ref={scrollContainerRef}
           sx={{
@@ -292,7 +302,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
             flex: 1,
           }}
         >
-          {isMetadataLoading ? (
+          {isTableLoading || isRowIdsLoading ? (
             <Stack
               alignItems={'center'}
               flex={1}
@@ -301,7 +311,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
             >
               <StyledLoading size={24} sx={{ color: '#D0CEDA !important' }} />
             </Stack>
-          ) : (
+          ) : columns.length === 0 ? null : (
             <StyledTable
               aiLoading={aiLoadingState}
               columns={columns}

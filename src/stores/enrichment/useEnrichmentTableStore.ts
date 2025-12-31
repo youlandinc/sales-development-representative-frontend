@@ -71,6 +71,7 @@ export type EnrichmentTableState = {
   columns: TableColumnProps[];
   activeColumnId: string;
   views: TableViewData[];
+  activeViewId: string;
 
   rowIds: string[];
   runRecords: {
@@ -87,7 +88,7 @@ export type EnrichmentTableActions = {
     } | null;
     fields: TableColumnProps[];
   }>;
-  fetchRowIds: (tableId: string) => Promise<void>;
+  fetchRowIds: (tableId: string, viewId?: string) => Promise<void>;
   setRowIds: (rowIds: string[]) => void;
   // helper
   setActiveColumnId: (columnId: string) => void;
@@ -150,6 +151,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       TableColumnMenuActionEnum.ai_agent,
     ],
     views: [],
+    activeViewId: '',
     tableName: '',
     columns: [],
     activeColumnId: '',
@@ -167,12 +169,14 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
           data: { fields, tableName, runRecords, fieldGroupMap, views },
         } = await _fetchTable(tableId);
         result = runRecords;
+        const defaultView = (views ?? []).find((view) => view.isDefaultOpen);
         set({
           columns: fields,
           tableName,
           runRecords: runRecords ?? null,
           fieldGroupMap,
           views: views ?? [],
+          activeViewId: defaultView?.viewId ?? '',
         });
         return { runRecords: result, fields };
       } catch (err) {
@@ -180,22 +184,26 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         return { runRecords: result, fields: [] };
       }
     },
-    fetchRowIds: async (tableId) => {
+    fetchRowIds: async (tableId, viewId) => {
       if (!tableId) {
         return;
       }
-      const views = get().views;
-      const defaultView = views.find((view) => view.isDefaultOpen);
-      if (!defaultView) {
+      const { views, activeViewId } = get();
+      // Use passed viewId, or activeViewId from store, or find default
+      const targetViewId = viewId || activeViewId;
+      const targetView = targetViewId
+        ? views.find((view) => view.viewId === targetViewId)
+        : views.find((view) => view.isDefaultOpen);
+      if (!targetView) {
         return;
       }
       try {
         const { data } = await _fetchTableRowIds({
           tableId,
-          viewId: defaultView.viewId,
-          filters: defaultView.filters ?? undefined,
+          viewId: targetView.viewId,
+          filters: targetView.filters ?? undefined,
         });
-        set({ rowIds: data });
+        set({ rowIds: data, activeViewId: targetView.viewId });
       } catch (err) {
         handleApiError<EnrichmentTableState>(err);
       }
@@ -539,6 +547,8 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         rowIds: [],
         runRecords: null,
         fieldGroupMap: null,
+        views: [],
+        activeViewId: '',
       });
     },
   }),

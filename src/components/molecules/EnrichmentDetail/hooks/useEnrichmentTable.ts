@@ -31,7 +31,8 @@ interface UseEnrichmentTableReturn {
   fullData: any[];
   aiLoadingState: Record<string, Record<string, boolean>>;
   aiColumnIds: Set<string>;
-  isMetadataLoading: boolean;
+  isTableLoading: boolean;
+  isRowIdsLoading: boolean;
   scrollContainerRef: RefObject<HTMLDivElement | null>;
   rowsMapRef: RefObject<Record<string, any>>;
   isScrolled: boolean;
@@ -64,6 +65,7 @@ export const useEnrichmentTable = ({
     columns,
     rowIds,
     runRecords,
+    activeViewId,
     resetTable,
     updateCellValue,
   } = useEnrichmentTableStore(
@@ -73,6 +75,7 @@ export const useEnrichmentTable = ({
       columns: store.columns,
       rowIds: store.rowIds,
       runRecords: store.runRecords,
+      activeViewId: store.activeViewId,
       resetTable: store.resetTable,
       updateCellValue: store.updateCellValue,
     })),
@@ -114,16 +117,24 @@ export const useEnrichmentTable = ({
     null,
   );
 
-  // Fetch metadata (headers and rowIds)
-  // fetchRowIds depends on views from fetchTable, so must be sequential
-  const { isLoading: isMetadataLoading } = useSWR(
-    tableId ? `metadata-${tableId}` : null,
-    async () => {
-      await fetchTable(tableId);
-      await fetchRowIds(tableId);
-    },
+  // Fetch table metadata (controls full page loading)
+  const { isLoading: isTableLoading } = useSWR(
+    tableId ? `table-${tableId}` : null,
+    () => fetchTable(tableId),
     {
       revalidateOnFocus: false,
+      revalidateOnMount: true,
+    },
+  );
+
+  // Fetch rowIds (controls table loading, depends on views from fetchTable)
+  // Key includes activeViewId so switching views triggers refetch
+  const { isLoading: isRowIdsLoading } = useSWR(
+    tableId && activeViewId ? `rowIds-${tableId}-${activeViewId}` : null,
+    () => fetchRowIds(tableId),
+    {
+      revalidateOnFocus: false,
+      revalidateOnMount: true,
     },
   );
 
@@ -324,7 +335,7 @@ export const useEnrichmentTable = ({
 
   // Initial data load
   useEffect(() => {
-    if (!tableId || total === 0 || isMetadataLoading) {
+    if (!tableId || total === 0 || isTableLoading) {
       return;
     }
     fetchBatchData(0, Math.min(MIN_BATCH_SIZE - 1, total - 1));
@@ -335,7 +346,7 @@ export const useEnrichmentTable = ({
     tableId,
     total,
     fetchBatchData,
-    isMetadataLoading,
+    isTableLoading,
     fetchActionsMenus,
     fetchWebResearchModelList,
     fetchDialogAllEnrichments,
@@ -794,7 +805,8 @@ export const useEnrichmentTable = ({
     fullData,
     aiLoadingState,
     aiColumnIds,
-    isMetadataLoading,
+    isTableLoading,
+    isRowIdsLoading,
     scrollContainerRef,
     rowsMapRef,
     isScrolled,

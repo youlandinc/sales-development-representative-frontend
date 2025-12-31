@@ -41,7 +41,7 @@ export const HeadFilterPanel = () => {
   return (
     <>
       <Stack
-        onClick={(e) => setAnchorEl(e.currentTarget)}
+        onClick={(e) => setAnchorEl(anchorEl ? null : e.currentTarget)}
         sx={STACK_CONTAINER_SX}
       >
         <Icon component={ICON_FILTER} sx={{ width: 20, height: 20 }} />
