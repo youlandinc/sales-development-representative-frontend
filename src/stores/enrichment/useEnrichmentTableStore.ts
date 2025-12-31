@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { arrayMove } from '@dnd-kit/sortable';
 
 import { ColumnFieldGroupMap, HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
@@ -6,6 +7,7 @@ import {
   TableColumnMenuActionEnum,
   TableColumnProps,
   TableColumnTypeEnum,
+  TableViewData,
 } from '@/types/enrichment/table';
 
 import {
@@ -60,13 +62,15 @@ const getActiveColumn = (
 };
 
 export type EnrichmentTableState = {
-  tableName: string;
-  columns: TableColumnProps[];
-  activeColumnId: string;
   // dialog
   dialogVisible: boolean;
   dialogType: TableColumnMenuActionEnum | null;
   drawersType: TableColumnMenuActionEnum[];
+
+  tableName: string;
+  columns: TableColumnProps[];
+  activeColumnId: string;
+  views: TableViewData[];
 
   rowIds: string[];
   runRecords: {
@@ -136,9 +140,6 @@ export type EnrichmentTableStoreProps = EnrichmentTableState &
 
 export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
   (set, get) => ({
-    tableName: '',
-    columns: [],
-    activeColumnId: '',
     dialogVisible: false,
     dialogType: null,
     drawersType: [
@@ -148,6 +149,10 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       TableColumnMenuActionEnum.work_email,
       TableColumnMenuActionEnum.ai_agent,
     ],
+    views: [],
+    tableName: '',
+    columns: [],
+    activeColumnId: '',
     rowIds: [],
     runRecords: null,
     fieldGroupMap: null,
@@ -159,7 +164,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
 
       try {
         const {
-          data: { fields, tableName, runRecords, fieldGroupMap },
+          data: { fields, tableName, runRecords, fieldGroupMap, views },
         } = await _fetchTable(tableId);
         result = runRecords;
         set({
@@ -167,6 +172,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
           tableName,
           runRecords: runRecords ?? null,
           fieldGroupMap,
+          views: views ?? [],
         });
         return { runRecords: result, fields };
       } catch (err) {
@@ -178,8 +184,17 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       if (!tableId) {
         return;
       }
+      const views = get().views;
+      const defaultView = views.find((view) => view.isDefaultOpen);
+      if (!defaultView) {
+        return;
+      }
       try {
-        const { data } = await _fetchTableRowIds(tableId);
+        const { data } = await _fetchTableRowIds({
+          tableId,
+          viewId: defaultView.viewId,
+          filters: defaultView.filters ?? undefined,
+        });
         set({ rowIds: data });
       } catch (err) {
         handleApiError<EnrichmentTableState>(err);
@@ -461,39 +476,40 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         return;
       }
 
-      const currentColumn = columns[currentIndex];
-      const withoutCurrent = columns.filter(
-        (col) => col.fieldId !== currentFieldId,
-      );
+      // API semantics:
+      // - afterFieldId = X means X will be AFTER the moved item (insert at X's position)
+      // - beforeFieldId = X means X will be BEFORE the moved item (insert after X)
+      let newIndex: number;
 
-      let insertIndex: number;
-
-      if (beforeFieldId) {
-        insertIndex = withoutCurrent.findIndex(
-          (col) => col.fieldId === beforeFieldId,
-        );
-        if (insertIndex === -1) {
-          return;
-        }
-      } else if (afterFieldId) {
-        const afterIndex = withoutCurrent.findIndex(
+      if (afterFieldId) {
+        const afterIndex = columns.findIndex(
           (col) => col.fieldId === afterFieldId,
         );
         if (afterIndex === -1) {
           return;
         }
-        insertIndex = afterIndex + 1;
+        // Insert at afterFieldId's position (it will move after)
+        newIndex = afterIndex;
+      } else if (beforeFieldId) {
+        const beforeIndex = columns.findIndex(
+          (col) => col.fieldId === beforeFieldId,
+        );
+        if (beforeIndex === -1) {
+          return;
+        }
+        // Insert after beforeFieldId
+        newIndex = beforeIndex + 1;
       } else {
         return;
       }
 
-      const newColumns: TableColumnProps[] = [
-        ...withoutCurrent.slice(0, insertIndex),
-        currentColumn,
-        ...withoutCurrent.slice(insertIndex),
-      ];
+      // Adjust newIndex if moving from before to after
+      if (currentIndex < newIndex) {
+        newIndex -= 1;
+      }
 
       const oldColumns = columns;
+      const newColumns = arrayMove(columns, currentIndex, newIndex);
       set({ columns: newColumns });
 
       try {

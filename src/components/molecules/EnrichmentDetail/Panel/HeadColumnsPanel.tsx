@@ -31,8 +31,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { COLUMN_TYPE_ICONS } from '../Table/config';
 import { buildColumnSortParams } from '../Table/utils/handler';
 import {
-  PAPPER_CONFIG,
   PAPPER_STACK_CONTAINER_SX,
+  PAPPER_SX,
   STACK_CONTAINER_SX,
 } from './config';
 
@@ -320,7 +320,7 @@ export const HeadColumnsPanel: FC<HeadColumnsPanelProps> = ({ tableId }) => {
         sx={STACK_CONTAINER_SX}
       >
         <Icon component={ICON_COLUMN} sx={{ width: 20, height: 20 }} />
-        <Typography fontSize={14} lineHeight={1.4}>
+        <Typography sx={{ fontSize: 14, lineHeight: 1.4 }}>
           {columnsVisible}/{columns.length} columns
         </Typography>
       </Stack>
@@ -328,13 +328,13 @@ export const HeadColumnsPanel: FC<HeadColumnsPanelProps> = ({ tableId }) => {
       <Popper
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
-        placement="bottom-start"
+        placement="bottom"
         sx={{ zIndex: 1300 }}
         transition
       >
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} timeout={300}>
-            <Paper {...PAPPER_CONFIG}>
+            <Paper sx={PAPPER_SX}>
               <ClickAwayListener onClickAway={onPanelClose}>
                 <Stack
                   sx={{
@@ -380,9 +380,9 @@ export const HeadColumnsPanel: FC<HeadColumnsPanelProps> = ({ tableId }) => {
                       px: 1.5,
                       py: 0.75,
                       height: 32,
+                      gap: 1,
                       flexDirection: 'row',
                       alignItems: 'center',
-                      gap: 1,
                       cursor: 'pointer',
                       '&:hover': {
                         bgcolor: '#F4F5F9',
@@ -412,9 +412,9 @@ export const HeadColumnsPanel: FC<HeadColumnsPanelProps> = ({ tableId }) => {
                       px: 1.5,
                       py: 0.75,
                       height: 32,
+                      gap: 1,
                       flexDirection: 'row',
                       alignItems: 'center',
-                      gap: 1,
                       cursor: 'pointer',
                       '&:hover': {
                         bgcolor: '#F4F5F9',

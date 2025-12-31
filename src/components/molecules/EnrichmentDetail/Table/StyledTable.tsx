@@ -49,9 +49,6 @@ import { BodyCell } from './body';
 import { MenuColumnAi, MenuColumnInsert, MenuColumnNormal } from './menu';
 import { CommonOverlay, CommonSpacer } from './common';
 
-import ICON_TYPE_ADD from './assets/icon-type-add.svg';
-import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
-
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
@@ -63,6 +60,9 @@ import {
   checkIsEditableColumn,
 } from './utils';
 import { UTypeOf } from '@/utils';
+
+import ICON_TYPE_ADD from './assets/icon-type-add.svg';
+import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
 
 // ============================================
 // Type Definitions
@@ -222,7 +222,7 @@ export const StyledTable: FC<StyledTableProps> = ({
         isEditing: false,
       }));
     }
-  }, [externalActiveColumnId]);
+  }, [externalActiveColumnId, headerState.activeColumnId]);
   // TODO: Menu state optimization
   // 1. Merge three menu anchors into unified menuState object
   // 2. Reduce state count, improve maintainability

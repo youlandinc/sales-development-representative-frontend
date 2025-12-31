@@ -1,25 +1,23 @@
 import { del, get, patch, post, put } from '@/request/request';
-import { ColumnFieldGroupMap } from '@/types';
 import {
   TableCellProps,
   TableColumnProps,
   TableColumnTypeEnum,
+  TableDataApiResponse,
   UpdateTableColumnConfigParams,
 } from '@/types/enrichment/table';
+import { TableFilterRequestParams } from '@/types/enrichment/tableFilter';
 
 export const _fetchTable = (tableId: string) => {
-  return get<{
-    fields: TableColumnProps[];
-    tableName: string;
-    runRecords: {
-      [key: string]: { recordIds: string[]; isAll: boolean };
-    };
-    fieldGroupMap: ColumnFieldGroupMap;
-  }>(`/sdr/table/${tableId}`);
+  return get<TableDataApiResponse>(`/sdr/table/${tableId}`);
 };
 
-export const _fetchTableRowIds = (tableId: string) => {
-  return get(`/sdr/table/data/${tableId}/ids`);
+export const _fetchTableRowIds = (params: {
+  tableId: string;
+  viewId: string;
+  filters?: TableFilterRequestParams;
+}) => {
+  return post('/sdr/table/data/ids', params);
 };
 
 export const _fetchTableRowData = (params: {
@@ -85,20 +83,6 @@ export const _createTableColumn = (params: {
   fieldType: TableColumnTypeEnum;
   beforeFieldId?: string; // Insert before this field
   afterFieldId?: string; // Insert after this field
-  // If neither beforeFieldId nor afterFieldId provided, insert at end
-  //actionKey?: string;
-  //groupId?: string;
-  //isExtractedField?: boolean;
-  //dependentFieldId?: string;
-  //typeSettings?: {
-  //  inputBinding?: Array<{
-  //    name: string;
-  //    optional?: boolean;
-  //    formulaText?: string;
-  //  }>;
-  //  optionalPathsInInputs?: Record<string, any>;
-  //};
-  //actionDefinition?: any;
 }) => {
   // API v2 returns the created column directly
   return post<TableColumnProps>('/sdr/table/field/v2', params);

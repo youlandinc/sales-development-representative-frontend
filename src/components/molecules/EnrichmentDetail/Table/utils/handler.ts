@@ -20,7 +20,7 @@ export interface ColumnSortParams {
 export const buildColumnSortParams = (
   event: DragEndEvent,
 ): Omit<ColumnSortParams, 'tableId'> | null => {
-  const { active, over } = event;
+  const { active, over, delta } = event;
 
   if (!over || active.id === over.id) {
     return null;
@@ -29,20 +29,30 @@ export const buildColumnSortParams = (
   const currentFieldId = String(active.id);
   const overFieldId = String(over.id);
 
-  const activeIndex = active.data.current?.sortable.index as number;
-  const overIndex = over.data.current?.sortable.index as number;
-
-  if (activeIndex === -1 || overIndex === -1) {
-    return null;
-  }
-
   let beforeFieldId: string | undefined;
   let afterFieldId: string | undefined;
 
-  if (activeIndex < overIndex) {
+  // Get sortable data to determine target position
+  const sortableData = over.data.current?.sortable;
+  const overIndex = sortableData?.index ?? -1;
+  const items = sortableData?.items ?? [];
+
+  const isMovingForward = delta.x > 0 || delta.y > 0;
+  const isMovingToFirst = overIndex === 0 && !isMovingForward;
+
+  // Original pattern:
+  // - Only first position uses afterId
+  // - All other positions use beforeId
+  if (isMovingToFirst) {
+    // First position: afterFieldId = first item (it will be after us)
     afterFieldId = overFieldId;
-  } else {
+  } else if (isMovingForward) {
+    // Moving right/down: beforeFieldId = over (it will be before us)
     beforeFieldId = overFieldId;
+  } else {
+    // Moving left/up (not first): beforeFieldId = item before over
+    const previousItemId = items[overIndex - 1];
+    beforeFieldId = previousItemId ? String(previousItemId) : overFieldId;
   }
 
   return {

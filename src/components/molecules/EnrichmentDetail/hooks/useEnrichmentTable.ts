@@ -115,10 +115,12 @@ export const useEnrichmentTable = ({
   );
 
   // Fetch metadata (headers and rowIds)
+  // fetchRowIds depends on views from fetchTable, so must be sequential
   const { isLoading: isMetadataLoading } = useSWR(
     tableId ? `metadata-${tableId}` : null,
     async () => {
-      await Promise.all([fetchTable(tableId), fetchRowIds(tableId)]);
+      await fetchTable(tableId);
+      await fetchRowIds(tableId);
     },
     {
       revalidateOnFocus: false,

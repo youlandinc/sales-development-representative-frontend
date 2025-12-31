@@ -2,6 +2,13 @@
 // Enums
 // ============================================================================
 
+import {
+  ColumnFieldGroupMap,
+  RunRecordItem,
+  TableFilterConditionType,
+  TableFilterGroupItem,
+} from '@/types';
+
 export enum TableColumnTypeEnum {
   text = 'TEXT',
   number = 'NUMBER',
@@ -41,6 +48,45 @@ export enum TableCellConfidenceEnum {
   low = 'LOW',
   medium = 'MEDIUM',
   high = 'HIGH',
+}
+
+export interface TableDataApiResponse {
+  runRecords: {
+    [key: string]: RunRecordItem;
+  } | null;
+  fields: TableColumnProps[];
+  fieldGroupMap: ColumnFieldGroupMap | null;
+  description: null | string;
+
+  tableName: string;
+  tableId: string;
+  views: TableViewData[];
+
+  source: string;
+
+  updatedAt: string;
+  updatedBy: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export enum TableViewTypeEnum {
+  general = 'GENERAL',
+  missing_data = 'MISSING_DATA',
+  errored = 'ERRORED',
+}
+
+export interface TableViewData {
+  tableId: string;
+
+  viewId: string;
+  viewName: string;
+  viewDescription: string | null;
+  viewType: TableViewTypeEnum;
+
+  filters: TableFilterGroupItem[] | null;
+  isDefaultOpen: boolean;
+  isPreconfigured: boolean;
 }
 
 // ============================================================================
@@ -87,6 +133,13 @@ export interface TableColumnProps {
   } | null;
   isExtractedField: boolean | null;
   mappingField: string | null;
+
+  supportedFilterOperators:
+    | {
+        operator: TableFilterConditionType;
+        needsValue: boolean;
+      }[]
+    | null;
 }
 
 // Runtime column meta (extends TableColumnProps with computed fields)

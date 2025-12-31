@@ -10,8 +10,8 @@ import {
 } from '@mui/material';
 
 import {
-  PAPPER_CONFIG,
   PAPPER_STACK_CONTAINER_SX,
+  PAPPER_SX,
   STACK_CONTAINER_SX,
 } from './config';
 
@@ -46,7 +46,7 @@ export const HeadViewPanel = () => {
       >
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} timeout={300}>
-            <Paper {...PAPPER_CONFIG}>
+            <Paper sx={PAPPER_SX}>
               <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
                 <Stack
                   sx={{
