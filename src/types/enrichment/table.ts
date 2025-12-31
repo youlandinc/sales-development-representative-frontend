@@ -134,9 +134,9 @@ export interface TableColumnProps {
   isExtractedField: boolean | null;
   mappingField: string | null;
 
-  supportedFilterOperators:
+  supportedFilterConditions:
     | {
-        operator: TableFilterConditionType;
+        conditionType: TableFilterConditionType;
         needsValue: boolean;
       }[]
     | null;

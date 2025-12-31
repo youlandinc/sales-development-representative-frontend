@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ClickAwayListener,
   Grow,
@@ -16,44 +16,182 @@ import {
   STACK_CONTAINER_SX,
 } from '../config';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
-import { TableFilterRequestParams } from '@/types/enrichment/tableFilter';
+import {
+  TableFilterConditionType,
+  TableFilterRequestParams,
+} from '@/types/enrichment/tableFilter';
 
-import { StyledButton, StyledSelect } from '@/components/atoms';
-import { FilterFooter } from './index';
+import { FilterFooter } from './FilterFooter';
+import { FilterGroup, FilterGroupData, FilterRowData } from './base';
 
-import ICON_ADD from './asset/icon-add.svg';
 import ICON_FILTER from './asset/icon-filter.svg';
 
-export const HeadFilterPanel = () => {
+const EMPTY_FILTER_ROW: FilterRowData = {
+  fieldId: '',
+  conditionType: '',
+  values: '',
+};
+
+const EMPTY_FILTER_GROUP: FilterGroupData = {
+  filters: [{ ...EMPTY_FILTER_ROW }],
+};
+
+interface HeadFilterPanelProps {
+  onFilterChange?: (params: TableFilterRequestParams) => void;
+}
+
+export const HeadFilterPanel = ({ onFilterChange }: HeadFilterPanelProps) => {
   const { columns } = useEnrichmentTableStore(
     useShallow((state) => ({
       columns: state.columns,
     })),
   );
 
-  //console.log(columns);
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [temp, setTemp] = useState();
+  const [filterGroups, setFilterGroups] = useState<FilterGroupData[]>([
+    { ...EMPTY_FILTER_GROUP, filters: [{ ...EMPTY_FILTER_ROW }] },
+  ]);
 
-  const [requestData, setRequestData] = useState<TableFilterRequestParams>([]);
+  const filterableColumns = useMemo(() => {
+    // Show all columns including hidden ones, as long as they have filter conditions
+    return columns.filter((col) => col.supportedFilterConditions?.length);
+  }, [columns]);
+
+  const filledFilterCount = useMemo(() => {
+    return filterGroups.reduce((count, group) => {
+      return (
+        count + group.filters.filter((f) => f.fieldId && f.conditionType).length
+      );
+    }, 0);
+  }, [filterGroups]);
+
+  const buildRequestParams = useCallback((): TableFilterRequestParams => {
+    return filterGroups
+      .map((group) => ({
+        filters: group.filters
+          .filter((f) => f.fieldId && f.conditionType)
+          .map((f) => ({
+            fieldId: f.fieldId,
+            conditionType: f.conditionType as TableFilterConditionType,
+            values: f.values,
+          })),
+      }))
+      .filter((group) => group.filters.length > 0);
+  }, [filterGroups]);
+
+  const onFilterRowChange = useCallback(
+    (
+      groupIndex: number,
+      rowIndex: number,
+      field: keyof FilterRowData,
+      value: FilterRowData[keyof FilterRowData],
+    ) => {
+      setFilterGroups((prev) => {
+        const newGroups = [...prev];
+        newGroups[groupIndex] = {
+          ...newGroups[groupIndex],
+          filters: newGroups[groupIndex].filters.map((filter, i) =>
+            i === rowIndex ? { ...filter, [field]: value } : filter,
+          ),
+        };
+        return newGroups;
+      });
+
+      setTimeout(() => {
+        const params = buildRequestParams();
+        onFilterChange?.(params);
+      }, 0);
+    },
+    [buildRequestParams, onFilterChange],
+  );
+
+  const onAddFilterRow = useCallback((groupIndex: number) => {
+    setFilterGroups((prev) => {
+      const newGroups = [...prev];
+      newGroups[groupIndex] = {
+        ...newGroups[groupIndex],
+        filters: [...newGroups[groupIndex].filters, { ...EMPTY_FILTER_ROW }],
+      };
+      return newGroups;
+    });
+  }, []);
+
+  const onDeleteFilterRow = useCallback(
+    (groupIndex: number, rowIndex: number) => {
+      setFilterGroups((prev) => {
+        const newGroups = [...prev];
+        const newFilters = newGroups[groupIndex].filters.filter(
+          (_, i) => i !== rowIndex,
+        );
+
+        if (newFilters.length === 0) {
+          return prev.filter((_, i) => i !== groupIndex);
+        }
+
+        newGroups[groupIndex] = {
+          ...newGroups[groupIndex],
+          filters: newFilters,
+        };
+        return newGroups;
+      });
+
+      setTimeout(() => {
+        const params = buildRequestParams();
+        onFilterChange?.(params);
+      }, 0);
+    },
+    [buildRequestParams, onFilterChange],
+  );
+
+  const onDuplicateFilterRow = useCallback(
+    (groupIndex: number, rowIndex: number) => {
+      setFilterGroups((prev) => {
+        const newGroups = [...prev];
+        const filterToDuplicate = newGroups[groupIndex].filters[rowIndex];
+        newGroups[groupIndex] = {
+          ...newGroups[groupIndex],
+          filters: [
+            ...newGroups[groupIndex].filters.slice(0, rowIndex + 1),
+            { ...filterToDuplicate },
+            ...newGroups[groupIndex].filters.slice(rowIndex + 1),
+          ],
+        };
+        return newGroups;
+      });
+    },
+    [],
+  );
+
+  const onAddFilterGroup = useCallback(() => {
+    setFilterGroups((prev) => [
+      ...prev,
+      { filters: [{ ...EMPTY_FILTER_ROW }] },
+    ]);
+  }, []);
+
+  const onClearAllFilters = useCallback(() => {
+    setFilterGroups([{ filters: [{ ...EMPTY_FILTER_ROW }] }]);
+    onFilterChange?.([]);
+  }, [onFilterChange]);
 
   return (
     <>
       <Stack
-        onClick={(e) => setAnchorEl(anchorEl ? null : e.currentTarget)}
+        onMouseDown={(e) => setAnchorEl(anchorEl ? null : e.currentTarget)}
         sx={STACK_CONTAINER_SX}
       >
         <Icon component={ICON_FILTER} sx={{ width: 20, height: 20 }} />
         <Typography sx={{ fontSize: 14, lineHeight: 1.4 }}>
-          No filters
+          {filledFilterCount > 0
+            ? `${filledFilterCount} filters`
+            : 'No filters'}
         </Typography>
       </Stack>
 
       <Popper
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
-        placement="bottom"
+        placement={'bottom'}
         sx={{ zIndex: 1300 }}
         transition
       >
@@ -74,84 +212,24 @@ export const HeadFilterPanel = () => {
                     gap: 1.5,
                   }}
                 >
-                  {/*<Stack*/}
-                  {/*  sx={{*/}
-                  {/*    py: 1,*/}
-                  {/*    px: 1.5,*/}
-                  {/*    border: '1px solid rgba(210, 214, 225, 0.60)',*/}
-                  {/*    borderRadius: 2,*/}
-                  {/*    bgcolor: '#F4F5F9',*/}
-                  {/*    gap: 1.5,*/}
-                  {/*  }}*/}
-                  {/*>*/}
-                  {/*  <Stack*/}
-                  {/*    sx={{*/}
-                  {/*      pl: 1,*/}
-                  {/*      flexDirection: 'row',*/}
-                  {/*      alignItems: 'center',*/}
-                  {/*      gap: 1.5,*/}
-                  {/*    }}*/}
-                  {/*  >*/}
-                  {/*    <Typography*/}
-                  {/*      sx={{ color: 'text.secondary', fontSize: 14 }}*/}
-                  {/*    >*/}
-                  {/*      Where*/}
-                  {/*    </Typography>*/}
-                  {/*    <StyledSelect*/}
-                  {/*      onChange={(e) => {*/}
-                  {/*        setTemp(e.target.value);*/}
-                  {/*      }}*/}
-                  {/*      options={[{ label: '1', key: '1', value: 1 }]}*/}
-                  {/*      size={'small'}*/}
-                  {/*      value={temp}*/}
-                  {/*    />*/}
-                  {/*    <StyledSelect*/}
-                  {/*      onChange={(e) => {*/}
-                  {/*        setTemp(e.target.value);*/}
-                  {/*      }}*/}
-                  {/*      options={[{ label: '1', key: '1', value: 1 }]}*/}
-                  {/*      size={'small'}*/}
-                  {/*      value={temp}*/}
-                  {/*    />*/}
-                  {/*    <StyledSelect*/}
-                  {/*      onChange={(e) => {*/}
-                  {/*        setTemp(e.target.value);*/}
-                  {/*      }}*/}
-                  {/*      options={[{ label: '1', key: '1', value: 1 }]}*/}
-                  {/*      size={'small'}*/}
-                  {/*      value={temp}*/}
-                  {/*    />*/}
-                  {/*  </Stack>*/}
+                  {filterGroups.map((group, groupIndex) => (
+                    <FilterGroup
+                      columns={filterableColumns}
+                      data={group}
+                      groupIndex={groupIndex}
+                      key={groupIndex}
+                      onAddFilterRow={onAddFilterRow}
+                      onDeleteFilterRow={onDeleteFilterRow}
+                      onDuplicateFilterRow={onDuplicateFilterRow}
+                      onFilterRowChange={onFilterRowChange}
+                    />
+                  ))}
 
-                  {/*  <Stack*/}
-                  {/*    sx={{*/}
-                  {/*      pl: 1,*/}
-                  {/*      flexDirection: 'row',*/}
-                  {/*      alignItems: 'center',*/}
-                  {/*      gap: 1.5,*/}
-                  {/*    }}*/}
-                  {/*  >*/}
-                  {/*    <Typography*/}
-                  {/*      sx={{ color: 'text.secondary', fontSize: 14 }}*/}
-                  {/*    >*/}
-                  {/*      and*/}
-                  {/*    </Typography>*/}
-
-                  {/*    <StyledButton*/}
-                  {/*      color={'info'}*/}
-                  {/*      size={'small'}*/}
-                  {/*      sx={{ bgcolor: '#fff !important' }}*/}
-                  {/*      variant={'outlined'}*/}
-                  {/*    >*/}
-                  {/*      <Icon*/}
-                  {/*        component={ICON_ADD}*/}
-                  {/*        sx={{ width: 12, height: 12, mr: 0.5 }}*/}
-                  {/*      />*/}
-                  {/*      Add filter*/}
-                  {/*    </StyledButton>*/}
-                  {/*  </Stack>*/}
-                  {/*</Stack>*/}
-                  <FilterFooter disabled={true} />
+                  <FilterFooter
+                    disabled={filledFilterCount === 0}
+                    onClickToAddGroup={async () => onAddFilterGroup()}
+                    onClickToClearAll={async () => onClearAllFilters()}
+                  />
                 </Stack>
               </ClickAwayListener>
             </Paper>
