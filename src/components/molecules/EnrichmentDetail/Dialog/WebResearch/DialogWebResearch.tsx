@@ -318,7 +318,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
         </Box>
 
         <Stack display={generateIsThinking ? 'none' : 'flex'} gap={3}>
-          <Stack gap={4}>
+          <Stack gap={3}>
             <ToggleButtonGroup
               color={'primary'}
               exclusive

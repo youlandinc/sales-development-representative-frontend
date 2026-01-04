@@ -9,14 +9,9 @@ import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
 import { useComputedInWorkEmailStore, useWorkEmailRequest } from './hooks';
 
-import {
-  DisplayTypeEnum,
-  SourceOfOpenEnum,
-  WaterfallConfigTypeEnum,
-} from '@/types/enrichment';
+import { DisplayTypeEnum, WaterfallConfigTypeEnum } from '@/types/enrichment';
 
 import { COINS_PER_ROW } from '@/constants';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 interface DialogWorkEmailFooterProps {
   cb?: () => void;
@@ -27,20 +22,14 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
 }) => {
   const { rowIds } = useEnrichmentTableStore((store) => store);
   const { isMissingConfig } = useComputedInWorkEmailStore();
-  const {
-    setWaterfallConfigType,
-    setDisplayType,
-    displayType,
-    selectedIntegrationToConfig,
-  } = useWorkEmailStore(
-    useShallow((state) => ({
-      setWaterfallConfigType: state.setWaterfallConfigType,
-      setDisplayType: state.setDisplayType,
-      displayType: state.displayType,
-      selectedIntegrationToConfig: state.selectedIntegrationToConfig,
-    })),
-  );
-  const sourceOfOpen = useActionsStore((store) => store.sourceOfOpen);
+  const { setWaterfallConfigType, setDisplayType, displayType } =
+    useWorkEmailStore(
+      useShallow((state) => ({
+        setWaterfallConfigType: state.setWaterfallConfigType,
+        setDisplayType: state.setDisplayType,
+        displayType: state.displayType,
+      })),
+    );
   const params = useParams();
   const tableId =
     typeof params.tableId === 'string' && params.tableId.trim() !== ''
@@ -48,10 +37,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
       : '';
   const { requestState } = useWorkEmailRequest(tableId, cb);
 
-  const isDisabled =
-    sourceOfOpen === SourceOfOpenEnum.dialog
-      ? selectedIntegrationToConfig?.inputParams?.some((p) => !p.selectedOption)
-      : isMissingConfig;
+  const isDisabled = isMissingConfig;
 
   return (
     <DialogFooter
@@ -68,8 +54,7 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
         requestState?.request?.(tableId, rowIds.length, false);
       }}
       slot={
-        displayType === DisplayTypeEnum.integration &&
-        sourceOfOpen !== SourceOfOpenEnum.dialog ? (
+        displayType === DisplayTypeEnum.integration ? (
           <StyledButton
             onClick={() => {
               setWaterfallConfigType(WaterfallConfigTypeEnum.configure);

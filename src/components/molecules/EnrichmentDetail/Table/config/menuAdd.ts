@@ -8,14 +8,14 @@ import {
 // Add column menu (p1 - highest priority)
 export const getAddColumnMenuActions = (): TableColumnActionOption[] => [
   {
-    label: 'Add enrichment',
-    icon: '',
-    value: '', // No enum yet
-  },
-  {
-    label: 'Use AI',
+    label: 'Atlas Intelligence Agent',
     icon: COLUMN_MENU_ICONS.USE_AI,
     value: TableColumnMenuActionEnum.ai_agent,
+  },
+  {
+    label: 'Add enrichment',
+    icon: COLUMN_MENU_ICONS.ENRICHMENT,
+    value: TableColumnMenuActionEnum.work_email,
   },
   {
     label: '1',

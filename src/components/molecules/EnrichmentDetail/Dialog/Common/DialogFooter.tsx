@@ -1,4 +1,5 @@
 import {
+  Box,
   Icon,
   Menu,
   MenuItem,
@@ -106,14 +107,22 @@ export const DialogFooter: FC<DialogFooterProps> = ({
           paper: {
             sx: {
               transform: 'translateY(-18px) !important',
+              boxShadow: 'none',
+              border: '1px solid #F0F0F4',
+              borderRadius: 2,
             },
           },
           list: {
             sx: {
               p: 0,
+              gap: '4px',
+              display: 'flex',
+              flexDirection: 'column',
               width: 400,
               [`& .${menuItemClasses.root}`]: {
                 justifyContent: 'space-between',
+                height: '36px',
+                px: 1,
               },
             },
           },
@@ -159,6 +168,7 @@ export const DialogFooter: FC<DialogFooterProps> = ({
             textColor={'text.secondary'}
           />
         </MenuItem>
+        <Box bgcolor={'#E9E9EF'} height={'1px'} />
         <MenuItem
           onClick={async () => {
             setAnchorEl(null);

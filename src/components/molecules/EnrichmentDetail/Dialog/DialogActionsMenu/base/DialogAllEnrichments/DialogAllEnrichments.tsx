@@ -32,6 +32,7 @@ import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
+import { DisplayTypeEnum } from '@/types/enrichment/integrations';
 
 /**
  * 弹窗属性接口
@@ -275,7 +276,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
         {/* 2. Actions标签内容 - 只在非搜索状态且是Actions标签时显示 */}
         {!hasSearchValue &&
           dialogAllEnrichmentsTabKey === EnrichmentCategoryEnum.actions && (
-            <Stack sx={{ gap: 1.5, height: 550, overflow: 'auto' }}>
+            <Stack sx={{ gap: 1.5, height: 574, overflow: 'auto' }}>
               {dialogAllEnrichmentsData
                 .find(
                   (item) => item.categoryKey === EnrichmentCategoryEnum.actions,
@@ -305,6 +306,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
                     }
                     key={`action-${provider.key ?? providerIndex}`}
                     onClick={() => {
+                      setDisplayType(DisplayTypeEnum.main);
                       onWorkEmailItemClick(provider.key ?? '');
                       setDialogAllEnrichmentsVisible(false);
                     }}

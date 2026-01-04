@@ -85,7 +85,7 @@ export const PlaceholderNode: FC = (props: any) => {
           }}
           width={'fit-content'}
         >
-          <Switch checked={checked} onChange={onChange} size={'small'} />
+          {/* <Switch checked={checked} onChange={onChange} size={'small'} /> */}
           <Icon
             component={COLUMN_TYPE_ICONS[fieldType as TableColumnTypeEnum]}
             sx={{ width: 18, height: 18 }}

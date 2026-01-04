@@ -43,8 +43,7 @@ export const EnrichmentsContent: FC<EnrichmentsContentProps> = ({
 
   return (
     <Stack gap={1.5}>
-      {/* //TODO */}
-      {/* <Stack
+      <Stack
         onClick={onClickViewAllEnrichments}
         sx={{
           flexDirection: 'row',
@@ -61,7 +60,7 @@ export const EnrichmentsContent: FC<EnrichmentsContentProps> = ({
         <Typography color={'text.secondary'} variant={'body3'}>
           View all enrichments
         </Typography>
-      </Stack> */}
+      </Stack>
       {enrichments.map((item, index) => (
         <StyledCollapseMenuContainer
           key={item?.categoryKey ?? `enrichment-${index}`}

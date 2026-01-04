@@ -1,13 +1,4 @@
-import {
-  Box,
-  Icon,
-  Menu,
-  MenuItem,
-  menuItemClasses,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Icon, Stack, Tooltip, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
 import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { createEditor } from 'slate';
@@ -18,12 +9,11 @@ import { useShallow } from 'zustand/shallow';
 import {
   StyledSlateEditor,
   StyledSwitch,
-  StyledTextField,
   StyledTiptapEditor,
 } from '@/components/atoms';
 import { CollapseCard, ModelSelect, OutputsFields } from './base';
 
-import { useSwitch, useVariableFromStore } from '@/hooks';
+import { useVariableFromStore } from '@/hooks';
 
 import { useWebResearchStore } from '@/stores/enrichment';
 
@@ -38,7 +28,6 @@ import {
 } from './extensions';
 
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_arrow_left.svg';
-import ICON_DELETE from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_delete.svg';
 import ICON_WARNING from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_warning.svg';
 
 interface WebResearchConfigureProps {
@@ -78,12 +67,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
   const { filedMapping } = useVariableFromStore();
 
   const [outPuts] = useState<'fields' | 'json'>('fields');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { visible, toggle } = useSwitch(true);
-
-  const onMenuClose = useCallback(() => {
-    setAnchorEl(null);
-  }, []);
 
   const promptEditorRef = useRef<null | Editor>(null);
   const schemaEditorRef = useRef(null);
@@ -268,27 +251,29 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
         </Typography>
       )}
       <CollapseCard hasCollapse={false} title={'Model'}>
-        <ModelSelect />
-        <Stack
-          alignItems={'center'}
-          flexDirection={'row'}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
-            <Typography variant={'body2'}>Enable web access</Typography>
-            <Tooltip
-              arrow
-              title={
-                'Enables Atlas to research information online in real time. This may increase usage costs.'
-              }
-            >
-              <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />
-            </Tooltip>
+        <Stack gap={1.5}>
+          <ModelSelect />
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+          >
+            <Stack alignItems={'center'} flexDirection={'row'} gap={0.5}>
+              <Typography variant={'body2'}>Enable web access</Typography>
+              <Tooltip
+                arrow
+                title={
+                  'Enables Atlas to research information online in real time. This may increase usage costs.'
+                }
+              >
+                <Icon component={ICON_WARNING} sx={{ width: 12, height: 12 }} />
+              </Tooltip>
+            </Stack>
+            <StyledSwitch
+              checked={enableWebSearch}
+              onChange={(e) => setEnableWebSearch(e.target.checked)}
+            />
           </Stack>
-          <StyledSwitch
-            checked={enableWebSearch}
-            onChange={(e) => setEnableWebSearch(e.target.checked)}
-          />
         </Stack>
       </CollapseCard>
       <CollapseCard title={'Agent instructions'}>
@@ -428,62 +413,6 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
             >
               + Add field
             </Box>
-            <Menu
-              anchorEl={anchorEl}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              onClose={onMenuClose}
-              open={Boolean(anchorEl)}
-              slotProps={{
-                list: {
-                  sx: {
-                    p: 1.5,
-                    width: 240,
-                    [`& .${menuItemClasses.root}`]: {
-                      gap: 1,
-                      '&:hover': {
-                        bgcolor: 'unset !important',
-                        cursor: 'unset',
-                      },
-                    },
-                  },
-                },
-              }}
-            >
-              <MenuItem>
-                <Stack gap={1.25} width={200}>
-                  <Typography variant={'body3'}>
-                    Output description (helps Al)
-                  </Typography>
-                  <StyledTextField
-                    maxRows={3}
-                    minRows={3}
-                    multiline
-                    sx={{
-                      '& .MuiOutlinedInput-input': {
-                        fontSize: 12,
-                      },
-                    }}
-                  />
-
-                  <Box bgcolor={'#D0CEDA'} height={'1px'}></Box>
-                  <Stack
-                    alignItems={'center'}
-                    flexDirection={'row'}
-                    gap={1}
-                    onClick={onMenuClose}
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    <Icon
-                      component={ICON_DELETE}
-                      sx={{ width: 20, height: 20 }}
-                    />
-                    <Typography color={'#D75B5B'} variant={'body2'}>
-                      Delete
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </MenuItem>
-            </Menu>
           </Stack>
           {/* )} */}
           {/* <Box display={outPuts === 'json' ? 'block' : 'none'}> */}

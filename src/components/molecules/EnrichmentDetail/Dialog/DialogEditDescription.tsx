@@ -66,7 +66,12 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
             multiline
             onChange={(e) => setDescription(e.target.value)}
             placeholder={'Add description...'}
-            rows={3}
+            rows={4}
+            sx={{
+              '& .MuiInputBase-input': {
+                padding: '0px',
+              },
+            }}
             value={description}
           />
         </Stack>

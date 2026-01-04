@@ -1,5 +1,5 @@
-import { FC, useEffect, useState } from 'react';
 import { Icon, Stack } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { UTypeOf } from '@/utils';
@@ -11,26 +11,29 @@ import {
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import {
+  TabTypeEnum,
+  useActionsStore,
+} from '@/stores/enrichment/useActionsStore';
 import { useDialogStore } from '@/stores/useDialogStore';
 
 import { ROW_HEIGHT } from './Table/config';
 
 import { StyledButton, StyledLoading } from '@/components/atoms';
 import { DrawerActionsContainer } from '@/components/molecules';
-import { StyledTable } from './Table';
 import {
   HeadColumnsPanel,
   HeadFilterPanel,
   //HeadRowsPanel,
   HeadViewPanel,
 } from './Panel';
+import { StyledTable } from './Table';
 
+import { ActiveCellParams, SourceOfOpenEnum } from '@/types';
 import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
-import { ActiveCellParams, SourceOfOpenEnum } from '@/types';
 
 import { _createTableRows } from '@/request';
 
@@ -121,27 +124,33 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     })),
   );
 
-  const { setEditParams, setWebResearchVisible, allClear } =
+  const { setEditParams, setWebResearchVisible, allClear, setWebResearchTab } =
     useWebResearchStore(
       useShallow((store) => ({
         setEditParams: store.setEditParams,
         setWebResearchVisible: store.setWebResearchVisible,
         allClear: store.allClear,
+        setWebResearchTab: store.setWebResearchTab,
       })),
     );
 
   const setAiTableInfo = useDialogStore((state) => state.setAiTableInfo);
 
-  const { fetchActionsMenus, setSourceOfOpen } = useActionsStore(
+  const { fetchActionsMenus, setSourceOfOpen, setTabType } = useActionsStore(
     useShallow((state) => ({
       fetchActionsMenus: state.fetchActionsMenus,
       setSourceOfOpen: state.setSourceOfOpen,
+      setTabType: state.setTabType,
     })),
   );
 
-  const onClickToEditWorkEmail = useWorkEmailStore(
-    (store) => store.handleEditClick,
-  );
+  const { onClickToEditWorkEmail, onClickToSingleIntegration } =
+    useWorkEmailStore(
+      useShallow((store) => ({
+        onClickToEditWorkEmail: store.handleEditClick,
+        onClickToSingleIntegration: store.onClickToSingleIntegration,
+      })),
+    );
 
   const onClickActions = () => {
     setAiTableInfo({ tableId, mappings: [] });
@@ -321,8 +330,8 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               onAddMenuItemClick={(item) => {
                 // AI Agent opens configuration dialog
                 if (item.value === TableColumnMenuActionEnum.ai_agent) {
-                  openDialog(TableColumnMenuActionEnum.ai_agent);
-                  setWebResearchVisible(true, ActiveTypeEnum.add);
+                  openDialog(TableColumnMenuActionEnum.actions_overview);
+                  setTabType(TabTypeEnum.suggestions);
                   return;
                 }
 
@@ -333,6 +342,11 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                     fieldType: item.value as TableColumnTypeEnum,
                     // No beforeFieldId or afterFieldId = insert at end
                   });
+                }
+                if (item.value === TableColumnMenuActionEnum.work_email) {
+                  openDialog(TableColumnMenuActionEnum.actions_overview);
+                  setTabType(TabTypeEnum.enrichments);
+                  return;
                 }
               }}
               onAddRows={onClickToAddRows}
@@ -395,6 +409,15 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                       onClickToEditWorkEmail(columnId);
                       return;
                     }
+                    //groupId === null && actionKey !== 'use-ai' ==> 单独integration，非group integration
+                    if (
+                      column?.groupId === null &&
+                      column?.actionKey !== 'use-ai' &&
+                      column?.actionKey
+                    ) {
+                      onClickToSingleIntegration(columnId);
+                      return;
+                    }
                     // AI column configuration
                     if (column && column.actionKey === 'use-ai') {
                       const {
@@ -417,6 +440,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                         model,
                         taskDescription,
                       });
+                      setWebResearchTab('configure');
                       openDialog(TableColumnMenuActionEnum.ai_agent);
                       return;
                     }

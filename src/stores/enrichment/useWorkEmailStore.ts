@@ -66,6 +66,7 @@ type WorkEmailStoreActions = {
   updateIntegrationsOrder: (integrations: IntegrationAction[]) => void;
   addIntegrationToDefault: (integration: IntegrationAction) => void;
   handleEditClick: (columnId: string) => void;
+  onClickToSingleIntegration: (columnId: string) => void;
   setIntegrationMenus: (menus: IntegrationActionMenu[]) => void;
   setValidationOptions: (config: IntegrationActionValidation[] | null) => void;
   setSelectedValidationOption: (option: string | null) => void;
@@ -382,6 +383,21 @@ export const useWorkEmailStore = create<
             .getState()
             .openDialog(TableColumnMenuActionEnum.work_email);
         }),
+      onClickToSingleIntegration: (columnId: string) => {
+        const column = useEnrichmentTableStore
+          .getState()
+          .getColumnById(columnId);
+        if (!column) {
+          return;
+        }
+        set({
+          displayType: DisplayTypeEnum.integration,
+          selectedIntegrationToConfig: column.actionDefinition,
+        });
+        useEnrichmentTableStore
+          .getState()
+          .openDialog(TableColumnMenuActionEnum.work_email);
+      },
       setIntegrationMenus: (menus) => {
         try {
           if (Array.isArray(menus)) {

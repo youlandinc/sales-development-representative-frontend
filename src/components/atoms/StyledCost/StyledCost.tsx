@@ -11,7 +11,7 @@ type StyledCostProps = StackProps & {
 
 export const StyledCost: FC<StyledCostProps> = ({
   count,
-  textLineHeight,
+  textLineHeight = 1,
   textColor,
   ...rest
 }) => {

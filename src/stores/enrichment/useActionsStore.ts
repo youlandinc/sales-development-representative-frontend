@@ -19,6 +19,12 @@ import {
 } from '@/request';
 import { useWorkEmailStore } from './useWorkEmailStore';
 
+export enum TabTypeEnum {
+  suggestions = 'suggestions',
+  enrichments = 'enrichments',
+  exports = 'exports',
+}
+
 interface ActionsStoreStates {
   suggestionsLoading: boolean;
   suggestionsList: SuggestionItem[];
@@ -28,6 +34,7 @@ interface ActionsStoreStates {
   dialogAllEnrichmentsData: DialogAllEnrichmentsResponse[];
   dialogAllEnrichmentsTabKey: EnrichmentCategoryEnum;
   sourceOfOpen: SourceOfOpenEnum;
+  tabType: TabTypeEnum;
 }
 
 const initialState: ActionsStoreStates = {
@@ -39,6 +46,7 @@ const initialState: ActionsStoreStates = {
   dialogAllEnrichmentsData: [],
   dialogAllEnrichmentsTabKey: EnrichmentCategoryEnum.actions,
   sourceOfOpen: SourceOfOpenEnum.drawer,
+  tabType: TabTypeEnum.suggestions,
 };
 
 interface ActionsStoreActions {
@@ -49,6 +57,7 @@ interface ActionsStoreActions {
   fetchDialogAllEnrichments: () => Promise<void>;
   setDialogAllEnrichmentsTabKey: (key: EnrichmentCategoryEnum) => void;
   setSourceOfOpen: (source: SourceOfOpenEnum) => void;
+  setTabType: (key: TabTypeEnum) => void;
 }
 
 type ActionsStore = ActionsStoreStates & ActionsStoreActions;
@@ -63,7 +72,11 @@ export const useActionsStore = create<ActionsStore>()(
             state.dialogAllEnrichmentsTabKey = key;
           });
         },
-
+        setTabType: (key: TabTypeEnum) => {
+          set((state) => {
+            state.tabType = key;
+          });
+        },
         fetchSuggestions: async (tableId: string) => {
           set((state) => {
             state.suggestionsLoading = true;

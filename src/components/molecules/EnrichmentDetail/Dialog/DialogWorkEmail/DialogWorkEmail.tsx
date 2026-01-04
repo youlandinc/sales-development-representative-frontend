@@ -4,7 +4,6 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { DialogAllIntegrations } from '../DialogAllIntegrations';
 import {
-  DialogWorkEmailFooter,
   DialogWorkEmailIntegrationAccount,
   DialogWorkEmailMain,
 } from './index';
