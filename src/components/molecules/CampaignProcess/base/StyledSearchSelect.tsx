@@ -17,7 +17,7 @@ import { SelectWithFlagTypeEnum } from '@/types';
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
-export const StyledChip = styled(Chip)({
+export const StyledSearchSelectChip = styled(Chip)({
   '&.MuiChip-root': {
     borderRadius: '16px',
   },
@@ -137,7 +137,7 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
       }}
       renderValue={(value, getTagProps) => {
         return value.map((option, index) => (
-          <StyledChip
+          <StyledSearchSelectChip
             {...getTagProps({ index })}
             deleteIcon={<ClearIcon />}
             key={`${option.key}-chip-${index}-key`}
@@ -169,86 +169,3 @@ export const StyledSearchSelect: FC<StyledSearchSelectProps> = ({
     />
   );
 };
-
-//type === TreeNodeRenderTypeEnum.search_select ? (
-//  <li
-//    {...props}
-//    key={`${option.key}-input-key`}
-//    style={{
-//      display: 'flex',
-//      alignItems: 'center',
-//      justifyContent: 'space-between',
-//    }}
-//  >
-//    <Typography>{option.label}</Typography>
-//
-//    <Stack
-//      alignItems={'center'}
-//      flexDirection={'row'}
-//      gap={1.25}
-//      mr={6}
-//    >
-//      <Typography
-//        borderRadius={1}
-//        color={'#6E4EFB'}
-//        onClick={() => {
-//          const target = value.find(
-//            (item) => item.value === option.value,
-//          );
-//          if (target) {
-//            target.isIncludes = true;
-//            onSelect([...value]);
-//          } else {
-//            onSelect([...value, { ...option, isIncludes: true }]);
-//          }
-//        }}
-//        p={0.5}
-//        sx={() => {
-//          const target = value.find(
-//            (item) => item.value === option.value,
-//          );
-//          if (!target) {
-//            return {};
-//          }
-//          return {
-//            bgcolor: target.isIncludes ? '#E9F1FF' : 'transparent',
-//          };
-//        }}
-//        variant={'body3'}
-//      >
-//        Include
-//      </Typography>
-//      <Box bgcolor={'#4C4957'} height={20} width={'1px'} />
-//      <Typography
-//        borderRadius={1}
-//        color={'#E26E6E'}
-//        onClick={() => {
-//          const target = value.find(
-//            (item) => item.value === option.value,
-//          );
-//          if (target) {
-//            target.isIncludes = false;
-//            onSelect([...value]);
-//          } else {
-//            onSelect([...value, { ...option, isIncludes: false }]);
-//          }
-//        }}
-//        p={0.5}
-//        sx={() => {
-//          const target = value.find(
-//            (item) => item.value === option.value,
-//          );
-//          if (!target) {
-//            return {};
-//          }
-//          return {
-//            bgcolor: target.isIncludes ? 'transparent' : '#FEEFED',
-//          };
-//        }}
-//        variant={'body3'}
-//      >
-//        Exclude
-//      </Typography>
-//    </Stack>
-//  </li>
-//) : ()

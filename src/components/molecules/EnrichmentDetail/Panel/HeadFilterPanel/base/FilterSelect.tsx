@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, SVGProps, useState } from 'react';
 import {
   FormControl,
   Icon,
@@ -12,13 +12,14 @@ import {
 } from '@mui/material';
 import { Clear } from '@mui/icons-material';
 
-import ICON_ARROW from '@/components/atoms/StyledSelect/assets/icon_arrow.svg';
+import ICON_ARROW from '../asset/icon-arrow.svg';
+import ICON_TICK from '../asset/icon-tick.svg';
 
 export interface FilterSelectOption {
   label: string;
   value: string;
   key: string;
-  icon?: FC<React.SVGProps<SVGSVGElement>>;
+  icon?: FC<SVGProps<SVGSVGElement>>;
 }
 
 interface FilterSelectProps {
@@ -32,6 +33,8 @@ interface FilterSelectProps {
   clearable?: boolean;
   showIcon?: boolean;
 }
+
+const ICON_SIZE = { width: 16, height: 16 };
 
 export const FilterSelect: FC<FilterSelectProps> = ({
   options,
@@ -67,6 +70,7 @@ export const FilterSelect: FC<FilterSelectProps> = ({
           minWidth: 120,
           '& .MuiInputBase-formControl': {
             borderRadius: 2,
+            bgcolor: '#fff',
           },
           '& .MuiSelect-outlined': {
             py: '7px',
@@ -101,27 +105,41 @@ export const FilterSelect: FC<FilterSelectProps> = ({
           )
         }
         IconComponent={(props) => (
-          <ICON_ARROW style={{ marginRight: '2px' }} {...props} />
+          <ICON_ARROW
+            style={{ marginRight: '2px', height: 16, width: 16 }}
+            {...props}
+          />
         )}
         inputProps={{
           MenuProps: {
+            anchorOrigin: {
+              vertical: 'bottom',
+              horizontal: 'left',
+            },
+            transformOrigin: {
+              vertical: 'top',
+              horizontal: 'left',
+            },
             MenuListProps: {
               sx: {
                 p: 0,
                 m: 0,
+                minWidth: 300,
                 '& .MuiMenuItem-root:hover': {
                   bgcolor: '#F4F5F9 !important',
                 },
                 '& .Mui-selected': {
-                  bgcolor: '#F0F0F4 !important',
+                  bgcolor: 'transparent !important',
                 },
                 '& .Mui-selected:hover': {
-                  bgcolor: '#F0F0F4 !important',
+                  bgcolor: ' !important',
                 },
                 '& .MuiMenuItem-root': {
                   fontSize: 14,
                   color: 'text.primary',
-                  p: 1.5,
+                  px: 1,
+                  py: 0.5,
+                  height: 36,
                 },
               },
             },
@@ -137,7 +155,7 @@ export const FilterSelect: FC<FilterSelectProps> = ({
         renderValue={(val) => {
           if (!val) {
             return (
-              <Typography color="text.secondary" sx={{ fontSize: 12 }}>
+              <Typography sx={{ fontSize: 14, color: 'text.secondary' }}>
                 {placeholder}
               </Typography>
             );
@@ -147,18 +165,14 @@ export const FilterSelect: FC<FilterSelectProps> = ({
               sx={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 0.75,
+                gap: 0.5,
+                fontSize: 14,
               }}
             >
               {showIcon && selectedOption?.icon && (
-                <Icon
-                  component={selectedOption.icon}
-                  sx={{ width: 16, height: 16 }}
-                />
+                <Icon component={selectedOption.icon} sx={ICON_SIZE} />
               )}
-              <Typography sx={{ fontSize: 12 }}>
-                {selectedOption?.label}
-              </Typography>
+              {selectedOption?.label}
             </Stack>
           );
         }}
@@ -166,11 +180,39 @@ export const FilterSelect: FC<FilterSelectProps> = ({
         value={value}
       >
         {options.map((opt) => (
-          <MenuItem key={opt.key} sx={{ gap: 1 }} value={opt.value}>
-            {showIcon && opt.icon && (
-              <Icon component={opt.icon} sx={{ width: 16, height: 16 }} />
-            )}
-            {opt.label}
+          <MenuItem key={opt.key} sx={{ gap: 2 }} value={opt.value}>
+            <Stack
+              sx={{
+                flexDirection: 'row',
+                gap: 0.5,
+                alignItems: 'center',
+                fontSize: 14,
+                color: 'text.primary',
+                px: 1,
+                py: 0.5,
+                height: 36,
+              }}
+            >
+              {showIcon && opt.icon && (
+                <Icon component={opt.icon} sx={ICON_SIZE} />
+              )}
+              {opt.label}
+            </Stack>
+
+            <Stack
+              sx={{
+                width: 16,
+                ml: 'auto',
+              }}
+            >
+              <Icon
+                component={ICON_TICK}
+                sx={{
+                  ...ICON_SIZE,
+                  display: value === opt.value ? 'block' : 'none',
+                }}
+              />
+            </Stack>
           </MenuItem>
         ))}
       </Select>

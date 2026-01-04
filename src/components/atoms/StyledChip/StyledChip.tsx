@@ -1,5 +1,6 @@
 import { FC, MouseEvent } from 'react';
 import { createUseStyles } from 'react-jss';
+
 import { StyledImage } from '@/components/atoms';
 
 const useStyles = createUseStyles({
@@ -29,19 +30,16 @@ const useStyles = createUseStyles({
   },
 });
 
-interface QueryAutoCompleteChipProps {
+interface StyledChipChipProps {
   label: string;
   onDelete?: (e: MouseEvent) => void;
 }
 
-export const QueryAutoCompleteChip: FC<QueryAutoCompleteChipProps> = ({
-  label,
-  onDelete,
-}) => {
+export const StyledChip: FC<StyledChipChipProps> = ({ label, onDelete }) => {
   const classes = useStyles();
 
   return (
-    <div className={`${classes.container} query-autocomplete-chip`}>
+    <div className={`${classes.container} styled-chip`}>
       {onDelete && (
         <StyledImage
           className={classes.button}

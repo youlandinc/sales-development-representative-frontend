@@ -18,9 +18,10 @@ import {
   Stack,
 } from '@mui/material';
 
-import { QueryAutoCompleteChip } from '../QueryAutoComplete';
-
 import { CascadeOption, useCascadeOptions, useCascadeSelection } from './hooks';
+
+import { StyledChip } from '@/components/atoms';
+
 import {
   ARROW_ICON,
   buildPopupIcon,
@@ -227,7 +228,7 @@ export const QueryCascadeSelect: FC<QueryCascadeSelectProps> = ({
         }}
       >
         {displayLabels.map((label, index) => (
-          <QueryAutoCompleteChip
+          <StyledChip
             key={`${label}-${index}`}
             label={label}
             onDelete={(e) => {

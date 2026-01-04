@@ -153,7 +153,7 @@ export const HeadColumnsPanel: FC<HeadColumnsPanelProps> = ({ tableId }) => {
   return (
     <>
       <Stack
-        onClick={(e) => setAnchorEl(e.currentTarget)}
+        onClick={(e) => setAnchorEl(anchorEl ? null : e.currentTarget)}
         sx={STACK_CONTAINER_SX}
       >
         <Icon component={ICON_COLUMN} sx={{ width: 20, height: 20 }} />
@@ -172,7 +172,11 @@ export const HeadColumnsPanel: FC<HeadColumnsPanelProps> = ({ tableId }) => {
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} timeout={300}>
             <Paper sx={PAPPER_SX}>
-              <ClickAwayListener onClickAway={onPanelClose}>
+              <ClickAwayListener
+                mouseEvent={'onMouseDown'}
+                onClickAway={() => onPanelClose()}
+                touchEvent={'onTouchStart'}
+              >
                 <Stack
                   sx={{
                     ...PAPPER_STACK_CONTAINER_SX,

@@ -4,7 +4,8 @@ import { Icon, Stack, Typography } from '@mui/material';
 import { StyledButton } from '@/components/atoms';
 import { TableColumnProps } from '@/types/enrichment/table';
 
-import { FilterRow } from './FilterRow';
+import { FilterRow } from './index';
+
 import ICON_ADD from '../asset/icon-add.svg';
 
 export interface FilterGroupData {

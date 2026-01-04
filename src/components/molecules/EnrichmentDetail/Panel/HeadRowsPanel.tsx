@@ -24,7 +24,7 @@ export const HeadRowsPanel = () => {
     <>
       <Stack
         data-toolbar-button
-        onClick={(e) => setAnchorEl(e.currentTarget)}
+        onClick={(e) => setAnchorEl(anchorEl ? null : e.currentTarget)}
         sx={STACK_CONTAINER_SX}
       >
         <Icon component={ICON_ROW} sx={{ width: 20, height: 20 }} />
@@ -43,7 +43,11 @@ export const HeadRowsPanel = () => {
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} timeout={300}>
             <Paper sx={PAPPER_SX}>
-              <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
+              <ClickAwayListener
+                mouseEvent={'onMouseDown'}
+                onClickAway={() => setAnchorEl(null)}
+                touchEvent={'onTouchStart'}
+              >
                 <Stack
                   sx={{
                     ...PAPPER_STACK_CONTAINER_SX,

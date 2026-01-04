@@ -3,45 +3,27 @@ import {
   Autocomplete,
   AutocompleteChangeReason,
   Box,
-  CircularProgress,
   createFilterOptions,
   Divider,
   FilterOptionsState,
-  Icon,
   Tooltip,
   Typography,
 } from '@mui/material';
 
-import { StyledImage, StyledTextField } from '@/components/atoms';
 import { UTypeOf } from '@/utils/UTypeOf';
 
-import { AutoCompleteOption, useQueryAutoComplete } from './hooks';
-import { QueryAutoCompleteChip } from './index';
-import { QUERY_TOOLTIP_SLOT_PROPS, QueryTooltipAccessTitle } from '../index';
+import { StyledChip, StyledImage, StyledTextField } from '@/components/atoms';
 
-import ICON_ARROW from './assets/icon-arrow.svg';
-import ICON_CLOSE from './assets/icon-close.svg';
+import { AutoCompleteOption, useQueryAutoComplete } from './hooks';
+import { CLEAR_ICON, LOADING_SPINNER, POPUP_ICON } from './index';
+
+import { QUERY_TOOLTIP_SLOT_PROPS, QueryTooltipAccessTitle } from '../index';
 
 const LOADING_MORE_OPTION: AutoCompleteOption = {
   inputValue: '__loading_more__',
   key: '__loading_more__',
   label: '',
 };
-
-const CLEAR_ICON = (
-  <Icon
-    component={ICON_CLOSE}
-    sx={{ width: 14, height: 14, cursor: 'pointer' }}
-  />
-);
-
-const POPUP_ICON = (
-  <Icon component={ICON_ARROW} sx={{ width: 14, height: 14 }} />
-);
-
-const LOADING_SPINNER = (
-  <CircularProgress size="20px" sx={{ color: '#D0CEDA' }} />
-);
 
 const OPTION_BASE_SX = {
   display: 'flex',
@@ -375,7 +357,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
                     onDelete: () => void;
                   };
                   return (
-                    <QueryAutoCompleteChip
+                    <StyledChip
                       key={key}
                       label={item.label || item.inputValue}
                       onDelete={isAuth ? onDelete : undefined}

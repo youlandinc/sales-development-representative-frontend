@@ -2,8 +2,11 @@ import { ChangeEvent, FC, useMemo } from 'react';
 import { Autocomplete, SxProps, TextField } from '@mui/material';
 import { format, isValid, parseISO } from 'date-fns';
 
-import { StyledDatePicker, StyledTextField } from '@/components/atoms';
-import { QueryAutoCompleteChip } from '@/components/molecules/DirectoriesIndustry/DirectoriesIndustryQuery/base/QueryAutoComplete/QueryAutoCompleteChip';
+import {
+  StyledChip,
+  StyledDatePicker,
+  StyledTextField,
+} from '@/components/atoms';
 import {
   TableColumnProps,
   TableColumnTypeEnum,
@@ -97,15 +100,11 @@ export const FilterValueInput: FC<FilterValueInputProps> = ({
             }}
           />
         )}
-        renderTags={(tagValue, getTagProps) =>
+        renderValue={(tagValue, getTagProps) =>
           tagValue.map((option, index) => {
             const { onDelete } = getTagProps({ index });
             return (
-              <QueryAutoCompleteChip
-                key={index}
-                label={option}
-                onDelete={onDelete}
-              />
+              <StyledChip key={index} label={option} onDelete={onDelete} />
             );
           })
         }

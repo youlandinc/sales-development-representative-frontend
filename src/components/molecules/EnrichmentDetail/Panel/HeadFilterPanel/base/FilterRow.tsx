@@ -12,11 +12,9 @@ import {
 
 import { TableColumnProps } from '@/types/enrichment/table';
 
+import { getColumnTypeIcon } from '../utils';
 import { CONDITION_LABEL_MAP } from '../config/valueToContent';
-import { FilterRowData } from './FilterGroup';
-import { FilterSelect } from './FilterSelect';
-import { FilterValueInput } from './FilterValueInput';
-import { getColumnTypeIcon } from './utils';
+import { FilterRowData, FilterSelect, FilterValueInput } from './index';
 
 import ICON_DOTS from '../asset/icon-dots.svg';
 import ICON_COPY from '../asset/icon-copy.svg';
@@ -165,7 +163,6 @@ export const FilterRow: FC<FilterRowProps> = ({
             <ClickAwayListener onClickAway={() => setMenuAnchor(null)}>
               <Paper
                 sx={{
-                  py: 1,
                   borderRadius: 2,
                   border: '1px solid #E9E9EF',
                   boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)',
@@ -183,11 +180,12 @@ export const FilterRow: FC<FilterRowProps> = ({
                     alignItems: 'center',
                     gap: 1,
                     cursor: 'pointer',
+                    fontSize: 14,
                     '&:hover': { bgcolor: '#F4F5F9' },
                   }}
                 >
                   <Icon component={ICON_COPY} sx={{ width: 16, height: 16 }} />
-                  <Typography sx={{ fontSize: 14 }}>Duplicate</Typography>
+                  Duplicate
                 </Stack>
 
                 <Stack
@@ -202,6 +200,8 @@ export const FilterRow: FC<FilterRowProps> = ({
                     alignItems: 'center',
                     gap: 1,
                     cursor: 'pointer',
+                    color: '#D75B5B',
+                    fontSize: 14,
                     '&:hover': { bgcolor: '#F4F5F9' },
                   }}
                 >
@@ -209,9 +209,7 @@ export const FilterRow: FC<FilterRowProps> = ({
                     component={ICON_TRASH}
                     sx={{ width: 16, height: 16, color: '#D75B5B' }}
                   />
-                  <Typography sx={{ fontSize: 14, color: '#D75B5B' }}>
-                    Delete
-                  </Typography>
+                  Delete
                 </Stack>
               </Paper>
             </ClickAwayListener>

@@ -2,6 +2,8 @@ export * from './StyledButton';
 
 export * from './StyledCheckbox';
 
+export * from './StyledChip';
+
 export * from './StyledDialog';
 
 export * from './StyledOTP';

@@ -93,7 +93,7 @@ export const HeadViewPanel: FC<HeadViewPanelProps> = ({ tableId }) => {
   return (
     <>
       <Stack
-        onClick={(e) => setAnchorEl(e.currentTarget)}
+        onClick={(e) => setAnchorEl(anchorEl ? null : e.currentTarget)}
         sx={STACK_CONTAINER_SX}
       >
         <Icon component={ICON_VIEW} sx={{ width: 20, height: 20 }} />
@@ -117,7 +117,11 @@ export const HeadViewPanel: FC<HeadViewPanelProps> = ({ tableId }) => {
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} timeout={300}>
             <Paper sx={{ ...PAPPER_SX, mx: 0 }}>
-              <ClickAwayListener onClickAway={onPanelClose}>
+              <ClickAwayListener
+                mouseEvent={'onMouseDown'}
+                onClickAway={() => setAnchorEl(null)}
+                touchEvent={'onTouchStart'}
+              >
                 <Stack
                   sx={{
                     ...PAPPER_STACK_CONTAINER_SX,
