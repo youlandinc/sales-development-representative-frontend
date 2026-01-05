@@ -3,7 +3,6 @@ import {
   Box,
   ClickAwayListener,
   Divider,
-  Icon,
   MenuItem,
   Paper,
   Popper,
