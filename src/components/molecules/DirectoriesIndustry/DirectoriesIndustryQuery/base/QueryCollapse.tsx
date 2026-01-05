@@ -1,12 +1,7 @@
 import { FC, MouseEvent, ReactNode, useState } from 'react';
-import { Box, Collapse, Icon, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Collapse, Stack, Tooltip, Typography } from '@mui/material';
 
-import { QUERY_TOOLTIP_SLOT_PROPS, QueryBadgeAuth } from './index';
-
-import ICON_INFO from './assets/icon-info.svg';
-
-import ICON_ARROW from './assets/icon-arrow.svg';
-import ICON_CLOSE from './assets/icon-close.svg';
+import { QUERY_TOOLTIP_SLOT_PROPS, QueryBadgeAuth, QueryIcon } from './index';
 
 interface QueryCollapseProps {
   title?: string | null;
@@ -48,7 +43,10 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
             gap: 0.5,
           }}
         >
-          <Typography component="span" sx={{ fontSize: 14, fontWeight: 600 }}>
+          <Typography
+            component="span"
+            sx={{ fontSize: 14, lineHeight: '20px', fontWeight: 600 }}
+          >
             {title}
             {tooltip && (
               <Tooltip
@@ -57,15 +55,16 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                 slotProps={QUERY_TOOLTIP_SLOT_PROPS}
                 title={tooltip}
               >
-                <Icon
-                  component={ICON_INFO}
+                <Box
+                  component="span"
                   sx={{
-                    width: 12,
-                    height: 12,
                     ml: 0.5,
                     verticalAlign: 'middle',
+                    display: 'inline-flex',
                   }}
-                />
+                >
+                  <QueryIcon.Info />
+                </Box>
               </Tooltip>
             )}
           </Typography>
@@ -76,6 +75,7 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
               alignItems: 'center',
               flexShrink: 0,
               gap: 1,
+              height: 20,
             }}
           >
             {filterCount > 0 && (
@@ -97,24 +97,21 @@ export const QueryCollapse: FC<QueryCollapseProps> = ({
                   cursor: 'default',
                 }}
               >
-                <Icon
-                  component={ICON_CLOSE}
+                <QueryIcon.Close
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     e.preventDefault();
                     onClearFilters?.();
                   }}
-                  sx={{ width: 14, height: 14, cursor: 'pointer' }}
+                  sx={{ cursor: 'pointer' }}
                 />
                 {filterCount} {`filter${filterCount > 1 ? 's' : ''}`}
               </Box>
             )}
             {!isAuth && <QueryBadgeAuth />}
-            <Icon
-              component={ICON_ARROW}
+            <QueryIcon.Arrow
+              size={12}
               sx={{
-                width: 12,
-                height: 12,
                 transform: `rotate(${expanded ? '.25' : '0'}turn)`,
                 transition: 'transform .3s',
               }}

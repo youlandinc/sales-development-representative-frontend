@@ -1,12 +1,8 @@
 import { FC } from 'react';
-import { Box, Collapse, Icon, Stack, Typography } from '@mui/material';
+import { Box, Collapse, Stack, Typography } from '@mui/material';
 import { ResponseEnrichmentTableViaSearch } from '@/types';
 
-import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
-import ICON_FOLDER from './assets/icon-folder.svg';
-import ICON_TICK from './assets/icon-tick.svg';
-
-import ICON_TABLE_NORMAL from './assets/icon-table-normal.svg';
+import { QueryTableIcon } from './QueryTableIcons';
 
 interface FilterTableSelectItemProps {
   item: ResponseEnrichmentTableViaSearch[0];
@@ -48,24 +44,19 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
           '&:hover': { bgcolor: '#F4F5F9' },
         }}
       >
-        <Icon
-          component={ICON_ARROW_DOWN}
+        <QueryTableIcon.ArrowDown
           sx={{
-            width: 12,
-            height: 12,
             transition: 'all .3s',
             transform: `rotate(${isExpanded ? 0 : -0.25}turn)`,
             visibility: hasChildren ? 'visible' : 'hidden',
           }}
         />
 
-        <Icon
-          component={hasChildren ? ICON_FOLDER : ICON_TABLE_NORMAL}
-          sx={{
-            width: 20,
-            height: 20,
-          }}
-        />
+        {hasChildren ? (
+          <QueryTableIcon.Folder />
+        ) : (
+          <QueryTableIcon.TableNormal />
+        )}
 
         <Typography
           sx={{
@@ -79,13 +70,8 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
           {item.tableName}
         </Typography>
 
-        <Icon
-          component={ICON_TICK}
-          sx={{
-            width: 20,
-            height: 20,
-            visibility: isSelected ? 'visible' : 'hidden',
-          }}
+        <QueryTableIcon.Tick
+          sx={{ visibility: isSelected ? 'visible' : 'hidden' }}
         />
       </Stack>
 
@@ -111,11 +97,8 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
                     '&:hover': { bgcolor: '#F4F5F9' },
                   }}
                 >
-                  <Icon
-                    component={ICON_TABLE_NORMAL}
+                  <QueryTableIcon.TableNormal
                     sx={{
-                      width: 20,
-                      height: 20,
                       '& path': {
                         fill: isChildSelected ? '#6E4EFB' : '#363440',
                       },
@@ -135,13 +118,8 @@ export const QueryTableSelectItem: FC<FilterTableSelectItemProps> = ({
                     {child.tableName}
                   </Typography>
 
-                  <Icon
-                    component={ICON_TICK}
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      visibility: isChildSelected ? 'visible' : 'hidden',
-                    }}
+                  <QueryTableIcon.Tick
+                    sx={{ visibility: isChildSelected ? 'visible' : 'hidden' }}
                   />
                 </Stack>
               );

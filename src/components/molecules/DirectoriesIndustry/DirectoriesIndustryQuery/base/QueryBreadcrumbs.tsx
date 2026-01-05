@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import ICON_BACK from './assets/icon-back.svg';
+import { QueryIcon } from './index';
 
 interface QueryBreadcrumbsProps {
   current: string;
@@ -38,7 +38,7 @@ export const QueryBreadcrumbs: FC<QueryBreadcrumbsProps> = ({ current }) => {
           },
         }}
       >
-        <Icon component={ICON_BACK} sx={{ width: 12, height: 12 }} />
+        <QueryIcon.Back />
         <Typography
           className={'previous'}
           sx={{

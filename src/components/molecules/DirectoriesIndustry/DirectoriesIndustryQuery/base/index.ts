@@ -1,3 +1,4 @@
+export * from './QueryIcons';
 export * from './QueryBreadcrumbs';
 export * from './QueryTab';
 

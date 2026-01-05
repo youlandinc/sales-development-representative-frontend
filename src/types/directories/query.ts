@@ -33,6 +33,7 @@ export enum DirectoriesQueryComponentNameEnum {
   date_range_select = 'DATE_RANGE_SELECT',
   auto_complete_location = 'AUTO_COMPLETE_LOCATION',
   cascade_select = 'CASCADE_SELECT',
+  cascade_select_dynamic = 'CASCADE_SELECT_DYNAMIC',
 }
 
 export enum DirectoriesEntityTypeEnum {
@@ -77,6 +78,10 @@ export interface DirectoriesQueryItem {
   subLabel: string | null; // for checkbox/switch inside tooltip
   subTooltip: string | null;
   subDescription: string | null;
+
+  // ========== InputNumber Props ==========
+  notAllowZero: boolean | null;
+  maxLength: number | null;
 
   // ========== Options & Values ==========
   optionMultiple: boolean;

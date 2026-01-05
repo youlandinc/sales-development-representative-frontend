@@ -1,16 +1,12 @@
 import { FC, ReactNode } from 'react';
-import { Box, Icon, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 
 import {
   DirectoriesEntityTypeEnum,
   DirectoriesQueryItem,
 } from '@/types/directories';
 
-import ICON_FIRM_DEFAULT from './assets/icon-firm-default.svg';
-import ICON_FIRM_ACTIVE from './assets/icon-firm-active.svg';
-
-import ICON_EXECUTIVE_DEFAULT from './assets/icon-executive-default.svg';
-import ICON_EXECUTIVE_ACTIVE from './assets/icon-executive-active.svg';
+import { QueryIcon } from './index';
 
 interface QueryTabProps {
   config: DirectoriesQueryItem;
@@ -21,20 +17,10 @@ interface QueryTabProps {
 
 const getIconByValue = (value: string, isActive: boolean) => {
   if (value === DirectoriesEntityTypeEnum.firm) {
-    return (
-      <Icon
-        component={isActive ? ICON_FIRM_ACTIVE : ICON_FIRM_DEFAULT}
-        sx={{ width: 20, height: 20 }}
-      />
-    );
+    return <QueryIcon.Firm isActive={isActive} />;
   }
   if (value === DirectoriesEntityTypeEnum.executive) {
-    return (
-      <Icon
-        component={isActive ? ICON_EXECUTIVE_ACTIVE : ICON_EXECUTIVE_DEFAULT}
-        sx={{ width: 20, height: 20 }}
-      />
-    );
+    return <QueryIcon.Executive isActive={isActive} />;
   }
   return null;
 };

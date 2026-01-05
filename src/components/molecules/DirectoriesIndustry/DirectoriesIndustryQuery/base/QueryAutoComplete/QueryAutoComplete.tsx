@@ -15,7 +15,7 @@ import { UTypeOf } from '@/utils/UTypeOf';
 import { StyledChip, StyledImage, StyledTextField } from '@/components/atoms';
 
 import { AutoCompleteOption, useQueryAutoComplete } from './hooks';
-import { CLEAR_ICON, LOADING_SPINNER, POPUP_ICON } from './index';
+import { QueryIcon } from '../QueryIcons';
 
 import { QUERY_TOOLTIP_SLOT_PROPS, QueryTooltipAccessTitle } from '../index';
 
@@ -231,7 +231,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           false,
           typeof freeSolo
         >
-          clearIcon={CLEAR_ICON}
+          clearIcon={<QueryIcon.Close />}
           disableCloseOnSelect={multiple}
           filterOptions={filterOptions}
           freeSolo={freeSolo && isAuth}
@@ -244,7 +244,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           getOptionLabel={onGetOptionLabel}
           isOptionEqualToValue={onIsOptionEqualToValue}
           loading={loading}
-          loadingText={LOADING_SPINNER}
+          loadingText={<QueryIcon.Loading />}
           multiple={multiple}
           noOptionsText={noOptionsText}
           onChange={onChangeToHandleSelection}
@@ -253,7 +253,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           onOpen={onOpenToTrigger}
           open={open}
           options={displayOptions}
-          popupIcon={POPUP_ICON}
+          popupIcon={<QueryIcon.Arrow />}
           renderInput={(params) => (
             <StyledTextField
               {...params}
@@ -293,7 +293,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
                     cursor: 'default',
                   }}
                 >
-                  {LOADING_SPINNER}
+                  <QueryIcon.Loading />
                 </Box>
               );
             }
@@ -424,13 +424,16 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
               whiteSpace: 'nowrap',
               pl: '-2px',
             },
+            '& .MuiAutocomplete-input': {
+              minWidth: '4px !important',
+            },
             '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall': {
               py: 0.5,
               pl: 1.75,
               pr: 1,
             },
             // When chips are present, reduce left padding and reserve space for endAdornment icons
-            '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall:has(.query-autocomplete-chip)':
+            '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall:has(.styled-chip)':
               {
                 py: 0.5,
                 pl: 0.75,

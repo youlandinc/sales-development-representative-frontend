@@ -1,6 +1,6 @@
-import { Icon, Stack, Tooltip, Typography } from '@mui/material';
+import { Stack, Tooltip, Typography } from '@mui/material';
 
-import ICON_INFO from './assets/icon-info.svg';
+import { QueryIcon } from './index';
 
 const TOOLTIP_SLOT_PROPS = {
   tooltip: {
@@ -63,15 +63,7 @@ export const QueryTips = () => {
         </Stack>
       }
     >
-      <Icon
-        component={ICON_INFO}
-        sx={{
-          width: 12,
-          height: 12,
-          ml: 0.5,
-          verticalAlign: 'middle',
-        }}
-      />
+      <QueryIcon.Info sx={{ ml: 0.5, verticalAlign: 'middle' }} />
     </Tooltip>
   );
 };

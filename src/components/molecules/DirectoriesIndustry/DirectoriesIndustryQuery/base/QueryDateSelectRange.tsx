@@ -3,7 +3,6 @@ import {
   Box,
   ClickAwayListener,
   Fade,
-  Icon,
   Popper,
   Stack,
   Tooltip,
@@ -17,13 +16,11 @@ import {
   StyledSelect,
 } from '@/components/atoms';
 
-import ICON_CLOSE from './assets/icon-close.svg';
-import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
-
 import {
   QUERY_TOOLTIP_SLOT_PROPS,
+  QueryIcon,
   QueryTooltipAccessTitle,
-} from './QueryTooltip';
+} from './index';
 
 const DATE_PICKER_SLOT_PROPS = {
   textField: {
@@ -242,30 +239,12 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
           <Box>
             <StyledSelect
               clearable={!!selectValue}
-              clearIcon={
-                <Icon
-                  component={ICON_CLOSE}
-                  sx={{ width: 14, height: 14, cursor: 'pointer' }}
-                />
-              }
-              IconComponent={({ className }) => {
-                return (
-                  <Stack
-                    className={className}
-                    sx={{
-                      mr: 0.25,
-                    }}
-                  >
-                    <Icon
-                      component={ICON_ARROW_DOWN}
-                      sx={{
-                        width: 14,
-                        height: 14,
-                      }}
-                    />
-                  </Stack>
-                );
-              }}
+              clearIcon={<QueryIcon.Close />}
+              IconComponent={({ className }) => (
+                <Stack className={className} sx={{ mr: 0.25 }}>
+                  <QueryIcon.ArrowDown />
+                </Stack>
+              )}
               menuPaperSx={{
                 mt: 0.5,
                 borderRadius: 2,
@@ -325,15 +304,10 @@ export const QueryDateSelectRange: FC<QueryDateSelectRangeProps> = ({
                   <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
                     Select a custom range
                   </Typography>
-                  <Icon
-                    component={ICON_CLOSE}
+                  <QueryIcon.Close
                     onClick={onClickToCancel}
-                    sx={{
-                      width: 16,
-                      height: 16,
-                      ml: 'auto',
-                      cursor: 'pointer',
-                    }}
+                    size={16}
+                    sx={{ ml: 'auto', cursor: 'pointer' }}
                   />
                 </Stack>
                 <DateField

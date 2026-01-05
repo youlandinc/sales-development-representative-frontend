@@ -1,11 +1,11 @@
 import { FC } from 'react';
-import { Icon, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
 import { StyledButton, StyledDialog, StyledLoading } from '@/components/atoms';
 import { ResponseEnrichmentTableViaSearch } from '@/types';
 import { QueryTableSelectItem } from './index';
 
-import ICON_CLOSE from './assets/icon-close.svg';
+import { QueryTableIcon } from './QueryTableIcons';
 
 interface QueryTableSelectDialogProps {
   visible: boolean;
@@ -94,11 +94,7 @@ export const QueryTableSelectDialog: FC<QueryTableSelectDialogProps> = ({
           <Typography sx={{ fontSize: 20, fontWeight: 600, lineHeight: 1.2 }}>
             {dialogTitle}
           </Typography>
-          <Icon
-            component={ICON_CLOSE}
-            onClick={onClose}
-            sx={{ width: 24, height: 24, cursor: 'pointer' }}
-          />
+          <QueryTableIcon.Close onClick={onClose} sx={{ cursor: 'pointer' }} />
         </Stack>
       }
       headerSx={{ pb: 3 }}

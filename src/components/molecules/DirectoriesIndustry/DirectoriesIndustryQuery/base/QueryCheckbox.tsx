@@ -3,33 +3,12 @@ import {
   Box,
   Checkbox,
   FormControlLabel,
-  Icon,
   Stack,
   Tooltip,
   Typography,
 } from '@mui/material';
 
-import { StyledImage } from '@/components/atoms';
-import { QUERY_TOOLTIP_SLOT_PROPS } from './index';
-
-import ICON_INFO from './assets/icon-info.svg';
-
-const CHECKBOX_ICON_SX = { width: 20, height: 20, position: 'relative' };
-
-const CHECKBOX_CHECKED_ICON = (
-  <StyledImage sx={CHECKBOX_ICON_SX} url="/images/icon-checkbox-check.svg" />
-);
-
-const CHECKBOX_UNCHECKED_ICON = (
-  <StyledImage sx={CHECKBOX_ICON_SX} url="/images/icon-checkbox-static.svg" />
-);
-
-const CHECKBOX_INDETERMINATE_ICON = (
-  <StyledImage
-    sx={CHECKBOX_ICON_SX}
-    url="/images/icon-checkbox-intermediate.svg"
-  />
-);
+import { QUERY_TOOLTIP_SLOT_PROPS, QueryIcon } from './index';
 
 interface QueryCheckboxProps {
   value?: boolean;
@@ -57,10 +36,10 @@ export const QueryCheckbox: FC<QueryCheckboxProps> = ({
           control={
             <Checkbox
               checked={value}
-              checkedIcon={CHECKBOX_CHECKED_ICON}
-              icon={CHECKBOX_UNCHECKED_ICON}
+              checkedIcon={<QueryIcon.CheckboxChecked />}
+              icon={<QueryIcon.CheckboxUnchecked />}
               indeterminate={indeterminate}
-              indeterminateIcon={CHECKBOX_INDETERMINATE_ICON}
+              indeterminateIcon={<QueryIcon.CheckboxIndeterminate />}
               onChange={(_, checked) => onFormChange(checked)}
               sx={{ width: 20, height: 20, padding: 0 }}
             />
@@ -100,7 +79,7 @@ export const QueryCheckbox: FC<QueryCheckboxProps> = ({
             title={subTooltip}
           >
             <Box>
-              <Icon component={ICON_INFO} sx={{ width: 12, height: 12 }} />
+              <QueryIcon.Info />
             </Box>
           </Tooltip>
         )}

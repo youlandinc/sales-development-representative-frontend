@@ -1,13 +1,15 @@
 import { FC } from 'react';
-import { Box, Icon, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Stack, Tooltip, Typography } from '@mui/material';
 
 import { useDirectoriesStore } from '@/stores/directories';
 import { DIRECTORIES_BADGE_AUTH } from '@/constants/directories';
 import { DirectoriesBizIdEnum } from '@/types/directories';
 
-import { QUERY_TOOLTIP_SLOT_PROPS, QueryTooltipAccessTitle } from './index';
-
-import ICON_LOCK from './assets/icon-lock.svg';
+import {
+  QUERY_TOOLTIP_SLOT_PROPS,
+  QueryIcon,
+  QueryTooltipAccessTitle,
+} from './index';
 
 export const QueryBadgeAuth: FC = () => {
   const bizId = useDirectoriesStore(
@@ -42,7 +44,7 @@ export const QueryBadgeAuth: FC = () => {
             cursor: 'default',
           }}
         >
-          <Icon component={ICON_LOCK} sx={{ width: 11, height: 11 }} />
+          <QueryIcon.Lock />
           <Typography
             sx={{
               color: '#BC9166',

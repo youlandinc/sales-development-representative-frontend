@@ -1,7 +1,6 @@
 import { FC, MouseEvent, useState } from 'react';
 import {
   CircularProgress,
-  Icon,
   Menu,
   MenuItem,
   Stack,
@@ -10,22 +9,7 @@ import {
 
 import { EnrichmentTableEnum } from '@/types';
 
-import ICON_FOLDER from './assets/icon-folder.svg';
-import ICON_CLOSE from './assets/icon-close.svg';
-import ICON_MORE from './assets/icon-more.svg';
-import ICON_OPEN from './assets/icon-open.svg';
-import ICON_PEOPLE from './assets/icon-people.svg';
-import ICON_COMPANY from './assets/icon-company.svg';
-import ICON_CSV from './assets/icon-csv.svg';
-
-const ICON_HASH: Record<EnrichmentTableEnum, any> = {
-  [EnrichmentTableEnum.find_people]: ICON_PEOPLE,
-  [EnrichmentTableEnum.find_companies]: ICON_COMPANY,
-  [EnrichmentTableEnum.from_csv]: ICON_CSV,
-  [EnrichmentTableEnum.blank_table]: ICON_FOLDER,
-  [EnrichmentTableEnum.crm_list]: ICON_FOLDER,
-  [EnrichmentTableEnum.agent]: ICON_FOLDER,
-};
+import { QueryTableIcon, TABLE_SOURCE_ICON } from './QueryTableIcons';
 
 interface QueryTableSelectInputProps {
   selectedTableName: string;
@@ -85,12 +69,9 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
           },
         }}
       >
-        {selectedTableName && selectedTableSource && (
-          <Icon
-            component={ICON_HASH[selectedTableSource]}
-            sx={{ width: 16, height: 16, flexShrink: 0 }}
-          />
-        )}
+        {selectedTableName &&
+          selectedTableSource &&
+          TABLE_SOURCE_ICON[selectedTableSource]}
         <Typography
           onClick={onOpenDialog}
           sx={{
@@ -123,23 +104,19 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
               <CircularProgress size={16} sx={{ color: '#6F6C7D' }} />
             ) : (
               <>
-                <Icon
-                  component={ICON_FOLDER}
+                <QueryTableIcon.Folder
                   onClick={onOpenDialog}
+                  size={16}
                   sx={{
-                    width: 16,
-                    height: 16,
                     flexShrink: 0,
                     cursor: 'pointer',
                     '&:hover': { '& path': { fill: '#363440' } },
                   }}
                 />
-                <Icon
-                  component={ICON_CLOSE}
+                <QueryTableIcon.Close
                   onClick={onClearSelection}
+                  size={16}
                   sx={{
-                    width: 16,
-                    height: 16,
                     flexShrink: 0,
                     cursor: 'pointer',
                     '&:hover': { '& path': { fill: '#363440' } },
@@ -149,12 +126,10 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
               </>
             )
           ) : (
-            <Icon
-              component={ICON_FOLDER}
+            <QueryTableIcon.Folder
               onClick={onOpenDialog}
+              size={16}
               sx={{
-                width: 16,
-                height: 16,
                 flexShrink: 0,
                 cursor: 'pointer',
                 '&:hover': { '& path': { fill: '#363440' } },
@@ -177,7 +152,7 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
               border: '1px solid #E5E5E5',
             }}
           >
-            <Icon component={ICON_MORE} sx={{ width: 16, height: 16 }} />
+            <QueryTableIcon.More size={16} />
           </Stack>
           <Menu
             anchorEl={anchorEl}
@@ -215,7 +190,7 @@ export const QueryTableSelectInput: FC<QueryTableSelectInputProps> = ({
             }}
           >
             <MenuItem onClick={onClickToOpenTable} sx={{ px: 1.5, gap: 1 }}>
-              <Icon component={ICON_OPEN} sx={{ width: 16, height: 16 }} />
+              <QueryTableIcon.Open size={16} />
               <Typography fontSize={12}>Open table</Typography>
             </MenuItem>
           </Menu>

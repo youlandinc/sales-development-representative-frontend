@@ -1,7 +1,6 @@
 import { FC, ReactNode } from 'react';
 import {
   Box,
-  Icon,
   Stack,
   StackProps,
   SxProps,
@@ -9,9 +8,12 @@ import {
   Typography,
 } from '@mui/material';
 
-import { QUERY_TOOLTIP_SLOT_PROPS, QueryBadgeAuth, QueryTips } from './index';
-
-import ICON_INFO from './assets/icon-info.svg';
+import {
+  QUERY_TOOLTIP_SLOT_PROPS,
+  QueryBadgeAuth,
+  QueryIcon,
+  QueryTips,
+} from './index';
 
 interface QueryContainerProps extends StackProps {
   label?: string | null;
@@ -57,15 +59,16 @@ export const QueryContainer: FC<QueryContainerProps> = ({
                   slotProps={QUERY_TOOLTIP_SLOT_PROPS}
                   title={tooltip}
                 >
-                  <Icon
-                    component={ICON_INFO}
+                  <Box
+                    component="span"
                     sx={{
-                      width: 12,
-                      height: 12,
                       ml: 0.5,
                       verticalAlign: 'middle',
+                      display: 'inline-flex',
                     }}
-                  />
+                  >
+                    <QueryIcon.Info />
+                  </Box>
                 </Tooltip>
               )}
               {showTips && <QueryTips />}

@@ -16,6 +16,7 @@ import {
   QueryAdditionalDetails,
   QueryAutoComplete,
   QueryCascadeSelect,
+  QueryCascadeSelectExternal,
   QueryCheckbox,
   QueryCollapse,
   QueryContainer,
@@ -307,55 +308,75 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
         }
       }
 
-      if (
-        config.componentName ===
-        DirectoriesQueryComponentNameEnum.cascade_select
-      ) {
-        return (
-          <QueryContainer
-            description={config.description}
-            isAuth={containerIsAuth}
-            label={config.label}
-            tooltip={config.tooltip}
-          >
-            <QueryCascadeSelect
-              onFormChange={(newValue) =>
-                onFormChange?.(config.key, newValue, groupPath)
-              }
-              placeholder={config.placeholder || ''}
-              requestParams={selectRequestParams}
-              url={config.url}
-              value={formData[config.key!] ?? []}
-            />
-          </QueryContainer>
-        );
+      switch (config.componentName) {
+        case DirectoriesQueryComponentNameEnum.cascade_select:
+          return (
+            <QueryContainer
+              description={config.description}
+              isAuth={containerIsAuth}
+              label={config.label}
+              tooltip={config.tooltip}
+            >
+              <QueryCascadeSelect
+                onFormChange={(newValue) =>
+                  onFormChange?.(config.key, newValue, groupPath)
+                }
+                placeholder={config.placeholder || ''}
+                requestParams={selectRequestParams}
+                url={config.url}
+                value={formData[config.key!] ?? []}
+              />
+            </QueryContainer>
+          );
+        case DirectoriesQueryComponentNameEnum.cascade_select_dynamic:
+          return (
+            <QueryContainer
+              description={config.description}
+              isAuth={containerIsAuth}
+              label={config.label}
+              tooltip={config.tooltip}
+            >
+              <QueryCascadeSelectExternal
+                onFormChange={(newValue) =>
+                  onFormChange?.(config.key, newValue, groupPath)
+                }
+                placeholder={config.placeholder || ''}
+                url={null}
+                useMockData
+                value={formData[config.key!] ?? []}
+              />
+            </QueryContainer>
+          );
+        default:
+          return (
+            <QueryContainer
+              description={config.description}
+              isAuth={containerIsAuth}
+              label={config.label}
+              tooltip={config.tooltip}
+            >
+              <QueryAutoComplete
+                freeSolo={false}
+                isAuth={config.isAuth}
+                isShowRemark={
+                  config.componentName ===
+                  DirectoriesQueryComponentNameEnum.auto_complete_location
+                }
+                multiple={config.optionMultiple}
+                onFormChange={(newValue: string[] | string | null) =>
+                  onFormChange?.(config.key, newValue, groupPath)
+                }
+                options={config.optionValues || []}
+                placeholder={config.placeholder || ''}
+                requestParams={selectRequestParams}
+                url={config.url}
+                value={
+                  formData[config.key!] ?? (config.optionMultiple ? [] : '')
+                }
+              />
+            </QueryContainer>
+          );
       }
-      return (
-        <QueryContainer
-          description={config.description}
-          isAuth={containerIsAuth}
-          label={config.label}
-          tooltip={config.tooltip}
-        >
-          <QueryAutoComplete
-            freeSolo={false}
-            isAuth={config.isAuth}
-            isShowRemark={
-              config.componentName ===
-              DirectoriesQueryComponentNameEnum.auto_complete_location
-            }
-            multiple={config.optionMultiple}
-            onFormChange={(newValue: string[] | string | null) =>
-              onFormChange?.(config.key, newValue, groupPath)
-            }
-            options={config.optionValues || []}
-            placeholder={config.placeholder || ''}
-            requestParams={selectRequestParams}
-            url={config.url}
-            value={formData[config.key!] ?? (config.optionMultiple ? [] : '')}
-          />
-        </QueryContainer>
-      );
     }
 
     case DirectoriesQueryActionTypeEnum.input: {
@@ -368,9 +389,11 @@ export const CreateQueryElement: FC<CreateQueryElementProps> = ({
             tooltip={config.tooltip}
           >
             <StyledTextFieldNumber
-              onValueChange={({ value }) =>
-                onFormChange?.(config.key, value, groupPath)
-              }
+              maxLength={config.maxLength ?? 0}
+              notAllowZero={config.notAllowZero ?? false}
+              onValueChange={({ floatValue }) => {
+                onFormChange?.(config.key, floatValue, groupPath);
+              }}
               placeholder={config.placeholder || ''}
               size={'small'}
               sx={{

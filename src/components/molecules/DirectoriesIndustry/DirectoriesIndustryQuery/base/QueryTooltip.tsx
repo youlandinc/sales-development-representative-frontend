@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { FC } from 'react';
 import { Typography } from '@mui/material';
 
 import { DIRECTORIES_BADGE_AUTH } from '@/constants/directories';
