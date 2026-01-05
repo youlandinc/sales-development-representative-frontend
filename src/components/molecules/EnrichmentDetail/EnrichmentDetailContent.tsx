@@ -22,10 +22,10 @@ import { ROW_HEIGHT } from './Table/config';
 import { StyledButton, StyledLoading } from '@/components/atoms';
 import { DrawerActionsContainer } from '@/components/molecules';
 import {
-  HeadColumnsPanel,
-  HeadFilterPanel,
-  //HeadRowsPanel,
-  HeadViewPanel,
+  PanelColumns,
+  PanelFilter,
+  //PanelRows,
+  PanelView,
 } from './Panel';
 import { StyledTable } from './Table';
 
@@ -271,10 +271,10 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                 height: 32,
               }}
             >
-              <HeadViewPanel tableId={tableId} />
-              <HeadColumnsPanel tableId={tableId} />
-              {/*<HeadRowsPanel />*/}
-              <HeadFilterPanel />
+              <PanelView tableId={tableId} />
+              <PanelColumns tableId={tableId} />
+              {/*<PanelRows />*/}
+              <PanelFilter />
             </Stack>
             {isActionsButtonVisible && (
               <Stack flexDirection={'row'}>

@@ -1,9 +1,9 @@
-import { Icon, Stack, Switch, Tooltip, Typography } from '@mui/material';
+import { Stack, Tooltip, Typography } from '@mui/material';
 import { NodeViewWrapper } from '@tiptap/react';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 
-import { COLUMN_TYPE_ICONS } from '../../../Table/config';
+import { TypeIcon } from '../../../Table/TableIcon';
 import { useWebResearchStore } from '@/stores/enrichment';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
@@ -86,10 +86,7 @@ export const PlaceholderNode: FC = (props: any) => {
           width={'fit-content'}
         >
           {/* <Switch checked={checked} onChange={onChange} size={'small'} /> */}
-          <Icon
-            component={COLUMN_TYPE_ICONS[fieldType as TableColumnTypeEnum]}
-            sx={{ width: 18, height: 18 }}
-          />
+          <TypeIcon size={18} type={fieldType as TableColumnTypeEnum} />
           <Typography color={'text.primary'} variant={'body3'}>
             {label}
           </Typography>

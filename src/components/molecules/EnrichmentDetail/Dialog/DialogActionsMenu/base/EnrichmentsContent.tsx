@@ -1,6 +1,6 @@
-import { Icon, Stack, Typography } from '@mui/material';
+import { FC } from 'react';
 import Image from 'next/image';
-import { FC, memo } from 'react';
+import { Icon, Stack, Typography } from '@mui/material';
 import { useShallow } from 'zustand/shallow';
 
 import { StyledProviderBadges } from './StyledProviderBadges';

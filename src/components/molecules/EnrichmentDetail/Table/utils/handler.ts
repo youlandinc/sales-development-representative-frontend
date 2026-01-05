@@ -12,7 +12,7 @@ export interface ColumnSortParams {
 
 /**
  * Build column sort params from DragEndEvent
- * Used by both HeadColumnsPanel and StyledTable
+ * Used by both PanelColumns and StyledTable
  *
  * @param event - DragEndEvent from dnd-kit
  * @returns ColumnSortParams or null if invalid

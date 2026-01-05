@@ -1,5 +1,4 @@
 import {
-  Icon,
   List,
   ListItem,
   ListItemButton,
@@ -18,7 +17,7 @@ import {
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
 import { useEnrichmentTableStore } from '@/stores/enrichment';
-import { COLUMN_TYPE_ICONS } from '../../../Table/config';
+import { TypeIcon } from '../../../Table/TableIcon';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 export type SuggestionListRef = {
@@ -127,12 +126,12 @@ export const SuggestionList = forwardRef<
               selected={index === selectedIndex}
               sx={{ px: 1.5, py: 1, gap: 1 }}
             >
-              <Icon
-                component={
-                  COLUMN_TYPE_ICONS[item?.fieldType as TableColumnTypeEnum] ||
-                  COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+              <TypeIcon
+                size={18}
+                type={
+                  (item?.fieldType as TableColumnTypeEnum) ||
+                  TableColumnTypeEnum.text
                 }
-                sx={{ width: 18, height: 18 }}
               />
               <Typography fontSize={12} lineHeight={1.5}>
                 {item.fieldName}

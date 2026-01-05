@@ -1,9 +1,9 @@
 import { FC, MouseEvent, ReactNode } from 'react';
-import { Box, Icon, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 import { CommonAiIcon } from '../common';
 
-import { COLUMN_TYPE_ICONS } from '../config';
+import { TypeIcon } from '../TableIcon';
 import { TableColumnMeta, TableColumnTypeEnum } from '@/types/enrichment/table';
 
 interface HeadCellContentProps {
@@ -40,12 +40,11 @@ export const HeadCellContent: FC<HeadCellContentProps> = ({
             }}
           />
         ) : (
-          <Icon
-            component={
-              COLUMN_TYPE_ICONS[columnMeta?.fieldType as TableColumnTypeEnum] ||
-              COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+          <TypeIcon
+            type={
+              (columnMeta?.fieldType as TableColumnTypeEnum) ||
+              TableColumnTypeEnum.text
             }
-            sx={{ width: 16, height: 16 }}
           />
         )}
         {content}

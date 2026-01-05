@@ -1,9 +1,9 @@
 import { FC } from 'react';
-import { Icon, Skeleton, Stack } from '@mui/material';
+import { Skeleton, Stack } from '@mui/material';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 import { DirectoriesQueryTableHeaderItem } from '@/types/directories';
-import { COLUMN_TYPE_ICONS } from '@/components/molecules/EnrichmentDetail/Table/config';
+import { TypeIcon } from '@/components/molecules/EnrichmentDetail/Table/TableIcon';
 
 import { OverflowTooltip } from './OverflowTooltip';
 
@@ -49,12 +49,10 @@ export const PreviewHeaderCell: FC<PreviewHeaderCellProps> = ({
       }}
     >
       {index > 0 && (
-        <Icon
-          component={
-            COLUMN_TYPE_ICONS[head.columnType as TableColumnTypeEnum] ||
-            COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+        <TypeIcon
+          type={
+            (head.columnType as TableColumnTypeEnum) || TableColumnTypeEnum.text
           }
-          sx={{ width: 16, height: 16 }}
         />
       )}
       <OverflowTooltip>{head.columnName}</OverflowTooltip>

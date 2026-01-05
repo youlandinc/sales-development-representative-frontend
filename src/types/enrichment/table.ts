@@ -10,6 +10,8 @@ import {
   TableFilterGroupItem,
 } from '@/types';
 
+import { ReactNode } from 'react';
+
 export enum TableColumnTypeEnum {
   text = 'TEXT',
   number = 'NUMBER',
@@ -34,6 +36,7 @@ export enum TableColumnMenuActionEnum {
   sort_a_z = 'SORT_A_Z',
   sort_z_a = 'SORT_Z_A',
   pin = 'PIN',
+  unpin = 'UNPIN',
   visible = 'VISIBLE',
   delete = 'DELETE',
   cell_detail = 'CELL_DETAIL',
@@ -140,7 +143,7 @@ export interface TableColumnMeta extends Partial<TableColumnProps> {
 export interface TableColumnActionOption {
   label: string;
   value: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
-  icon: any;
+  icon: ReactNode;
   key?: string;
   submenu?: TableColumnActionOption[];
   parentValue?: TableColumnMenuActionEnum | TableColumnTypeEnum | string;

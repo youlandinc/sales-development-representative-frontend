@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from 'react';
 import { StyledButton, StyledTextField } from '@/components/atoms';
 import { CommonSelectFieldType } from '@/components/molecules/Common';
 
-import { COLUMN_TYPE_ICONS } from '../Table/config';
+import { TypeIcon } from '../Table/TableIcon';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 import { useAsyncFn } from '@/hooks';
@@ -60,12 +60,12 @@ export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
         px={3}
       >
         {column?.fieldType && (
-          <Icon
-            component={
-              COLUMN_TYPE_ICONS[column?.fieldType as TableColumnTypeEnum] ||
-              COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+          <TypeIcon
+            size={20}
+            type={
+              (column?.fieldType as TableColumnTypeEnum) ||
+              TableColumnTypeEnum.text
             }
-            sx={{ width: 20, height: 20 }}
           />
         )}
         <Typography fontWeight={600} lineHeight={1.2}>

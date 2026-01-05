@@ -11,8 +11,7 @@ import {
 } from '@mui/material';
 
 import { MENU_STYLES } from '../styles/menu';
-
-import ICON_ARROW from '../assets/icon-arrow.svg';
+import { TableIcon } from '../TableIcon';
 
 import {
   TableColumnMenuActionEnum,
@@ -102,16 +101,11 @@ export const MenuColumnNormal: FC<MenuColumnNormalProps> = ({
                     onClick={() => !hasSubmenu && onMenuItemClick(item)}
                     sx={MENU_STYLES.menuItemWithSubmenu}
                   >
-                    {item.icon && (
-                      <Icon component={item.icon} sx={MENU_STYLES.icon} />
-                    )}
+                    {item.icon}
                     {item.label}
                     {hasSubmenu && (
                       <>
-                        <Icon
-                          component={ICON_ARROW}
-                          sx={MENU_STYLES.submenuIcon}
-                        />
+                        <TableIcon.Arrow sx={MENU_STYLES.submenuIcon} />
                         <Paper
                           className="submenu-container"
                           sx={MENU_STYLES.submenuPaper}
@@ -158,12 +152,7 @@ export const MenuColumnNormal: FC<MenuColumnNormalProps> = ({
                                       },
                                     ]}
                                   >
-                                    {subItem.icon && (
-                                      <Icon
-                                        component={subItem.icon}
-                                        sx={MENU_STYLES.icon}
-                                      />
-                                    )}
+                                    {subItem.icon}
                                     {subItem.label}
                                   </MenuItem>
                                 );

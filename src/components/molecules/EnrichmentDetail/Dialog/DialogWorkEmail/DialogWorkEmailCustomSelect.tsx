@@ -13,7 +13,7 @@ import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
-import { COLUMN_TYPE_ICONS } from '../../Table/config';
+import { TypeIcon } from '../../Table/TableIcon';
 import {
   DEFAULT_AUTOCOMPLETE_LISTBOX_SX,
   DEFAULT_AUTOCOMPLETE_PAPER_SX,
@@ -83,14 +83,12 @@ export const DialogWorkEmailCustomSelect: FC<
                 input: {
                   ...params.InputProps,
                   startAdornment: !value?.value ? null : (
-                    <Icon
-                      component={
-                        COLUMN_TYPE_ICONS[
-                          columns.find((col) => col.fieldId === value.value)
-                            ?.fieldType as TableColumnTypeEnum
-                        ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+                    <TypeIcon
+                      type={
+                        (columns.find((col) => col.fieldId === value.value)
+                          ?.fieldType as TableColumnTypeEnum) ||
+                        TableColumnTypeEnum.text
                       }
-                      sx={{ width: 16, height: 16 }}
                     />
                   ),
                 },
@@ -109,14 +107,12 @@ export const DialogWorkEmailCustomSelect: FC<
               key={key}
               {...optionProps}
             >
-              <Icon
-                component={
-                  COLUMN_TYPE_ICONS[
-                    columns.find((col) => col.fieldId === option.value)
-                      ?.fieldType as TableColumnTypeEnum
-                  ] || COLUMN_TYPE_ICONS[TableColumnTypeEnum.text]
+              <TypeIcon
+                type={
+                  (columns.find((col) => col.fieldId === option.value)
+                    ?.fieldType as TableColumnTypeEnum) ||
+                  TableColumnTypeEnum.text
                 }
-                sx={{ width: 16, height: 16 }}
               />
               {option.label}
             </Stack>
