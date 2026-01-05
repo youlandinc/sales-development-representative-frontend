@@ -94,6 +94,7 @@ export const PlanCard: FC<PlanCardProps> = ({
   fullAccess = false,
   onCancel,
   status,
+  planType,
 }) => {
   const progress = useMemo(
     () => calculateProgress(fullAccess, currentValue, totalValue),
@@ -138,7 +139,9 @@ export const PlanCard: FC<PlanCardProps> = ({
             </Typography>
             <PlanBadge {...planBadge} />
           </Stack>
-          <CancelButton onCancel={onCancel} status={status} />
+          {planType !== PlanTypeEnum.free && (
+            <CancelButton onCancel={onCancel} status={status} />
+          )}
         </Stack>
 
         {/* Progress section */}
