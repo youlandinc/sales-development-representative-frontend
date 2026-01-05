@@ -49,7 +49,7 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
     ) => {
       try {
         if (activeType === ActiveTypeEnum.add) {
-          const { data } = await _saveIntegrationConfig(param);
+          await _saveIntegrationConfig(param);
           const { fields } = await fetchTable(param.tableId);
           const fieldIdsWithGroupId = fields?.map((f) => f.fieldId);
           closeDialog();

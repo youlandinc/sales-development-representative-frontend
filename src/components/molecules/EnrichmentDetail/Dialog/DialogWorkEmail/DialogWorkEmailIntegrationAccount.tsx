@@ -54,7 +54,7 @@ export const DialogWorkEmailIntegrationAccount: FC<
       setDisplayType(DisplayTypeEnum.main);
     }
   };
-
+  console.log(activeType);
   return (
     <Stack flex={1} overflow={'hidden'}>
       <DialogHeader

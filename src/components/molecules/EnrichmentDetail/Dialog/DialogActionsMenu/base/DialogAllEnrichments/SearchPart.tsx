@@ -1,15 +1,16 @@
-import { FC } from 'react';
 import { Stack, Typography } from '@mui/material';
 import Image from 'next/image';
+import { FC } from 'react';
+
 import { StyledActionItem } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
-import { StyledProviderBadges } from '../StyledProviderBadges';
 import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
+import { StyledProviderBadges } from '../StyledProviderBadges';
+
 import {
   DisplayTypeEnum,
   IntegrationAction,
 } from '@/types/enrichment/integrations';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
-import { ConfigItem } from './index';
 
 // 定义搜索结果的基础类型
 interface BaseSearchItem {
@@ -46,6 +47,7 @@ interface SearchPartProps {
   openDialog: (action: TableColumnMenuActionEnum) => void;
   setDisplayType: (type: DisplayTypeEnum) => void;
   setSelectedIntegrationToConfig: (config: IntegrationAction) => void;
+  onConfigItemClick: (config: IntegrationAction) => void;
 }
 
 /**
@@ -56,9 +58,7 @@ export const SearchPart: FC<SearchPartProps> = ({
   onWorkEmailItemClick,
   onClickToAiTemplate,
   setDialogAllEnrichmentsVisible,
-  openDialog,
-  setDisplayType,
-  setSelectedIntegrationToConfig,
+  onConfigItemClick,
 }) => {
   if (searchResults.length === 0) {
     return (
@@ -141,13 +141,7 @@ export const SearchPart: FC<SearchPartProps> = ({
                 setDialogAllEnrichmentsVisible(false);
                 return;
               }
-              openDialog(TableColumnMenuActionEnum.work_email);
-              setDisplayType(DisplayTypeEnum.integration);
-              // 使用类型断言处理类型兼容性问题
-              setSelectedIntegrationToConfig(
-                result as unknown as IntegrationAction,
-              );
-              setDialogAllEnrichmentsVisible(false);
+              onConfigItemClick(result as unknown as IntegrationAction);
             }}
             title={result?.name ?? ''}
           />

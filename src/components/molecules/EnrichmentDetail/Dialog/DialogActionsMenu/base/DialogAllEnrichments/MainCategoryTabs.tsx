@@ -1,6 +1,10 @@
-import { Box, Stack, Tab, Tabs } from '@mui/material';
+import { Box, Icon, Stack, Tab, Tabs } from '@mui/material';
 import { SyntheticEvent } from 'react';
+
 import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
+
+import ICON_ATLAS_TASK_LIBRARY from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogAllEnrichments/icon_ai.svg';
+import ICON_INTEGRATIONS from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogAllEnrichments/icon_integrations.svg';
 
 interface MainCategoryTabsProps {
   data: Array<{
@@ -10,6 +14,11 @@ interface MainCategoryTabsProps {
   activeKey: EnrichmentCategoryEnum;
   onTabChange: (event: SyntheticEvent, value: EnrichmentCategoryEnum) => void;
 }
+
+const iconMap: Record<string, any> = {
+  [EnrichmentCategoryEnum.integrations]: ICON_INTEGRATIONS,
+  [EnrichmentCategoryEnum.atlas_task_library]: ICON_ATLAS_TASK_LIBRARY,
+};
 
 /**
  * 主分类标签栏组件
@@ -41,6 +50,14 @@ export const MainCategoryTabs = ({
       >
         {data.map((item) => (
           <Tab
+            icon={
+              iconMap[item.categoryKey] ? (
+                <Icon
+                  component={iconMap[item.categoryKey]}
+                  sx={{ width: 16, height: 16, m: '0px !important' }}
+                />
+              ) : undefined
+            }
             key={item.categoryKey}
             label={item.categoryName}
             sx={{
@@ -55,6 +72,9 @@ export const MainCategoryTabs = ({
               '&.Mui-selected': {
                 color: '#363440',
               },
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 0.5,
             }}
             value={item.categoryKey}
           />

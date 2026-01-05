@@ -48,9 +48,9 @@ export const DialogWorkEmailIntegrationAccountFooter: FC<
   const { saveOrRunIntegrationAccount, saveState } =
     useIntegrationAccountRequest(cb);
 
-  const isDisabled = selectedIntegrationToConfig?.inputParams?.some(
-    (p) => !p.selectedOption,
-  );
+  const isDisabled = selectedIntegrationToConfig?.inputParams
+    ?.filter((i) => i.isRequired)
+    ?.some((p) => !p.selectedOption);
 
   const handleAction = (recordCount: number, shouldRun = true) => {
     if (selectedIntegrationToConfig) {
