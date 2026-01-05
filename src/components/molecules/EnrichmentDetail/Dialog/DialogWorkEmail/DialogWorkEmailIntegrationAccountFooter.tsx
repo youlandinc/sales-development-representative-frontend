@@ -1,5 +1,5 @@
 import { useParams } from 'next/navigation';
-import { FC } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton } from '@/components/atoms';
@@ -48,27 +48,46 @@ export const DialogWorkEmailIntegrationAccountFooter: FC<
   const { saveOrRunIntegrationAccount, saveState } =
     useIntegrationAccountRequest(cb);
 
-  const isDisabled = selectedIntegrationToConfig?.inputParams
-    ?.filter((i) => i.isRequired)
-    ?.some((p) => !p.selectedOption);
+  const isDisabled = useMemo(
+    () =>
+      selectedIntegrationToConfig?.inputParams
+        ?.filter((i) => i.isRequired)
+        ?.some((p) => !p.selectedOption),
+    [selectedIntegrationToConfig],
+  );
 
-  const handleAction = (recordCount: number, shouldRun = true) => {
-    if (selectedIntegrationToConfig) {
-      saveOrRunIntegrationAccount(
-        {
-          tableId,
-          actionKey: selectedIntegrationToConfig.actionKey,
-          inputBinding:
-            selectedIntegrationToConfig?.inputParams?.map((param) => ({
-              name: param.semanticType,
-              formulaText: param.selectedOption?.value || '',
-            })) || [],
-        },
-        shouldRun,
-        recordCount,
-      );
-    }
-  };
+  const handleAction = useCallback(
+    (recordCount: number, shouldRun = true) => {
+      if (selectedIntegrationToConfig) {
+        saveOrRunIntegrationAccount(
+          {
+            tableId,
+            actionKey: selectedIntegrationToConfig.actionKey,
+            inputBinding:
+              selectedIntegrationToConfig?.inputParams?.map((param) => ({
+                name: param.semanticType,
+                formulaText: param.selectedOption?.value || '',
+              })) || [],
+          },
+          shouldRun,
+          recordCount,
+        );
+      }
+    },
+    [selectedIntegrationToConfig, tableId, saveOrRunIntegrationAccount],
+  );
+
+  const shouldShowSaveButton = useMemo(
+    () =>
+      sourceOfOpen !== SourceOfOpenEnum.dialog &&
+      activeType !== ActiveTypeEnum.edit,
+    [sourceOfOpen, activeType],
+  );
+
+  const onClickToSaveWaterfallStep = useCallback(() => {
+    setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
+    setDisplayType(DisplayTypeEnum.main);
+  }, [setWaterfallConfigType, setDisplayType]);
 
   return (
     <DialogFooter
@@ -85,13 +104,9 @@ export const DialogWorkEmailIntegrationAccountFooter: FC<
         handleAction(rowIds.length, false);
       }}
       slot={
-        sourceOfOpen !== SourceOfOpenEnum.dialog &&
-        activeType !== ActiveTypeEnum.edit ? (
+        shouldShowSaveButton ? (
           <StyledButton
-            onClick={() => {
-              setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
-              setDisplayType(DisplayTypeEnum.main);
-            }}
+            onClick={onClickToSaveWaterfallStep}
             sx={{ height: '40px !important' }}
             variant={'contained'}
           >

@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { FC } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import {
   DialogWorkEmailCollapseCard,
@@ -25,25 +25,19 @@ export const DialogWorkEmailIntegrationColumnMapping: FC = () => {
         <Typography color={'text.secondary'} variant={'body3'}>
           SETUP INPUTS
         </Typography>
-        {(selectedIntegrationToConfig?.inputParams || []).map((i, key) => (
+        {(selectedIntegrationToConfig?.inputParams || []).map((i, index) => (
           <DialogWorkEmailCustomSelect
-            key={key}
+            key={i.columnName || index}
             onChange={(_, newValue) => {
-              const updatedIntegration = {
-                ...selectedIntegrationToConfig,
-                inputParams: (
-                  selectedIntegrationToConfig?.inputParams || []
-                ).map((p) => {
-                  if (i.columnName === p.columnName) {
-                    return {
-                      ...p,
-                      selectedOption: newValue,
-                    };
-                  }
-                  return p;
-                }),
-              } as IntegrationAction;
-              setSelectedIntegrationToConfig(updatedIntegration);
+              setSelectedIntegrationToConfig({
+                ...selectedIntegrationToConfig!,
+                inputParams: selectedIntegrationToConfig!.inputParams.map(
+                  (p) =>
+                    i.columnName === p.columnName
+                      ? { ...p, selectedOption: newValue }
+                      : p,
+                ),
+              } as IntegrationAction);
             }}
             required={i.isRequired}
             title={i.displayName}

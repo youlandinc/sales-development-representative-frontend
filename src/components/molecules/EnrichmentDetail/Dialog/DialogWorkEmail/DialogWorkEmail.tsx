@@ -12,14 +12,15 @@ import { useWorkEmailStore } from '@/stores/enrichment';
 import { WaterfallConfigTypeEnum } from '@/types/enrichment';
 
 interface DialogWorkEmailProps {
-  cb?: () => void;
+  onCloseToCallback?: () => void;
 }
 
-export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
+export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({
+  onCloseToCallback,
+}) => {
   const { setWorkEmailVisible, displayType, setWaterfallConfigType } =
     useWorkEmailStore(
       useShallow((state) => ({
-        workEmailVisible: state.workEmailVisible,
         setWorkEmailVisible: state.setWorkEmailVisible,
         displayType: state.displayType,
         setWaterfallConfigType: state.setWaterfallConfigType,
@@ -32,7 +33,7 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
         return (
           <Fade in>
             <Stack flex={1} overflow={'hidden'}>
-              <DialogWorkEmailMain cb={cb} />
+              <DialogWorkEmailMain cb={onCloseToCallback} />
             </Stack>
           </Fade>
         );
@@ -40,14 +41,14 @@ export const DialogWorkEmail: FC<DialogWorkEmailProps> = ({ cb }) => {
         return (
           <Fade in>
             <Stack flex={1} overflow={'hidden'}>
-              <DialogWorkEmailIntegrationAccount cb={cb} />
+              <DialogWorkEmailIntegrationAccount cb={onCloseToCallback} />
             </Stack>
           </Fade>
         );
       default:
         return null;
     }
-  }, [displayType, cb]);
+  }, [displayType, onCloseToCallback]);
 
   useEffect(() => {
     setWaterfallConfigType(WaterfallConfigTypeEnum.setup);
