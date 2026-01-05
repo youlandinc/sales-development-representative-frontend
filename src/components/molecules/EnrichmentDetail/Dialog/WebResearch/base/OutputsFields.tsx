@@ -1,14 +1,11 @@
 import {
   Box,
   Icon,
-  Menu,
-  MenuItem,
-  menuItemClasses,
+  Popover,
   SelectChangeEvent,
   Stack,
   Typography,
 } from '@mui/material';
-import { MoreHoriz } from '@mui/icons-material';
 import { debounce } from 'lodash-es';
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -17,6 +14,7 @@ import { CommonSelectFieldType } from '@/components/molecules/Common';
 
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
+import { MoreHoriz } from '@mui/icons-material';
 import ICON_DELETE from '@/components/molecules/EnrichmentDetail/Dialog/WebResearch/assets/icon_delete.svg';
 
 interface SelectOption {
@@ -133,60 +131,54 @@ export const OutputsFields = ({
           cursor: 'pointer',
         }}
       />
-      <Menu
+      <Popover
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         onClose={onMenuClose}
         open={Boolean(anchorEl)}
         slotProps={{
-          list: {
+          paper: {
             sx: {
               p: 1.5,
-              width: 240,
-              [`& .${menuItemClasses.root}`]: {
-                gap: 1,
-                '&:hover': {
-                  bgcolor: 'unset !important',
-                  cursor: 'unset',
-                },
-              },
+              borderRadius: 2,
             },
           },
         }}
       >
-        <MenuItem>
-          <Stack gap={1.25} width={200}>
-            <Typography variant={'body3'}>
-              Output description (helps AI)
+        <Stack gap={1.25} width={200}>
+          <Typography variant={'body3'}>
+            Output description (helps AI)
+          </Typography>
+          <StyledTextField
+            maxRows={3}
+            minRows={3}
+            multiline
+            onChange={onDescriptionChange}
+            sx={{
+              '& .MuiOutlinedInput-input': {
+                fontSize: 12,
+              },
+              '& .MuiInputBase-input': {
+                py: 0,
+              },
+            }}
+            value={description}
+          />
+          <Box bgcolor={'#D0CEDA'} height={'1px'} />
+          <Stack
+            alignItems={'center'}
+            flexDirection={'row'}
+            gap={1}
+            onClick={onClickToRemove}
+            sx={{ cursor: 'pointer', width: 'fit-content' }}
+          >
+            <Icon component={ICON_DELETE} sx={{ width: 20, height: 20 }} />
+            <Typography color={'#D75B5B'} variant={'body2'}>
+              Delete field
             </Typography>
-            <StyledTextField
-              maxRows={3}
-              minRows={3}
-              multiline
-              onChange={onDescriptionChange}
-              sx={{
-                '& .MuiOutlinedInput-input': {
-                  fontSize: 12,
-                },
-              }}
-              value={description}
-            />
-            <Box bgcolor={'#D0CEDA'} height={'1px'} />
-            <Stack
-              alignItems={'center'}
-              flexDirection={'row'}
-              gap={1}
-              onClick={onClickToRemove}
-              sx={{ cursor: 'pointer' }}
-            >
-              <Icon component={ICON_DELETE} sx={{ width: 20, height: 20 }} />
-              <Typography color={'#D75B5B'} variant={'body2'}>
-                Delete
-              </Typography>
-            </Stack>
           </Stack>
-        </MenuItem>
-      </Menu>
+        </Stack>
+      </Popover>
     </Stack>
   );
 };

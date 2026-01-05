@@ -134,6 +134,7 @@ export type EnrichmentTableActions = {
     value: string;
   }) => Promise<any>;
   resetTable: () => void;
+  getColumnById: (fieldId: string) => TableColumnProps | undefined;
 };
 
 export type EnrichmentTableStoreProps = EnrichmentTableState &
@@ -231,6 +232,10 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
     },
     closeDialog: () => {
       set({ dialogVisible: false, dialogType: null });
+    },
+    getColumnById: (fieldId) => {
+      const columns = get().columns;
+      return columns.find((col) => col.fieldId === fieldId);
     },
     // table header
     updateColumnWidth: async (fieldId, width) => {

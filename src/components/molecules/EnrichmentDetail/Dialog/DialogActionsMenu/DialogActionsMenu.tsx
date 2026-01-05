@@ -1,6 +1,6 @@
 import { Divider, Icon, Stack, SxProps, Typography } from '@mui/material';
 import Image from 'next/image';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import { StyledTextField } from '@/components/atoms';
@@ -12,18 +12,19 @@ import {
   StyledProviderBadges,
   SuggestionsContent,
   TabsBar,
-  type TabType,
 } from './base';
 
 import { useLocalSearch } from '@/hooks';
 import { useDialogActionsMenu, useExport } from './hooks';
 
 import {
-  ActiveTypeEnum,
   useEnrichmentTableStore,
   useWebResearchStore,
 } from '@/stores/enrichment';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import {
+  TabTypeEnum,
+  useActionsStore,
+} from '@/stores/enrichment/useActionsStore';
 
 import type { SuggestionItem } from '@/types/enrichment/drawerActions';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
@@ -48,7 +49,6 @@ interface DialogActionsMenuProps {
 }
 
 export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('suggestions');
   const { EXPORTS_MENUS, visible, close } = useExport();
 
   // Store selectors
@@ -59,13 +59,16 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
     })),
   );
 
-  const { suggestions, suggestionsLoading, enrichments } = useActionsStore(
-    useShallow((store) => ({
-      suggestions: store.suggestionsList,
-      suggestionsLoading: store.suggestionsLoading,
-      enrichments: store.enrichmentsList,
-    })),
-  );
+  const { suggestions, suggestionsLoading, enrichments, tabType, setTabType } =
+    useActionsStore(
+      useShallow((store) => ({
+        suggestions: store.suggestionsList,
+        suggestionsLoading: store.suggestionsLoading,
+        enrichments: store.enrichmentsList,
+        tabType: store.tabType,
+        setTabType: store.setTabType,
+      })),
+    );
 
   const { allClear } = useWebResearchStore(
     useShallow((state) => ({
@@ -127,16 +130,19 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
   );
 
   // Event handlers with useCallback
-  const onTabClick = useCallback((tab: TabType) => {
-    setActiveTab(tab);
-  }, []);
+  const onTabClick = useCallback(
+    (tab: TabTypeEnum) => {
+      setTabType(tab);
+    },
+    [setTabType],
+  );
 
   const onClickToClose = useCallback(() => {
     closeDialog();
     resetSearch();
     allClear();
-    setActiveTab('suggestions');
-  }, [closeDialog, resetSearch, allClear]);
+    setTabType(TabTypeEnum.suggestions);
+  }, [closeDialog, resetSearch, allClear, setTabType]);
 
   const onAtlasClick = useCallback(() => {
     openDialog(TableColumnMenuActionEnum.ai_agent);
@@ -171,29 +177,27 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
   );
 
   return (
-    <Stack
-      gap={1.5}
-      sx={{ bgcolor: 'white', width: '100%', height: '100%', px: 3 }}
-    >
-      <DialogHeader onClose={onClickToClose} />
-
-      <StyledTextField
-        onChange={onSearchChange}
-        placeholder={'Search...'}
-        size={'small'}
-        slotProps={{
-          input: {
-            startAdornment: searchAdornment,
-            endAdornment: clearEndAdornment,
-          },
-        }}
-        sx={{
-          '&:hover .icon_clear': {
-            width: 20,
-          },
-        }}
-        value={text}
-      />
+    <Stack gap={1.5} sx={{ bgcolor: 'white', width: '100%', height: '100%' }}>
+      <Stack gap={1.5} px={3}>
+        <DialogHeader onClose={onClickToClose} />
+        <StyledTextField
+          onChange={onSearchChange}
+          placeholder={'Search...'}
+          size={'small'}
+          slotProps={{
+            input: {
+              startAdornment: searchAdornment,
+              endAdornment: clearEndAdornment,
+            },
+          }}
+          sx={{
+            '&:hover .icon_clear': {
+              width: 20,
+            },
+          }}
+          value={text}
+        />
+      </Stack>
 
       {hasSearchValue ? (
         <Stack sx={scrollContainerStyles}>
@@ -206,7 +210,7 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
               No results found.
             </Typography>
           ) : (
-            <Stack flex={1} gap={1.5} minHeight={0} overflow={'auto'}>
+            <Stack flex={1} gap={1.5} minHeight={0} overflow={'auto'} px={3}>
               {searchResults.map((item, index) => (
                 <StyledActionItem
                   badges={
@@ -249,11 +253,13 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
         </Stack>
       ) : (
         <Stack flex={1} gap={1.5} minHeight={0}>
-          <TabsBar activeTab={activeTab} onTabClick={onTabClick} />
-          <Divider sx={{ borderColor: 'border.default' }} />
+          <Stack gap={1.5} px={3}>
+            <TabsBar activeTab={tabType} onTabClick={onTabClick} />
+            <Divider sx={{ borderColor: 'border.default' }} />
+          </Stack>
 
-          <Stack sx={scrollContainerStyles}>
-            {activeTab === 'suggestions' && (
+          <Stack px={3} sx={scrollContainerStyles}>
+            {tabType === TabTypeEnum.suggestions && (
               <SuggestionsContent
                 loading={suggestionsLoading}
                 onAtlasClick={onAtlasClick}
@@ -262,14 +268,16 @@ export const DialogActionsMenu: FC<DialogActionsMenuProps> = ({ tableId }) => {
               />
             )}
 
-            {activeTab === 'enrichments' && (
+            {tabType === TabTypeEnum.enrichments && (
               <EnrichmentsContent
                 enrichments={enrichments}
                 onItemClick={onItemClick}
               />
             )}
 
-            {activeTab === 'exports' && <ExportsContent tableId={tableId} />}
+            {tabType === TabTypeEnum.exports && (
+              <ExportsContent tableId={tableId} />
+            )}
           </Stack>
         </Stack>
       )}

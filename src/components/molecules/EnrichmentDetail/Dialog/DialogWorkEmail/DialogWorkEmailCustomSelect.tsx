@@ -14,7 +14,11 @@ import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { TableColumnTypeEnum } from '@/types/enrichment/table';
 
 import { COLUMN_TYPE_ICONS } from '../../Table/config';
-import { DEFAULT_AUTOCOMPLETE_SX } from '@/styles';
+import {
+  DEFAULT_AUTOCOMPLETE_LISTBOX_SX,
+  DEFAULT_AUTOCOMPLETE_PAPER_SX,
+  DEFAULT_AUTOCOMPLETE_SX,
+} from '@/styles';
 
 import ICON_ARROW from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_arrow_down.svg';
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close_thin.svg';
@@ -36,13 +40,11 @@ export const DialogWorkEmailCustomSelect: FC<
   >
 > = ({ title, onChange, value, required }) => {
   const { columns } = useEnrichmentTableStore((store) => store);
-
   const options: TOption[] = columns.map((item) => ({
     label: item.fieldName,
     value: item.fieldId,
     key: item.fieldId,
   }));
-
   return (
     <Stack gap={0.5}>
       {title && (
@@ -119,6 +121,14 @@ export const DialogWorkEmailCustomSelect: FC<
               {option.label}
             </Stack>
           );
+        }}
+        slotProps={{
+          listbox: {
+            sx: DEFAULT_AUTOCOMPLETE_LISTBOX_SX,
+          },
+          paper: {
+            sx: DEFAULT_AUTOCOMPLETE_PAPER_SX,
+          },
         }}
         sx={DEFAULT_AUTOCOMPLETE_SX}
         value={value || null}

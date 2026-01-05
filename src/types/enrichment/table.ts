@@ -4,6 +4,7 @@
 
 import {
   ColumnFieldGroupMap,
+  IntegrationAction,
   RunRecordItem,
   TableFilterConditionType,
   TableFilterGroupItem,
@@ -118,19 +119,7 @@ export interface TableColumnProps {
   } | null;
   semanticType: string | null;
   groupId: string | null;
-  actionDefinition: {
-    actionKey: string;
-    authAccountId: string;
-    description: string;
-    integrationName: string;
-    logoUrl: string;
-    name: string;
-    score: string;
-    skipped: boolean;
-    inputParameters:
-      | { formulaText: string; name: string; optional: boolean }[]
-      | null;
-  } | null;
+  actionDefinition: IntegrationAction | null;
   isExtractedField: boolean | null;
   mappingField: string | null;
 

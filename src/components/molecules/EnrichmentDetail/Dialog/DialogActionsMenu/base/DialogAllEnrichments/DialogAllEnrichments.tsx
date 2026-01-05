@@ -28,10 +28,15 @@ import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
 import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
 // 导入拆分的子组件
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { ActiveTypeEnum, useEnrichmentTableStore } from '@/stores/enrichment';
 
 import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_search.svg';
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
+import {
+  DisplayTypeEnum,
+  IntegrationAction,
+} from '@/types/enrichment/integrations';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
 /**
  * 弹窗属性接口
@@ -58,17 +63,46 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
     );
     const { onWorkEmailItemClick, onClickToAiTemplate } =
       useDialogActionsMenu();
-    const { setDisplayType, setSelectedIntegrationToConfig } =
+    const { setDisplayType, setSelectedIntegrationToConfig, setActiveType } =
       useWorkEmailStore(
         useShallow((state) => ({
           setDisplayType: state.setDisplayType,
           setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
+          setActiveType: state.setActiveType,
         })),
       );
     const { openDialog } = useEnrichmentTableStore(
       useShallow((state) => ({
         openDialog: state.openDialog,
       })),
+    );
+
+    const handleConfigItemClick = useCallback(
+      (config: IntegrationAction) => {
+        if (
+          dialogAllEnrichmentsTabKey ===
+          EnrichmentCategoryEnum.atlas_task_library
+        ) {
+          const description = config.description ?? '';
+          onClickToAiTemplate(`Name:${config.name},Description:${description}`);
+          setDialogAllEnrichmentsVisible(false);
+          return;
+        }
+        openDialog(TableColumnMenuActionEnum.work_email);
+        setDisplayType(DisplayTypeEnum.integration);
+        setSelectedIntegrationToConfig(config);
+        setActiveType(ActiveTypeEnum.add);
+        setDialogAllEnrichmentsVisible(false);
+      },
+      [
+        dialogAllEnrichmentsTabKey,
+        openDialog,
+        setDisplayType,
+        setSelectedIntegrationToConfig,
+        setActiveType,
+        setDialogAllEnrichmentsVisible,
+        onClickToAiTemplate,
+      ],
     );
 
     // 纵向标签页状态管理 - 默认空字符串会导致 MUI Tabs 错误
@@ -263,6 +297,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
         {hasSearchValue && (
           <SearchPart
             onClickToAiTemplate={onClickToAiTemplate}
+            onConfigItemClick={handleConfigItemClick}
             onWorkEmailItemClick={onWorkEmailItemClick}
             openDialog={openDialog}
             searchResults={searchResults}
@@ -275,7 +310,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
         {/* 2. Actions标签内容 - 只在非搜索状态且是Actions标签时显示 */}
         {!hasSearchValue &&
           dialogAllEnrichmentsTabKey === EnrichmentCategoryEnum.actions && (
-            <Stack sx={{ gap: 1.5, height: 550, overflow: 'auto' }}>
+            <Stack sx={{ gap: 1.5, height: 574, overflow: 'auto' }}>
               {dialogAllEnrichmentsData
                 .find(
                   (item) => item.categoryKey === EnrichmentCategoryEnum.actions,
@@ -305,6 +340,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
                     }
                     key={`action-${provider.key ?? providerIndex}`}
                     onClick={() => {
+                      setDisplayType(DisplayTypeEnum.main);
                       onWorkEmailItemClick(provider.key ?? '');
                       setDialogAllEnrichmentsVisible(false);
                     }}
@@ -321,6 +357,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
               dialogAllEnrichmentsData={dialogAllEnrichmentsData}
               dialogAllEnrichmentsTabKey={dialogAllEnrichmentsTabKey}
               getActionTabValue={getActionTabValue}
+              handleConfigItemClick={handleConfigItemClick}
               integrationsTabKey={integrationsTabKey}
               setIntegrationsTabKey={setIntegrationsTabKey}
               setTaskTabKey={setTaskTabKey}

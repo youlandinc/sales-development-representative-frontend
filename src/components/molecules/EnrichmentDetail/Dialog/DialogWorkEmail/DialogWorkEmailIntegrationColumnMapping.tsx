@@ -18,6 +18,7 @@ export const DialogWorkEmailIntegrationColumnMapping: FC = () => {
         setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
       })),
     );
+
   return (
     <DialogWorkEmailCollapseCard title={'Column mapping'}>
       <Stack gap={2}>

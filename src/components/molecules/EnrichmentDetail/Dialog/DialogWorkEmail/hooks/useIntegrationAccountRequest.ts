@@ -34,7 +34,6 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
     })),
   );
   const { runAi } = useRunAi();
-
   const [saveState, saveOrRunIntegrationAccount] = useAsyncFn(
     async (
       param: {
@@ -50,12 +49,9 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
     ) => {
       try {
         if (activeType === ActiveTypeEnum.add) {
-          const { data } = await _saveIntegrationConfig(param);
+          await _saveIntegrationConfig(param);
           const { fields } = await fetchTable(param.tableId);
-          const groupId = data;
-          const fieldIdsWithGroupId = fields
-            .filter((f) => f.groupId === groupId)
-            ?.map((f) => f.fieldId);
+          const fieldIdsWithGroupId = fields?.map((f) => f.fieldId);
           closeDialog();
           if (isRunAi) {
             await runAi({
@@ -63,28 +59,31 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
               recordCount: recordCount,
               fieldIds: fieldIdsWithGroupId,
             });
-            await fetchTable(param.tableId);
+            // await fetchTable(param.tableId);
             cb?.();
           }
         }
         //TODO
-        /* if (activeType === ActiveTypeEnum.edit) {
-          await _updateIntegrationConfig(param);
+        if (activeType === ActiveTypeEnum.edit) {
+          const { activeColumnId } = useEnrichmentTableStore.getState();
+          await _updateIntegrationConfig({
+            tableId: param.tableId,
+            fieldId: activeColumnId,
+            inputBinding: param.inputBinding,
+          });
           await fetchTable(param.tableId);
           closeDialog();
           if (isRunAi) {
-            const fieldIdsWithGroupId = columns
-              .filter((f) => f.groupId === param.fieldId)
-              ?.map((f) => f.fieldId);
+            const fieldIdsWithGroupId = columns?.map((f) => f.fieldId);
             await runAi({
               tableId: param.tableId,
               recordCount: recordCount,
               fieldIds: fieldIdsWithGroupId,
             });
-            await fetchTable(param.tableId);
+            // await fetchTable(param.tableId);
             cb?.();
           }
-        } */
+        }
         fetchActionsMenus(param.tableId);
       } catch (err) {
         const { header, message, variant } = err as HttpError;
@@ -92,6 +91,7 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
         return Promise.reject(err);
       }
     },
+    [activeType, columns, fetchTable, runAi, closeDialog],
   );
 
   return {

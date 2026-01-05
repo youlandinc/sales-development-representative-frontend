@@ -1,4 +1,4 @@
-import { Icon, Stack, SxProps, Typography } from '@mui/material';
+import { Collapse, Icon, Stack, SxProps, Typography } from '@mui/material';
 import { FC, PropsWithChildren, useMemo } from 'react';
 
 import { useSwitch } from '@/hooks';
@@ -38,7 +38,15 @@ export const CollapseCard: FC<PropsWithChildren<CollapseCardProps>> = ({
   );
 
   return (
-    <Stack border={'1px solid #F0F0F4'} borderRadius={2} gap={1.5} p={1.5}>
+    <Stack
+      border={'1px solid #F0F0F4'}
+      borderRadius={2}
+      gap={visible ? 1.5 : 0}
+      p={1.5}
+      sx={{
+        transitionDuration: '.3s',
+      }}
+    >
       <Stack
         alignItems={'center'}
         flexDirection={'row'}
@@ -51,7 +59,7 @@ export const CollapseCard: FC<PropsWithChildren<CollapseCardProps>> = ({
         </Typography>
         {hasCollapse && <Icon component={ICON_ARROW} sx={iconSx} />}
       </Stack>
-      {visible && children}
+      <Collapse in={visible}>{children}</Collapse>
     </Stack>
   );
 };

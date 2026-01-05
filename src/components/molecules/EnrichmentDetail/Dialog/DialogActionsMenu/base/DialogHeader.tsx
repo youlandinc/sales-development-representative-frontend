@@ -33,7 +33,7 @@ export const DialogHeader: FC<DialogHeaderProps> = memo(({ onClose }) => (
         },
       }}
     >
-      <Icon component={ICON_ARROW_LINE_RIGHT} sx={{ width: 20, height: 20 }} />
+      <Icon component={ICON_ARROW_LINE_RIGHT} sx={{ width: 16, height: 16 }} />
     </Box>
   </Stack>
 ));

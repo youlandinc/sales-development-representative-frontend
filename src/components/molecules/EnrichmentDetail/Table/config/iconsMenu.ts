@@ -8,6 +8,7 @@ import ICON_COLUMN_PIN from '@/components/molecules/EnrichmentDetail/assets/tabl
 import ICON_COLUMN_UNPIN from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-unpin.svg';
 import ICON_COLUMN_INSERT_LEFT from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-insert-left.svg';
 import ICON_COLUMN_INSERT_RIGHT from '@/components/molecules/EnrichmentDetail/assets/table/icon-column-insert-right.svg';
+import ICON_COLUMN_ENRICHMENT from '@/components/molecules/EnrichmentDetail/assets/table/icon_enrichment.svg';
 
 export const COLUMN_MENU_ICONS = {
   USE_AI: ICON_COLUMN_USE_AI,
@@ -20,4 +21,5 @@ export const COLUMN_MENU_ICONS = {
   UNPIN: ICON_COLUMN_UNPIN,
   INSERT_LEFT: ICON_COLUMN_INSERT_LEFT,
   INSERT_RIGHT: ICON_COLUMN_INSERT_RIGHT,
+  ENRICHMENT: ICON_COLUMN_ENRICHMENT,
 } as const;

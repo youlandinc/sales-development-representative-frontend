@@ -5,13 +5,10 @@ import { useShallow } from 'zustand/react/shallow';
 import { StyledButton } from '@/components/atoms';
 import { DialogFooter } from '@/components/molecules/EnrichmentDetail/Dialog/Common';
 
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { ActiveTypeEnum, useEnrichmentTableStore } from '@/stores/enrichment';
 import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
-import {
-  useComputedInWorkEmailStore,
-  useIntegrationAccountRequest,
-  useWorkEmailRequest,
-} from './hooks';
+import { useIntegrationAccountRequest } from './hooks';
+import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import {
   DisplayTypeEnum,
@@ -20,7 +17,6 @@ import {
 } from '@/types/enrichment';
 
 import { COINS_PER_ROW } from '@/constants';
-import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 interface DialogWorkEmailIntegrationAccountFooterProps {
   cb?: () => void;
@@ -30,16 +26,17 @@ export const DialogWorkEmailIntegrationAccountFooter: FC<
   DialogWorkEmailIntegrationAccountFooterProps
 > = ({ cb }) => {
   const rowIds = useEnrichmentTableStore((store) => store.rowIds);
-  const { isMissingConfig } = useComputedInWorkEmailStore();
   const {
     setWaterfallConfigType,
     setDisplayType,
     selectedIntegrationToConfig,
+    activeType,
   } = useWorkEmailStore(
     useShallow((state) => ({
       setWaterfallConfigType: state.setWaterfallConfigType,
       setDisplayType: state.setDisplayType,
       selectedIntegrationToConfig: state.selectedIntegrationToConfig,
+      activeType: state.activeType,
     })),
   );
   const sourceOfOpen = useActionsStore((store) => store.sourceOfOpen);
@@ -48,41 +45,36 @@ export const DialogWorkEmailIntegrationAccountFooter: FC<
     typeof params.tableId === 'string' && params.tableId.trim() !== ''
       ? params.tableId
       : '';
-  const { requestState } = useWorkEmailRequest(tableId, cb);
-  const { saveOrRunIntegrationAccount } = useIntegrationAccountRequest(cb);
+  const { saveOrRunIntegrationAccount, saveState } =
+    useIntegrationAccountRequest(cb);
 
-  const isDisabled =
-    sourceOfOpen === SourceOfOpenEnum.dialog
-      ? selectedIntegrationToConfig?.inputParams?.some((p) => !p.selectedOption)
-      : isMissingConfig;
+  const isDisabled = selectedIntegrationToConfig?.inputParams
+    ?.filter((i) => i.isRequired)
+    ?.some((p) => !p.selectedOption);
 
   const handleAction = (recordCount: number, shouldRun = true) => {
-    if (sourceOfOpen === SourceOfOpenEnum.dialog) {
-      if (selectedIntegrationToConfig) {
-        saveOrRunIntegrationAccount(
-          {
-            tableId,
-            actionKey: selectedIntegrationToConfig.actionKey,
-            inputBinding:
-              selectedIntegrationToConfig?.inputParams?.map((param) => ({
-                name: param.semanticType,
-                formulaText: param.selectedOption?.value || '',
-              })) || [],
-          },
-          shouldRun,
-          recordCount,
-        );
-      }
-    } else {
-      requestState?.request?.(tableId, recordCount, shouldRun);
+    if (selectedIntegrationToConfig) {
+      saveOrRunIntegrationAccount(
+        {
+          tableId,
+          actionKey: selectedIntegrationToConfig.actionKey,
+          inputBinding:
+            selectedIntegrationToConfig?.inputParams?.map((param) => ({
+              name: param.semanticType,
+              formulaText: param.selectedOption?.value || '',
+            })) || [],
+        },
+        shouldRun,
+        recordCount,
+      );
     }
   };
 
   return (
     <DialogFooter
       coinsPerRow={COINS_PER_ROW}
-      disabled={requestState?.state?.loading || isDisabled}
-      loading={requestState?.state?.loading}
+      disabled={saveState?.loading || isDisabled}
+      loading={saveState?.loading}
       onClickToSaveAndRun10={() => {
         handleAction(10);
       }}
@@ -93,7 +85,8 @@ export const DialogWorkEmailIntegrationAccountFooter: FC<
         handleAction(rowIds.length, false);
       }}
       slot={
-        sourceOfOpen !== SourceOfOpenEnum.dialog ? (
+        sourceOfOpen !== SourceOfOpenEnum.dialog &&
+        activeType !== ActiveTypeEnum.edit ? (
           <StyledButton
             onClick={() => {
               setWaterfallConfigType(WaterfallConfigTypeEnum.configure);

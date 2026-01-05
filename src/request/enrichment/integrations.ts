@@ -48,20 +48,17 @@ export const _saveIntegrationConfig = (params: {
 
 export const _updateIntegrationConfig = (params: {
   tableId: string;
-  actionKey: string;
-  fieldName: string;
   fieldId: string;
+  inputBinding: {
+    name: string;
+    formulaText: string;
+  }[];
 }) => {
   return patch('/sdr/table/field/aiField', {
     tableId: params.tableId,
-    actionKey: params.actionKey,
+    fieldId: params.fieldId,
     typeSettings: {
-      inputBinding: [
-        {
-          name: params.fieldName,
-          formulaText: params.fieldId,
-        },
-      ],
+      inputBinding: params.inputBinding,
     },
   });
 };

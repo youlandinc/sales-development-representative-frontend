@@ -66,6 +66,7 @@ type WorkEmailStoreActions = {
   updateIntegrationsOrder: (integrations: IntegrationAction[]) => void;
   addIntegrationToDefault: (integration: IntegrationAction) => void;
   handleEditClick: (columnId: string) => void;
+  onClickToSingleIntegration: (columnId: string) => void;
   setIntegrationMenus: (menus: IntegrationActionMenu[]) => void;
   setValidationOptions: (config: IntegrationActionValidation[] | null) => void;
   setSelectedValidationOption: (option: string | null) => void;
@@ -382,6 +383,51 @@ export const useWorkEmailStore = create<
             .getState()
             .openDialog(TableColumnMenuActionEnum.work_email);
         }),
+      onClickToSingleIntegration: (columnId: string) => {
+        const column = useEnrichmentTableStore
+          .getState()
+          .getColumnById(columnId);
+        if (!column) {
+          return;
+        }
+        const { actionDefinition, typeSettings } = column;
+        if (actionDefinition) {
+          const editInputParams = typeSettings?.inputBinding || [];
+          const columns = useEnrichmentTableStore.getState().columns;
+
+          set({
+            activeType: ActiveTypeEnum.edit,
+            displayType: DisplayTypeEnum.integration,
+            selectedIntegrationToConfig: {
+              ...actionDefinition,
+              inputParams:
+                actionDefinition?.inputParams?.map((item) => {
+                  //通过item中semanticType找到inputBinding中的name
+                  const selectedBinding = editInputParams.find(
+                    (i) => i.name === item.semanticType,
+                  );
+                  //再通过inputBinding中的formulaText，找到column
+                  const column = columns.find(
+                    (c) => c.fieldId === selectedBinding?.formulaText,
+                  );
+                  return {
+                    ...item,
+                    selectedOption: {
+                      label: column?.fieldName || '',
+                      value: column?.fieldId || '',
+                      key: column?.fieldId || '',
+                    },
+                  };
+                }) || [],
+            },
+          });
+          useEnrichmentTableStore
+            .getState()
+            .openDialog(TableColumnMenuActionEnum.work_email);
+        } else {
+          console.error('actionDefinition is undefined');
+        }
+      },
       setIntegrationMenus: (menus) => {
         try {
           if (Array.isArray(menus)) {

@@ -6,33 +6,32 @@ import { StyledTabButton } from './StyledTabButton';
 import ICON_LIGHTING from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_lighting.svg';
 import ICON_SHARE from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_share.svg';
 import ICON_TARGET from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogActionsMenu/icon_target.svg';
-
-export type TabType = 'suggestions' | 'enrichments' | 'exports';
+import { TabTypeEnum } from '@/stores/enrichment/useActionsStore';
 
 export interface TabsBarProps {
-  activeTab: TabType;
-  onTabClick: (tab: TabType) => void;
+  activeTab: TabTypeEnum;
+  onTabClick: (tab: TabTypeEnum) => void;
 }
 
 export const TabsBar: FC<TabsBarProps> = memo(({ activeTab, onTabClick }) => (
   <Stack flexDirection={'row'} gap={1.25}>
     <StyledTabButton
       icon={<Icon component={ICON_TARGET} sx={{ width: 20, height: 20 }} />}
-      isActive={activeTab === 'suggestions'}
+      isActive={activeTab === TabTypeEnum.suggestions}
       label={'Suggestions'}
-      onClick={() => onTabClick('suggestions')}
+      onClick={() => onTabClick(TabTypeEnum.suggestions)}
     />
     <StyledTabButton
       icon={<Icon component={ICON_LIGHTING} sx={{ width: 20, height: 20 }} />}
-      isActive={activeTab === 'enrichments'}
+      isActive={activeTab === TabTypeEnum.enrichments}
       label={'Enrichments'}
-      onClick={() => onTabClick('enrichments')}
+      onClick={() => onTabClick(TabTypeEnum.enrichments)}
     />
     <StyledTabButton
       icon={<Icon component={ICON_SHARE} sx={{ width: 20, height: 20 }} />}
-      isActive={activeTab === 'exports'}
+      isActive={activeTab === TabTypeEnum.exports}
       label={'Exports'}
-      onClick={() => onTabClick('exports')}
+      onClick={() => onTabClick(TabTypeEnum.exports)}
     />
   </Stack>
 ));

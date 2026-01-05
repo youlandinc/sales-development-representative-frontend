@@ -24,6 +24,7 @@ export const StyledCollapseMenuContainer: FC<
         onClick={toggle}
         sx={{
           cursor: 'pointer',
+          height: '24px',
         }}
       >
         <Stack

@@ -62,3 +62,12 @@ export const DEFAULT_AUTOCOMPLETE_SX = {
     bgcolor: '#F4F5F9 !important',
   },
 };
+
+export const DEFAULT_AUTOCOMPLETE_LISTBOX_SX = {
+  p: 0,
+};
+
+export const DEFAULT_AUTOCOMPLETE_PAPER_SX = {
+  borderRadius: 2,
+  border: '1px solid #F0F0F4',
+};
