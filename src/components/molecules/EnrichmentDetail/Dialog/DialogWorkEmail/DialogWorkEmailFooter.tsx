@@ -1,5 +1,5 @@
 import { useParams } from 'next/navigation';
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton } from '@/components/atoms';
@@ -39,6 +39,13 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
 
   const isDisabled = isMissingConfig;
 
+  const onClickToSaveWaterfallStep = useCallback(() => {
+    setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
+    setDisplayType(DisplayTypeEnum.main);
+  }, [setWaterfallConfigType, setDisplayType]);
+
+  const shouldShowSaveButton = displayType === DisplayTypeEnum.integration;
+
   return (
     <DialogFooter
       coinsPerRow={COINS_PER_ROW}
@@ -54,12 +61,9 @@ export const DialogWorkEmailFooter: FC<DialogWorkEmailFooterProps> = ({
         requestState?.request?.(tableId, rowIds.length, false);
       }}
       slot={
-        displayType === DisplayTypeEnum.integration ? (
+        shouldShowSaveButton ? (
           <StyledButton
-            onClick={() => {
-              setWaterfallConfigType(WaterfallConfigTypeEnum.configure);
-              setDisplayType(DisplayTypeEnum.main);
-            }}
+            onClick={onClickToSaveWaterfallStep}
             sx={{ height: '40px !important' }}
             variant={'contained'}
           >

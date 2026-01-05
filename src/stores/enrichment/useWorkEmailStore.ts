@@ -18,8 +18,13 @@ import {
 } from '@/types/enrichment';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
+import { TableColumnProps } from '@/types/enrichment/table';
+
+// 常量定义
+const LEADMAGIC_VALIDATION_KEY = 'leadmagic';
+
 // 工具函数：构建selectedOption对象
-const buildSelectedOption = (column: any) =>
+const buildSelectedOption = (column: TableColumnProps | undefined) =>
   column?.fieldId
     ? {
         label: column.fieldName || '',
@@ -165,7 +170,7 @@ export const useWorkEmailStore = create<
       setValidationOptions: (config: IntegrationActionValidation[] | null) =>
         set((state) => {
           state.validationOptions = config;
-          if (config && config?.length > 0) {
+          if (config && config.length > 0) {
             state.selectedValidationOption =
               config.find((item) => item.isDefault)?.actionKey || null;
           } else {
@@ -177,7 +182,7 @@ export const useWorkEmailStore = create<
       setSelectedValidationOption: (option: string | null) =>
         set((state) => {
           state.selectedValidationOption = option;
-          if (!option?.includes('leadmagic')) {
+          if (!option?.includes(LEADMAGIC_VALIDATION_KEY)) {
             state.safeToSend = false;
           }
         }),

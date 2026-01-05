@@ -43,9 +43,7 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
 
   const { closeDialog, columns, fetchTable } = useEnrichmentTableStore(
     useShallow((state) => ({
-      rowIds: state.rowIds,
       activeColumnId: state.activeColumnId,
-      openDialog: state.openDialog,
       closeDialog: state.closeDialog,
       columns: state.columns,
       fetchTable: state.fetchTable,
@@ -63,32 +61,43 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
   //request
   const integrationSaveTypeParam = dialogHeaderName;
 
-  const requestParams: CreateWaterfallConfigRequestParam = {
-    waterfallFieldName: integrationSaveTypeParam,
-    waterfallGroupName: integrationSaveTypeParam,
-    requiredInputsBinding: waterfallAllInputs.map((i) => ({
-      name: i.columnName,
-      formulaText: i.selectedOption?.value || '',
-    })),
-    waterfallConfigs: integrationsInWaterfall.map((item) => {
-      const { inputParams, ...others } = item;
-      return {
-        ...others,
-        inputParameters: inputParams.map((i) => ({
-          name: i.columnName,
-          formulaText: i.selectedOption?.value || '',
-        })),
-      };
+  const requestParams: CreateWaterfallConfigRequestParam = useMemo(
+    () => ({
+      waterfallFieldName: integrationSaveTypeParam,
+      waterfallGroupName: integrationSaveTypeParam,
+      requiredInputsBinding: waterfallAllInputs.map((i) => ({
+        name: i.columnName,
+        formulaText: i.selectedOption?.value || '',
+      })),
+      waterfallConfigs: integrationsInWaterfall.map((item) => {
+        const { inputParams, ...others } = item;
+        return {
+          ...others,
+          inputParameters: inputParams.map((i) => ({
+            name: i.columnName,
+            formulaText: i.selectedOption?.value || '',
+          })),
+        };
+      }),
+      validationActionConfig:
+        validationOptions && validationOptions.length > 0
+          ? {
+              actionKey: selectedValidationOption || '',
+              safeToSend,
+              requireValidationSuccess,
+            }
+          : undefined,
     }),
-    validationActionConfig:
-      validationOptions && validationOptions.length > 0
-        ? {
-            actionKey: selectedValidationOption || '',
-            safeToSend,
-            requireValidationSuccess,
-          }
-        : undefined,
-  };
+    [
+      integrationSaveTypeParam,
+      waterfallAllInputs,
+      integrationsInWaterfall,
+      validationOptions,
+      selectedValidationOption,
+      safeToSend,
+      requireValidationSuccess,
+    ],
+  );
 
   const [saveOrRunIntegrationState, saveOrRunIntegration] = useAsyncFn(
     async (tableId: string, recordCount = 10, isRunAi = true) => {

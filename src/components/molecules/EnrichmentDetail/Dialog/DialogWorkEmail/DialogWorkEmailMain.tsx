@@ -4,6 +4,8 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { DialogHeader } from '../Common';
 import {
@@ -11,9 +13,6 @@ import {
   DialogWorkEmailFullConfiguration,
   DialogWorkEmailQuickSetup,
 } from './index';
-
-import { FC } from 'react';
-import { useShallow } from 'zustand/shallow';
 
 import {
   useEnrichmentTableStore,
@@ -69,6 +68,8 @@ export const DialogWorkEmailMain: FC<DialogWorkEmailMainProps> = ({ cb }) => {
       openDialog(TableColumnMenuActionEnum.actions_overview);
     }
   };
+  const hasDefaultIntegrations =
+    allIntegrations.filter((i) => i.isDefault).length > 0;
 
   return (
     <Stack flex={1} overflow={'hidden'}>
@@ -89,7 +90,7 @@ export const DialogWorkEmailMain: FC<DialogWorkEmailMainProps> = ({ cb }) => {
         </Stack>
 
         <Stack gap={3}>
-          {allIntegrations.filter((i) => i.isDefault).length > 0 && (
+          {hasDefaultIntegrations && (
             <ToggleButtonGroup
               color={'primary'}
               exclusive
