@@ -75,7 +75,7 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
           </Typography>
         </Stack>
       )}
-      {schemaJsonStr && (
+      {/* {schemaJsonStr && (
         <Stack gap={0.5}>
           <Typography sx={TITLE_DEFAULT_STYLE}>
             Suggested output format
@@ -84,7 +84,7 @@ export const SculptingPrompt: FC<SculptingPromptProps> = ({
             {schemaJsonStr}
           </Typography>
         </Stack>
-      )}
+      )} */}
       <div ref={bottomRef} />
     </Stack>
   );

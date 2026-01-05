@@ -364,6 +364,8 @@ export const useWebResearchStore = create<
       generateIsThinking: true,
       taskModelText: '',
       suggestedModelContent: '',
+      prompt: '',
+      generateDescription: params.params?.userInput || '',
     });
     try {
       const columnsNames = useEnrichmentTableStore
@@ -464,6 +466,7 @@ export const useWebResearchStore = create<
         set({
           generateText: textBeforeJson,
           schemaJson: jsonContent,
+          prompt: textBeforeJson,
         });
         setTimeout(() => {
           // 再次检查是否仍然是当前请求

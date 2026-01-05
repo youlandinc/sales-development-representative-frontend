@@ -14,7 +14,7 @@ import { StyledActionItem, StyledSearchInput } from '../Common';
 import { StyledProviderBadges } from '../DialogActionsMenu/base';
 import { StyledTiptapEditor } from '@/components/atoms';
 
-import { ActionsTypeKeyEnum } from '@/types';
+import { ActionsTypeKeyEnum, IntegrationActionMenu } from '@/types';
 import { insertWithPlaceholders } from '@/utils';
 
 import { useLocalSearch, useSwitch, useVariableFromStore } from '@/hooks';
@@ -88,6 +88,20 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
     [debouncedSetSearch, setText],
   );
 
+  const handleItemClick = useCallback(
+    async (item: IntegrationActionMenu) => {
+      const description =
+        (item.description ?? '') || (item.shortDescription ?? '');
+      const userInput = `Name:${item.name},Description:${description}`;
+      await runGenerateAiModel('/aiResearch/generate/stream', {
+        params: {
+          userInput,
+        },
+      });
+    },
+    [runGenerateAiModel],
+  );
+
   return (
     <Stack gap={1.5}>
       <StyledSearchInput
@@ -128,15 +142,7 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
                   />
                 }
                 key={index}
-                onClick={async () => {
-                  const description =
-                    (item.description ?? '') || (item.shortDescription ?? '');
-                  await runGenerateAiModel('/aiResearch/generate/stream', {
-                    params: {
-                      userInput: `Name:${item.name},Description:${description}`,
-                    },
-                  });
-                }}
+                onClick={() => handleItemClick(item)}
                 title={item.name}
               />
             ),
