@@ -13,6 +13,7 @@ import {
 import { DisplayTypeEnum, SourceOfOpenEnum } from '@/types/enrichment';
 
 import {
+  ActiveTypeEnum,
   useActionsStore,
   useEnrichmentTableStore,
   useWorkEmailStore,
@@ -28,12 +29,14 @@ interface DialogWorkEmailIntegrationAccountProps {
 export const DialogWorkEmailIntegrationAccount: FC<
   DialogWorkEmailIntegrationAccountProps
 > = ({ cb }) => {
-  const { selectedIntegrationToConfig, setDisplayType } = useWorkEmailStore(
-    useShallow((store) => ({
-      selectedIntegrationToConfig: store.selectedIntegrationToConfig,
-      setDisplayType: store.setDisplayType,
-    })),
-  );
+  const { selectedIntegrationToConfig, setDisplayType, activeType } =
+    useWorkEmailStore(
+      useShallow((store) => ({
+        selectedIntegrationToConfig: store.selectedIntegrationToConfig,
+        setDisplayType: store.setDisplayType,
+        activeType: store.activeType,
+      })),
+    );
   const closeDialog = useEnrichmentTableStore((state) => state.closeDialog);
   const { sourceOfOpen, setDialogAllEnrichmentsVisible } = useActionsStore(
     useShallow((store) => ({
@@ -45,6 +48,7 @@ export const DialogWorkEmailIntegrationAccount: FC<
   const onClickBack = () => {
     if (sourceOfOpen === SourceOfOpenEnum.dialog) {
       setDialogAllEnrichmentsVisible(true);
+      setDisplayType(DisplayTypeEnum.main);
       closeDialog();
     } else {
       setDisplayType(DisplayTypeEnum.main);
@@ -58,6 +62,7 @@ export const DialogWorkEmailIntegrationAccount: FC<
         handleClose={() => {
           closeDialog();
         }}
+        showBackButton={activeType !== ActiveTypeEnum.edit}
         title={selectedIntegrationToConfig?.name}
       />
       <Stack flex={1} gap={3} minHeight={0} overflow={'auto'} p={3}>

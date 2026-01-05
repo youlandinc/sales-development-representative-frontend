@@ -107,7 +107,7 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
             recordCount: recordCount,
             fieldIds: fieldIdsWithGroupId,
           });
-          await fetchTable(tableId);
+          // await fetchTable(tableId);
           cb?.();
         }
       } catch (error) {
@@ -137,7 +137,7 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
             recordCount: recordCount,
             fieldIds: fieldIdsWithGroupId,
           });
-          await fetchTable(tableId);
+          // await fetchTable(tableId);
           cb?.();
         }
       } catch (error) {

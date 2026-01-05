@@ -8,6 +8,7 @@ import { VerticalProviderTabs } from './VerticalProviderTabs';
 import { Provider } from './ProviderTabLabel';
 
 import {
+  ActiveTypeEnum,
   useEnrichmentTableStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
@@ -52,12 +53,14 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
       setDialogAllEnrichmentsVisible: store.setDialogAllEnrichmentsVisible,
     })),
   );
-  const { setDisplayType, setSelectedIntegrationToConfig } = useWorkEmailStore(
-    useShallow((state) => ({
-      setDisplayType: state.setDisplayType,
-      setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
-    })),
-  );
+  const { setDisplayType, setSelectedIntegrationToConfig, setActiveType } =
+    useWorkEmailStore(
+      useShallow((state) => ({
+        setDisplayType: state.setDisplayType,
+        setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
+        setActiveType: state.setActiveType,
+      })),
+    );
   const { openDialog } = useEnrichmentTableStore(
     useShallow((state) => ({
       openDialog: state.openDialog,
@@ -117,6 +120,7 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
       openDialog(TableColumnMenuActionEnum.work_email);
       setDisplayType(DisplayTypeEnum.integration);
       setSelectedIntegrationToConfig(config);
+      setActiveType(ActiveTypeEnum.add);
       setDialogAllEnrichmentsVisible(false);
     },
     [
@@ -124,6 +128,7 @@ export const VerticalTabsContent: FC<VerticalTabsContentProps> = ({
       openDialog,
       setDisplayType,
       setSelectedIntegrationToConfig,
+      setActiveType,
       setDialogAllEnrichmentsVisible,
       onClickToAiTemplate,
     ],

@@ -15,6 +15,7 @@ import {
 } from '@/types/enrichment/drawerActions';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
+import { DisplayTypeEnum } from '@/types/enrichment/integrations';
 
 export const useDialogActionsMenu = () => {
   // Store selectors
@@ -31,6 +32,7 @@ export const useDialogActionsMenu = () => {
     setAllIntegrations,
     setValidationOptions,
     integrationMenus,
+    setDisplayType,
   } = useWorkEmailStore(
     useShallow((state) => ({
       setActiveType: state.setActiveType,
@@ -39,6 +41,7 @@ export const useDialogActionsMenu = () => {
       setAllIntegrations: state.setAllIntegrations,
       setValidationOptions: state.setValidationOptions,
       integrationMenus: state.integrationMenus,
+      setDisplayType: state.setDisplayType,
     })),
   );
 
@@ -77,6 +80,7 @@ export const useDialogActionsMenu = () => {
   const onWorkEmailItemClick = useCallback(
     (key: string) => {
       const integration = integrationMenus.find((i) => i.key === key);
+      setDisplayType(DisplayTypeEnum.main);
       openDialog(TableColumnMenuActionEnum.work_email);
       setDialogHeaderName(integration?.name ?? '');
       setWaterfallDescription(integration?.description ?? '');
@@ -90,6 +94,7 @@ export const useDialogActionsMenu = () => {
       setActiveType,
       setAllIntegrations,
       setDialogHeaderName,
+      setDisplayType,
       setValidationOptions,
       setWaterfallDescription,
     ],

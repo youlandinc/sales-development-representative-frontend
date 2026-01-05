@@ -9,6 +9,7 @@ type DialogHeaderProps = {
   title: string | ReactNode;
   handleBack?: () => void;
   titleIcon?: ElementType;
+  showBackButton?: boolean;
 } & Omit<StackProps, 'title'>;
 
 export const DialogHeader: FC<DialogHeaderProps> = ({
@@ -16,15 +17,18 @@ export const DialogHeader: FC<DialogHeaderProps> = ({
   title,
   handleBack,
   titleIcon,
+  showBackButton = true,
   ...rest
 }) => {
   return (
     <Stack alignItems={'center'} flexDirection={'row'} pt={3} px={3} {...rest}>
-      <Icon
-        component={ICON_ARROW}
-        onClick={handleBack}
-        sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
-      />
+      {showBackButton && (
+        <Icon
+          component={ICON_ARROW}
+          onClick={handleBack}
+          sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
+        />
+      )}
       {titleIcon && (
         <Icon component={titleIcon} sx={{ width: 20, height: 20, mr: 0.5 }} />
       )}

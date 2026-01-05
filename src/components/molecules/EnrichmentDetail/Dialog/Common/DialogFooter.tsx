@@ -71,14 +71,16 @@ export const DialogFooter: FC<DialogFooterProps> = ({
           <StyledButton
             disabled={disabled}
             endIcon={
-              <Icon
-                component={ICON_ARROW}
-                sx={{
-                  width: 12,
-                  height: 12,
-                  '& path': { fill: 'currentColor' },
-                }}
-              />
+              !loading && (
+                <Icon
+                  component={ICON_ARROW}
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    '& path': { fill: 'currentColor' },
+                  }}
+                />
+              )
             }
             loading={loading}
             onClick={(e) => {
