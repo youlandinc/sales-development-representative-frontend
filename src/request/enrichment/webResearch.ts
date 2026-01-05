@@ -89,7 +89,7 @@ export const _updateWebResearchConfig = (params: {
   model: string;
   taskDescription: string;
 }) => {
-  return patch('/sdr/table/field/aiField', {
+  return patch('/sdr/table/field', {
     tableId: params.tableId,
     fieldId: params.fieldId,
     typeSettings: {

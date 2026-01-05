@@ -54,7 +54,7 @@ export const _updateIntegrationConfig = (params: {
     formulaText: string;
   }[];
 }) => {
-  return patch('/sdr/table/field/aiField', {
+  return patch('/sdr/table/field', {
     tableId: params.tableId,
     fieldId: params.fieldId,
     typeSettings: {
