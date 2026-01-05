@@ -50,25 +50,37 @@ const extractTextBeforeJson = (fullText: string): string => {
 const readStreamToText = async (
   body: ReadableStream<Uint8Array>,
   onTextChange: (fullText: string) => void,
+  abortSignal?: AbortSignal,
 ): Promise<string> => {
   const reader = body.getReader();
   const decoder = new TextDecoder('utf-8');
   let buffer = '';
   let fullText = '';
 
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) {
-      return fullText;
+  try {
+    while (true) {
+      // 检查是否被中止
+      if (abortSignal?.aborted) {
+        reader.cancel();
+        throw new Error('Stream reading aborted');
+      }
+
+      const { value, done } = await reader.read();
+      if (done) {
+        return fullText;
+      }
+      buffer += decoder.decode(value, { stream: true });
+      const events = (buffer.split('\n\n') || ['']) as string[];
+      buffer = events.pop() || '';
+      for (const e of events) {
+        const chunk = e.replace(/data:/g, '');
+        fullText += chunk;
+        onTextChange(fullText);
+      }
     }
-    buffer += decoder.decode(value, { stream: true });
-    const events = (buffer.split('\n\n') || ['']) as string[];
-    buffer = events.pop() || '';
-    for (const e of events) {
-      const chunk = e.replace(/data:/g, '');
-      fullText += chunk;
-      onTextChange(fullText);
-    }
+  } catch (error) {
+    reader.cancel();
+    throw error;
   }
 };
 
@@ -114,6 +126,8 @@ type WebResearchStoreProps = {
   generateIsThinking: boolean;
   enableWebSearch: boolean;
   aiModelList: ModelGroupItem[];
+  currentAbortController: AbortController | null;
+  requestId: number;
 };
 
 type WebResearchActions = {
@@ -166,6 +180,7 @@ type WebResearchActions = {
     params: Record<string, any>,
   ) => Promise<void>;
   fetchWebResearchModelList: () => Promise<void>;
+  cancelCurrentRequest: () => void;
 };
 
 export const useWebResearchStore = create<
@@ -193,6 +208,8 @@ export const useWebResearchStore = create<
   generateIsThinking: false,
   enableWebSearch: false,
   aiModelList: [],
+  currentAbortController: null,
+  requestId: 0,
   setPrompt: (prompt: string) => {
     set({ prompt });
   },
@@ -334,7 +351,20 @@ export const useWebResearchStore = create<
     });
   },
   runGenerateAiModel: async (api: string, params: Record<string, any>) => {
-    set({ generateIsLoading: true, generateIsThinking: true });
+    // 取消上一个请求
+    get().cancelCurrentRequest();
+
+    // 创建新的 AbortController 和 requestId
+    const abortController = new AbortController();
+    const currentRequestId = get().requestId + 1;
+    set({
+      currentAbortController: abortController,
+      requestId: currentRequestId,
+      generateIsLoading: true,
+      generateIsThinking: true,
+      taskModelText: '',
+      suggestedModelContent: '',
+    });
     try {
       const columnsNames = useEnrichmentTableStore
         .getState()
@@ -352,6 +382,10 @@ export const useWebResearchStore = create<
         const fullText = await readStreamToText(
           response.body,
           (nextFullText) => {
+            // 检查是否仍然是当前请求
+            if (get().requestId !== currentRequestId) {
+              return;
+            }
             const { taskContent, suggestedModelContent } =
               parseTaskModelText(nextFullText);
             set({
@@ -360,7 +394,13 @@ export const useWebResearchStore = create<
               suggestedModelContent,
             });
           },
+          abortController.signal,
         );
+
+        // 检查是否仍然是当前请求
+        if (get().requestId !== currentRequestId) {
+          return;
+        }
 
         const { suggestedModelType, enableWebSearch } =
           parseTaskModelText(fullText);
@@ -379,18 +419,30 @@ export const useWebResearchStore = create<
         });
       }
     } catch (err) {
+      // 如果是被中止的请求，不显示错误
+      if (err instanceof Error && err.message === 'Stream reading aborted') {
+        console.log('请求已被取消');
+        return;
+      }
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
       set({ generateIsLoading: false, generateIsThinking: false });
     }
   },
   runGeneratePrompt: async (api: string, params: Record<string, any>) => {
+    const currentRequestId = get().requestId;
+    const abortController = get().currentAbortController;
+
     try {
       const response = await generatePromptApi(api, params);
       if (response.body) {
         const fullText = await readStreamToText(
           response.body,
           (nextFullText) => {
+            // 检查是否仍然是当前请求
+            if (get().requestId !== currentRequestId) {
+              return;
+            }
             const textBeforeJson = extractTextBeforeJson(nextFullText);
             const jsonContent = extractJsonFromMarkdown(nextFullText);
             set({
@@ -398,21 +450,34 @@ export const useWebResearchStore = create<
               generateSchemaStr: jsonContent,
             });
           },
+          abortController?.signal,
         );
+
+        // 检查是否仍然是当前请求
+        if (get().requestId !== currentRequestId) {
+          return;
+        }
+
         const textBeforeJson = extractTextBeforeJson(fullText);
         const jsonContent = extractJsonFromMarkdown(fullText);
 
         set({
           generateText: textBeforeJson,
-          generateSchemaStr: jsonContent,
-          prompt: textBeforeJson,
           schemaJson: jsonContent,
         });
         setTimeout(() => {
-          set({ webResearchTab: 'configure', generateIsThinking: false });
+          // 再次检查是否仍然是当前请求
+          if (get().requestId === currentRequestId) {
+            set({ webResearchTab: 'configure', generateIsThinking: false });
+          }
         }, 1000);
       }
     } catch (err) {
+      // 如果是被中止的请求，不显示错误
+      if (err instanceof Error && err.message === 'Stream reading aborted') {
+        console.log('请求已被取消');
+        return;
+      }
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     }
@@ -445,6 +510,13 @@ export const useWebResearchStore = create<
     } catch (err) {
       const { header, message, variant } = err as HttpError;
       SDRToast({ message, header, variant });
+    }
+  },
+  cancelCurrentRequest: () => {
+    const controller = get().currentAbortController;
+    if (controller) {
+      controller.abort();
+      set({ currentAbortController: null });
     }
   },
 }));

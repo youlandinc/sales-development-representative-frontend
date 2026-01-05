@@ -92,7 +92,7 @@ const phaseVisualMap: Record<
   },
 };
 
-const formatAttemptOrdinal = (attemptNo?: number) => {
+/* const formatAttemptOrdinal = (attemptNo?: number) => {
   if (!attemptNo) {
     return '';
   }
@@ -106,7 +106,7 @@ const formatAttemptOrdinal = (attemptNo?: number) => {
     return '3rd time';
   }
   return `${attemptNo}th time`;
-};
+}; */
 
 export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
   cellDetails,
@@ -289,9 +289,9 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                 const phaseVisual =
                   phaseVisualMap[phase] ||
                   phaseVisualMap[TableCellDetailPhaseEnum.thinking];
-                const ordinal = formatAttemptOrdinal(log.attemptNo);
-                const showLine =
-                  index < (state?.value?.data?.logs?.length || 0) - 1;
+                // const ordinal = formatAttemptOrdinal(log.attemptNo);
+                // const showLine =
+                //   index < (state?.value?.data?.logs?.length || 0) - 1;
 
                 return (
                   <TimelineItem key={`${log.phase}-${index}`}>
@@ -305,11 +305,10 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                           sx={{ width: 20, height: 20 }}
                         />
                       </TimelineDot>
-                      {showLine && (
-                        <TimelineConnector
-                          sx={{ bgcolor: '#D0CEDA', width: '1px' }}
-                        />
-                      )}
+
+                      <TimelineConnector
+                        sx={{ bgcolor: '#D0CEDA', width: '1px' }}
+                      />
                     </TimelineSeparator>
                     <TimelineContent sx={{ p: 0, ml: 1, overflow: 'hidden' }}>
                       <Stack gap={1}>
@@ -319,10 +318,10 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                           variant={'h7'}
                         >
                           {phaseVisual.label}
-                          {ordinal &&
+                          {/*  {ordinal &&
                           log.phase !== TableCellDetailPhaseEnum.thinking
                             ? ` (${ordinal})`
-                            : ''}
+                            : ''} */}
                         </Typography>
                         <Typography
                           color={'text.secondary'}

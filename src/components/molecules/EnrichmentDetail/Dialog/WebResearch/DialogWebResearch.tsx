@@ -70,7 +70,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     webResearchTab,
     setWebResearchTab,
     generateText,
-    generateSchemaStr,
+    // generateSchemaStr,
     generateIsLoading,
     generateIsThinking,
     runGenerateAiModel,
@@ -97,7 +97,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
       generateText: state.generateText,
       taskContent: state.taskContent,
       suggestedModelContent: state.suggestedModelContent,
-      generateSchemaStr: state.generateSchemaStr,
+      // generateSchemaStr: state.generateSchemaStr,
       generateIsLoading: state.generateIsLoading,
       generateIsThinking: state.generateIsThinking,
       runGeneratePrompt: state.runGeneratePrompt,
@@ -311,7 +311,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
           <SculptingPrompt
             isLoading={generateIsLoading}
             prompt={generateText}
-            schemaJsonStr={generateSchemaStr}
+            schemaJsonStr={'' /* generateSchemaStr */}
             suggestedModelContent={suggestedModelContent}
             taskContent={taskContent}
           />

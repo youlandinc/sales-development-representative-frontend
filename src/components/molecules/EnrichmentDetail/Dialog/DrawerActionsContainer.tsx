@@ -78,7 +78,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
               <DialogCellDetailsThinking cellDetails={cellDetails} />
             )}
             {dialogType === TableColumnMenuActionEnum.work_email && (
-              <DialogWorkEmail cb={onInitializeAiColumns} />
+              <DialogWorkEmail onCloseToCallback={onInitializeAiColumns} />
             )}
             {dialogType === TableColumnMenuActionEnum.ai_agent && (
               <DialogWebResearch cb={onInitializeAiColumns} tableId={tableId} />
