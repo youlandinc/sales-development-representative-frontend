@@ -425,6 +425,7 @@ export const useWorkEmailStore = create<
           state.dialogHeaderName = integration.name;
           state.waterfallDescription = integration.description;
           state.groupId = column.groupId;
+
           if (integration.validations) {
             state.validationOptions = integration.validations;
           }
