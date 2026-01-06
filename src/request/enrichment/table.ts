@@ -110,11 +110,12 @@ export const _deleteTableColumn = (fieldId: string) => {
   return del(`/sdr/table/field/${fieldId}`);
 };
 
-export const _reorderTableColumn = (params: {
+export const _reorderTableViewColumn = (params: {
+  viewId: string;
   tableId: string;
   currentFieldId: string;
   beforeFieldId?: string;
   afterFieldId?: string;
 }) => {
-  return put('/sdr/table/field/reorder', params);
+  return put<TableViewData>('/sdr/table/view/header/reorder', params);
 };

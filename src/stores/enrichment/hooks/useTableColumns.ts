@@ -2,10 +2,7 @@ import { useMemo } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import { useEnrichmentTableStore } from '../index';
-import {
-  TableColumnProps,
-  TableViewColumnProps,
-} from '@/types/enrichment/table';
+import { TableColumnProps } from '@/types/enrichment/table';
 
 /**
  * Merge metaColumns and activeView.fieldProps to generate final columns
@@ -29,27 +26,34 @@ export const useTableColumns = (): TableColumnProps[] => {
     const activeView = views.find((v) => v.viewId === activeViewId);
     const fieldProps = activeView?.fieldProps ?? [];
 
-    // Create fieldProps lookup Map
-    const fieldPropsMap = new Map<string, TableViewColumnProps>(
-      fieldProps.map((fp) => [fp.fieldId, fp]),
+    // If no fieldProps, fallback to metaColumns order
+    if (fieldProps.length === 0) {
+      return metaColumns;
+    }
+
+    // Create metaColumns lookup Map
+    const metaColumnsMap = new Map<string, TableColumnProps>(
+      metaColumns.map((col) => [col.fieldId, col]),
     );
 
-    // Merge metaColumns + fieldProps
-    return metaColumns.map((meta) => {
-      const fp = fieldPropsMap.get(meta.fieldId);
-      if (!fp) {
-        // No fieldProps, use default values from metaColumns
-        return meta;
+    // Use fieldProps order, merge with metaColumns data
+    const result: TableColumnProps[] = [];
+    for (const fp of fieldProps) {
+      const meta = metaColumnsMap.get(fp.fieldId);
+      if (!meta) {
+        // fieldId not found in metaColumns, skip
+        continue;
       }
       // Override view-related properties with fieldProps
-      return {
+      result.push({
         ...meta,
         pin: fp.pin,
         visible: fp.visible,
         width: fp.width,
         color: fp.color,
         csn: fp.sort,
-      };
-    });
+      });
+    }
+    return result;
   }, [metaColumns, views, activeViewId]);
 };

@@ -16,7 +16,7 @@ import {
   _fetchTable,
   _fetchTableRowIds,
   _renameEnrichmentTable,
-  _reorderTableColumn,
+  _reorderTableViewColumn,
   _updateTableCellValue,
 } from '@/request';
 
@@ -300,27 +300,38 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
 
     updateColumnOrder: async (params) => {
       const { currentFieldId, beforeFieldId, afterFieldId } = params;
-      const metaColumns = get().metaColumns;
-      const currentIndex = metaColumns.findIndex(
-        (col) => col.fieldId === currentFieldId,
-      );
+      const { activeViewId, views } = get();
+      if (!activeViewId) {
+        return;
+      }
 
+      // Find active view and its fieldProps
+      const activeView = views.find((v) => v.viewId === activeViewId);
+      if (!activeView) {
+        return;
+      }
+
+      const fieldProps = activeView.fieldProps;
+      const currentIndex = fieldProps.findIndex(
+        (fp) => fp.fieldId === currentFieldId,
+      );
       if (currentIndex === -1) {
         return;
       }
 
+      // Calculate new index
       let newIndex: number;
       if (afterFieldId) {
-        const afterIndex = metaColumns.findIndex(
-          (col) => col.fieldId === afterFieldId,
+        const afterIndex = fieldProps.findIndex(
+          (fp) => fp.fieldId === afterFieldId,
         );
         if (afterIndex === -1) {
           return;
         }
         newIndex = afterIndex;
       } else if (beforeFieldId) {
-        const beforeIndex = metaColumns.findIndex(
-          (col) => col.fieldId === beforeFieldId,
+        const beforeIndex = fieldProps.findIndex(
+          (fp) => fp.fieldId === beforeFieldId,
         );
         if (beforeIndex === -1) {
           return;
@@ -334,14 +345,27 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         newIndex -= 1;
       }
 
-      const oldMetaColumns = metaColumns;
-      const newMetaColumns = arrayMove(metaColumns, currentIndex, newIndex);
-      set({ metaColumns: newMetaColumns });
+      // Optimistic update: reorder fieldProps locally
+      const newFieldProps = arrayMove(fieldProps, currentIndex, newIndex);
+      const optimisticView = { ...activeView, fieldProps: newFieldProps };
+      const optimisticViews = views.map((v) =>
+        v.viewId === activeViewId ? optimisticView : v,
+      );
+      set({ views: optimisticViews });
 
       try {
-        await _reorderTableColumn(params);
+        const { data: updatedView } = await _reorderTableViewColumn({
+          ...params,
+          viewId: activeViewId,
+        });
+        // Replace with API response to ensure consistency
+        const finalViews = get().views.map((v) =>
+          v.viewId === updatedView.viewId ? updatedView : v,
+        );
+        set({ views: finalViews });
       } catch (err) {
-        set({ metaColumns: oldMetaColumns });
+        // Rollback on error
+        set({ views });
         onApiError(err);
         throw err;
       }
