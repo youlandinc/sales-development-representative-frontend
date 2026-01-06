@@ -98,7 +98,13 @@ export const MenuColumnNormal: FC<MenuColumnNormalProps> = ({
                     component={'div'}
                     key={item.label}
                     onClick={() => !hasSubmenu && onMenuItemClick(item)}
-                    sx={MENU_STYLES.menuItemWithSubmenu}
+                    sx={{
+                      ...MENU_STYLES.menuItemWithSubmenu,
+                      color:
+                        item.value === TableColumnMenuActionEnum.delete
+                          ? '#E26E6E'
+                          : 'text.primary',
+                    }}
                   >
                     {item.icon}
                     {item.label}

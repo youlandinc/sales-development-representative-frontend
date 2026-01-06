@@ -231,3 +231,8 @@ export interface TableCellBaseData {
 }
 
 export type TableCellProps = TableCellBaseData & TableCellBusinessData;
+
+export interface AddColumnApiData {
+  field: TableColumnProps;
+  view: TableViewData;
+}

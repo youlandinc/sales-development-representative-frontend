@@ -77,9 +77,6 @@ export const ViewActions: FC<ViewActionsProps> = ({
         <PanelIcon.ViewDelete
           sx={{
             flexShrink: 0,
-            '& path': {
-              fill: '#E26E6E',
-            },
           }}
         />
         <Typography sx={{ fontSize: 14, color: '#E26E6E' }}>

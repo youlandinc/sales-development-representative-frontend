@@ -220,7 +220,9 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
 
     addColumn: async (params) => {
       try {
-        const { data: newColumn } = await _createTableColumn(params);
+        const {
+          data: { field: newColumn, view },
+        } = await _createTableColumn({ ...params, viewId: get().activeViewId });
         if (!newColumn) {
           return null;
         }
@@ -259,7 +261,12 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
           newMetaColumns = [...metaColumns, newColumn];
         }
 
-        set({ metaColumns: newMetaColumns });
+        // Update metaColumns and replace current view with API response
+        const views = get().views;
+        const updatedViews = view
+          ? views.map((v) => (v.viewId === view.viewId ? view : v))
+          : views;
+        set({ metaColumns: newMetaColumns, views: updatedViews });
         return newColumn;
       } catch (err) {
         onApiError<EnrichmentTableCoreState>(err);

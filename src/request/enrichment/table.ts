@@ -1,5 +1,6 @@
 import { del, get, patch, post, put } from '@/request/request';
 import {
+  AddColumnApiData,
   TableCellProps,
   TableColumnProps,
   TableColumnTypeEnum,
@@ -96,12 +97,13 @@ export const _updateTableColumns = (
 
 export const _createTableColumn = (params: {
   tableId: string;
+  viewId: string;
   fieldType: TableColumnTypeEnum;
   beforeFieldId?: string; // Insert before this field
   afterFieldId?: string; // Insert after this field
 }) => {
   // API v2 returns the created column directly
-  return post<TableColumnProps>('/sdr/table/field/v2', params);
+  return post<AddColumnApiData>('/sdr/table/field/v2', params);
 };
 
 export const _deleteTableColumn = (fieldId: string) => {

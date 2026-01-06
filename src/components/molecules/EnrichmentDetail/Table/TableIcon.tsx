@@ -372,7 +372,7 @@ interface MenuIconProps extends SvgIconProps {
 
 export const MenuIcon: FC<MenuIconProps> = ({
   action,
-  size = 20,
+  size = 16,
   ...props
 }) => (
   <Icon
