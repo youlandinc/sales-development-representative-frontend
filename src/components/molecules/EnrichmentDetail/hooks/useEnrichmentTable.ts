@@ -13,6 +13,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import {
   useEnrichmentTableStore,
+  useTableColumns,
   useWebResearchStore,
 } from '@/stores/enrichment';
 import { useTableWebSocket } from './useTableWebSocket';
@@ -62,7 +63,6 @@ export const useEnrichmentTable = ({
   const {
     fetchTable,
     fetchRowIds,
-    columns,
     rowIds,
     runRecords,
     activeViewId,
@@ -72,7 +72,6 @@ export const useEnrichmentTable = ({
     useShallow((store) => ({
       fetchTable: store.fetchTable,
       fetchRowIds: store.fetchRowIds,
-      columns: store.columns,
       rowIds: store.rowIds,
       runRecords: store.runRecords,
       activeViewId: store.activeViewId,
@@ -80,6 +79,17 @@ export const useEnrichmentTable = ({
       updateCellValue: store.updateCellValue,
     })),
   );
+
+  // Get merged columns (metaColumns + activeView.fieldProps)
+  const columns = useTableColumns();
+
+  // Use ref to track column fieldIds to avoid unnecessary re-renders
+  const columnFieldIdsRef = useRef<string[]>([]);
+  const columnFieldIds = useMemo(
+    () => columns.map((col) => col.fieldId),
+    [columns],
+  );
+  columnFieldIdsRef.current = columnFieldIds;
 
   const { fetchActionsMenus, fetchDialogAllEnrichments } = useActionsStore(
     useShallow((store) => ({
@@ -118,7 +128,7 @@ export const useEnrichmentTable = ({
   );
 
   // Fetch table metadata (controls full page loading)
-  const { isLoading: isTableLoading } = useSWR(
+  const { isLoading: isTableLoading, data: tableData } = useSWR(
     tableId ? `table-${tableId}` : null,
     () => fetchTable(tableId),
     {
@@ -128,9 +138,12 @@ export const useEnrichmentTable = ({
   );
 
   // Fetch rowIds (controls table loading, depends on views from fetchTable)
+  // Key uses tableData to ensure fetchTable completes first
   // Key includes activeViewId so switching views triggers refetch
   const { isLoading: isRowIdsLoading } = useSWR(
-    tableId && activeViewId ? `rowIds-${tableId}-${activeViewId}` : null,
+    tableId && tableData && activeViewId
+      ? `rowIds-${tableId}-${activeViewId}`
+      : null,
     () => fetchRowIds(tableId),
     {
       revalidateOnFocus: false,
@@ -181,25 +194,30 @@ export const useEnrichmentTable = ({
   }, [rowIds, rowsMap, aiColumnIds]);
 
   // Add new columns to existing rows with default empty values
+  // Use columnFieldIdsRef to avoid dependency on columns array reference
   const addColumnsToRows = useCallback(() => {
-    if (columns.length === 0) {
+    const fieldIds = columnFieldIdsRef.current;
+    if (fieldIds.length === 0) {
       return;
     }
 
-    const columnIds = new Set(columns.map((col) => col.fieldId));
+    const columnIds = new Set(fieldIds);
 
     setRowsMap((prev) => {
       const updated = { ...prev };
+      let hasChanges = false;
       Object.keys(updated).forEach((rowId) => {
         const row = updated[rowId];
         columnIds.forEach((fieldId) => {
           if (!(fieldId in row)) {
             // Add new column with empty default value
             row[fieldId] = '';
+            hasChanges = true;
           }
         });
       });
-      return updated;
+      // Only return new object if there were actual changes
+      return hasChanges ? updated : prev;
     });
 
     // Update ref as well
@@ -211,7 +229,7 @@ export const useEnrichmentTable = ({
         }
       });
     });
-  }, [columns]);
+  }, []); // No dependencies - uses ref
 
   // Reset on tableId change
   useEffect(() => {
@@ -223,12 +241,12 @@ export const useEnrichmentTable = ({
     lastVisibleRangeRef.current = null;
   }, [resetTable, tableId]);
 
-  // Add new columns when columns count changes
+  // Add new columns when column fieldIds change
   useEffect(() => {
-    if (columns.length > 0) {
+    if (columnFieldIds.length > 0) {
       addColumnsToRows();
     }
-  }, [columns?.length, addColumnsToRows]);
+  }, [columnFieldIds, addColumnsToRows]);
 
   // WebSocket integration for real-time updates
   useTableWebSocket({
@@ -561,7 +579,7 @@ export const useEnrichmentTable = ({
   }, [aiColumnIds, rowIds, runRecords]);
 
   // Handle scroll
-  const handleScroll = useCallback(() => {
+  const onScrollChange = useCallback(() => {
     if (scrollContainerRef.current) {
       const scrollTop = scrollContainerRef.current.scrollTop;
       setIsScrolled(scrollTop > 0);
@@ -571,12 +589,12 @@ export const useEnrichmentTable = ({
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener('scroll', handleScroll);
+      container.addEventListener('scroll', onScrollChange);
       return () => {
-        container.removeEventListener('scroll', handleScroll);
+        container.removeEventListener('scroll', onScrollChange);
       };
     }
-  }, [handleScroll]);
+  }, [onScrollChange]);
 
   // Handle cell edit
   const onCellEdit = useCallback(

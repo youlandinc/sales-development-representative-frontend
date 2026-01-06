@@ -1,5 +1,5 @@
 import { Icon, Stack, Typography } from '@mui/material';
-import React, { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import {
   StyledButton,
@@ -7,11 +7,14 @@ import {
   StyledTextField,
 } from '@/components/atoms';
 
-import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+import {
+  TableColumnMenuActionEnum,
+  TableColumnProps,
+} from '@/types/enrichment/table';
 
 import { useAsyncFn } from '@/hooks';
 
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore, useTableColumns } from '@/stores/enrichment';
 
 import ICON_CLOSE from '../assets/dialog/icon_close.svg';
 
@@ -21,7 +24,6 @@ type DialogEditDescriptionProps = {
 
 export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
   const {
-    columns,
     activeColumnId,
     dialogType,
     closeDialog,
@@ -29,11 +31,13 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
     dialogVisible,
   } = useEnrichmentTableStore((store) => store);
 
-  const column = columns.find((col) => col.fieldId === activeColumnId);
-
-  const [description, setDescription] = React.useState(
-    column?.description || '',
+  // Get merged columns
+  const columns = useTableColumns();
+  const column = columns.find(
+    (col: TableColumnProps) => col.fieldId === activeColumnId,
   );
+
+  const [description, setDescription] = useState(column?.description || '');
 
   const [state, updateDescription] = useAsyncFn(
     async (description: string) => {
@@ -43,7 +47,7 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
     [activeColumnId],
   );
 
-  const handleClose = () => {
+  const onDialogClose = () => {
     closeDialog();
     setDescription('');
   };
@@ -80,7 +84,7 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
         <Stack flexDirection={'row'} gap={1.5}>
           <StyledButton
             color={'info'}
-            onClick={handleClose}
+            onClick={onDialogClose}
             size={'medium'}
             variant={'outlined'}
           >
@@ -110,12 +114,12 @@ export const DialogEditDescription: FC<DialogEditDescriptionProps> = () => {
           </Typography>
           <Icon
             component={ICON_CLOSE}
-            onClick={handleClose}
+            onClick={onDialogClose}
             sx={{ width: 24, height: 24, cursor: 'pointer' }}
           />
         </Stack>
       }
-      onClose={handleClose}
+      onClose={onDialogClose}
       open={
         dialogType === TableColumnMenuActionEnum.edit_description &&
         dialogVisible &&

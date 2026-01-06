@@ -89,6 +89,8 @@ export interface TableViewData {
   viewType: TableViewTypeEnum;
 
   filters: TableFilterGroupItem[] | null;
+  fieldProps: TableViewColumnProps[];
+
   isDefaultOpen: boolean;
   isPreconfigured: boolean;
 }
@@ -149,15 +151,37 @@ export interface TableColumnActionOption {
   parentValue?: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
 }
 
-export interface UpdateTableColumnConfigParams {
+export interface UpdateTableMetaColumnParams {
   fieldId: string;
+  description: string;
   fieldName: string;
   fieldType: TableColumnTypeEnum;
-  visible: boolean;
-  description: string;
-  color: string;
+}
+
+export interface TableViewColumnProps {
+  fieldId: string;
+  sort: number;
   pin: boolean;
+  visible: boolean;
   width: number;
+  // todo: enum
+  color: string;
+}
+
+export interface UpdateTableViewColumnsParams {
+  tableId: string;
+  viewId: string;
+  fields: Partial<TableViewColumnProps>[];
+}
+
+export interface UpdateTableViewColumnParams {
+  viewId: string;
+  fieldId: string;
+  sort?: number;
+  pin?: boolean;
+  visible?: boolean;
+  width?: number;
+  color?: string;
 }
 
 // ============================================================================

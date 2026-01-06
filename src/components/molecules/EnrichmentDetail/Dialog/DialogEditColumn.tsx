@@ -5,10 +5,13 @@ import { StyledButton, StyledTextField } from '@/components/atoms';
 import { CommonSelectFieldType } from '@/components/molecules/Common';
 
 import { TypeIcon } from '../Table/TableIcon';
-import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import {
+  TableColumnProps,
+  TableColumnTypeEnum,
+} from '@/types/enrichment/table';
 
 import { useAsyncFn } from '@/hooks';
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore, useTableColumns } from '@/stores/enrichment';
 
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 
@@ -17,10 +20,14 @@ interface DialogEditColumnProps {
 }
 
 export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
-  const { columns, activeColumnId, closeDialog, updateColumnNameAndType } =
+  const { activeColumnId, closeDialog, updateColumnNameAndType } =
     useEnrichmentTableStore((store) => store);
 
-  const column = columns.find((col) => col.fieldId === activeColumnId);
+  // Get merged columns
+  const columns = useTableColumns();
+  const column = columns.find(
+    (col: TableColumnProps) => col.fieldId === activeColumnId,
+  );
 
   const [value, setValue] = useState(TableColumnTypeEnum.text);
   const [name, setName] = useState('');

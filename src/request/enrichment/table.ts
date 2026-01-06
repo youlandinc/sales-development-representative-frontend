@@ -4,7 +4,10 @@ import {
   TableColumnProps,
   TableColumnTypeEnum,
   TableDataApiResponse,
-  UpdateTableColumnConfigParams,
+  TableViewData,
+  UpdateTableMetaColumnParams,
+  UpdateTableViewColumnParams,
+  UpdateTableViewColumnsParams,
 } from '@/types/enrichment/table';
 import { TableFilterRequestParams } from '@/types/enrichment/tableFilter';
 
@@ -66,14 +69,27 @@ export const _createBlankTable = () => {
 };
 
 // columns
-export const _updateTableColumn = (
-  params: Partial<UpdateTableColumnConfigParams>,
+export const _updateTableMetaColumn = (
+  params: Partial<UpdateTableMetaColumnParams>,
 ) => {
   return patch('/sdr/table/field', params);
 };
 
+export const _updateTableViewColumn = (
+  params: Partial<UpdateTableViewColumnParams>,
+) => {
+  return put<TableViewData>('/sdr/table/view/properties', params);
+};
+
+export const _updateTableViewColumns = (
+  params: UpdateTableViewColumnsParams,
+) => {
+  return put<TableViewData>('/sdr/table/view/properties/batch', params);
+};
+
+/** @deprecated */
 export const _updateTableColumns = (
-  params: Partial<UpdateTableColumnConfigParams>[],
+  params: Partial<UpdateTableMetaColumnParams>[],
 ) => {
   return patch('/sdr/table/field/batch', params);
 };

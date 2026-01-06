@@ -59,7 +59,7 @@ const readStreamToText = async (
 
   try {
     while (true) {
-      // 检查是否被中止
+      // Check if aborted
       if (abortSignal?.aborted) {
         reader.cancel();
         throw new Error('Stream reading aborted');
@@ -351,10 +351,10 @@ export const useWebResearchStore = create<
     });
   },
   runGenerateAiModel: async (api: string, params: Record<string, any>) => {
-    // 取消上一个请求
+    // Cancel previous request
     get().cancelCurrentRequest();
 
-    // 创建新的 AbortController 和 requestId
+    // Create new AbortController and requestId
     const abortController = new AbortController();
     const currentRequestId = get().requestId + 1;
     set({
@@ -368,9 +368,10 @@ export const useWebResearchStore = create<
       generateDescription: params.params?.userInput || '',
     });
     try {
+      // Only need field names, use metaColumns directly
       const columnsNames = useEnrichmentTableStore
         .getState()
-        .columns.map((item) => item.fieldName)
+        .metaColumns.map((item) => item.fieldName)
         .join(',');
       const response = await generatePromptApi(api, {
         module: 'TASK_MODEL_CHOOSER',
@@ -384,7 +385,7 @@ export const useWebResearchStore = create<
         const fullText = await readStreamToText(
           response.body,
           (nextFullText) => {
-            // 检查是否仍然是当前请求
+            // Check if still current request
             if (get().requestId !== currentRequestId) {
               return;
             }
@@ -399,7 +400,7 @@ export const useWebResearchStore = create<
           abortController.signal,
         );
 
-        // 检查是否仍然是当前请求
+        // Check if still current request
         if (get().requestId !== currentRequestId) {
           return;
         }
@@ -421,9 +422,9 @@ export const useWebResearchStore = create<
         });
       }
     } catch (err) {
-      // 如果是被中止的请求，不显示错误
+      // If request was aborted, don't show error
       if (err instanceof Error && err.message === 'Stream reading aborted') {
-        console.log('请求已被取消');
+        console.log('Request cancelled');
         return;
       }
       const { header, message, variant } = err as HttpError;
@@ -441,7 +442,7 @@ export const useWebResearchStore = create<
         const fullText = await readStreamToText(
           response.body,
           (nextFullText) => {
-            // 检查是否仍然是当前请求
+            // Check if still current request
             if (get().requestId !== currentRequestId) {
               return;
             }
@@ -455,7 +456,7 @@ export const useWebResearchStore = create<
           abortController?.signal,
         );
 
-        // 检查是否仍然是当前请求
+        // Check if still current request
         if (get().requestId !== currentRequestId) {
           return;
         }
@@ -469,16 +470,16 @@ export const useWebResearchStore = create<
           prompt: textBeforeJson,
         });
         setTimeout(() => {
-          // 再次检查是否仍然是当前请求
+          // Recheck if still current request
           if (get().requestId === currentRequestId) {
             set({ webResearchTab: 'configure', generateIsThinking: false });
           }
         }, 1000);
       }
     } catch (err) {
-      // 如果是被中止的请求，不显示错误
+      // If request was aborted, don't show error
       if (err instanceof Error && err.message === 'Stream reading aborted') {
-        console.log('请求已被取消');
+        console.log('Request cancelled');
         return;
       }
       const { header, message, variant } = err as HttpError;

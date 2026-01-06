@@ -4,10 +4,10 @@ import { useShallow } from 'zustand/react/shallow';
 import { SDRToast } from '@/components/atoms';
 
 import { useAsyncFn } from '@/hooks';
-import { useWorkEmailStore } from '@/stores/enrichment';
+import { useTableColumns, useWorkEmailStore } from '@/stores/enrichment';
 import { useRunAi } from '@/hooks/useRunAi';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
-import { useComputedInWorkEmailStore } from './useComputedInWorkEmailStore';
+import { useComputedInWorkEmailStore } from './index';
 
 import {
   _createIntegrationConfig,
@@ -16,6 +16,8 @@ import {
 
 import { ActiveTypeEnum, HttpError } from '@/types';
 import { CreateWaterfallConfigRequestParam } from '@/types/enrichment';
+
+import { TableColumnProps } from '@/types/enrichment/table';
 
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
@@ -41,14 +43,16 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
   );
   const { runAi } = useRunAi();
 
-  const { closeDialog, columns, fetchTable } = useEnrichmentTableStore(
+  const { closeDialog, fetchTable } = useEnrichmentTableStore(
     useShallow((state) => ({
       activeColumnId: state.activeColumnId,
       closeDialog: state.closeDialog,
-      columns: state.columns,
       fetchTable: state.fetchTable,
     })),
   );
+
+  // Get merged columns
+  const columns = useTableColumns();
   const { waterfallAllInputs, integrationsInWaterfall } =
     useComputedInWorkEmailStore();
 
@@ -103,11 +107,11 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
     async (tableId: string, recordCount = 10, isRunAi = true) => {
       try {
         const { data } = await _createIntegrationConfig(tableId, requestParams);
-        const { fields } = await fetchTable(tableId);
+        const { metaColumns: newColumns } = await fetchTable(tableId);
         const groupId = data;
-        const fieldIdsWithGroupId = fields
-          .filter((f) => f.groupId === groupId)
-          ?.map((f) => f.fieldId);
+        const fieldIdsWithGroupId = newColumns
+          .filter((col: TableColumnProps) => col.groupId === groupId)
+          ?.map((col: TableColumnProps) => col.fieldId);
         closeDialog();
         fetchActionsMenus(tableId);
         if (isRunAi) {
@@ -139,8 +143,8 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
         fetchActionsMenus(tableId);
         if (isRunAi) {
           const fieldIdsWithGroupId = columns
-            .filter((f) => f.groupId === groupId)
-            ?.map((f) => f.fieldId);
+            .filter((f: TableColumnProps) => f.groupId === groupId)
+            ?.map((f: TableColumnProps) => f.fieldId);
           await runAi({
             tableId: tableId,
             recordCount: recordCount,

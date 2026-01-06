@@ -18,12 +18,43 @@ import {
 } from '@/types/enrichment';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
-import { TableColumnProps } from '@/types/enrichment/table';
+import {
+  TableColumnProps,
+  TableViewColumnProps,
+} from '@/types/enrichment/table';
 
-// 常量定义
+const getMergedColumns = (): TableColumnProps[] => {
+  const { metaColumns, views, activeViewId } =
+    useEnrichmentTableStore.getState();
+  const activeView = views.find((v) => v.viewId === activeViewId);
+  const fieldProps = activeView?.fieldProps ?? [];
+  const fieldPropsMap = new Map<string, TableViewColumnProps>(
+    fieldProps.map((fp) => [fp.fieldId, fp]),
+  );
+  return metaColumns.map((meta) => {
+    const fp = fieldPropsMap.get(meta.fieldId);
+    if (!fp) {
+      return meta;
+    }
+    return {
+      ...meta,
+      pin: fp.pin,
+      visible: fp.visible,
+      width: fp.width,
+      color: fp.color,
+      csn: fp.sort,
+    };
+  });
+};
+
+const getMergedColumnById = (fieldId: string): TableColumnProps | undefined => {
+  return getMergedColumns().find((col) => col.fieldId === fieldId);
+};
+
+// Constants
 const LEADMAGIC_VALIDATION_KEY = 'leadmagic';
 
-// 工具函数：构建selectedOption对象
+// Helper function: build selectedOption object
 const buildSelectedOption = (column: TableColumnProps | undefined) =>
   column?.fieldId
     ? {
@@ -76,7 +107,7 @@ type WorkEmailStoreActions = {
   setIsValidatedInputParams: (isValidated: boolean) => void;
   updateIntegrationsOrder: (integrations: IntegrationAction[]) => void;
   addIntegrationToDefault: (integration: IntegrationAction) => void;
-  handleEditClick: (columnId: string) => void;
+  onWorkEmailEditClick: (columnId: string) => void;
   onClickToSingleIntegration: (columnId: string) => void;
   setIntegrationMenus: (menus: IntegrationActionMenu[]) => void;
   setValidationOptions: (config: IntegrationActionValidation[] | null) => void;
@@ -143,7 +174,7 @@ export const useWorkEmailStore = create<
             state.selectedIntegrationToConfig = {
               ...integration,
               inputParams: integration.inputParams.map((p) => {
-                const columns = useEnrichmentTableStore.getState().columns;
+                const columns = getMergedColumns();
                 const column = columns.find(
                   (c) => c.semanticType === p.semanticType,
                 );
@@ -208,7 +239,7 @@ export const useWorkEmailStore = create<
         }),
       addIntegrationToDefault: (integration: IntegrationAction) =>
         set((state) => {
-          // 查找要添加的集成
+          // Find integration to add
           const integrationToAdd = state.allIntegrations.find(
             (i) => i.actionKey === integration.actionKey,
           );
@@ -217,7 +248,7 @@ export const useWorkEmailStore = create<
             return;
           }
 
-          // 获取当前所有默认集成
+          // Get current default integrations
           const defaultIntegrations = state.allIntegrations.filter(
             (i) => i.isDefault,
           );
@@ -225,18 +256,18 @@ export const useWorkEmailStore = create<
             (i) => !i.isDefault,
           );
 
-          // 从非默认列表中移除要添加的集成
+          // Remove integration from non-default list
           const updatedNonDefault = nonDefaultIntegrations.filter(
             (i) => i.actionKey !== integration.actionKey,
           );
 
-          // 创建要添加的集成的更新版本
+          // Create updated version of integration to add
           const updatedIntegration = {
             ...integrationToAdd,
             isDefault: true,
           };
 
-          // 更新 allIntegrations，将新集成添加到默认列表末尾
+          // Update allIntegrations, add new integration to end of default list
           state.allIntegrations = [
             ...defaultIntegrations,
             updatedIntegration,
@@ -245,7 +276,7 @@ export const useWorkEmailStore = create<
         }),
       updateIntegrationsOrder: (sortedIntegrations: IntegrationAction[]) =>
         set((state) => {
-          // 获取当前所有默认和非默认集成
+          // Get current default and non-default integrations
           const currentDefaultIntegrations = state.allIntegrations.filter(
             (i) => i.isDefault,
           );
@@ -253,7 +284,7 @@ export const useWorkEmailStore = create<
             (i) => !i.isDefault,
           );
 
-          // 创建一个映射，记录排序后的集成的顺序
+          // Create map to record order of sorted integrations
           const sortedMap = new Map(
             sortedIntegrations.map((integration, index) => [
               integration.actionKey,
@@ -261,7 +292,7 @@ export const useWorkEmailStore = create<
             ]),
           );
 
-          // 按照排序后的顺序重新排列 defaultIntegrations
+          // Sort defaultIntegrations by sorted order
           const sortedDefaultIntegrations = [
             ...currentDefaultIntegrations,
           ].sort((a, b) => {
@@ -272,27 +303,32 @@ export const useWorkEmailStore = create<
             return indexA - indexB;
           });
 
-          // 更新 allIntegrations
+          // Update allIntegrations
           state.allIntegrations = [
             ...sortedDefaultIntegrations,
             ...nonDefaultIntegrations,
           ];
         }),
-      handleEditClick: (columnId: string) =>
+      onWorkEmailEditClick: (columnId: string) =>
         set((state) => {
-          const { columns, fieldGroupMap } = useEnrichmentTableStore.getState();
-          const column = columns.find((col) => col.fieldId === columnId);
+          const { fieldGroupMap } = useEnrichmentTableStore.getState();
+          const columns = getMergedColumns();
+          const column = columns.find(
+            (col: TableColumnProps) => col.fieldId === columnId,
+          );
 
           if (!column?.groupId || !fieldGroupMap) {
             return;
           }
 
-          //将requiredInputsBinding转换为选中的选项展示
+          //Convert requiredInputsBinding to selected options for display
           const requiredInputsBinding =
             fieldGroupMap?.[column.groupId]?.requiredInputsBinding || [];
 
           const selectedOptions = requiredInputsBinding.map((i) => {
-            const field = columns.find((col) => col.fieldId === i.formulaText);
+            const field = columns.find(
+              (col: TableColumnProps) => col.fieldId === i.formulaText,
+            );
             return {
               label: field?.fieldName || '',
               value: field?.fieldId || '',
@@ -323,7 +359,7 @@ export const useWorkEmailStore = create<
             }),
           }));
 
-          //根据actionKey找到integration
+          //Find integration by actionKey
           const integration = state.integrationMenus.find(
             (i) => column && column.actionKey?.includes(i.key || ''),
           );
@@ -334,12 +370,12 @@ export const useWorkEmailStore = create<
 
           const editParam = waterfallConfigInField;
 
-          // 创建一个映射，记录 editParam 中每个项的顺序
+          // Create map to record order of each item in editParam
           const orderMap = new Map(
             editParam.map((item, index) => [item.actionKey, index]),
           );
 
-          // 处理 API 返回的数据
+          // Process API returned data
           const processedIntegrations =
             integration.waterfallConfigs?.map((i) => {
               const editItem = editParam.find(
@@ -364,7 +400,7 @@ export const useWorkEmailStore = create<
               };
             }) || [];
 
-          // 对集成进行排序 - 使用Set提高性能
+          // Sort integrations - use Set for better performance
           const editParamKeys = new Set(editParam.map((e) => e.actionKey));
           const inEditParam = processedIntegrations.filter((i) =>
             editParamKeys.has(i.actionKey),
@@ -373,14 +409,14 @@ export const useWorkEmailStore = create<
             (i) => !editParamKeys.has(i.actionKey),
           );
 
-          // 按照 editParam 的顺序排序
+          // Sort by editParam order
           inEditParam.sort((a, b) => {
             const orderA = orderMap.get(a.actionKey) ?? Number.MAX_SAFE_INTEGER;
             const orderB = orderMap.get(b.actionKey) ?? Number.MAX_SAFE_INTEGER;
             return orderA - orderB;
           });
 
-          // 合并排序后的结果
+          // Merge sorted results
           state.allIntegrations = [...inEditParam, ...notInEditParam];
           state.activeType = ActiveTypeEnum.edit;
           state.integrationType = IntegrationTypeEnum.collectionIntegrated;
@@ -403,16 +439,14 @@ export const useWorkEmailStore = create<
             .openDialog(TableColumnMenuActionEnum.work_email);
         }),
       onClickToSingleIntegration: (columnId: string) => {
-        const column = useEnrichmentTableStore
-          .getState()
-          .getColumnById(columnId);
+        const column = getMergedColumnById(columnId);
         if (!column) {
           return;
         }
         const { actionDefinition, typeSettings } = column;
         if (actionDefinition) {
           const editInputParams = typeSettings?.inputBinding || [];
-          const columns = useEnrichmentTableStore.getState().columns;
+          const columns = getMergedColumns();
 
           set({
             activeType: ActiveTypeEnum.edit,
@@ -422,11 +456,11 @@ export const useWorkEmailStore = create<
               ...actionDefinition,
               inputParams:
                 actionDefinition?.inputParams?.map((item) => {
-                  //通过item中semanticType找到inputBinding中的name
+                  //Find name in inputBinding by semanticType in item
                   const selectedBinding = editInputParams.find(
                     (i) => i.name === item.semanticType,
                   );
-                  //再通过inputBinding中的formulaText，找到column
+                  //Find column by formulaText in inputBinding
                   const column = columns.find(
                     (c) => c.fieldId === selectedBinding?.formulaText,
                   );
@@ -457,9 +491,10 @@ export const useWorkEmailStore = create<
                 waterfallConfigs: (item.waterfallConfigs || []).map((i) => ({
                   ...i,
                   inputParams: (i.inputParams || []).map((p) => {
-                    const columns = useEnrichmentTableStore.getState().columns;
+                    const columns = getMergedColumns();
                     const column = columns.find(
-                      (c) => c.semanticType === p.semanticType,
+                      (c: TableColumnProps) =>
+                        c.semanticType === p.semanticType,
                     );
                     return {
                       ...p,

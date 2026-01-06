@@ -16,9 +16,12 @@ import {
 
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useTableColumns } from '@/stores/enrichment';
 import { TypeIcon } from '../../../Table/TableIcon';
-import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import {
+  TableColumnProps,
+  TableColumnTypeEnum,
+} from '@/types/enrichment/table';
 
 export type SuggestionListRef = {
   // For convenience using this SuggestionList from within the
@@ -47,7 +50,8 @@ export const SuggestionList = forwardRef<
   SuggestionListRef,
   SuggestionListProps
 >((props, ref) => {
-  const { columns } = useEnrichmentTableStore((store) => store);
+  // Get merged columns
+  const columns = useTableColumns();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectItem = useCallback(
@@ -119,7 +123,7 @@ export const SuggestionList = forwardRef<
           p: 0,
         }}
       >
-        {columns.map((item, index) => (
+        {columns.map((item: TableColumnProps, index: number) => (
           <ListItem disablePadding key={item.fieldId}>
             <ListItemButton
               onClick={() => onClickToSelectItem(index)}

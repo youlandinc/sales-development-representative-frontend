@@ -8,6 +8,7 @@ import { useEnrichmentTable } from './hooks';
 import {
   ActiveTypeEnum,
   useEnrichmentTableStore,
+  useTableColumns,
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
@@ -86,7 +87,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     activeColumnId,
     addColumn,
     closeDialog,
-    columns,
     dialogType,
     dialogVisible,
     fieldGroupMap,
@@ -95,10 +95,10 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
     setActiveColumnId,
     setRowIds,
     updateColumnName,
-    updateColumnPin,
+    updateViewColumnPin,
     updateColumnType,
-    updateColumnVisible,
-    updateColumnWidth,
+    updateViewColumnVisible,
+    updateViewColumnWidth,
     updateColumnOrder,
   } = useEnrichmentTableStore(
     useShallow((store) => ({
@@ -107,7 +107,6 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
       activeColumnId: store.activeColumnId,
       addColumn: store.addColumn,
       closeDialog: store.closeDialog,
-      columns: store.columns,
       dialogType: store.dialogType,
       dialogVisible: store.dialogVisible,
       fieldGroupMap: store.fieldGroupMap,
@@ -116,13 +115,16 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
       setActiveColumnId: store.setActiveColumnId,
       setRowIds: store.setRowIds,
       updateColumnName: store.updateColumnName,
-      updateColumnPin: store.updateColumnPin,
+      updateViewColumnPin: store.updateViewColumnPin,
       updateColumnType: store.updateColumnType,
-      updateColumnVisible: store.updateColumnVisible,
-      updateColumnWidth: store.updateColumnWidth,
+      updateViewColumnVisible: store.updateViewColumnVisible,
+      updateViewColumnWidth: store.updateViewColumnWidth,
       updateColumnOrder: store.updateColumnOrder,
     })),
   );
+
+  // Get merged columns (metaColumns + activeView.fieldProps)
+  const columns = useTableColumns();
 
   const { setEditParams, setWebResearchVisible, allClear, setWebResearchTab } =
     useWebResearchStore(
@@ -147,7 +149,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   const { onClickToEditWorkEmail, onClickToSingleIntegration } =
     useWorkEmailStore(
       useShallow((store) => ({
-        onClickToEditWorkEmail: store.handleEditClick,
+        onClickToEditWorkEmail: store.onWorkEmailEditClick,
         onClickToSingleIntegration: store.onClickToSingleIntegration,
       })),
     );
@@ -382,7 +384,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
               }}
               onCellEdit={onCellEdit}
               onColumnResize={(fieldId, width) =>
-                updateColumnWidth(fieldId, width)
+                updateViewColumnWidth(fieldId, width)
               }
               onColumnSort={updateColumnOrder}
               onHeaderMenuClick={async ({
@@ -461,11 +463,11 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                     break;
                   }
                   case TableColumnMenuActionEnum.pin: {
-                    await updateColumnPin(value);
+                    await updateViewColumnPin(columnId, value);
                     break;
                   }
                   case TableColumnMenuActionEnum.visible: {
-                    await updateColumnVisible(columnId, value);
+                    await updateViewColumnVisible(columnId, value);
                     break;
                   }
                   case TableColumnMenuActionEnum.delete: {

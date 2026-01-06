@@ -9,9 +9,12 @@ import { FC, ReactNode } from 'react';
 
 import { StyledTextField } from '@/components/atoms';
 
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useTableColumns } from '@/stores/enrichment';
 
-import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import {
+  TableColumnProps,
+  TableColumnTypeEnum,
+} from '@/types/enrichment/table';
 
 import { TypeIcon } from '../../Table/TableIcon';
 import {
@@ -39,8 +42,9 @@ export const DialogWorkEmailCustomSelect: FC<
     'value' | 'onChange'
   >
 > = ({ title, onChange, value, required }) => {
-  const { columns } = useEnrichmentTableStore((store) => store);
-  const options: TOption[] = columns.map((item) => ({
+  // Get merged columns
+  const columns = useTableColumns();
+  const options: TOption[] = columns.map((item: TableColumnProps) => ({
     label: item.fieldName,
     value: item.fieldId,
     key: item.fieldId,
@@ -85,8 +89,10 @@ export const DialogWorkEmailCustomSelect: FC<
                   startAdornment: !value?.value ? null : (
                     <TypeIcon
                       type={
-                        (columns.find((col) => col.fieldId === value.value)
-                          ?.fieldType as TableColumnTypeEnum) ||
+                        (columns.find(
+                          (col: TableColumnProps) =>
+                            col.fieldId === value.value,
+                        )?.fieldType as TableColumnTypeEnum) ||
                         TableColumnTypeEnum.text
                       }
                     />
@@ -109,8 +115,9 @@ export const DialogWorkEmailCustomSelect: FC<
             >
               <TypeIcon
                 type={
-                  (columns.find((col) => col.fieldId === option.value)
-                    ?.fieldType as TableColumnTypeEnum) ||
+                  (columns.find(
+                    (col: TableColumnProps) => col.fieldId === option.value,
+                  )?.fieldType as TableColumnTypeEnum) ||
                   TableColumnTypeEnum.text
                 }
               />

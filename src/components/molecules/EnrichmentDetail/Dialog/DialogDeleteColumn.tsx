@@ -4,7 +4,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton, StyledDialog } from '@/components/atoms';
 
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore, useTableColumns } from '@/stores/enrichment';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
@@ -21,11 +21,13 @@ export const DialogDeleteColumn: FC<DialogDeleteColumnProps> = ({
   const {
     dialogVisible,
     dialogType,
-    columns,
     activeColumnId,
     deleteColumn,
     closeDialog,
   } = useEnrichmentTableStore((state) => state);
+
+  // Get merged columns
+  const columns = useTableColumns();
 
   const { fetchActionsMenus } = useActionsStore(
     useShallow((state) => ({

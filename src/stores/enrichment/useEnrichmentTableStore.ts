@@ -18,12 +18,16 @@ import {
   _renameEnrichmentTable,
   _reorderTableColumn,
   _updateTableCellValue,
-  _updateTableColumn,
-  _updateTableColumns,
 } from '@/request';
-import { UTypeOf } from '@/utils';
 
-const handleApiError = <T extends Record<string, any>>(
+import {
+  createTableFieldMetaSlice,
+  createTableViewConfigSlice,
+  TableFieldMetaSlice,
+  TableViewConfigSlice,
+} from './slices';
+
+const onApiError = <T extends Record<string, any>>(
   err: unknown,
   rollbackState?: Partial<T>,
   set?: (state: Partial<T>) => void,
@@ -35,69 +39,41 @@ const handleApiError = <T extends Record<string, any>>(
   SDRToast({ message, header, variant });
 };
 
-/**
- * Helper function to get active column info from store
- *
- * Note: This is only used by methods that operate on the currently active column
- * (e.g., updateColumnName, updateColumnPin, deleteColumn).
- *
- * Methods like updateColumnWidth and updateColumnVisible receive fieldId as a parameter
- * because they may need to update any column, not just the active one.
- */
-type GetActiveColumnResult = {
-  fieldId: string;
-  columns: TableColumnProps[];
-  column: TableColumnProps | undefined;
-};
+// ============================================================================
+// Core Store Types (non-slice state)
+// ============================================================================
 
-const getActiveColumn = (
-  get: () => EnrichmentTableStoreProps,
-): GetActiveColumnResult => {
-  const { activeColumnId, columns } = get();
-  return {
-    fieldId: activeColumnId,
-    columns,
-    column: columns.find((col) => col.fieldId === activeColumnId),
-  };
-};
-
-export type EnrichmentTableState = {
-  // dialog
+export type EnrichmentTableCoreState = {
+  // Dialog
   dialogVisible: boolean;
   dialogType: TableColumnMenuActionEnum | null;
   drawersType: TableColumnMenuActionEnum[];
-
+  // Table
+  tableId: string;
   tableName: string;
-  columns: TableColumnProps[];
-  activeColumnId: string;
-  views: TableViewData[];
-  activeViewId: string;
-
+  // Rows
   rowIds: string[];
   runRecords: {
     [key: string]: { recordIds: string[]; isAll: boolean };
   } | null;
-
   fieldGroupMap: ColumnFieldGroupMap | null;
 };
 
-export type EnrichmentTableActions = {
+export type EnrichmentTableCoreActions = {
   fetchTable: (tableId: string) => Promise<{
     runRecords: {
       [key: string]: { recordIds: string[]; isAll: boolean };
     } | null;
-    fields: TableColumnProps[];
+    metaColumns: TableColumnProps[];
   }>;
   fetchRowIds: (tableId: string, viewId?: string) => Promise<void>;
   setRowIds: (rowIds: string[]) => void;
-  // helper
-  setActiveColumnId: (columnId: string) => void;
-  openDialog: (type: EnrichmentTableState['dialogType']) => void;
+  // Dialog
+  openDialog: (type: EnrichmentTableCoreState['dialogType']) => void;
   closeDialog: () => void;
-  // table
+  // Table
   renameTable: (tableId: string, name: string) => Promise<void>;
-  // table header
-  // Single operation
+  // Column CRUD (non-meta operations)
   addColumn: (params: {
     tableId: string;
     fieldType: TableColumnTypeEnum;
@@ -105,28 +81,14 @@ export type EnrichmentTableActions = {
     afterFieldId?: string;
     fieldName?: string;
   }) => Promise<TableColumnProps | null>;
+  deleteColumn: () => Promise<void>;
   updateColumnOrder: (params: {
     tableId: string;
     currentFieldId: string;
     beforeFieldId?: string;
     afterFieldId?: string;
   }) => Promise<void>;
-  updateColumnName: (newName: string) => Promise<void>;
-  updateColumnNameAndType: (params: {
-    fieldName: string;
-    fieldType: TableColumnTypeEnum;
-  }) => Promise<void>;
-  updateColumnPin: (pin: boolean) => Promise<void>;
-  updateColumnWidth: (fieldId: string, width: number) => Promise<void>;
-  // Multiple operation
-  updateColumnVisible: (fieldId: string, visible: boolean) => Promise<void>;
-  updateColumnsVisible: (
-    updates: { fieldId: string; visible: boolean }[],
-  ) => Promise<void>;
-  updateColumnDescription: (description: string) => Promise<void>;
-  updateColumnType: (fieldType: TableColumnTypeEnum) => Promise<void>;
-  deleteColumn: () => Promise<void>;
-  // table cell
+  // Cell
   updateCellValue: (data: {
     tableId: string;
     recordId: string;
@@ -134,14 +96,34 @@ export type EnrichmentTableActions = {
     value: string;
   }) => Promise<any>;
   resetTable: () => void;
-  getColumnById: (fieldId: string) => TableColumnProps | undefined;
 };
 
-export type EnrichmentTableStoreProps = EnrichmentTableState &
-  EnrichmentTableActions;
+export type EnrichmentTableCoreSlice = EnrichmentTableCoreState &
+  EnrichmentTableCoreActions;
+
+// ============================================================================
+// Combined Store Type
+// ============================================================================
+
+export type EnrichmentTableStoreProps = EnrichmentTableCoreSlice &
+  TableFieldMetaSlice &
+  TableViewConfigSlice;
+
+// Legacy aliases for backward compatibility
+export type EnrichmentTableState = EnrichmentTableStoreProps;
+export type EnrichmentTableActions = EnrichmentTableStoreProps;
+
+// ============================================================================
+// Store Implementation
+// ============================================================================
 
 export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
-  (set, get) => ({
+  (set, get, api) => ({
+    // Combine slices
+    ...createTableFieldMetaSlice(set, get, api),
+    ...createTableViewConfigSlice(set, get, api),
+
+    // Core state
     dialogVisible: false,
     dialogType: null,
     drawersType: [
@@ -151,18 +133,17 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       TableColumnMenuActionEnum.work_email,
       TableColumnMenuActionEnum.ai_agent,
     ],
-    views: [],
-    activeViewId: '',
+    tableId: '',
     tableName: '',
-    columns: [],
-    activeColumnId: '',
     rowIds: [],
     runRecords: null,
     fieldGroupMap: null,
+
+    // Core actions
     fetchTable: async (tableId) => {
       let result = null;
       if (!tableId) {
-        return { runRecords: result, fields: [] };
+        return { runRecords: result, metaColumns: [] };
       }
 
       try {
@@ -170,27 +151,30 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
           data: { fields, tableName, runRecords, fieldGroupMap, views },
         } = await _fetchTable(tableId);
         result = runRecords;
-        const defaultView = (views ?? []).find((view) => view.isDefaultOpen);
+        const defaultView = (views ?? []).find(
+          (view: TableViewData) => view.isDefaultOpen,
+        );
         set({
-          columns: fields,
+          tableId,
+          metaColumns: fields,
           tableName,
           runRecords: runRecords ?? null,
           fieldGroupMap,
           views: views ?? [],
           activeViewId: defaultView?.viewId ?? '',
         });
-        return { runRecords: result, fields };
+        return { runRecords: result, metaColumns: fields };
       } catch (err) {
-        handleApiError<EnrichmentTableState>(err);
-        return { runRecords: result, fields: [] };
+        onApiError<EnrichmentTableCoreState>(err);
+        return { runRecords: result, metaColumns: [] };
       }
     },
+
     fetchRowIds: async (tableId, viewId) => {
       if (!tableId) {
         return;
       }
       const { views, activeViewId } = get();
-      // Use passed viewId, or activeViewId from store, or find default
       const targetViewId = viewId || activeViewId;
       const targetView = targetViewId
         ? views.find((view) => view.viewId === targetViewId)
@@ -206,229 +190,34 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         });
         set({ rowIds: data, activeViewId: targetView.viewId });
       } catch (err) {
-        handleApiError<EnrichmentTableState>(err);
+        onApiError<EnrichmentTableCoreState>(err);
       }
     },
+
     setRowIds: (rowIds) => {
       set({ rowIds });
     },
+
+    openDialog: (type) => {
+      set({ dialogVisible: true, dialogType: type });
+    },
+
+    closeDialog: () => {
+      set({ dialogVisible: false, dialogType: null });
+    },
+
     renameTable: async (tableId, name) => {
       if (!tableId || !name) {
         return;
       }
       const tableName = get().tableName;
-
       try {
         await _renameEnrichmentTable({ tableName: name, tableId });
       } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { tableName }, set);
+        onApiError<EnrichmentTableCoreState>(err, { tableName }, set);
       }
     },
-    setActiveColumnId: (columnId) => {
-      set({ activeColumnId: columnId });
-    },
-    openDialog: (type) => {
-      set({ dialogVisible: true, dialogType: type });
-    },
-    closeDialog: () => {
-      set({ dialogVisible: false, dialogType: null });
-    },
-    getColumnById: (fieldId) => {
-      const columns = get().columns;
-      return columns.find((col) => col.fieldId === fieldId);
-    },
-    // table header
-    updateColumnWidth: async (fieldId, width) => {
-      if (!fieldId || !width) {
-        return;
-      }
-      const columns = get().columns;
-      const updatedColumns = columns.map((col) =>
-        col.fieldId === fieldId ? { ...col, width } : col,
-      );
-      set({ columns: updatedColumns });
 
-      try {
-        await _updateTableColumn({ fieldId, width });
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    updateColumnName: async (newName) => {
-      const { fieldId, columns, column } = getActiveColumn(get);
-
-      const trimmedName = newName.trim();
-      if (!fieldId || !column || !trimmedName) {
-        return;
-      }
-
-      const updatedColumns = columns.map((col) =>
-        col.fieldId === fieldId ? { ...col, fieldName: trimmedName } : col,
-      );
-      set({ columns: updatedColumns });
-
-      try {
-        await _updateTableColumn({ fieldId, fieldName: trimmedName });
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    updateColumnVisible: async (fieldId, visible) => {
-      if (!fieldId || UTypeOf.isUndefined(visible)) {
-        return;
-      }
-      const columns = get().columns;
-      const updatedColumns = columns.map((col) =>
-        col.fieldId === fieldId ? { ...col, visible } : col,
-      );
-
-      set({ columns: updatedColumns });
-
-      try {
-        await _updateTableColumn({ fieldId, visible });
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    updateColumnsVisible: async (updates) => {
-      if (!updates.length) {
-        return;
-      }
-      const columns = get().columns;
-      const updateMap = new Map(updates.map((u) => [u.fieldId, u.visible]));
-      const updatedColumns = columns.map((col) =>
-        updateMap.has(col.fieldId)
-          ? { ...col, visible: updateMap.get(col.fieldId)! }
-          : col,
-      );
-
-      set({ columns: updatedColumns });
-
-      try {
-        await _updateTableColumns(updates);
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    updateColumnPin: async (pin) => {
-      const { fieldId, columns, column } = getActiveColumn(get);
-
-      if (!fieldId || !column || UTypeOf.isUndefined(pin)) {
-        return;
-      }
-
-      const updatedColumns = columns.map((col) =>
-        col.fieldId === fieldId ? { ...col, pin } : col,
-      );
-      set({
-        columns: updatedColumns,
-      });
-
-      try {
-        await _updateTableColumn({ fieldId, pin });
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    updateColumnDescription: async (description) => {
-      const { fieldId, columns, column } = getActiveColumn(get);
-
-      const trimmedDescription = description.trim();
-      if (!fieldId || !column || UTypeOf.isUndefined(trimmedDescription)) {
-        return;
-      }
-
-      const updatedColumns = columns.map((col) =>
-        col.fieldId === fieldId
-          ? { ...col, description: trimmedDescription }
-          : col,
-      );
-      set({
-        columns: updatedColumns,
-      });
-
-      try {
-        await _updateTableColumn({
-          fieldId,
-          description: trimmedDescription,
-        });
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    updateColumnType: async (fieldType) => {
-      const { fieldId, columns, column } = getActiveColumn(get);
-
-      if (!fieldId || !column || !fieldType) {
-        return;
-      }
-
-      // Don't update if it's the same type
-      if (column.fieldType === fieldType) {
-        return;
-      }
-
-      const updatedColumns = columns.map((col) =>
-        col.fieldId === fieldId ? { ...col, fieldType } : col,
-      );
-      set({
-        columns: updatedColumns,
-      });
-
-      try {
-        await _updateTableColumn({
-          fieldId,
-          fieldType,
-        });
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    updateColumnNameAndType: async (params) => {
-      const { fieldId, columns, column } = getActiveColumn(get);
-
-      const trimmedFieldName = params.fieldName.trim();
-      if (!fieldId || !column || !trimmedFieldName || !params.fieldType) {
-        return;
-      }
-
-      const updatedColumns = columns.map((col) =>
-        col.fieldId === fieldId
-          ? { ...col, fieldName: trimmedFieldName, fieldType: params.fieldType }
-          : col,
-      );
-      set({
-        columns: updatedColumns,
-      });
-
-      try {
-        await _updateTableColumn({
-          fieldId,
-          fieldName: trimmedFieldName,
-          fieldType: params.fieldType,
-        });
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
-    deleteColumn: async () => {
-      const { fieldId, columns, column } = getActiveColumn(get);
-
-      if (!fieldId || !column) {
-        return;
-      }
-
-      // Optimistic update
-      const updatedColumns = columns.filter((col) => col.fieldId !== fieldId);
-      set({ columns: updatedColumns });
-      get().closeDialog();
-
-      try {
-        await _deleteTableColumn(fieldId);
-      } catch (err) {
-        handleApiError<EnrichmentTableState>(err, { columns }, set);
-      }
-    },
     addColumn: async (params) => {
       try {
         const { data: newColumn } = await _createTableColumn(params);
@@ -436,52 +225,76 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
           return null;
         }
 
-        const columns = get().columns;
+        const metaColumns = get().metaColumns;
         const { beforeFieldId, afterFieldId } = params;
 
-        let newColumns: TableColumnProps[];
+        let newMetaColumns: TableColumnProps[];
         if (beforeFieldId) {
-          const index = columns.findIndex(
+          const index = metaColumns.findIndex(
             (col) => col.fieldId === beforeFieldId,
           );
           if (index >= 0) {
-            newColumns = [
-              ...columns.slice(0, index),
+            newMetaColumns = [
+              ...metaColumns.slice(0, index),
               newColumn,
-              ...columns.slice(index),
+              ...metaColumns.slice(index),
             ];
           } else {
-            newColumns = [...columns, newColumn];
+            newMetaColumns = [...metaColumns, newColumn];
           }
         } else if (afterFieldId) {
-          const index = columns.findIndex(
+          const index = metaColumns.findIndex(
             (col) => col.fieldId === afterFieldId,
           );
           if (index >= 0) {
-            newColumns = [
-              ...columns.slice(0, index + 1),
+            newMetaColumns = [
+              ...metaColumns.slice(0, index + 1),
               newColumn,
-              ...columns.slice(index + 1),
+              ...metaColumns.slice(index + 1),
             ];
           } else {
-            newColumns = [...columns, newColumn];
+            newMetaColumns = [...metaColumns, newColumn];
           }
         } else {
-          newColumns = [...columns, newColumn];
+          newMetaColumns = [...metaColumns, newColumn];
         }
 
-        set({ columns: newColumns });
+        set({ metaColumns: newMetaColumns });
         return newColumn;
       } catch (err) {
-        handleApiError<EnrichmentTableState>(err);
+        onApiError<EnrichmentTableCoreState>(err);
         return null;
       }
     },
+
+    deleteColumn: async () => {
+      const { activeColumnId, metaColumns } = get();
+      const metaColumn = metaColumns.find(
+        (col) => col.fieldId === activeColumnId,
+      );
+
+      if (!activeColumnId || !metaColumn) {
+        return;
+      }
+
+      const updatedMetaColumns = metaColumns.filter(
+        (col) => col.fieldId !== activeColumnId,
+      );
+      set({ metaColumns: updatedMetaColumns });
+      get().closeDialog();
+
+      try {
+        await _deleteTableColumn(activeColumnId);
+      } catch (err) {
+        onApiError<EnrichmentTableCoreState>(err);
+        set({ metaColumns });
+      }
+    },
+
     updateColumnOrder: async (params) => {
       const { currentFieldId, beforeFieldId, afterFieldId } = params;
-
-      const columns = get().columns;
-      const currentIndex = columns.findIndex(
+      const metaColumns = get().metaColumns;
+      const currentIndex = metaColumns.findIndex(
         (col) => col.fieldId === currentFieldId,
       );
 
@@ -489,63 +302,58 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         return;
       }
 
-      // API semantics:
-      // - afterFieldId = X means X will be AFTER the moved item (insert at X's position)
-      // - beforeFieldId = X means X will be BEFORE the moved item (insert after X)
       let newIndex: number;
-
       if (afterFieldId) {
-        const afterIndex = columns.findIndex(
+        const afterIndex = metaColumns.findIndex(
           (col) => col.fieldId === afterFieldId,
         );
         if (afterIndex === -1) {
           return;
         }
-        // Insert at afterFieldId's position (it will move after)
         newIndex = afterIndex;
       } else if (beforeFieldId) {
-        const beforeIndex = columns.findIndex(
+        const beforeIndex = metaColumns.findIndex(
           (col) => col.fieldId === beforeFieldId,
         );
         if (beforeIndex === -1) {
           return;
         }
-        // Insert after beforeFieldId
         newIndex = beforeIndex + 1;
       } else {
         return;
       }
 
-      // Adjust newIndex if moving from before to after
       if (currentIndex < newIndex) {
         newIndex -= 1;
       }
 
-      const oldColumns = columns;
-      const newColumns = arrayMove(columns, currentIndex, newIndex);
-      set({ columns: newColumns });
+      const oldMetaColumns = metaColumns;
+      const newMetaColumns = arrayMove(metaColumns, currentIndex, newIndex);
+      set({ metaColumns: newMetaColumns });
 
       try {
         await _reorderTableColumn(params);
       } catch (err) {
-        set({ columns: oldColumns });
-        handleApiError(err, { columns: oldColumns }, set);
+        set({ metaColumns: oldMetaColumns });
+        onApiError(err);
         throw err;
       }
     },
-    // table cell
+
     updateCellValue: async (data) => {
       try {
         return await _updateTableCellValue(data);
       } catch (err) {
-        handleApiError<EnrichmentTableState>(err);
+        onApiError<EnrichmentTableCoreState>(err);
         throw err;
       }
     },
+
     resetTable: () => {
       set({
+        tableId: '',
         tableName: '',
-        columns: [],
+        metaColumns: [],
         activeColumnId: '',
         dialogVisible: false,
         dialogType: null,

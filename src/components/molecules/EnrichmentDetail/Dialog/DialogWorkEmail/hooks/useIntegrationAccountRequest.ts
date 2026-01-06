@@ -11,8 +11,11 @@ import {
   ActiveTypeEnum,
   useActionsStore,
   useEnrichmentTableStore,
+  useTableColumns,
   useWorkEmailStore,
 } from '@/stores/enrichment';
+import { HttpError } from '@/types';
+import { TableColumnProps } from '@/types/enrichment/table';
 
 export const useIntegrationAccountRequest = (cb?: () => void) => {
   const { fetchActionsMenus } = useActionsStore(
@@ -26,13 +29,15 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
     })),
   );
 
-  const { columns, fetchTable, closeDialog } = useEnrichmentTableStore(
+  const { fetchTable, closeDialog } = useEnrichmentTableStore(
     useShallow((state) => ({
-      columns: state.columns,
       fetchTable: state.fetchTable,
       closeDialog: state.closeDialog,
     })),
   );
+
+  // Get merged columns
+  const columns = useTableColumns();
   const { runAi } = useRunAi();
   const [saveState, saveOrRunIntegrationAccount] = useAsyncFn(
     async (
@@ -50,8 +55,10 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
       try {
         if (activeType === ActiveTypeEnum.add) {
           await _saveIntegrationConfig(param);
-          const { fields } = await fetchTable(param.tableId);
-          const fieldIdsWithGroupId = fields?.map((f) => f.fieldId);
+          const { metaColumns: newColumns } = await fetchTable(param.tableId);
+          const fieldIdsWithGroupId = newColumns?.map(
+            (col: TableColumnProps) => col.fieldId,
+          );
           closeDialog();
           if (isRunAi) {
             await runAi({
@@ -74,7 +81,9 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
           await fetchTable(param.tableId);
           closeDialog();
           if (isRunAi) {
-            const fieldIdsWithGroupId = columns?.map((f) => f.fieldId);
+            const fieldIdsWithGroupId = columns?.map(
+              (col: TableColumnProps) => col.fieldId,
+            );
             await runAi({
               tableId: param.tableId,
               recordCount: recordCount,

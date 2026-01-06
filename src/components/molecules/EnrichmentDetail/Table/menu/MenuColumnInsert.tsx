@@ -2,7 +2,6 @@ import { FC } from 'react';
 import {
   ClickAwayListener,
   Divider,
-  Icon,
   MenuItem,
   Paper,
   Popper,
@@ -50,9 +49,7 @@ export const MenuColumnInsert: FC<MenuColumnInsertProps> = ({
                       { alignItems: 'center', gap: 1 },
                     ]}
                   >
-                    {item.icon && (
-                      <Icon component={item.icon} sx={MENU_STYLES.icon} />
-                    )}
+                    {item.icon}
                     {item.label}
                   </MenuItem>
                 );

@@ -7,14 +7,15 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useShallow } from 'zustand/shallow';
+//import { useShallow } from 'zustand/shallow';
 
 import {
   PAPPER_STACK_CONTAINER_SX,
   PAPPER_SX,
   STACK_CONTAINER_SX,
 } from '../config';
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useTableColumns } from '@/stores/enrichment';
+import { TableColumnProps } from '@/types/enrichment/table';
 import {
   TableFilterConditionType,
   TableFilterRequestParams,
@@ -39,11 +40,8 @@ interface PanelFilterProps {
 }
 
 export const PanelFilter = ({ onFilterChange }: PanelFilterProps) => {
-  const { columns } = useEnrichmentTableStore(
-    useShallow((state) => ({
-      columns: state.columns,
-    })),
-  );
+  // Get merged columns
+  const columns = useTableColumns();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [filterGroups, setFilterGroups] = useState<FilterGroupData[]>([
@@ -52,7 +50,9 @@ export const PanelFilter = ({ onFilterChange }: PanelFilterProps) => {
 
   const filterableColumns = useMemo(() => {
     // Show all columns including hidden ones, as long as they have filter conditions
-    return columns.filter((col) => col.supportedFilterConditions?.length);
+    return columns.filter(
+      (col: TableColumnProps) => col.supportedFilterConditions?.length,
+    );
   }, [columns]);
 
   const filledFilterCount = useMemo(() => {

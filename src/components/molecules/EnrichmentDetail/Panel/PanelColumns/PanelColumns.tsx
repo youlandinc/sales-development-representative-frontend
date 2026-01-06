@@ -30,7 +30,8 @@ import { ColumnSection } from './index';
 import { PanelIcon } from '../PanelIcon';
 import { TableIcon } from '../../Table';
 
-import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useEnrichmentTableStore, useTableColumns } from '@/stores/enrichment';
+import { TableColumnProps } from '@/types/enrichment/table';
 
 import { StyledTextField } from '@/components/atoms';
 
@@ -40,49 +41,50 @@ interface PanelColumnsProps {
 
 export const PanelColumns: FC<PanelColumnsProps> = ({ tableId }) => {
   const {
-    columns,
-    updateColumnVisible,
-    updateColumnsVisible,
+    updateViewColumnVisible,
+    updateViewColumnsVisible,
     updateColumnOrder,
     setActiveColumnId,
   } = useEnrichmentTableStore(
     useShallow((store) => ({
-      columns: store.columns,
-      updateColumnVisible: store.updateColumnVisible,
-      updateColumnsVisible: store.updateColumnsVisible,
+      updateViewColumnVisible: store.updateViewColumnVisible,
+      updateViewColumnsVisible: store.updateViewColumnsVisible,
       updateColumnOrder: store.updateColumnOrder,
       setActiveColumnId: store.setActiveColumnId,
     })),
   );
 
+  // Get merged columns
+  const columns = useTableColumns();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchValue, setSearchValue] = useState<string>('');
 
   const columnsVisible = useMemo(() => {
-    return columns.filter((col) => col.visible).length;
+    return columns.filter((col: TableColumnProps) => col.visible).length;
   }, [columns]);
 
   const { pinnedColumns, unpinnedColumns } = useMemo(() => {
     const lowerSearch = searchValue.toLowerCase().trim();
     const filtered = lowerSearch
-      ? columns.filter((col) =>
+      ? columns.filter((col: TableColumnProps) =>
           col.fieldName.toLowerCase().includes(lowerSearch),
         )
       : columns;
 
     return {
-      pinnedColumns: filtered.filter((col) => col.pin),
-      unpinnedColumns: filtered.filter((col) => !col.pin),
+      pinnedColumns: filtered.filter((col: TableColumnProps) => col.pin),
+      unpinnedColumns: filtered.filter((col: TableColumnProps) => !col.pin),
     };
   }, [columns, searchValue]);
 
   const pinnedColumnIds = useMemo(
-    () => pinnedColumns.map((col) => col.fieldId),
+    () => pinnedColumns.map((col: TableColumnProps) => col.fieldId),
     [pinnedColumns],
   );
 
   const unpinnedColumnIds = useMemo(
-    () => unpinnedColumns.map((col) => col.fieldId),
+    () => unpinnedColumns.map((col: TableColumnProps) => col.fieldId),
     [unpinnedColumns],
   );
 
@@ -124,28 +126,34 @@ export const PanelColumns: FC<PanelColumnsProps> = ({ tableId }) => {
 
   const onVisibilityToggle = useCallback(
     async (fieldId: string, visible: boolean) => {
-      await updateColumnVisible(fieldId, visible);
+      await updateViewColumnVisible(fieldId, visible);
     },
-    [updateColumnVisible],
+    [updateViewColumnVisible],
   );
 
   const onColumnsShowAll = useCallback(async () => {
     const updates = columns
-      .filter((col) => !col.visible)
-      .map((col) => ({ fieldId: col.fieldId, visible: true }));
+      .filter((col: TableColumnProps) => !col.visible)
+      .map((col: TableColumnProps) => ({
+        fieldId: col.fieldId,
+        visible: true,
+      }));
     if (updates.length) {
-      await updateColumnsVisible(updates);
+      await updateViewColumnsVisible(updates);
     }
-  }, [columns, updateColumnsVisible]);
+  }, [columns, updateViewColumnsVisible]);
 
   const onColumnsHideAll = useCallback(async () => {
     const updates = columns
-      .filter((col) => col.visible)
-      .map((col) => ({ fieldId: col.fieldId, visible: false }));
+      .filter((col: TableColumnProps) => col.visible)
+      .map((col: TableColumnProps) => ({
+        fieldId: col.fieldId,
+        visible: false,
+      }));
     if (updates.length) {
-      await updateColumnsVisible(updates);
+      await updateViewColumnsVisible(updates);
     }
-  }, [columns, updateColumnsVisible]);
+  }, [columns, updateViewColumnsVisible]);
 
   return (
     <>
