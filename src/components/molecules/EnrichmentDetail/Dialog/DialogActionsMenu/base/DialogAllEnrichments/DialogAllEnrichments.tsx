@@ -25,7 +25,10 @@ import {
 import { useDialogActionsMenu } from '@/components/molecules/EnrichmentDetail/Dialog/DialogActionsMenu/hooks';
 import { useLocalSearch } from '@/hooks';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
-import { useWorkEmailStore } from '@/stores/enrichment/useWorkEmailStore';
+import {
+  IntegrationTypeEnum,
+  useWorkEmailStore,
+} from '@/stores/enrichment/useWorkEmailStore';
 import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
 // 导入拆分的子组件
 import { ActiveTypeEnum, useEnrichmentTableStore } from '@/stores/enrichment';
@@ -63,14 +66,19 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
     );
     const { onWorkEmailItemClick, onClickToAiTemplate } =
       useDialogActionsMenu();
-    const { setDisplayType, setSelectedIntegrationToConfig, setActiveType } =
-      useWorkEmailStore(
-        useShallow((state) => ({
-          setDisplayType: state.setDisplayType,
-          setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
-          setActiveType: state.setActiveType,
-        })),
-      );
+    const {
+      setDisplayType,
+      setSelectedIntegrationToConfig,
+      setActiveType,
+      setIntegrationType,
+    } = useWorkEmailStore(
+      useShallow((state) => ({
+        setDisplayType: state.setDisplayType,
+        setSelectedIntegrationToConfig: state.setSelectedIntegrationToConfig,
+        setActiveType: state.setActiveType,
+        setIntegrationType: state.setIntegrationType,
+      })),
+    );
     const { openDialog } = useEnrichmentTableStore(
       useShallow((state) => ({
         openDialog: state.openDialog,
@@ -79,23 +87,26 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
 
     const handleConfigItemClick = useCallback(
       (config: IntegrationAction) => {
+        setActiveType(ActiveTypeEnum.add);
+        setDialogAllEnrichmentsVisible(false);
         if (
           dialogAllEnrichmentsTabKey ===
           EnrichmentCategoryEnum.atlas_task_library
         ) {
           const description = config.description ?? '';
           onClickToAiTemplate(`Name:${config.name},Description:${description}`);
-          setDialogAllEnrichmentsVisible(false);
+          setIntegrationType(IntegrationTypeEnum.collectionIntegrated);
+          setDisplayType(DisplayTypeEnum.main);
           return;
         }
+        setIntegrationType(IntegrationTypeEnum.singleIntegrated);
         openDialog(TableColumnMenuActionEnum.work_email);
         setDisplayType(DisplayTypeEnum.integration);
         setSelectedIntegrationToConfig(config);
-        setActiveType(ActiveTypeEnum.add);
-        setDialogAllEnrichmentsVisible(false);
       },
       [
         dialogAllEnrichmentsTabKey,
+        setIntegrationType,
         openDialog,
         setDisplayType,
         setSelectedIntegrationToConfig,
