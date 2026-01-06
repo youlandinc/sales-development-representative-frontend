@@ -287,6 +287,15 @@ export const useWorkEmailStore = create<
             return;
           }
 
+          //根据actionKey找到integration
+          const integration = state.integrationMenus.find(
+            (i) => column && column.actionKey?.includes(i.key || ''),
+          );
+
+          if (!integration) {
+            return;
+          }
+
           //将requiredInputsBinding转换为选中的选项展示
           const requiredInputsBinding =
             fieldGroupMap?.[column.groupId]?.requiredInputsBinding || [];
@@ -322,11 +331,6 @@ export const useWorkEmailStore = create<
               };
             }),
           }));
-
-          //根据actionKey找到integration
-          const integration = state.integrationMenus.find(
-            (i) => column && column.actionKey?.includes(i.key || ''),
-          );
 
           if (!waterfallConfigInField || !integration) {
             return;
@@ -389,6 +393,7 @@ export const useWorkEmailStore = create<
           state.dialogHeaderName = integration.name;
           state.waterfallDescription = integration.description;
           state.groupId = column.groupId;
+
           if (integration.validations) {
             state.validationOptions = integration.validations;
           }

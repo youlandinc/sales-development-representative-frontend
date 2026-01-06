@@ -5,6 +5,7 @@ import { EnrichmentCategoryEnum } from '@/types/enrichment/drawerActions';
 
 import ICON_ATLAS_TASK_LIBRARY from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogAllEnrichments/icon_ai.svg';
 import ICON_INTEGRATIONS from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogAllEnrichments/icon_integrations.svg';
+import ICON_ACTION from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogAllEnrichments/icon_action.svg';
 
 interface MainCategoryTabsProps {
   data: Array<{
@@ -18,6 +19,7 @@ interface MainCategoryTabsProps {
 const iconMap: Record<string, any> = {
   [EnrichmentCategoryEnum.integrations]: ICON_INTEGRATIONS,
   [EnrichmentCategoryEnum.atlas_task_library]: ICON_ATLAS_TASK_LIBRARY,
+  [EnrichmentCategoryEnum.actions]: ICON_ACTION,
 };
 
 /**
