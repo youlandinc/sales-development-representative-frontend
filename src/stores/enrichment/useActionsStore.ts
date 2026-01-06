@@ -130,6 +130,8 @@ export const useActionsStore = create<ActionsStore>()(
             const res = await _fetchAllEnrichmentsData();
             set((state) => {
               state.dialogAllEnrichmentsData = res.data || [];
+              state.dialogAllEnrichmentsTabKey =
+                res.data?.[0]?.categoryKey || EnrichmentCategoryEnum.actions;
             });
           } catch (err) {
             const { message, header, variant } = err as HttpError;
