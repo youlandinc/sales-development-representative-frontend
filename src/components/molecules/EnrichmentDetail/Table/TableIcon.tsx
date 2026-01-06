@@ -363,7 +363,7 @@ const MENU_ICON_MAP: Partial<Record<TableColumnMenuActionEnum, any>> = {
 
 /**
  * Dynamic Menu Icon Component
- * @example <MenuIcon action={TableColumnMenuActionEnum.pin} size={20} />
+ * @example <MenuIcon action={TableColumnMenuActionEnum.pin} size={16} />
  */
 interface MenuIconProps extends SvgIconProps {
   action: TableColumnMenuActionEnum;

@@ -253,7 +253,7 @@ export const QueryAutoComplete: FC<QueryAutoCompleteProps> = ({
           onOpen={onOpenToTrigger}
           open={open}
           options={displayOptions}
-          popupIcon={<QueryIcon.Arrow />}
+          popupIcon={<QueryIcon.ArrowDown />}
           renderInput={(params) => (
             <StyledTextField
               {...params}

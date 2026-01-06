@@ -655,10 +655,7 @@ export const QueryCascadeSelectExternal: FC<
                               : option.label}
                           </span>
                           {!isInSearchMode && hasChildren && (
-                            <QueryIcon.Arrow
-                              size={16}
-                              sx={{ transform: 'rotate(-90deg)', ml: 'auto' }}
-                            />
+                            <QueryIcon.Arrow size={16} sx={{ ml: 'auto' }} />
                           )}
                         </Box>
                       );
