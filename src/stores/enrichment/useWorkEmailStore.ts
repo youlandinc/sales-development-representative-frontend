@@ -33,6 +33,11 @@ const buildSelectedOption = (column: TableColumnProps | undefined) =>
       }
     : null;
 
+export enum IntegrationTypeEnum {
+  collectionIntegrated = 'collectionIntegrated',
+  singleIntegrated = 'singleIntegrated',
+}
+
 type WorkEmailStoreState = {
   integrationMenus: IntegrationActionMenu[];
   activeType: ActiveTypeEnum;
@@ -52,6 +57,7 @@ type WorkEmailStoreState = {
   selectedValidationOption: string | null;
   safeToSend: boolean;
   requireValidationSuccess: boolean;
+  integrationType: IntegrationTypeEnum;
 };
 
 type WorkEmailStoreActions = {
@@ -77,6 +83,7 @@ type WorkEmailStoreActions = {
   setSelectedValidationOption: (option: string | null) => void;
   setSafeToSend: (safeToSend: boolean) => void;
   setRequireValidationSuccess: (requireValidationSuccess: boolean) => void;
+  setIntegrationType: (type: IntegrationTypeEnum) => void;
 };
 
 const initialState: WorkEmailStoreState = {
@@ -98,6 +105,7 @@ const initialState: WorkEmailStoreState = {
   selectedValidationOption: null,
   safeToSend: false,
   requireValidationSuccess: false,
+  integrationType: IntegrationTypeEnum.collectionIntegrated,
 };
 
 export const useWorkEmailStore = create<
@@ -193,6 +201,10 @@ export const useWorkEmailStore = create<
       setRequireValidationSuccess: (requireValidationSuccess: boolean) =>
         set((state) => {
           state.requireValidationSuccess = requireValidationSuccess;
+        }),
+      setIntegrationType: (type: IntegrationTypeEnum) =>
+        set((state) => {
+          state.integrationType = type;
         }),
       addIntegrationToDefault: (integration: IntegrationAction) =>
         set((state) => {
@@ -371,7 +383,9 @@ export const useWorkEmailStore = create<
           // 合并排序后的结果
           state.allIntegrations = [...inEditParam, ...notInEditParam];
           state.activeType = ActiveTypeEnum.edit;
+          state.integrationType = IntegrationTypeEnum.collectionIntegrated;
           state.workEmailVisible = true;
+          state.displayType = DisplayTypeEnum.main;
           state.dialogHeaderName = integration.name;
           state.waterfallDescription = integration.description;
           state.groupId = column.groupId;
@@ -403,6 +417,7 @@ export const useWorkEmailStore = create<
           set({
             activeType: ActiveTypeEnum.edit,
             displayType: DisplayTypeEnum.integration,
+            integrationType: IntegrationTypeEnum.singleIntegrated,
             selectedIntegrationToConfig: {
               ...actionDefinition,
               inputParams:
