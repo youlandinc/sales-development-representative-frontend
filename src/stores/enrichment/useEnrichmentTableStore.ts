@@ -82,7 +82,7 @@ export type EnrichmentTableCoreActions = {
     afterFieldId?: string;
     fieldName?: string;
   }) => Promise<TableColumnProps | null>;
-  deleteColumn: () => Promise<void>;
+  deleteColumn: (columnId: string) => Promise<void>;
   updateColumnOrder: (params: {
     tableId: string;
     currentFieldId: string;
@@ -252,27 +252,23 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       }
     },
 
-    deleteColumn: async () => {
-      const { activeColumnId, metaColumns, views } = get();
-      const metaColumn = metaColumns.find(
-        (col) => col.fieldId === activeColumnId,
-      );
+    deleteColumn: async (columnId: string) => {
+      const { metaColumns, views } = get();
+      const metaColumn = metaColumns.find((col) => col.fieldId === columnId);
 
-      if (!activeColumnId || !metaColumn) {
+      if (!columnId || !metaColumn) {
         return;
       }
 
       // Remove from metaColumns
       const updatedMetaColumns = metaColumns.filter(
-        (col) => col.fieldId !== activeColumnId,
+        (col) => col.fieldId !== columnId,
       );
 
       // Remove from all views' fieldProps
       const updatedViews = views.map((view) => ({
         ...view,
-        fieldProps: view.fieldProps.filter(
-          (fp) => fp.fieldId !== activeColumnId,
-        ),
+        fieldProps: view.fieldProps.filter((fp) => fp.fieldId !== columnId),
       }));
 
       set({ metaColumns: updatedMetaColumns, views: updatedViews });
@@ -281,7 +277,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       try {
         await _deleteTableColumn({
           tableId: get().tableId,
-          fieldId: activeColumnId,
+          fieldId: columnId,
         });
       } catch (err) {
         onApiError<EnrichmentTableCoreState>(err);

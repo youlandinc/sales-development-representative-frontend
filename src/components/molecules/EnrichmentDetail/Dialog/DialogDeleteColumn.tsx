@@ -82,7 +82,7 @@ export const DialogDeleteColumn: FC<DialogDeleteColumnProps> = ({
                 return;
               }
               setDeleting(true);
-              await deleteColumn();
+              await deleteColumn(activeColumnId);
               setDeleting(false);
               fetchActionsMenus(tableId);
             }}
