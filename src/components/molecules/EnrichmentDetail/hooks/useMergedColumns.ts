@@ -11,6 +11,8 @@ import { TableColumnProps } from '@/types/enrichment/table';
  * fieldProps: Current view's column config (pin, visible, width, sort, color)
  *
  * Merge rule: metaColumns properties + fieldProps properties override
+ *
+ * @example const columns = useMergedColumns()
  */
 export const useMergedColumns = (): TableColumnProps[] => {
   const { metaColumns, views, activeViewId } = useEnrichmentTableStore(
