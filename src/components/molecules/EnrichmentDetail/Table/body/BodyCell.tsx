@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Stack } from '@mui/material';
 import { CellContext } from '@tanstack/react-table';
 
 import { CELL_AI_PHASE_HASH, SYSTEM_COLUMN_SELECT } from '../config';
@@ -33,6 +33,7 @@ import {
 
 const CELL_CONSTANTS = {
   FONT_SIZE: 14,
+  PROGRESS_SIZE: 16,
 } as const;
 
 const renderAiLoadingContent = (aiPhase?: TableCellAIPhaseEnum | null) => {
@@ -41,14 +42,17 @@ const renderAiLoadingContent = (aiPhase?: TableCellAIPhaseEnum | null) => {
     : 'Processing...';
 
   return (
-    <Box
-      sx={{
-        fontSize: CELL_CONSTANTS.FONT_SIZE,
-        color: 'text.secondary',
-      }}
-    >
-      {phaseText}
-    </Box>
+    <Stack alignItems="center" direction="row" spacing={1}>
+      <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
+      <Box
+        sx={{
+          fontSize: CELL_CONSTANTS.FONT_SIZE,
+          color: 'text.secondary',
+        }}
+      >
+        {phaseText}
+      </Box>
+    </Stack>
   );
 };
 
