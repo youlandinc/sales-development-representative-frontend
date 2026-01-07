@@ -18,7 +18,7 @@ import {
 } from '@/stores/enrichment/useActionsStore';
 import { useDialogStore } from '@/stores/useDialogStore';
 
-import { ROW_HEIGHT } from './Table/config';
+import { ACTION_KEY_AI, ROW_HEIGHT } from './Table/config';
 
 import { StyledButton, StyledLoading } from '@/components/atoms';
 import { DrawerActionsContainer } from '@/components/molecules';
@@ -164,6 +164,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   const [activeCell, setActiveCell] = useState<ActiveCellParams>({
     columnId: '',
     rowId: '',
+    rowData: {},
   });
   const [isActionsButtonVisible, setIsActionsButtonVisible] = useState(false);
 
@@ -231,7 +232,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
 
       if (newColumn) {
         // If it's an AI column, initialize it
-        if (newColumn.actionKey === 'use-ai') {
+        if (newColumn.actionKey === ACTION_KEY_AI) {
           await onInitializeAiColumns();
         }
       }
@@ -368,6 +369,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                   setActiveCell({
                     columnId,
                     rowId: _rowId,
+                    rowData: data?.original || {},
                   });
                   if (!dialogVisible) {
                     openDialog(TableColumnMenuActionEnum.cell_detail);
@@ -414,14 +416,14 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                     //groupId === null && actionKey !== 'use-ai' ==> 单独integration，非group integration
                     if (
                       column?.groupId === null &&
-                      column?.actionKey !== 'use-ai' &&
+                      column?.actionKey !== ACTION_KEY_AI &&
                       column?.actionKey
                     ) {
                       onClickToSingleIntegration(columnId);
                       return;
                     }
                     // AI column configuration
-                    if (column && column.actionKey === 'use-ai') {
+                    if (column && column.actionKey === ACTION_KEY_AI) {
                       const {
                         schema,
                         prompt,

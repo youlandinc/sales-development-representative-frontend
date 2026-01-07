@@ -1,7 +1,11 @@
 import { DragEndEvent } from '@dnd-kit/core';
 
 import { TableColumnProps } from '@/types/enrichment/table';
-import { NON_EDITABLE_ACTION_KEYS, SYSTEM_COLUMN_SELECT } from '../config';
+import {
+  ACTION_KEY_AI,
+  NON_EDITABLE_ACTION_KEYS,
+  SYSTEM_COLUMN_SELECT,
+} from '../config';
 
 export interface ColumnSortParams {
   tableId: string;
@@ -74,7 +78,7 @@ export const buildColumnSortParams = (
  */
 export const checkIsAiColumn = (column: TableColumnProps): boolean => {
   return (
-    column.actionKey === 'use-ai' ||
+    column.actionKey === ACTION_KEY_AI ||
     column.actionKey?.includes('find') ||
     !!column.dependentFieldId
   );

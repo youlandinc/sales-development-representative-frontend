@@ -71,6 +71,7 @@ export interface CellDetailResponse {
 export interface ActiveCellParams {
   columnId: string;
   rowId: string;
+  rowData: Record<string, any>;
 }
 
 export interface RunRecordItem {
