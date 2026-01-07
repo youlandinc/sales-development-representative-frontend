@@ -129,7 +129,19 @@ export const useActionsStore = create<ActionsStore>()(
           try {
             const res = await _fetchAllEnrichmentsData();
             set((state) => {
-              state.dialogAllEnrichmentsData = res.data || [];
+              if (Array.isArray(res.data)) {
+                state.dialogAllEnrichmentsData = res.data.map((item) => ({
+                  ...item,
+                  actions: item.actions.map((action) => ({
+                    ...action,
+                    waterfallConfigs:
+                      action.waterfallConfigs?.map((config) => ({
+                        ...config,
+                        sourceCategory: item.categoryKey,
+                      })) || [],
+                  })),
+                }));
+              }
               state.dialogAllEnrichmentsTabKey =
                 res.data?.[0]?.categoryKey || EnrichmentCategoryEnum.actions;
             });

@@ -21,6 +21,7 @@ export enum EnrichmentCategoryEnum {
 
 export type DialogAllEnrichmentsAction = {
   name: IntegrationActionMenu['name'];
+  sourceCategory: EnrichmentCategoryEnum;
 } & {
   [K in Exclude<keyof IntegrationActionMenu, 'name'>]:
     | IntegrationActionMenu[K]
