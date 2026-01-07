@@ -141,15 +141,6 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
 
           <Typography color={'text.secondary'} lineHeight={1.2} variant={'h7'}>
             <Box component={'span'} fontWeight={600}>
-              Search attempts:{' '}
-            </Box>
-            <Box component={'span'} fontWeight={400}>
-              {state?.value?.data?.attemptNo || 0} / 3
-            </Box>
-          </Typography>
-
-          <Typography color={'text.secondary'} lineHeight={1.2} variant={'h7'}>
-            <Box component={'span'} fontWeight={600}>
               Cell content:{' '}
             </Box>
             <Box
