@@ -1,13 +1,11 @@
 import { Stack, Typography } from '@mui/material';
-import { FC, useMemo } from 'react';
-import { useShallow } from 'zustand/shallow';
 import Image from 'next/image';
+import { FC, useMemo } from 'react';
 
-import { useEnrichmentTableStore } from '@/stores/enrichment/useEnrichmentTableStore';
 import { ActiveCellParams } from '@/types/enrichment/base';
-import { DialogCellDetailsContainer, ValidationStatus } from './base';
+import { DialogCellDetailsContainer } from './base';
 
-import { TableCellDetailValidateStatusEnum } from '@/types/enum';
+import { UTypeOf } from '@/utils';
 
 interface DialogCellDetailsFindingProps {
   cellDetails: ActiveCellParams;
@@ -32,57 +30,48 @@ export const DialogCellDetailsFinding: FC<DialogCellDetailsFindingProps> = ({
   cellDetails,
 }) => {
   const { rowData, columnId } = cellDetails;
-  const { getMetaColumnById } = useEnrichmentTableStore(
-    useShallow((store) => ({
-      getMetaColumnById: store.getMetaColumnById,
-    })),
-  );
 
-  const metaColumn = getMetaColumnById(columnId);
-
-  const cellValue = useMemo(() => {
-    return rowData[columnId];
+  const metaData = useMemo(() => {
+    return rowData[columnId]?.metaData || {};
   }, [rowData, columnId]);
-  /* 
-  const actionDefinition = metaColumn?.actionDefinition;
 
-  const inputBinding = useMemo(
-    () => metaColumn?.typeSettings?.inputBinding || [],
-    [metaColumn?.typeSettings?.inputBinding],
-  );
-
-  const actionName = metaColumn?.fieldName || 'Find';
-  const integrationName = actionDefinition?.integrationName || '';
-  const integrationLogoUrl = actionDefinition?.logoUrl || '';
-
-  const status = cellValue?.status || 'unknown';
-  const statusVisual =
-    statusIconMap[status.toLowerCase()] || statusIconMap.unknown;
-
-  const inputFields = useMemo(
-    () =>
-      inputBinding.map((input: any) => ({
-        name: input.name,
-        value: rowData[input.formulaText] || '',
-      })),
-    [inputBinding, rowData],
-  );
-
-  const outputFields = useMemo(() => {
-    if (!cellValue || typeof cellValue !== 'object') {
+  const inputFields = useMemo(() => {
+    if (!metaData.input || typeof metaData.input !== 'object') {
       return [];
     }
-    const excludeKeys = new Set(['status', 'statusReason']);
-    return Object.entries(cellValue)
-      .filter(([key]) => !excludeKeys.has(key))
-      .map(([key, value]) => ({
-        name: key,
-        value: String(value ?? ''),
-      }));
-  }, [cellValue]);
- */
+    return Object.entries(metaData.input).map(([key, value]) => ({
+      name: key,
+      value: String(value ?? ''),
+    }));
+  }, [metaData]);
+
+  const outputFields = useMemo(() => {
+    if (!metaData.output || typeof metaData.output !== 'object') {
+      return [];
+    }
+    return Object.entries(metaData.output).map(([key, value]) => ({
+      name: key,
+      value: String(value ?? ''),
+    }));
+  }, [metaData]);
+
+  const otherDetails = useMemo(() => {
+    if (!metaData.otherDetails || typeof metaData.otherDetails !== 'object') {
+      return [];
+    }
+    return Object.entries(metaData.otherDetails).map(([key, value]) => ({
+      name: key,
+      value: String(value ?? ''),
+    }));
+  }, [metaData]);
+
+  const actionName = metaData.action || '';
+  const integrationName = metaData.provider || '';
+  const status = metaData.status || '';
+  // const statusVisual =
+  //   statusIconMap[status.toLowerCase()] || statusIconMap.unknown;
   return (
-    <DialogCellDetailsContainer>
+    <DialogCellDetailsContainer isEmpty={UTypeOf.isEmptyObject(metaData)}>
       <Stack
         sx={{
           flex: 1,
@@ -98,77 +87,104 @@ export const DialogCellDetailsFinding: FC<DialogCellDetailsFindingProps> = ({
         <Stack gap={1}>
           <Stack alignItems={'center'} direction={'row'} gap={1}>
             <Typography sx={DEFAULT_STYLE.title}>Action:</Typography>
-            <Typography sx={DEFAULT_STYLE.value}>Find work email</Typography>
+            <Typography sx={DEFAULT_STYLE.value}>{actionName}</Typography>
           </Stack>
 
           <Stack alignItems={'center'} direction={'row'} gap={1}>
             <Typography sx={DEFAULT_STYLE.title}>Provider:</Typography>
             <Stack alignItems={'center'} direction={'row'} gap={0.5}>
-              <Image
-                alt={''}
-                height={20}
-                src={
-                  'https://public-storage-hub.s3.us-west-1.amazonaws.com/LeadMagic.svg'
-                }
-                width={20}
-              />
-              <Typography sx={DEFAULT_STYLE.value}>Findymail</Typography>
+              {metaData.imagePreview && (
+                <Image
+                  alt={''}
+                  height={20}
+                  src={metaData.imagePreview || ''}
+                  width={20}
+                />
+              )}
+              <Typography sx={DEFAULT_STYLE.value}>
+                {integrationName}
+              </Typography>
             </Stack>
           </Stack>
 
           <Stack alignItems={'center'} direction={'row'} gap={1}>
             <Typography sx={DEFAULT_STYLE.title}>Result:</Typography>
-            <Typography sx={DEFAULT_STYLE.value}>
-              123456@132.com / Run condition not met / Missing input
-            </Typography>
+            <Typography sx={DEFAULT_STYLE.value}>{metaData.result}</Typography>
           </Stack>
 
-          <Stack alignItems={'center'} direction={'row'} gap={1}>
-            <Typography sx={DEFAULT_STYLE.title}>Status:</Typography>
-            <ValidationStatus
-              status={TableCellDetailValidateStatusEnum.verified}
-            />
-          </Stack>
+          {status && (
+            <Stack alignItems={'center'} direction={'row'} gap={1}>
+              <Typography sx={DEFAULT_STYLE.title}>Status:</Typography>
+              <Typography sx={DEFAULT_STYLE.value}>{status}</Typography>
+            </Stack>
+          )}
         </Stack>
 
         {/* Input Section */}
-
-        <Stack gap={1}>
-          <Typography sx={DEFAULT_STYLE.title}>Input</Typography>
-          <Stack alignItems={'center'} direction={'row'} gap={1}>
-            <Typography sx={DEFAULT_STYLE.title}>First name:</Typography>
-            <Typography sx={DEFAULT_STYLE.title}>name</Typography>
-          </Stack>
-          <Stack alignItems={'center'} direction={'row'} gap={1}>
-            <Typography sx={DEFAULT_STYLE.title}>Last name:</Typography>
-            <Typography sx={DEFAULT_STYLE.value}>456</Typography>
-          </Stack>
-          <Stack alignItems={'center'} direction={'row'} gap={1}>
-            <Typography sx={DEFAULT_STYLE.title}>LinkedIn profile:</Typography>
-            <Typography sx={DEFAULT_STYLE.value}>
-              123456@linkedin.com
+        {inputFields.length > 0 && (
+          <Stack gap={1}>
+            <Typography color={'text.secondary'} variant={'h7'}>
+              Input
             </Typography>
+            {inputFields.map((field) => (
+              <Stack
+                alignItems={'center'}
+                direction={'row'}
+                gap={1}
+                key={field.name}
+              >
+                <Typography sx={DEFAULT_STYLE.title}>{field.name}:</Typography>
+                <Typography sx={DEFAULT_STYLE.value}>
+                  {field.value || 'N/A'}
+                </Typography>
+              </Stack>
+            ))}
           </Stack>
-        </Stack>
+        )}
 
         {/* Output Section */}
-
-        <Stack gap={1}>
-          <Typography sx={DEFAULT_STYLE.title}>Output</Typography>
-
-          <Stack alignItems={'center'} direction={'row'} gap={1}>
-            <Typography sx={DEFAULT_STYLE.title}>Field name:</Typography>
-            <Typography sx={DEFAULT_STYLE.value}>xxxxx</Typography>
+        {outputFields.length > 0 && (
+          <Stack gap={1}>
+            <Typography color={'text.secondary'} variant={'h7'}>
+              Output
+            </Typography>
+            {outputFields.map((field) => (
+              <Stack
+                alignItems={'center'}
+                direction={'row'}
+                gap={1}
+                key={field.name}
+              >
+                <Typography sx={DEFAULT_STYLE.title}>{field.name}:</Typography>
+                <Typography sx={DEFAULT_STYLE.value}>
+                  {field.value || 'N/A'}
+                </Typography>
+              </Stack>
+            ))}
           </Stack>
-        </Stack>
-        <Stack gap={1}>
-          <Typography sx={DEFAULT_STYLE.title}>Other details</Typography>
+        )}
 
-          <Stack alignItems={'center'} direction={'row'} gap={1}>
-            <Typography sx={DEFAULT_STYLE.title}>Field name:</Typography>
-            <Typography sx={DEFAULT_STYLE.value}>xxxxx</Typography>
+        {/* Other Details Section */}
+        {otherDetails.length > 0 && (
+          <Stack gap={1}>
+            <Typography color={'text.secondary'} variant={'h7'}>
+              Other details
+            </Typography>
+            {otherDetails.map((field) => (
+              <Stack
+                alignItems={'center'}
+                direction={'row'}
+                gap={1}
+                key={field.name}
+              >
+                <Typography sx={DEFAULT_STYLE.title}>{field.name}:</Typography>
+                <Typography sx={DEFAULT_STYLE.value}>
+                  {field.value || 'N/A'}
+                </Typography>
+              </Stack>
+            ))}
           </Stack>
-        </Stack>
+        )}
       </Stack>
     </DialogCellDetailsContainer>
   );

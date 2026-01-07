@@ -11,6 +11,9 @@ export const ACTION_KEY_AI = 'use-ai';
 //find action keys
 export const ACTION_KEY_FIND = 'find';
 
+//validate action key
+export const ACTION_KEY_VALIDATE = 'validate';
+
 // Non-editable action keys
 export const NON_EDITABLE_ACTION_KEYS = [
   ACTION_KEY_AI,
