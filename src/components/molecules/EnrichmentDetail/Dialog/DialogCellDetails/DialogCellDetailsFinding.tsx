@@ -11,17 +11,6 @@ interface DialogCellDetailsFindingProps {
   cellDetails: ActiveCellParams;
 }
 
-// interface MetaData {
-//   imagePreview: string;
-//   result: string;
-//   input: Record<string, any>;
-//   output: Record<string, any>;
-//   otherDetails: Record<string, any>;
-//   action: string;
-//   provider: string;
-//   status: string;
-// }
-
 const DEFAULT_STYLE = {
   title: {
     fontSize: 14,
