@@ -141,11 +141,13 @@ const BodyCellComponent: FC<BodyCellProps> = ({
   const isFinished = originalData?.isFinished ?? false;
   const hasAiColumn = tableMeta?.hasAiColumn ?? false;
 
-  const metaData = originalData?.metaData;
+  // for ai
   const aiPhase = originalData?.aiPhase;
+  const validateStatus = originalData?.validateStatus;
+
+  const metaData = originalData?.metaData;
   const isValidate = metaData?.isValidate ?? true;
   const imagePreview = metaData?.imagePreview;
-  const validateStatus = metaData?.validateStatus;
 
   const isSelectColumn = columnId === SYSTEM_COLUMN_SELECT;
   const isActive = isCellStateMatch(cellState, rowId, columnId);

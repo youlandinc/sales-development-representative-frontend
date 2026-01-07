@@ -51,6 +51,7 @@ export interface TableCellFieldData {
   value: any;
   isFinished?: boolean;
   aiPhase?: TableCellAIPhaseEnum | null;
+  validateStatus?: TableCellMetaDataValidateStatusEnum | null;
   externalContent?: {
     validateStatus: TableCellMetaDataValidateStatusEnum;
     stepsTaken: [];
