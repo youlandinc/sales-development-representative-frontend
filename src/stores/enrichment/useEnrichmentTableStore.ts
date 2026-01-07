@@ -4,6 +4,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { ColumnFieldGroupMap, HttpError } from '@/types';
 import { SDRToast } from '@/components/atoms';
 import {
+  RunRecordItem,
   TableColumnMenuActionEnum,
   TableColumnProps,
   TableColumnTypeEnum,
@@ -13,11 +14,11 @@ import {
 import {
   _createTableColumn,
   _deleteTableColumn,
-  _fetchTable,
+  _fetchTableDetail,
   _fetchTableRowIds,
   _renameEnrichmentTable,
   _reorderTableViewColumn,
-  _updateTableCellValue,
+  _updateTableCell,
 } from '@/request';
 
 import {
@@ -54,7 +55,7 @@ export type EnrichmentTableCoreState = {
   // Rows
   rowIds: string[];
   runRecords: {
-    [key: string]: { recordIds: string[]; isAll: boolean };
+    [key: string]: RunRecordItem;
   } | null;
   fieldGroupMap: ColumnFieldGroupMap | null;
 };
@@ -62,7 +63,7 @@ export type EnrichmentTableCoreState = {
 export type EnrichmentTableCoreActions = {
   fetchTable: (tableId: string) => Promise<{
     runRecords: {
-      [key: string]: { recordIds: string[]; isAll: boolean };
+      [key: string]: RunRecordItem;
     } | null;
     metaColumns: TableColumnProps[];
   }>;
@@ -149,7 +150,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
       try {
         const {
           data: { fields, tableName, runRecords, fieldGroupMap, views },
-        } = await _fetchTable(tableId);
+        } = await _fetchTableDetail(tableId);
         result = runRecords;
         const defaultView = (views ?? []).find(
           (view: TableViewData) => view.isDefaultOpen,
@@ -221,51 +222,28 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
     addColumn: async (params) => {
       try {
         const {
-          data: { field: newColumn, view },
+          data: { field: newColumn, views: returnedViews },
         } = await _createTableColumn({ ...params, viewId: get().activeViewId });
         if (!newColumn) {
           return null;
         }
 
+        // metaColumns only stores metadata, order is controlled by views.fieldProps
+        // Simply append new column to metaColumns
         const metaColumns = get().metaColumns;
-        const { beforeFieldId, afterFieldId } = params;
+        const newMetaColumns = [...metaColumns, newColumn];
 
-        let newMetaColumns: TableColumnProps[];
-        if (beforeFieldId) {
-          const index = metaColumns.findIndex(
-            (col) => col.fieldId === beforeFieldId,
-          );
-          if (index >= 0) {
-            newMetaColumns = [
-              ...metaColumns.slice(0, index),
-              newColumn,
-              ...metaColumns.slice(index),
-            ];
-          } else {
-            newMetaColumns = [...metaColumns, newColumn];
-          }
-        } else if (afterFieldId) {
-          const index = metaColumns.findIndex(
-            (col) => col.fieldId === afterFieldId,
-          );
-          if (index >= 0) {
-            newMetaColumns = [
-              ...metaColumns.slice(0, index + 1),
-              newColumn,
-              ...metaColumns.slice(index + 1),
-            ];
-          } else {
-            newMetaColumns = [...metaColumns, newColumn];
-          }
-        } else {
-          newMetaColumns = [...metaColumns, newColumn];
-        }
-
-        // Update metaColumns and replace current view with API response
-        const views = get().views;
-        const updatedViews = view
-          ? views.map((v) => (v.viewId === view.viewId ? view : v))
-          : views;
+        // Replace views with API response (contains correct fieldProps order)
+        const storedViews = get().views;
+        const activeViewId = get().activeViewId;
+        const returnedView = returnedViews?.find(
+          (v) => v.viewId === activeViewId,
+        );
+        const updatedViews = returnedView
+          ? storedViews.map((v) =>
+              v.viewId === returnedView.viewId ? returnedView : v,
+            )
+          : storedViews;
         set({ metaColumns: newMetaColumns, views: updatedViews });
         return newColumn;
       } catch (err) {
@@ -275,7 +253,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
     },
 
     deleteColumn: async () => {
-      const { activeColumnId, metaColumns } = get();
+      const { activeColumnId, metaColumns, views } = get();
       const metaColumn = metaColumns.find(
         (col) => col.fieldId === activeColumnId,
       );
@@ -284,17 +262,31 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
         return;
       }
 
+      // Remove from metaColumns
       const updatedMetaColumns = metaColumns.filter(
         (col) => col.fieldId !== activeColumnId,
       );
-      set({ metaColumns: updatedMetaColumns });
+
+      // Remove from all views' fieldProps
+      const updatedViews = views.map((view) => ({
+        ...view,
+        fieldProps: view.fieldProps.filter(
+          (fp) => fp.fieldId !== activeColumnId,
+        ),
+      }));
+
+      set({ metaColumns: updatedMetaColumns, views: updatedViews });
       get().closeDialog();
 
       try {
-        await _deleteTableColumn(activeColumnId);
+        await _deleteTableColumn({
+          tableId: get().tableId,
+          fieldId: activeColumnId,
+        });
       } catch (err) {
         onApiError<EnrichmentTableCoreState>(err);
-        set({ metaColumns });
+        // Rollback both metaColumns and views
+        set({ metaColumns, views });
       }
     },
 
@@ -373,7 +365,7 @@ export const useEnrichmentTableStore = create<EnrichmentTableStoreProps>()(
 
     updateCellValue: async (data) => {
       try {
-        return await _updateTableCellValue(data);
+        return await _updateTableCell(data);
       } catch (err) {
         onApiError<EnrichmentTableCoreState>(err);
         throw err;

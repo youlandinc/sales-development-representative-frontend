@@ -1,8 +1,6 @@
 import { TypeIcon } from '../TableIcon';
-import {
-  TableColumnActionOption,
-  TableColumnTypeEnum,
-} from '@/types/enrichment/table';
+import { TableColumnTypeEnum } from '@/types/enrichment/table';
+import { TableColumnActionOption } from '../types';
 
 // Column type labels mapping
 export const COLUMN_TYPE_LABELS: {
@@ -20,6 +18,7 @@ export const COLUMN_TYPE_LABELS: {
   [TableColumnTypeEnum.select]: 'Select',
   [TableColumnTypeEnum.assigned_to]: 'Assigned To',
   [TableColumnTypeEnum.paragraph]: 'Paragraph',
+  [TableColumnTypeEnum.action]: 'Action',
 };
 
 // Get all available column type options for the submenu

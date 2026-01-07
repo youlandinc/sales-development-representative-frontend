@@ -17,7 +17,7 @@ import {
   DirectoriesBizIdEnum,
   DirectoriesQueryActionTypeEnum,
   DirectoriesQueryItem,
-  DirectoriesQueryTableBodyApiResponse,
+  DirectoriesTableBodyResponse,
 } from '@/types/directories';
 
 import { SDRToast } from '@/components/atoms';
@@ -44,7 +44,7 @@ interface DirectoriesStoreState {
   additionalValues: Record<string, any>;
   // Preview
   previewHeader: any[];
-  previewBody: DirectoriesQueryTableBodyApiResponse;
+  previewBody: DirectoriesTableBodyResponse;
   isLoadingPreview: boolean;
   hasSubmittedSearch: boolean;
   lastSearchParams: Record<string, any> | null;

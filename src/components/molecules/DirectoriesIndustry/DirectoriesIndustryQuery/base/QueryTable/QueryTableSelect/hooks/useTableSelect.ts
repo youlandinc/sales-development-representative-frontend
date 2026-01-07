@@ -7,14 +7,14 @@ import {
   _fetchCompanyNameViaTableId,
 } from '@/request/directories';
 import {
+  EnrichmentTableAllResponse,
   EnrichmentTableEnum,
   EnrichmentTableItem,
   HttpError,
-  ResponseEnrichmentTableViaSearch,
 } from '@/types';
 
 const findTableItemById = (
-  list: ResponseEnrichmentTableViaSearch,
+  list: EnrichmentTableAllResponse,
   targetId: string,
 ): EnrichmentTableItem | undefined => {
   for (const item of list) {
@@ -48,7 +48,7 @@ interface UseTableSelectReturn {
   outerTableName: string;
   outerTableSource: EnrichmentTableEnum | undefined;
   expandedIds: Set<string>;
-  tableList: ResponseEnrichmentTableViaSearch;
+  tableList: EnrichmentTableAllResponse;
 
   // Actions
   toggleExpand: (tableId: string) => void;
@@ -83,9 +83,7 @@ export const useTableSelect = (
     EnrichmentTableEnum | undefined
   >(externalOuterTableSource);
 
-  const [tableList, setTableList] = useState<ResponseEnrichmentTableViaSearch>(
-    [],
-  );
+  const [tableList, setTableList] = useState<EnrichmentTableAllResponse>([]);
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 

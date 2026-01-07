@@ -1,41 +1,15 @@
 import {
-  EnrichmentTableEnum,
-  IntegrationAction,
-  ValidationActionConfigParam,
-} from '@/types';
-import {
   TableCellDetailPhaseEnum,
   TableCellDetailValidateStatusEnum,
 } from '@/types/enum';
-
-export interface EnrichmentTableItem {
-  tableId: string;
-  tableName: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  contacts: number;
-  source: EnrichmentTableEnum;
-  children: EnrichmentTableItem[] | null;
-}
-
-export type ResponseEnrichmentTableViaSearch = EnrichmentTableItem[];
-
-export interface ResponseEnrichmentTable {
-  content: EnrichmentTableItem[];
-  page: {
-    size: number;
-    totalElements: number;
-    totalPages: number;
-    number: number;
-  };
-}
+import { IntegrationAction, ValidationActionConfigParam } from './integrations';
 
 export interface ColumnFieldGroupMapItem extends IntegrationAction {
   inputParameters: { name: string; formulaText: string }[];
 }
 
 export interface ColumnFieldGroupMap {
-  [key: string]: {
+  [groupId: string]: {
     groupId: string;
     name: string;
     requiredInputsBinding: {
@@ -72,9 +46,4 @@ export interface ActiveCellParams {
   columnId: string;
   rowId: string;
   rowData: Record<string, any>;
-}
-
-export interface RunRecordItem {
-  recordIds: string[];
-  isAll: boolean;
 }

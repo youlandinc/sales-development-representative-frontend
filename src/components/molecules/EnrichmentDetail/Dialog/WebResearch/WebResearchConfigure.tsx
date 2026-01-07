@@ -13,7 +13,7 @@ import {
 } from '@/components/atoms';
 import { CollapseCard, ModelSelect, OutputsFields } from './base';
 
-import { useVariableFromStore } from '@/hooks';
+import { useFieldMapping } from '@/components/molecules/EnrichmentDetail/hooks';
 
 import { useWebResearchStore } from '@/stores/enrichment';
 
@@ -64,7 +64,7 @@ export const WebResearchConfigure: FC<WebResearchConfigureProps> = ({
       setWebResearchTab: state.setWebResearchTab,
     })),
   );
-  const { filedMapping } = useVariableFromStore();
+  const { filedMapping } = useFieldMapping();
 
   const [outPuts] = useState<'fields' | 'json'>('fields');
 

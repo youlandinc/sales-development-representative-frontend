@@ -1,8 +1,9 @@
-import { generatePrompt } from '@/request';
 import { useCallback, useState } from 'react';
-import { useSwitch } from '@/hooks/useSwitch';
-import { HttpError } from '@/types';
+
 import { SDRToast } from '@/components/atoms';
+import { useSwitch } from '@/hooks';
+import { generatePrompt } from '@/request';
+import { HttpError } from '@/types';
 
 export const useGeneratePrompt = (
   streamCb?: (text: string) => unknown,
@@ -42,21 +43,21 @@ export const useGeneratePrompt = (
 
               buffer += decoder.decode(value, { stream: true });
 
-              // 按 SSE 事件分割
+              // Split by SSE events
               const events = (buffer.split('\n\n') || ['']) as string[];
-              buffer = events.pop() || ''; // 最后可能是半截，留到下一轮解析
+              buffer = events.pop() || ''; // Last one might be incomplete
 
               for (const e of events) {
-                const chunk = e.replace(/data:/g, ''); // 去掉 `data: `
+                const chunk = e.replace(/data:/g, ''); // Remove `data: `
 
-                // 这里有可能是 JSON，也可能是纯文本
+                // Could be JSON or plain text
                 // try {
                 //   const json = JSON.parse(chunk);
                 //   const delta = json.choices?.[0]?.delta?.content ?? '';
                 //   console.log(delta);
                 //   fullText += delta;
                 // } catch {
-                // 纯文本（SSE可能直接推Markdown）
+                // Plain text (SSE might push Markdown directly)
                 fullText += chunk;
                 // }
                 streamCb?.(fullText);

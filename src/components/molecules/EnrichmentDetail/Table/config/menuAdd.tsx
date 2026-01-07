@@ -1,9 +1,9 @@
 import { MenuIcon, TypeIcon } from '../TableIcon';
 import {
-  TableColumnActionOption,
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
+import { TableColumnActionOption } from '../types';
 
 // Add column menu (p1 - highest priority)
 export const getAddColumnMenuActions = (): TableColumnActionOption[] => [

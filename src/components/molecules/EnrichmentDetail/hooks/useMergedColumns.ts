@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/shallow';
 
-import { useEnrichmentTableStore } from '../index';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { TableColumnProps } from '@/types/enrichment/table';
 
 /**
@@ -12,7 +12,7 @@ import { TableColumnProps } from '@/types/enrichment/table';
  *
  * Merge rule: metaColumns properties + fieldProps properties override
  */
-export const useTableColumns = (): TableColumnProps[] => {
+export const useMergedColumns = (): TableColumnProps[] => {
   const { metaColumns, views, activeViewId } = useEnrichmentTableStore(
     useShallow((state) => ({
       metaColumns: state.metaColumns,
@@ -49,7 +49,7 @@ export const useTableColumns = (): TableColumnProps[] => {
         ...meta,
         pin: fp.pin,
         visible: fp.visible,
-        width: fp.width,
+        width: fp.width ?? meta.width,
         color: fp.color,
         csn: fp.sort,
       });

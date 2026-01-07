@@ -21,19 +21,21 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useShallow } from 'zustand/react/shallow';
 
 import { buildColumnSortParams } from '../../Table/utils/handler';
+import { useMergedColumns } from '../../hooks';
+
 import {
   PAPPER_STACK_CONTAINER_SX,
   PAPPER_SX,
   STACK_CONTAINER_SX,
 } from '../config';
-import { ColumnSection } from './index';
 import { PanelIcon } from '../PanelIcon';
 import { TableIcon } from '../../Table';
 
-import { useEnrichmentTableStore, useTableColumns } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { TableColumnProps } from '@/types/enrichment/table';
 
 import { StyledTextField } from '@/components/atoms';
+import { ColumnSection } from './index';
 
 interface PanelColumnsProps {
   tableId: string;
@@ -55,7 +57,7 @@ export const PanelColumns: FC<PanelColumnsProps> = ({ tableId }) => {
   );
 
   // Get merged columns
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchValue, setSearchValue] = useState<string>('');

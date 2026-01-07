@@ -9,8 +9,8 @@ import { UFormatDate } from '@/utils';
 
 import { EnrichmentTableItem, HttpError } from '@/types';
 import {
-  _deleteEnrichmentTableItem,
-  _fetchEnrichmentTableData,
+  _deleteEnrichmentTable,
+  _fetchEnrichmentTableList,
   _renameEnrichmentTable,
 } from '@/request';
 
@@ -157,7 +157,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     },
     async ({ page, size, searchWord }) => {
       try {
-        const { data } = await _fetchEnrichmentTableData({
+        const { data } = await _fetchEnrichmentTableList({
           size,
           page,
           searchWord,
@@ -200,7 +200,7 @@ export const EnrichmentList: FC<EnrichmentTableProps> = ({
     }
     setIsDeleting(true);
     try {
-      await _deleteEnrichmentTableItem(tableId);
+      await _deleteEnrichmentTable(tableId);
       setTableId('');
       closeDelete();
       await mutate();

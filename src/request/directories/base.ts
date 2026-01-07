@@ -1,13 +1,13 @@
 import { get, post } from '@/request/request';
 import {
-  DirectoriesImportApiResponse,
-  DirectoryApiResponse,
+  DirectoriesImportResponse,
+  DirectoryInfoResponse,
 } from '@/types/directories';
 
 export const _fetchDirectoriesInfo = () => {
-  return get<DirectoryApiResponse[]>('/sdr/search/type');
+  return get<DirectoryInfoResponse[]>('/sdr/search/type');
 };
 
 export const _importDirectoriesDataToTable = (param: Record<string, any>) => {
-  return post<DirectoriesImportApiResponse>('/sdr/table/import', param);
+  return post<DirectoriesImportResponse>('/sdr/table/import', param);
 };

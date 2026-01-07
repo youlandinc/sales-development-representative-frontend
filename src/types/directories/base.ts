@@ -6,7 +6,7 @@ export enum DirectoriesBizIdEnum {
   business_corporate = 'BUSINESS_CORPORATE',
 }
 
-export interface DirectoryApiResponse {
+export interface DirectoryInfoResponse {
   isAuth: boolean;
   planType: PlanTypeEnum;
   planLogo: string | null;
@@ -20,7 +20,7 @@ export interface DirectoryApiResponse {
   statPeriod: string;
 }
 
-export interface DirectoriesImportApiResponse {
+export interface DirectoriesImportResponse {
   tableId: string | null;
   remainingCredit: number | null;
   currentImportNumber: number | null;

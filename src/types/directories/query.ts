@@ -99,8 +99,8 @@ export interface DirectoriesQueryItem {
   children: DirectoriesQueryItem[] | null; // sub-components
 }
 
-export type DirectoriesQueryDefaultApiResponse = DirectoriesQueryItem[];
-export type DirectoriesQueryAdditionalApiResponse = DirectoriesQueryItem[];
+export type DirectoriesQueryConfigResponse = DirectoriesQueryItem[];
+export type DirectoriesAdditionalConfigResponse = DirectoriesQueryItem[];
 
 export interface DirectoriesQueryTableHeaderItem {
   columnKey: string | null;
@@ -112,12 +112,11 @@ export interface DirectoriesQueryTableHeaderItem {
   isAuth: boolean;
 }
 
-export type DirectoriesQueryTableHeaderApiResponse =
-  DirectoriesQueryTableHeaderItem[];
+export type DirectoriesTableHeaderResponse = DirectoriesQueryTableHeaderItem[];
 
 export type DirectoriesQueryTableBodyItem = Record<string, any>;
 
-export interface DirectoriesQueryTableBodyApiResponse {
+export interface DirectoriesTableBodyResponse {
   findCount: number;
   defaultPreviewCount: number;
   maxImportCount: number;

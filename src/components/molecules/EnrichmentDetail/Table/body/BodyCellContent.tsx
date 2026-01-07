@@ -17,7 +17,7 @@ export interface BodyCellContentProps {
   children: ReactNode;
   isEditing?: boolean;
   imagePreview?: string;
-  confidence?: TableCellConfidenceEnum;
+  confidence?: TableCellConfidenceEnum | null;
   isValidate?: boolean;
   fieldType?: TableColumnTypeEnum;
   displayValue?: string;

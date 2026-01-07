@@ -23,7 +23,7 @@ import {
 } from './index';
 
 import { useDialogActionsMenu } from '@/components/molecules/EnrichmentDetail/Dialog/DialogActionsMenu/hooks';
-import { useLocalSearch } from '@/hooks';
+import { useLocalSearch } from '@/components/molecules/EnrichmentDetail/hooks';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 import {
   IntegrationTypeEnum,

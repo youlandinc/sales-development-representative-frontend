@@ -1,9 +1,7 @@
 import { MenuIcon } from '../TableIcon';
 import { getAddColumnMenuActions } from './menuAdd';
-import {
-  TableColumnActionOption,
-  TableColumnMenuActionEnum,
-} from '@/types/enrichment/table';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
+import { TableColumnActionOption } from '../types';
 
 // AI column menu (p3)
 export const getAiColumnMenuActions = (

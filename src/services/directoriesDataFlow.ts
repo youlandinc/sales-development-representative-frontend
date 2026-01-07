@@ -27,8 +27,8 @@ import {
 } from '@/utils/directories';
 import {
   _fetchDirectoriesAdditionalConfig,
-  _fetchPreviewBody,
-  _fetchPreviewHeader,
+  _fetchDirectoriesPreviewBody,
+  _fetchDirectoriesPreviewHeader,
 } from '@/request/directories';
 
 // Re-export for convenience
@@ -361,11 +361,11 @@ class DirectoriesDataFlow {
 
       // Parallel requests for header and body
       return forkJoin({
-        header: from(_fetchPreviewHeader(requestData)).pipe(
+        header: from(_fetchDirectoriesPreviewHeader(requestData)).pipe(
           map(({ data }) => data || []),
           catchError(this._handleError([])),
         ),
-        body: from(_fetchPreviewBody(requestData)).pipe(
+        body: from(_fetchDirectoriesPreviewBody(requestData)).pipe(
           map(
             ({ data }) =>
               data || {

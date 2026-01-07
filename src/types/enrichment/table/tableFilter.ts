@@ -1,3 +1,7 @@
+// ============================================================================
+// Table Filter Types
+// ============================================================================
+
 export enum TableFilterConditionType {
   equal_to = 'EQUAL_TO',
   not_equal_to = 'NOT_EQUAL_TO',
@@ -33,11 +37,11 @@ export enum TableFilterConditionType {
 export interface TableFilterItem {
   fieldId: string;
   conditionType: TableFilterConditionType;
-  values: string | string[];
+  values: string | string[] | null;
 }
 
 export interface TableFilterGroupItem {
   filters: TableFilterItem[];
 }
 
-export type TableFilterRequestParams = TableFilterGroupItem[];
+export type TableFilterParams = TableFilterGroupItem[];

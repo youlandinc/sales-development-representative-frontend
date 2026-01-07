@@ -11,7 +11,8 @@ import {
 } from '@/types/enrichment/table';
 
 import { useAsyncFn } from '@/hooks';
-import { useEnrichmentTableStore, useTableColumns } from '@/stores/enrichment';
+import { useEnrichmentTableStore } from '@/stores/enrichment';
+import { useMergedColumns } from '@/components/molecules/EnrichmentDetail/hooks';
 
 import ICON_CLOSE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_close.svg';
 
@@ -24,7 +25,7 @@ export const DialogEditColumn: FC<DialogEditColumnProps> = ({ cb }) => {
     useEnrichmentTableStore((store) => store);
 
   // Get merged columns
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
   const column = columns.find(
     (col: TableColumnProps) => col.fieldId === activeColumnId,
   );

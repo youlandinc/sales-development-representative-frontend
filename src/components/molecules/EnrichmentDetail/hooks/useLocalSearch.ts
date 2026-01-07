@@ -14,14 +14,14 @@ export const useLocalSearch = <T extends SearchItemType>(
   const [searchValue, setSearchValue] = useState<string>('');
   const [text, setText] = useState('');
 
-  // 防抖设置搜索值
+  // Debounced search value setter
   const debouncedSetSearch = useMemo(() => {
     return debounce((value: string) => {
       setSearchValue(value);
     }, 300);
   }, []);
 
-  // Fuse.js 搜索实例
+  // Fuse.js search instance
   const fuse = useMemo(
     () =>
       new Fuse(items, {
@@ -32,7 +32,7 @@ export const useLocalSearch = <T extends SearchItemType>(
     [items],
   );
 
-  // 搜索结果
+  // Search results
   const searchResults = useMemo(() => {
     if (searchValue.trim() === '') {
       return [] as T[];
@@ -40,20 +40,20 @@ export const useLocalSearch = <T extends SearchItemType>(
 
     const fuseResults = fuse.search(searchValue);
 
-    // 如果需要保持原始顺序，则按照原始数组的顺序重新排序
+    // If preserveOriginalOrder is true, sort by original array order
     if (options?.preserveOriginalOrder) {
       const matchedItems = new Set(fuseResults.map((result) => result.item));
       return items.filter((item) => matchedItems.has(item));
     }
 
-    // 默认按照相关度排序
+    // Default: sort by relevance
     return fuseResults.map((result) => result.item);
   }, [fuse, searchValue, items, options?.preserveOriginalOrder]);
 
-  // 是否有搜索内容
+  // Whether has search content
   const hasSearchValue = searchValue.trim() !== '';
 
-  // 重置搜索
+  // Reset search
   const resetSearch = () => {
     setSearchValue('');
     setText('');

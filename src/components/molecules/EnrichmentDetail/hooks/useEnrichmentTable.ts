@@ -13,11 +13,11 @@ import { useShallow } from 'zustand/react/shallow';
 
 import {
   useEnrichmentTableStore,
-  useTableColumns,
   useWebResearchStore,
 } from '@/stores/enrichment';
 import { useTableWebSocket } from './useTableWebSocket';
-import { useRunAi } from '@/hooks';
+import { useColumnRunAi } from './useColumnRunAi';
+import { useMergedColumns } from './useMergedColumns';
 
 import { _fetchTableRowData } from '@/request';
 import { MIN_BATCH_SIZE, SYSTEM_COLUMN_SELECT } from '../Table/config';
@@ -81,7 +81,7 @@ export const useEnrichmentTable = ({
   );
 
   // Get merged columns (metaColumns + activeView.fieldProps)
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
 
   // Use ref to track column fieldIds to avoid unnecessary re-renders
   const columnFieldIdsRef = useRef<string[]>([]);
@@ -104,7 +104,7 @@ export const useEnrichmentTable = ({
     })),
   );
 
-  const { runAi } = useRunAi();
+  const { runAi } = useColumnRunAi();
   // const fetchIntegrationMenus = useWorkEmailStore(
   //   (store) => store.fetchIntegrationMenus,
   // );

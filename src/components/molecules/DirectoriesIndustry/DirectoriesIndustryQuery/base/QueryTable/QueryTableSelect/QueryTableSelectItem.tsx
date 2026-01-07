@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { Box, Collapse, Stack, Typography } from '@mui/material';
-import { ResponseEnrichmentTableViaSearch } from '@/types';
+import { EnrichmentTableItem } from '@/types';
 
 import { QueryTableIcon } from './QueryTableIcons';
 
 interface FilterTableSelectItemProps {
-  item: ResponseEnrichmentTableViaSearch[0];
+  item: EnrichmentTableItem;
   isExpanded: boolean;
   selectedTableId: string;
   onToggleExpand: (tableId: string) => void;

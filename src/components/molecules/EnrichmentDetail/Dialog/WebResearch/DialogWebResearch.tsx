@@ -24,7 +24,8 @@ import {
 } from '@/stores/enrichment';
 
 import { COINS_PER_ROW } from '@/constants';
-import { useAsyncFn, useVariableFromStore } from '@/hooks';
+import { useAsyncFn } from '@/hooks';
+import { useFieldMapping } from '@/components/molecules/EnrichmentDetail/hooks';
 import { columnRun } from '@/request';
 import { HttpError, SourceOfOpenEnum } from '@/types';
 import { extractPromptText } from '@/utils';
@@ -115,7 +116,7 @@ export const DialogWebResearch: FC<DialogWebResearchProps> = ({
     })),
   );
 
-  const { filedMapping } = useVariableFromStore();
+  const { filedMapping } = useFieldMapping();
 
   const onClickToClose = () => {
     setWebResearchTab('generate');

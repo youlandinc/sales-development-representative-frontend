@@ -17,7 +17,11 @@ import { StyledTiptapEditor } from '@/components/atoms';
 import { ActionsTypeKeyEnum, IntegrationActionMenu } from '@/types';
 import { insertWithPlaceholders } from '@/utils';
 
-import { useLocalSearch, useSwitch, useVariableFromStore } from '@/hooks';
+import { useSwitch } from '@/hooks';
+import {
+  useFieldMapping,
+  useLocalSearch,
+} from '@/components/molecules/EnrichmentDetail/hooks';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import ICON_SPARK_OUTLINE from '@/components/molecules/EnrichmentDetail/assets/dialog/icon_sparkle_outline.svg';
@@ -48,7 +52,7 @@ export const WebResearchGenerate: FC<WebResearchGenerateProps> = ({
       setDialogAllEnrichmentsVisible: store.setDialogAllEnrichmentsVisible,
     })),
   );
-  const { filedMapping } = useVariableFromStore();
+  const { filedMapping } = useFieldMapping();
   const { visible, open, close } = useSwitch(false);
 
   const onEditorReady = useCallback(

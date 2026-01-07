@@ -1,9 +1,9 @@
 import { SDRToast } from '@/components/atoms';
+import { useAsyncFn } from '@/hooks';
 import { columnRun } from '@/request';
 import { HttpError } from '@/types';
-import { useAsyncFn } from './useAsyncFn';
 
-export const useRunAi = () => {
+export const useColumnRunAi = () => {
   const [runAiState, runAi] = useAsyncFn(
     async (param: {
       tableId: string;

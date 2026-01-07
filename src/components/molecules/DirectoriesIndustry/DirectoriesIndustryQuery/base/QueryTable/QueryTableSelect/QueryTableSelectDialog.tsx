@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Stack, Typography } from '@mui/material';
 
 import { StyledButton, StyledDialog, StyledLoading } from '@/components/atoms';
-import { ResponseEnrichmentTableViaSearch } from '@/types';
+import { EnrichmentTableAllResponse } from '@/types';
 import { QueryTableSelectItem } from './index';
 
 import { QueryTableIcon } from './QueryTableIcons';
@@ -13,7 +13,7 @@ interface QueryTableSelectDialogProps {
   fetchingKeywords: boolean;
   selectedTableId: string;
   expandedIds: Set<string>;
-  tableList: ResponseEnrichmentTableViaSearch;
+  tableList: EnrichmentTableAllResponse;
   onClose: () => void;
   onToggleExpand: (tableId: string) => void;
   onSelectTable: (tableId: string) => void;

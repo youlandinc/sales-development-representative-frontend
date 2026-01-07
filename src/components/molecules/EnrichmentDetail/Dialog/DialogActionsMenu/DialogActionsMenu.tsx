@@ -14,7 +14,7 @@ import {
   TabsBar,
 } from './base';
 
-import { useLocalSearch } from '@/hooks';
+import { useLocalSearch } from '@/components/molecules/EnrichmentDetail/hooks';
 import { useDialogActionsMenu, useExport } from './hooks';
 
 import {

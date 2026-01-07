@@ -1,41 +1,41 @@
 import { get, post } from '@/request/request';
 
 import {
+  DirectoriesAdditionalConfigResponse,
   DirectoriesBizIdEnum,
-  DirectoriesQueryAdditionalApiResponse,
-  DirectoriesQueryDefaultApiResponse,
-  DirectoriesQueryTableBodyApiResponse,
-  DirectoriesQueryTableHeaderApiResponse,
+  DirectoriesQueryConfigResponse,
+  DirectoriesTableBodyResponse,
+  DirectoriesTableHeaderResponse,
 } from '@/types/directories';
-import { ResponseEnrichmentTableViaSearch } from '@/types';
+import { EnrichmentTableAllResponse } from '@/types';
 import { CreditTypeEnum } from '@/types/pricingPlan';
 
 export const _fetchDirectoriesConfig = (params: {
   bizId: DirectoriesBizIdEnum;
 }) => {
-  return post<DirectoriesQueryDefaultApiResponse>('/sdr/search/config', params);
+  return post<DirectoriesQueryConfigResponse>('/sdr/search/config', params);
 };
 
 export const _fetchDirectoriesAdditionalConfig = (params: any) => {
-  return post<DirectoriesQueryAdditionalApiResponse>(
+  return post<DirectoriesAdditionalConfigResponse>(
     '/sdr/search/config/additional',
     params,
   );
 };
 
-export const _fetchPreviewHeader = (params: any) => {
-  return post<DirectoriesQueryTableHeaderApiResponse>(
+export const _fetchDirectoriesPreviewHeader = (params: any) => {
+  return post<DirectoriesTableHeaderResponse>(
     '/sdr/column/config/header',
     params,
   );
 };
 
-export const _fetchPreviewBody = (params: any) => {
-  return post<DirectoriesQueryTableBodyApiResponse>('/sdr/search', params);
+export const _fetchDirectoriesPreviewBody = (params: any) => {
+  return post<DirectoriesTableBodyResponse>('/sdr/search', params);
 };
 
 export const _fetchAllEnrichmentTable = () => {
-  return post<ResponseEnrichmentTableViaSearch>('/sdr/table/all', {
+  return post<EnrichmentTableAllResponse>('/sdr/table/all', {
     params: { size: 1000, page: 0 },
   });
 };

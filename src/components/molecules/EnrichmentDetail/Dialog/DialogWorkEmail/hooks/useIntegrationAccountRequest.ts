@@ -2,7 +2,11 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { SDRToast } from '@/components/atoms';
 
-import { useAsyncFn, useRunAi } from '@/hooks';
+import { useAsyncFn } from '@/hooks';
+import {
+  useColumnRunAi,
+  useMergedColumns,
+} from '@/components/molecules/EnrichmentDetail/hooks';
 import {
   _saveIntegrationConfig,
   _updateIntegrationConfig,
@@ -11,7 +15,6 @@ import {
   ActiveTypeEnum,
   useActionsStore,
   useEnrichmentTableStore,
-  useTableColumns,
   useWorkEmailStore,
 } from '@/stores/enrichment';
 import { HttpError } from '@/types';
@@ -37,8 +40,8 @@ export const useIntegrationAccountRequest = (cb?: () => void) => {
   );
 
   // Get merged columns
-  const columns = useTableColumns();
-  const { runAi } = useRunAi();
+  const columns = useMergedColumns();
+  const { runAi } = useColumnRunAi();
   const [saveState, saveOrRunIntegrationAccount] = useAsyncFn(
     async (
       param: {

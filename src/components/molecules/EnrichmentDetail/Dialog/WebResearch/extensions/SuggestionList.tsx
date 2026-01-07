@@ -16,7 +16,7 @@ import {
 
 import type { MentionSuggestion } from './mentionSuggestionOptions';
 
-import { useTableColumns } from '@/stores/enrichment';
+import { useMergedColumns } from '@/components/molecules/EnrichmentDetail/hooks';
 import { TypeIcon } from '../../../Table/TableIcon';
 import {
   TableColumnProps,
@@ -51,7 +51,7 @@ export const SuggestionList = forwardRef<
   SuggestionListProps
 >((props, ref) => {
   // Get merged columns
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectItem = useCallback(

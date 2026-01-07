@@ -11,7 +11,7 @@ import { SDRToast, StyledButton, StyledDialog } from '@/components/atoms';
 
 import { useAsyncFn } from '@/hooks';
 
-import { _exportTableData } from '@/request';
+import { _exportTableDataAsCsv } from '@/request';
 import { HttpError } from '@/types';
 
 import { createFile } from '@/utils/UnknowHandler';
@@ -43,7 +43,7 @@ export const DialogExportInProgress: FC<DialogExportInProgressProps> = ({
 
   const [, downloadCsv] = useAsyncFn(async () => {
     try {
-      const res = await _exportTableData(tableId);
+      const res = await _exportTableDataAsCsv(tableId);
       const disposition = res.headers['content-disposition'] || '';
       const parsedName = disposition.split('filename=')[1] || 'export.csv';
       const blob = new Blob([res.data], {

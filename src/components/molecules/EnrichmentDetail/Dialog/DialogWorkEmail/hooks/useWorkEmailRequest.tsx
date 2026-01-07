@@ -4,8 +4,11 @@ import { useShallow } from 'zustand/react/shallow';
 import { SDRToast } from '@/components/atoms';
 
 import { useAsyncFn } from '@/hooks';
-import { useTableColumns, useWorkEmailStore } from '@/stores/enrichment';
-import { useRunAi } from '@/hooks/useRunAi';
+import { useWorkEmailStore } from '@/stores/enrichment';
+import {
+  useColumnRunAi,
+  useMergedColumns,
+} from '@/components/molecules/EnrichmentDetail/hooks';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useComputedInWorkEmailStore } from './index';
 
@@ -41,7 +44,7 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
       selectedValidationOption: state.selectedValidationOption,
     })),
   );
-  const { runAi } = useRunAi();
+  const { runAi } = useColumnRunAi();
 
   const { closeDialog, fetchTable } = useEnrichmentTableStore(
     useShallow((state) => ({
@@ -52,7 +55,7 @@ export const useWorkEmailRequest = (tableId: string, cb?: () => void) => {
   );
 
   // Get merged columns
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
   const { waterfallAllInputs, integrationsInWaterfall } =
     useComputedInWorkEmailStore();
 

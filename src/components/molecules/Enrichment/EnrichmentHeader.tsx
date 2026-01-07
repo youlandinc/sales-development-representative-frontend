@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
 
-import { _createBlankTable } from '@/request';
+import { _createBlankEnrichmentTable } from '@/request';
 import { HttpError } from '@/types';
 
 import { SDRToast, StyledButton, StyledTextField } from '@/components/atoms';
@@ -57,7 +57,7 @@ export const EnrichmentHeader: FC<EnrichmentHeaderProps> = ({
     }
     setIsCreating(true);
     try {
-      const { data } = await _createBlankTable();
+      const { data } = await _createBlankEnrichmentTable();
       router.push(`/enrichment/${data}`);
     } catch (err) {
       const { header, message, variant } = err as HttpError;

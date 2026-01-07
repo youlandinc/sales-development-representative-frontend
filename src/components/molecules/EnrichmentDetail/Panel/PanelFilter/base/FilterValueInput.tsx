@@ -11,7 +11,7 @@ import {
   TableColumnProps,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
-import { TableFilterConditionType } from '@/types/enrichment/tableFilter';
+import { TableFilterConditionType } from '@/types/enrichment/table';
 
 interface FilterValueInputProps {
   column: TableColumnProps | undefined;

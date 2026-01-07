@@ -40,7 +40,7 @@ const getMergedColumns = (): TableColumnProps[] => {
       ...meta,
       pin: fp.pin,
       visible: fp.visible,
-      width: fp.width,
+      width: fp.width ?? meta.width,
       color: fp.color,
       csn: fp.sort,
     };

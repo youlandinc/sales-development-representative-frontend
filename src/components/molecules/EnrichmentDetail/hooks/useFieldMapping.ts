@@ -1,9 +1,10 @@
-import { useTableColumns } from '@/stores/enrichment';
 import { TableColumnProps } from '@/types/enrichment/table';
 
-export const useVariableFromStore = () => {
+import { useMergedColumns } from './useMergedColumns';
+
+export const useFieldMapping = () => {
   // Get merged columns
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
   const filedMapping = columns.reduce(
     (pre: Record<string, string>, cur: TableColumnProps) => {
       pre[cur.fieldName] = cur.fieldId;

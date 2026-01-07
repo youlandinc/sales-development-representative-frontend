@@ -3,12 +3,11 @@ import { FC, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { UTypeOf } from '@/utils';
-import { useEnrichmentTable } from './hooks';
+import { useEnrichmentTable, useMergedColumns } from './hooks';
 
 import {
   ActiveTypeEnum,
   useEnrichmentTableStore,
-  useTableColumns,
   useWebResearchStore,
   useWorkEmailStore,
 } from '@/stores/enrichment';
@@ -124,7 +123,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
   );
 
   // Get merged columns (metaColumns + activeView.fieldProps)
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
 
   const { setEditParams, setWebResearchVisible, allClear, setWebResearchTab } =
     useWebResearchStore(

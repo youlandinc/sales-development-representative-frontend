@@ -14,12 +14,12 @@ import {
   PAPPER_SX,
   STACK_CONTAINER_SX,
 } from '../config';
-import { useTableColumns } from '@/stores/enrichment';
-import { TableColumnProps } from '@/types/enrichment/table';
+import { useMergedColumns } from '@/components/molecules/EnrichmentDetail/hooks';
 import {
+  TableColumnProps,
   TableFilterConditionType,
-  TableFilterRequestParams,
-} from '@/types/enrichment/tableFilter';
+  TableFilterParams,
+} from '@/types/enrichment/table';
 
 import { FilterFooter } from './FilterFooter';
 import { FilterGroup, FilterGroupData, FilterRowData } from './base';
@@ -36,12 +36,12 @@ const EMPTY_FILTER_GROUP: FilterGroupData = {
 };
 
 interface PanelFilterProps {
-  onFilterChange?: (params: TableFilterRequestParams) => void;
+  onFilterChange?: (params: TableFilterParams) => void;
 }
 
 export const PanelFilter = ({ onFilterChange }: PanelFilterProps) => {
   // Get merged columns
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [filterGroups, setFilterGroups] = useState<FilterGroupData[]>([
@@ -63,7 +63,7 @@ export const PanelFilter = ({ onFilterChange }: PanelFilterProps) => {
     }, 0);
   }, [filterGroups]);
 
-  const buildRequestParams = useCallback((): TableFilterRequestParams => {
+  const buildRequestParams = useCallback((): TableFilterParams => {
     return filterGroups
       .map((group) => ({
         filters: group.filters

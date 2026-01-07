@@ -1,11 +1,10 @@
 import { DragEndEvent } from '@dnd-kit/core';
 
-import { TableColumnProps } from '@/types/enrichment/table';
 import {
-  ACTION_KEY_AI,
-  NON_EDITABLE_ACTION_KEYS,
-  SYSTEM_COLUMN_SELECT,
-} from '../config';
+  TableColumnProps,
+  TableColumnTypeEnum,
+} from '@/types/enrichment/table';
+import { NON_EDITABLE_ACTION_KEYS, SYSTEM_COLUMN_SELECT } from '../config';
 
 export interface ColumnSortParams {
   tableId: string;
@@ -16,7 +15,7 @@ export interface ColumnSortParams {
 
 /**
  * Build column sort params from DragEndEvent
- * Used by both PanelColumns and StyledTable
+ * Used by both PanelColumns and StyledTablebase
  *
  * @param event - DragEndEvent from dnd-kit
  * @returns ColumnSortParams or null if invalid
@@ -72,16 +71,12 @@ export const buildColumnSortParams = (
  * - actionKey === 'use-ai'
  * - actionKey includes 'find'
  * - has dependentFieldId
- *
+ * - fieldType === TableColumnTypeEnum.action
  * @param column - Table column configuration
  * @returns true if column is an AI column
  */
 export const checkIsAiColumn = (column: TableColumnProps): boolean => {
-  return (
-    column.actionKey === ACTION_KEY_AI ||
-    column.actionKey?.includes('find') ||
-    !!column.dependentFieldId
-  );
+  return column.fieldType === TableColumnTypeEnum.action;
 };
 
 /**

@@ -5,7 +5,7 @@ import { DIRECTORIES_COLORS } from './constants';
 
 import {
   DirectoriesBizIdEnum,
-  DirectoryApiResponse,
+  DirectoryInfoResponse,
 } from '@/types/directories';
 
 import { StyledButton } from '@/components/atoms';
@@ -15,7 +15,7 @@ import {
   DirectoriesStats,
 } from './index';
 
-type DirectoriesCardProps = DirectoryApiResponse & {
+type DirectoriesCardProps = DirectoryInfoResponse & {
   onButtonClick?: (data: {
     bizId: DirectoriesBizIdEnum;
     isAuth: boolean;

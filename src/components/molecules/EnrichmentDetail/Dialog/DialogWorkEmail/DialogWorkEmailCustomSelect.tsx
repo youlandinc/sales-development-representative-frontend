@@ -9,7 +9,7 @@ import { FC, ReactNode } from 'react';
 
 import { StyledTextField } from '@/components/atoms';
 
-import { useTableColumns } from '@/stores/enrichment';
+import { useMergedColumns } from '@/components/molecules/EnrichmentDetail/hooks';
 
 import {
   TableColumnProps,
@@ -43,7 +43,7 @@ export const DialogWorkEmailCustomSelect: FC<
   >
 > = ({ title, onChange, value, required }) => {
   // Get merged columns
-  const columns = useTableColumns();
+  const columns = useMergedColumns();
   const options: TOption[] = columns.map((item: TableColumnProps) => ({
     label: item.fieldName,
     value: item.fieldId,

@@ -15,7 +15,7 @@ import { SDRToast } from '@/components/atoms';
 import { useAsyncFn } from '@/hooks';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 
-import { _fetchCellDetails } from '@/request/enrichment/base';
+import { _fetchTableCellDetails } from '@/request/enrichment';
 
 import { ActiveCellParams } from '@/types/enrichment/base';
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
@@ -93,7 +93,10 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
 
   const [state, fetchCellDetails] = useAsyncFn(async () => {
     try {
-      return await _fetchCellDetails(cellDetails.columnId, cellDetails.rowId);
+      return await _fetchTableCellDetails(
+        cellDetails.columnId,
+        cellDetails.rowId,
+      );
     } catch (error) {
       const { header, message, variant } = error as HttpError;
       SDRToast({ message, header, variant });

@@ -314,7 +314,7 @@ export const TableIcon = {
 };
 
 // ========== Type Icon Map (internal) ==========
-const TYPE_ICON_MAP: Record<TableColumnTypeEnum, any> = {
+const TYPE_ICON_MAP: Partial<Record<TableColumnTypeEnum, any>> = {
   [TableColumnTypeEnum.text]: ICON_TYPE_TEXT,
   [TableColumnTypeEnum.number]: ICON_TYPE_NUMBER,
   [TableColumnTypeEnum.email]: ICON_TYPE_EMAIL,

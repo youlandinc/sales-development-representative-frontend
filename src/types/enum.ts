@@ -95,15 +95,6 @@ export enum BizCodeEnum {
   signature = 'SIGNATURE',
 }
 
-export enum EnrichmentTableEnum {
-  find_people = 'FIND_PEOPLE',
-  find_companies = 'FIND_COMPANIES',
-  from_csv = 'FROM_CSV',
-  blank_table = 'BLANK_TABLE',
-  crm_list = 'CRM_LIST',
-  agent = 'AGENT',
-}
-
 export enum PlanTypeEnum {
   // capital
   research = 'RESEARCH',

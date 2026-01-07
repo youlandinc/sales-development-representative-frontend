@@ -17,7 +17,7 @@ const CONFIDENCE_URL = {
 
 interface BodyCellIconsProps {
   imagePreview?: string;
-  confidence?: TableCellConfidenceEnum;
+  confidence?: TableCellConfidenceEnum | null;
   isValidate?: boolean;
   fieldType?: TableColumnTypeEnum;
   value?: any;

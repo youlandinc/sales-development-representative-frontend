@@ -5,10 +5,10 @@ import {
   getChangeColumnTypeMenuActions,
 } from './menuChangeType';
 import {
-  TableColumnActionOption,
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
+import { TableColumnActionOption } from '../types';
 
 // Normal column menu (p2)
 export const getNormalColumnMenuActions = (
