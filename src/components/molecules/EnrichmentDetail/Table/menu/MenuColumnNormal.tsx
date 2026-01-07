@@ -16,6 +16,7 @@ import {
   TableColumnMenuActionEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
+import { HeaderState } from '../types';
 import { getAiColumnMenuActions, getNormalColumnMenuActions } from '../config';
 import { checkIsAiColumn } from '../utils';
 
@@ -23,13 +24,7 @@ interface MenuColumnNormalProps {
   anchorEl: HTMLElement | null;
   columns: any[];
   columnPinning: { left?: string[]; right?: string[] };
-  headerState: {
-    activeColumnId: string | null; // Background color (used as menuColumnId for menu operations)
-    focusedColumnId: string | null; // Bottom line
-    isMenuOpen: boolean;
-    isEditing: boolean;
-    selectedColumnIds: string[]; // Multi-select (reserved for future)
-  };
+  headerState: Pick<HeaderState, 'activeColumnId' | 'isMenuOpen' | 'isEditing'>;
   onClose: () => void;
   onMenuItemClick: (item: {
     label: string;

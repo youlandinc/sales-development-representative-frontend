@@ -1,5 +1,5 @@
 // ============================================================================
-// Table Cell Types
+// Table Cell Enums
 // ============================================================================
 
 export enum TableCellAIPhaseEnum {
@@ -18,36 +18,62 @@ export enum TableCellMetaDataValidateStatusEnum {
   not_found = 'NOT_FOUND',
 }
 
-export interface TableCellSourceItem {
-  type: string;
-  url: string;
-  title: string;
-}
+// ============================================================================
+// Table Cell Metadata Types (Mutually Exclusive)
+// ============================================================================
 
-export interface TableCellMetadata {
-  runType: string;
-  sources: TableCellSourceItem[] | null;
-  thinkingProcess: string | null;
-  validateStatus: TableCellMetaDataValidateStatusEnum | null;
-}
+export type TableCellMetadata =
+  | {
+      isValidate: boolean;
+      status: string;
+      imagePreview: string;
+      validateStatus?: never;
+    }
+  | {
+      isValidate: boolean;
+      status: string;
+      validateStatus: TableCellMetaDataValidateStatusEnum;
+      imagePreview?: never;
+    }
+  | {
+      isValidate: boolean;
+      status: string;
+      imagePreview?: never;
+      validateStatus?: never;
+    };
 
-export interface TableCellProps {
-  cellId: string;
-  fieldId: string;
-  recordId: string;
-  value: string | null;
-  status: string | null;
-  error: string | null;
-  aiPhase: TableCellAIPhaseEnum | null;
-  metadata: TableCellMetadata | null;
-}
+// ============================================================================
+// Table Cell Field Data Types
+// ============================================================================
 
-// Cell field data (used in table row)
 export interface TableCellFieldData {
+  fid: string;
+  value: any;
   isFinished?: boolean;
-  metaData?: {
-    isValidate?: boolean;
-    imagePreview?: string;
-    validateStatus?: TableCellMetaDataValidateStatusEnum | null;
-  } | null;
+  aiPhase?: TableCellAIPhaseEnum | null;
+  externalContent?: {
+    validateStatus: TableCellMetaDataValidateStatusEnum;
+    stepsTaken: [];
+    reasoning: '';
+    [key: string]: any;
+  };
+  metaData?: TableCellMetadata | null;
 }
+
+export interface TableRowBaseData {
+  deleted?: boolean;
+  id?: string;
+  tableId?: string;
+  sourceId?: string;
+  createBy?: string;
+  updateBy?: string;
+  createdAt?: number;
+  updatedAt?: number;
+  tenantId?: string;
+}
+
+export interface TableRowCellData {
+  [fieldId: string]: TableCellFieldData;
+}
+
+export type TableRowItemData = TableRowBaseData & TableRowCellData;

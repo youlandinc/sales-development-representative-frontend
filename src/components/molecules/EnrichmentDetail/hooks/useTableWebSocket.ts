@@ -6,11 +6,12 @@ import { useWebSocket } from '@/hooks';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import { WebSocketTypeEnum } from '@/types';
+import { TableRowItemData } from '@/types/enrichment/table';
 
 interface UseTableWebSocketParams {
   tableId: string;
-  rowsMapRef: RefObject<Record<string, any>>;
-  setRowsMap: Dispatch<SetStateAction<Record<string, any>>>;
+  rowsMapRef: RefObject<Record<string, TableRowItemData>>;
+  setRowsMap: Dispatch<SetStateAction<Record<string, TableRowItemData>>>;
   setAiLoadingState: Dispatch<
     SetStateAction<Record<string, Record<string, boolean>>>
   >;
@@ -119,10 +120,10 @@ export const useTableWebSocket = ({
           const updatedRowData = { ...currentRowData };
 
           Object.entries(metadata).forEach(([fieldId, result]) => {
-            updatedRowData[fieldId] = result;
+            (updatedRowData as any)[fieldId] = result;
           });
 
-          rowsMapRef.current[recordId] = updatedRowData;
+          rowsMapRef.current[recordId] = updatedRowData as TableRowItemData;
           setRowsMap((prev) => ({
             ...prev,
             [recordId]: updatedRowData,

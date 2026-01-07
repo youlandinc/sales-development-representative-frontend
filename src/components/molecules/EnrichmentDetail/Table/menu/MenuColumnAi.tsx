@@ -8,18 +8,14 @@ import {
 } from '@mui/material';
 
 import { MENU_STYLES } from '../styles/menu';
+import { AiRunParams } from '../types';
 
 interface MenuColumnAiProps {
   anchorEl: HTMLElement | null;
   columnId: string;
   rowIds: string[];
   onClose: () => void;
-  onRunAi?: (params: {
-    fieldId: string;
-    recordId?: string;
-    isHeader?: boolean;
-    recordCount?: number;
-  }) => Promise<void>;
+  onRunAi?: (params: AiRunParams) => Promise<void>;
 }
 
 export const MenuColumnAi: FC<MenuColumnAiProps> = ({

@@ -1,16 +1,22 @@
 import { post } from '@/request/request';
-import { TableCellProps, TableFilterParams } from '@/types/enrichment/table';
+import {
+  TableFilterParams,
+  TableRowDataResponse,
+  TableRowIdsResponse,
+  TableRowsCreationResponse,
+} from '@/types/enrichment/table';
 
 /**
  * Fetch table row IDs with optional filters
  * API: POST /sdr/table/data/ids
+ * @returns string[] - Array of recordIds
  */
 export const _fetchTableRowIds = (params: {
   tableId: string;
   viewId: string;
   filters?: TableFilterParams;
 }) => {
-  return post('/sdr/table/data/ids', params);
+  return post<TableRowIdsResponse>('/sdr/table/data/ids', params);
 };
 
 /**
@@ -21,7 +27,7 @@ export const _fetchTableRowData = (params: {
   tableId: string;
   recordIds: string[];
 }) => {
-  return post<TableCellProps[]>(`/sdr/table/data/${params.tableId}`, {
+  return post<TableRowDataResponse>(`/sdr/table/data/${params.tableId}`, {
     recordIds: params.recordIds,
   });
 };
@@ -34,7 +40,7 @@ export const _createTableRows = (params: {
   tableId: string;
   rowCounts: number;
 }) => {
-  return post<string[]>('/sdr/table/rows/add', {
+  return post<TableRowsCreationResponse>('/sdr/table/rows/add', {
     tableId: params.tableId,
     rowCounts: params.rowCounts,
   });

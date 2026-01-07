@@ -20,6 +20,7 @@ import { useColumnRunAi } from './useColumnRunAi';
 import { useMergedColumns } from './useMergedColumns';
 
 import { _fetchTableRowData } from '@/request';
+import { TableRowItemData } from '@/types/enrichment/table';
 import { MIN_BATCH_SIZE, SYSTEM_COLUMN_SELECT } from '../Table/config';
 import { checkIsAiColumn } from '../Table/utils';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';
@@ -35,7 +36,7 @@ interface UseEnrichmentTableReturn {
   isTableLoading: boolean;
   isRowIdsLoading: boolean;
   scrollContainerRef: RefObject<HTMLDivElement | null>;
-  rowsMapRef: RefObject<Record<string, any>>;
+  rowsMapRef: RefObject<Record<string, TableRowItemData>>;
   isScrolled: boolean;
   setAiLoadingState: Dispatch<
     SetStateAction<Record<string, Record<string, boolean>>>
@@ -114,8 +115,8 @@ export const useEnrichmentTable = ({
   // 2. Too many useRefs may indicate state design issues
   // 3. Consider using zustand or other state management solutions
   // State management
-  const rowsMapRef = useRef<Record<string, any>>({});
-  const [rowsMap, setRowsMap] = useState<Record<string, any>>({});
+  const rowsMapRef = useRef<Record<string, TableRowItemData>>({});
+  const [rowsMap, setRowsMap] = useState<Record<string, TableRowItemData>>({});
   const [aiLoadingState, setAiLoadingState] = useState<
     Record<string, Record<string, boolean>>
   >({});
@@ -211,7 +212,7 @@ export const useEnrichmentTable = ({
         columnIds.forEach((fieldId) => {
           if (!(fieldId in row)) {
             // Add new column with empty default value
-            row[fieldId] = '';
+            (row as any)[fieldId] = { fid: fieldId, value: '' };
             hasChanges = true;
           }
         });
@@ -225,7 +226,7 @@ export const useEnrichmentTable = ({
       const row = rowsMapRef.current[rowId];
       columnIds.forEach((fieldId) => {
         if (!(fieldId in row)) {
-          row[fieldId] = '';
+          (row as any)[fieldId] = { fid: fieldId, value: '' };
         }
       });
     });

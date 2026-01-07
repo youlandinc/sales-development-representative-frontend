@@ -1,7 +1,7 @@
 import {
   TableCellAIPhaseEnum,
   TableCellMetaDataValidateStatusEnum,
-} from '@/types/enrichment/table';
+} from '@/types/enrichment/table/tableCell';
 import { IntegrationAction, ValidationActionConfigParam } from './index';
 
 export interface ColumnFieldGroupMapItem extends IntegrationAction {

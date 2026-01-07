@@ -1,5 +1,5 @@
 // ============================================================================
-// Table Component Types
+// Menu Types
 // ============================================================================
 
 import { ReactNode } from 'react';
@@ -16,4 +16,11 @@ export interface TableColumnActionOption {
   variant?: 'danger' | 'normal';
   children?: TableColumnActionOption[];
   submenu?: TableColumnActionOption[];
+}
+
+export interface HeaderMenuClickParams {
+  type: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
+  columnId: string;
+  value?: any;
+  parentValue?: any;
 }

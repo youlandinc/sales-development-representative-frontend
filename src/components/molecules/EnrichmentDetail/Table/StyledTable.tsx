@@ -3,7 +3,6 @@ import {
   FC,
   MouseEvent,
   ReactNode,
-  RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -50,11 +49,16 @@ import { BodyCell } from './body';
 import { MenuColumnAi, MenuColumnInsert, MenuColumnNormal } from './menu';
 import { CommonOverlay, CommonSpacer } from './common';
 
-import {
-  TableColumnMenuActionEnum,
-  TableColumnTypeEnum,
-} from '@/types/enrichment/table';
+import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import { SYSTEM_COLUMN_SELECT } from './config';
+import {
+  AiLoadingState,
+  AiRunParams,
+  CellState,
+  HeaderMenuClickParams,
+  HeaderState,
+  VirtualizationConfig,
+} from './types';
 import {
   buildColumnSortParams,
   checkIsAiColumn,
@@ -66,42 +70,13 @@ import ICON_TYPE_ADD from './assets/icon-type-add.svg';
 import ICON_ARROW_DOWN from './assets/icon-arrow-down.svg';
 
 // ============================================
-// Type Definitions
+// Type Definitions (Component-specific)
 // ============================================
 
 interface MenuItem {
   label: string;
   value: string;
   icon: any;
-}
-
-interface HeaderMenuClickParams {
-  type: TableColumnMenuActionEnum | TableColumnTypeEnum | string;
-  columnId: string;
-  value?: any;
-  parentValue?: any;
-}
-
-interface VirtualizationConfig {
-  enabled?: boolean;
-  rowHeight?: number;
-  scrollContainer?: RefObject<HTMLDivElement | null>;
-  onVisibleRangeChange?: (startIndex: number, endIndex: number) => void;
-}
-
-type AiLoadingState = Record<string, Record<string, boolean>>;
-
-interface AiRunParams {
-  fieldId: string;
-  recordId?: string;
-  isHeader?: boolean;
-  recordCount?: number;
-}
-
-interface CellState {
-  recordId: string;
-  columnId: string;
-  isEditing?: boolean;
 }
 
 // ============================================
@@ -136,38 +111,6 @@ interface StyledTableProps {
 }
 
 const columnHelper = createColumnHelper<any>();
-
-/**
- * Header State - Manages table header interaction states
- *
- * @property activeColumnId - Column with background highlight
- *   - Set when: header clicked (single/right click)
- *   - Cleared when: click away from table
- *   - Used for: header background color, menu target column, body cell column highlight
- *
- * @property focusedColumnId - Column with bottom line indicator
- *   - Set when: header clicked
- *   - Cleared when: another header clicked (not on click away)
- *   - Used for: bottom line visual indicator, persists after click away
- *
- * @property isMenuOpen - Whether header menu is currently visible
- *   - Set when: header clicked to show menu
- *   - Cleared when: menu closed, click away, or action selected
- *
- * @property isEditing - Whether header is in rename/edit mode
- *   - Set when: header double-clicked or rename menu item selected
- *   - Cleared when: edit completed or cancelled
- *
- * @property selectedColumnIds - Array of selected column IDs for multi-select
- *   - Reserved for future multi-column selection feature
- */
-type HeaderState = {
-  activeColumnId: string | null;
-  focusedColumnId: string | null;
-  isMenuOpen: boolean;
-  isEditing: boolean;
-  selectedColumnIds: string[];
-};
 
 const HEADER_STATE_RESET: HeaderState = {
   activeColumnId: null,

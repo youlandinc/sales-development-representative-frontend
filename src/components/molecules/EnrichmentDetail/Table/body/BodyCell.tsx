@@ -8,11 +8,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box, CircularProgress, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { CellContext } from '@tanstack/react-table';
 
-import { SYSTEM_COLUMN_SELECT } from '../config';
+import { CELL_AI_PHASE_HASH, SYSTEM_COLUMN_SELECT } from '../config';
+import { CellState, HeaderState } from '../types';
 import {
+  TableCellAIPhaseEnum,
   TableCellFieldData,
   TableColumnMeta,
   TableColumnTypeEnum,
@@ -31,36 +33,24 @@ import {
 
 const CELL_CONSTANTS = {
   FONT_SIZE: 14,
-  PROGRESS_SIZE: 16,
 } as const;
 
-const AI_LOADING_CONTENT = (
-  <Stack alignItems="center" direction="row" spacing={1}>
-    <CircularProgress size={CELL_CONSTANTS.PROGRESS_SIZE} />
+const renderAiLoadingContent = (aiPhase?: TableCellAIPhaseEnum | null) => {
+  const phaseText = aiPhase
+    ? (CELL_AI_PHASE_HASH[aiPhase] ?? 'Processing...')
+    : 'Processing...';
+
+  return (
     <Box
-      component="span"
       sx={{
         fontSize: CELL_CONSTANTS.FONT_SIZE,
         color: 'text.secondary',
       }}
     >
-      Processing...
+      {phaseText}
     </Box>
-  </Stack>
-);
-
-export interface CellState {
-  recordId: string;
-  columnId: string;
-  isEditing?: boolean;
-}
-
-export interface HeaderState {
-  activeColumnId: string | null;
-  isMenuOpen: boolean;
-  focusedColumnId: string | null;
-  isEditing: boolean;
-}
+  );
+};
 
 // Helper: check if cellState matches current cell
 const isCellStateMatch = (
@@ -152,6 +142,7 @@ const BodyCellComponent: FC<BodyCellProps> = ({
   const hasAiColumn = tableMeta?.hasAiColumn ?? false;
 
   const metaData = originalData?.metaData;
+  const aiPhase = originalData?.aiPhase;
   const isValidate = metaData?.isValidate ?? true;
   const imagePreview = metaData?.imagePreview;
   const validateStatus = metaData?.validateStatus;
@@ -265,7 +256,7 @@ const BodyCellComponent: FC<BodyCellProps> = ({
     }
 
     if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
-      return AI_LOADING_CONTENT;
+      return renderAiLoadingContent(aiPhase);
     }
 
     if (isEditing && isEditableCell && !isTruncated) {

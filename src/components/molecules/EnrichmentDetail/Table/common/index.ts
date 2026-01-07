@@ -1,3 +1,3 @@
-export { CommonAiIcon } from './CommonAiIcon';
-export { CommonOverlay } from './CommonOverlay';
-export { CommonSpacer } from './CommonSpacer';
+export * from './CommonAiIcon';
+export * from './CommonOverlay';
+export * from './CommonSpacer';

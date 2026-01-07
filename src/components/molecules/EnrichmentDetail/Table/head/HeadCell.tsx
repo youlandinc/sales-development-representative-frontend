@@ -27,17 +27,9 @@ import {
 } from '../styles';
 
 import { SYSTEM_COLUMN_SELECT } from '../config';
+import { HeaderState } from '../types';
 import { UTypeOf } from '@/utils';
 import { TableColumnMeta } from '@/types/enrichment/table';
-
-// Re-export HeaderState for external use
-export interface HeaderState {
-  activeColumnId: string | null;
-  focusedColumnId: string | null;
-  isMenuOpen: boolean;
-  isEditing: boolean;
-  selectedColumnIds: string[];
-}
 
 interface TableHeadCellProps {
   // Primary data source - similar to BodyCell's cellContext pattern
