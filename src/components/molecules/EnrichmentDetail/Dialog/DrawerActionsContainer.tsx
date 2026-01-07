@@ -4,7 +4,7 @@ import { useShallow } from 'zustand/shallow';
 
 import {
   DialogActionsMenu,
-  DialogCellDetailsThinking,
+  DialogCellDetails,
   DialogDeleteColumn,
   DialogEditColumn,
   DialogEditDescription,
@@ -75,7 +75,7 @@ export const DrawerActionsContainer: FC<DialogActionsContainerProps> = ({
               <DialogEditColumn />
             )}
             {dialogType === TableColumnMenuActionEnum.cell_detail && (
-              <DialogCellDetailsThinking cellDetails={cellDetails} />
+              <DialogCellDetails cellDetails={cellDetails} />
             )}
             {dialogType === TableColumnMenuActionEnum.work_email && (
               <DialogWorkEmail onCloseToCallback={onInitializeAiColumns} />

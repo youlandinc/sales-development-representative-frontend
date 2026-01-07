@@ -1,4 +1,5 @@
-import { get, patch, post } from '../request';
+import { ACTION_KEY_AI } from '@/components/molecules/EnrichmentDetail/Table/config/constants';
+import { patch, post } from '../request';
 
 export const generatePrompt = (api: string, param: Record<string, any>) => {
   //TODO
@@ -39,7 +40,7 @@ export const _saveWebResearchConfig = (params: {
 }) => {
   return post<string>('/sdr/table/field/add', {
     tableId: params.tableId,
-    actionKey: 'use-ai',
+    actionKey: ACTION_KEY_AI,
     fieldType: 'TEXT',
     fieldName: 'Use AI',
     typeSettings: {
