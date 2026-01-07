@@ -5,7 +5,11 @@ import { useShallow } from 'zustand/react/shallow';
 import { DialogCellDetailsThinking } from './DialogCellDetailsThinking';
 
 import { useEnrichmentTableStore } from '@/stores/enrichment/useEnrichmentTableStore';
-import { ACTION_KEY_AI, ACTION_KEY_FIND } from '../../Table/config';
+import {
+  ACTION_KEY_AI,
+  ACTION_KEY_FIND,
+  ACTION_KEY_VALIDATE,
+} from '../../Table/config';
 import { DialogCellDetailsFinding } from './DialogCellDetailsFinding';
 
 interface DialogCellDetailsProps {
@@ -27,7 +31,10 @@ export const DialogCellDetails: FC<DialogCellDetailsProps> = ({
     return <DialogCellDetailsThinking cellDetails={cellDetails} />;
   }
 
-  if (metaColumn?.actionKey?.includes(ACTION_KEY_FIND)) {
+  if (
+    metaColumn?.actionKey?.includes(ACTION_KEY_FIND) ||
+    metaColumn?.actionKey?.includes(ACTION_KEY_VALIDATE)
+  ) {
     return <DialogCellDetailsFinding cellDetails={cellDetails} />;
   }
 
