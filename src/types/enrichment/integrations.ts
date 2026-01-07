@@ -1,3 +1,5 @@
+import { EnrichmentCategoryEnum } from './drawerActions';
+
 export enum IntegrationActionType {
   work_email = 'WORK_EMAIL',
   personal_email = 'PERSONAL_EMAIL',
@@ -48,6 +50,8 @@ export interface IntegrationAction {
   isDefault: boolean;
   inputParams: IntegrationActionInputParams[];
   skipped: boolean;
+  //only for dialog all enrichments
+  sourceCategory?: EnrichmentCategoryEnum;
 }
 
 export interface IntegrationActionValidation {

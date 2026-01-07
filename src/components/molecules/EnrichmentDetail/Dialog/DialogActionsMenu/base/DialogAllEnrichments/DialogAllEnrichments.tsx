@@ -90,8 +90,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
         setActiveType(ActiveTypeEnum.add);
         setDialogAllEnrichmentsVisible(false);
         if (
-          dialogAllEnrichmentsTabKey ===
-          EnrichmentCategoryEnum.atlas_task_library
+          config?.sourceCategory === EnrichmentCategoryEnum.atlas_task_library
         ) {
           const description = config.description ?? '';
           onClickToAiTemplate(`Name:${config.name},Description:${description}`);
@@ -105,7 +104,6 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
         setSelectedIntegrationToConfig(config);
       },
       [
-        dialogAllEnrichmentsTabKey,
         setIntegrationType,
         openDialog,
         setDisplayType,
@@ -185,10 +183,7 @@ export const DialogAllEnrichments: FC<DialogAllEnrichments> = memo(
           if (category.categoryKey !== EnrichmentCategoryEnum.actions) {
             action.waterfallConfigs?.forEach((config) => {
               if (config.name && config.description) {
-                result.push({
-                  ...config,
-                  sourceCategory: category.categoryKey,
-                } as SearchResultItem);
+                result.push(config as SearchResultItem);
               }
             });
             return;
