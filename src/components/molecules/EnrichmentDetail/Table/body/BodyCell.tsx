@@ -257,7 +257,11 @@ const BodyCellComponent: FC<BodyCellProps> = ({
       );
     }
 
-    if (isAiColumn && isAiLoading && !displayValue && !isFinished) {
+    // Show loading if: AI column + no value + not finished + (isAiLoading OR has aiPhase)
+    // This prevents flicker when aiLoadingState is cleared but aiPhase still exists
+    const shouldShowAiLoading =
+      isAiColumn && !displayValue && !isFinished && (isAiLoading || aiPhase);
+    if (shouldShowAiLoading) {
       return renderAiLoadingContent(aiPhase);
     }
 

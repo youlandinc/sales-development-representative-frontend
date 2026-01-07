@@ -20,8 +20,8 @@ export const CELL_AI_VALIDATE_HASH: Record<
 // for loading state
 export const CELL_AI_PHASE_HASH: Partial<Record<TableCellAIPhaseEnum, string>> =
   {
-    [TableCellAIPhaseEnum.searching]: 'Searching',
-    [TableCellAIPhaseEnum.verifying]: 'Verifying',
-    [TableCellAIPhaseEnum.re_searching]: 'Re-searching',
-    [TableCellAIPhaseEnum.populating]: 'Populating',
+    [TableCellAIPhaseEnum.searching]: 'Searching...',
+    [TableCellAIPhaseEnum.verifying]: 'Verifying...',
+    [TableCellAIPhaseEnum.re_searching]: 'Re-searching...',
+    [TableCellAIPhaseEnum.populating]: 'Populating...',
   };
