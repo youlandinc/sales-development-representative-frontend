@@ -1,8 +1,8 @@
 import {
-  TableCellDetailPhaseEnum,
-  TableCellDetailValidateStatusEnum,
-} from '@/types/enum';
-import { IntegrationAction, ValidationActionConfigParam } from './integrations';
+  TableCellAIPhaseEnum,
+  TableCellMetaDataValidateStatusEnum,
+} from '@/types/enrichment/table';
+import { IntegrationAction, ValidationActionConfigParam } from './index';
 
 export interface ColumnFieldGroupMapItem extends IntegrationAction {
   inputParameters: { name: string; formulaText: string }[];
@@ -28,14 +28,14 @@ export interface CellDetailSource {
 }
 
 export interface CellDetailLog {
-  phase: TableCellDetailPhaseEnum;
+  phase: TableCellAIPhaseEnum;
   attemptNo: number;
   sources: CellDetailSource[] | null;
   content: string;
 }
 
 export interface CellDetailResponse {
-  status: TableCellDetailValidateStatusEnum | null;
+  status: TableCellMetaDataValidateStatusEnum | null;
   attemptNo: number | null;
   content: string | null;
   validateSummary: string | null;

@@ -3,21 +3,15 @@ import { Box, Tooltip } from '@mui/material';
 
 import { StyledImage } from '@/components/atoms';
 
-import { COLUMN_TYPE_LABELS } from '../config';
+import { CELL_AI_VALIDATE_HASH, COLUMN_TYPE_LABELS } from '../config';
 import {
-  TableCellConfidenceEnum,
+  TableCellMetaDataValidateStatusEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
 
-const CONFIDENCE_URL = {
-  [TableCellConfidenceEnum.low]: '/images/icon-confidence-low.svg',
-  [TableCellConfidenceEnum.medium]: '/images/icon-confidence-medium.svg',
-  [TableCellConfidenceEnum.high]: '/images/icon-confidence-high.svg',
-} as const;
-
 interface BodyCellIconsProps {
   imagePreview?: string;
-  confidence?: TableCellConfidenceEnum | null;
+  validateStatus?: TableCellMetaDataValidateStatusEnum | null;
   isValidate?: boolean;
   fieldType?: TableColumnTypeEnum;
   value?: any;
@@ -25,7 +19,7 @@ interface BodyCellIconsProps {
 
 const BodyCellIconsComponent: FC<BodyCellIconsProps> = ({
   imagePreview,
-  confidence,
+  validateStatus,
   isValidate,
   fieldType,
   value,
@@ -77,11 +71,11 @@ const BodyCellIconsComponent: FC<BodyCellIconsProps> = ({
       )}
 
       {/* Confidence Indicator - Prefix (left of text) */}
-      {!imagePreview && confidence && (
+      {!imagePreview && validateStatus && (
         <Box
           alt="confidence logo"
           component="img"
-          src={CONFIDENCE_URL[confidence as TableCellConfidenceEnum] || ''}
+          src={CELL_AI_VALIDATE_HASH[validateStatus] || ''}
           sx={{
             mr: 0.5,
             width: 16,

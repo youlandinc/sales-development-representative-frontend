@@ -4,3 +4,5 @@ export * from './menuAi';
 export * from './menuChangeType';
 
 export * from './constants';
+
+export * from './cellAi';

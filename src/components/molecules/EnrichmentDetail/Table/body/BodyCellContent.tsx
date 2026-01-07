@@ -2,7 +2,7 @@ import { FC, memo, ReactNode, useLayoutEffect, useRef } from 'react';
 import { Box, Stack } from '@mui/material';
 
 import {
-  TableCellConfidenceEnum,
+  TableCellMetaDataValidateStatusEnum,
   TableColumnTypeEnum,
 } from '@/types/enrichment/table';
 
@@ -17,7 +17,7 @@ export interface BodyCellContentProps {
   children: ReactNode;
   isEditing?: boolean;
   imagePreview?: string;
-  confidence?: TableCellConfidenceEnum | null;
+  validateStatus?: TableCellMetaDataValidateStatusEnum | null;
   isValidate?: boolean;
   fieldType?: TableColumnTypeEnum;
   displayValue?: string;
@@ -29,7 +29,7 @@ const BodyCellContentComponent: FC<BodyCellContentProps> = ({
   children,
   isEditing = false,
   imagePreview,
-  confidence,
+  validateStatus,
   isValidate = true,
   fieldType,
   displayValue = '',
@@ -49,7 +49,7 @@ const BodyCellContentComponent: FC<BodyCellContentProps> = ({
 
   const shouldShowPrefixIcons =
     !isEditing &&
-    (imagePreview || confidence || fieldType === TableColumnTypeEnum.url);
+    (imagePreview || validateStatus || fieldType === TableColumnTypeEnum.url);
   const shouldShowSuffixIcons = !isEditing && !isValidate && fieldType;
 
   return (
@@ -63,9 +63,9 @@ const BodyCellContentComponent: FC<BodyCellContentProps> = ({
       {/* Prefix icons: Image Preview & Confidence Indicator */}
       {shouldShowPrefixIcons && (
         <BodyCellIcons
-          confidence={confidence}
           fieldType={fieldType}
           imagePreview={imagePreview}
+          validateStatus={validateStatus}
           value={displayValue}
         />
       )}

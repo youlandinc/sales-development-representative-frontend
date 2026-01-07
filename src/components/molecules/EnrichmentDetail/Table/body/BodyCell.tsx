@@ -154,14 +154,14 @@ const BodyCellComponent: FC<BodyCellProps> = ({
   const metaData = originalData?.metaData;
   const isValidate = metaData?.isValidate ?? true;
   const imagePreview = metaData?.imagePreview;
-  const confidence = metaData?.confidence;
+  const validateStatus = metaData?.validateStatus;
 
   const isSelectColumn = columnId === SYSTEM_COLUMN_SELECT;
   const isActive = isCellStateMatch(cellState, rowId, columnId);
   const isEditing = isActive && cellState?.isEditing === true;
   const hasActiveInRow = isSelectColumn && cellState?.recordId === rowId;
   const isColumnHighlighted = isColumnHighlightedCheck(headerState, columnId);
-  const isEditableCell = canEdit && !imagePreview && !confidence;
+  const isEditableCell = canEdit && !imagePreview && !validateStatus;
   const canInteract = Boolean(!isSelectColumn && isEditableCell);
 
   // ========== 4. Effects ==========
@@ -248,7 +248,7 @@ const BodyCellComponent: FC<BodyCellProps> = ({
   const cursor =
     canInteract || isAiColumn
       ? 'pointer'
-      : imagePreview || confidence
+      : imagePreview || validateStatus
         ? 'not-allowed'
         : 'default';
 
@@ -311,13 +311,13 @@ const BodyCellComponent: FC<BodyCellProps> = ({
       width={width}
     >
       <BodyCellContent
-        confidence={confidence}
         displayValue={displayValue}
         fieldType={fieldType}
         imagePreview={imagePreview}
         isEditing={isEditing}
         isValidate={isValidate}
         onTruncatedChange={onTruncatedChange}
+        validateStatus={validateStatus}
         width={width}
       >
         {renderContent()}

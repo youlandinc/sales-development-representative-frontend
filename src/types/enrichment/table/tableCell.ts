@@ -2,10 +2,20 @@
 // Table Cell Types
 // ============================================================================
 
-export enum TableCellConfidenceEnum {
-  high = 'HIGH',
-  medium = 'MEDIUM',
-  low = 'LOW',
+export enum TableCellAIPhaseEnum {
+  thinking = 'THINKING',
+  searching = 'SEARCHING',
+  verifying = 'VERIFYING',
+  re_searching = 'RE_SEARCHING',
+  standardizing = 'STANDARDIZING',
+  populating = 'POPULATING',
+}
+
+export enum TableCellMetaDataValidateStatusEnum {
+  verified = 'VERIFIED',
+  potential_issue = 'POTENTIAL_ISSUE',
+  not_validated = 'NOT_VALIDATED',
+  not_found = 'NOT_FOUND',
 }
 
 export interface TableCellSourceItem {
@@ -18,7 +28,7 @@ export interface TableCellMetadata {
   runType: string;
   sources: TableCellSourceItem[] | null;
   thinkingProcess: string | null;
-  confidence: TableCellConfidenceEnum | null;
+  validateStatus: TableCellMetaDataValidateStatusEnum | null;
 }
 
 export interface TableCellProps {
@@ -28,6 +38,7 @@ export interface TableCellProps {
   value: string | null;
   status: string | null;
   error: string | null;
+  aiPhase: TableCellAIPhaseEnum | null;
   metadata: TableCellMetadata | null;
 }
 
@@ -37,6 +48,6 @@ export interface TableCellFieldData {
   metaData?: {
     isValidate?: boolean;
     imagePreview?: string;
-    confidence?: TableCellConfidenceEnum | null;
+    validateStatus?: TableCellMetaDataValidateStatusEnum | null;
   } | null;
 }

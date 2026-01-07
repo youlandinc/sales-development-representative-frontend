@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Icon, Stack, Typography } from '@mui/material';
 
-import { TableCellDetailValidateStatusEnum } from '@/types/enum';
+import { TableCellMetaDataValidateStatusEnum } from '@/types/enrichment/table';
 
 import ICON_ERROR from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_error.svg';
 import ICON_NORMAL from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_normal.svg';
@@ -9,26 +9,26 @@ import ICON_SUCCESS from '@/components/molecules/EnrichmentDetail/assets/dialog/
 import ICON_WARNING from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_warning.svg';
 
 interface ValidationStatusProps {
-  status: TableCellDetailValidateStatusEnum;
+  status: TableCellMetaDataValidateStatusEnum;
 }
 
 const statusVisualMap: Record<
-  TableCellDetailValidateStatusEnum,
+  TableCellMetaDataValidateStatusEnum,
   { label: string; icon: typeof ICON_SUCCESS }
 > = {
-  [TableCellDetailValidateStatusEnum.verified]: {
+  [TableCellMetaDataValidateStatusEnum.verified]: {
     label: 'Verified',
     icon: ICON_SUCCESS,
   },
-  [TableCellDetailValidateStatusEnum.potentialIssue]: {
+  [TableCellMetaDataValidateStatusEnum.potential_issue]: {
     label: 'Potential Issue',
     icon: ICON_WARNING,
   },
-  [TableCellDetailValidateStatusEnum.notValidated]: {
+  [TableCellMetaDataValidateStatusEnum.not_validated]: {
     label: 'Not Validated',
     icon: ICON_NORMAL,
   },
-  [TableCellDetailValidateStatusEnum.notFound]: {
+  [TableCellMetaDataValidateStatusEnum.not_found]: {
     label: 'Not Found',
     icon: ICON_ERROR,
   },
@@ -37,7 +37,7 @@ const statusVisualMap: Record<
 export const ValidationStatus: FC<ValidationStatusProps> = ({ status }) => {
   const statusVisual =
     statusVisualMap[status] ||
-    statusVisualMap[TableCellDetailValidateStatusEnum.notValidated];
+    statusVisualMap[TableCellMetaDataValidateStatusEnum.not_validated];
   return (
     <Stack alignItems={'center'} direction={'row'} gap={0.5}>
       <Icon component={statusVisual.icon} sx={{ width: 20, height: 20 }} />

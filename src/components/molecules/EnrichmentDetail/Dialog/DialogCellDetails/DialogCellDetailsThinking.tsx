@@ -15,51 +15,52 @@ import { SDRToast } from '@/components/atoms';
 import { useAsyncFn } from '@/hooks';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 
+import { DialogCellDetailsContainer, ValidationStatus } from './base';
+
 import { _fetchTableCellDetails } from '@/request/enrichment';
 
 import { ActiveCellParams } from '@/types/enrichment/base';
-import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 import {
-  TableCellDetailPhaseEnum,
-  TableCellDetailValidateStatusEnum,
-} from '@/types/enum';
+  TableCellAIPhaseEnum,
+  TableCellMetaDataValidateStatusEnum,
+  TableColumnMenuActionEnum,
+} from '@/types/enrichment/table';
 
 import ICON_FORK from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_fork.svg';
 import ICON_CHECK from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_list_checks.svg';
 import ICON_SEARCH from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_search.svg';
 import ICON_THINKING from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_thinking.svg';
 import ICON_TRAY from '@/components/molecules/EnrichmentDetail/assets/dialog/DialogCellDetailsThinking/icon_tray_arrow_down.svg';
-import { DialogCellDetailsContainer, ValidationStatus } from './base';
 
 interface DialogCellDetailsThinkingProps {
   cellDetails: ActiveCellParams;
 }
 
 const phaseVisualMap: Record<
-  TableCellDetailPhaseEnum,
+  TableCellAIPhaseEnum,
   { label: string; icon: typeof ICON_THINKING }
 > = {
-  [TableCellDetailPhaseEnum.thinking]: {
+  [TableCellAIPhaseEnum.thinking]: {
     label: 'Thinking',
     icon: ICON_THINKING,
   },
-  [TableCellDetailPhaseEnum.searching]: {
+  [TableCellAIPhaseEnum.searching]: {
     label: 'Searching',
     icon: ICON_SEARCH,
   },
-  [TableCellDetailPhaseEnum.verifying]: {
+  [TableCellAIPhaseEnum.verifying]: {
     label: 'Verifying',
     icon: ICON_CHECK,
   },
-  [TableCellDetailPhaseEnum.re_searching]: {
+  [TableCellAIPhaseEnum.re_searching]: {
     label: 'Re-Searching',
     icon: ICON_SEARCH,
   },
-  [TableCellDetailPhaseEnum.standardizing]: {
+  [TableCellAIPhaseEnum.standardizing]: {
     label: 'Standardizing',
     icon: ICON_FORK,
   },
-  [TableCellDetailPhaseEnum.populating]: {
+  [TableCellAIPhaseEnum.populating]: {
     label: 'Populating',
     icon: ICON_TRAY,
   },
@@ -104,8 +105,8 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
   }, [cellDetails]);
 
   const status =
-    (state?.value?.data?.status as TableCellDetailValidateStatusEnum) ||
-    TableCellDetailValidateStatusEnum.notValidated;
+    (state?.value?.data?.status as TableCellMetaDataValidateStatusEnum) ||
+    TableCellMetaDataValidateStatusEnum.not_validated;
 
   useEffect(() => {
     if (
@@ -175,11 +176,11 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
           >
             {state?.value?.data?.logs?.map((log, index) => {
               const phase =
-                (log.phase as TableCellDetailPhaseEnum) ||
-                TableCellDetailPhaseEnum.thinking;
+                (log.phase as TableCellAIPhaseEnum) ||
+                TableCellAIPhaseEnum.thinking;
               const phaseVisual =
                 phaseVisualMap[phase] ||
-                phaseVisualMap[TableCellDetailPhaseEnum.thinking];
+                phaseVisualMap[TableCellAIPhaseEnum.thinking];
               // const ordinal = formatAttemptOrdinal(log.attemptNo);
               // const showLine =
               //   index < (state?.value?.data?.logs?.length || 0) - 1;
@@ -210,7 +211,7 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                       >
                         {phaseVisual.label}
                         {/*  {ordinal &&
-                          log.phase !== TableCellDetailPhaseEnum.thinking
+                          log.phase !== TableCellAIPhaseEnum.thinking
                             ? ` (${ordinal})`
                             : ''} */}
                       </Typography>

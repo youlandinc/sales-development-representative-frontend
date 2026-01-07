@@ -543,7 +543,7 @@ export const useEnrichmentTable = ({
     [aiColumnIds, runRecords, rowIds, rowsMap, columns],
   );
 
-  // Clean up AI loading state based on runRecords
+  // Initialize and clean up AI loading state based on runRecords
   useEffect(() => {
     if (!runRecords) {
       setAiLoadingState({});
@@ -555,28 +555,54 @@ export const useEnrichmentTable = ({
       return;
     }
 
-    const validRecordIds = new Set<string>();
+    const newLoadingState: Record<string, Record<string, boolean>> = {};
 
+    // Initialize loading state for AI columns in runRecords
     Object.entries(runRecords)
       .filter(([columnId]) => aiColumnIds.has(columnId))
       .forEach(([columnId, config]) => {
-        if (config.isAll) {
-          rowIds.forEach((id) => validRecordIds.add(id));
-        } else {
-          config.recordIds?.forEach((id) => validRecordIds.add(id));
-        }
+        const recordIds = config.isAll ? rowIds : (config.recordIds ?? []);
+
+        recordIds.forEach((recordId) => {
+          // Skip if recordId not in current rowIds
+          if (!rowIds.includes(recordId)) {
+            return;
+          }
+
+          const currentValue = rowsMap[recordId]?.[columnId];
+
+          let hasValue = false;
+          let isFinished = false;
+
+          if (
+            typeof currentValue === 'object' &&
+            currentValue !== null &&
+            'value' in currentValue
+          ) {
+            isFinished = currentValue.isFinished === true;
+            hasValue =
+              currentValue.value !== undefined &&
+              currentValue.value !== null &&
+              currentValue.value !== '';
+          } else {
+            hasValue =
+              currentValue !== undefined &&
+              currentValue !== null &&
+              currentValue !== '';
+          }
+
+          // Only set loading if no value and not finished
+          if (!hasValue && !isFinished) {
+            if (!newLoadingState[recordId]) {
+              newLoadingState[recordId] = {};
+            }
+            newLoadingState[recordId][columnId] = true;
+          }
+        });
       });
 
-    setAiLoadingState((prev) => {
-      const updated = { ...prev };
-      Object.keys(updated).forEach((recordId) => {
-        if (!validRecordIds.has(recordId)) {
-          delete updated[recordId];
-        }
-      });
-      return updated;
-    });
-  }, [aiColumnIds, rowIds, runRecords]);
+    setAiLoadingState(newLoadingState);
+  }, [aiColumnIds, rowIds, runRecords, rowsMap]);
 
   // Handle scroll
   const onScrollChange = useCallback(() => {

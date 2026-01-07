@@ -107,6 +107,8 @@ export const useTableWebSocket = ({
         ) {
           const { recordId, metadata } = parsedMessage.data.data;
 
+          console.log(parsedMessage.data.data);
+
           if (!metadata || Object.keys(metadata).length === 0) {
             return;
           }
