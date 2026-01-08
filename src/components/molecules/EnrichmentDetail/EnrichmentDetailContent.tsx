@@ -20,7 +20,7 @@ import { useDialogStore } from '@/stores/useDialogStore';
 import { ACTION_KEY_AI, ROW_HEIGHT } from './Table/config';
 
 import { StyledButton, StyledLoading } from '@/components/atoms';
-import { DrawerActionsContainer } from '@/components/molecules';
+import { DrawerActionsContainer } from '@/components/molecules/EnrichmentDetail/Drawers/DrawerActionsContainer';
 import {
   PanelColumns,
   PanelFilter,
