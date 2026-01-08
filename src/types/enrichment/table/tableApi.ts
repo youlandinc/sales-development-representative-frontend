@@ -3,12 +3,12 @@
 // ============================================================================
 
 import {
+  ColumnFieldGroupMap,
   RunRecordItem,
   TableColumnProps,
   TableRowItemData,
   TableViewData,
 } from './index';
-import { ColumnFieldGroupMap } from '../base';
 
 // ============================================================================
 // Row Data API Response Types

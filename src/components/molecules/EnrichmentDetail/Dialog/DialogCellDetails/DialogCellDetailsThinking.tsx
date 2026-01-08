@@ -19,7 +19,7 @@ import { DialogCellDetailsContainer, ValidationStatus } from './base';
 
 import { _fetchTableCellDetails } from '@/request/enrichment';
 
-import { ActiveCellParams } from '@/types/enrichment/base';
+import { ActiveCellParams } from '@/types/enrichment';
 import {
   TableCellAIPhaseEnum,
   TableCellMetaDataValidateStatusEnum,

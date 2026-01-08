@@ -2,7 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { FC, useMemo } from 'react';
 
-import { ActiveCellParams } from '@/types/enrichment/base';
+import { ActiveCellParams } from '@/types/enrichment';
 import { DialogCellDetailsContainer } from './base';
 
 import { UTypeOf } from '@/utils';

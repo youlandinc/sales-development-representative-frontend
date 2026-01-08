@@ -2,7 +2,10 @@
 // Table Column Types (metaColumns - shared across all views)
 // ============================================================================
 
-import { IntegrationAction } from '../integrations';
+import {
+  IntegrationAction,
+  ValidationActionConfigParam,
+} from '../integrations';
 import { TableColumnTypeEnum, TableFilterConditionType } from './index';
 
 export interface TableColumnProps {
@@ -55,4 +58,22 @@ export interface MetaColumnUpdateParams {
   description?: string;
   fieldName?: string;
   fieldType?: TableColumnTypeEnum;
+}
+
+export interface ColumnFieldGroupMapItem extends IntegrationAction {
+  inputParameters: { name: string; formulaText: string }[];
+}
+
+export interface ColumnFieldGroupMap {
+  [groupId: string]: {
+    groupId: string;
+    name: string;
+    requiredInputsBinding: {
+      name: string;
+      formulaText: string;
+      optional: boolean;
+    }[];
+    waterfallConfigs: ColumnFieldGroupMapItem[];
+    validationActionConfig: ValidationActionConfigParam | null;
+  };
 }

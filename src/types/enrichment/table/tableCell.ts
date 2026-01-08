@@ -78,3 +78,29 @@ export interface TableRowCellData {
 }
 
 export type TableRowItemData = TableRowBaseData & TableRowCellData;
+
+export interface CellDetailSource {
+  sourceUrl?: string;
+  sourceName?: string;
+}
+
+export interface CellDetailLog {
+  phase: TableCellAIPhaseEnum;
+  attemptNo: number;
+  sources: CellDetailSource[] | null;
+  content: string;
+}
+
+export interface CellDetailResponse {
+  status: TableCellMetaDataValidateStatusEnum | null;
+  attemptNo: number | null;
+  content: string | null;
+  validateSummary: string | null;
+  logs: CellDetailLog[];
+}
+
+export interface ActiveCellParams {
+  columnId: string;
+  rowId: string;
+  rowData: Record<string, any>;
+}

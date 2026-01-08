@@ -1,4 +1,4 @@
-import { ActiveCellParams } from '@/types/enrichment/base';
+import { ActiveCellParams } from '@/types/enrichment';
 import { FC } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
