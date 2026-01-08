@@ -181,8 +181,8 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                 phaseVisualMap[phase] ||
                 phaseVisualMap[TableCellDetailPhaseEnum.thinking];
               // const ordinal = formatAttemptOrdinal(log.attemptNo);
-              // const showLine =
-              //   index < (state?.value?.data?.logs?.length || 0) - 1;
+              const showLine =
+                index < (state?.value?.data?.logs?.length || 0) - 1;
 
               return (
                 <TimelineItem key={`${log.phase}-${index}`}>
@@ -197,9 +197,11 @@ export const DialogCellDetailsThinking: FC<DialogCellDetailsThinkingProps> = ({
                       />
                     </TimelineDot>
 
-                    <TimelineConnector
-                      sx={{ bgcolor: '#D0CEDA', width: '1px' }}
-                    />
+                    {showLine && (
+                      <TimelineConnector
+                        sx={{ bgcolor: '#D0CEDA', width: '1px' }}
+                      />
+                    )}
                   </TimelineSeparator>
                   <TimelineContent sx={{ p: 0, ml: 1, overflow: 'hidden' }}>
                     <Stack gap={1}>
