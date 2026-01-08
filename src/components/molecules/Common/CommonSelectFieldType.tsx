@@ -25,12 +25,12 @@ export const CommonSelectFieldType: FC<Omit<StyledSelectProps, 'options'>> = ({
   return (
     <StyledSelect
       {...rest}
-      options={options as any}
+      options={options}
       renderValue={(selected) => {
         const option = options.find((opt) => opt.value === selected);
         return (
           <Stack alignItems={'center'} direction={'row'} gap={1}>
-            {option?.icon}
+            {option?.icon && option.icon}
             <Typography fontSize={14} lineHeight={1.5}>
               {option?.label || 'Text'}
             </Typography>

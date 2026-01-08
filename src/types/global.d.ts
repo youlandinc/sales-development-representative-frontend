@@ -5,7 +5,7 @@ interface TOption {
   value: any;
   label: string;
   disabled?: boolean;
-  icon?: React.ElementType;
+  icon?: React.ReactNode;
   default?: boolean;
 }
 
