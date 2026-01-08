@@ -2,7 +2,6 @@ import { FC, ReactNode, useState } from 'react';
 import {
   BaseSelectProps,
   FormControl,
-  Icon,
   InputAdornment,
   InputLabel,
   inputLabelClasses,
@@ -253,9 +252,7 @@ export const StyledSelect: FC<StyledSelectProps> = ({
                 sx={{ gap: 1 }}
                 value={opt.value}
               >
-                {opt.icon && (
-                  <Icon component={opt.icon} sx={{ width: 16, height: 16 }} />
-                )}
+                {opt.icon && opt.icon}
                 {opt.label}
               </MenuItem>
             ),
