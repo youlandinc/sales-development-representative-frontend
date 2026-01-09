@@ -18,7 +18,7 @@ export const HeaderMessaging: FC = () => {
     useDialogStore();
 
   const [value, setValue] = useState(campaignName);
-  const { loading, onClickToNext } = useCampaignLaunch();
+  const { isLoading, onCampaignLaunchNext } = useCampaignLaunch();
 
   const debounceSearchWord = useMemo(
     () =>
@@ -75,9 +75,9 @@ export const HeaderMessaging: FC = () => {
       <HeaderButtonGroup />
 
       <StyledButton
-        disabled={loading}
-        loading={loading}
-        onClick={() => onClickToNext()}
+        disabled={isLoading}
+        loading={isLoading}
+        onClick={onCampaignLaunchNext}
         size={'medium'}
         sx={{ width: 180, alignSelf: 'flex-end' }}
       >
