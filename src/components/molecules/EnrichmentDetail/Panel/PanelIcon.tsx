@@ -24,6 +24,10 @@ import ICON_VIEW_RENAME from './assets/icon-view-rename.svg';
 import ICON_VIEW_DESCRIPTION from './assets/icon-view-description.svg';
 import ICON_VIEW_DUPLICATE from './assets/icon-view-duplicate.svg';
 
+import ICON_ROW from './assets/icon-row.svg';
+import ICON_BACK from './assets/icon-back.svg';
+import ICON_ARROW_LINE_LEFT from './assets/icon-arrow-line-left.svg';
+
 type IconSize = 12 | 14 | 16 | 18 | 20;
 
 interface PanelIconProps extends SvgIconProps {
@@ -176,6 +180,27 @@ export const PanelIcon = {
   ViewDelete: ({ size = 16, ...props }: PanelIconProps) => (
     <Icon
       component={ICON_TRASH}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  RowIcon: ({ size = 20, ...props }: PanelIconProps) => (
+    <Icon
+      component={ICON_ROW}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  RowLeftIcon: ({ size = 16, ...props }: PanelIconProps) => (
+    <Icon
+      component={ICON_ARROW_LINE_LEFT}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  BackIcon: ({ size = 20, ...props }: PanelIconProps) => (
+    <Icon
+      component={ICON_BACK}
       {...props}
       sx={{ width: size, height: size, ...props.sx }}
     />

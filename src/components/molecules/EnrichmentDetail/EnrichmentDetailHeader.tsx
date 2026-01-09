@@ -7,6 +7,7 @@ import { CommonRenameTextField, LayoutUserInfo } from '@/components/molecules';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 
 import ICON_BACK from './assets/head/icon-back.svg';
+import { PanelIcon } from './Panel';
 
 interface EnrichmentDetailHeaderProps {
   tableId: string;
@@ -57,13 +58,12 @@ export const EnrichmentDetailHeader: FC<EnrichmentDetailHeaderProps> = ({
           gap: 1,
         }}
       >
-        <Icon
-          component={ICON_BACK}
+        <PanelIcon.BackIcon
           onClick={() => {
             resetTable();
             router.push('/enrichment');
           }}
-          sx={{ width: 20, height: 20, mt: 0.5, cursor: 'pointer' }}
+          sx={{ mt: 0.5, cursor: 'pointer' }}
         />
         <Stack
           sx={{
