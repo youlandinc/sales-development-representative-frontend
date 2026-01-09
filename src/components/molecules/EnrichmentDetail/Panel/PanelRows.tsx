@@ -1,13 +1,12 @@
-import { useState } from 'react';
 import {
   ClickAwayListener,
   Grow,
-  Icon,
   Paper,
   Popper,
   Stack,
   Typography,
 } from '@mui/material';
+import { useState } from 'react';
 
 import {
   PAPPER_STACK_CONTAINER_SX,
@@ -15,7 +14,7 @@ import {
   STACK_CONTAINER_SX,
 } from './config';
 
-import ICON_ROW from '../assets/head/icon-row.svg';
+import { PanelIcon } from './PanelIcon';
 
 export const PanelRows = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -27,7 +26,7 @@ export const PanelRows = () => {
         onClick={(e) => setAnchorEl(anchorEl ? null : e.currentTarget)}
         sx={STACK_CONTAINER_SX}
       >
-        <Icon component={ICON_ROW} sx={{ width: 20, height: 20 }} />
+        <PanelIcon.RowIcon size={20} />
         <Typography fontSize={14} lineHeight={1.4}>
           0/0 rows
         </Typography>

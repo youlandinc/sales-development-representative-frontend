@@ -20,14 +20,16 @@ import { useDialogStore } from '@/stores/useDialogStore';
 import { ACTION_KEY_AI, ROW_HEIGHT } from './Table/config';
 
 import { StyledButton, StyledLoading } from '@/components/atoms';
-import { DrawerActionsContainer } from '@/components/molecules';
+import { DrawerContainer } from '@/components/molecules/EnrichmentDetail/Drawers';
 import {
   PanelColumns,
   PanelFilter,
+  PanelIcon,
   //PanelRows,
   PanelView,
 } from './Panel';
 import { StyledTable } from './Table';
+import { DialogDeleteColumn, DialogEditDescription } from './Dialog';
 
 import { ActiveCellParams, SourceOfOpenEnum } from '@/types';
 import {
@@ -293,10 +295,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                     }}
                   >
                     Actions
-                    <Icon
-                      component={ICON_ARROW}
-                      sx={{ width: 16, height: 16 }}
-                    />
+                    <PanelIcon.RowLeftIcon />
                   </Stack>
                 </StyledButton>
               </Stack>
@@ -533,11 +532,13 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           )}
         </Stack>
       </Stack>
-      <DrawerActionsContainer
+      <DrawerContainer
         cellDetails={activeCell}
         onInitializeAiColumns={onInitializeAiColumns}
         tableId={tableId}
       />
+      <DialogEditDescription />
+      <DialogDeleteColumn tableId={tableId} />
     </Stack>
   );
 };

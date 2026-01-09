@@ -10,7 +10,7 @@ import { useActionsStore } from '@/stores/enrichment/useActionsStore';
 
 import { TableColumnMenuActionEnum } from '@/types/enrichment/table';
 
-import ICON_CLOSE_THIN from '../assets/dialog/icon_close_thin.svg';
+import ICON_CLOSE_THIN from './assets/icon_close_thin.svg';
 
 interface DialogDeleteColumnProps {
   tableId: string;
