@@ -817,11 +817,11 @@ export const useEnrichmentTable = ({
             loadingUpdates[col.fieldId] = true;
             updates[col.fieldId] = { value: '', isFinished: false };
 
-            if (col.dependentFieldId) {
-              fieldIds.push(col.dependentFieldId);
-              loadingUpdates[col.dependentFieldId] = true;
-              updates[col.dependentFieldId] = { value: '', isFinished: false };
-            }
+            //if (col.dependentFieldId) {
+            //  fieldIds.push(col.dependentFieldId);
+            //  loadingUpdates[col.dependentFieldId] = true;
+            //  updates[col.dependentFieldId] = { value: '', isFinished: false };
+            //}
           });
 
           // Set loading state
