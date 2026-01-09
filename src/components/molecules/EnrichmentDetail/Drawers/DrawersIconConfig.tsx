@@ -1,4 +1,3 @@
-import { ComponentType, FC } from 'react';
 import { Icon, SvgIconProps } from '@mui/material';
 
 import ICON_DELETE_DEFAULT from './assets/Icon_delete_default.svg';
@@ -43,8 +42,8 @@ import ICON_THINKING_LIST_CHECKS from './assets/icon_thinking_list_checks.svg';
 import ICON_THINKING_NORMAL from './assets/icon_thinking_normal.svg';
 import ICON_THINKING_SEARCH from './assets/icon_thinking_search.svg';
 import ICON_THINKING_SUCCESS from './assets/icon_thinking_success.svg';
-import ICON_THINKING_WARNING from './assets/icon_thinking_warning.svg';
 import ICON_TRAY_ARROW_DOWN from './assets/icon_thinking_tray_arrow_down.svg';
+import ICON_THINKING_WARNING from './assets/icon_thinking_warning.svg';
 
 import ICON_FIND_CHECK_CIRCLE from './assets/icon_find_check_circle.svg';
 import ICON_FIND_CHECK_SQUARE_OUTLINE from './assets/icon_find_check_square_outline.svg';
@@ -55,161 +54,326 @@ type IconSize = 12 | 14 | 16 | 18 | 20;
 
 interface DrawersIconProps extends SvgIconProps {
   size?: IconSize | number;
-  component: ComponentType;
 }
 
-type DrawersIconConfigProps = Omit<DrawersIconProps, 'component'>;
-
-export const DrawersIcon: FC<DrawersIconProps> = ({
-  size = 16,
-  component,
-  ...props
-}) => (
-  <Icon
-    component={component}
-    {...props}
-    sx={{ width: size, height: size, ...props.sx }}
-  />
-);
-
 export const DrawersIconConfig = {
-  DeleteDefault: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_DELETE_DEFAULT} {...props} />
+  DeleteDefault: ({ size = 20, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_DELETE_DEFAULT}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Arrow: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ARROW} {...props} />
+  Arrow: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ARROW}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  ArrowDown: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ARROW_DOWN} {...props} />
+  ArrowDown: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ARROW_DOWN}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Close: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_CLOSE} {...props} />
+  Close: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_CLOSE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  CloseThin: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_CLOSE_THIN} {...props} />
+  CloseThin: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_CLOSE_THIN}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Coins: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_COINS} {...props} />
+  Coins: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_COINS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Collapse: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_COLLAPSE} {...props} />
+  Collapse: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_COLLAPSE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Delete: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_DELETE} {...props} />
+  Delete: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_DELETE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Drag: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_DRAG} {...props} />
+  Drag: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_DRAG}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Plus: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_PLUS} {...props} />
+  Plus: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_PLUS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Sparkle: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_SPARKLE} {...props} />
+  Sparkle: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_SPARKLE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  SparkleFill: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_SPARKLE_FILL} {...props} />
+  SparkleFill: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_SPARKLE_FILL}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  SparkleOutline: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_SPARKLE_OUTLINE} {...props} />
+  SparkleOutline: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_SPARKLE_OUTLINE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Success: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_SUCCESS} {...props} />
+  Success: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_SUCCESS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Text: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_TEXT} {...props} />
+  Text: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_TEXT}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  Warning: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_WARNING} {...props} />
-  ),
-
-  ActionMenuArrowLineRight: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_ARROW_LINE_RIGHT} {...props} />
-  ),
-  ActionMenuCall: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_CALL} {...props} />
-  ),
-  ActionMenuCampaign: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_CAMPAIGN} {...props} />
-  ),
-  ActionMenuCsv: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_CSV} {...props} />
-  ),
-  ActionMenuLighting: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_LIGHTING} {...props} />
-  ),
-  ActionMenuSearch: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_SEARCH} {...props} />
-  ),
-  ActionMenuShare: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_SHARE} {...props} />
-  ),
-  ActionMenuSuccess: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_SUCCESS} {...props} />
-  ),
-  ActionMenuSuggestions: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_SUGGESTIONS} {...props} />
-  ),
-  ActionMenuSuggestionsBlue: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_SUGGESTIONS_BLUE} {...props} />
-  ),
-  ActionMenuTarget: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_TARGET} {...props} />
-  ),
-  ActionMenuWarningTriangle: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ACTION_MENU_WARNING_TRIANGLE} {...props} />
-  ),
-
-  EnrichmentAction: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ENRICHMENT_ACTION} {...props} />
-  ),
-  EnrichmentAi: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ENRICHMENT_AI} {...props} />
-  ),
-  EnrichmentIntegrations: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_ENRICHMENT_INTEGRATIONS} {...props} />
-  ),
-
-  Thinking: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING} {...props} />
-  ),
-  ThinkingArrowUpRight: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_ARROW_UP_RIGHT} {...props} />
-  ),
-  ThinkingError: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_ERROR} {...props} />
-  ),
-  ThinkingFork: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_FORK} {...props} />
-  ),
-  ThinkingListChecks: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_LIST_CHECKS} {...props} />
-  ),
-  ThinkingNormal: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_NORMAL} {...props} />
-  ),
-  ThinkingSearch: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_SEARCH} {...props} />
-  ),
-  ThinkingSuccess: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_SUCCESS} {...props} />
-  ),
-  ThinkingWarning: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_THINKING_WARNING} {...props} />
-  ),
-  TrayArrowDown: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_TRAY_ARROW_DOWN} {...props} />
+  Warning: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_WARNING}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
 
-  FindCheckCircle: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_FIND_CHECK_CIRCLE} {...props} />
+  ActionMenuArrowLineRight: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_ARROW_LINE_RIGHT}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  FindCheckSquareOutline: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_FIND_CHECK_SQUARE_OUTLINE} {...props} />
+  ActionMenuCall: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_CALL}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  FindNoCheckSquareOutline: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_FIND_NO_CHECK_SQUARE_OUTLINE} {...props} />
+  ActionMenuCampaign: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_CAMPAIGN}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
-  FindValidateFalse: (props: DrawersIconConfigProps) => (
-    <DrawersIcon component={ICON_FIND_VALIDATE_FALSE} {...props} />
+  ActionMenuCsv: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_CSV}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuLighting: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_LIGHTING}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuSearch: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_SEARCH}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuShare: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_SHARE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuSuccess: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_SUCCESS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuSuggestions: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_SUGGESTIONS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuSuggestionsBlue: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_SUGGESTIONS_BLUE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuTarget: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_TARGET}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ActionMenuWarningTriangle: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ACTION_MENU_WARNING_TRIANGLE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+
+  EnrichmentAction: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ENRICHMENT_ACTION}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  EnrichmentAi: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ENRICHMENT_AI}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  EnrichmentIntegrations: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_ENRICHMENT_INTEGRATIONS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+
+  Thinking: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingArrowUpRight: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_ARROW_UP_RIGHT}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingError: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_ERROR}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingFork: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_FORK}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingListChecks: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_LIST_CHECKS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingNormal: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_NORMAL}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingSearch: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_SEARCH}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingSuccess: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_SUCCESS}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  ThinkingWarning: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_THINKING_WARNING}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  TrayArrowDown: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_TRAY_ARROW_DOWN}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+
+  FindCheckCircle: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_FIND_CHECK_CIRCLE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  FindCheckSquareOutline: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_FIND_CHECK_SQUARE_OUTLINE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  FindNoCheckSquareOutline: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_FIND_NO_CHECK_SQUARE_OUTLINE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
+  ),
+  FindValidateFalse: ({ size = 16, ...props }: DrawersIconProps) => (
+    <Icon
+      component={ICON_FIND_VALIDATE_FALSE}
+      {...props}
+      sx={{ width: size, height: size, ...props.sx }}
+    />
   ),
 };
