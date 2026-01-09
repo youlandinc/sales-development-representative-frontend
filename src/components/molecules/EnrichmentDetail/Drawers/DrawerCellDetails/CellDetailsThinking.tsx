@@ -8,7 +8,7 @@ import {
 } from '@mui/lab';
 import { Box, Stack, Typography } from '@mui/material';
 import { ComponentType, FC, useEffect } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { SDRToast } from '@/components/atoms';
 import { DrawersIconConfig } from '@/components/molecules/EnrichmentDetail/Drawers';

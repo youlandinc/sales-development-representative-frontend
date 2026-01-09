@@ -1,6 +1,6 @@
 import { Collapse, Stack } from '@mui/material';
 import { FC } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { CampaignProcess } from '@/components/molecules';
 import { DialogAllEnrichments } from './DrawerActionsMenu/base';

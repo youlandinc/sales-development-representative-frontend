@@ -3,7 +3,7 @@ import { Box, ClickAwayListener, Stack, Typography } from '@mui/material';
 import { Editor } from '@tiptap/core';
 import Image from 'next/image';
 import { FC, useCallback, useMemo, useRef } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import {
   ExtensionMention,

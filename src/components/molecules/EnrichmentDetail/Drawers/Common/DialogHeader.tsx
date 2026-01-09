@@ -26,7 +26,8 @@ export const DialogHeader: FC<DialogHeaderProps> = ({
       {showBackButton && (
         <DrawersIconConfig.Arrow
           onClick={handleBack}
-          sx={{ width: 20, height: 20, mr: 3, cursor: 'pointer' }}
+          size={20}
+          sx={{ mr: 3, cursor: 'pointer' }}
         />
       )}
       {titleIcon && <div style={{ marginRight: 4 }}>{titleIcon}</div>}

@@ -1,7 +1,7 @@
 import { Stack, Tooltip, Typography } from '@mui/material';
 import { NodeViewWrapper } from '@tiptap/react';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { TypeIcon } from '../../../Table/TableIcon';
 import { useWebResearchStore } from '@/stores/enrichment';

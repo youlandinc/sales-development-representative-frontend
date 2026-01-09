@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import Image from 'next/image';
 import { Stack, Typography } from '@mui/material';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledProviderBadges } from './StyledProviderBadges';
 

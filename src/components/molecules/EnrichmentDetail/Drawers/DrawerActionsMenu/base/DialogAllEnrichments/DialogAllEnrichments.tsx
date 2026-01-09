@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledTextField } from '@/components/atoms';
 import { StyledDialog } from '@/components/atoms/StyledDialog';

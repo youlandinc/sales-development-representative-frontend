@@ -18,7 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Stack, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
 import { FC } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledButton, StyledCost, StyledSwitch } from '@/components/atoms';
 import { WorkEmailCollapseCard } from './index';

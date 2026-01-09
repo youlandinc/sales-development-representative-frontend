@@ -4,7 +4,7 @@ import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { createEditor } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';
 import { v4 as uuidv4 } from 'uuid';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import {
   StyledSlateEditor,

@@ -1,6 +1,6 @@
 import { DrawersIconConfig } from '../../DrawersIconConfig';
 import { useDialogStore } from '@/stores/useDialogStore';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 import { ProcessCreateTypeEnum } from '@/types';
 import { useSwitch } from '@/hooks';
 

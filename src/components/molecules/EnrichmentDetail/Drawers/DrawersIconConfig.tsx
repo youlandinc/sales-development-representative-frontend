@@ -54,14 +54,14 @@ import ICON_FIND_VALIDATE_FALSE from './assets/icon_find_validate_false.svg';
 type IconSize = 12 | 14 | 16 | 18 | 20;
 
 interface DrawersIconProps extends SvgIconProps {
-  size: IconSize | number;
+  size?: IconSize | number;
   component: ComponentType;
 }
 
 type DrawersIconConfigProps = Omit<DrawersIconProps, 'component'>;
 
 export const DrawersIcon: FC<DrawersIconProps> = ({
-  size,
+  size = 16,
   component,
   ...props
 }) => (

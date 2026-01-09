@@ -17,7 +17,7 @@ export const ExportsContent: FC<ExportsContentProps> = memo(({ tableId }) => {
       {EXPORTS_MENUS.map((item, index) => (
         <StyledActionItem
           description={item.description}
-          icon={<item.icon style={{ width: 16, height: 16 }} />}
+          icon={<item.icon size={16} />}
           key={`export-${index}`}
           onClick={item.onClick}
           title={item.title}

@@ -1,7 +1,7 @@
 import { Divider, Stack, SxProps, Typography } from '@mui/material';
 import Image from 'next/image';
 import { FC, useCallback, useMemo } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { StyledTextField } from '@/components/atoms';
 import { StyledActionItem } from '@/components/molecules/EnrichmentDetail/Drawers/Common';
