@@ -1,6 +1,6 @@
 import { Fade, Icon, Stack, Typography } from '@mui/material';
 import { useRouter } from 'nextjs-toploader/app';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useCurrentPlanStore } from '@/stores/useCurrentPlanStore';
 

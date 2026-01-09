@@ -1,4 +1,4 @@
-import { Icon, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -20,10 +20,12 @@ import { useDialogStore } from '@/stores/useDialogStore';
 import { ACTION_KEY_AI, ROW_HEIGHT } from './Table/config';
 
 import { StyledButton, StyledLoading } from '@/components/atoms';
-import { DrawerActionsContainer } from '@/components/molecules';
+import { DrawerContainer } from '@/components/molecules/EnrichmentDetail/Drawers';
+import { DialogDeleteColumn, DialogEditDescription } from './Dialog';
 import {
   PanelColumns,
   PanelFilter,
+  PanelIcon,
   //PanelRows,
   PanelView,
 } from './Panel';
@@ -36,8 +38,6 @@ import {
 } from '@/types/enrichment/table';
 
 import { _createTableRows } from '@/request';
-
-import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
 
 interface InputBindingItem {
   name: string;
@@ -293,10 +293,7 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
                     }}
                   >
                     Actions
-                    <Icon
-                      component={ICON_ARROW}
-                      sx={{ width: 16, height: 16 }}
-                    />
+                    <PanelIcon.RowLeftIcon />
                   </Stack>
                 </StyledButton>
               </Stack>
@@ -533,11 +530,13 @@ export const EnrichmentDetailContent: FC<EnrichmentDetailTableProps> = ({
           )}
         </Stack>
       </Stack>
-      <DrawerActionsContainer
+      <DrawerContainer
         cellDetails={activeCell}
         onInitializeAiColumns={onInitializeAiColumns}
         tableId={tableId}
       />
+      <DialogEditDescription />
+      <DialogDeleteColumn tableId={tableId} />
     </Stack>
   );
 };

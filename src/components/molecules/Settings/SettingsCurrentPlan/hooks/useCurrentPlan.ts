@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useShallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 
 import { SDRToast } from '@/components/atoms';
 

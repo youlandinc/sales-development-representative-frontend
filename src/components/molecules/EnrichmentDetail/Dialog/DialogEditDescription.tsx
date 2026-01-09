@@ -17,7 +17,7 @@ import { useAsyncFn } from '@/hooks';
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useMergedColumns } from '@/components/molecules/EnrichmentDetail/hooks';
 
-import ICON_CLOSE from '../assets/dialog/icon_close.svg';
+import ICON_CLOSE from './assets/icon_close.svg';
 
 type DialogEditDescriptionProps = {
   cb?: () => Promise<void>;
