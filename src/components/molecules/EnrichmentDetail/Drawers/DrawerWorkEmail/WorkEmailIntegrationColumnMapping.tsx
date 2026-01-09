@@ -2,10 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import { FC } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import {
-  WorkEmailCollapseCard,
-  WorkEmailCustomSelect,
-} from './index';
+import { WorkEmailCollapseCard, WorkEmailCustomSelect } from './index';
 
 import { useWorkEmailStore } from '@/stores/enrichment';
 import { IntegrationAction } from '@/types';

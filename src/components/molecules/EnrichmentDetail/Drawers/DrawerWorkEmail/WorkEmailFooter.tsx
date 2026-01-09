@@ -17,9 +17,7 @@ interface WorkEmailFooterProps {
   cb?: () => void;
 }
 
-export const WorkEmailFooter: FC<WorkEmailFooterProps> = ({
-  cb,
-}) => {
+export const WorkEmailFooter: FC<WorkEmailFooterProps> = ({ cb }) => {
   const { rowIds } = useEnrichmentTableStore((store) => store);
   const { isMissingConfig } = useComputedInWorkEmailStore();
   const { setWaterfallConfigType, setDisplayType, displayType } =

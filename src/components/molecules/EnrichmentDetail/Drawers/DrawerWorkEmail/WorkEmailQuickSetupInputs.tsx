@@ -2,10 +2,7 @@ import { Box, Stack, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
 import { FC, useCallback } from 'react';
 
-import {
-  WorkEmailCollapseCard,
-  WorkEmailCustomSelect,
-} from './index';
+import { WorkEmailCollapseCard, WorkEmailCustomSelect } from './index';
 
 import { useWorkEmailStore } from '@/stores/enrichment';
 import { useComputedInWorkEmailStore } from './hooks';
