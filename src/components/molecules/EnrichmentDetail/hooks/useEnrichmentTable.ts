@@ -738,12 +738,12 @@ export const useEnrichmentTable = ({
               [columnId]: { value: '', isFinished: false },
             };
 
-            if (column?.dependentFieldId) {
-              updates[column.dependentFieldId] = {
-                value: '',
-                isFinished: false,
-              };
-            }
+            // if (column?.dependentFieldId) {
+            //   updates[column.dependentFieldId] = {
+            //     value: '',
+            //     isFinished: false,
+            //   };
+            // }
 
             onUpdateRowData(recordId, updates);
 
@@ -752,9 +752,9 @@ export const useEnrichmentTable = ({
             }
             newLoadingState[recordId][columnId] = true;
 
-            if (column?.dependentFieldId) {
-              newLoadingState[recordId][column.dependentFieldId] = true;
-            }
+            // if (column?.dependentFieldId) {
+            //   newLoadingState[recordId][column.dependentFieldId] = true;
+            // }
           }
         });
     });

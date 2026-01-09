@@ -4,13 +4,11 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { CampaignProcess } from '@/components/molecules';
 import { DialogAllEnrichments } from './DrawerActionsMenu/base';
-import {
-  DrawerActionsMenu,
-  DrawerCellDetails,
-  DrawerEditColumn,
-  DrawerWebResearch,
-  WorkEmail,
-} from './index';
+import { DrawerActionsMenu } from './DrawerActionsMenu';
+import { DrawerCellDetails } from './DrawerCellDetails';
+import { DrawerEditColumn } from './DrawerEditColumn';
+import { DrawerWebResearch } from './DrawerWebResearch';
+import { WorkEmail } from './DrawerWorkEmail';
 
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 import { useActionsStore } from '@/stores/enrichment/useActionsStore';

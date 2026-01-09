@@ -2,7 +2,7 @@ import { FC, useMemo } from 'react';
 
 import { StyledTextField } from '@/components/atoms';
 
-import { DrawersIconConfig } from '../DrawersIconConfig';
+import { DrawersIconConfig } from '../index';
 
 interface StyledSearchInputProps {
   placeholder?: string;

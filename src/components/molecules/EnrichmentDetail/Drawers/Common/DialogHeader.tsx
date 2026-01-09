@@ -1,7 +1,7 @@
 import { Stack, StackProps, Typography } from '@mui/material';
 import { FC, ReactNode } from 'react';
 
-import { DrawersIconConfig } from '../DrawersIconConfig';
+import { DrawersIconConfig } from '../index';
 
 import CloseIcon from '@mui/icons-material/Close';
 

@@ -1,6 +1,7 @@
 import { FC, ReactNode } from 'react';
 import { Box, Skeleton, Stack, Typography } from '@mui/material';
-import { DrawersIconConfig } from '../DrawersIconConfig';
+
+import { DrawersIconConfig } from '../index';
 
 interface StyledActionItemProps {
   icon?: ReactNode;

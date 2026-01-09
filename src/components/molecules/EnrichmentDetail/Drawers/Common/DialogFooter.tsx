@@ -10,7 +10,7 @@ import { useParams } from 'next/navigation';
 import { FC, ReactNode, useState } from 'react';
 
 import { StyledButton, StyledCost } from '@/components/atoms';
-import { DrawersIconConfig } from '../DrawersIconConfig';
+import { DrawersIconConfig } from '../index';
 
 import { useEnrichmentTableStore } from '@/stores/enrichment';
 

@@ -377,3 +377,5 @@ export const DrawersIconConfig = {
     />
   ),
 };
+
+export default DrawersIconConfig;

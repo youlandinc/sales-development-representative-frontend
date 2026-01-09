@@ -3,7 +3,7 @@ import { Collapse, Stack, Typography } from '@mui/material';
 
 import { useSwitch } from '@/hooks';
 
-import { DrawersIconConfig } from '../DrawersIconConfig';
+import { DrawersIconConfig } from '../index';
 
 interface StyledCollapseMenuContainerProps {
   icon?: ReactNode;
