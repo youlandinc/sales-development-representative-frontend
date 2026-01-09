@@ -291,7 +291,8 @@ export const DrawerWebResearch: FC<DrawerWebResearchProps> = ({
         <Typography fontWeight={600}>Atlas Intelligence Agent</Typography>
         <DrawersIconConfig.Close
           onClick={onClickToClose}
-          sx={{ fontSize: 20, ml: 'auto', cursor: 'pointer' }}
+          size={20}
+          sx={{ ml: 'auto', cursor: 'pointer' }}
         />
       </Stack>
       {/* content */}

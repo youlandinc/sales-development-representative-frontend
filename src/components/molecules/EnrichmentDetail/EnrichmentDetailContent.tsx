@@ -1,4 +1,4 @@
-import { Icon, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -21,6 +21,7 @@ import { ACTION_KEY_AI, ROW_HEIGHT } from './Table/config';
 
 import { StyledButton, StyledLoading } from '@/components/atoms';
 import { DrawerContainer } from '@/components/molecules/EnrichmentDetail/Drawers';
+import { DialogDeleteColumn, DialogEditDescription } from './Dialog';
 import {
   PanelColumns,
   PanelFilter,
@@ -29,7 +30,6 @@ import {
   PanelView,
 } from './Panel';
 import { StyledTable } from './Table';
-import { DialogDeleteColumn, DialogEditDescription } from './Dialog';
 
 import { ActiveCellParams, SourceOfOpenEnum } from '@/types';
 import {
@@ -38,8 +38,6 @@ import {
 } from '@/types/enrichment/table';
 
 import { _createTableRows } from '@/request';
-
-import ICON_ARROW from './assets/head/icon-arrow-line-left.svg';
 
 interface InputBindingItem {
   name: string;

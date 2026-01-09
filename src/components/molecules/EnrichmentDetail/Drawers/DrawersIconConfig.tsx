@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { ComponentType, FC } from 'react';
 import { Icon, SvgIconProps } from '@mui/material';
 
 import ICON_DELETE_DEFAULT from './assets/Icon_delete_default.svg';
@@ -54,12 +54,14 @@ import ICON_FIND_VALIDATE_FALSE from './assets/icon_find_validate_false.svg';
 type IconSize = 12 | 14 | 16 | 18 | 20;
 
 interface DrawersIconProps extends SvgIconProps {
-  size?: IconSize | number;
-  component: React.ComponentType;
+  size: IconSize | number;
+  component: ComponentType;
 }
 
-export const DrawersIcon: React.FC<DrawersIconProps> = ({
-  size = 20,
+type DrawersIconConfigProps = Omit<DrawersIconProps, 'component'>;
+
+export const DrawersIcon: FC<DrawersIconProps> = ({
+  size,
   component,
   ...props
 }) => (
@@ -70,119 +72,144 @@ export const DrawersIcon: React.FC<DrawersIconProps> = ({
   />
 );
 
-export const DrawersIconConfig: Record<
-  string,
-  FC<Omit<DrawersIconProps, 'component'>>
-> = {
-  DeleteDefault: (props) => (
+export const DrawersIconConfig = {
+  DeleteDefault: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_DELETE_DEFAULT} {...props} />
   ),
-  Arrow: (props) => <DrawersIcon component={ICON_ARROW} {...props} />,
-  ArrowDown: (props) => <DrawersIcon component={ICON_ARROW_DOWN} {...props} />,
-  Close: (props) => <DrawersIcon component={ICON_CLOSE} {...props} />,
-  CloseThin: (props) => <DrawersIcon component={ICON_CLOSE_THIN} {...props} />,
-  Coins: (props) => <DrawersIcon component={ICON_COINS} {...props} />,
-  Collapse: (props) => <DrawersIcon component={ICON_COLLAPSE} {...props} />,
-  Delete: (props) => <DrawersIcon component={ICON_DELETE} {...props} />,
-  Drag: (props) => <DrawersIcon component={ICON_DRAG} {...props} />,
-  Plus: (props) => <DrawersIcon component={ICON_PLUS} {...props} />,
-  Sparkle: (props) => <DrawersIcon component={ICON_SPARKLE} {...props} />,
-  SparkleFill: (props) => (
+  Arrow: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_ARROW} {...props} />
+  ),
+  ArrowDown: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_ARROW_DOWN} {...props} />
+  ),
+  Close: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_CLOSE} {...props} />
+  ),
+  CloseThin: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_CLOSE_THIN} {...props} />
+  ),
+  Coins: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_COINS} {...props} />
+  ),
+  Collapse: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_COLLAPSE} {...props} />
+  ),
+  Delete: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_DELETE} {...props} />
+  ),
+  Drag: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_DRAG} {...props} />
+  ),
+  Plus: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_PLUS} {...props} />
+  ),
+  Sparkle: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_SPARKLE} {...props} />
+  ),
+  SparkleFill: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_SPARKLE_FILL} {...props} />
   ),
-  SparkleOutline: (props) => (
+  SparkleOutline: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_SPARKLE_OUTLINE} {...props} />
   ),
-  Success: (props) => <DrawersIcon component={ICON_SUCCESS} {...props} />,
-  Text: (props) => <DrawersIcon component={ICON_TEXT} {...props} />,
-  Warning: (props) => <DrawersIcon component={ICON_WARNING} {...props} />,
+  Success: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_SUCCESS} {...props} />
+  ),
+  Text: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_TEXT} {...props} />
+  ),
+  Warning: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_WARNING} {...props} />
+  ),
 
-  ActionMenuArrowLineRight: (props) => (
+  ActionMenuArrowLineRight: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_ARROW_LINE_RIGHT} {...props} />
   ),
-  ActionMenuCall: (props) => (
+  ActionMenuCall: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_CALL} {...props} />
   ),
-  ActionMenuCampaign: (props) => (
+  ActionMenuCampaign: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_CAMPAIGN} {...props} />
   ),
-  ActionMenuCsv: (props) => (
+  ActionMenuCsv: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_CSV} {...props} />
   ),
-  ActionMenuLighting: (props) => (
+  ActionMenuLighting: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_LIGHTING} {...props} />
   ),
-  ActionMenuSearch: (props) => (
+  ActionMenuSearch: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_SEARCH} {...props} />
   ),
-  ActionMenuShare: (props) => (
+  ActionMenuShare: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_SHARE} {...props} />
   ),
-  ActionMenuSuccess: (props) => (
+  ActionMenuSuccess: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_SUCCESS} {...props} />
   ),
-  ActionMenuSuggestions: (props) => (
+  ActionMenuSuggestions: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_SUGGESTIONS} {...props} />
   ),
-  ActionMenuSuggestionsBlue: (props) => (
+  ActionMenuSuggestionsBlue: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_SUGGESTIONS_BLUE} {...props} />
   ),
-  ActionMenuTarget: (props) => (
+  ActionMenuTarget: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_TARGET} {...props} />
   ),
-  ActionMenuWarningTriangle: (props) => (
+  ActionMenuWarningTriangle: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ACTION_MENU_WARNING_TRIANGLE} {...props} />
   ),
 
-  EnrichmentAction: (props) => (
+  EnrichmentAction: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ENRICHMENT_ACTION} {...props} />
   ),
-  EnrichmentAi: (props) => (
+  EnrichmentAi: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ENRICHMENT_AI} {...props} />
   ),
-  EnrichmentIntegrations: (props) => (
+  EnrichmentIntegrations: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_ENRICHMENT_INTEGRATIONS} {...props} />
   ),
 
-  Thinking: (props) => <DrawersIcon component={ICON_THINKING} {...props} />,
-  ThinkingArrowUpRight: (props) => (
+  Thinking: (props: DrawersIconConfigProps) => (
+    <DrawersIcon component={ICON_THINKING} {...props} />
+  ),
+  ThinkingArrowUpRight: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_ARROW_UP_RIGHT} {...props} />
   ),
-  ThinkingError: (props) => (
+  ThinkingError: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_ERROR} {...props} />
   ),
-  ThinkingFork: (props) => (
+  ThinkingFork: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_FORK} {...props} />
   ),
-  ThinkingListChecks: (props) => (
+  ThinkingListChecks: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_LIST_CHECKS} {...props} />
   ),
-  ThinkingNormal: (props) => (
+  ThinkingNormal: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_NORMAL} {...props} />
   ),
-  ThinkingSearch: (props) => (
+  ThinkingSearch: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_SEARCH} {...props} />
   ),
-  ThinkingSuccess: (props) => (
+  ThinkingSuccess: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_SUCCESS} {...props} />
   ),
-  ThinkingWarning: (props) => (
+  ThinkingWarning: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_THINKING_WARNING} {...props} />
   ),
-  TrayArrowDown: (props) => (
+  TrayArrowDown: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_TRAY_ARROW_DOWN} {...props} />
   ),
 
-  FindCheckCircle: (props) => (
+  FindCheckCircle: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_FIND_CHECK_CIRCLE} {...props} />
   ),
-  FindCheckSquareOutline: (props) => (
+  FindCheckSquareOutline: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_FIND_CHECK_SQUARE_OUTLINE} {...props} />
   ),
-  FindNoCheckSquareOutline: (props) => (
+  FindNoCheckSquareOutline: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_FIND_NO_CHECK_SQUARE_OUTLINE} {...props} />
   ),
-  FindValidateFalse: (props) => (
+  FindValidateFalse: (props: DrawersIconConfigProps) => (
     <DrawersIcon component={ICON_FIND_VALIDATE_FALSE} {...props} />
   ),
 };
