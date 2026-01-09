@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useShallow } from 'zustand/shallow';
 import { addDays, differenceInCalendarDays } from 'date-fns';
 
 import { useDialogStore } from '@/stores/useDialogStore';
@@ -23,11 +24,26 @@ export const useCampaignLaunch = () => {
     setIsValidate,
     campaignId,
     setReloadTable,
-  } = useDialogStore();
+  } = useDialogStore(
+    useShallow((state) => ({
+      activeStep: state.activeStep,
+      setActiveStep: state.setActiveStep,
+      setSetupPhase: state.setSetupPhase,
+      launchInfo: state.launchInfo,
+      resetDialogState: state.resetDialogState,
+      setIsValidate: state.setIsValidate,
+      campaignId: state.campaignId,
+      setReloadTable: state.setReloadTable,
+    })),
+  );
 
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onClickToNext = async () => {
+  const onCampaignLaunchNext = async () => {
+    if (isLoading) {
+      return;
+    }
+
     if (activeStep === CampaignStepEnum.messaging) {
       setActiveStep(CampaignStepEnum.launch);
       await setSetupPhase(SetupPhaseEnum.launch);
@@ -42,7 +58,7 @@ export const useCampaignLaunch = () => {
       if (
         !launchInfo.scheduleTime ||
         differenceInCalendarDays(
-          launchInfo.scheduleTime,
+          new Date(launchInfo.scheduleTime),
           addDays(new Date(), 1),
         ) < 0
       ) {
@@ -62,7 +78,7 @@ export const useCampaignLaunch = () => {
       // signatureId: launchInfo.signatureId,
       emilProfileId: launchInfo.emilProfileId,
     };
-    setLoading(true);
+    setIsLoading(true);
     try {
       await _saveAndLaunchCampaign(postData);
       SDRToast({
@@ -76,12 +92,12 @@ export const useCampaignLaunch = () => {
       const { message, header, variant } = err as HttpError;
       SDRToast({ message, header, variant });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return {
-    loading,
-    onClickToNext,
+    isLoading,
+    onCampaignLaunchNext,
   };
 };

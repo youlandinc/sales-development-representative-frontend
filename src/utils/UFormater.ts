@@ -1,5 +1,4 @@
-import { format } from 'date-fns';
-import { FormatDateOptions } from 'date-fns/format';
+import { format, FormatOptions } from 'date-fns';
 import { UNotNull, UNotUndefined, UTypeOf } from '@/utils/UTypeOf';
 
 export const UFormatDollar = (
@@ -74,7 +73,7 @@ export const UGetRadix = (
 export const UFormatDate = (
   date: string | Date | null,
   timeFormat = 'MM/dd/yyyy',
-  options?: FormatDateOptions,
+  options?: FormatOptions,
 ): string => {
   if (!date) {
     return '-';
